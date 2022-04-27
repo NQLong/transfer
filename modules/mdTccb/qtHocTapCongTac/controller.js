@@ -119,6 +119,7 @@ module.exports = app => {
             }
         });
     });
+
     app.post('/api/qua-trinh/htct', app.permission.check('staff:write'), (req, res) =>
         app.model.qtHocTapCongTac.create(req.body.data, (error, item) => res.send({ error, item })));
 

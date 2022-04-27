@@ -136,9 +136,9 @@ module.exports = app => {
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
         if (loaiHocVi == 'null') loaiHocVi = null;
-        app.model.qtHoTroHocPhi.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtHoTroHocPhi.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('hotrohocphi');
@@ -193,6 +193,5 @@ module.exports = app => {
                 });
             }
         });
-
     });
 };

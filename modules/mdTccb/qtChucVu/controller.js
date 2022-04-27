@@ -20,12 +20,12 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            let filter = '{}';
-            try {
-                filter = JSON.stringify(req.query.filter || {});
-            } catch(error) {
-                console.log(error);
-            }
+        let filter = '{}';
+        try {
+            filter = JSON.stringify(req.query.filter || {});
+        } catch (error) {
+            console.log(error);
+        }
         app.model.qtChucVu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -41,12 +41,12 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            let filter = '{}';
-            try {
-                filter = JSON.stringify(req.query.filter || {});
-            } catch(error) {
-                console.log(error);
-            }
+        let filter = '{}';
+        try {
+            filter = JSON.stringify(req.query.filter || {});
+        } catch (error) {
+            console.log(error);
+        }
         app.model.qtChucVu.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -86,9 +86,9 @@ module.exports = app => {
         });
     });
 
-/// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
+    /// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
 
-/// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
+    /// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
         let { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
         if (listShcc == 'null') listShcc = null;
@@ -97,9 +97,9 @@ module.exports = app => {
         if (toYear == 'null') toYear = null;
         if (listCv == 'null') listCv = null;
         if (gioiTinh == 'null') gioiTinh = null;
-        app.model.qtChucVu.download(listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtChucVu.download(listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 let newRows = [];
                 for (let idx = 0; idx < result.rows.length; idx++) {
@@ -153,7 +153,7 @@ module.exports = app => {
                         let hoTen = item.ho + ' ' + item.ten;
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
-                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });  
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
                         cells.push({ cell: 'D' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinh == '01' ? 'Nam' : 'Nữ' });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: donViChinh });

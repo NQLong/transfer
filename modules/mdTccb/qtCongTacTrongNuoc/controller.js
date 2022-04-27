@@ -137,9 +137,9 @@ module.exports = app => {
         if (tinhTrang == 'null') tinhTrang = null;
         if (loaiHocVi == 'null') loaiHocVi = null;
         if (mucDich == 'null') mucDich = null;
-        app.model.qtCongTacTrongNuoc.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtCongTacTrongNuoc.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('congtactrongnuoc');
@@ -190,6 +190,5 @@ module.exports = app => {
                 });
             }
         });
-
     });
 };

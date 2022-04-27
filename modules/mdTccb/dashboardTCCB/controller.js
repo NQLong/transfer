@@ -52,15 +52,16 @@ module.exports = app => {
             if (!error) listCanBo = data.filter(canBo => !canBo.ngayNghi).map(canBo => {
                 let gioiTinh = canBo.phai ? (canBo.phai === '01' ? 'Nam' : 'Nữ') : null,
                     namBienChe = canBo.ngayBienChe ? (canBo.ngayBienChe != 1 ? new Date(canBo.ngayBienChe).getFullYear() : null) : null;
-                
+
                 canBo = app.clone(canBo, { gioiTinh, namBienChe });
                 return canBo;
             });
         });
-        
+
         app.model.canBo.tccbDasboardTotalGender((error, data) => {
-            if (error || !data) res.send({ error });
-            else {
+            if (error || !data) {
+                res.send({ error });
+            } else {
                 let result = app.clone(data.rows[0], { listStaff, listStaffFaculty, listStaffPB, numDiNuocNgoai, listDiNuocNgoai, listCongTacTrongNuoc, listCanBo });
                 new Promise(resolve => app.model.dmDonVi.getAll((error, items) => {
                     if (error || !items) {
