@@ -110,7 +110,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 updateItems = [...updateItems, ...kienThuc];
             });
             const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
-            console.log(updateDatas);
             this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
                 location.replace('/new', `/${item.id}`);
                 location.reload();

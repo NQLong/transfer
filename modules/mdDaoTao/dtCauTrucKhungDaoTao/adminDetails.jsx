@@ -6,7 +6,6 @@ import ComponentMTDT from './componentMTDT';
 import ComponentCTDT from './componentCTDT';
 import { AdminPage, FormTextBox } from 'view/component/AdminPage';
 import Loading from 'view/component/Loading';
-import T from 'view/js/common';
 
 
 class DtCauTrucKhungDaoTaoDetails extends AdminPage {
