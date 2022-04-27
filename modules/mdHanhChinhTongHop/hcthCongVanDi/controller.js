@@ -67,7 +67,7 @@ module.exports = app => {
     // app.permission.check('hcthCongVanDi:write')
     app.post('/api/hcth/cong-van-cac-phong', (req, res) => {
         const {fileList, ...data} = req.body.data;
-        app.model.hcthCongVanDi.create(data, (error, item) => {
+        app.model.hcthCongVanDi.create({...data}, (error, item) => {
             if(error) {
                 res.send({ error, item });
             } else {
@@ -78,11 +78,19 @@ module.exports = app => {
                         if (error) {
                             deleteCongVan(id, () => res.send({ error }));
                         }
-                        else
+                        else {
                             res.send({ item });
+                        }
                     });
                 }
                 else res.send({ item });
+                app.model.hcthHistory.create({ loai: 'DI', key: id, shcc: req.session?.user?.shcc,  hanhDong: 'CREATE', thoiGian: new Date().getTime() }, error => {
+                    if (error) {
+                        res.send({ error });
+                    } else {
+                        res.send({ item });
+                    }
+                });
             }
         });
     });
@@ -275,21 +283,7 @@ module.exports = app => {
         res.status(400).send('Không tìm thấy tập tin');
     });
 
-    // app.get('/api/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), (req, res) => {
-    //     const id = req.params.id;
-    //     app.model.hcthCongVanDi.get({ id }, (error, item) => {
-    //         if (error) {
-    //             res.send({ error, item });
-    //         } else {
-    //             app.model.dmLoaiCongVan.get({ })
-    //             app.model.hcthFileCongVan.getAll({congVan: id, loai: FILE_TYPE}, '*', 'thoiGian', (fileError, files) => {
-    //                 app.model.hcthCongVanDi.getAllPhanHoi(id, (phanHoiError, phanHoi) => {
-    //                     res.send({error: fileError || phanHoiError, item: {...item, listFile: files || [], danhSachPhanHoi: phanHoi?.rows || []}});
-    //                 });
-    //             });
-    //         }
-    //     });
-    // });
+    
 
     app.get('/api/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
@@ -307,8 +301,6 @@ module.exports = app => {
             const tenVietTatLoaiCongVan = loaiCV !== null ? await app.model.dmLoaiCongVan.getLoai({ id: loaiCV }, 'tenVietTat', '') : null;
             const tenVietTatDonViGui = await app.model.dmDonVi.getDonVi({ ma: donViGui }, 'tenVietTat', '');
 
-            // console.log(tenVietTatLoaiCongVan);
-            // console.log(tenVietTatDonViGui);
             res.send({
                 item: {
                     ...congVan,
@@ -368,5 +360,7 @@ module.exports = app => {
     app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
     });
+
+
 };
 

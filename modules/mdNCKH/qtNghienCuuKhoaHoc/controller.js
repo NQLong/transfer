@@ -47,7 +47,7 @@ module.exports = app => {
     // const checkReadPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly', 'staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
