@@ -120,9 +120,9 @@ module.exports = app => {
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (listLoaiBang == 'null') listLoaiBang = null;
-        app.model.qtDaoTao.download(listShcc, listDv, fromYear, toYear, listLoaiBang, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtDaoTao.download(listShcc, listDv, fromYear, toYear, listLoaiBang, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('daotaoboiduong');

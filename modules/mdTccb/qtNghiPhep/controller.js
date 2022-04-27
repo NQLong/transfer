@@ -86,7 +86,7 @@ module.exports = app => {
         });
     });
     ///END USER ACTIONS
-    
+
     app.get('/api/tccb/qua-trinh/nghi-phep/page/:pageNumber/:pageSize', app.permission.check('qtNghiPhep:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -140,7 +140,7 @@ module.exports = app => {
         }
         app.model.qtNghiPhep.getAll(condition, (error, items) => res.send({ error, items }));
     });
-    
+
     app.post('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
         app.model.qtNghiPhep.create(req.body.data, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ phép');
@@ -176,12 +176,12 @@ module.exports = app => {
                 parameter: { shcc },
             }, '*', 'batDau', (error, items) => {
                 const solve = (idx = 0) => {
-                    if (idx == items.length || new Date(items[idx].batDau) >= dateCalc)  {
+                    if (idx == items.length || new Date(items[idx].batDau) >= dateCalc) {
                         resolve(result);
                         return;
                     }
                     if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
-                        app.model.dmNghiPhep.get({ ma: items[idx].lyDo }, (error, itemNghiPhep ) => {
+                        app.model.dmNghiPhep.get({ ma: items[idx].lyDo }, (error, itemNghiPhep) => {
                             let value = app.date.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, danhSachNgayLe);
                             if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
                             result -= value;
@@ -214,9 +214,7 @@ module.exports = app => {
                 if (batDau) {
                     condition = {
                         statement: 'ngay >= :ngay',
-                        parameter: {
-                            ngay: batDau,
-                        }
+                        parameter: { ngay: batDau }
                     };
                 }
                 app.model.dmNgayLe.getAll(condition, (error, items) => {
@@ -232,11 +230,11 @@ module.exports = app => {
                             { cell: 'F1', value: 'Lý do nghỉ', bold: true, border: '1234' },
                             { cell: 'G1', value: 'Nơi đến', bold: true, border: '1234' },
                             { cell: 'H1', value: 'Bắt đầu', bold: true, border: '1234' },
-                            { cell: 'I1', value: 'Kết thúc',   bold: true, border: '1234' },
-                            { cell: 'J1', value: 'Tổng ngày được nghỉ',   bold: true, border: '1234' },
-                            { cell: 'K1', value: 'Số ngày xin nghỉ',   bold: true, border: '1234' },
-                            { cell: 'L1', value: 'Số ngày tính phép',   bold: true, border: '1234' },
-                            { cell: 'M1', value: 'Thâm niên',   bold: true, border: '1234' },
+                            { cell: 'I1', value: 'Kết thúc', bold: true, border: '1234' },
+                            { cell: 'J1', value: 'Tổng ngày được nghỉ', bold: true, border: '1234' },
+                            { cell: 'K1', value: 'Số ngày xin nghỉ', bold: true, border: '1234' },
+                            { cell: 'L1', value: 'Số ngày tính phép', bold: true, border: '1234' },
+                            { cell: 'M1', value: 'Thâm niên', bold: true, border: '1234' },
                         ];
                         const solve = (index = 0) => {
                             if (index == result.rows.length) {
@@ -291,7 +289,5 @@ module.exports = app => {
                 });
             }
         });
-
     });
-
 };

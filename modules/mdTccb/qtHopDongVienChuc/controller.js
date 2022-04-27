@@ -110,11 +110,8 @@ module.exports = app => {
             app.model.qtHopDongVienChuc.download(req.params.ma, (error, item) => {
                 if (error || !item) {
                     res.send({ error });
-                }
-                else {
-
+                } else {
                     const source = app.path.join(__dirname, 'resource', 'Mau-HD-LaoDong.docx');
-
                     new Promise(resolve => {
                         let hopDong = item.rows[0];
                         const data = {
@@ -159,13 +156,7 @@ module.exports = app => {
                         };
                         resolve(data);
                     }).then((data) => {
-                        app.docx.generateFile(source, data, (error, data) => {
-                            if (error)
-                                res.send({ error });
-                            else {
-                                res.send({ data });
-                            }
-                        });
+                        app.docx.generateFile(source, data, (error, data) => res.send({ error, data }));
                     });
                 }
             });
@@ -270,8 +261,6 @@ module.exports = app => {
                 }).catch((error) => {
                     res.send({ error });
                 });
-
-
             }
         });
     });
@@ -279,7 +268,6 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/get-truong-phong-tccb', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         app.model.canBo.get({ maChucVu: '003', maDonVi: '30' }, 'shcc', 'shcc DESC', (error, truongPhongTccb) => {
             res.send({ error, truongPhongTccb });
-
         });
     });
 };
