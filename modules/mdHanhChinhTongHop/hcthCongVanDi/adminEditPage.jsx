@@ -108,7 +108,7 @@ const actionColor = (value) => {
 const statusToAction = (before, after) => {
     switch (before) {
         case '1':
-            return action.CREATE;
+            return action.UPDATE;
         case '2':
             if (after == '4')
                 return action.RETURN;
@@ -196,7 +196,7 @@ class AdminEditPage extends AdminPage {
             hanhDong: statusToAction(this.state.trangThai ? this.state.trangThai : '', value),
             thoiGian: new Date().getTime()
         };
-        this.props.createHistory(newHistory, () => this.getData());
+        this.props.createHistory(newHistory);
     }
 
     renderHistory = (history) => renderTimeline({
