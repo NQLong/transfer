@@ -7,7 +7,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Dropdown from 'view/component/Dropdown';
-import { SelectAdapter_FwCanBo, getStaffEdit } from '../tccbCanBo/redux';
+import { SelectAdapter_FwCanBo, getStaffEdit, getStaffByEmail } from '../tccbCanBo/redux';
 import { getTruongPhongTccb, suggestSoHopDong, getDaiDienKyHopDong } from './redux';
 const EnumLoaiCanBo = Object.freeze({
     1: { text: 'Cán bộ mới' },
@@ -104,6 +104,17 @@ export class ComponentPhiaCanBo extends React.Component {
         this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
     }
 
+    checkNewEmail = () => {
+        let newEmail = this.email.value();
+        console.log(newEmail);
+        this.props.getStaffByEmail(newEmail, (item) => {
+            if (item) {
+                T.notify(`Email ${newEmail} đã được sử dụng, vui lòng nhập email khác!`, 'danger');
+                this.email.focus();
+            }
+        });
+    }
+
     getValue = () => {
         try {
             const data = {
@@ -181,7 +192,7 @@ export class ComponentPhiaCanBo extends React.Component {
                     <FormSelect ref={e => this.quocTich = e} data={SelectAdapter_DmQuocGia} className='col-md-6' label='Quốc tịch' required readOnly={readOnly} />
                     <FormSelect ref={e => this.danToc = e} data={SelectAdapter_DmDanTocV2} className='col-md-6' label='Dân tộc' required readOnly={readOnly} />
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='col-md-4' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.email = e} label='Email trường' className='col-md-4' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.email = e} label='Email trường' className='col-md-4' onChange={this.checkNewEmail} readOnly={readOnly} />
                     <FormTextBox type='phone' ref={e => this.dienThoai = e} label='Số diện thoại cá nhân' className='col-md-4' readOnly={readOnly} />
                     <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-xl-6 col-md-6' />
                     <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-xl-6 col-md-6' />
@@ -200,6 +211,6 @@ export class ComponentPhiaCanBo extends React.Component {
 
 const mapStateToProps = state => ({ staff: state.tccb.qtHopDongLaoDong, system: state.system });
 const mapActionsToProps = {
-    getTruongPhongTccb, suggestSoHopDong, getDaiDienKyHopDong, getStaffEdit
+    getTruongPhongTccb, suggestSoHopDong, getDaiDienKyHopDong, getStaffEdit, getStaffByEmail
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentPhiaCanBo);

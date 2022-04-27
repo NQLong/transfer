@@ -390,3 +390,16 @@ export function deleteQuanHeStaffUser(id, email) {
     };
 }
 //#endregion quanHeCanBo User
+
+export function getStaffByEmail(email, done) {
+    return () => {
+        const url = `/api/staff/by-email/${email}`;
+        T.get(url, data => {
+            if (data.error) {
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data.items);
+            }
+        });
+    };
+}
