@@ -114,7 +114,7 @@ class App extends React.Component {
                             <Route path='**' component={Loadable({ loading: Loading, loader: () => import('view/component/MessagePage') })} />
                         )}
                     </Switch>
-                    <div id='paddingFooterSection' style={{ marginTop: '0px' }} />
+                    {/*<div id='paddingFooterSection' style={{ marginTop: '0px' }} />*/}
                     <HomeFooter />
                     <LoginModal ref={this.loginModal} register={this.props.register} login={this.props.login} forgotPassword={this.props.forgotPassword} pushHistory={url => this.props.history.push(url)} />
                     <Loader ref={this.loader} />

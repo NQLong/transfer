@@ -28,6 +28,10 @@ const texts = {
 
 class Footer extends React.Component {
     state = { footerData: [] }
+    handlePaddingFooter = () => {
+        const footerHeight = $('footer').outerHeight();
+        $('#paddingFooterSection').css('padding-bottom', footerHeight + 'px');
+    };
 
     componentDidMount() {
         T.ready(() => {
@@ -39,12 +43,8 @@ class Footer extends React.Component {
                     data.item.filter(i => i.header == 0).map(v => footerData.filter(d => d.priority <= v.priority)[0].childData.push(v));
                     this.setState({ footerData: footerData.reverse() }, () => {
                         //Handle loader and paddingFooter
-                        const handlePaddingFooter = () => {
-                            const footerHeight = $('footer').outerHeight();
-                            $('#paddingFooterSection').css('padding-bottom', footerHeight + 'px');
-                        };
-                        handlePaddingFooter();
-                        $(window).on('resize', handlePaddingFooter);
+                        // this.handlePaddingFooter();
+                        // $(window).on('resize', this.handlePaddingFooter);
                     });
                 }
             });
@@ -52,10 +52,12 @@ class Footer extends React.Component {
     }
 
     componentDidUpdate() {
+        // console.log('Did update', new Date().getTime());
+        // this.handlePaddingFooter();
         $('.footer-link h3 i').click(function () {
             $(this).parents('.footer-link').find('ul').slideToggle();
-            $('.home-footer').css('height', '0px');
-            $('#paddingFooterSection').css('padding-bottom', '0px');
+            // $('.home-footer').css('height', '0px');
+            // $('#paddingFooterSection').css('padding-bottom', '0px');
         });
     }
 
@@ -349,7 +351,8 @@ class Footer extends React.Component {
             }
         }
         return (
-            <footer className='ftco-footer ftco-section img footer home-footer' style={{ position: 'absolute', bottom: 0, width: '100%', paddingBottom: '30px', paddingTop: '30px', backgroundColor: '#0139A6', color: 'white' }}>
+            // <footer className='ftco-footer ftco-section img footer home-footer' style={{ position: 'absolute', bottom: 0, width: '100%', paddingBottom: '30px', paddingTop: '30px', backgroundColor: '#0139A6', color: 'white' }}>
+            <footer className='ftco-footer ftco-section img footer home-footer' style={{ paddingBottom: '30px', paddingTop: '30px', backgroundColor: '#0139A6', color: 'white' }}>
                 <div className='container-fluid'>
                     <div className='row justify-content-center'>
                         {footerList}
