@@ -6,8 +6,6 @@ import ComponentMTDT from './componentMTDT';
 import ComponentCTDT from './componentCTDT';
 import { AdminPage, FormTextBox } from 'view/component/AdminPage';
 import Loading from 'view/component/Loading';
-
-
 class DtCauTrucKhungDaoTaoDetails extends AdminPage {
     state = { isLoading: true }
 
@@ -119,7 +117,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body'>
-                        <FormTextBox type='year' ref={e => this.namDaoTao = e} label='Năm đào tạo' className='col-md-3' required readOnly={readOnly} />
+                        <FormTextBox type='year' ref={e => this.namDaoTao = e} label='Khóa' className='col-md-3' required readOnly={readOnly} />
                     </div>
                 </div>
                 <div className='tile'>

@@ -166,10 +166,10 @@ export class TaoThoiGianMoMon extends AdminModal {
             title: 'Mở thời gian đăng ký môn mới',
             size: 'elarge',
             body: <div className='row'>
-                <FormTextBox type='year' ref={e => this.year = e} label='Năm' className='col-md-3' readOnly={readOnly} />
-                <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-2' data={[1, 2, 3]} readOnly={readOnly} />
-                <FormDatePicker type='date-mask' ref={e => this.batDauMoMon = e} label='Ngày mở' className='col-md-3' readOnly={readOnly} />
-                <FormDatePicker type='date-mask' ref={e => this.ketThucMoMon = e} label='Ngày đóng' className='col-md-3' readOnly={readOnly} />
+                <FormTextBox type='year' ref={e => this.year = e} label='Năm học' className='col-md-6' readOnly={readOnly} placeholder='Nếu NH là 2020 - 2021 thì nhập 2020' />
+                <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-6' data={[1, 2, 3]} readOnly={readOnly} />
+                <FormDatePicker type='date-mask' ref={e => this.batDauMoMon = e} label='Ngày mở' className='col-md-6' readOnly={readOnly} />
+                <FormDatePicker type='date-mask' ref={e => this.ketThucMoMon = e} label='Ngày đóng' className='col-md-5' readOnly={readOnly} />
                 {permission.write && <div className='form-group col-md-1 d-flex align-items-end justify-content-end' style={{ paddingLeft: 0 }}>
                     <Tooltip title='Tạo thời gian đăng ký mới' arrow ><button className='btn btn-success' type='button' onClick={e => e.preventDefault() || this.create()}>
                         <i className='fa fa-lg fa-plus' />
