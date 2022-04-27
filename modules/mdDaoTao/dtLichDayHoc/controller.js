@@ -4,7 +4,7 @@ module.exports = app => {
         menus: {
             7011: {
                 title: 'Lịch dạy học', groupIndex: 0,
-                link: '/user/dao-tao/lich-day-hoc', icon: 'fa-calendar-check-o', backgroundColor: '#DE67A1'
+                link: '/user/dao-tao/lich-day-hoc', icon: 'fa-calendar-check-o', backgroundColor: '#366384'
             }
         }
     };

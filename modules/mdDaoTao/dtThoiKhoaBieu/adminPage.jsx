@@ -34,13 +34,21 @@ class AdjustModal extends AdminModal {
             soTiet: this.state.soTiet,
             giangVien: this.giangVien.value()
         };
-        if (!data.giangVien) {
-            T.notify('Vui lòng chọn giảng viên', 'danger');
-            this.giangVien.focus();
+        if (!data.phong) {
+            T.notify('Vui lòng chọn phòng', 'danger');
+            this.phong.focus();
+        } else if (!data.thu) {
+            T.notify('Vui lòng chọn thứ', 'danger');
+            this.thu.focus();
+        } else if (!data.tietBatDau) {
+            T.notify('Vui lòng chọn tiết bắt đầu', 'danger');
+            this.tietBatDau.focus();
         } else {
-            this.props.update(this.state.id, data, () => {
-                this.hide();
-                this.props.initData();
+            this.props.update(this.state.id, data, (result) => {
+                if (result.item) {
+                    this.hide();
+                    this.props.initData();
+                }
             });
         }
     }
@@ -116,9 +124,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition } = this.state.page ? this.state.page : { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '' };
-        let table = this.state.page ? renderTable({
+        let table = renderTable({
             emptyTable: 'Không có dữ liệu thời khóa biểu',
-            getDataSource: () => this.state.page.list, stickyHead: false,
+            getDataSource: () => this.state.page ? this.state.page.list : null, stickyHead: false,
             header: 'thead-light',
             renderHead: () => (
                 <>
@@ -150,7 +158,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
                         <i> {item.tenKhoaBoMon}</i>
                     </>} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={
                         <FormSelect ref={e => this.phong[(pageNumber - 1) * pageSize + index + 1] = e} style={{ marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={SelectAdapter_DmPhong} placeholder='Phòng' />
                     } onClick={e => {
                         e.preventDefault();
@@ -159,7 +167,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         }, () => this.phong[(pageNumber - 1) * pageSize + index + 1].focus());
                     }}
                     />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.nhom} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nhom} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
                         <FormSelect ref={e => this.thu[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '70px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
                     }
@@ -215,13 +223,13 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                 </button>
                             </Tooltip>}</>}
                         {item.phong && <Tooltip title='Điều chỉnh' arrow>
-                            <button className='btn btn-primary' onClick={e => e.preventDefault() || this.modal.show(item)}>
-                                <i className='fa fa-lg fa-wrench' />
+                            <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
+                                <i className='fa fa-lg fa-cog' />
                             </button>
                         </Tooltip>}
                     </TableCell>
                 </tr>)
-        }) : '';
+        });
 
         return this.renderPage({
             icon: 'fa fa-calendar',

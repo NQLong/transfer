@@ -9,7 +9,7 @@ module.exports = app => {
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7009: { title: 'Tòa nhà', link: '/user/dao-tao/toa-nha', groupIndex: 2, backgroundColor: '#5A4C7D' },
+            7009: { title: 'Tòa nhà', link: '/user/dao-tao/toa-nha', groupIndex: 2, backgroundColor: '#5A4C7D', icon: 'fa-building' },
         },
     };
     app.permission.add(
