@@ -9,9 +9,9 @@ module.exports = (app) => {
         { name: 'hcthGiaoNhiemVu:read' },
         { name: 'hcthGiaoNhiemVu:write' },
         { name: 'hcthGiaoNhiemVu:delete' },
-        { name: 'hcth:login'},
-        { name: 'hcth:manage'},
-        { name: 'staff:login', menu},
+        { name: 'hcth:login' },
+        { name: 'hcth:manage' },
+        { name: 'staff:login', menu },
     );
 
     app.get('/user/hcth/giao-nhiem-vu', app.permission.check('staff:login'), app.templates.admin);
@@ -62,7 +62,7 @@ module.exports = (app) => {
                         updateListFile(listFile, nhiemVuId, done);
                 });
         } else {
-            done && done({error: null});
+            done && done({ error: null });
         }
 
     };
@@ -135,7 +135,7 @@ module.exports = (app) => {
             }
 
             else {
-                app.model.hcthCanBoNhan.update({ 
+                app.model.hcthCanBoNhan.update({
                     key: parseInt(req.body.id),
                     loai: 'NHIEM_VU',
                     nguoiTao: postData.nguoiTao
@@ -177,7 +177,7 @@ module.exports = (app) => {
 
         if (permissions.includes('hcth:manage') || permissions.includes('president:login')) {
             userId = null;
-        } 
+        }
 
         app.model.hcthGiaoNhiemVu.searchPage(pageNumber, pageSize, userId, donViNhan, canBoNhan, searchTerm, (error, page) => {
             if (error || page == null) {
@@ -188,7 +188,7 @@ module.exports = (app) => {
                 res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
-        
+
     });
 
     app.createFolder(app.path.join(app.assetPath, '/nhiemVu'));
@@ -209,7 +209,7 @@ module.exports = (app) => {
                 isNew = fields.userData[0].substring(19) == 'new',
                 id = fields.userData[0].substring(20),
                 originalFilename = files.hcthGiaoNhiemVuFile[0].originalFilename,
-                filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthGiaoNhiemVuFile[0].originalFilename,
+                filePath = (isNew ? '/new/' : `/${id}/`) + files.hcthGiaoNhiemVuFile[0].originalFilename,
                 destPath = app.assetPath + '/nhiemVu' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
                 baseNamePath = app.path.extname(srcPath);
@@ -259,7 +259,7 @@ module.exports = (app) => {
                     app.model.hcthFileCongVan.getAll({ congVan: id, loai: 'NHIEM_VU' }, '*', 'thoiGian', (fileError, files) => {
                         app.model.hcthPhanHoi.getAllFrom(id, 'NHIEM_VU', (phanHoiError, phanHoi) => {
                             app.model.hcthLienKet.getAllLienKet(id, 'NHIEM_VU', (lienKetError, lienKet) => {
-                                res.send({ error: error || canBoNhanError || fileError || phanHoiError || lienKetError, item: { ...item, phanHoi: phanHoi?.rows || [], listFile: files || [], lienKet: lienKet?.rows || [], canBoNhanNhiemVu: canBoNhan?.rows || []} });
+                                res.send({ error: error || canBoNhanError || fileError || phanHoiError || lienKetError, item: { ...item, phanHoi: phanHoi?.rows || [], listFile: files || [], lienKet: lienKet?.rows || [], canBoNhanNhiemVu: canBoNhan?.rows || [] } });
                             });
                         });
                     });
@@ -288,14 +288,14 @@ module.exports = (app) => {
     });
 
     // cán bộ nhận nhiệm vụ API
-    
+
     app.post('/api/hcth/giao-nhiem-vu/can-bo-nhan-nhiem-vu', app.permission.check('manager:write'), async (req, res) => {
         const { key, nguoiTao, canBoNhan: newCanBoNhan } = req.body.data;
         app.model.hcthCanBoNhan.get({ key, loai: 'NHIEM_VU', nguoiTao }, '*', 'id', (error, item) => {
             if (item) {
                 let { canBoNhan } = item;
                 canBoNhan = canBoNhan + ',' + newCanBoNhan;
-                app.model.hcthCanBoNhan.update({ key, loai: 'NHIEM_VU', nguoiTao }, { canBoNhan } ,(error, item) => {
+                app.model.hcthCanBoNhan.update({ key, loai: 'NHIEM_VU', nguoiTao }, { canBoNhan }, (error, item) => {
                     res.send({ error, item });
                 });
             } else {
@@ -319,7 +319,7 @@ module.exports = (app) => {
                     res.send({ error, item });
                 });
             } else {
-                res.send({ error, item});
+                res.send({ error, item });
             }
         });
     });
@@ -341,13 +341,13 @@ module.exports = (app) => {
     // liên kết API
 
     app.post('/api/hcth/giao-nhiem-vu/lien-ket', app.permission.check('staff:login'), async (req, res) => {
-        const { data } = req.body; 
+        const { data } = req.body;
         const postData = {
             ...data,
             keyA: Number(data.keyA),
             keyB: Number(data.keyB)
         };
-        app.model.hcthLienKet.create({...postData}, (error, item) => {
+        app.model.hcthLienKet.create({ ...postData }, (error, item) => {
             res.send({ error, item });
         });
     });
@@ -355,7 +355,7 @@ module.exports = (app) => {
     app.get('/api/hcth/giao-nhiem-vu/lien-ket/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            app.model.hcthLienKet.getAllLienKet(id,'NHIEM_VU',(error, result) => {
+            app.model.hcthLienKet.getAllLienKet(id, 'NHIEM_VU', (error, result) => {
                 res.send({ error: null, items: result?.rows });
             });
 

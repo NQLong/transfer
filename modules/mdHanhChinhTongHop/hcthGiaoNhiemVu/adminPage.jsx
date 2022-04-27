@@ -16,7 +16,7 @@ const dsDoUuTien = [
         color: 'blue'
     },
     {
-        id: 2, 
+        id: 2,
         text: 'Khẩn cấp',
         color: 'red'
     }
@@ -46,8 +46,8 @@ class hcthGiaoNhiemVuPage extends AdminPage {
         // let timeType = this.timeType?.value() || null;
         // let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
         const userId = this.props.system.user.shcc;
-        const pageFilter = isInitial ? { userId } : { donViNhan, canBoNhan, userId};
-        
+        const pageFilter = isInitial ? { userId } : { donViNhan, canBoNhan, userId };
+
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -57,7 +57,7 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     // this.timeType?.value(filter.timeType || '');
                     // this.fromTime?.value(filter.fromTime || '');
-                    
+
                     if (!$.isEmptyObject(filter) && filter && (filter.donViNhan || filter.canBoNhan)) this.showAdvanceSearch();
                 }
             });
@@ -88,10 +88,10 @@ class hcthGiaoNhiemVuPage extends AdminPage {
     render() {
         //const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [], 
         const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']),
-        presidentPermission = this.getUserPermission('president', ['login']),
-        managerPermision = this.getUserPermission('manager', ['write']),
-        rectorPermission = this.getUserPermission('rectors', ['login']),
-        hcthPermission = this.getUserPermission('hcth', ['login']);
+            presidentPermission = this.getUserPermission('president', ['login']),
+            managerPermision = this.getUserPermission('manager', ['write']),
+            rectorPermission = this.getUserPermission('rectors', ['login']),
+            hcthPermission = this.getUserPermission('hcth', ['login']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ?
             this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         const doUuTienMapObj = dsDoUuTien.reduce((acc, ele) => {
@@ -99,78 +99,79 @@ class hcthGiaoNhiemVuPage extends AdminPage {
             return acc;
         }, {});
 
-        let table = 'Không có danh sách nhiệm vụ!';
-        if (list && list.length > 0) {
-            table = renderTable({
-                getDataSource: () => list, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Tiêu đề</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Độ ưu tiên</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Người tạo</th>
-                        <th style={{ width: 'atuo', whiteSpace: 'nowrap' }}>Ngày tạo</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày kết thúc</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
-                    </tr>
-                ),
-                renderRow: (item, index) => {
-                    let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
-                    let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
-                    return (
-                        <tr key={index}>
-                            <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                            <TableCell type='text' content={item.tieuDe ? this.formatText(item.tieuDe, 20) : ''} />
-                            <TableCell type='text' content={item.noiDung ? this.formatText(item.noiDung , 30) : ''} />
-                            <TableCell type='text' content={
-                                <>
-                                    <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
-                                        <span key={index}>
-                                            <b style={{ color: 'blue' }}>{item.normalizedName()}</b>
-                                            <br />
-                                        </span>
-                                    )) : null}
+        // let table = 'Không có danh sách nhiệm vụ!';
+        // if (list && list.length > 0) {
+        let table = renderTable({
+            emptyTable: 'Không có danh sách nhiệm vụ!',
+            getDataSource: () => list, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Tiêu đề</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Độ ưu tiên</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại</th>
+                    <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Người tạo</th>
+                    <th style={{ width: 'atuo', whiteSpace: 'nowrap' }}>Ngày tạo</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày kết thúc</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => {
+                let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
+                let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
+                return (
+                    <tr key={index}>
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={<Link to={`/user/hcth/giao-nhiem-vu/${item.id}`}>{item.tieuDe ? this.formatText(item.tieuDe, 20) : ''}</Link>} />
+                        <TableCell type='text' content={item.noiDung ? this.formatText(item.noiDung, 30) : ''} />
+                        <TableCell type='text' content={
+                            <>
+                                <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <b style={{ color: 'blue' }}>{item.normalizedName()}</b>
+                                        <br />
                                     </span>
-                                    <span>{danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
-                                        <span key={index}>
-                                            <b>{item?.normalizedName()}</b>
-                                            <br />
-                                        </span>
-                                    )) : null
-                                    }</span>
-                                </>
-                            } style={{ whiteSpace: 'nowrap' }} />
-                            <TableCell type='text' content={item.doUuTien ? doUuTienMapObj[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapObj[item.doUuTien].color : '#000000', fontWeight: 'bold'}} />
-                            <TableCell type='text' content={item.isNhiemVuLienPhong ? 'Liên phòng' : 'Thường'} style={{ fontWeight: 'bold', whiteSpace: 'nowrap'}} />
-                            <TableCell type='text' content={item.tenNguoiTao} style={{ fontWeight: 'bold', whiteSpace: 'nowrap'}}/>
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                                item.ngayTao ? (<>
-                                    <span style={{ color: 'black' }}> {T.dateToText(item.ngayTao, 'dd/mm/yyyy')}</span>
-                                </>) : null
-                            } />
+                                )) : null}
+                                </span>
+                                <span>{danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <b>{item?.normalizedName()}</b>
+                                        <br />
+                                    </span>
+                                )) : null
+                                }</span>
+                            </>
+                        } style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={item.doUuTien ? doUuTienMapObj[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapObj[item.doUuTien].color : '#000000' }} />
+                        <TableCell type='text' content={item.isNhiemVuLienPhong ? 'Liên phòng' : 'Thường'} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={item.tenNguoiTao} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                            item.ngayTao ? (<>
+                                <span> {T.dateToText(item.ngayTao, 'dd/mm/yyyy')}</span>
+                            </>) : null
+                        } />
 
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={
-                                item.ngayBatDau ? (<>
-                                    <span style={{ color: 'blue' }}> {T.dateToText(item.ngayBatDau, 'dd/mm/yyyy')}</span>
-                                </>) : null
-                            } />
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={
-                                item.ngayKetThuc ? (<>
-                                    <span style={{ color: 'red' }}> {T.dateToText(item.ngayKetThuc, 'dd/mm/yyyy')}</span>
-                                </>) : null
-                            } />
-            
-                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.props.history.push({ pathname : `/user/hcth/giao-nhiem-vu/${item.id}`, state: { nguoiTao: item.ngayTao}})} onDelete={e => this.delete(e, item)} />
-                        </tr>
-                    );
-                }
-            });
-        }
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                            item.ngayBatDau ? (<>
+                                <span style={{ color: 'blue' }}> {T.dateToText(item.ngayBatDau, 'dd/mm/yyyy')}</span>
+                            </>) : null
+                        } />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                            item.ngayKetThuc ? (<>
+                                <span style={{ color: 'red' }}> {T.dateToText(item.ngayKetThuc, 'dd/mm/yyyy')}</span>
+                            </>) : null
+                        } />
+
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            onEdit={() => this.props.history.push({ pathname: `/user/hcth/giao-nhiem-vu/${item.id}`, state: { nguoiTao: item.ngayTao } })} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                );
+            }
+        });
+        // }
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
@@ -206,10 +207,10 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                 /> */}
             </>,
             backRoute: '/user/hcth',
-            onCreate: ((managerPermision && managerPermision.write) 
-            || (presidentPermission && presidentPermission.login) 
-            || (rectorPermission && rectorPermission.login)
-            || (hcthPermission && hcthPermission.login)) ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
+            onCreate: ((managerPermision && managerPermision.write)
+                || (presidentPermission && presidentPermission.login)
+                || (rectorPermission && rectorPermission.login)
+                || (hcthPermission && hcthPermission.login)) ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
         });
     }
 }
