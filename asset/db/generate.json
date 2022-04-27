@@ -6718,7 +6718,7 @@
                 "TRANG_THAI": {
                     "value": "trangThai",
                     "dataType": "NVARCHAR2",
-                    "dataDefault": "",
+                    "dataDefault": "NULL",
                     "nullable": true,
                     "size": 10
                 },
@@ -12582,6 +12582,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "5,0"
+                },
+                "MA_KHOI_KIEN_THUC_CON": {
+                    "value": "maKhoiKienThucCon",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -12725,13 +12732,6 @@
                     "nullable": true,
                     "size": 1000
                 },
-                "MUC_TIEU_CHUNG": {
-                    "value": "mucTieuChung",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 2000
-                },
                 "USER_MODIFIED": {
                     "value": "userModified",
                     "dataType": "NVARCHAR2",
@@ -12746,8 +12746,8 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "MUC_TIEU_CU_THE": {
-                    "value": "mucTieuCuThe",
+                "MUC_TIEU": {
+                    "value": "mucTieu",
                     "dataType": "CLOB",
                     "dataDefault": "",
                     "nullable": true,
@@ -13028,12 +13028,78 @@
                     "nullable": true,
                     "size": 64
                 },
-                "READ": {
-                    "value": "read",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
+                "GROUP": {
+                    "value": "group",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
                     "nullable": true,
-                    "size": "1,0"
+                    "size": 255
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DM_TIEP_NHAN_VE_NUOC": {
+            "active": true,
+            "moduleName": "dmTiepNhanVeNuoc",
+            "modelName": "dmTiepNhanVeNuoc",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 2
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_CAU_TRUC_KHUNG_DAO_TAO": {
+            "active": true,
+            "moduleName": "dtCauTrucKhungDaoTao",
+            "modelName": "dtCauTrucKhungDaoTao",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_112766\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MUC_CON": {
+                    "value": "mucCon",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "NAM_DAO_TAO": {
+                    "value": "namDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "MUC_CHA": {
+                    "value": "mucCha",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 4000
                 }
             },
             "primaryKeys": [
