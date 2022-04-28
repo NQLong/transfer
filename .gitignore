@@ -16,6 +16,9 @@ asset/upload/*
 asset/download/*
 asset/ho_so_ccvc_nld
 asset/db/tables
+asset/congVanDen
+asset/congVanDi
+asset/nhiemVu
 
 public/img/*
 !public/img/*.*
