@@ -1,6 +1,6 @@
-// Table name: FW_USER_NOTIFICATION { id, notification, email, group }
+// Table name: FW_USER_NOTIFICATION { id, notification, email }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'notification': 'NOTIFICATION', 'email': 'EMAIL', 'group': 'GROUP' };
+const obj2Db = { 'id': 'ID', 'notification': 'NOTIFICATION', 'email': 'EMAIL' };
 
 module.exports = app => {
     app.model.fwUserNotification = {

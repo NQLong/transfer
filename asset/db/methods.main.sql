@@ -2500,6 +2500,7 @@ CREATE OR REPLACE FUNCTION HCTH_GIAO_NHIEM_VU_SEARCH_PAGE(
     pageNumber IN OUT NUMBER,
     pageSize IN OUT NUMBER,
     userId IN STRING,
+    maDonVi IN STRING,
     donViNhan in STRING,
     canBoNhan IN STRING,
     searchTerm IN STRING,
@@ -2514,8 +2515,7 @@ FROM HCTH_GIAO_NHIEM_VU hcthgnv
 LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = hcthgnv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
 WHERE
     ((
-        userId is not null AND
-        hcthgnv.NGUOI_TAO = userId
+        userId is not null AND hcthgnv.NGUOI_TAO = userId
     ) OR
     (
         hcthcbn.CAN_BO_NHAN IS NOT NULL AND
@@ -5503,6 +5503,7 @@ BEGIN
                         qtdnn.NGAY_QUYET_DINH   AS "ngayQuyetDinh",
                         qtdnn.SO_QD_TIEP_NHAN AS "soQdTiepNhan",
                         qtdnn.NOI_DUNG_TIEP_NHAN AS "noiDungTiepNhan",
+                        tnvn.TEN AS "tenNoiDungTiepNhan",
                         qtdnn.NGAY_QD_TIEP_NHAN AS "ngayQdTiepNhan",
                         qtdnn.NGAY_VE_NUOC AS "ngayVeNuoc",
                         qtdnn.BAO_CAO_TINH_TRANG AS "baoCaoTinhTrang",
@@ -5517,6 +5518,8 @@ BEGIN
                         today                 AS                  "today",
                         cb.HO                 AS                  "hoCanBo",
                         cb.TEN                AS                  "tenCanBo",
+                        cb.NGAY_SINH AS "ngaySinh",
+                        cb.PHAI AS "phai",
 
                         dv.MA                 AS                  "maDonVi",
                         dv.TEN                AS                  "tenDonVi",
@@ -5538,6 +5541,7 @@ BEGIN
                          LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
                          LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
                          LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
+                         LEFT JOIN DM_TIEP_NHAN_VE_NUOC tnvn ON (qtdnn.NOI_DUNG_TIEP_NHAN = tnvn.MA)
                 WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrangCongTac IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL) AND (tinhTrangBaoCao IS NULL))
                     OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                   OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
@@ -5989,6 +5993,7 @@ BEGIN
              LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
              LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
              LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
+             LEFT JOIN DM_TIEP_NHAN_VE_NUOC tnvn ON (qtdnn.NOI_DUNG_TIEP_NHAN = tnvn.MA)
     WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrangCongTac IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL) AND (tinhTrangBaoCao IS NULL))
         OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
       OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
@@ -6049,6 +6054,7 @@ BEGIN
                         qtdnn.NGAY_QUYET_DINH   AS "ngayQuyetDinh",
                         qtdnn.SO_QD_TIEP_NHAN AS "soQdTiepNhan",
                         qtdnn.NOI_DUNG_TIEP_NHAN AS "noiDungTiepNhan",
+                        tnvn.TEN AS "tenNoiDungTiepNhan",
                         qtdnn.NGAY_QD_TIEP_NHAN AS "ngayQdTiepNhan",
                         qtdnn.NGAY_VE_NUOC AS "ngayVeNuoc",
                         qtdnn.BAO_CAO_TINH_TRANG AS "baoCaoTinhTrang",
@@ -6084,6 +6090,7 @@ BEGIN
                          LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
                          LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
                          LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
+                         LEFT JOIN DM_TIEP_NHAN_VE_NUOC tnvn ON (qtdnn.NOI_DUNG_TIEP_NHAN = tnvn.MA)
                 WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrangCongTac IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL) AND (tinhTrangBaoCao IS NULL))
                     OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                   OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
