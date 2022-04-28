@@ -281,7 +281,7 @@ class StaffEditPage extends AdminPage {
         this.chiDao?.value('');
 
         this.setState({ listFile, chiDao: danhSachChiDao, trangThai, history, needConduct }, () => {
-            listFile.map((item, index) => this.listFileRefs[index]?.value(item.viTri));
+            listFile.map((item, index) => this.listFileRefs[index]?.value(item.viTri || ''));
             //fetch list banGiamHieu to render quyen chi dao
             this.props.getStaffPage(1, 100, '', { listDonVi: MA_BAN_GIAM_HIEU }, (page) => {
                 const presiendents = page.list.filter(item => item.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG).map(item => item.shcc);
