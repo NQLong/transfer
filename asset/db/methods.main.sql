@@ -1542,8 +1542,8 @@ BEGIN
                (SELECT LISTAGG(hcthdvn.DON_VI_NHAN, ',') WITHIN GROUP (
                    order by hcthdvn.ID
                    )ICATION
-                FROM HCTH_DON_VI_NHAN_CONG_VAN hcthdvn
-                WHERE hcthdvn.CONG_VAN = cvd.ID
+                FROM HCTH_DON_VI_NHAN hcthdvn
+                WHERE hcthdvn.MA = cvd.ID
                   AND hcthdvn.LOAI = 'DEN'
                )               AS "maDonViNhan"
         FROM HCTH_CONG_VAN_DEN cvd
@@ -1577,9 +1577,9 @@ BEGIN
         )
            OR (qtcv.MA_CHUC_VU in ('003', '009') AND qtcv.MA_DON_VI IN (
             SELECT dvn.DON_VI_NHAN
-            FROM HCTH_DON_VI_NHAN_CONG_VAN dvn
+            FROM HCTH_DON_VI_NHAN dvn
             WHERE dvn.LOAI = 'DEN'
-              and dvn.CONG_VAN = key)
+              and dvn.MA = key)
             );
 
     RETURN my_cursor;
@@ -1626,14 +1626,16 @@ BEGIN
                 )
             OR (
                         maCanBo is NOT NULL
-                    AND INSTR(hcthcvd.CAN_BO_NHAN, maCanBo) != 0
+                    AND maCanBo in (SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
+                                      from dual
+                                      connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
                 )
             OR (
                         listDonVi IS NOT NULL
                     AND Exists(
                                 select hcthdvn.id
-                                from HCTH_DON_VI_NHAN_CONG_VAN hcthdvn
-                                where hcthdvn.CONG_VAN = hcthcvd.id
+                                from HCTH_DON_VI_NHAN hcthdvn
+                                where hcthdvn.MA = hcthcvd.id
                                   and hcthdvn.LOAI = 'DEN'
                                   and hcthdvn.DON_VI_NHAN in
                                       (
@@ -1697,8 +1699,8 @@ BEGIN
             (donViCanBo is null and shccCanBo is null) or
             (donViCanBo is not null and Exists(
                     select hcthdvn.id
-                    from HCTH_DON_VI_NHAN_CONG_VAN hcthdvn
-                    where hcthdvn.CONG_VAN = hcthcvd.id
+                    from HCTH_DON_VI_NHAN hcthdvn
+                    where hcthdvn.MA = hcthcvd.id
                       and hcthdvn.LOAI = 'DEN'
                       and hcthdvn.DON_VI_NHAN in
                           (
@@ -1760,8 +1762,8 @@ BEGIN
                         (SELECT LISTAGG(hcthdvn.DON_VI_NHAN, ',') WITHIN GROUP (
                             order by hcthdvn.ID
                             )
-                         FROM HCTH_DON_VI_NHAN_CONG_VAN hcthdvn
-                         WHERE hcthdvn.CONG_VAN = hcthcvd.ID
+                         FROM HCTH_DON_VI_NHAN hcthdvn
+                         WHERE hcthdvn.MA = hcthcvd.ID
                            AND hcthdvn.LOAI = 'DEN'
                         )                     AS "maDonViNhan",
 
@@ -1770,8 +1772,8 @@ BEGIN
                             order by dvn.TEN
                             )
                          FROM DM_DON_VI dvn
-                                  LEFT JOIN HCTH_DON_VI_NHAN_CONG_VAN hcthdvn on dvn.MA = hcthdvn.DON_VI_NHAN
-                         WHERE hcthdvn.CONG_VAN = hcthcvd.ID
+                                  LEFT JOIN HCTH_DON_VI_NHAN hcthdvn on dvn.MA = hcthdvn.DON_VI_NHAN
+                         WHERE hcthdvn.MA = hcthcvd.ID
                            AND hcthdvn.LOAI = 'DEN'
                         )                     AS "danhSachDonViNhan",
 
@@ -1875,8 +1877,8 @@ BEGIN
                                      listDonVi IS NOT NULL
                                  AND Exists(
                                              select hcthdvn.id
-                                             from HCTH_DON_VI_NHAN_CONG_VAN hcthdvn
-                                             where hcthdvn.CONG_VAN = hcthcvd.id
+                                             from HCTH_DON_VI_NHAN hcthdvn
+                                             where hcthdvn.MA = hcthcvd.id
                                                and hcthdvn.LOAI = 'DEN'
                                                and hcthdvn.DON_VI_NHAN in
                                                    (
@@ -1940,8 +1942,8 @@ BEGIN
                          (donViCanBo is null and shccCanBo is null) or
                          (donViCanBo is not null and Exists(
                                  select hcthdvn.id
-                                 from HCTH_DON_VI_NHAN_CONG_VAN hcthdvn
-                                 where hcthdvn.CONG_VAN = hcthcvd.id
+                                 from HCTH_DON_VI_NHAN hcthdvn
+                                 where hcthdvn.MA = hcthcvd.id
                                    and hcthdvn.LOAI = 'DEN'
                                    and hcthdvn.DON_VI_NHAN in
                                        (
@@ -1968,6 +1970,184 @@ BEGIN
                      )
                    AND (
 --           staffType : 0 - hcth, 1 - rector, 2 - normal staff
+                             staffType = 0 or
+                             (staffType = 1 and hcthcvd.TRANG_THAI != 0) or
+                             (staffType = 2 and hcthcvd.TRANG_THAI = 5)
+                     )
+                   AND (
+                     status is NULL or hcthcvd.TRANG_THAI = status
+                     )
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY R;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DEN_SEARCH_SELECTOR(
+    pageNumber IN OUT NUMBER,
+    pageSize IN OUT NUMBER,
+    filterParam in STRING,
+    searchTerm IN STRING,
+    totalItem OUT NUMBER,
+    pageTotal OUT NUMBER
+) RETURN SYS_REFCURSOR AS
+    my_cursor  SYS_REFCURSOR;
+    sT         STRING(500) := '%' || lower(searchTerm) || '%';
+    donViCanBo STRING(24);
+    shccCanBo  STRING(24);
+    fromTime   NUMBER(20);
+    toTime     NUMBER(20);
+    staffType  NUMBER(4);
+    status     NUMBER(4);
+
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM HCTH_CONG_VAN_DEN hcthcvd
+             LEFT JOIN DM_DON_VI_GUI_CV dvgcv on hcthcvd.DON_VI_GUI = dvgcv.ID
+    WHERE (fromTime is null or (hcthcvd.NGAY_CONG_VAN is not null and hcthcvd.NGAY_CONG_VAN > fromTime))
+      AND (toTime is null or (hcthcvd.NGAY_CONG_VAN is not null and hcthcvd.NGAY_CONG_VAN < toTime))
+      AND (
+            (donViCanBo is null and shccCanBo is null) or
+            (donViCanBo is not null and Exists(select hcthdvn.id
+                                               from HCTH_DON_VI_NHAN hcthdvn
+                                               where hcthdvn.MA = hcthcvd.id
+                                                 and hcthdvn.LOAI = 'DEN'
+                                                 and hcthdvn.DON_VI_NHAN in
+                                                     (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                                      from dual
+                                                      connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)))
+            or (
+                        shccCanBo is not null and
+                        shccCanBo in (SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
+                                      from dual
+                                      connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
+                )
+        )
+      AND (
+                sT is null
+            OR LOWER(hcthcvd.SO_DEN) LIKE st
+            OR LOWER(hcthcvd.TRICH_YEU) LIKE sT
+            OR LOWER(hcthcvd.SO_CONG_VAN) LIKE sT
+            OR LOWER(dvgcv.TEN) LIKE sT
+        )
+      AND (
+                staffType = 0 or
+                (staffType = 1 and hcthcvd.TRANG_THAI != 0) or
+                (staffType = 2 and hcthcvd.TRANG_THAI = 5)
+        )
+      AND (
+        status is NULL or hcthcvd.TRANG_THAI = status
+        );
+    IF pageNumber < 1 THEN
+        pageNumber := 1;
+    END IF;
+    IF pageSize < 1 THEN
+        pageSize := 1;
+    END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT hcthcvd.ID            AS                     "id",
+                        hcthcvd.SO_DEN        AS                     "soDen",
+                        hcthcvd.NGAY_NHAN     AS                     "ngayNhan",
+                        hcthcvd.TRICH_YEU     AS                     "trichYeu",
+                        hcthcvd.NGAY_CONG_VAN AS                     "ngayCongVan",
+                        hcthcvd.NGAY_HET_HAN  AS                     "ngayHetHan",
+                        hcthcvd.SO_CONG_VAN   AS                     "soCongVan",
+                        hcthcvd.CAN_BO_NHAN   AS                     "maCanBoNhan",
+                        hcthcvd.TRANG_THAI    AS                     "trangThai",
+                        dvgcv.ID              AS                     "maDonViGuiCV",
+                        dvgcv.TEN             AS                     "tenDonViGuiCV",
+
+
+                        (SELECT LISTAGG(hcthdvn.DON_VI_NHAN, ',') WITHIN GROUP (
+                            order by hcthdvn.ID
+                            )
+                         FROM HCTH_DON_VI_NHAN hcthdvn
+                         WHERE hcthdvn.MA = hcthcvd.ID
+                           AND hcthdvn.LOAI = 'DEN'
+                        )                     AS                     "maDonViNhan",
+
+
+                        (SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
+                            order by dvn.TEN
+                            )
+                         FROM DM_DON_VI dvn
+                                  LEFT JOIN HCTH_DON_VI_NHAN hcthdvn on dvn.MA = hcthdvn.DON_VI_NHAN
+                         WHERE hcthdvn.MA = hcthcvd.ID
+                           AND hcthdvn.LOAI = 'DEN'
+                        )                     AS                     "danhSachDonViNhan",
+
+
+                        CASE
+                            when hcthcvd.CAN_BO_NHAN is not null then
+                                (
+                                    SELECT LISTAGG(
+                                                   CASE
+                                                       WHEN cbn.HO IS NULL THEN cbn.TEN
+                                                       WHEN cbn.TEN IS NULL THEN cbn.HO
+                                                       WHEN DMCV.TEN IS NULL THEN CONCAT(CONCAT(cbn.HO, ' '), cbn.TEN)
+                                                       ELSE CONCAT(CONCAT(CONCAT(DMCV.TEN, ' - '), CONCAT(cbn.HO, ' ')),
+                                                                   cbn.TEN)
+                                                       END,
+                                                   '; '
+                                               ) WITHIN GROUP (
+                                                       order by cbn.TEN
+                                                       ) as "hoVaTenCanBo"
+                                    FROM TCHC_CAN_BO cbn
+                                             LEFT JOIN QT_CHUC_VU qtcv ON cbn.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
+                                             LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
+                                    WHERE cbn.SHCC in (SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                       from dual
+                                                       connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
+                                ) END         AS                     "danhSachCanBoNhan",
+
+
+                        CASE
+                            WHEN EXISTS(SELECT id
+                                        FROM HCTH_CHI_DAO cd
+                                        WHERE cd.CONG_VAN = hcthcvd.ID
+                                          and cd.LOAI = 'DEN') then 1
+                            ELSE 0
+                            END               as                     "hasChiDao",
+
+                        ROW_NUMBER() OVER (ORDER BY hcthcvd.ID DESC) R
+                 FROM HCTH_CONG_VAN_DEN hcthcvd
+                          LEFT JOIN DM_DON_VI_GUI_CV dvgcv on (hcthcvd.DON_VI_GUI = dvgcv.ID)
+                 WHERE (fromTime is null or (hcthcvd.NGAY_CONG_VAN is not null and hcthcvd.NGAY_CONG_VAN > fromTime))
+                   AND (toTime is null or (hcthcvd.NGAY_CONG_VAN is not null and hcthcvd.NGAY_CONG_VAN < toTime))
+                   AND (
+                         (donViCanBo is null and shccCanBo is null) or
+                         (donViCanBo is not null and Exists(select hcthdvn.id
+                                                            from HCTH_DON_VI_NHAN hcthdvn
+                                                            where hcthdvn.MA = hcthcvd.id
+                                                              and hcthdvn.LOAI = 'DEN'
+                                                              and hcthdvn.DON_VI_NHAN in
+                                                                  (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                                                   from dual
+                                                                   connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)))
+                         or (
+                                     shccCanBo is not null and
+                                     shccCanBo in (SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                   from dual
+                                                   connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
+                             )
+                     )
+                   AND (
+                             sT is null
+                         OR LOWER(hcthcvd.SO_DEN) LIKE st
+                         OR LOWER(hcthcvd.TRICH_YEU) LIKE sT
+                         OR LOWER(hcthcvd.SO_CONG_VAN) LIKE sT
+                         OR LOWER(dvgcv.TEN) LIKE sT
+                     )
+                   AND (
                              staffType = 0 or
                              (staffType = 1 and hcthcvd.TRANG_THAI != 0) or
                              (staffType = 2 and hcthcvd.TRANG_THAI = 5)
@@ -2060,12 +2240,17 @@ BEGIN
                           )
                       OR (
                                   donVi IS NOT NULL
-                              AND donVi IN
-                                  (
-                                      SELECT regexp_substr(hcthCVD.DON_VI_NHAN, '[^,]+', 1, level)
-                                      from dual
-                                      connect by regexp_substr(hcthCVD.DON_VI_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                 )
+                              AND EXISTS(
+                                    SELECT hcthDVN.id
+                                    FROM HCTH_DON_VI_NHAN hcthDVN
+                                    WHERE hcthDVN.MA = hcthCVD.ID
+                                    AND hcthDVN.LOAI = 'DI'
+                                    AND hcthDVN.DON_VI_NHAN IN (
+                                            select regexp_substr(donVi, '[^,]+', 1, level)
+                                            from dual
+                                            connect by regexp_substr(donVi, '[^,]+', 1, level) is not null
+                                        )
+                                    )
                           )
                       OR (
                                   donViNhanNgoai IS NOT NULL
@@ -2110,27 +2295,33 @@ BEGIN
                   AND (
                             (donViXem IS NULL AND canBoXem IS NULL)
                           OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
-                                                       (
-                                                           SELECT regexp_substr(donViXem, '[^,]+', 1, level)
-                                                           from dual
-                                                           connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
-                                                       )
+                               (
+                                   SELECT regexp_substr(donViXem, '[^,]+', 1, level)
+                                   from dual
+                                   connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
+                               )
                               )
-                          OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_NHAN IN
-                                                       (
-                                                           SELECT regexp_substr(donViXem, '[^,]+', 1, level)
-                                                           from dual
-                                                           connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
-                                                       )
+                          OR (donViXem IS NOT NULL AND EXISTS(
+                                SELECT hcthDVN.ID
+                                FROM HCTH_DON_VI_NHAN hcthDVN
+                                WHERE hcthDVN.MA = hcthCVD.ID
+                                AND hcthDVN.LOAI = 'DI'
+                                AND hcthDVN.DON_VI_NHAN IN
+                                    (
+                                        select regexp_substr(donViXem, '[^,]+', 1, level)
+                                        from dual
+                                        connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
+                                    )
+                              )
                               AND hcthCVD.TRANG_THAI != '1'
                               )
                           OR
                           (canBoXem IS NOT NULL AND canBoXem IN
-                                                    (
-                                                        SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                                        from dual
-                                                        connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                    )
+                                (
+                                    SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                    from dual
+                                    connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                )
                               AND hcthCVD.TRANG_THAI != '1'
                               )
                       )
@@ -2174,7 +2365,6 @@ BEGIN
                         hcthCVD.TRICH_YEU         AS                 "trichYeu",
                         hcthCVD.NGAY_GUI          AS                 "ngayGui",
                         hcthCVD.NGAY_KY           AS                 "ngayKy",
-                        hcthCVD.DON_VI_NHAN       AS                 "maDonViNhan",
                         hcthCVD.CAN_BO_NHAN       AS                 "maCanBoNhan",
                         hcthCVD.NOI_BO            AS                 "noiBo",
                         hcthCVD.TRANG_THAI        AS                 "trangThai",
@@ -2185,25 +2375,24 @@ BEGIN
                         dvg.TEN                   AS                 "tenDonViGui",
                         dvg.TEN_VIET_TAT         AS                 "tenVietTatDonViGui",
 
-                        CASE
-                            WHEN hcthCVD.DON_VI_NHAN IS NULL then NULL
-                            ELSE (
-                                SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
-                                    order by dvn.TEN
-                                    )
-                                FROM DM_DON_VI dvn
-                                WHERE (
-                                              (
-                                                  SELECT Count(*)
-                                                  from (
-                                                           select to_number(column_value) as IDs
-                                                           from xmltable(hcthCVD.DON_VI_NHAN)
-                                                       )
-                                                  where IDs = dvn.MA
-                                              ) != 0
-                                          )
-                            )
-                            END                   AS                 "danhSachDonViNhan",
+                        (
+                            SELECT LISTAGG(hcthDVN.DON_VI_NHAN, ',') WITHIN GROUP (
+                                    ORDER BY hcthDVN.ID
+                                )
+                            FROM HCTH_DON_VI_NHAN hcthDVN
+                            WHERE hcthDVN.MA = hcthCVD.ID
+                            AND hcthDVN.LOAI = 'DI'
+                        )   AS "maDonViNhan",
+
+                        (
+                            SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
+                                ORDER BY dvn.TEN
+                                )
+                            FROM DM_DON_VI dvn
+                                LEFT JOIN HCTH_DON_VI_NHAN hcthDVN ON dvn.MA = hcthDVN.DON_VI_NHAN
+                            WHERE hcthDVN.MA = hcthCVD.ID
+                            AND hcthDVN.LOAI = 'DI'
+                        ) AS "danhSachDonViNhan",
 
                         CASE
                             WHEN hcthCVD.DON_VI_NHAN_NGOAI IS NULL then NULL
@@ -2260,128 +2449,139 @@ BEGIN
                  FROM HCTH_CONG_VAN_DI hcthCVD
                           LEFT JOIN DM_DON_VI dvg on (hcthCVD.DON_VI_GUI = dvg.MA)
                  WHERE (
-                            (
-                                  (
-                                              donViGui IS NULL
-                                          AND donVi IS NULL
-                                          AND maCanBo IS NULL
-                                          AND donViNhanNgoai IS NULL
-                                      )
+                        (
+                              (
+                                          donViGui IS NULL
+                                      AND donVi IS NULL
+                                      AND maCanBo IS NULL
+                                      AND donViNhanNgoai IS NULL
+                                  )
+                              OR (
+                                          donViGui IS NOT NULL
+                                      AND donViGui = hcthCVD.DON_VI_GUI
+                                  )
+                              OR (
+                                          maCanBo IS NOT NULL
+                                      AND maCanBo IN
+                                          (SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                           from dual
+                                           connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                          )
+                                  )
+                              OR (
+                                          donVi IS NOT NULL
+                                      AND EXISTS(
+                                            SELECT hcthDVN.id
+                                            FROM HCTH_DON_VI_NHAN hcthDVN
+                                            WHERE hcthDVN.MA = hcthCVD.ID
+                                            AND hcthDVN.LOAI = 'DI'
+                                            AND hcthDVN.DON_VI_NHAN IN (
+                                                    select regexp_substr(donVi, '[^,]+', 1, level)
+                                                    from dual
+                                                    connect by regexp_substr(donVi, '[^,]+', 1, level) is not null
+                                                )
+                                            )
+                                  )
+                              OR (
+                                          donViNhanNgoai IS NOT NULL
+                                      AND donViNhanNgoai IN
+                                          (
+                                              SELECT regexp_substr(hcthCVD.DON_VI_NHAN_NGOAI, '[^,]+', 1, level)
+                                              from dual
+                                              connect by regexp_substr(hcthCVD.DON_VI_NHAN_NGOAI, '[^,]+', 1, level) is NOT NULL
+                                                         )
+                                  )
+                              )
+                          AND (
+                                    loaiCongVan IS NULL
                                   OR (
-                                              donViGui IS NOT NULL
-                                          AND donViGui = hcthCVD.DON_VI_GUI
-                                      )
-                                  OR (
-                                              maCanBo IS NOT NULL
-                                          AND maCanBo IN
-                                              (SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                               from dual
-                                               connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                          (
+                                                      loaiCongVan = 1
+                                                  AND hcthCVD.NOI_BO IS NOT NULL
+                                                  AND hcthCVD.NOI_BO = 1
+                                              )
+                                          OR (
+                                                      loaiCongVan = 2
+                                                  AND hcthCVD.NOI_BO IS NOT NULL
+                                                  AND hcthCVD.NOI_BO = 0
                                               )
                                       )
-                                  OR (
-                                              donVi IS NOT NULL
-                                          AND donVi IN
-                                              (
-                                                  SELECT regexp_substr(hcthCVD.DON_VI_NHAN, '[^,]+', 1, level)
-                                                  from dual
-                                                  connect by regexp_substr(hcthCVD.DON_VI_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                             )
+                              )
+                          AND (
+                                    congVanLaySo IS NULL
+                                OR (
+                                        (
+                                                congVanLaySo = 1
+                                            AND hcthCVD.LAY_SO IS NOT NULL
+                                            AND hcthCVD.LAY_SO = 1
+                                            )
+                                        OR (
+                                                congVanLaySo = 2
+                                            AND hcthCVD.LAY_SO IS NOT NULL
+                                            AND hcthCVD.LAY_SO = 0
+                                            )
+                                        )
+                              )
+                          AND (
+                                    (donViXem IS NULL AND canBoXem IS NULL)
+                                  OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
+                                       (
+                                           SELECT regexp_substr(donViXem, '[^,]+', 1, level)
+                                           from dual
+                                           connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
+                                       )
                                       )
-                                  OR (
-                                              donViNhanNgoai IS NOT NULL
-                                          AND donViNhanNgoai IN
-                                              (
-                                                  SELECT regexp_substr(hcthCVD.DON_VI_NHAN_NGOAI, '[^,]+', 1, level)
-                                                  from dual
-                                                  connect by regexp_substr(hcthCVD.DON_VI_NHAN_NGOAI, '[^,]+', 1, level) is NOT NULL
-                                                             )
-                                      )
-                                  )
-                              AND (
-                                        loaiCongVan IS NULL
-                                      OR (
-                                              (
-                                                          loaiCongVan = 1
-                                                      AND hcthCVD.NOI_BO IS NOT NULL
-                                                      AND hcthCVD.NOI_BO = 1
-                                                  )
-                                              OR (
-                                                          loaiCongVan = 2
-                                                      AND hcthCVD.NOI_BO IS NOT NULL
-                                                      AND hcthCVD.NOI_BO = 0
-                                                  )
-                                          )
-                                  )
-                              AND (
-                                        congVanLaySo IS NULL
-                                    OR (
+                                  OR (donViXem IS NOT NULL AND EXISTS(
+                                        SELECT hcthDVN.ID
+                                        FROM HCTH_DON_VI_NHAN hcthDVN
+                                        WHERE hcthDVN.MA = hcthCVD.ID
+                                        AND hcthDVN.LOAI = 'DI'
+                                        AND hcthDVN.DON_VI_NHAN IN
                                             (
-                                                    congVanLaySo = 1
-                                                AND hcthCVD.LAY_SO IS NOT NULL
-                                                AND hcthCVD.LAY_SO = 1
+                                                select regexp_substr(donViXem, '[^,]+', 1, level)
+                                                from dual
+                                                connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
+                                            )
+                                      )
+                                      AND hcthCVD.TRANG_THAI != '1'
+                                      )
+                                  OR
+                                  (canBoXem IS NOT NULL AND canBoXem IN
+                                        (
+                                            SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                            from dual
+                                            connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                        )
+                                      AND hcthCVD.TRANG_THAI != '1'
+                                      )
+                              )
+                          AND (
+                                    loaiCanBo = 0 -- staff
+                                    OR (
+                                            loaiCanBo = 1 -- rector
+                                            AND (
+                                                hcthCVD.TRANG_THAI != '1'
+                                                OR hcthCVD.TRANG_THAI IS NULL
                                                 )
-                                            OR (
-                                                    congVanLaySo = 2
-                                                AND hcthCVD.LAY_SO IS NOT NULL
-                                                AND hcthCVD.LAY_SO = 0
+                                        )
+                                    OR (
+                                            loaiCanBo = 2 -- hcth
+                                            AND (
+                                                hcthCVD.TRANG_THAI != '1'
+                                                OR (
+                                                    hcthCVD.TRANG_THAI = '1'
+                                                    AND hcthCVD.DON_VI_GUI = '29'
+                                                    )
+                                                OR hcthCVD.TRANG_THAI IS NULL
                                                 )
-                                            )
-                                  )
-                              AND (
-                                        (donViXem IS NULL AND canBoXem IS NULL)
-                                      OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
-                                                                   (
-                                                                       SELECT regexp_substr(donViXem, '[^,]+', 1, level)
-                                                                       from dual
-                                                                       connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
-                                                                   )
-                                          )
-                                      OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_NHAN IN
-                                                                   (
-                                                                       SELECT regexp_substr(donViXem, '[^,]+', 1, level)
-                                                                       from dual
-                                                                       connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
-                                                                   )
-                                          AND hcthCVD.TRANG_THAI != '1'
-                                          )
-                                      OR
-                                      (canBoXem IS NOT NULL AND canBoXem IN
-                                                                (
-                                                                    SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                                                    from dual
-                                                                    connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                                )
-                                          AND hcthCVD.TRANG_THAI != '1'
-                                          )
-                                  )
-                              AND (
-                                        loaiCanBo = 0 -- staff
-                                        OR (
-                                                loaiCanBo = 1 -- rector
-                                                AND (
-                                                    hcthCVD.TRANG_THAI != '1'
-                                                    OR hcthCVD.TRANG_THAI IS NULL
-                                                    )
-                                            )
-                                        OR (
-                                                loaiCanBo = 2 -- hcth
-                                                AND (
-                                                    hcthCVD.TRANG_THAI != '1'
-                                                    OR (
-                                                        hcthCVD.TRANG_THAI = '1'
-                                                        AND hcthCVD.DON_VI_GUI = '29'
-                                                        )
-                                                    OR hcthCVD.TRANG_THAI IS NULL
-                                                    )
-                                            )
-                                  )
-                              AND (
-                                          ST = ''
-                                      OR LOWER(hcthCVD.TRICH_YEU) LIKE ST
-                                      OR LOWER(dvg.TEN) LIKE ST
-                                  )
-                          )
+                                        )
+                              )
+                          AND (
+                                      ST = ''
+                                  OR LOWER(hcthCVD.TRICH_YEU) LIKE ST
+                                  OR LOWER(dvg.TEN) LIKE ST
+                              )
+                  )
                  ORDER BY hcthCVD.ID DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
@@ -2496,215 +2696,6 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION HCTH_GIAO_NHIEM_VU_SEARCH_PAGE(
-    pageNumber IN OUT NUMBER,
-    pageSize IN OUT NUMBER,
-    userId IN STRING,
-    maDonVi IN STRING,
-    donViNhan in STRING,
-    canBoNhan IN STRING,
-    searchTerm IN STRING,
-    totalItem OUT NUMBER,
-    pageTotal OUT NUMBER
-) RETURN SYS_REFCURSOR AS
-my_cursor SYS_REFCURSOR;
-sT STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-SELECT COUNT(*) INTO totalItem
-FROM HCTH_GIAO_NHIEM_VU hcthgnv
-LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = hcthgnv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
-WHERE
-    ((
-        userId is not null AND hcthgnv.NGUOI_TAO = userId
-    ) OR
-    (
-        hcthcbn.CAN_BO_NHAN IS NOT NULL AND
-        INSTR(hcthcbn.CAN_BO_NHAN, userId) != 0
-     ) OR
-     (
-        userId is null
-    ))
-    AND
-    ((
-        donViNhan IS NULL
-        AND canBoNhan IS NULL
-    )
-    OR (
-        canBoNhan is NOT NULL
-        AND INSTR(hcthcbn.CAN_BO_NHAN, canBoNhan) != 0
-    )
-    OR (
-        donViNhan IS NOT NULL
-        AND hcthgnv.DON_VI_NHAN is not NULL
-        AND (
-            (
-                select count(id2)
-                from (
-                        select *
-                        from (
-                                (
-                                    SELECT to_number(COLUMN_VALUE) as id1
-                                    FROM xmltable(donViNhan)
-                                    ORDER BY id1
-                                ) t1
-                                LEFT JOIN (
-                                    SELECT to_number(COLUMN_VALUE) as id2
-                                    FROM xmltable(hcthgnv.DON_VI_NHAN)
-                                    ORDER BY id2
-                                ) t2 ON id1 = id2
-                            )
-                    )
-            ) != 0
-        )
-    ))
-    AND (
-        sT = ''
-        OR LOWER(hcthgnv.NOI_DUNG) LIKE sT
-    )
-    ;
-IF pageNumber < 1 THEN pageNumber := 1;
-END IF;
-IF pageSize < 1 THEN pageSize := 1;
-END IF;
-pageTotal := CEIL(totalItem / pageSize);
-pageNumber := LEAST(pageNumber, pageTotal);
--- if donVi is NOT NULL then SELECT to_number(COLUMN_VALUE) as id1 into "hcthCongVanDenSearchDonvi"
---                                             FROM xmltable(donVi)
---                                             ORDER BY id1 ASC;
---
--- end if;
-OPEN my_cursor FOR
-SELECT *
-FROM (
-        SELECT  hcthgnv.ID              AS "id",
-                hcthgnv.TIEU_DE         AS "tieuDe",
-                hcthgnv.NOI_DUNG        AS "noiDung",
-                hcthgnv.NGAY_BAT_DAU    AS "ngayBatDau",
-                hcthgnv.NGAY_KET_THUC   AS "ngayKetThuc",
-                hcthgnv.NGAY_TAO        AS "ngayTao",
-                hcthgnv.DO_UU_TIEN      AS "doUuTien",
-                hcthgnv.DON_VI_NHAN     AS "maDonViNhan",
-                hcthcbn.CAN_BO_NHAN     AS "maCanBoNhan",
-                hcthgnv.NGUOI_TAO       AS "nguoiTao",
-                hcthgnv.IS_NHIEM_VU_LIEN_PHONG       AS "isNhiemVuLienPhong",
-            CASE
-                WHEN hcthgnv.DON_VI_NHAN IS NULL then NULL
-                ELSE (
-                    SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
-                            order by dvn.TEN
-                        )
-                    FROM DM_DON_VI dvn
-                    WHERE (
-                            (
-                                SELECT Count(*)
-                                from (
-                                        select to_number(column_value) as IDs
-                                        from xmltable(hcthgnv.DON_VI_NHAN)
-                                    )
-                                where IDs = dvn.MA
-                            ) != 0
-                        )
-                )
-            END AS "danhSachDonViNhan",
-
-
-            CASE when hcthcbn.CAN_BO_NHAN is not null then
-               (
-                SELECT LISTAGG(
-                        CASE
-                            WHEN cbn.HO IS NULL THEN cbn.TEN
-                            WHEN cbn.TEN IS NULL THEN cbn.HO
-                            WHEN DMCV.TEN IS NULL THEN CONCAT(CONCAT(cbn.HO, ' '), cbn.TEN)
-                            ELSE CONCAT(CONCAT(CONCAT(DMCV.TEN, ' - '), CONCAT(cbn.HO, ' ')), cbn.TEN)
-                        END,
-                        '; '
-                    ) WITHIN GROUP (
-                        order by cbn.TEN
-                    ) as hoVaTenCanBo
-                FROM TCHC_CAN_BO cbn
-                LEFT JOIN QT_CHUC_VU qtcv ON cbn.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
-                LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
-                WHERE INSTR(CONCAT(hcthcbn.CAN_BO_NHAN,','), CONCAT( cbn.shcc, ',')) != 0
-            ) ELSE NULL END AS "danhSachCanBoNhan",
-
-            CASE when hcthgnv.NGUOI_TAO is not null then
-            (
-                SELECT (
-                        CASE
-                            WHEN cbn.HO IS NULL THEN cbn.TEN
-                            WHEN cbn.TEN IS NULL THEN cbn.HO
-                            ELSE CONCAT(CONCAT(cbn.HO, ' '), cbn.TEN)
-                        END
-                )
-                FROM TCHC_CAN_BO cbn
-                WHERE hcthgnv.NGUOI_TAO = cbn.shcc
-            ) ELSE NULL END AS "tenNguoiTao",
-
-            ROW_NUMBER() OVER (
-                ORDER BY hcthgnv.ID DESC
-            ) R
-        FROM HCTH_GIAO_NHIEM_VU hcthgnv
-        LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = hcthgnv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
-        WHERE
-        ((
-            userId is not null and
-            hcthgnv.NGUOI_TAO = userId
-        ) OR
-        (
-            hcthcbn.CAN_BO_NHAN IS NOT NULL AND
-            INSTR(hcthcbn.CAN_BO_NHAN, userId) != 0
-        ) OR
-        (
-             userId is null
-        ))
-        AND
-        (
-            (
-                canBoNhan IS NULL
-                AND donViNhan IS NULL
-            )
-            OR (
-                canBoNhan is NOT NULL
-                AND INSTR(hcthcbn.CAN_BO_NHAN, canBoNhan) != 0
-            )
-            OR (
-                donViNhan IS NOT NULL
-                AND hcthgnv.DON_VI_NHAN is not NULL
-                AND (
-                    (
-                        select count(id2)
-                        from (
-                                select *
-                                from (
-                                        (
-                                            SELECT to_number(COLUMN_VALUE) as id1
-                                            FROM xmltable(donViNhan)
-                                            ORDER BY id1
-                                        ) t1
-                                        LEFT JOIN (
-                                            SELECT to_number(COLUMN_VALUE) as id2
-                                            FROM xmltable(hcthgnv.DON_VI_NHAN)
-                                            ORDER BY id2
-                                        ) t2 ON id1 = id2
-                                    )
-                            )
-                    ) != 0
-                )
-            ))
-        AND (
-            sT = ''
-            OR LOWER(hcthgnv.NOI_DUNG) LIKE sT
-            )
-        ORDER BY hcthgnv.ID DESC
-    )
-WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
-ORDER BY 'id' DESC;
-RETURN my_cursor;
-END;
-
-/
---EndMethod--
-
 CREATE OR REPLACE FUNCTION HCTH_HISTORY_GET_ALL_FROM(
     target IN NUMBER,
     type in STRING
@@ -2733,6 +2724,260 @@ BEGIN
 
         WHERE (target is not null and hs.KEY = target and loai is not null and type = hs.loai)
         ORDER BY hs.THOI_GIAN ASC;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_NHIEM_VU_SEARCH_PAGE(
+    pageNumber IN OUT NUMBER,
+    pageSize IN OUT NUMBER,
+    filterParam in STRING,
+    searchTerm IN STRING,
+    totalItem OUT NUMBER,
+    pageTotal OUT NUMBER
+) RETURN SYS_REFCURSOR AS
+    my_cursor  SYS_REFCURSOR;
+    sT         STRING(500) := '%' || lower(searchTerm) || '%';
+    donViNhan  Number;
+    canBoNhan  String(128);
+    canBoShcc  String(24);
+    donViCanBo String(128);
+    canBoType  String(24);
+    TYPE maDonViTableType IS TABLE OF DM_DON_VI.MA%TYPE INDEX BY PLS_INTEGER;
+        maDonViTable maDonViTableType;
+BEGIN
+
+    SELECT JSON_VALUE(filterParam, '$.donViNhan') INTO donViNhan FROM DUAL;
+    SELECT JSON_VALUE(filterParam, '$.canBoNhan') INTO canBoNhan FROM DUAL;
+    SELECT JSON_VALUE(filterParam, '$.userShcc') INTO canBoShcc FROM DUAL;
+    SELECT JSON_VALUE(filterParam, '$.canBoType') INTO canBoType FROM DUAL;
+    SELECT JSON_VALUE(filterParam, '$.donViCanBo') INTO donViCanBo FROM DUAL;
+
+
+
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM HCTH_NHIEM_VU nv
+-- LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
+    WHERE
+-- check if user is related to mission
+(
+    -- RECTOR or HCTH staff can see all mission
+            canBoType = 'HCTH' or canBoType = 'RECTOR' OR
+        -- other staff mission permission check
+            nv.NGUOI_TAO = canBoShcc or EXISTS(select cbn.id
+                                               from HCTH_CAN_BO_NHAN cbn
+                                               where cbn.LOAI = 'NHIEM_VU'
+                                                 and cbn.KEY = nv.ID
+                                                 and cbn.CAN_BO_NHAN = canBoShcc)
+        or (donViCanBo is not null and Exists(
+            select dvn.id
+            from HCTH_DON_VI_NHAN dvn
+            where dvn.MA = nv.id
+              and dvn.LOAI = 'NHIEM_VU'
+              and dvn.DON_VI_NHAN in
+                  (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                   from dual
+                   connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
+        ))
+    )
+    --     ((
+--         userShcc is not null AND nv.NGUOI_TAO = userShcc
+--     ) OR
+--     (
+--         hcthcbn.CAN_BO_NHAN IS NOT NULL AND
+--         INSTR(hcthcbn.CAN_BO_NHAN, userShcc) != 0
+--      ) OR
+--      (
+--         userShcc is null
+--     ))
+--     AND
+--     ((
+--         donViNhan IS NULL
+--         AND canBoNhan IS NULL
+--     )
+--     OR (
+--         canBoNhan is NOT NULL
+--         AND INSTR(hcthcbn.CAN_BO_NHAN, canBoNhan) != 0
+--     )
+--     OR (
+--         donViNhan IS NOT NULL
+--         AND nv.DON_VI_NHAN is not NULL
+--         AND (
+--             (
+--                 select count(id2)
+--                 from (
+--                         select *
+--                         from (
+--                                 (
+--                                     SELECT to_number(COLUMN_VALUE) as id1
+--                                     FROM xmltable(donViNhan)
+--                                     ORDER BY id1
+--                                 ) t1
+--                                 LEFT JOIN (
+--                                     SELECT to_number(COLUMN_VALUE) as id2
+--                                     FROM xmltable(nv.DON_VI_NHAN)
+--                                     ORDER BY id2
+--                                 ) t2 ON id1 = id2
+--                             )
+--                     )
+--             ) != 0
+--         )
+--     ))
+--     AND (
+--         sT = ''
+--         OR LOWER(nv.NOI_DUNG) LIKE sT
+--     )
+    ;
+    IF pageNumber < 1 THEN
+        pageNumber := 1;
+    END IF;
+    IF pageSize < 1 THEN
+        pageSize := 1;
+    END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT nv.ID                                       AS "id",
+                     nv.TIEU_DE                                  AS "tieuDe",
+                     nv.NOI_DUNG                                 AS "noiDung",
+                     nv.NGAY_BAT_DAU                             AS "ngayBatDau",
+                     nv.NGAY_KET_THUC                            AS "ngayKetThuc",
+                     nv.NGAY_TAO                                 AS "ngayTao",
+                     nv.DO_UU_TIEN                               AS "doUuTien",
+                     nv.DON_VI_NHAN                              AS "maDonViNhan",
+                     hcthcbn.CAN_BO_NHAN                              AS "maCanBoNhan",
+                     nv.NGUOI_TAO                                AS "nguoiTao",
+                     nv.IS_NHIEM_VU_LIEN_PHONG                   AS "isNhiemVuLienPhong",
+                     CASE
+                         WHEN nv.DON_VI_NHAN IS NULL then NULL
+                         ELSE (SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
+                             order by dvn.TEN
+                             )
+                               FROM DM_DON_VI dvn
+                               WHERE (
+                                             (SELECT Count(*)
+                                              from (select to_number(column_value) as IDs
+                                                    from xmltable(nv.DON_VI_NHAN))
+                                              where IDs = dvn.MA) != 0
+                                         ))
+                         END                                          AS "danhSachDonViNhan",
+
+
+                     CASE
+                         when hcthcbn.CAN_BO_NHAN is not null then
+                             (SELECT LISTAGG(
+                                             CASE
+                                                 WHEN cbn.HO IS NULL THEN cbn.TEN
+                                                 WHEN cbn.TEN IS NULL THEN cbn.HO
+                                                 WHEN DMCV.TEN IS NULL THEN CONCAT(CONCAT(cbn.HO, ' '), cbn.TEN)
+                                                 ELSE CONCAT(CONCAT(CONCAT(DMCV.TEN, ' - '), CONCAT(cbn.HO, ' ')),
+                                                             cbn.TEN)
+                                                 END,
+                                             '; '
+                                         ) WITHIN GROUP (
+                                                 order by cbn.TEN
+                                                 ) as hoVaTenCanBo
+                              FROM TCHC_CAN_BO cbn
+                                       LEFT JOIN QT_CHUC_VU qtcv ON cbn.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
+                                       LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
+                              WHERE INSTR(CONCAT(hcthcbn.CAN_BO_NHAN, ','), CONCAT(cbn.shcc, ',')) !=
+                                    0) END                            AS "danhSachCanBoNhan",
+
+                     CASE
+                         when nv.NGUOI_TAO is not null then
+                             (SELECT (
+                                         CASE
+                                             WHEN cbn.HO IS NULL THEN cbn.TEN
+                                             WHEN cbn.TEN IS NULL THEN cbn.HO
+                                             ELSE CONCAT(CONCAT(cbn.HO, ' '), cbn.TEN)
+                                             END
+                                         )
+                              FROM TCHC_CAN_BO cbn
+                              WHERE nv.NGUOI_TAO = cbn.shcc) END AS "tenNguoiTao",
+
+                     ROW_NUMBER() OVER (
+                         ORDER BY nv.ID DESC
+                         )                                               R
+              FROM HCTH_NHIEM_VU nv
+                       LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
+              WHERE (
+    -- RECTOR or HCTH staff can see all mission
+            canBoType = 'HCTH' or canBoType = 'RECTOR' OR
+        -- other staff mission permission check
+            nv.NGUOI_TAO = canBoShcc or EXISTS(select cbn.id
+                                               from HCTH_CAN_BO_NHAN cbn
+                                               where cbn.LOAI = 'NHIEM_VU'
+                                                 and cbn.KEY = nv.ID
+                                                 and cbn.CAN_BO_NHAN = canBoShcc)
+        or (donViCanBo is not null and Exists(
+            select dvn.id
+            from HCTH_DON_VI_NHAN dvn
+            where dvn.MA = nv.id
+              and dvn.LOAI = 'NHIEM_VU'
+              and dvn.DON_VI_NHAN in
+                  (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                   from dual
+                   connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
+        ))
+    ))
+--         ((
+--             userShcc is not null and
+--             nv.NGUOI_TAO = userShcc
+--         ) OR
+--         (
+--             hcthcbn.CAN_BO_NHAN IS NOT NULL AND
+--             INSTR(hcthcbn.CAN_BO_NHAN, userShcc) != 0
+--         ) OR
+--         (
+--              userShcc is null
+--         ))
+--         AND
+--         (
+--             (
+--                 canBoNhan IS NULL
+--                 AND donViNhan IS NULL
+--             )
+--             OR (
+--                 canBoNhan is NOT NULL
+--                 AND INSTR(hcthcbn.CAN_BO_NHAN, canBoNhan) != 0
+--             )
+--             OR (
+--                 donViNhan IS NOT NULL
+--                 AND nv.DON_VI_NHAN is not NULL
+--                 AND (
+--                     (
+--                         select count(id2)
+--                         from (
+--                                 select *
+--                                 from (
+--                                         (
+--                                             SELECT to_number(COLUMN_VALUE) as id1
+--                                             FROM xmltable(donViNhan)
+--                                             ORDER BY id1
+--                                         ) t1
+--                                         LEFT JOIN (
+--                                             SELECT to_number(COLUMN_VALUE) as id2
+--                                             FROM xmltable(nv.DON_VI_NHAN)
+--                                             ORDER BY id2
+--                                         ) t2 ON id1 = id2
+--                                     )
+--                             )
+--                     ) != 0
+--                 )
+--             ))
+--         AND (
+--             sT = ''
+--             OR LOWER(nv.NOI_DUNG) LIKE sT
+--             )
+--         ORDER BY nv.ID DESC
+--     )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY 'id' DESC;
     RETURN my_cursor;
 END;
 
@@ -3797,26 +4042,26 @@ AS
     my_cursor SYS_REFCURSOR;
 BEGIN
     OPEN my_cursor FOR
-        SELECT qtcv.SHCC                    AS "shcc",
-               qtcv.STT                     AS "stt",
-               cb.HO                        AS "ho",
-               cb.TEN                       AS "ten",
-               cv.PHU_CAP                   AS "phuCap",
-               qtcv.MA_DON_VI               AS "maDonVi",
-               dv.TEN                       AS "tenDonVi",
-               qtcv.MA_BO_MON               AS "maBoMon",
-               bm.TEN                       AS "tenBoMon",
-               qtcv.MA_CHUC_VU              AS "maChucVu",
-               cv.TEN                       AS "tenChucVu",
-               qtcv.SO_QD                   AS "soQuyetDinh",
-               cv.LOAI_CHUC_VU              AS "loaiChucVu",
-               qtcv.NGAY_RA_QD              AS "ngayRaQuyetDinh",
-               qtcv.CHUC_VU_CHINH           AS "chucVuChinh",
-               qtcv.THOI_CHUC_VU            AS "thoiChucVu",
-               qtcv.SO_QD_THOI_CHUC_VU      AS "soQdThoiChucVu",
-               qtcv.NGAY_THOI_CHUC_VU       AS "ngayThoiChucVu",
-               qtcv.NGAY_RA_QD_THOI_CHUC_VU AS "ngayRaQdThoiChucVu",
-             ROW_NUMBER() OVER (ORDER BY qtcv.CHUC_VU_CHINH DESC ) R
+        SELECT qtcv.SHCC                    AS                       "shcc",
+               qtcv.STT                     AS                       "stt",
+               cb.HO                        AS                       "ho",
+               cb.TEN                       AS                       "ten",
+               cv.PHU_CAP                   AS                       "phuCap",
+               qtcv.MA_DON_VI               AS                       "maDonVi",
+               dv.TEN                       AS                       "tenDonVi",
+               qtcv.MA_BO_MON               AS                       "maBoMon",
+               bm.TEN                       AS                       "tenBoMon",
+               qtcv.MA_CHUC_VU              AS                       "maChucVu",
+               cv.TEN                       AS                       "tenChucVu",
+               qtcv.SO_QD                   AS                       "soQuyetDinh",
+               cv.LOAI_CHUC_VU              AS                       "loaiChucVu",
+               qtcv.NGAY_RA_QD              AS                       "ngayRaQuyetDinh",
+               qtcv.CHUC_VU_CHINH           AS                       "chucVuChinh",
+               qtcv.THOI_CHUC_VU            AS                       "thoiChucVu",
+               qtcv.SO_QD_THOI_CHUC_VU      AS                       "soQdThoiChucVu",
+               qtcv.NGAY_THOI_CHUC_VU       AS                       "ngayThoiChucVu",
+               qtcv.NGAY_RA_QD_THOI_CHUC_VU AS                       "ngayRaQdThoiChucVu",
+               ROW_NUMBER() OVER (ORDER BY qtcv.CHUC_VU_CHINH DESC ) R
 
         FROM QT_CHUC_VU qtcv
                  LEFT JOIN TCHC_CAN_BO cb ON qtcv.SHCC = cb.SHCC
@@ -3824,7 +4069,7 @@ BEGIN
                  LEFT JOIN DM_DON_VI dv ON dv.MA = qtcv.MA_DON_VI
                  LEFT JOIN DM_BO_MON bm ON qtcv.MA_BO_MON = bm.MA
         WHERE qtcv.SHCC = isSHCC
-    ORDER BY CHUC_VU_CHINH DESC;
+        ORDER BY CHUC_VU_CHINH DESC;
     RETURN my_cursor;
 END;
 
@@ -5056,8 +5301,6 @@ begin
                DT.KET_THUC              AS "ketThuc",
                DT.KET_THUC_TYPE         AS "ketThucType",
                DT.THOI_GIAN             AS "thoiGian",
-               DT.GHI_CHU_HINH_THUC     AS "ghiChuHinhThuc",
-               DT.GHI_CHU_LOAI_BANG_CAP AS "ghiChuLoaiBangCap",
                DT.TRINH_DO              AS "trinhDo",
 
                LBC.TEN                  AS "tenLoaiBangCap",
@@ -5092,6 +5335,7 @@ begin
                DT.SHCC                  AS "shcc",
                CB.HO                    AS "ho",
                CB.TEN                   AS "ten",
+               DT.MINH_CHUNG            AS "minhChung",
                DT.TEN_TRUONG            AS "tenCoSoDaoTao",
                DT.CHUYEN_NGANH          AS "chuyenNganh",
                DT.BAT_DAU               AS "batDau",
@@ -5099,10 +5343,7 @@ begin
                DT.KET_THUC              AS "ketThuc",
                DT.KET_THUC_TYPE         AS "ketThucType",
                DT.THOI_GIAN             AS "thoiGian",
-               DT.GHI_CHU_HINH_THUC     AS "ghiChuHinhThuc",
-               DT.GHI_CHU_LOAI_BANG_CAP AS "ghiChuLoaiBangCap",
                DT.TRINH_DO              AS "trinhDo",
-
                LBC.TEN                  AS "tenLoaiBangCap",
                TDDT.TEN                 AS "tenTrinhDo",
                HTDT.TEN                 AS "tenHinhThuc",
@@ -5113,130 +5354,7 @@ begin
                  LEFT JOIN DM_BANG_DAO_TAO LBC ON TO_CHAR(DT.LOAI_BANG_CAP) = TO_CHAR(LBC.MA)
                  LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TO_CHAR(TDDT.MA) = DT.TRINH_DO
                  LEFT JOIN DM_HINH_THUC_DAO_TAO HTDT ON TO_CHAR(DT.HINH_THUC) = TO_CHAR(HTDT.MA)
-            WHERE DT.SHCC = iSHCC AND (DT.TRINH_DO = '1' OR DT.TRINH_DO = '2' OR DT.TRINH_DO = '3' OR DT.TRINH_DO = '4');
-    RETURN my_cursor;
-end;
-
-/
---EndMethod--
-
-CREATE OR REPLACE function QT_DAO_TAO_GET_TRINH_DO_CHINH_TRI_CAN_BO(iSHCC in string) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-
-begin
-    open my_cursor FOR
-        select DT.ID                    AS "id",
-               DT.SHCC                  AS "shcc",
-               CB.HO                    AS "ho",
-               CB.TEN                   AS "ten",
-               DT.TEN_TRUONG            AS "tenCoSoDaoTao",
-               DT.CHUYEN_NGANH          AS "chuyenNganh",
-               DT.BAT_DAU               AS "batDau",
-               DT.BAT_DAU_TYPE          AS "batDauType",
-               DT.KET_THUC              AS "ketThuc",
-               DT.KET_THUC_TYPE         AS "ketThucType",
-               DT.THOI_GIAN             AS "thoiGian",
-               DT.GHI_CHU_HINH_THUC     AS "ghiChuHinhThuc",
-               DT.GHI_CHU_LOAI_BANG_CAP AS "ghiChuLoaiBangCap",
-               DT.TRINH_DO              AS "trinhDo",
-
-               LBC.TEN                  AS "tenLoaiBangCap",
-               TDDT.TEN                 AS "tenTrinhDo",
-               HTDT.TEN                 AS "tenHinhThuc",
-               DT.LOAI_BANG_CAP         AS "loaiBangCap",
-               DT.HINH_THUC             AS "hinhThuc"
-            FROM (SELECT *
-                FROM QT_DAO_TAO
-                WHERE TRINH_DO IN (SELECT MIN(TRINH_DO) FROM (SELECT * FROM QT_DAO_TAO DT1 WHERE DT1.LOAI_BANG_CAP = '7' AND DT1.SHCC = iSHCC)
-                    )) DT
-            LEFT JOIN TCHC_CAN_BO CB ON DT.SHCC = CB.SHCC
-                 LEFT JOIN DM_BANG_DAO_TAO LBC ON TO_CHAR(DT.LOAI_BANG_CAP) = TO_CHAR(LBC.MA)
-                 LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TO_CHAR(TDDT.MA) = DT.TRINH_DO
-                 LEFT JOIN DM_HINH_THUC_DAO_TAO HTDT ON TO_CHAR(DT.HINH_THUC) = TO_CHAR(HTDT.MA)
-            WHERE DT.SHCC = iSHCC;
-    RETURN my_cursor;
-end;
-
-/
---EndMethod--
-
-CREATE OR REPLACE function QT_DAO_TAO_GET_TRINH_DO_QLNN_CAN_BO(iSHCC in string) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-
-begin
-    open my_cursor FOR
-        select DT.ID                    AS "id",
-               DT.SHCC                  AS "shcc",
-               CB.HO                    AS "ho",
-               CB.TEN                   AS "ten",
-               DT.TEN_TRUONG            AS "tenCoSoDaoTao",
-               DT.CHUYEN_NGANH          AS "chuyenNganh",
-               DT.BAT_DAU               AS "batDau",
-               DT.BAT_DAU_TYPE          AS "batDauType",
-               DT.KET_THUC              AS "ketThuc",
-               DT.KET_THUC_TYPE         AS "ketThucType",
-               DT.THOI_GIAN             AS "thoiGian",
-               DT.GHI_CHU_HINH_THUC     AS "ghiChuHinhThuc",
-               DT.GHI_CHU_LOAI_BANG_CAP AS "ghiChuLoaiBangCap",
-               DT.TRINH_DO              AS "trinhDo",
-
-               LBC.TEN                  AS "tenLoaiBangCap",
-               TDDT.TEN                 AS "tenTrinhDo",
-               HTDT.TEN                 AS "tenHinhThuc",
-               DT.LOAI_BANG_CAP         AS "loaiBangCap",
-               DT.HINH_THUC             AS "hinhThuc"
-            FROM (SELECT *
-                FROM QT_DAO_TAO
-                WHERE TRINH_DO IN (SELECT MAX(TRINH_DO) FROM (SELECT * FROM QT_DAO_TAO DT1 WHERE DT1.LOAI_BANG_CAP = '8' AND DT1.SHCC = iSHCC)
-                    )) DT
-            LEFT JOIN TCHC_CAN_BO CB ON DT.SHCC = CB.SHCC
-                 LEFT JOIN DM_BANG_DAO_TAO LBC ON TO_CHAR(DT.LOAI_BANG_CAP) = TO_CHAR(LBC.MA)
-                 LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TO_CHAR(TDDT.MA) = DT.TRINH_DO
-                 LEFT JOIN DM_HINH_THUC_DAO_TAO HTDT ON TO_CHAR(DT.HINH_THUC) = TO_CHAR(HTDT.MA)
-            WHERE DT.SHCC = iSHCC;
-    RETURN my_cursor;
-end;
-
-/
---EndMethod--
-
-CREATE OR REPLACE function QT_DAO_TAO_GET_TRINH_DO_TIN_HOC_CAN_BO(iSHCC in string) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-
-begin
-    open my_cursor FOR
-        select DT.ID                    AS "id",
-               DT.SHCC                  AS "shcc",
-               CB.HO                    AS "ho",
-               CB.TEN                   AS "ten",
-               DT.TEN_TRUONG            AS "tenCoSoDaoTao",
-               DT.CHUYEN_NGANH          AS "chuyenNganh",
-               DT.BAT_DAU               AS "batDau",
-               DT.BAT_DAU_TYPE          AS "batDauType",
-               DT.KET_THUC              AS "ketThuc",
-               DT.KET_THUC_TYPE         AS "ketThucType",
-               DT.THOI_GIAN             AS "thoiGian",
-               DT.GHI_CHU_HINH_THUC     AS "ghiChuHinhThuc",
-               DT.GHI_CHU_LOAI_BANG_CAP AS "ghiChuLoaiBangCap",
-               DT.TRINH_DO              AS "trinhDo",
-
-               LBC.TEN                  AS "tenLoaiBangCap",
-               TDDT.TEN                 AS "tenTrinhDo",
-               HTDT.TEN                 AS "tenHinhThuc",
-               DT.LOAI_BANG_CAP         AS "loaiBangCap",
-               DT.HINH_THUC             AS "hinhThuc"
-            FROM (SELECT *
-                FROM QT_DAO_TAO
-                WHERE TRINH_DO IN (SELECT MAX(TRINH_DO) FROM (SELECT * FROM QT_DAO_TAO DT1 WHERE DT1.LOAI_BANG_CAP = '6' AND DT1.SHCC = iSHCC ORDER BY DT1.BAT_DAU DESC )
-                    )) DT
-            LEFT JOIN TCHC_CAN_BO CB ON DT.SHCC = CB.SHCC
-                 LEFT JOIN DM_BANG_DAO_TAO LBC ON TO_CHAR(DT.LOAI_BANG_CAP) = TO_CHAR(LBC.MA)
-                 LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TO_CHAR(TDDT.MA) = DT.TRINH_DO
-                 LEFT JOIN DM_HINH_THUC_DAO_TAO HTDT ON TO_CHAR(DT.HINH_THUC) = TO_CHAR(HTDT.MA)
-            WHERE DT.SHCC = iSHCC;
+            WHERE DT.SHCC = iSHCC AND DT.KET_THUC != -1;
     RETURN my_cursor;
 end;
 
@@ -5287,8 +5405,6 @@ BEGIN
                         qtdt.KET_THUC_TYPE  as  "ketThucType",
                         qtdt.HINH_THUC      as  "hinhThuc",
                         qtdt.LOAI_BANG_CAP  as  "loaiBangCap",
-                        qtdt.GHI_CHU_HINH_THUC  as  "ghiChuHinhThuc",
-                        qtdt.GHI_CHU_LOAI_BANG_CAP  as  "ghiChuLoaiBangCap",
                         qtdt.TRINH_DO       as  "trinhDo",
                         qtdt.KINH_PHI       as  "kinhPhi",
 
@@ -5404,8 +5520,6 @@ BEGIN
                         qtdt.KET_THUC_TYPE         as             "ketThucType",
                         qtdt.HINH_THUC             as             "hinhThuc",
                         qtdt.LOAI_BANG_CAP         as             "loaiBangCap",
-                        qtdt.GHI_CHU_HINH_THUC     as             "ghiChuHinhThuc",
-                        qtdt.GHI_CHU_LOAI_BANG_CAP as             "ghiChuLoaiBangCap",
                         qtdt.TRINH_DO              as             "trinhDo",
                         qtdt.KINH_PHI              as             "kinhPhi",
 
@@ -11248,7 +11362,8 @@ BEGIN
                qhcb.QUE_QUAN AS "queQuan"
         FROM QUAN_HE_CAN_BO qhcb
                  LEFT JOIN DM_QUAN_HE_GIA_DINH dmqh ON dmqh.MA = qhcb.MOI_QUAN_HE
-        WHERE isSHCC = qhcb.SHCC;
+        WHERE isSHCC = qhcb.SHCC
+    ORDER BY  qhcb.NAM_SINH ;
     return cur;
 END;
 

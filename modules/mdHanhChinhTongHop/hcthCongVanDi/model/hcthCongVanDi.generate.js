@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, noiBo, loaiCongVan, tenVietTatDonViGui, soDi, donViNhanNgoai, trangThai, laySo }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, noiBo, loaiCongVan, tenVietTatDonViGui, soDi, donViNhanNgoai, trangThai, laySo }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'noiBo': 'NOI_BO', 'loaiCongVan': 'LOAI_CONG_VAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'soDi': 'SO_DI', 'donViNhanNgoai': 'DON_VI_NHAN_NGOAI', 'trangThai': 'TRANG_THAI', 'laySo': 'LAY_SO' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'noiBo': 'NOI_BO', 'loaiCongVan': 'LOAI_CONG_VAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'soDi': 'SO_DI', 'donViNhanNgoai': 'DON_VI_NHAN_NGOAI', 'trangThai': 'TRANG_THAI', 'laySo': 'LAY_SO' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
@@ -77,21 +77,17 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sql_count = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
-                if (error) {
-                    done(error);
-                } else {
-                    let result = {};
-                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT HCTH_CONG_VAN_DI.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                        done(error, result);
-                    });
-                }
+            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
+                let result = {};
+                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT HCTH_CONG_VAN_DI.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                    done(error, result);
+                });
             });
         },
 
