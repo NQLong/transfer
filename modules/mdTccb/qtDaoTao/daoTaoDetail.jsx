@@ -9,7 +9,7 @@ class DaoTaoDetail extends AdminPage {
     trinhDo = ''
     render = () => {
         let chungChi = this.props.chungChi, hocVi = this.props.hocVi;
-        let dataDaoTao = this.props.staff?.dataStaff.daoTaoBoiDuong.filter(i => {
+        let dataDaoTao = this.props.staff?.dataStaff?.daoTaoBoiDuong.filter(i => {
             if (hocVi) return i.tenTrinhDo === hocVi;
             else if (chungChi != 'Hiện tại') return i.chuyenNganh === chungChi;
         }),
@@ -27,7 +27,7 @@ class DaoTaoDetail extends AdminPage {
             case 'Quản lý nhà nước': this.loaiBangCap = 8; break;
         }
 
-        if (chungChi == 'Hiện tại') dataDaoTao = this.props.staff?.dataStaff.daoTaoCurrent;
+        if (chungChi == 'Hiện tại') dataDaoTao = this.props.staff?.dataStaff?.daoTaoCurrent || [];
         const renderData = (items) => (
             renderTable({
                 emptyTable: 'Chưa có dữ liệu về quá trình đào tạo, bồi dưỡng ' + (hocVi || chungChi),

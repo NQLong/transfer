@@ -78,7 +78,7 @@ class StaffPage extends AdminPage {
             listQuocGia = this.listQuocGia.value().toString() || '',
             fromAge = this.fromAge.value() ? Number(this.fromAge.value()) : '',
             toAge = this.toAge.value() ? Number(this.toAge.value()) : '';
-        const pageFilter = (isInitial || isReset)  ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge };
+        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
@@ -104,7 +104,6 @@ class StaffPage extends AdminPage {
                     this.listQuocGia.value(listQuocGia || filter.listQuocGia || '');
                     this.fromAge.value(fromAge || filter.fromAge || '');
                     this.toAge.value(toAge || filter.toAge || '');
-                    if (this.listShcc.value() || this.listDonVi.value() || this.gender.value() || this.listNgach.value() || this.listHocVi.value() || this.listChucDanh.value() || this.isBienChe.value() || this.fromYear.value() || this.toYear.value() || this.listDanToc.value() || this.listTonGiao.value() || this.loaiHopDong?.value() || this.loaiChuyenVien?.value() || this.listQuocGia.value() || this.fromAge.value() || this.toAge.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.listShcc.value('');
                     this.listDonVi.value('');
@@ -145,7 +144,7 @@ class StaffPage extends AdminPage {
 
     handleBienChe = (value) => {
         if (value && value.id == '1') {
-            this.setState({ visibleHDTN: true }); 
+            this.setState({ visibleHDTN: true });
         } else {
             this.setState({ visibleHDTN: false });
         }
@@ -153,7 +152,7 @@ class StaffPage extends AdminPage {
 
     handleChucDanhNgheNghiep = () => {
         if (this.listNgach.value().includes('01.003')) {
-            this.setState({ visibleCVDT: true }); 
+            this.setState({ visibleCVDT: true });
         } else {
             this.setState({ visibleCVDT: false });
         }
@@ -177,11 +176,11 @@ class StaffPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tôn giáo</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Chuyên ngành</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Quốc gia<br/>tốt nghiệp</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Quốc gia<br />tốt nghiệp</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Email</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu<br/>công tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu<br />công tác</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>CMND</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mã ngạch</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Hệ số lương</th>
@@ -212,7 +211,7 @@ class StaffPage extends AdminPage {
                         {item.tenDonVi && item.tenDonVi.normalizedName()}
                     </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.email} />
-                    <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayBatDauCongTac} />
+                    <TableCell type='date' style={{ color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayBatDauCongTac} />
                     <TableCell type='text' content={item.cmnd} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='text' content={item.ngach} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='number' content={item.heSoLuong?.toFixed(2)} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
@@ -236,23 +235,31 @@ class StaffPage extends AdminPage {
                 <div className='row'>
                     <FormSelect ref={e => this.listDonVi = e} className='col-md-6' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
                     <FormSelect ref={e => this.listShcc = e} className='col-md-6' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
-                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-2' minimumResultsForSearch={-1} allowClear />
+
+                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear />
+                    <FormSelect className='col-md-3' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
+                    <FormSelect className='col-md-3' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
+                    <FormSelect className='col-md-3' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh khoa học' />
+
                     <FormSelect ref={e => this.isBienChe = e} data={
                         [{ id: 0, text: 'Biên chế' }, { id: 1, text: 'Hợp đồng' }]
-                    } className='col-md-2' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
-                    {this.state.visibleHDTN == true && <FormSelect className='col-md-2' ref={e => this.loaiHopDong = e} data={[{ id: 0, text: 'Viên chức + Lao động' }, { id: 1, text: 'Trách nhiệm' }]} minimumResultsForSearch={-1} allowClear label='Lọc theo loại hợp đồng' /> }
-                    <FormSelect className='col-md-3' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep}/>
-                    {this.state.visibleCVDT && <FormSelect className='col-md-3' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên'/> }
-                    <FormSelect className='col-md-4' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
-                    <FormSelect className='col-md-4' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
-                    <FormSelect className='col-md-4' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh khoa học' />
-                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
-                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
+                    } className='col-md-6' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
+                    {this.state.visibleHDTN == true && <FormSelect className='col-md-6' ref={e => this.loaiHopDong = e} data={[{ id: 0, text: 'Viên chức + Lao động' }, { id: 1, text: 'Trách nhiệm' }]} minimumResultsForSearch={-1} allowClear label='Lọc theo loại hợp đồng' />}
+
+                    <FormSelect className='col-md-6' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
+                    {this.state.visibleCVDT && <FormSelect className='col-md-6' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên' />}
+
+
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-md-6' label='Từ thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-md-6' label='Đến thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
+
                     <FormSelect className='col-md-4' ref={e => this.listDanToc = e} data={SelectAdapter_DmDanTocV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo dân tộc' />
                     <FormSelect className='col-md-4' ref={e => this.listTonGiao = e} data={SelectAdapter_DmTonGiaoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo tôn giáo' />
                     <FormTextBox className='col-md-2' type='number' ref={e => this.fromAge = e} label='Từ độ tuổi' />
                     <FormTextBox className='col-md-2' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
+
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <div style={{ marginRight: '10px' }}>Tìm thấy: &nbsp;{<b>{totalItem}</b>} cán bộ</div>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                         </button>
@@ -263,11 +270,6 @@ class StaffPage extends AdminPage {
                 </div>
             </>,
             content: <>
-                <div className='tile'>
-                    <div className='tile-title'>Thống kê</div>
-                    <div className='row col-sm-12'>Tổng cán bộ: &nbsp;{<b>{totalItem}</b>}</div>
-                    {/* <div className='row col-sm-12'>Cán bộ nam: &nbsp;{<b>{list.groupBy('phai')['01']?.length}</b>}</div> */}
-                </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}

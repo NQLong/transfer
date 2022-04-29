@@ -57,7 +57,7 @@ class ComponentToChucKhac extends AdminPage {
     }
 
     render() {
-        const dataToChucKhac = this.props.staff?.dataStaff.toChucKhac || [];
+        const dataToChucKhac = this.props.staff?.dataStaff?.toChucKhac || [];
         let isCanBo = this.getUserPermission('staff', ['login']).login, permission = {
             write: isCanBo, read: isCanBo, delete: isCanBo
         };

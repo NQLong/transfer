@@ -16,7 +16,7 @@ class ComponentChucVu extends AdminPage {
 
     render() {
         let type = this.props.type,
-            dataChucVu = (type == 'CQ') ? this.props.staff?.dataStaff.chucVuChinhQuyen : this.props.staff?.dataStaff.chucVuDoanThe;
+            dataChucVu = (type == 'CQ') ? this.props.staff?.dataStaff?.chucVuChinhQuyen : this.props.staff?.dataStaff?.chucVuDoanThe;
         const renderTableChucVu = (items) => renderTable({
             getDataSource: () => items, stickyHead: false,
             header: 'thead-light',

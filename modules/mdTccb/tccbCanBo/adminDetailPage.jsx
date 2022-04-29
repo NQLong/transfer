@@ -37,10 +37,10 @@ class CanBoPage extends AdminPage {
     }
 
     setUp = (item) => {
-        this.componentCaNhan.value(item);
-        this.componentTTCongTac.value(item);
-        this.componentQuanHe.value(item.email, item.phai, item.shcc);
-        this.componentTrinhDo.value(item);
+        this.componentCaNhan?.value(item);
+        this.componentTTCongTac?.value(item);
+        this.componentQuanHe?.value(item.email, item.phai, item.shcc);
+        this.componentTrinhDo?.value(item);
         this.setState({ load: false });
     }
 
@@ -70,7 +70,7 @@ class CanBoPage extends AdminPage {
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={this.state.shcc} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} userEdit={false} tccb={true} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />
             </>,
             backRoute: '/user/tccb/staff',
             onSave: this.save,

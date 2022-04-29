@@ -119,7 +119,7 @@ class ComponentQuanHe extends AdminPage {
     );
 
     render() {
-        const dataQuanHe = this.props.staff?.dataStaff.quanHeCanBo;
+        const dataQuanHe = this.props.staff?.dataStaff?.quanHeCanBo || [];
         let isCanBo = this.getUserPermission('staff', ['login']).login, permission = { write: isCanBo, read: isCanBo, delete: isCanBo };
         let familyTabs = [
             {
