@@ -36,20 +36,19 @@ class ProfileCommon extends AdminPage {
     render() {
         return (
             <div className='tile' >
-                <h3 className='tile-title'>THÔNG TIN CÁ NHÂN</h3>
+                <h3 className='tile-title'>Thông tin cá nhân</h3>
                 <div className='tile-body' >
-                    <div className='row'><div className='col-12 col-lg-8 order-2 order-lg-1' style={{ paddingTop: 10 }}>
-                        <FormTextBox ref={e => this.hoTen = e} label='Họ và tên' className='form-group' readOnly />
-                        <FormTextBox ref={e => this.email = e} label='Email' className='form-group' readOnly />
-                        <FormSelect ref={e => this.phai = e} label='Giới tính' data={SelectAdapter_DmGioiTinhV2} className='form-group' />
-                        <FormTextBox ref={e => this.dienThoai = e} label='Điện thoại' className='form-group' />
-                        <FormDatePicker type='date-mask' ref={e => this.ngaySinh = e} label='Ngày sinh' className='form-group' />
-                    </div>
-                        <div className='col-12 col-lg-4 order-1 order-lg-2'>
-                            <FormImageBox ref={e => this.imageBox = e} label='Hình đại diện'
-                                postUrl='/user/upload' uploadType='UserImage' onSuccess={this.imageChanged} />
+                    <div className='row'><div className='col-md-9 order-2 order-lg-1' style={{ paddingTop: 10 }}>
+                        <div className='row'>
+                            <FormTextBox ref={e => this.hoTen = e} label='Họ và tên' className='col-md-12' readOnly />
+                            <FormTextBox ref={e => this.email = e} label='Email' className='col-md-12' readOnly />
+                            <FormSelect ref={e => this.phai = e} label='Giới tính' data={SelectAdapter_DmGioiTinhV2} className='col-md-6' />
+                            <FormDatePicker type='date-mask' ref={e => this.ngaySinh = e} label='Ngày sinh' className='col-md-6' />
+                            <FormTextBox ref={e => this.dienThoai = e} label='Điện thoại' className='col-md-12' />
                         </div>
-
+                    </div>
+                        <FormImageBox ref={e => this.imageBox = e} label='Hình đại diện' className='col-md-3 order-1 order-lg-2 rounded-circle' isProfile={true}
+                            postUrl='/user/upload' uploadType='UserImage' onSuccess={this.imageChanged} />
                     </div>
                 </div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>

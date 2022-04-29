@@ -61,7 +61,7 @@ class ComponentNN extends AdminPage {
     }
 
     render() {
-        const dataTrinhDoNgoaiNgu = this.props.staff?.dataStaff.trinhDoNN;
+        const dataTrinhDoNgoaiNgu = this.props.staff?.dataStaff?.trinhDoNN || [];
         let isCanBo = this.getUserPermission('staff', ['login']).login,
             permission = { read: isCanBo, write: isCanBo, delete: isCanBo };
 
