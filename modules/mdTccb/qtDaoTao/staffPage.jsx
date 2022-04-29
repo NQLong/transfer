@@ -116,6 +116,7 @@ class EditModal extends AdminModal {
     };
 
     handleKetThuc = (value) => {
+        console.log($('#ketThucDate'));
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
         this.setState({ denNay: value });
         if (!value) {

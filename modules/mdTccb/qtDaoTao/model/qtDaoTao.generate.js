@@ -1,6 +1,6 @@
-// Table name: QT_DAO_TAO { shcc, tenTruong, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id, batDauType, ketThucType, thoiGian, ghiChuHinhThuc, ghiChuLoaiBangCap, trinhDo, kinhPhi }
+// Table name: QT_DAO_TAO { shcc, tenTruong, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id, batDauType, ketThucType, thoiGian, trinhDo, kinhPhi, minhChung }
 const keys = ['ID'];
-const obj2Db = { 'shcc': 'SHCC', 'tenTruong': 'TEN_TRUONG', 'chuyenNganh': 'CHUYEN_NGANH', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'hinhThuc': 'HINH_THUC', 'loaiBangCap': 'LOAI_BANG_CAP', 'id': 'ID', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'thoiGian': 'THOI_GIAN', 'ghiChuHinhThuc': 'GHI_CHU_HINH_THUC', 'ghiChuLoaiBangCap': 'GHI_CHU_LOAI_BANG_CAP', 'trinhDo': 'TRINH_DO', 'kinhPhi': 'KINH_PHI' };
+const obj2Db = { 'shcc': 'SHCC', 'tenTruong': 'TEN_TRUONG', 'chuyenNganh': 'CHUYEN_NGANH', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'hinhThuc': 'HINH_THUC', 'loaiBangCap': 'LOAI_BANG_CAP', 'id': 'ID', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'thoiGian': 'THOI_GIAN', 'trinhDo': 'TRINH_DO', 'kinhPhi': 'KINH_PHI', 'minhChung': 'MINH_CHUNG' };
 
 module.exports = app => {
     app.model.qtDaoTao = {
@@ -77,17 +77,21 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sql_count = 'SELECT COUNT(*) FROM QT_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 
@@ -131,33 +135,8 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        getByShcc: (isshcc, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_dao_tao_get_by_shcc(:isshcc); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, isshcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        getTDCT: (ishcc, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_dao_tao_get_trinh_do_chinh_tri_can_bo(:ishcc); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, ishcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        getQLNN: (ishcc, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_dao_tao_get_trinh_do_qlnn_can_bo(:ishcc); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, ishcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        getTH: (ishcc, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_dao_tao_get_trinh_do_tin_hoc_can_bo(:ishcc); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, ishcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
         getHV: (ishcc, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=qt_dao_tao_get_hoc_vi_can_bo(:ishcc); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, ishcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        getCC: (ishcc, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_dao_tao_get_cc_can_bo(:ishcc); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, ishcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 

@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getStaffEdit, userGetStaff } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import {
-    createToChucKhacStaff, updateToChucKhacStaff, deleteToChucKhacStaff,
-    createToChucKhacStaffUser, updateToChucKhacStaffUser, deleteToChucKhacStaffUser
+    createToChucKhacStaff, updateToChucKhacStaff, deleteToChucKhacStaff
 } from './redux';
 
 class ToChucKhacModal extends AdminModal {
@@ -12,7 +10,7 @@ class ToChucKhacModal extends AdminModal {
         let { ma, tenToChuc, ngayThamGia, moTa } = item && item.item ? item.item : {
             ma: null, tenToChuc: '', ngayThamGia: null, moTa: ''
         };
-        this.setState({ ma, email: item.email, item, shcc: item.shcc });
+        this.setState({ ma, item });
         this.tenToChuc.value(tenToChuc ? tenToChuc : '');
         this.ngayThamGia.value(ngayThamGia ? ngayThamGia : null);
         this.moTa.value(moTa ? moTa : '');
@@ -20,8 +18,7 @@ class ToChucKhacModal extends AdminModal {
 
     onSubmit = () => {
         const changes = {
-            shcc: this.state.shcc,
-            email: this.state.email,
+            shcc: this.props.shcc,
             tenToChuc: this.tenToChuc.value(),
             ngayThamGia: Number(this.ngayThamGia.value()),
             moTa: this.moTa.value(),
@@ -46,13 +43,6 @@ class ToChucKhacModal extends AdminModal {
 
 
 class ComponentToChucKhac extends AdminPage {
-    shcc = '';
-    email = '';
-
-    value = (shcc, email) => {
-        this.shcc = shcc;
-        this.email = email;
-    }
 
     showModal = (e, item) => {
         e.preventDefault();
@@ -60,25 +50,26 @@ class ComponentToChucKhac extends AdminPage {
     }
 
     deleteToChucKhac = (e, item) => {
-        T.confirm('Xóa thông tin tổ chức tham gia', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && ((this.props.staff && this.props.staff.userItem) ? this.props.deleteToChucKhacStaffUser(item.ma, () => this.props.userGetStaff(this.email)) : this.props.deleteToChucKhacStaff(item.ma, () => this.props.getStaffEdit(this.shcc))));
         e.preventDefault();
+        T.confirm('Xóa thông tin tổ chức tham gia', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
+            isConfirm && this.props.deleteToChucKhacStaff(item.ma, item.shcc)
+        );
     }
 
     render() {
-        const dataToChucKhac = (this.props.staff && this.props.staff.userItem) ? this.props.staff?.userItem?.toChucKhac : this.props.staff?.selectedItem?.toChucKhac;
-        let permission = {
-            write: true,
-            read: true,
-            delete: true
+        const dataToChucKhac = this.props.staff?.dataStaff.toChucKhac || [];
+        let isCanBo = this.getUserPermission('staff', ['login']).login, permission = {
+            write: isCanBo, read: isCanBo, delete: isCanBo
         };
 
         const renderTableToChucKhac = (items) => (
             renderTable({
                 emptyTable: 'Không tham gia tổ chức nào',
                 getDataSource: () => items, stickyHead: false,
+                header: 'thead-light',
                 renderHead: () => (
                     <tr>
+                        <th style={{ width: 'auto' }}>#</th>
                         <th style={{ width: '50%' }}>Tên tổ chức</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày tham gia</th>
                         <th style={{ width: '50%' }}>Mô tả nội dung công việc tham gia tổ chức</th>
@@ -86,6 +77,7 @@ class ComponentToChucKhac extends AdminPage {
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
+                        <TableCell content={index + 1} />
                         <TableCell type='link' content={item.tenToChuc} onClick={e => this.showModal(e, item)} />
                         <TableCell type='date' style={{ textAlign: 'center' }} content={item.ngayThamGia} dateFormat='dd/mm/yyyy' />
                         <TableCell type='text' content={item.moTa} />
@@ -95,21 +87,21 @@ class ComponentToChucKhac extends AdminPage {
         );
         return (
             <div style={{ marginTop: '1rem' }}>{this.props.label}
-                <div className='tile-body'>{dataToChucKhac ? renderTableToChucKhac(dataToChucKhac) : renderTableToChucKhac([])}</div>
+                <div style={{ marginTop: '1rem' }} className='tile-body'>{renderTableToChucKhac(dataToChucKhac)}</div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm
                     </button>
                 </div>
-                <ToChucKhacModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
-                    create={(this.props.staff && this.props.staff.userItem) ? this.props.createToChucKhacStaffUser : this.props.createToChucKhacStaff}
-                    update={(this.props.staff && this.props.staff.userItem) ? this.props.updateToChucKhacStaffUser : this.props.updateToChucKhacStaff} />
+                <ToChucKhacModal ref={e => this.modal = e} shcc={this.props.shcc}
+                    create={this.props.createToChucKhacStaff}
+                    update={this.props.updateToChucKhacStaff} />
             </div>
         );
     }
 }
 const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
-    getStaffEdit, userGetStaff, createToChucKhacStaff, updateToChucKhacStaff, deleteToChucKhacStaff, createToChucKhacStaffUser, updateToChucKhacStaffUser, deleteToChucKhacStaffUser
+    createToChucKhacStaff, updateToChucKhacStaff, deleteToChucKhacStaff
 };
-export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentToChucKhac);
+export default connect(mapStateToProps, mapActionsToProps)(ComponentToChucKhac);

@@ -3,7 +3,7 @@ module.exports = app => {
         parentMenu: app.parentMenu.daoTao,
         menus: {
             7005: {
-                title: 'Danh sách chuyên ngành', subTitle: 'Chuyên ngành của Khoa mở trong CTĐT', groupIndex: 0,
+                title: 'Danh sách chuyên ngành', groupIndex: 0,
                 icon: 'fa-sitemap', backgroundColor: '#5C4732',
                 link: '/user/dao-tao/danh-sach-chuyen-nganh'
             },

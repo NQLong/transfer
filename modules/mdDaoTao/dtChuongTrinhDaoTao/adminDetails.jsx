@@ -176,7 +176,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                 </div>
                             </div>
 
-                            <FormSelect ref={e => this.namDaoTao = e} label='Năm đào tạo' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-3' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
+                            <FormSelect ref={e => this.namDaoTao = e} label='Khóa' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-3' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
                             <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-3' required readOnly={readOnly} />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-3' required readOnly={readOnly} />
                             <FormTextBox type='number' suffix=' năm' step={0.5} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-3' required readOnly={readOnly} />
