@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtDaoTaoGetAll = 'QtDaoTao:GetAll';
@@ -106,15 +106,15 @@ export function createQtDaoTao(data, done) {
         const url = '/api/qua-trinh/dao-tao';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger');
+                T.notify('Thêm quá trình đào tạo bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
+                T.notify('Thêm quá trình đào tạo thành công!', 'success');
                 done(data);
                 dispatch(getQtDaoTaoPage());
 
             }
-        }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Thêm quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
@@ -123,14 +123,14 @@ export function updateQtDaoTao(id, changes, done) {
         const url = '/api/qua-trinh/dao-tao';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger');
+                T.notify('Cập nhật quá trình đào tạo bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình đào tạo thành công!', 'info');
+                T.notify('Cập nhật quá trình đào tạo thành công!', 'success');
                 done && done(data.item);
                 dispatch(getQtDaoTaoPage());
             }
-        }, () => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
@@ -139,61 +139,61 @@ export function deleteQtDaoTao(id) {
         const url = '/api/qua-trinh/dao-tao';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger');
+                T.notify('Xóa quá trình đào tạo bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'success', false, 800);
                 dispatch(getQtDaoTaoPage());
             }
-        }, () => T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Xóa quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
-export function createQtDaoTaoStaffUser(data, isEdit, done) {
+export function createQtDaoTaoStaff(data, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/dao-tao';
-        T.post(url, { data }, res => {
+        T.post(url, { data, shcc: data.shcc }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger');
+                T.notify('Thêm quá trình đào tạo bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
+                T.notify('Thêm quá trình đào tạo thành công!', 'success');
+                dispatch(getStaffEdit(data.shcc));
                 if (done) done(res.item);
-                isEdit ? dispatch(userGetStaff(data.email)) : dispatch(getStaffEdit(data.shcc));
             }
-        }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Thêm quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
-export function updateQtDaoTaoStaffUser(id, changes, isEdit, done) {
+export function updateQtDaoTaoStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/dao-tao';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { id, changes, shcc: changes.shcc }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger');
+                T.notify('Cập nhật quá trình đào tạo bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình đào tạo thành công!', 'info');
+                T.notify('Cập nhật quá trình đào tạo thành công!', 'success');
+                dispatch(getStaffEdit(changes.shcc));
                 if (done) done(data.item);
-                isEdit ? dispatch(userGetStaff(changes.email)) : dispatch(getStaffEdit(changes.shcc));
             }
-        }, () => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtDaoTaoStaffUser(id, email, isEdit, done) {
+export function deleteQtDaoTaoStaff(id, shcc, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/dao-tao';
-        T.delete(url, { id }, data => {
+        T.delete(url, { id, shcc }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger');
+                T.notify('Xóa quá trình đào tạo bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'info', false, 800);
-                // done && done();
-                isEdit ? dispatch(userGetStaff(email, done && done())) : dispatch(getStaffEdit(email, done && done()));
+                T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'success', false, 800);
+                dispatch(getStaffEdit(shcc));
+                done && done();
             }
-        }, () => T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Xóa quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
@@ -226,14 +226,14 @@ export function createQtDaoTaoStaffPage(data, done) {
         const url = '/api/user/qua-trinh/dao-tao';
         T.post(url, { data }, data => {
             if (data.error) {
-                T.notify('Tạo thông tin đào tạo lỗi', 'danger');
+                T.notify('Tạo đào tạo lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + data.error);
             } else {
-                T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
+                T.notify('Thêm quá trình đào tạo thành công!', 'success');
                 if (done) done(data);
                 dispatch(getQtDaoTaoStaffPage());
             }
-        }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Thêm quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
@@ -242,14 +242,14 @@ export function updateQtDaoTaoStaffPage(id, changes, done) {
         const url = '/api/user/qua-trinh/dao-tao';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin đào tạo lỗi', 'danger');
+                T.notify('Cập nhật đào tạo lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + data.error);
             } else {
-                T.notify('Cập nhật thông tin đào tạo thành công!', 'info');
+                T.notify('Cập nhật đào tạo thành công!', 'success');
                 if (done) done(data);
                 dispatch(getQtDaoTaoStaffPage());
             }
-        }, () => T.notify('Cập nhật thông tin đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật đào tạo bị lỗi', 'danger'));
     };
 }
 
@@ -258,13 +258,13 @@ export function deleteQtDaoTaoStaffPage(id, done) {
         const url = '/api/user/qua-trinh/dao-tao';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xoá thông tin đào tạo lỗi', 'danger');
+                T.notify('Xoá đào tạo lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + data.error);
             } else {
-                T.notify('Xoá thông tin đào tạo thành công!', 'info');
+                T.notify('Xoá đào tạo thành công!', 'success');
                 if (done) done(data);
                 dispatch(getQtDaoTaoStaffPage());
             }
-        }, () => T.notify('Xoá thông tin đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Xoá đào tạo bị lỗi', 'danger'));
     };
 }

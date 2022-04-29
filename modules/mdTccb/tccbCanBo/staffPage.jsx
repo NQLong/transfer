@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
-    userGetStaff, updateStaffUser
+    getStaffEdit, updateStaff
 } from './redux';
 // import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import ComponentCaNhan from './componentCaNhan';
@@ -27,12 +27,16 @@ class StaffUserPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user', () => {
-            if (this.props.system && this.props.system.user) {
-                const user = this.props.system.user;
-                this.emailCanBo = user.email ? user.email : null;
-                this.props.userGetStaff(user.email, data => {
+            if (this.props.system && this.props.system.user && this.props.system.user.staff) {
+                const staff = this.props.system.user.staff;
+                if (!staff.shcc) {
+                    T.notify('Cán bộ chưa có mã thẻ', 'danger');
+                    this.props.history.goBack();
+                } else this.shcc = staff.shcc;
+                this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
+                        return;
                     } else if (data.item) {
                         this.setState({ lastModified: data.item.lastModified });
                         this.setUp(data.item);
@@ -55,33 +59,38 @@ class StaffUserPage extends AdminPage {
 
     save = () => {
         const caNhanData = this.componentCaNhan.getAndValidate();
-        const congTacData = this.componentTTCongTac.getAndValidate();
-        const trinhDoData = this.componentTrinhDo.getAndValidate();
-        if (this.emailCanBo) {
-            if (caNhanData && congTacData && trinhDoData) {
-                this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
-            }
-        }
+        // const congTacData = this.componentTTCongTac.getAndValidate();
+        // const trinhDoData = this.componentTrinhDo.getAndValidate();
+        this.props.updateStaff(this.shcc, {
+            ...caNhanData
+        });
+        // if (this.emailCanBo) {
+        //     if (caNhanData && congTacData && trinhDoData) {
+        //         this.props.updateStaff(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
+        //     }
+        // }
     }
 
 
     render() {
-        const { staff } = this.props.system && this.props.system.user ? this.props.system.user : { staff: null },
-            permission = this.getUserPermission('staff');
+        const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
+            shcc = this.props.system.user.staff.shcc;
+        if (permission.login && permission.write) permission.write = false;
+
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',
-            subTitle: staff ? <span>Chỉnh sửa lần cuối lúc <span style={{ color: 'blue' }}>{T.dateToText(this.state.lastModified ? this.state.lastModified : staff.lastModified)}</span></span> : '',
+            subTitle: <span>Chỉnh sửa lần cuối lúc <span style={{ color: 'blue' }}>{T.dateToText(this.state.lastModified) || ''}</span></span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Hồ sơ',
             ],
             content: <>
                 {!this.state.item && <Loading />}
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} />
-                <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false} />
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={shcc} />
+                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} />
+                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={shcc} readOnly={!permission.write} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
             </>,
             backRoute: '/user',
             onSave: this.save,
@@ -92,6 +101,6 @@ class StaffUserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
-    userGetStaff, updateStaffUser
+    getStaffEdit, updateStaff
 };
 export default connect(mapStateToProps, mapActionsToProps)(StaffUserPage);
