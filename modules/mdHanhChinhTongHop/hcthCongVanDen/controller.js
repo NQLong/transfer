@@ -101,14 +101,14 @@ module.exports = (app) => {
                 app.fs.rename(sourcePath, destPath, error => {
                     if (error) done && done({ error });
                     else
-                        app.model.hcthFileCongVan.update({ id }, { ...changes, congVan: congVanId }, (error) => {
+                        app.model.hcthFile.update({ id }, { ...changes, ma: congVanId }, (error) => {
                             if (error)
                                 done && done({ error });
                             else updateListFile(listFile, congVanId, done);
                         });
                 });
             else
-                app.model.hcthFileCongVan.update({ id }, { ...changes }, (error) => {
+                app.model.hcthFile.update({ id }, { ...changes }, (error) => {
                     if (error)
                         done && done({ error });
                     else
@@ -119,7 +119,7 @@ module.exports = (app) => {
     };
 
     const deleteCongVan = (id, done) => {
-        app.model.hcthFileCongVan.delete({ congVan: id }, (error) => {
+        app.model.hcthFile.delete({ ma: id }, (error) => {
             if (error) done && done({ error });
             else
                 app.model.hcthChiDao.delete({ congVan: id, loai: CONG_VAN_TYPE }, (error) => {
@@ -145,7 +145,7 @@ module.exports = (app) => {
                             res.send({ errors, item });
                         else
                             createChiDaoFromList(chiDao, req.body.id, () => {
-                                app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
+                                app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_TYPE }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
                                     updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
                                         const trangThaiBefore = congVan.trangThai;
                                         const trangThaiAfter = item.trangThai;
@@ -182,7 +182,7 @@ module.exports = (app) => {
     const createDonViNhanFromList = (listDonViNhan, congVanId, done) => {
         if (listDonViNhan && listDonViNhan.length > 0) {
             const [donViNhan] = listDonViNhan.splice(0, 1);
-            app.model.hcthDonViNhanCongVan.create({ donViNhan, congVan: congVanId, loai: CONG_VAN_TYPE }, (error) => {
+            app.model.hcthDonViNhan.create({ donViNhan, ma: congVanId, loai: CONG_VAN_TYPE }, (error) => {
                 if (error)
                     done && done({ error });
                 else createDonViNhanFromList(listDonViNhan, congVanId, done);
@@ -285,7 +285,7 @@ module.exports = (app) => {
                     if (error) {
                         done && done({ error });
                     } else {
-                        app.model.hcthFileCongVan.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: CONG_VAN_TYPE, congVan: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
+                        app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: CONG_VAN_TYPE, ma: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
                     }
                 });
             }
@@ -300,7 +300,7 @@ module.exports = (app) => {
             file = req.body.file,
             congVan = id || null,
             filePath = app.assetPath + '/congVanDen/' + (id ? id + '/' : 'new/') + file;
-        app.model.hcthFileCongVan.delete({ id: fileId, congVan }, (error) => {
+        app.model.hcthFile.delete({ id: fileId, ma: congVan, loai: CONG_VAN_TYPE }, (error) => {
             if (error) {
                 res.send({ error });
             }
@@ -316,7 +316,7 @@ module.exports = (app) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhanCongVan.getAllDVN({ congVan: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
             } else {
@@ -364,10 +364,10 @@ module.exports = (app) => {
             if (isNaN(id))
                 throw { status: 400, message: 'Invalid id' };
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhanCongVan.getAllDVN({ congVan: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
-            const files = await app.model.hcthFileCongVan.getAllFile({ congVan: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
+            const files = await app.model.hcthFile.getAllFile({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
             const history = await app.model.hcthHistory.getAllHistoryFrom(id, CONG_VAN_TYPE);
             const chiDao = await app.model.hcthChiDao.getAllChiDao(id, CONG_VAN_TYPE);
