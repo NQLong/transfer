@@ -1,21 +1,33 @@
 module.exports = app => {
     const FILE_TYPE = 'DI';
 
-    const menu = {
+    const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
             531: { title: 'Công văn giữa các phòng', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
+
+    const menu = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1053: { title: 'Công văn giữa các phòng', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
+        },
+    };
     app.permission.add(
-        { name: 'hcthCongVanDi:read' },
+        { name: 'hcthCongVanDi:read', menu: staffMenu },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
+        { name: 'hcthCongVanDi:manage'},
         { name: 'hcth:login' },
+        { name: 'hcth:manage'},
         { name: 'staff:login', menu },
     );
-    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), app.templates.admin);
+
+    app.get('/user/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/cong-van-cac-phong/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/hcth/cong-van-cac-phong/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {

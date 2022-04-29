@@ -141,8 +141,9 @@ class AdminEditPage extends AdminPage {
     };
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
-            const params = T.routeMatcher('/user/hcth/cong-van-cac-phong/:id').parse(window.location.pathname),
+        const hcthMenu = window.location.pathname.startsWith('/user/hcth');
+        T.ready(hcthMenu ? '/user/hcth' : '/user', () => {
+            const params = T.routeMatcher(hcthMenu ? '/user/hcth/cong-van-cac-phong/:id' : '/user/hcth/cong-van-cac-phong/:id').parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '', maDonVi: '' },
                 { shcc, maDonVi } = user;
 
