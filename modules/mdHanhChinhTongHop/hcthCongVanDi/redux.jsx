@@ -106,6 +106,7 @@ export function updateHcthCongVanDi(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật công văn giữa các phòng thành công!', 'success');
+                // console.log(changes);
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done();
             }

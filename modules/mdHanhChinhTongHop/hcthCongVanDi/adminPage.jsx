@@ -161,7 +161,7 @@ class HcthCongVanDi extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)} content={item.soDi && item.tenVietTatDonViGui ? getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : 'Chưa có số công văn'} />
-                        <TableCell type='text' contentClassName='multiple-lines' content={item.trichYeu || ''} />
+                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.trichYeu || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
