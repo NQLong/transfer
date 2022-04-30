@@ -86,7 +86,9 @@ const actionToText = (value) => {
         case action.ACCEPT:
             return 'chấp nhận';
         case action.READ:
-            return 'đã đọc';
+            return 'đọc';
+        case action.SEND:
+            return 'gửi';
         default:
             return '';
     }
@@ -108,7 +110,10 @@ const actionColor = (value) => {
 const statusToAction = (before, after) => {
     switch (before) {
         case '1':
-            return action.UPDATE;
+            if (before == after) {
+                return action.UPDATE;
+            }
+            return action.SEND;
         case '2':
             if (after == '4')
                 return action.RETURN;
@@ -340,10 +345,13 @@ class AdminEditPage extends AdminPage {
 
     save = () => {
         const changes = this.getValidatedData();
+
         if (changes) {
             if (!this.state.trangThai) changes.trangThai = '1';
             if (this.state.id) {
-                this.onCreateHistory();
+                if (changes.trangThai == '1') {
+                    this.onCreateHistory(changes.trangThai);
+                }
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
                 this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-cac-phong'));
