@@ -1,0 +1,10 @@
+FROM node:10
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+ARG API_URI
+ENV API_URI ${API_URI:-https://backend.lt-ecom.tk/graphql/}
+
+EXPOSE 3000
+CMD npm start -- --host 0.0.0.0 --disable-host-check
