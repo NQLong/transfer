@@ -335,10 +335,12 @@ module.exports = app => {
             const tenVietTatLoaiCongVan = loaiCV !== null ? await app.model.dmLoaiCongVan.getLoai({ id: loaiCV }, 'tenVietTat', '') : null;
             const tenVietTatDonViGui = await app.model.dmDonVi.getDonVi({ ma: donViGui }, 'tenVietTat', '');
 
+            // console.log(phanHoi);
+            // console.log(history);
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi?.rows || [],
+                    phanHoi: phanHoi || [],
                     donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     history: history?.rows || [],
@@ -396,6 +398,15 @@ module.exports = app => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
-
+    // const createNotification = (emails, notification, done) => {
+    //     const promises = [];
+    //     emails.forEach(email => {
+    //         promises.push(app.notification.send({
+    //             toEmail: email,
+    //             ...notification
+    //         }));
+    //     });
+    //     Promise.all(promises).then(() => done(null)).catch(error => done(error));
+    // };
 };
 

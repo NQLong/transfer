@@ -183,7 +183,7 @@ export function getCongVanDi(id, done) {
 }
 
 export function createPhanHoi(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/hcth/cong-van-cac-phong/phan-hoi';
         T.post(url, { data: data }, res => {
             if (res.error) {
@@ -192,7 +192,6 @@ export function createPhanHoi(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm phản hồi thành công!', 'success');
-                dispatch(getHcthCongVanDiSearchPage());
                 done && done(data);
             }
         }, () => T.notify('Thêm phản hồi bị lỗi', 'danger'));
@@ -207,7 +206,6 @@ export function createHistory(data, done) {
                 T.notify('Thêm lịch sử bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
             } else {
-                // T.notify('Thêm lịch sử thành công', 'success');
                 done && done(data);
             }
         }, () => T.notify('Thêm lịch sử bị lỗi', 'danger'));

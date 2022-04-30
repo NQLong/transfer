@@ -110,6 +110,7 @@ const actionColor = (value) => {
 const statusToAction = (before, after) => {
     switch (before) {
         case '1':
+        case '4':
             if (before == after) {
                 return action.UPDATE;
             }
@@ -124,8 +125,6 @@ const statusToAction = (before, after) => {
                 return action.RETURN;
             else
                 return action.APPROVE;
-        case '4':
-            return action.UPDATE;
         case '5':
             return action.READ;
         default:
@@ -349,7 +348,7 @@ class AdminEditPage extends AdminPage {
         if (changes) {
             if (!this.state.trangThai) changes.trangThai = '1';
             if (this.state.id) {
-                if (changes.trangThai == '1') {
+                if (changes.trangThai == '1' || changes.trangThai == '4') {
                     this.onCreateHistory(changes.trangThai);
                 }
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
@@ -400,7 +399,8 @@ class AdminEditPage extends AdminPage {
                     };
                     this.onCreateHistory('4');
                     this.props.createPhanHoi(newPhanHoi, () => {
-                        this.setState({ trangThai: '4' }, () => this.save());
+                        this.setState({ trangThai: '4' }, () =>
+                            this.props.updateHcthCongVanDi(this.state.id, this.getValidatedData(), this.getData));
                     });
                 } else {
                     T.notify('Bạn cần thêm lý do trả lại', 'danger');
@@ -582,7 +582,7 @@ class AdminEditPage extends AdminPage {
                             <div className='tile-body row'>
                                 <div className='col-md-12'>
                                     {
-                                        this.renderPhanHoi(this.state.phanHoi)
+                                        this.renderPhanHoi(this.props.hcthCongVanDi?.item?.phanHoi)
                                     }
                                 </div>
                                 {addPhanHoi &&
@@ -625,7 +625,7 @@ class AdminEditPage extends AdminPage {
 
             </>,
             backRoute: '/user/hcth/cong-van-cac-phong',
-            onSave: ((((permission && permission.write) || (lengthDv >= 1)) && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login && this.state.trangThai == '') || (checkDonViGui && this.state.trangThai == '1')) ? this.save : null,
+            onSave: ((((permission && permission.write) || (lengthDv >= 1)) && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login && this.state.trangThai == '') || (checkDonViGui && (this.state.trangThai == '1' || this.state.trangThai == '4'))) ? this.save : null,
             buttons: !readTrangThai && !presidentPermission.login && !isNew && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onSend }],
         });
     }
