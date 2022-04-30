@@ -312,3 +312,18 @@ export function getThongKeMucDich(pageCondition, filter, done) {
         }, (error) => T.notify('Thống kê danh sách mục đích đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
+
+export function deleteFile(shcc, file, done) {
+    return () => {
+        const url = '/api/qua-trinh/di-nuoc-ngoai/delete-file';
+        T.put(url, { shcc, file }, data => {
+            if (data.error) {
+                console.error('PUT: ' + url + '.', data.error);
+                T.notify('Xóa file đính kèm lỗi!', 'danger');
+            } else {
+                T.notify('Xóa file đính kèm thành công!', 'success');
+                done && done();
+            }
+        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
+    };
+}
