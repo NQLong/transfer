@@ -147,7 +147,7 @@ class AdminEditPage extends AdminPage {
     componentDidMount() {
         const hcthMenu = window.location.pathname.startsWith('/user/hcth');
         T.ready(hcthMenu ? '/user/hcth' : '/user', () => {
-            const params = T.routeMatcher(hcthMenu ? '/user/hcth/cong-van-cac-phong/:id' : '/user/hcth/cong-van-cac-phong/:id').parse(window.location.pathname),
+            const params = T.routeMatcher(hcthMenu ? '/user/hcth/cong-van-cac-phong/:id' : '/user/cong-van-cac-phong/:id').parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '', maDonVi: '' },
                 { shcc, maDonVi } = user;
 
@@ -199,7 +199,8 @@ class AdminEditPage extends AdminPage {
             key: this.state.id ? this.state.id : null,
             shcc: shcc,
             hanhDong: statusToAction(this.state.trangThai ? this.state.trangThai : '', value),
-            thoiGian: new Date().getTime()
+            thoiGian: new Date().getTime(),
+            trangThai: value ? value : ''
         };
         this.props.createHistory(newHistory);
     }
@@ -624,7 +625,7 @@ class AdminEditPage extends AdminPage {
                 }
 
             </>,
-            backRoute: '/user/hcth/cong-van-cac-phong',
+            backRoute: window.location.pathname.startsWith('/user/hcth') ? '/user/hcth/cong-van-cac-phong' : '/user/cong-van-cac-phong',
             onSave: ((((permission && permission.write) || (lengthDv >= 1)) && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login && this.state.trangThai == '') || (checkDonViGui && (this.state.trangThai == '1' || this.state.trangThai == '4'))) ? this.save : null,
             buttons: !readTrangThai && !presidentPermission.login && !isNew && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onSend }],
         });

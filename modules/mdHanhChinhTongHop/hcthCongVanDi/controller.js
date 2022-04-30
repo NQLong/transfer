@@ -177,7 +177,7 @@ module.exports = app => {
         const { fileList, donViNhan, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
-        console.log(req.body.changes);
+        // console.log(req.body.changes);
         if (isSend) {
             const currentYear = new Date().getFullYear();
             const firstDayOfYear = new Date(currentYear, 0, 1);
@@ -374,39 +374,138 @@ module.exports = app => {
         app.model.hcthPhanHoi.create(newPhanHoi, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), (req, res) => {
-        const {
-            loai,
-            key,
-            shcc,
-            hanhDong,
-            thoiGian
-        } = req.body.data;
+    const getMessage = (status) => {
+        switch (status) {
+            case '4': 
+                return 'Bạn có công văn đi bị trả lại';
+            case '5': 
+                return 'Bạn đã nhận công văn đi mới';
+            default:
+                return '';
+        }
+    };
 
-        const newHistory = {
-            loai,
-            key: Number(key),
-            shcc,
-            hanhDong,
-            thoiGian: Number(thoiGian)
-        };
+    const getIconColor = (status) => {
+        switch (status) {
+            case '4': return 'danger';
+            case '2':
+            case '3':
+                return 'info';
+            default:
+                return '';
+        }
+    };
 
-        app.model.hcthHistory.create(newHistory, (error, item) => res.send({ error, item }));
+    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), async(req, res) => {
+        try{
+            const {
+                loai,
+                key,
+                shcc,
+                hanhDong,
+                thoiGian,
+                trangThai
+            } = req.body.data;
+    
+            const newHistory = {
+                loai,
+                key: Number(key),
+                shcc,
+                hanhDong,
+                thoiGian: Number(thoiGian)
+            };
+            const congVan = await app.model.hcthCongVanDi.getCVD({ id: key });
+            await app.model.hcthHistory.createHistory(newHistory);
+
+            const beforeStatus = congVan.trangThai;
+            const afterStatus = trangThai;
+
+            console.log(congVan);
+            await onCreateNotification(congVan, beforeStatus, afterStatus, shcc);
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    const onCreateNotification = (item, before, after, shcc) => new Promise((resolve) => {
+        try {
+            if (before == after) {
+                resolve();
+            }
+            if (after == '2') {
+                console.log('đã nhận');
+                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+            } else if (after == '3') {
+                createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+            } else if (after == '5') {
+                createStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+            } else if (after == '4') {
+                createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => {throw error;});
+            }
+        } catch (error) {
+            console.error(error);
+            resolve();
+        }
     });
 
     app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
-    // const createNotification = (emails, notification, done) => {
-    //     const promises = [];
-    //     emails.forEach(email => {
-    //         promises.push(app.notification.send({
-    //             toEmail: email,
-    //             ...notification
-    //         }));
-    //     });
-    //     Promise.all(promises).then(() => done(null)).catch(error => done(error));
-    // };
+    const createNotification = (emails, notification, done) => {
+        const promises = [];
+        emails.forEach(email => {
+            promises.push(app.notification.send({
+                toEmail: email,
+                ...notification
+            }));
+        });
+        Promise.all(promises).then(() => done(null)).catch(error => done(error));
+    };
+
+    const createStaffNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDi.getAllStaff(item.id, (error, staffs) => {
+            if (error) return reject(error);
+            else {
+                const emails = staffs.rows.map(item => item.email);
+                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}`}, error => {
+                    error ? reject(error) : resolve();
+                });
+            }
+        });
+    });
+
+    // Đang gửi cho thầy Duy
+    const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.canBo.get({ shcc: '004.0001' }, 'email', '', (error, staff) => {
+            if (error) reject(error);
+            else {
+                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` });
+            }
+        });
+    });
+
+    // Đang gửi cho cô Lan
+    const createSchoolAdministratorNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.canBo.get({ shcc: '001.0068' }, 'email', '', (error, staff) => {
+            if (error) reject(error);
+            else {
+                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+            }
+        });
+    });
+
+    // Đang gửi trả lại
+    const createAuthorNotification = (id, shcc, status) => new Promise((resolve, reject) => {
+        app.model.canBo.get({ shcc: shcc }, 'email', '', (error, staff) => {
+            if (error) reject(error);
+            else {
+                console.log(staff);
+                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
+            }
+        });
+    });
+
+
 };
 
