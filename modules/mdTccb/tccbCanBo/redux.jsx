@@ -223,8 +223,9 @@ export function createMultiCanBo(canBoList, done) {
 
 export function downloadWord(shcc, done) {
     return () => {
-        const url = `/user/staff/${shcc}/word`;
+        const url = `/api/staff/get-ly-lich/${shcc}`;
         T.get(url, data => {
+            console.log(data);
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);

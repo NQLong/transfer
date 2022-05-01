@@ -224,7 +224,7 @@ export function getQtDaoTaoStaffPage(pageNumber, pageSize, pageCondition, ma, fi
 export function createQtDaoTaoStaffPage(data, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/dao-tao';
-        T.post(url, { data }, data => {
+        T.post(url, { data, shcc: data.shcc }, data => {
             if (data.error) {
                 T.notify('Tạo đào tạo lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + data.error);
@@ -233,14 +233,14 @@ export function createQtDaoTaoStaffPage(data, done) {
                 if (done) done(data);
                 dispatch(getQtDaoTaoStaffPage());
             }
-        }, () => T.notify('Thêm quá trình đào tạo bị lỗi', 'danger'));
+        }, () => T.notify('Thêm quá trìnph đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function updateQtDaoTaoStaffPage(id, changes, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/dao-tao';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { id, changes, shcc: changes.shcc }, data => {
             if (data.error) {
                 T.notify('Cập nhật đào tạo lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + data.error);
