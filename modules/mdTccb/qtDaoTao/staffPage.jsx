@@ -238,7 +238,7 @@ class QtDaoTao extends AdminPage {
                         </>} />
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show({ item })} onDelete={e => this.delete(e, item)} > </TableCell>
+                                onEdit={() => this.modal.show({ item, shcc })} onDelete={e => this.delete(e, item)} > </TableCell>
                         }
                     </tr>
                 )

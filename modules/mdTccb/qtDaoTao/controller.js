@@ -69,11 +69,12 @@ module.exports = app => {
 
     app.post('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
-        shcc ? app.model.qtDaoTao.create(req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
+        shcc ? app.model.qtDaoTao.create(req.body.data, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.put('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        console.log(req.body.changes, shcc);
         shcc ? app.model.qtDaoTao.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 

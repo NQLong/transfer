@@ -77,17 +77,21 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sql_count = 'SELECT COUNT(*) FROM QT_SANG_KIEN' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_SANG_KIEN.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_SANG_KIEN' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_SANG_KIEN.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_SANG_KIEN' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 
