@@ -13,7 +13,6 @@ module.exports = app => {
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
         { name: 'hcthCongVanDi:manage'},
-        { name: 'hcthCongVanDi:approve'},
         { name: 'hcth:login'},
         { name: 'staff:login', menu},
     );
@@ -366,29 +365,29 @@ module.exports = app => {
 
     // Phân quyền duyệt công văn
     
-    const duyetCongVanDiRole = 'duyetCongVanDi';
-    app.assignRoleHooks.addRoles(duyetCongVanDiRole, { id: 'hcthCongVanDi:approve', text: 'Hành chính - Tổng hợp: Duyệt công văn đi'});
+    const quanLyCongVanDiRole = 'quanLyCongVanDi';
+    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lí Công văn đi'});
 
-    app.assignRoleHooks.addHook(duyetCongVanDiRole, async (req, roles) => {
+    app.assignRoleHooks.addHook(quanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
-        if (req.query.nhomRole && req.query.nhomRole == duyetCongVanDiRole && userPermissions.includes('hcth:manage')) {
-            const assignRolesList = app.assignRoleHooks.get(duyetCongVanDiRole).map(item => item.id);
+        if (req.query.nhomRole && req.query.nhomRole == quanLyCongVanDiRole && userPermissions.includes('hcth:manage')) {
+            const assignRolesList = app.assignRoleHooks.get(quanLyCongVanDiRole).map(item => item.id);
             return roles && roles.length && assignRolesList.contains(roles);
         }
     });
 
     app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
-            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:approve', 'hcth:manage');
+            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:manage', 'hcth:manage');
         }
         resolve();
     }));
 
-    app.permissionHooks.add('assignRole', 'checkRoleDuyetCongVanDi', (user, assignRoles) => new Promise(resolve => {
-        const inScopeRoles = assignRoles.filter(role => role.nhomRole == duyetCongVanDiRole);
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVanDi', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == quanLyCongVanDiRole);
         inScopeRoles.forEach(role => {
-            if (role.tenRole === 'hcthCongVanDi:approve') {
-                app.permissionHooks.pushUserPermission(user, 'hcth:login' ,'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:approve');
+            if (role.tenRole === 'hcthCongVanDi:manage') {
+                app.permissionHooks.pushUserPermission(user, 'hcth:login' ,'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:manage');
             }
         });
         resolve();
