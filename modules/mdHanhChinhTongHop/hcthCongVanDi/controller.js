@@ -1,4 +1,5 @@
 module.exports = app => {
+    const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
 
     const menu = {
@@ -11,6 +12,8 @@ module.exports = app => {
         { name: 'hcthCongVanDi:read' },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
+        { name: 'hcthCongVanDi:manage'},
+        { name: 'hcthCongVanDi:approve'},
         { name: 'hcth:login'},
         { name: 'staff:login', menu},
     );
@@ -361,6 +364,34 @@ module.exports = app => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
+    // Phân quyền duyệt công văn
+    
+    const duyetCongVanDiRole = 'duyetCongVanDi';
+    app.assignRoleHooks.addRoles(duyetCongVanDiRole, { id: 'hcthCongVanDi:approve', text: 'Hành chính - Tổng hợp: Duyệt công văn đi'});
 
+    app.assignRoleHooks.addHook(duyetCongVanDiRole, async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == duyetCongVanDiRole && userPermissions.includes('hcth:manage')) {
+            const assignRolesList = app.assignRoleHooks.get(duyetCongVanDiRole).map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
+            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:approve', 'hcth:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleDuyetCongVanDi', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == duyetCongVanDiRole);
+        inScopeRoles.forEach(role => {
+            if (role.tenRole === 'hcthCongVanDi:approve') {
+                app.permissionHooks.pushUserPermission(user, 'hcth:login' ,'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:approve');
+            }
+        });
+        resolve();
+    }));
 };
 
