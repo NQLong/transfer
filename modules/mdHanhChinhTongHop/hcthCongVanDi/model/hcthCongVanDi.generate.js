@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, noiBo, loaiCongVan, tenVietTatDonViGui, soDi, donViNhanNgoai, trangThai, laySo }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui,  canBoNhan, noiBo, loaiCongVan, tenVietTatDonViGui, soDi, donViNhanNgoai, trangThai, laySo }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'noiBo': 'NOI_BO', 'loaiCongVan': 'LOAI_CONG_VAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'soDi': 'SO_DI', 'donViNhanNgoai': 'DON_VI_NHAN_NGOAI', 'trangThai': 'TRANG_THAI', 'laySo': 'LAY_SO' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'noiBo': 'NOI_BO', 'loaiCongVan': 'LOAI_CONG_VAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'soDi': 'SO_DI', 'donViNhanNgoai': 'DON_VI_NHAN_NGOAI', 'trangThai': 'TRANG_THAI', 'laySo': 'LAY_SO' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
@@ -145,5 +145,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_phan_hoi(:idnhiemvu); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idnhiemvu }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getAllStaff: (congvanid, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_staff(:congvanid); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        }
     };
 };
