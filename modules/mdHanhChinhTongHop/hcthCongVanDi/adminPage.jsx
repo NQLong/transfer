@@ -75,7 +75,8 @@ class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
+        const hcthMenu = window.location.pathname.startsWith('/user/hcth');
+        T.ready(hcthMenu ? '/user/hcth' : '/user', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -160,8 +161,8 @@ class HcthCongVanDi extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)} content={item.soDi && item.tenVietTatDonViGui ? getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : 'Chưa có số công văn'} />
-                        <TableCell type='text' contentClassName='multiple-lines' content={item.trichYeu || ''} />
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`${window.location.pathname}/${item.id}`)} content={item.soDi && item.tenVietTatDonViGui ? getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : 'Chưa có số công văn'} />
+                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.trichYeu || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
@@ -205,7 +206,7 @@ class HcthCongVanDi extends AdminPage {
                         } />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai ? listTrangThai[item.trangThai].color : '' }} content={item.trangThai ? listTrangThai[item.trangThai].status : ''}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.props.history.push({ pathname: `/user/hcth/cong-van-cac-phong/${item.id}` })}
+                            onEdit={() => this.props.history.push({ pathname: `${window.location.pathname}/${item.id}` })}
                             onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>
 
@@ -232,7 +233,7 @@ class HcthCongVanDi extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </>,
-            backRoute: '/user/hcth',
+            backRoute: window.location.pathname.startsWith('/user/hcth') ? '/user/hcth' : '/user',
             advanceSearch: <>
                 <div className="row">
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />

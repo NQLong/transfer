@@ -1,21 +1,33 @@
 module.exports = app => {
     const FILE_TYPE = 'DI';
 
-    const menu = {
+    const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
             531: { title: 'Công văn giữa các phòng', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
+
+    const menu = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1053: { title: 'Công văn giữa các phòng', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
+        },
+    };
     app.permission.add(
-        { name: 'hcthCongVanDi:read' },
+        { name: 'hcthCongVanDi:read', menu: staffMenu },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
+        { name: 'hcthCongVanDi:manage'},
         { name: 'hcth:login' },
+        { name: 'hcth:manage'},
         { name: 'staff:login', menu },
     );
-    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), app.templates.admin);
+
+    app.get('/user/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/cong-van-cac-phong/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/hcth/cong-van-cac-phong/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
@@ -64,68 +76,88 @@ module.exports = app => {
         app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
+    const createDonViNhan = (listDonViNhan, congVanId, done) => {
+        if ( listDonViNhan && listDonViNhan.length > 0) {
+            const [donViNhan] = listDonViNhan.splice(0, 1);
+            app.model.hcthDonViNhan.create({ donViNhan, ma: congVanId, loai: 'DI' }, (error) => {
+                if (error) {
+                    done && done({ error });
+                }
+                else createDonViNhan(listDonViNhan, congVanId, done);
+            });
+        } else {
+            done && done({ error: null});
+        }
+    };
+
     // app.permission.check('hcthCongVanDi:write')
     app.post('/api/hcth/cong-van-cac-phong', (req, res) => {
-        const { fileList, ...data } = req.body.data;
+        const { fileList, donViNhan, ...data } = req.body.data;
         app.model.hcthCongVanDi.create({ ...data }, (error, item) => {
             if (error) {
                 res.send({ error, item });
             } else {
                 let { id } = item;
                 app.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
-                if (fileList && fileList.length > 0) {
+                try {
                     updateListFile(fileList, id, ({ error }) => {
                         if (error) {
-                            deleteCongVan(id, () => res.send({ error }));
+                            throw error;
                         }
                         else {
-                            res.send({ item });
+                            createDonViNhan(donViNhan, id, ({ error }) => {
+                                if (error) {
+                                    throw error;
+                                } else {
+                                    app.model.hcthHistory.create({ loai: 'DI', key: id, shcc: req.session?.user?.shcc, hanhDong: 'CREATE', thoiGian: new Date().getTime() }, (error) => {
+                                        if (error) {
+                                            throw error;
+                                        } else {
+                                            res.send({ error, item });
+                                        }
+                                    });
+                                }
+                            });
                         }
                     });
                 }
-                else res.send({ item });
-                app.model.hcthHistory.create({ loai: 'DI', key: id, shcc: req.session?.user?.shcc, hanhDong: 'CREATE', thoiGian: new Date().getTime() }, error => {
-                    if (error) {
-                        res.send({ error });
-                    } else {
-                        res.send({ item });
-                    }
-                });
+                catch (error) {
+                    deleteCongVan(id, () => res.send({ error }));
+                }
+
             }
         });
     });
 
     const updateListFile = (listFile, congVanId, done) => {
-        const [{ id, ...changes }] = listFile.splice(0, 1),
-            sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.ten}`),
-            destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.ten}`);
-        if (!changes.congVan)
-            app.fs.rename(sourcePath, destPath, error => {
-                if (error) done && done({ error });
-                else {
-                    app.model.hcthFile.update({ id }, { ...changes, ma: congVanId }, (error, item) => {
-                        if (error)
-                            done && done({ error });
-                        else {
-                            if (listFile.length > 0)
+        if (listFile && listFile.length > 0) {
+            const [{ id, ...changes }] = listFile.splice(0, 1),
+                sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.ten}`),
+                destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.ten}`);
+            if (!changes.ma)
+                app.fs.rename(sourcePath, destPath, error => {
+                    if (error) done && done({ error });
+                    else {
+                        app.model.hcthFile.update({ id }, { ...changes, ma: congVanId }, (error) => {
+                            if (error)
+                                done && done({ error });
+                            else {
                                 updateListFile(listFile, congVanId, done);
-                            else
-                                done && done({ error, item });
-                        }
-                    });
-                }
-            });
-        else {
-            app.model.hcthFile.update({ id }, { ...changes }, (error, item) => {
-                if (error)
-                    done && done({ error });
-                else {
-                    if (listFile.length > 0)
+                            }
+                        });
+                    }
+                });
+            else {
+                app.model.hcthFile.update({ id }, { ...changes }, (error) => {
+                    if (error)
+                        done && done({ error });
+                    else {
                         updateListFile(listFile, congVanId, done);
-                    else
-                        done && done({ error, item });
-                }
-            });
+                    }
+                });
+            }
+        } else {
+            done && done({});
         }
     };
 
@@ -142,9 +174,10 @@ module.exports = app => {
 
     // Cần sửa lại
     app.put('/api/hcth/cong-van-cac-phong', app.permission.check('staff:login'), (req, res) => {
-        const { fileList, ...changes } = req.body.changes;
+        const { fileList, donViNhan, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
+        // console.log(req.body.changes);
         if (isSend) {
             const currentYear = new Date().getFullYear();
             const firstDayOfYear = new Date(currentYear, 0, 1);
@@ -160,24 +193,21 @@ module.exports = app => {
                         if (errors)
                             res.send({ errors, item });
                         else {
-                            if (fileList && fileList.length > 0) {
-                                updateListFile(fileList, req.body.id, ({ error }) => res.send({ error }));
-                            }
-                            else res.send({ item });
+                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI'}, () => createDonViNhan(donViNhan, req.body.id, () => {
+                                updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
+                            }));
                         }
                     });
                 }
             });
-
         } else {
             app.model.hcthCongVanDi.update({ id: req.body.id }, changes, (errors, item) => {
                 if (errors)
                     res.send({ errors, item });
                 else {
-                    if (fileList && fileList.length > 0) {
-                        updateListFile(fileList, req.body.id, ({ error }) => res.send({ error }));
-                    }
-                    else res.send({ item });
+                    app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI'}, () => createDonViNhan(donViNhan, req.body.id, () => {
+                        updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
+                    }));
                 }
             });
         }
@@ -223,7 +253,6 @@ module.exports = app => {
                 srcPath = files.hcthCongVanDiFile[0].path,
                 isNew = fields.userData[0].substring(18) == 'new',
                 id = fields.userData[0].substring(18),
-                // filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDiFile[0].originalFilename,
                 originalFilename = files.hcthCongVanDiFile[0].originalFilename,
                 filePath = (isNew ? '/new/' : `/${id}/`) + originalFilename,
                 destPath = app.assetPath + '/congVanDi' + filePath,
@@ -268,19 +297,23 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), (req, res) => {
-        const { id, fileName } = req.params;
-        const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
-        if (app.fs.existsSync(dir)) {
-            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
-            for (const serverFileName of serverFileNames) {
-                const clientFileIndex = serverFileName.indexOf(fileName);
-                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
-                    return res.sendFile(app.path.join(dir, serverFileName));
+    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), async (req, res) => {
+        try {
+            const { id, fileName } = req.params;
+            const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
+            if (app.fs.existsSync(dir)) {
+                const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+                for (const serverFileName of serverFileNames) {
+                    const clientFileIndex = serverFileName.indexOf(fileName);
+                    if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                        return res.sendFile(app.path.join(dir, serverFileName));
+                    }
                 }
             }
+            throw { status: 404, message: 'Không tìm thấy tập tin!'};
+        } catch (error) {
+            res.status(error.status || 400).send(error.message || 'Không tìm thấy tập tin');
         }
-        res.status(400).send('Không tìm thấy tập tin');
     });
 
 
@@ -292,6 +325,7 @@ module.exports = app => {
                 throw { status: 400, message: 'Invalid id' };
             }
             const congVan = await app.model.hcthCongVanDi.getCVD({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
             const files = await app.model.hcthFile.getAllFile({ ma: id, loai: 'DI' }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllHistoryFrom(id, 'DI');
@@ -301,10 +335,13 @@ module.exports = app => {
             const tenVietTatLoaiCongVan = loaiCV !== null ? await app.model.dmLoaiCongVan.getLoai({ id: loaiCV }, 'tenVietTat', '') : null;
             const tenVietTatDonViGui = await app.model.dmDonVi.getDonVi({ ma: donViGui }, 'tenVietTat', '');
 
+            // console.log(phanHoi);
+            // console.log(history);
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi?.rows || [],
+                    phanHoi: phanHoi || [],
+                    donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     history: history?.rows || [],
                     tenVietTatLoaiCongVan: tenVietTatLoaiCongVan ? tenVietTatLoaiCongVan : null,
@@ -337,28 +374,136 @@ module.exports = app => {
         app.model.hcthPhanHoi.create(newPhanHoi, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), (req, res) => {
-        const {
-            loai,
-            key,
-            shcc,
-            hanhDong,
-            thoiGian
-        } = req.body.data;
+    const getMessage = (status) => {
+        switch (status) {
+            case '4': 
+                return 'Bạn có công văn đi bị trả lại';
+            case '5': 
+                return 'Bạn đã nhận công văn đi mới';
+            default:
+                return '';
+        }
+    };
 
-        const newHistory = {
-            loai,
-            key: Number(key),
-            shcc,
-            hanhDong,
-            thoiGian: Number(thoiGian)
-        };
+    const getIconColor = (status) => {
+        switch (status) {
+            case '4': return 'danger';
+            case '2':
+            case '3':
+                return 'info';
+            default:
+                return '';
+        }
+    };
 
-        app.model.hcthHistory.create(newHistory, (error, item) => res.send({ error, item }));
+    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), async(req, res) => {
+        try{
+            const {
+                loai,
+                key,
+                shcc,
+                hanhDong,
+                thoiGian,
+                trangThai
+            } = req.body.data;
+    
+            const newHistory = {
+                loai,
+                key: Number(key),
+                shcc,
+                hanhDong,
+                thoiGian: Number(thoiGian)
+            };
+            const congVan = await app.model.hcthCongVanDi.getCVD({ id: key });
+            await app.model.hcthHistory.createHistory(newHistory);
+
+            const beforeStatus = congVan.trangThai;
+            const afterStatus = trangThai;
+
+            console.log(congVan);
+            await onCreateNotification(congVan, beforeStatus, afterStatus, shcc);
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    const onCreateNotification = (item, before, after, shcc) => new Promise((resolve) => {
+        try {
+            if (before == after) {
+                resolve();
+            }
+            if (after == '2') {
+                console.log('đã nhận');
+                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+            } else if (after == '3') {
+                createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+            } else if (after == '5') {
+                createStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+            } else if (after == '4') {
+                createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => {throw error;});
+            }
+        } catch (error) {
+            console.error(error);
+            resolve();
+        }
     });
 
     app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
+    });
+
+    const createNotification = (emails, notification, done) => {
+        const promises = [];
+        emails.forEach(email => {
+            promises.push(app.notification.send({
+                toEmail: email,
+                ...notification
+            }));
+        });
+        Promise.all(promises).then(() => done(null)).catch(error => done(error));
+    };
+
+    const createStaffNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDi.getAllStaff(item.id, (error, staffs) => {
+            if (error) return reject(error);
+            else {
+                const emails = staffs.rows.map(item => item.email);
+                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}`}, error => {
+                    error ? reject(error) : resolve();
+                });
+            }
+        });
+    });
+
+    // Đang gửi cho thầy Duy
+    const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.canBo.get({ shcc: '004.0001' }, 'email', '', (error, staff) => {
+            if (error) reject(error);
+            else {
+                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` });
+            }
+        });
+    });
+
+    // Đang gửi cho cô Lan
+    const createSchoolAdministratorNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.canBo.get({ shcc: '001.0068' }, 'email', '', (error, staff) => {
+            if (error) reject(error);
+            else {
+                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+            }
+        });
+    });
+
+    // Đang gửi trả lại
+    const createAuthorNotification = (id, shcc, status) => new Promise((resolve, reject) => {
+        app.model.canBo.get({ shcc: shcc }, 'email', '', (error, staff) => {
+            if (error) reject(error);
+            else {
+                console.log(staff);
+                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
+            }
+        });
     });
 
 
