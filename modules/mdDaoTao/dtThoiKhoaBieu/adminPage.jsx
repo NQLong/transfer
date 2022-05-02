@@ -59,7 +59,7 @@ class AdjustModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormTextBox ref={e => this.monHoc = e} className='form-group col-md-12' readOnly label='Môn' />
-                <FormTextBox ref={e => this.nhom = e} className='form-group col-md-4' readOnly label='Nhóm' />
+                <FormTextBox ref={e => this.nhom = e} className='form-group col-md-4' readOnly label='Lớp' />
                 <FormTextBox ref={e => this.khoa = e} className='form-group col-md-8' readOnly label='Khoa, bộ môn' />
                 <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={readOnly} />
                 <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={readOnly} />
@@ -136,7 +136,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <th rowSpan='2' style={{ width: '25%', textAlign: 'center', verticalAlign: 'middle' }}>Mã</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Môn học</th>
                         <th rowSpan='2' style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Phòng</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Nhóm</th>
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Lớp</th>
                         <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian
                         </th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Khoa <br />Bộ môn</th>

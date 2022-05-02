@@ -2,11 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDraftNews, checkLink, createDraftNews, updateDraftNews } from './redux';
 import { SelectAdapter_FwStorage } from 'modules/_default/fwStorage/redux';
-import { getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViFaculty, SelectAdapter_DmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { Link, withRouter } from 'react-router-dom';
 import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';
 import { Select } from 'view/component/Input';
+import { FormSelect } from 'view/component/AdminPage';
 
 class RejectModal extends React.Component {
     modal = React.createRef();
@@ -74,9 +75,6 @@ class DraftNewsEditPage extends React.Component {
         this.enEditor = React.createRef();
         this.reject = React.createRef();
         this.file = React.createRef();
-        this.DonVi = React.createRef();
-
-
     }
     componentDidMount() {
         T.ready('/user/truyen-thong', () => {
@@ -86,12 +84,12 @@ class DraftNewsEditPage extends React.Component {
             $('#neNewsStartPost').datetimepicker(T.dateFormat);
         });
     }
-    componentDidUpdate() {
-        $(this.DonVi.current).on('change', e => {
-            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
-            if (donVi != this.state.donVi) this.setState({ donVi });
-        });
-    }
+    // componentDidUpdate() {
+    //     $(this.DonVi.current).on('change', e => {
+    //         let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
+    //         if (donVi != this.state.donVi) this.setState({ donVi });
+    //     });
+    // }
     pushUrl = () => {
         this.props.history.push('/user/news/draft');
 
@@ -125,13 +123,16 @@ class DraftNewsEditPage extends React.Component {
                 $('#neNewsViAbstract').val(abstract.vi); $('#neNewsEnAbstract').val(abstract.en);
                 this.viEditor.current.html(content.vi); this.enEditor.current.html(content.en);
                 if (data.listAttachment) this.file.current.setVal(data.listAttachment.map(item => ({ value: item.id, text: item.nameDisplay })));
-                this.props.getDmDonViFaculty(items => {
-                    $(this.DonVi.current).select2({
-                        data: [{ id: 0, text: 'TRƯỜNG ĐẠI HỌC KHXH & NV' }, ...items.map(item => ({ id: item.ma, text: item.ten }))],
-                        placeholder: 'Chọn đơn vị'
-                    }).val(data.item && data.item.maDonVi
-                        ? data.item.maDonVi : 0).trigger('change');
-                });
+
+                this.donVi.value(data.item.maDonVi.toString());
+
+                // this.props.getDmDonViFaculty(items => {
+                //     $(this.DonVi.current).select2({
+                //         data: [{ id: 0, text: 'TRƯỜNG ĐẠI HỌC KHXH & NV' }, ...items.map(item => ({ id: item.ma, text: item.ten }))],
+                //         placeholder: 'Chọn đơn vị'
+                //     }).val(data.item && data.item.maDonVi
+                //         ? data.item.maDonVi : 0).trigger('change');
+                // });
                 this.setState(data);
             } else {
                 this.props.history.push('/user/news/draft');
@@ -185,7 +186,7 @@ class DraftNewsEditPage extends React.Component {
             lastModified: new Date().getTime(),
             isDraftApproved: 1,
             isUnitApproved: 1,
-            maDonVi: this.state.donVi,
+            maDonVi: this.donVi.value(),
         };
         if (this.props.system.user.permissions.includes('news:write')) {
             delete newDraft.editorId; delete newDraft.editorName;
@@ -279,10 +280,11 @@ class DraftNewsEditPage extends React.Component {
                                         <optgroup label='Lựa chọn danh mục' />
                                     </select>
                                 </div>
-                                <div className='form-group'>
+                                {/* <div className='form-group'>
                                     <label className='control-label'>Đơn vị nhận bài viết</label>
                                     <select ref={this.DonVi} placeholder='Chọn danh mục' multiple={false} className='select2-input' disabled={readOnly}></select>
-                                </div>
+                                </div> */}
+                                <FormSelect ref={e => this.donVi = e} label='Đơn vị nhận bài viết' readOnly={readOnly} data={SelectAdapter_DmDonViAll} />
                                 <div className='form-group'>
                                     <label className='control-label'>Tệp tin đính kèm</label>
                                     <Select ref={this.file} adapter={SelectAdapter_FwStorage} multiple={true} disabled={readOnly} />

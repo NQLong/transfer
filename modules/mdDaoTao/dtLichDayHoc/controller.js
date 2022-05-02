@@ -3,7 +3,7 @@ module.exports = app => {
         parentMenu: app.parentMenu.daoTao,
         menus: {
             7011: {
-                title: 'Lịch dạy học', groupIndex: 0,
+                title: 'Lịch dạy học', groupIndex: 1,
                 link: '/user/dao-tao/lich-day-hoc', icon: 'fa-calendar-check-o', backgroundColor: '#366384'
             }
         }
