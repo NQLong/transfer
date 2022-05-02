@@ -1,4 +1,5 @@
 module.exports = app => {
+    const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
 
     const staffMenu = {
@@ -19,9 +20,9 @@ module.exports = app => {
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
         { name: 'hcthCongVanDi:manage'},
-        { name: 'hcth:login' },
-        { name: 'hcth:manage'},
-        { name: 'staff:login', menu },
+        { name: 'donViCongVanDi:manage'},
+        { name: 'hcth:login'},
+        { name: 'staff:login', menu},
     );
 
     app.get('/user/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
@@ -506,6 +507,65 @@ module.exports = app => {
         });
     });
 
+    // Phân quyền Quản lý công văn đi trong đơn vị
+    const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
 
+    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý công văn đi trong đơn vị'});
+
+    app.assignRoleHooks.addHook(quanLyCongVanDiRole, async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole === quanLyCongVanDiRole && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get(quanLyCongVanDiRole).map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyDonVi', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length > 0) {
+            app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVanDiTrongDonVi', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole === quanLyCongVanDiRole);
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'donViCongVanDi:manage') {
+                app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage');
+            }
+        });
+        resolve();
+    }));
+
+
+    // Phân quyền hành chính tổng hợp - Quản lí công văn đi
+    
+    const hcthQuanLyCongVanDiRole = 'hcthQuanLyCongVanDi';
+    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đi'});
+
+    app.assignRoleHooks.addHook(hcthQuanLyCongVanDiRole, async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == hcthQuanLyCongVanDiRole && userPermissions.includes('hcth:manage')) {
+            const assignRolesList = app.assignRoleHooks.get(hcthQuanLyCongVanDiRole).map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length > 0 && staff.maDonVi == MA_HCTH) {
+            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:manage', 'hcth:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleHcthQuanLyCongVanDi', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == hcthQuanLyCongVanDiRole);
+        inScopeRoles.forEach(role => {
+            if (role.tenRole === 'hcthCongVanDi:manage') {
+                app.permissionHooks.pushUserPermission(user, 'hcth:login', 'hcthCongVanDi:manage');
+            }
+        });
+        resolve();
+    }));
 };
 
