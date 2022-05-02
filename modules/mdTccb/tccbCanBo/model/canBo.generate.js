@@ -145,26 +145,6 @@ module.exports = app => {
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        tccbDasboardTotalGender: (done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_total_gender(); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        tccbDashboardStaffByDV: (done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_number_staff_by_don_vi(); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        tccbDashboardStaffCurrentlyForeign: (done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_staff_dang_nuoc_ngoai_by_muc_dich(); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        tccbDashboardStaffCurrentlyWorkOutside: (done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_staff_dang_trong_nuoc_by_muc_dich(); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
         getGiangVien: (searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=tchc_can_bo_get_giang_vien(:searchterm); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
