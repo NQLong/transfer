@@ -101,7 +101,10 @@ class HcthCongVanDi extends AdminPage {
         let congVanLaySo = this.congVanLaySo?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
 
-        const pageFilter = isInitial ? { congVanLaySo: 1 } : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo };
+        let permissions = this.props.system?.user?.permissions;
+        let hcthStaff = permissions.includes('hcth:login') ? { congVanLaySo: 1 } : {};
+
+        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 // console.log(page.filter);

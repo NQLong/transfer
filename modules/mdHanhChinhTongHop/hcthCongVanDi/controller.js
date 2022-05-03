@@ -1,3 +1,5 @@
+// const permission = require('config/permission');
+
 module.exports = app => {
     const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
@@ -23,6 +25,7 @@ module.exports = app => {
         { name: 'donViCongVanDi:manage'},
         { name: 'hcth:login'},
         { name: 'staff:login', menu},
+        { name: 'hcth:manage' }
     );
 
     app.get('/user/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
@@ -36,20 +39,27 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
-            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null, congVanLaySo: null };
+            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null, congVanLaySo: null },
+            donViXem = '', canBoXem = '';
 
         const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
         const hcthPermission = getUserPermission(req, 'hcth', ['login']);
+        const user = req.session.user;
+        const permissions = user.permissions;
 
-        let donViXem = '', canBoXem = '';
+        donViXem = (req.session?.user?.staff?.donViQuanLy || []);
+        donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes('donViCongVanDi:manage') && req.session?.user?.staff?.maDonVi || '';
+        canBoXem = req.session?.user?.shcc || '';
 
         let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
-        if (!rectorsPermission.login && !hcthPermission.login) {
-            donViXem = (req.session?.user?.staff?.donViQuanLy || []);
-            donViXem = donViXem.map(item => item.maDonVi).toString();
-            canBoXem = req.session?.user?.shcc || '';
+
+        console.log('1' + donViXem);
+        if (rectorsPermission.login || hcthPermission.login || (!user.isStaff && !user.isStudent)) {
+            donViXem = '';
+            canBoXem = '';
         }
 
+        console.log('2' + donViXem );
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, congVanLaySo, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -73,10 +83,6 @@ module.exports = app => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/item/:id', app.permission.check('hcthCongVanDi:read'), (req, res) => {
-        app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
-    });
-
     const createDonViNhan = (listDonViNhan, congVanId, done) => {
         if ( listDonViNhan && listDonViNhan.length > 0) {
             const [donViNhan] = listDonViNhan.splice(0, 1);
@@ -91,7 +97,6 @@ module.exports = app => {
         }
     };
 
-    // app.permission.check('hcthCongVanDi:write')
     app.post('/api/hcth/cong-van-cac-phong', (req, res) => {
         const { fileList, donViNhan, ...data } = req.body.data;
         app.model.hcthCongVanDi.create({ ...data }, (error, item) => {
@@ -478,10 +483,20 @@ module.exports = app => {
 
     // Đang gửi cho thầy Duy
     const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
-        app.model.canBo.get({ shcc: '004.0001' }, 'email', '', (error, staff) => {
+        // app.model.canBo.get({ shcc: '004.0001' }, 'email', '', (error, staff) => {
+        //     if (error) reject(error);
+        //     else {
+        //         app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` });
+        //     }
+        // });
+        app.model.hcthCongVanDi.getHcthStaff((error, staffs) => {
             if (error) reject(error);
             else {
-                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` });
+                const emails = staffs.rows.map(item => item.email);
+                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `user/hcth/cong-van-cac-phong/${item.id}` }, error => {
+                    if (error) reject(error);
+                    else resolve();
+                });
             }
         });
     });
@@ -492,6 +507,7 @@ module.exports = app => {
             if (error) reject(error);
             else {
                 app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+                resolve();
             }
         });
     });
@@ -503,6 +519,7 @@ module.exports = app => {
             else {
                 console.log(staff);
                 app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
+                resolve();
             }
         });
     });
@@ -545,7 +562,7 @@ module.exports = app => {
 
     app.assignRoleHooks.addHook(hcthQuanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
-        if (req.query.nhomRole && req.query.nhomRole == hcthQuanLyCongVanDiRole && userPermissions.includes('hcth:manage')) {
+        if (req.query.nhomRole && req.query.nhomRole == hcthQuanLyCongVanDiRole && userPermissions.includes('manager:write')) {
             const assignRolesList = app.assignRoleHooks.get(hcthQuanLyCongVanDiRole).map(item => item.id);
             return roles && roles.length && assignRolesList.contains(roles);
         }
@@ -562,7 +579,7 @@ module.exports = app => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == hcthQuanLyCongVanDiRole);
         inScopeRoles.forEach(role => {
             if (role.tenRole === 'hcthCongVanDi:manage') {
-                app.permissionHooks.pushUserPermission(user, 'hcth:login', 'hcthCongVanDi:manage');
+                app.permissionHooks.pushUserPermission(user, 'hcth:login', 'hcthCongVanDi:manage', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write', 'dmDonViGuiCv:delete', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
             }
         });
         resolve();

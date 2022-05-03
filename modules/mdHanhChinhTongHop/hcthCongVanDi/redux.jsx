@@ -63,22 +63,6 @@ export function getHcthCongVanDiAll(done) {
     };
 }
 
-export function getHcthCongVanDi(id, done) {
-    return () => {
-        const url = `/api/hcth/cong-van-cac-phong/item/${id}`;
-        T.get(url, { id }, data => {
-            if (data.error) {
-                T.notify('Lấy thông tin đơn vị gửi công văn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (done) done(data.item);
-            }
-        }, error => {
-            console.error(`GET: ${url}.`, error);
-        });
-    };
-}
-
 export function createHcthCongVanDi(data, done) {
     return dispatch => {
         const url = '/api/hcth/cong-van-cac-phong';
