@@ -68,7 +68,6 @@ export function createHcthCongVanDi(data, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
-                // console.log(data);
                 T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
@@ -90,7 +89,6 @@ export function updateHcthCongVanDi(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật công văn giữa các phòng thành công!', 'success');
-                // console.log(changes);
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done();
             }
@@ -171,7 +169,6 @@ export function createPhanHoi(data, done) {
         const url = '/api/hcth/cong-van-cac-phong/phan-hoi';
         T.post(url, { data: data }, res => {
             if (res.error) {
-                // console.log(res);
                 T.notify('Thêm phản hồi bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {

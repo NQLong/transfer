@@ -18,12 +18,12 @@ module.exports = app => {
         },
     };
     app.permission.add(
-        { name: 'hcthCongVanDi:read', menu: staffMenu },
+        { name: 'hcthCongVanDi:read' },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
         { name: 'hcthCongVanDi:manage'},
         { name: 'donViCongVanDi:manage'},
-        { name: 'hcth:login'},
+        { name: 'hcth:login', menu: staffMenu},
         { name: 'staff:login', menu},
         { name: 'hcth:manage' }
     );
@@ -53,13 +53,11 @@ module.exports = app => {
 
         let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
 
-        console.log('1' + donViXem);
         if (rectorsPermission.login || hcthPermission.login || (!user.isStaff && !user.isStudent)) {
             donViXem = '';
             canBoXem = '';
         }
 
-        console.log('2' + donViXem );
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, congVanLaySo, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -183,7 +181,6 @@ module.exports = app => {
         const { fileList, donViNhan, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
-        // console.log(req.body.changes);
         if (isSend) {
             const currentYear = new Date().getFullYear();
             const firstDayOfYear = new Date(currentYear, 0, 1);
@@ -249,6 +246,7 @@ module.exports = app => {
         app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
 
     const hcthCongVanDiFile = (req, fields, files, params, done) => {
+        // console.log({ fields, files });
         if (
             fields.userData &&
             fields.userData[0] &&
@@ -341,8 +339,6 @@ module.exports = app => {
             const tenVietTatLoaiCongVan = loaiCV !== null ? await app.model.dmLoaiCongVan.getLoai({ id: loaiCV }, 'tenVietTat', '') : null;
             const tenVietTatDonViGui = await app.model.dmDonVi.getDonVi({ ma: donViGui }, 'tenVietTat', '');
 
-            // console.log(phanHoi);
-            // console.log(history);
             res.send({
                 item: {
                     ...congVan,
@@ -426,7 +422,6 @@ module.exports = app => {
             const beforeStatus = congVan.trangThai;
             const afterStatus = trangThai;
 
-            console.log(congVan);
             await onCreateNotification(congVan, beforeStatus, afterStatus, shcc);
         } catch (error) {
             res.send({ error });
@@ -439,7 +434,7 @@ module.exports = app => {
                 resolve();
             }
             if (after == '2') {
-                console.log('đã nhận');
+                // console.log('đã nhận');
                 createHcthStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
             } else if (after == '3') {
                 createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => {throw error;});
@@ -517,7 +512,7 @@ module.exports = app => {
         app.model.canBo.get({ shcc: shcc }, 'email', '', (error, staff) => {
             if (error) reject(error);
             else {
-                console.log(staff);
+                // console.log(staff);
                 app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
                 resolve();
             }
@@ -539,7 +534,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'checkRoleQuanLyDonVi', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length > 0) {
-            app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage');
+            app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage', 'dmDonVi:read', 'dmDonViGuiCv:read', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
         }
         resolve();
     }));
@@ -548,7 +543,7 @@ module.exports = app => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole === quanLyCongVanDiRole);
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'donViCongVanDi:manage') {
-                app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage');
+                app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage', 'dmDonVi:read', 'dmDonViGuiCv:read', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
             }
         });
         resolve();
