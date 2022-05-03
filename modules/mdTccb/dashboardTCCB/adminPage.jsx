@@ -208,7 +208,12 @@ class Dashboard extends AdminPage {
                     <DashboardIcon type='info' icon='fa-fire' title='Đoàn thể' value={listDonVi[4]?.length || 0} link='/user/danh-muc/don-vi' />
                 </div>
 
-                <ChartArea className='col-lg-6' title='Giới tính' chartType='doughnut' data={listStaffGender} aspectRatio={2} />
+                <ChartArea className='col-lg-6' title='Giới tính' chartType='doughnut' data={listStaffGender} aspectRatio={2} renderFilter={
+                    <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.gioiTinhTheoDonVi = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px' }} allowClear placeholder='Chọn đơn vị' onChange={value => this.setState({
+                        listStaffGender: this.setUp(nhanSuCongTac.filter(item => value ? item.donVi == value.id : true), 'gioiTinh', [DefaultColors.green, DefaultColors.yellow])
+                    })} />
+
+                } />
 
                 <ChartArea className='col-lg-6' title='Chức danh khoa học' chartType='doughnut' data={listHocHam} aspectRatio={2} />
 
