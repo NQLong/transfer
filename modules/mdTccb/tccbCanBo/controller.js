@@ -1510,4 +1510,92 @@ module.exports = app => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
         shcc ? app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error)) : res.send({ error: 'No permission' });
     });
+
+    app.get('/api/staff/download-monthly-report', checkGetStaffPermission, (req, res) => {
+        const workbook = app.excel.create(),
+              worksheet = workbook.addWorksheet('Sheet1');
+        const promiseCalDonVi = new Promise((resolve) => {
+            let cells = [{ cell: 'A1', value: 'Thống kê các đơn vị thuộc trường', border: '1234' }];
+            app.model.dmDonVi.getAll((error, data) => {
+                data = data.groupBy('maPl');
+                // console.log(data['2']);
+                cells.push({ cell: 'A2', value: 'Phòng chức năng, Thư viện, Bảo tàng, CS.TĐ', border: '1234', bold: true });
+                cells.push({ cell: 'B2', number: data['2']?.length, border: '1234' });
+                cells.push({ cell: 'A3', value: 'Khoa', border: '1234' });
+                cells.push({ cell: 'B3', number: data['1']?.length, border: '1234' });
+                cells.push({ cell: 'A4', value: 'Bộ môn', border: '1234'} );
+                cells.push({ cell: 'B4', number: data['5']?.length, border: '1234'} );
+                cells.push({ cell: 'A5', value: 'Trung tâm', border: '1234'});
+                cells.push({ cell: 'B5', number: data['3']?.length, border: '1234' });
+                cells.push({ cell: 'A6', value: 'Công ty', border: '1234'});
+                cells.push({ cell: 'B6', number: data['6']?.length, border: '1234' });
+                cells.push({ cell: 'A7', value: 'Đoàn thể', border: '1234'});
+                cells.push({ cell: 'B7', number: data['4']?.length, border: '1234' });
+                resolve(cells);
+            });
+        });
+        
+        const promiseCalVCQL = new Promise((resolve) => {
+            let cells = [{ cell: 'A9', value: 'Thống kê viên chức quản lí', border: '1234', bold: true }];
+            let calVCQLCapTruong = 0;
+            let calVCQLCapTruongKhongKiemNhiem = 0;
+            let calVCQLCapKhoa = 0;
+            let calVCQLCapKhoaKhongKiemNhiem = 0;
+            app.model.qtChucVu.getAll((error, data) => {
+                data.forEach((item) => {
+                    if (item.maBoMon == null) calVCQLCapTruong++;
+                    if (item.maBoMon == null && item.chucVuChinh == 1) calVCQLCapTruongKhongKiemNhiem++;
+                    if (item.maBoMon) calVCQLCapKhoa++;
+                    if (item.maBoMon && item.chucVuChinh == 1) calVCQLCapKhoaKhongKiemNhiem++;
+                });
+                cells.push({ cell: 'A10', value: 'VCQL cấp đơn vị thuộc trường', border: '1234' });
+                cells.push({ cell: 'B10', number: calVCQLCapTruong, border: '1234' });
+                cells.push({ cell: 'A11', value: 'VCQL cấp đơn vị thuộc trường không tính kiêm nhiệm', border: '1234' });
+                cells.push({ cell: 'B11', number: calVCQLCapTruongKhongKiemNhiem, border: '1234' });
+                cells.push({ cell: 'A12', value: 'VCQL cấp đơn vị thuộc phòng, ban, khoa, bộ môn, trung tâm', border: '1234' });
+                cells.push({ cell: 'B12', number: calVCQLCapKhoa, border: '1234' });
+                cells.push({ cell: 'A13', value: 'VCQL cấp đơn vị thuộc phòng, ban, khoa, bộ môn, trung tâm không tính kiêm nhiệm', border: '1234' });
+                cells.push({ cell: 'B13', number: calVCQLCapKhoaKhongKiemNhiem, border: '1234' });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalCanBo = new Promise(resolve => {
+            let calBienChe = 0;
+            let calHopDong = 0;
+            let calBienCheNu = 0;
+            let calHopDongNu = 0;
+            app.model.canBo.getAll('NGAY_NGHI IS NULL', (error, data) => {
+                data.forEach((item) => {
+                    if (item.ng)
+                    if (item.ngayBienChe) {
+                        calBienChe++;
+                        if (item.phai == '02') calBienCheNu++;
+                    } else {
+                        calHopDong++;
+                        if (item.phai == '02') calHopDongNu++;
+                    }
+                });
+                let cells = [];
+                cells.push({ cell: 'A15', value: 'Cán bộ biên chế', border: '1234' });
+                cells.push({ cell: 'B15', number: calBienChe, border: '1234' });
+                cells.push({ cell: 'A16', value: 'Cán bộ biên chế nữ', border: '1234' });
+                cells.push({ cell: 'B16', number: calBienCheNu, border: '1234' });
+                cells.push({ cell: 'A17', value: 'Cán bộ hợp đồng', border: '1234' });
+                cells.push({ cell: 'B17', number: calHopDong, border: '1234' });
+                cells.push({ cell: 'A18', value: 'Cán bộ hợp đồng nữ', border: '1234' });
+                cells.push({ cell: 'B18', number: calHopDongNu, border: '1234' });
+                resolve(cells);
+            });
+        });
+
+        Promise.all([promiseCalDonVi, promiseCalVCQL, promiseCalCanBo]).then((values) => {
+            values = [].concat(...values);
+            console.log(values);
+            app.excel.write(worksheet, values);
+            app.excel.attachment(workbook, res, 'Bao cao hang thang.xlsx');
+        }).catch((error) => {
+            res.send({ error });
+        });
+    });
 };

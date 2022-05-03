@@ -284,6 +284,10 @@ class StaffPage extends AdminPage {
 
             //     T.download(T.url(`/api/staff/download-excel/${filter}`), 'Danh sach can bo.xlsx');
             // }
+            onExport: (e) => {
+                e.preventDefault();
+                T.download(T.url('/api/staff/download-monthly-report'), 'Bao cao hang thang.xlsx');
+            }
         });
     }
 }
