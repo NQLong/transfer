@@ -140,6 +140,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88712\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "MA_PL": {
+                    "value": "maPl",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -11897,6 +11904,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "SO_LUONG_DU_KIEN": {
+                    "value": "soLuongDuKien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "SUC_CHUA": {
+                    "value": "sucChua",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "BUOI": {
+                    "value": "buoi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -13117,10 +13145,10 @@
                 },
                 "DO_UU_TIEN": {
                     "value": "doUuTien",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 8
                 },
                 "NGAY_TAO": {
                     "value": "ngayTao",

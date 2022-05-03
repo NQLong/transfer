@@ -56,7 +56,7 @@ module.exports = app => {
                     if (!error && !tkb) {
                         m.nhom = i;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi }, () => { });
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi, buoi: i }, () => { });
                         }
                     }
                     save(i + 1, m);
