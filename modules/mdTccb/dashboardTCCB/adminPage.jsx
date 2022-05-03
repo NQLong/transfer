@@ -214,7 +214,7 @@ class Dashboard extends AdminPage {
 
                 <ChartArea className='col-lg-12' title='Trình độ học vị' chartType='bar' data={dataLevelByGender} aspectRatio={3}
                     renderFilter={
-                        <FormSelect data={SelectAdapter_DmNgachCdnnV3} ref={e => this.hocViTheoNgach = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px', display: this.state.hideHocVi ? 'none' : 'block' }} allowClear placeholder='Chọn ngạch CDNN' onChange={value => this.handleTrinhDoHocVi(nhanSuCongTac, value)} />
+                        <FormSelect data={SelectAdapter_DmNgachCdnnV3} ref={e => this.hocViTheoNgach = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px' }} allowClear placeholder='Chọn ngạch CDNN' onChange={value => this.handleTrinhDoHocVi(nhanSuCongTac, value)} />
                     } />
 
                 <ChartArea className='col-lg-6' title='Nhân sự Khoa, bộ môn' chartType='bar' data={nhanSuKhoaBM} aspectRatio={1.5} />
@@ -228,7 +228,7 @@ class Dashboard extends AdminPage {
 
                 <ChartArea className='col-lg-12' title='Chức danh nghề nghiệp' chartType='bar' data={listNgach} aspectRatio={3}
                     renderFilter={
-                        <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.ngachTheoDonVi = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px', display: this.state.hideNgach ? 'none' : 'block' }} allowClear placeholder='Chọn đơn vị' onChange={value => this.setState({
+                        <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.ngachTheoDonVi = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px' }} allowClear placeholder='Chọn đơn vị' onChange={value => this.setState({
                             listNgach: this.setUp(nhanSuCongTac.filter(item => value ? item.donVi == value.id : true), 'tenNgach', DefaultColors.maroon)
                         })} />
                     } />
