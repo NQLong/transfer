@@ -59,7 +59,6 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TCHC_CAN_BO' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            console.log(sql);
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
         },
 
@@ -141,9 +140,9 @@ module.exports = app => {
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        download: (filter, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_can_bo_download_excel(:filter); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        download: (filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_can_bo_download_excel(:filter, :searchterm); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
         getGiangVien: (searchterm, done) => {
