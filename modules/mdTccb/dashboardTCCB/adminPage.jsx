@@ -2,14 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import CountUp from 'view/js/countUp';
 import { getDashboardData } from './redux';
-import { AdminPage, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, loadSpinner } from 'view/component/AdminPage';
 import { AdminChart, DefaultColors } from 'view/component/Chart';
 import { Link } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmNgachCdnnV3 } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 
 const thisDate = new Date().getDate(),
-    thisMonthIndex = new Date().getMonth() - 1,
+    thisMonthIndex = new Date().getMonth(),
     thisYear = new Date().getFullYear();
 
 const listHocVi = ['Cử nhân', 'Thạc sĩ', 'Tiến sĩ'];
@@ -61,8 +62,30 @@ class DashboardIcon extends React.Component {
     }
 }
 
-class Dashboard extends AdminPage {
+class ChartArea extends React.Component {
     state = {}
+    render() {
+        let { className, title, chartType, data, aspectRatio = null, renderFilter = null } = this.props;
+        return (
+            <div className={className}>
+                <div className='tile'>
+                    <h5 className='tile-title' style={{ position: 'relative' }}>{title.toUpperCase()}</h5>
+                    <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
+                        <Tooltip title={this.state[title] ? 'Hiện' : 'Ẩn'} arrow>
+                            <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ [title]: !this.state[title] })} ><i className='fa fa-lg fa-minus' /></button>
+                        </Tooltip>
+                    </span>
+                    {renderFilter}
+                    <div style={{ display: this.state[title] ? 'none' : 'block' }} >
+                        <AdminChart type={chartType} data={data} aspectRatio={aspectRatio} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+class Dashboard extends AdminPage {
+    state = { isLoading: true }
     componentDidMount() {
         T.ready('/user/tccb', () => {
             this.initData(null);
@@ -71,17 +94,17 @@ class Dashboard extends AdminPage {
 
     initData = (value) => {
         this.props.getDashboardData(value, data => {
-            let { nhanSuDonVi = [], qtDiNuocNgoai = [], qtCongTacTrongNuoc = [], nhanSuCongTac = [], listDonVi = [] } = data,
-                listHocViNam = listHocVi.map(hocVi => nhanSuCongTac.filter(item => item.hocVi == hocVi && item.gioiTinh == 'Nam').length),
-                listHocViNu = listHocVi.map(hocVi => nhanSuCongTac.filter(item => item.hocVi == hocVi && item.gioiTinh == 'Nữ').length);
+            let { nhanSuDonVi = [], qtDiNuocNgoai = [], qtCongTacTrongNuoc = [], nhanSuCongTac = [], listDonVi = [] } = data;
+            this.handleTrinhDoHocVi(nhanSuCongTac);
             this.setState({
                 tongCB: nhanSuCongTac.length,
                 soLuongDonVi: listDonVi.length,
-
+                nhanSuCongTac,
+                fromTime: value,
                 nhanSuKhoaBM: this.setUp(nhanSuDonVi.filter(item => item.maPL == 1).map(item => {
                     item.tenDonVi = item.tenDonVi.getFirstLetters();
                     return item;
-                }), 'tenDonVi', DefaultColors.info),
+                }), 'tenDonVi', DefaultColors.navy),
 
                 nhanSuPhongBan: this.setUp(nhanSuDonVi.filter(item => item.maPL == 2).map(item => {
                     item.tenDonVi = item.tenDonVi.getFirstLetters();
@@ -98,7 +121,7 @@ class Dashboard extends AdminPage {
                     return item;
                 }), 'tenDonVi', [DefaultColors.blue, DefaultColors.orange]),
 
-                listStaffGender: this.setUp(nhanSuCongTac, 'gioiTinh', [DefaultColors.darkGrey, DefaultColors.olive]),
+                listStaffGender: this.setUp(nhanSuCongTac, 'gioiTinh', [DefaultColors.green, DefaultColors.yellow]),
                 listDiNuocNgoai: this.setUp(qtDiNuocNgoai, 'tenMucDich', DefaultColors.navy),
                 listCongTacTrongNuoc: this.setUp(qtCongTacTrongNuoc, 'tenMucDich', DefaultColors.yellow),
                 listNgach: this.setUp(nhanSuCongTac, 'tenNgach', DefaultColors.maroon),
@@ -108,18 +131,25 @@ class Dashboard extends AdminPage {
                     item.namCongTac = new Date(item.ngayCongTac)?.getFullYear() || null;
                     return item;
                 }), 'namCongTac', DefaultColors.orange),
-                dataLevelByGender: {
-                    labels: listHocVi,
-                    datas: {
-                        'Nam': listHocViNam,
-                        'Nữ': listHocViNu,
-                    },
-                    colors: {
-                        'Nam': DefaultColors.yellow,
-                        'Nữ': DefaultColors.info
-                    }
+            }, () => this.setState({ isLoading: false }));
+        });
+    }
+
+    handleTrinhDoHocVi = (nhanSuCongTac, value = null) => {
+        let listHocViNam = listHocVi.map(hocVi => nhanSuCongTac.filter(item => item.hocVi == hocVi && item.gioiTinh == 'Nam' && (value ? value.id.includes(item.ngach) : true)).length),
+            listHocViNu = listHocVi.map(hocVi => nhanSuCongTac.filter(item => item.hocVi == hocVi && item.gioiTinh == 'Nữ' && (value ? value.id.includes(item.ngach) : true)).length);
+        this.setState({
+            dataLevelByGender: {
+                labels: listHocVi,
+                datas: {
+                    'Nam': listHocViNam,
+                    'Nữ': listHocViNu,
+                },
+                colors: {
+                    'Nam': DefaultColors.yellow,
+                    'Nữ': DefaultColors.info
                 }
-            });
+            }
         });
     }
 
@@ -143,20 +173,22 @@ class Dashboard extends AdminPage {
         };
     }
 
+
     handleGiaiDoan = (giaiDoan) => {
         if (!giaiDoan) {
             T.notify('Vui lòng nhập mốc thời gian', 'warning');
             this.giaiDoan.focus();
         } else this.initData(giaiDoan.getTime());
     }
+
     render() {
         let { nhanSuCongTac = [], tongCB = 0, soLuongDonVi = 0, listDonVi = [], listStaffGender
-            = {}, listHocHam = {}, dataLevelByGender = {}, nhanSuKhoaBM = {}, nhanSuPhongBan = {}, nhanSuTrungTam = {}, nhanSuDoanThe = {}, listCongTacTrongNuoc = {}, listDiNuocNgoai = {}, listNgach = {}, listNhanSuTuyenDung = {} } = this.state;
+            = {}, listHocHam = {}, dataLevelByGender = {}, nhanSuKhoaBM = {}, nhanSuPhongBan = {}, nhanSuTrungTam = {}, nhanSuDoanThe = {}, listCongTacTrongNuoc = {}, listDiNuocNgoai = {}, listNgach = {}, listNhanSuTuyenDung = {}, fromTime = null } = this.state;
         return this.renderPage({
             icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng Tổ chức cán bộ',
-            subTitle: `${new Date().ddmmyyyy()}`,
-            content: <div className='row'>
+            subTitle: `${fromTime ? ('Từ ' + T.dateToText(Number(fromTime), 'dd/mm/yyyy') + ' đến') : ''} ${new Date().ddmmyyyy()}`,
+            content: this.state.isLoading ? loadSpinner() : <div className='row'>
                 <div className='col-md-6 col-lg-4'>
                     <DashboardIcon type='primary' icon='fa-users' title='Cán bộ' value={tongCB} link='/user/tccb/staff' />
                 </div>
@@ -175,157 +207,40 @@ class Dashboard extends AdminPage {
                 <div className='col-md-6 col-lg-4'>
                     <DashboardIcon type='info' icon='fa-fire' title='Đoàn thể' value={listDonVi[4]?.length || 0} link='/user/danh-muc/don-vi' />
                 </div>
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Giới tính</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideGioiTinh ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideGioiTinh: !this.state.hideGioiTinh })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideGioiTinh ? 'none' : 'block' }} >
-                            <AdminChart type='doughnut' data={listStaffGender} />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-6'>
-                    <div className='tile' >
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Chức danh khoa học</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideChucDanh ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideChucDanh: !this.state.hideChucDanh })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideChucDanh ? 'none' : 'block' }}>
-                            <AdminChart type='doughnut' data={listHocHam} />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-12'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Trình độ học vị</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideHocVi ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideHocVi: !this.state.hideHocVi })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideHocVi ? 'none' : 'block' }}>
-                            <AdminChart data={dataLevelByGender} type='bar' aspectRatio={2.8} />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Nhân sự Khoa, bộ môn</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideKhoaBM ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideKhoaBM: !this.state.hideKhoaBM })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideKhoaBM ? 'none' : 'block' }}>
-                            <AdminChart data={nhanSuKhoaBM} type='bar' />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Nhân sự phòng, ban</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hidePB ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hidePB: !this.state.hidePB })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hidePB ? 'none' : 'block' }}>
-                            <AdminChart data={nhanSuPhongBan} type='bar' />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Nhân sự trung tâm, công ty</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideTT ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideTT: !this.state.hideTT })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideTT ? 'none' : 'block' }}>
-                            <AdminChart data={nhanSuTrungTam} type='line' />
-                        </div>
-                    </div>
-                </div>
 
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Nhân sự đoàn thể</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideDT ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideDT: !this.state.hideDT })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideDT ? 'none' : 'block' }}>
-                            <AdminChart data={nhanSuDoanThe} type='doughnut' />
-                        </div>
-                    </div>
-                </div>
+                <ChartArea className='col-lg-6' title='Giới tính' chartType='doughnut' data={listStaffGender} aspectRatio={2} />
 
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Công tác trong nước</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideCongTacTN ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideCongTacTN: !this.state.hideCongTacTN })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideCongTacTN ? 'none' : 'block' }}>
-                            <AdminChart type='bar' data={listCongTacTrongNuoc} />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-6'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Công tác nước ngoài</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideCongTacNN ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideCongTacNN: !this.state.hideCongTacNN })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
-                        <div style={{ display: this.state.hideCongTacNN ? 'none' : 'block' }}>
-                            <AdminChart type='bar' data={listDiNuocNgoai} />
-                        </div>
-                    </div>
-                </div>
-                <div className='col-lg-12'>
-                    <div className='tile'>
-                        <h4 className='tile-title' style={{ position: 'relative' }}>Chức danh nghề nghiệp</h4>
-                        <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                            <Tooltip title={this.state.hideNgach ? 'Hiện' : 'Ẩn'} arrow>
-                                <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ hideNgach: !this.state.hideNgach })} ><i className='fa fa-lg fa-minus' /></button>
-                            </Tooltip>
-                        </span>
+                <ChartArea className='col-lg-6' title='Chức danh khoa học' chartType='doughnut' data={listHocHam} aspectRatio={2} />
+
+                <ChartArea className='col-lg-12' title='Trình độ học vị' chartType='bar' data={dataLevelByGender} aspectRatio={3}
+                    renderFilter={
+                        <FormSelect data={SelectAdapter_DmNgachCdnnV3} ref={e => this.hocViTheoNgach = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px', display: this.state.hideHocVi ? 'none' : 'block' }} allowClear placeholder='Chọn ngạch CDNN' onChange={value => this.handleTrinhDoHocVi(nhanSuCongTac, value)} />
+                    } />
+
+                <ChartArea className='col-lg-6' title='Nhân sự Khoa, bộ môn' chartType='bar' data={nhanSuKhoaBM} aspectRatio={1.5} />
+                <ChartArea className='col-lg-6' title='Nhân sự phòng, ban' chartType='bar' data={nhanSuPhongBan} aspectRatio={1.5} />
+                <ChartArea className='col-lg-6' title='Nhân sự trung tâm, công ty' chartType='line' data={nhanSuTrungTam} aspectRatio={2} />
+                <ChartArea className='col-lg-6' title='Nhân sự đoàn thể' chartType='doughnut' data={nhanSuDoanThe} aspectRatio={2} />
+
+                <ChartArea className='col-lg-6' title='Công tác trong nước' chartType='bar' data={listCongTacTrongNuoc} aspectRatio={2} />
+
+                <ChartArea className='col-lg-6' title='Đi nước ngoài' chartType='bar' data={listDiNuocNgoai} aspectRatio={2} />
+
+                <ChartArea className='col-lg-12' title='Chức danh nghề nghiệp' chartType='bar' data={listNgach} aspectRatio={3}
+                    renderFilter={
                         <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.ngachTheoDonVi = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px', display: this.state.hideNgach ? 'none' : 'block' }} allowClear placeholder='Chọn đơn vị' onChange={value => this.setState({
                             listNgach: this.setUp(nhanSuCongTac.filter(item => value ? item.donVi == value.id : true), 'tenNgach', DefaultColors.maroon)
                         })} />
-                        <div style={{ display: this.state.hideNgach ? 'none' : 'block' }}>
-                            <AdminChart type='bar' data={listNgach} aspectRatio={2.8} />
-                        </div>
-                    </div>
-                </div>
+                    } />
 
-                <div className='col-lg-12'>
-                    <div className='tile'>
-                        <h4 className='tile-title'>Số cán bộ bắt đầu công tác theo các năm</h4>
-                        <AdminChart type='line' data={listNhanSuTuyenDung} aspectRatio={2.8} />
-                    </div>
-                </div>
+                <ChartArea className='col-lg-12' title='Số cán bộ bắt đầu công tác theo các năm' chartType='line' data={listNhanSuTuyenDung} aspectRatio={3} />
             </div>,
             backRoute: '/user/tccb',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Dashboard'
             ],
-            header: <>
-                <FormSelect data={listThoiGian} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '300px', marginBottom: '0' }} onChange={value => this.initData(value?.id || null)} allowClear />
-            </>
+            header: <FormSelect data={listThoiGian} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '300px', marginBottom: '0' }} onChange={value => this.initData(value?.id || null)} allowClear />
         });
     }
 }
