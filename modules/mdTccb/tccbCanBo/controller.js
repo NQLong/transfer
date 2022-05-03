@@ -1614,11 +1614,11 @@ module.exports = app => {
                 cells.push({ cell: 'C20', value: Number.parseFloat(calHopDong * 100 / total).toFixed(2), border: '1234' });
                 cells.push({ cell: 'D20', number: calHopDongNu, border: '1234' });
                 cells.push({ cell: 'E20', value: Number.parseFloat(calHopDongNu * 100 / (calBienCheNu + calHopDongNu)).toFixed(2), border: '1234' });
-                cells.push({ cell: 'A21', value: 'Tổng cộng', border: '1234' });
-                cells.push({ cell: 'B21', number: total, border: '1234' });
-                cells.push({ cell: 'C21', value: 100.00, border: '1234' });
-                cells.push({ cell: 'D21', number: calBienCheNu + calHopDongNu, border: '1234' });
-                cells.push({ cell: 'E21', value: 100.00, border: '1234' });
+                cells.push({ cell: 'A21', value: 'Tổng cộng', border: '1234', bold: true});
+                cells.push({ cell: 'B21', number: total, border: '1234', bold: true });
+                cells.push({ cell: 'C21', value: 100.00, border: '1234', bold: true });
+                cells.push({ cell: 'D21', number: calBienCheNu + calHopDongNu, border: '1234', bold: true });
+                cells.push({ cell: 'E21', value: 100.00, border: '1234', bold: true });
                 resolve(cells);
             });
         });
@@ -1664,11 +1664,11 @@ module.exports = app => {
                         cells.push({ cell: 'D27', number: (totalNu - chuyenVienDaoTaoNu - listNhomNu[0] - listNhomNu[1]), border: '1234' });
                         cells.push({ cell: 'E27', value: Number.parseFloat((totalNu - chuyenVienDaoTaoNu - listNhomNu[0] - listNhomNu[1]) * 100 / totalNu).toFixed(2), border: '1234' });
 
-                        cells.push({ cell: 'A28', value: 'Tổng', border: '1234' });
-                        cells.push({ cell: 'B28', number: total, border: '1234' });
-                        cells.push({ cell: 'C28', value: 100.00, border: '1234' });
-                        cells.push({ cell: 'D28', number: totalNu, border: '1234' });
-                        cells.push({ cell: 'E28', value: 100.00, border: '1234' });
+                        cells.push({ cell: 'A28', value: 'Tổng', border: '1234', bold: true });
+                        cells.push({ cell: 'B28', number: total, border: '1234', bold: true });
+                        cells.push({ cell: 'C28', value: 100.00, border: '1234', bold: true });
+                        cells.push({ cell: 'D28', number: totalNu, border: '1234', bold: true });
+                        cells.push({ cell: 'E28', value: 100.00, border: '1234', bold: true });
                         resolve(cells);
                         return;
                     }
@@ -1790,11 +1790,11 @@ module.exports = app => {
                 cells.push({ cell: 'D37', number: remainNu, border: '1234' });
                 cells.push({ cell: 'E37', value: Number.parseFloat(remainNu * 100 / totalNu).toFixed(2), border: '1234' });
 
-                cells.push({ cell: 'A38', value: 'Tổng', border: '1234' });
-                cells.push({ cell: 'B38', number: total, border: '1234' });
-                cells.push({ cell: 'C38', value: 100.00, border: '1234' });
-                cells.push({ cell: 'D38', number: totalNu, border: '1234' });
-                cells.push({ cell: 'E38', value: 100.00, border: '1234' });
+                cells.push({ cell: 'A38', value: 'Tổng', border: '1234', bold: true });
+                cells.push({ cell: 'B38', number: total, border: '1234', bold: true });
+                cells.push({ cell: 'C38', value: 100.00, border: '1234', bold: true });
+                cells.push({ cell: 'D38', number: totalNu, border: '1234', bold: true });
+                cells.push({ cell: 'E38', value: 100.00, border: '1234', bold: true });
                 resolve(cells);
             });
         });
@@ -1870,11 +1870,11 @@ module.exports = app => {
                 cells.push({ cell: 'D45', number: dataHocViNu['04'], border: '1234' });
                 cells.push({ cell: 'E45', value: Number.parseFloat(dataHocViNu['04'] * 100 / totalNu).toFixed(2), border: '1234' });
 
-                cells.push({ cell: 'A46', value: 'Tổng', border: '1234' });
-                cells.push({ cell: 'B46', number: total, border: '1234' });
-                cells.push({ cell: 'C46', value: 100.00, border: '1234' });
-                cells.push({ cell: 'D46', number: totalNu, border: '1234' });
-                cells.push({ cell: 'E46', value: 100.00, border: '1234' });
+                cells.push({ cell: 'A46', value: 'Tổng', border: '1234', bold: true });
+                cells.push({ cell: 'B46', number: total, border: '1234', bold: true });
+                cells.push({ cell: 'C46', value: 100.00, border: '1234', bold: true });
+                cells.push({ cell: 'D46', number: totalNu, border: '1234', bold: true });
+                cells.push({ cell: 'E46', value: 100.00, border: '1234', bold: true });
                 resolve(cells);
             });
         });
