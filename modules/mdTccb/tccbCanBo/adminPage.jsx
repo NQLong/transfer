@@ -278,15 +278,23 @@ class StaffPage extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission ? e => this.create(e) : null,
-            // onExport: (e) => {
-            //     e.preventDefault();
-            //     const filter = JSON.stringify(this.state.filter || {});
-
-            //     T.download(T.url(`/api/staff/download-excel/${filter}`), 'Danh sach can bo.xlsx');
-            // }
             onExport: (e) => {
                 e.preventDefault();
-                T.download(T.url('/api/staff/download-monthly-report'), 'Bao cao hang thang.xlsx');
+                T.confirm3('Tải dữ liệu xuống', 'Vui lòng chọn tên file bạn muốn tải', 'info', 'Danh sách cán bộ', 'Báo cáo hàng tháng', isChoose => {
+                    if (isChoose !== null) {
+                        if (isChoose) {
+                            T.download(T.url('/api/staff/download-monthly-report'), 'Bao cao hang thang.xlsx');
+
+                        } else {
+                            const filter = T.stringify(this.state.filter);
+                            let pageC = pageCondition;
+                            pageC = typeof pageC === 'string' ? pageC : '';
+                            if (pageC.length == 0) pageC = null;
+            
+                            T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'Danh sach can bo.xlsx');
+                        }
+                    }
+                });
             }
         });
     }

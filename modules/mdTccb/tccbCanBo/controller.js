@@ -1441,8 +1441,11 @@ module.exports = app => {
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
 
-    app.get('/api/staff/download-excel/:filter', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.download(req.params.filter, (error, result) => {
+    app.get('/api/staff/download-excel/:filter/:searchTerm', checkGetStaffPermission, (req, res) => {
+        let searchTerm = req.params.searchTerm;
+        if (searchTerm == 'null') searchTerm = '';
+
+        app.model.canBo.download(req.params.filter, searchTerm, (error, result) => {
             if (error || !result) {
                 res.send({ error });
             } else {
@@ -1515,11 +1518,11 @@ module.exports = app => {
         const workbook = app.excel.create(),
               worksheet = workbook.addWorksheet('Sheet1');
         const promiseCalDonVi = new Promise((resolve) => {
-            let cells = [{ cell: 'A1', value: 'Thống kê các đơn vị thuộc trường', border: '1234' }];
+            let cells = [{ cell: 'A1', value: 'Thống kê Đơn vị thuộc Trường', border: '1234', bold: true }];
+            cells.push({ cell: 'B1', value: 'Số lượng', border: '1234', bold: true });
             app.model.dmDonVi.getAll((error, data) => {
                 data = data.groupBy('maPl');
-                // console.log(data['2']);
-                cells.push({ cell: 'A2', value: 'Phòng chức năng, Thư viện, Bảo tàng, CS.TĐ', border: '1234', bold: true });
+                cells.push({ cell: 'A2', value: 'Phòng chức năng, Thư viện, Bảo tàng, CS.TĐ', border: '1234'});
                 cells.push({ cell: 'B2', number: data['2']?.length, border: '1234' });
                 cells.push({ cell: 'A3', value: 'Khoa', border: '1234' });
                 cells.push({ cell: 'B3', number: data['1']?.length, border: '1234' });
@@ -1535,8 +1538,24 @@ module.exports = app => {
             });
         });
         
+        const promiseCalBoMon = new Promise((resolve) => {
+            let cells = [{ cell: 'A8', value: 'Thống kê Đơn vị thuộc Phòng/Khoa/Trung tâm', border: '1234', bold: true }];
+            app.model.dmBoMon.getAll((error, data) => {
+                data = data.groupBy('maPl');
+                cells.push({ cell: 'A9', value: 'Bộ môn thuộc Khoa/Trung tâm', border: '1234'});
+                cells.push({ cell: 'B9', number: data['1']?.length, border: '1234' });
+                cells.push({ cell: 'A10', value: 'Phòng thuộc Khoa', border: '1234' });
+                cells.push({ cell: 'B10', number: data['2']?.length, border: '1234' });
+                cells.push({ cell: 'A11', value: 'Bộ Trung tâm thuộc Khoa/Phòng', border: '1234'} );
+                cells.push({ cell: 'B11', number: data['3']?.length, border: '1234'} );
+                resolve(cells);
+            });
+        });
+
         const promiseCalVCQL = new Promise((resolve) => {
-            let cells = [{ cell: 'A9', value: 'Thống kê viên chức quản lí', border: '1234', bold: true }];
+            let cells = [{ cell: 'A13', value: 'Thống kê viên chức quản lí', border: '1234', bold: true }];
+            cells.push({ cell: 'B13', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C13', value: 'Không tính kiêm nhiệm', border: '1234', bold: true });
             let calVCQLCapTruong = 0;
             let calVCQLCapTruongKhongKiemNhiem = 0;
             let calVCQLCapKhoa = 0;
@@ -1548,26 +1567,34 @@ module.exports = app => {
                     if (item.maBoMon) calVCQLCapKhoa++;
                     if (item.maBoMon && item.chucVuChinh == 1) calVCQLCapKhoaKhongKiemNhiem++;
                 });
-                cells.push({ cell: 'A10', value: 'VCQL cấp đơn vị thuộc trường', border: '1234' });
-                cells.push({ cell: 'B10', number: calVCQLCapTruong, border: '1234' });
-                cells.push({ cell: 'A11', value: 'VCQL cấp đơn vị thuộc trường không tính kiêm nhiệm', border: '1234' });
-                cells.push({ cell: 'B11', number: calVCQLCapTruongKhongKiemNhiem, border: '1234' });
-                cells.push({ cell: 'A12', value: 'VCQL cấp đơn vị thuộc phòng, ban, khoa, bộ môn, trung tâm', border: '1234' });
-                cells.push({ cell: 'B12', number: calVCQLCapKhoa, border: '1234' });
-                cells.push({ cell: 'A13', value: 'VCQL cấp đơn vị thuộc phòng, ban, khoa, bộ môn, trung tâm không tính kiêm nhiệm', border: '1234' });
-                cells.push({ cell: 'B13', number: calVCQLCapKhoaKhongKiemNhiem, border: '1234' });
+                cells.push({ cell: 'A14', value: 'VCQL cấp đơn vị thuộc trường', border: '1234' });
+                cells.push({ cell: 'B14', number: calVCQLCapTruong, border: '1234' });
+                cells.push({ cell: 'C14', number: calVCQLCapTruongKhongKiemNhiem, border: '1234' });
+                cells.push({ cell: 'A15', value: 'VCQL cấp đơn vị thuộc phòng, ban, khoa, bộ môn, trung tâm', border: '1234' });
+                cells.push({ cell: 'B15', number: calVCQLCapKhoa, border: '1234' });
+                cells.push({ cell: 'C15', number: calVCQLCapKhoaKhongKiemNhiem, border: '1234' });
+                cells.push({ cell: 'A16', value: 'Tổng cộng', border: '1234', bold: true });
+                cells.push({ cell: 'B16', number: calVCQLCapTruong + calVCQLCapKhoa, border: '1234', bold: true });
+                cells.push({ cell: 'C16', number: calVCQLCapTruongKhongKiemNhiem + calVCQLCapKhoaKhongKiemNhiem, border: '1234', bold: true });
                 resolve(cells);
             });
         });
 
         const promiseCalCanBo = new Promise(resolve => {
+            let cells = [{ cell: 'A18', value: 'Loại hình biên chế/hợp đồng', border: '1234', bold: true }];
+            cells.push({ cell: 'B18', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C18', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D18', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E18', value: 'Tỷ lệ (%)', border: '1234', bold: true });
             let calBienChe = 0;
             let calHopDong = 0;
             let calBienCheNu = 0;
             let calHopDongNu = 0;
-            app.model.canBo.getAll('NGAY_NGHI IS NULL', (error, data) => {
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL',
+                parameter: {}
+            }, (error, data) => {
                 data.forEach((item) => {
-                    if (item.ng)
                     if (item.ngayBienChe) {
                         calBienChe++;
                         if (item.phai == '02') calBienCheNu++;
@@ -1576,22 +1603,283 @@ module.exports = app => {
                         if (item.phai == '02') calHopDongNu++;
                     }
                 });
-                let cells = [];
-                cells.push({ cell: 'A15', value: 'Cán bộ biên chế', border: '1234' });
-                cells.push({ cell: 'B15', number: calBienChe, border: '1234' });
-                cells.push({ cell: 'A16', value: 'Cán bộ biên chế nữ', border: '1234' });
-                cells.push({ cell: 'B16', number: calBienCheNu, border: '1234' });
-                cells.push({ cell: 'A17', value: 'Cán bộ hợp đồng', border: '1234' });
-                cells.push({ cell: 'B17', number: calHopDong, border: '1234' });
-                cells.push({ cell: 'A18', value: 'Cán bộ hợp đồng nữ', border: '1234' });
-                cells.push({ cell: 'B18', number: calHopDongNu, border: '1234' });
+                let total = calBienChe + calHopDong;
+                cells.push({ cell: 'A19', value: 'Biên chế', border: '1234' });
+                cells.push({ cell: 'B19', number: calBienChe, border: '1234' });
+                cells.push({ cell: 'C19', value: Number.parseFloat(calBienChe * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D19', number: calBienCheNu, border: '1234' });
+                cells.push({ cell: 'E19', value: Number.parseFloat(calBienCheNu * 100 / (calBienCheNu + calHopDongNu)).toFixed(2), border: '1234' });
+                cells.push({ cell: 'A20', value: 'Hợp đồng', border: '1234' });
+                cells.push({ cell: 'B20', number: calHopDong, border: '1234' });
+                cells.push({ cell: 'C20', value: Number.parseFloat(calHopDong * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D20', number: calHopDongNu, border: '1234' });
+                cells.push({ cell: 'E20', value: Number.parseFloat(calHopDongNu * 100 / (calBienCheNu + calHopDongNu)).toFixed(2), border: '1234' });
+                cells.push({ cell: 'A21', value: 'Tổng cộng', border: '1234' });
+                cells.push({ cell: 'B21', number: total, border: '1234' });
+                cells.push({ cell: 'C21', value: 100.00, border: '1234' });
+                cells.push({ cell: 'D21', number: calBienCheNu + calHopDongNu, border: '1234' });
+                cells.push({ cell: 'E21', value: 100.00, border: '1234' });
                 resolve(cells);
             });
         });
 
-        Promise.all([promiseCalDonVi, promiseCalVCQL, promiseCalCanBo]).then((values) => {
+        const promiseCalChucDanhNgheNghiep = new Promise(resolve => {
+            let cells = [{ cell: 'A23', value: 'Cơ cấu', border: '1234', bold: true }];
+            cells.push({ cell: 'B23', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C23', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D23', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E23', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            let listNhom = [0, 0, 0, 0, 0];
+            let listNhomNu = [0, 0, 0, 0, 0];
+            let chuyenVienDaoTao = 0, chuyenVienDaoTaoNu = 0;
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL',
+                parameter: {}
+            }, (error, data) => {
+                const traverse = (index = 0) => {
+                    if (index >= data.length) {
+                        let total = listNhom[0] + listNhom[1] + listNhom[2] + listNhom[3] + listNhom[4],
+                            totalNu = listNhomNu[0] + listNhomNu[1] + listNhomNu[2] + listNhomNu[3] + listNhomNu[4];
+                        cells.push({ cell: 'A24', value: 'Giảng viên', border: '1234' });
+                        cells.push({ cell: 'B24', number: listNhom[0], border: '1234' });
+                        cells.push({ cell: 'C24', value: Number.parseFloat(listNhom[0] * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D24', number: listNhomNu[0], border: '1234' });
+                        cells.push({ cell: 'E24', value: Number.parseFloat(listNhomNu[0] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A25', value: 'Nghiên cứu viên', border: '1234' });
+                        cells.push({ cell: 'B25', number: listNhom[1], border: '1234' });
+                        cells.push({ cell: 'C25', value: Number.parseFloat(listNhom[1] * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D25', number: listNhomNu[1], border: '1234' });
+                        cells.push({ cell: 'E25', value: Number.parseFloat(listNhomNu[1] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A26', value: 'Chuyên viên phục vụ đào tạo và NCKH', border: '1234' });
+                        cells.push({ cell: 'B26', number: chuyenVienDaoTao, border: '1234' });
+                        cells.push({ cell: 'C26', value: Number.parseFloat(chuyenVienDaoTao * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D26', number: chuyenVienDaoTaoNu, border: '1234' });
+                        cells.push({ cell: 'E26', value: Number.parseFloat(chuyenVienDaoTaoNu * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A27', value: 'Chuyên viên hành chính và nhân viên phục vụ', border: '1234' });
+                        cells.push({ cell: 'B27', number: (total - chuyenVienDaoTao - listNhom[0] - listNhom[1]), border: '1234' });
+                        cells.push({ cell: 'C27', value: Number.parseFloat((total - chuyenVienDaoTao - listNhom[0] - listNhom[1]) * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D27', number: (totalNu - chuyenVienDaoTaoNu - listNhomNu[0] - listNhomNu[1]), border: '1234' });
+                        cells.push({ cell: 'E27', value: Number.parseFloat((totalNu - chuyenVienDaoTaoNu - listNhomNu[0] - listNhomNu[1]) * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A28', value: 'Tổng', border: '1234' });
+                        cells.push({ cell: 'B28', number: total, border: '1234' });
+                        cells.push({ cell: 'C28', value: 100.00, border: '1234' });
+                        cells.push({ cell: 'D28', number: totalNu, border: '1234' });
+                        cells.push({ cell: 'E28', value: 100.00, border: '1234' });
+                        resolve(cells);
+                        return;
+                    }
+                    app.model.dmNgachCdnn.get({ ma: data[index].ngach }, (error, itemNgach) => {
+                        if (itemNgach) {
+                            if (itemNgach.nhom && itemNgach.nhom <= 5) {
+                                let nhom = itemNgach.nhom;
+                                listNhom[nhom - 1] += 1;
+                                if (data[index].phai == '02') listNhomNu[nhom - 1] += 1;
+                            }
+                            if (data[index].ngach == '01.003') {
+                                if (data[index].isCvdt == 1) {
+                                    chuyenVienDaoTao += 1;
+                                    if (data[index].phai == '02') chuyenVienDaoTaoNu += 1;
+                                }
+                            }
+                        }
+                        traverse(index + 1);
+                    });
+                };
+                traverse();
+            });
+        });
+
+        const promiseCalTrinhDoCanBo = new Promise(resolve => {
+            let cells = [{ cell: 'A30', value: 'Trình độ VC, NLĐ', border: '1234', bold: true }];
+            cells.push({ cell: 'B30', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C30', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D30', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E30', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL',
+                parameter: {}
+            }, (error, data) => {
+                let dataHocVi = data.groupBy('hocVi');
+                let dataChucDanh = data.groupBy('chucDanh');
+                ['01', '02', '03', '04', '05'].forEach((key, ) => {
+                    if (!(key in dataHocVi)) {
+                        dataHocVi[key] = [];
+                    }
+                });
+                ['01', '02'].forEach((key, ) => {
+                    if (!(key in dataChucDanh)) {
+                        dataChucDanh[key] = [];
+                    }
+                });
+                let dataHocViNu = {};
+                let dataChucDanhNu = {};
+                let total = data.length;
+                let totalNu = 0;
+                for (const [key, list] of Object.entries(dataHocVi)) {
+                    dataHocViNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') {
+                            dataHocViNu[key] += 1;
+                            totalNu += 1;
+                        }
+                    });
+                }
+                for (const [key, list] of Object.entries(dataChucDanh)) {
+                    dataChucDanhNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') dataChucDanhNu[key] += 1;
+                    });
+                }
+                cells.push({ cell: 'A31', value: 'Giáo sư', border: '1234' });
+                cells.push({ cell: 'B31', number: dataChucDanh['01'].length, border: '1234' });
+                cells.push({ cell: 'C31', value: Number.parseFloat(dataChucDanh['01'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D31', number: dataChucDanhNu['01'], border: '1234' });
+                cells.push({ cell: 'E31', value: Number.parseFloat(dataChucDanhNu['01'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A32', value: 'Phó giáo sư', border: '1234' });
+                cells.push({ cell: 'B32', number: dataChucDanh['02'].length, border: '1234' });
+                cells.push({ cell: 'C32', value: Number.parseFloat(dataChucDanh['02'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D32', number: dataChucDanhNu['02'], border: '1234' });
+                cells.push({ cell: 'E32', value: Number.parseFloat(dataChucDanhNu['02'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A33', value: 'Tiến sĩ + Tiến sĩ khoa học (không bao gồm GS, PGS)', border: '1234' });
+                cells.push({ cell: 'B33', number: (dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length), border: '1234' });
+                cells.push({ cell: 'C33', value: Number.parseFloat((dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length) * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D33', number: (dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']), border: '1234' });
+                cells.push({ cell: 'E33', value: Number.parseFloat((dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']) * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A34', value: 'Thạc sĩ', border: '1234' });
+                cells.push({ cell: 'B34', number: dataHocVi['03'].length, border: '1234' });
+                cells.push({ cell: 'C34', value: Number.parseFloat(dataHocVi['03'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D34', number: dataHocViNu['03'], border: '1234' });
+                cells.push({ cell: 'E34', value: Number.parseFloat(dataHocViNu['03'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A35', value: 'Cử nhân', border: '1234' });
+                cells.push({ cell: 'B35', number: dataHocVi['04'].length, border: '1234' });
+                cells.push({ cell: 'C35', value: Number.parseFloat(dataHocVi['04'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D35', number: dataHocViNu['04'], border: '1234' });
+                cells.push({ cell: 'E35', value: Number.parseFloat(dataHocViNu['04'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A36', value: 'Kỹ sư', border: '1234' });
+                cells.push({ cell: 'B36', number: dataHocVi['05'].length, border: '1234' });
+                cells.push({ cell: 'C36', value: Number.parseFloat(dataHocVi['05'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D36', number: dataHocViNu['05'], border: '1234' });
+                cells.push({ cell: 'E36', value: Number.parseFloat(dataHocViNu['05'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                let remain = total;
+                remain -= dataHocVi['01'].length;
+                remain -= dataHocVi['02'].length;
+                remain -= dataHocVi['03'].length;
+                remain -= dataHocVi['04'].length;
+                remain -= dataHocVi['05'].length;
+
+                let remainNu = totalNu;
+                remainNu -= dataHocViNu['01'];
+                remainNu -= dataHocViNu['02'];
+                remainNu -= dataHocViNu['03'];
+                remainNu -= dataHocViNu['04'];
+                remainNu -= dataHocViNu['05'];
+
+                cells.push({ cell: 'A37', value: 'Còn lại', border: '1234' });
+                cells.push({ cell: 'B37', number: remain, border: '1234' });
+                cells.push({ cell: 'C37', value: Number.parseFloat(remain * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D37', number: remainNu, border: '1234' });
+                cells.push({ cell: 'E37', value: Number.parseFloat(remainNu * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A38', value: 'Tổng', border: '1234' });
+                cells.push({ cell: 'B38', number: total, border: '1234' });
+                cells.push({ cell: 'C38', value: 100.00, border: '1234' });
+                cells.push({ cell: 'D38', number: totalNu, border: '1234' });
+                cells.push({ cell: 'E38', value: 100.00, border: '1234' });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalTrinhDoGiangVien = new Promise(resolve => {
+            let cells = [{ cell: 'A40', value: 'Trình độ giảng viên', border: '1234', bold: true }];
+            cells.push({ cell: 'B40', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C40', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D40', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E40', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL AND ngach IN (\'V.07.01.03\', \'15.109\', \'15.110\', \'V.07.01.01\', \'V.07.01.02\', \'15.111\')',
+                parameter: {}
+            }, (error, data) => {
+                let dataHocVi = data.groupBy('hocVi');
+                let dataChucDanh = data.groupBy('chucDanh');
+                ['01', '02', '03', '04'].forEach((key, ) => {
+                    if (!(key in dataHocVi)) {
+                        dataHocVi[key] = [];
+                    }
+                });
+                ['01', '02'].forEach((key, ) => {
+                    if (!(key in dataChucDanh)) {
+                        dataChucDanh[key] = [];
+                    }
+                });
+                let dataHocViNu = {};
+                let dataChucDanhNu = {};
+                let total = data.length;
+                let totalNu = 0;
+                for (const [key, list] of Object.entries(dataHocVi)) {
+                    dataHocViNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') {
+                            dataHocViNu[key] += 1;
+                            totalNu += 1;
+                        }
+                    });
+                }
+                for (const [key, list] of Object.entries(dataChucDanh)) {
+                    dataChucDanhNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') dataChucDanhNu[key] += 1;
+                    });
+                }
+                cells.push({ cell: 'A41', value: 'Giáo sư', border: '1234' });
+                cells.push({ cell: 'B41', number: dataChucDanh['01'].length, border: '1234' });
+                cells.push({ cell: 'C41', value: Number.parseFloat(dataChucDanh['01'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D41', number: dataChucDanhNu['01'], border: '1234' });
+                cells.push({ cell: 'E41', value: Number.parseFloat(dataChucDanhNu['01'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A42', value: 'Phó giáo sư', border: '1234' });
+                cells.push({ cell: 'B42', number: dataChucDanh['02'].length, border: '1234' });
+                cells.push({ cell: 'C42', value: Number.parseFloat(dataChucDanh['02'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D42', number: dataChucDanhNu['02'], border: '1234' });
+                cells.push({ cell: 'E42', value: Number.parseFloat(dataChucDanhNu['02'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A43', value: 'Tiến sĩ + Tiến sĩ khoa học (không bao gồm GS, PGS)', border: '1234' });
+                cells.push({ cell: 'B43', number: (dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length), border: '1234' });
+                cells.push({ cell: 'C43', value: Number.parseFloat((dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length) * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D43', number: (dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']), border: '1234' });
+                cells.push({ cell: 'E43', value: Number.parseFloat((dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']) * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A44', value: 'Thạc sĩ', border: '1234' });
+                cells.push({ cell: 'B44', number: dataHocVi['03'].length, border: '1234' });
+                cells.push({ cell: 'C44', value: Number.parseFloat(dataHocVi['03'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D44', number: dataHocViNu['03'], border: '1234' });
+                cells.push({ cell: 'E44', value: Number.parseFloat(dataHocViNu['03'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A45', value: 'Cử nhân', border: '1234' });
+                cells.push({ cell: 'B45', number: dataHocVi['04'].length, border: '1234' });
+                cells.push({ cell: 'C45', value: Number.parseFloat(dataHocVi['04'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D45', number: dataHocViNu['04'], border: '1234' });
+                cells.push({ cell: 'E45', value: Number.parseFloat(dataHocViNu['04'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A46', value: 'Tổng', border: '1234' });
+                cells.push({ cell: 'B46', number: total, border: '1234' });
+                cells.push({ cell: 'C46', value: 100.00, border: '1234' });
+                cells.push({ cell: 'D46', number: totalNu, border: '1234' });
+                cells.push({ cell: 'E46', value: 100.00, border: '1234' });
+                resolve(cells);
+            });
+        });
+        Promise.all([promiseCalDonVi, promiseCalVCQL, promiseCalCanBo, promiseCalBoMon, promiseCalChucDanhNgheNghiep, promiseCalTrinhDoCanBo, promiseCalTrinhDoGiangVien]).then((values) => {
             values = [].concat(...values);
-            console.log(values);
             app.excel.write(worksheet, values);
             app.excel.attachment(workbook, res, 'Bao cao hang thang.xlsx');
         }).catch((error) => {
