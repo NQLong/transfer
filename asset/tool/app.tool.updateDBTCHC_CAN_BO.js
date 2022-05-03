@@ -510,13 +510,90 @@ const run = () => {
             //updateMaDonVi(); //updated
             //updateGhiChu(); //updated
             //updateNgaySinhGioiTinh(); //updated
-            updateHocVi(); //updated, thiếu nơi tốt nghiệp
+            //updateHocVi(); //updated, thiếu nơi tốt nghiệp
             //updateChucDanhKhoaHocDanhHieu(); //updated
             //updateBienChe(); //updated
             //updateDangVien(); //updated
             //updateCMND(); //updated
             //updateIsHocVi(); //updated
             //updateLuong(); //updated
+        }
+    });
+    app.excel.readFile(app.path.join(__dirname, './data/DSCB_Thanh_LuongMoi-2022-04_.xlsx'), workbook => {
+        if (workbook) {
+            const worksheet = workbook.getWorksheet(1);
+            const updateLuongMoi = (row = 13) => {
+                //console.log("update with idx = ", row);
+                let stt = worksheet.getCell('A' + row).value;
+                if (stt == null) {
+                    process.exit();
+                }
+                let donVi = (worksheet.getCell('B' + row).value || '').toString().trim();
+                let ho = (worksheet.getCell('C' + row).value || '').toString().trim();
+                let ten = (worksheet.getCell('D' + row).value || '').toString().trim();
+                // ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung
+                let ngach = (worksheet.getCell('K' + row).value || '').toString().trim();
+                let bacLuong = (worksheet.getCell('L' + row).value || '').toString().trim();
+                if (ngach[0] == '1' && ngach[1] != '.') {
+                    if (ngach.length != 6) ngach += '0';
+                }
+                if (ngach[0] == '1' && ngach[1] == '.') {
+                    ngach = '0' + ngach;
+                    if (ngach.length != 6) ngach += '0';
+                }
+                let heSoLuong = worksheet.getCell('M' + row).value;
+                if (heSoLuong) {
+                    heSoLuong = parseFloat(heSoLuong).toFixed(2);
+                }
+                let tyLeVuotKhung = worksheet.getCell('N' + row).value;
+                if (tyLeVuotKhung) {
+                    tyLeVuotKhung = parseInt(tyLeVuotKhung * 100);
+                }
+                let mocNangLuong = worksheet.getCell('U' + row).value;
+                if (mocNangLuong) {
+                    mocNangLuong = mocNangLuong.toString().trim();
+                    mocNangLuong = new Date(mocNangLuong);
+                    mocNangLuong = mocNangLuong.getTime();
+                }
+                if (donVi == 'P. ĐN&QLKH') donVi = 'Phòng Đối ngoại và Quản lý khoa học';
+                if (donVi == 'P. KT&ĐBCL') donVi = 'Phòng Khảo thí và Đảm bảo chất lượng';
+                if (donVi == 'P. TT&QHDN') donVi = 'Phòng Truyền thông và Quan hệ doanh nghiệp';
+                if (donVi == 'TT. TVHN&PTNNL') donVi = 'Tư vấn hướng nghiệp và Phát triển nguồn nhân lực';
+                if (donVi == 'Văn Phòng Đảng ủy') donVi = 'Đảng Uỷ';
+                if (donVi == 'Văn Phòng Đoàn Thanh niên') donVi = 'Đoàn Thanh niên - Hội Sinh viên';
+                if (donVi == 'Văn Phòng Công Đoàn') donVi = 'Công Đoàn';
+                if (donVi == 'TT. NCCL&CSQG') donVi = 'Nghiên cứu Chiến lược và Chính sách Quốc gia';
+                app.model.dmDonVi.getMaDonVi(donVi, (maDv, tenDonVi) => {
+                    if (donVi == 'TT. Hàn Quốc học') {
+                        maDv = '44';
+                        tenDonVi = 'TT Hàn Quốc học'
+                    }
+                    if (donVi == 'TT. Tin học') {
+                        maDv = '54';
+                        tenDonVi = 'TT Tin học';
+                    }
+                    app.model.canBo.getShccCanBo({ ho, ten, ngaySinh: null, maDonVi: maDv }, (error, shcc) => {
+                        app.model.canBo.get({ shcc }, (error2, item) => {
+                            if (error2 || item == null) console.log("failed = ", ho, ten, maDv, error);
+                            else {
+                                //console.log("test = ", heSoLuong, tyLeVuotKhung, mocNangLuong);
+                                // app.model.canBo.update({ shcc }, { ngach, heSoLuong, tyLeVuotKhung, mocNangLuong }, (error, item) => {
+                                //     if (error || item == null) {
+                                //         console.log("Update failed: ", shcc, error);
+                                //     }
+                                //     updateLuongMoi(row + 1);
+                                // });
+                                console.log("test = ", shcc);
+                                console.log(ho, ten, maDv);
+                                console.log(item.ho, item.ten, item.maDonVi);
+                            }
+                            updateLuongMoi(row + 1);
+                        });
+                    });
+                });
+
+            };
+            updateLuongMoi(); //updated
         }
     });
 };
