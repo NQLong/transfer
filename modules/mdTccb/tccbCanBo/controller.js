@@ -1481,6 +1481,14 @@ module.exports = app => {
                         { cell: 'Y1', value: 'Chức danh khoa học', bold: true, border: '1234' },
                         { cell: 'Z1', value: 'Năm bổ nhiệm', bold: true, border: '1234' },
                         { cell: 'AA1', value: 'Ngành chuyên môn', bold: true, border: '1234' },
+                        { cell: 'AB1', value: 'Danh hiệu nhà giáo (NGND, NGUT)', bold: true, border: '1234' },
+                        { cell: 'AC1', value: 'Biên chế', bold: true, border: '1234' },
+                        { cell: 'AD1', value: 'Ngày vào biên chế', bold: true, border: '1234' },
+                        { cell: 'AE1', value: 'Đảng viên', bold: true, border: '1234' },
+                        { cell: 'AF1', value: 'Ghi chú', bold: true, border: '1234' },
+                        { cell: 'AG1', value: 'Số CMND', bold: true, border: '1234' },
+                        { cell: 'AH1', value: 'Ngày cấp', bold: true, border: '1234' },
+                        { cell: 'AI1', value: 'Nơi cấp', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -1510,6 +1518,14 @@ module.exports = app => {
                         cells.push({ cell: 'Y' + (index + 2), border: '1234', value: item.hocHam });
                         cells.push({ cell: 'Z' + (index + 2), border: '1234', value: item.namChucDanh ? app.date.dateTimeFormat(new Date(item.namChucDanh), 'yyyy') : '' });
                         cells.push({ cell: 'AA' + (index + 2), border: '1234', value: item.chuyenNganhChucDanh });
+                        cells.push({ cell: 'AB' + (index + 2), border: '1234', value: item.danhHieu });
+                        cells.push({ cell: 'AC' + (index + 2), border: '1234', value: item.ngayBienChe ? 'X' : '' });
+                        cells.push({ cell: 'AD' + (index + 2), border: '1234', value: (item.ngayBienChe && item.ngayBienChe != 1) ? app.date.dateTimeFormat(new Date(item.ngayBienChe), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'AE' + (index + 2), border: '1234', value: item.dangVien ? 'X' : '' });
+                        cells.push({ cell: 'AF' + (index + 2), border: '1234', value: item.ghiChu });
+                        cells.push({ cell: 'AG' + (index + 2), border: '1234', value: item.cmnd });
+                        cells.push({ cell: 'AH' + (index + 2), border: '1234', value: item.cmndNgayCap ? app.date.dateTimeFormat(new Date(item.cmndNgayCap), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'AI' + (index + 2), border: '1234', value: item.cmndNoiCap });
                     });
                     resolve(cells);
                 }).then((cells) => {
@@ -1908,7 +1924,41 @@ module.exports = app => {
                 resolve(cells);
             });
         });
-        Promise.all([promiseCalDonVi, promiseCalVCQL, promiseCalCanBo, promiseCalBoMon, promiseCalChucDanhNgheNghiep, promiseCalTrinhDoCanBo, promiseCalTrinhDoGiangVien]).then((values) => {
+        const promiseUpdateNhanSu = new Promise(resolve => {
+            let currentDate = new Date();
+            currentDate.setDate(1);
+            currentDate.setMonth(currentDate.getMonth()-1);
+            let monthYear = currentDate.getMonth() + '/' + currentDate.getFullYear();
+            let cells = [{ cell: 'A48', value: 'Cập nhật tình hình về nhân sự trong Tháng ' + monthYear, border: '1234', bold: true }];
+            cells.push({ cell: 'B48', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C48', value: 'Ghi chú', border: '1234', bold: true });
+            cells.push({ cell: 'A49', value: 'Tuyển dụng', border: '1234' });
+            cells.push({ cell: 'A50', value: 'Chuyển về trường', border: '1234' });
+            cells.push({ cell: 'A51', value: 'Nghỉ việc, chấm dứt hợp đồng', border: '1234' });
+            cells.push({ cell: 'A52', value: 'Nghỉ hưu', border: '1234' });
+            cells.push({ cell: 'A53', value: 'Chuyển công tác', border: '1234' });
+            cells.push({ cell: 'A54', value: 'Xóa tên', border: '1234' });
+            resolve(cells);
+        });
+
+        const promiseCalcCongTac = new Promise(resolve => {
+            let currentDate = new Date();
+            currentDate.setDate(1);
+            currentDate.setMonth(currentDate.getMonth()-1);
+            let monthYear = currentDate.getMonth() + '/' + currentDate.getFullYear();
+            let cells = [{ cell: 'A56', value: 'Quyết định cử đi học trong Tháng ' + monthYear, border: '1234', bold: true }];
+            cells.push({ cell: 'B56', value: 'Nước ngoài', border: '1234', bold: true });
+            cells.push({ cell: 'C56', value: 'Trong nước', border: '1234', bold: true });
+            cells.push({ cell: 'A57', value: 'Tiến sĩ', border: '1234' });
+            cells.push({ cell: 'A58', value: 'Thạc sĩ', border: '1234' });
+            cells.push({ cell: 'A60', value: 'Báo cáo kết quả học tập trong Tháng ' + monthYear, border: '1234', bold: true });
+            cells.push({ cell: 'B60', value: 'Nước ngoài', border: '1234', bold: true });
+            cells.push({ cell: 'C60', value: 'Trong nước', border: '1234', bold: true });
+            cells.push({ cell: 'A61', value: 'Tiến sĩ', border: '1234' });
+            cells.push({ cell: 'A62', value: 'Thạc sĩ', border: '1234' });
+            resolve(cells);
+        });
+        Promise.all([promiseCalDonVi, promiseCalVCQL, promiseCalCanBo, promiseCalBoMon, promiseCalChucDanhNgheNghiep, promiseCalTrinhDoCanBo, promiseCalTrinhDoGiangVien, promiseUpdateNhanSu, promiseCalcCongTac]).then((values) => {
             values = [].concat(...values);
             app.excel.write(worksheet, values);
             app.excel.attachment(workbook, res, 'Bao cao hang thang.xlsx');
