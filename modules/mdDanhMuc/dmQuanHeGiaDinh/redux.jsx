@@ -139,10 +139,11 @@ export function deleteDmQuanHeGiaDinh(ma, done) {
 }
 
 export const SelectAdapter_DmQuanHeGiaDinh = {
-    ajax: false,
-    getAll: getDmQuanHeGiaDinhAll,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
-    condition: { kichHoat: 1 },
+    ajax: true,
+    data: params => ({ searchTerm: params.term, condition: { kichHoat: 1 } }),
+    url: '/api/danh-muc/quan-he-gia-dinh/all',
+    processResults: response => ({ results: response ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmQuanHeGiaDinh(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };
 
 export const SelectAdapter_DmQuanHeGiaDinhV2 = (loai = -1) => {

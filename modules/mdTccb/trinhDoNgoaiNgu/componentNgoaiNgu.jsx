@@ -1,26 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getStaffEdit, userGetStaff } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { getDmNgoaiNguAll, SelectAdapter_DmNgoaiNgu } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
 import {
     createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff,
-    createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser
 } from './redux';
 import { Select } from 'view/component/Input';
 
 class TrinhDoNNModal extends AdminModal {
     onShow = (item) => {
         let { id, loaiNgonNgu, trinhDo } = item && item.item ? item.item : { id: null, loaiNgonNgu: null, trinhDo: '' };
-        this.setState({ id, email: item.email, item, shcc: item.shcc });
+        this.setState({ id });
         this.loaiNgonNgu.setVal(loaiNgonNgu);
         this.trinhDo.value(trinhDo);
     }
 
     onSubmit = () => {
         const changes = {
-            shcc: this.state.shcc,
-            email: this.state.email,
+            shcc: this.props.shcc,
             loaiNgonNgu: this.loaiNgonNgu.getVal(),
             trinhDo: this.trinhDo.value()
         };
@@ -52,11 +49,6 @@ class ComponentNN extends AdminPage {
         });
     }
 
-    value = (shcc, email) => {
-        this.shcc = shcc;
-        this.email = email;
-    }
-
     showModal = (e, item) => {
         e.preventDefault();
         this.modal.show({ item: item, shcc: this.shcc, email: this.email });
@@ -64,28 +56,29 @@ class ComponentNN extends AdminPage {
 
     deleteTrinhDoNN = (e, item) => {
         T.confirm('Xóa thông tin trình độ ngoại ngữ', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && ((this.props.staff && this.props.staff.userItem) ? this.props.deleteTrinhDoNNStaffUser(item.id, () => this.props.userGetStaff(this.email)) : this.props.deleteTrinhDoNNStaff(item.id, () => this.props.getStaffEdit(this.shcc))));
+            isConfirm && this.props.deleteTrinhDoNNStaff(item.id, this.props.shcc));
         e.preventDefault();
     }
 
     render() {
-        const dataTrinhDoNgoaiNgu = (this.props.staff && this.props.staff.userItem) ? this.props.staff?.userItem?.trinhDoNN : this.props.staff?.selectedItem?.trinhDoNN;
-        let permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
-        permission.read = true;
-        permission.write = true;
-        permission.delete = true;
+        const dataTrinhDoNgoaiNgu = this.props.staff?.dataStaff?.trinhDoNN || [];
+        let isCanBo = this.getUserPermission('staff', ['login']).login,
+            permission = { read: isCanBo, write: isCanBo, delete: isCanBo };
 
         const renderNNTable = (items) => (
             renderTable({
                 getDataSource: () => items, stickyHead: false,
+                header: 'thead-light',
                 renderHead: () => (
                     <tr>
+                        <th style={{ width: 'auto' }}>#</th>
                         <th style={{ width: '30%' }}>Loại ngôn ngữ</th>
                         <th style={{ width: '70%' }}>Trình độ</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
+                        <TableCell content={index + 1} />
                         <TableCell type='link' content={this.mapperNgonNgu[item.loaiNgonNgu]} onClick={e => this.showModal(e, item)} />
                         <TableCell type='text' content={item.trinhDo} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.showModal(e, item)} onDelete={this.deleteTrinhDoNN}></TableCell>
@@ -96,15 +89,15 @@ class ComponentNN extends AdminPage {
         return (
             <div className='col-md-12 form-group'>
                 <div>{this.props.label}
-                    <div className='tile-body'>{dataTrinhDoNgoaiNgu ? renderNNTable(dataTrinhDoNgoaiNgu) : renderNNTable([])}</div>
+                    <div className='tile-body' style={{ marginTop: '10px' }}>{renderNNTable(dataTrinhDoNgoaiNgu)}</div>
                     <div className='tile-footer' style={{ textAlign: 'right' }}>
                         <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
-                            <i className='fa fa-fw fa-lg fa-plus' />Thêm trình độ ngoại ngữ
+                            <i className='fa fa-fw fa-lg fa-plus' /> Thêm trình độ ngoại ngữ
                         </button>
                     </div>
-                    <TrinhDoNNModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
-                        create={(this.props.staff && this.props.staff.userItem) ? this.props.createTrinhDoNNStaffUser : this.props.createTrinhDoNNStaff}
-                        update={(this.props.staff && this.props.staff.userItem) ? this.props.updateTrinhDoNNStaffUser : this.props.updateTrinhDoNNStaff} />
+                    <TrinhDoNNModal ref={e => this.modal = e} shcc={this.props.shcc}
+                        create={this.props.createTrinhDoNNStaff}
+                        update={this.props.updateTrinhDoNNStaff} />
                 </div>
             </div>
         );
@@ -112,6 +105,6 @@ class ComponentNN extends AdminPage {
 }
 const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
-    getStaffEdit, userGetStaff, getDmNgoaiNguAll, createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff, createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser
+    getDmNgoaiNguAll, createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff
 };
-export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentNN);
+export default connect(mapStateToProps, mapActionsToProps)(ComponentNN);

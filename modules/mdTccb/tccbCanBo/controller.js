@@ -34,6 +34,7 @@ module.exports = app => {
         });
     });
 
+
     //Hook staff-------------------------------------------------------------------------------------------------
     app.permissionHooks.add('staff', 'checkKhoaBoMon', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi) {
@@ -141,7 +142,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), async (req, res) => {
+    app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:login'), async (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
@@ -166,12 +167,15 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/staff', app.permission.check('staff:write'), (req, res) => {
-        app.model.canBo.update({ shcc: req.body.shcc }, req.body.changes, (error, item) => {
-            if (item && !error) app.notification.send({ toEmail: item.email, title: 'Lý lịch được cập nhật thành công', subTitle: `Bởi ${req.session.user.lastName} ${req.session.user.firstName} (${req.session.user.email})`, icon: 'fa-check-square-o', iconColor: 'success' });
+    app.put('/api/staff', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.canBo.update({ shcc }, req.body.changes, (error, item) => {
+            // if (item && !error) app.notification.send({ toEmail: item.email, title: 'Lý lịch được cập nhật thành công', subTitle: `Bởi ${req.session.user.lastName} ${req.session.user.firstName}`, icon: 'fa-check-square-o', iconColor: 'success' });
             res.send({ error, item });
-        });
+        }) : res.send({ error: 'No permission' });
     });
+
+
 
     app.delete('/api/staff', app.permission.check('staff:delete'), (req, res) => {
         app.model.canBo.delete({ shcc: req.body.shcc }, error => {
@@ -295,559 +299,6 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/staff/quan-he', app.permission.check('staff:write'), (req, res) =>
-        app.model.quanHeCanBo.create(req.body.data, (error, item) => res.send({ error, item })));
-
-    app.put('/api/staff/quan-he', app.permission.check('staff:write'), (req, res) =>
-        app.model.quanHeCanBo.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/staff/quan-he', app.permission.check('staff:write'), (req, res) =>
-        app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error)));
-
-    app.post('/api/staff/multiple', app.permission.check('staff:write'), (req, res) => {
-        const canBoList = req.body.canBoList;
-        const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
-            tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
-            trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
-
-        new Promise(resolve => {
-            app.model.dmDanToc.getAll((error, items) => {
-                (items || []).forEach(item => danTocMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        }).then(() => new Promise(resolve => {
-            app.model.dmTonGiao.getAll((error, items) => {
-                (items || []).forEach(item => tonGiaoMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDoLyLuanChinhTri.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoLyLuanChinhTriMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmDonVi.getAll((error, items) => {
-                (items || []).forEach(item => donViMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmChucVu.getAll((error, items) => {
-                (items || []).forEach(item => chucVuMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTinhThanhPho.getAll((error, items) => {
-                (items || []).forEach(item => tinhMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuanHuyen.getAll((error, items) => {
-                (items || []).forEach(item => huyenMapping[item.maTinhThanhPho + ':' + item.tenQuanHuyen.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmPhuongXa.getAll((error, items) => {
-                (items || []).forEach(item => xaMapping[item.maQuanHuyen + ':' + item.tenPhuongXa.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuocGia.getAll((error, items) => {
-                (items || []).forEach(item => quocGiaMapping[item.tenQuocGia.toLowerCase()] = item.maCode);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmChucDanhKhoaHoc.getAll((error, items) => {
-                (items || []).forEach(item => chucDanhMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDo.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDoQuanLyNhaNuoc.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoQuanLyNhaNuocMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDoTinHoc.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoTinHocMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuanHeGiaDinh.getAll((error, items) => {
-                (items || []).forEach(item => quanHeMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmNgoaiNgu.getAll((error, items) => {
-                (items || []).forEach(item => ngoaiNguMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => {
-            const handleCanBo = (index = 0) => {
-                let item = canBoList[index];
-                if (index < canBoList.length) {
-                    let canBo = {
-                        shcc: item.shcc,
-                        ten: item.hoTen.split(' ')[item.hoTen.split(' ').length - 1].toUpperCase(),
-                        ho: item.hoTen.substring(0, item.hoTen.indexOf(item.hoTen.split(' ')[item.hoTen.split(' ').length - 1])).toUpperCase().trim(),
-                        phai: item.phai.toLowerCase() == 'nam' ? '01' : item.phai.toLowerCase() == 'nữ' ? '02' : null,
-                        dienThoaiCaNhan: item.dienThoaiCaNhan,
-                        email: item.email,
-                        ngaySinh: item.ngaySinh,
-                        ngayBatDauCongTac: item.ngayBatDauCongTac,
-                        ngayBienChe: item.ngayBienChe,
-                        chucVuDoanThe: item.chucVuDoanThe,
-                        chucVuDang: item.chucVuDang,
-                        chucVuKiemNhiem: item.chucVuKiemNhiem,
-                        maTrinhDoLlct: item.trinhDoLlct && trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] ? trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] : null,
-                        maTrinhDoQlnn: item.trinhDoQlnn && trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] ? trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] : null,
-                        maTrinhDoTinHoc: item.trinhDoTinHoc && trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] ? trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] : null,
-                        hoKhau: item.hoKhau,
-                        diaChiHienTai: item.diaChiHienTai,
-                        danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : null,
-                        tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : null,
-                        dangVien: item.ngayVaoDang || item.ngayVaoDangChinhThuc || item.noiDangDb || item.noiDangDb ? 1 : 0,
-                        maDonVi: item.donVi && donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] ? donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] : null,
-                        emailCaNhan: item.emailCaNhan,
-                        biDanh: item.biDanh,
-                        dienThoaiBaoTin: item.dienThoaiBaoTin,
-                        ngheNghiepCu: item.ngheNghiepCu,
-                        cmnd: item.cmnd,
-                        cmndNgayCap: item.cmndNgayCap,
-                        cmndNoiCap: item.cmndNoiCap,
-                        chucVuKhac: item.chucVuKhac,
-                        quocGia: item.quocGia && quocGiaMapping[item.quocGia.toLowerCase()] ? quocGiaMapping[item.quocGia.toLowerCase()] : null,
-                        chucDanh: item.chucDanh && chucDanhMapping[item.chucDanh.toLowerCase()] ? chucDanhMapping[item.chucDanh.toLowerCase()] : null,
-                        trinhDoPhoThong: item.trinhDoPhoThong ? typeof (item.trinhDoPhoThong) == 'object' ? item.trinhDoPhoThong.getDate() + '/' + item.trinhDoPhoThong.getMonth() : item.trinhDoPhoThong.replaceAll('//', '/') : null,
-                        hocVi: item.hocVi && trinhDoMapping[item.hocVi.toLowerCase()] ? trinhDoMapping[item.hocVi.toLowerCase()] : null,
-                        chuyenNganh: item.chuyenNganh,
-                        sucKhoe: item.sucKhoe,
-                        canNang: item.canNang,
-                        chieuCao: item.chieuCao,
-                        ngayNhapNgu: item.ngayNhapNgu,
-                        ngayXuatNgu: item.ngayXuatNgu,
-                        quanHamCaoNhat: item.quanHam,
-                        hangThuongBinh: item.hangThuongBinh,
-                        giaDinhChinhSach: item.giaDinhChinhSach,
-                        danhHieu: item.danhHieu,
-                        ngayVaoDang: item.ngayVaoDang,
-                        ngayVaoDangChinhThuc: item.ngayVaoDangChinhThuc,
-                        noiDangDb: item.noiDangDb,
-                        noiDangCt: item.noiDangCt,
-                        ngayVaoDoan: item.ngayVaoDoan,
-                        noiVaoDoan: item.noiVaoDoan,
-                        soTruong: item.soTruong,
-                        nhomMau: item.nhomMau,
-                        soBhxh: item.soBhxh,
-                        doanVien: item.noiVaoDoan || item.ngayVaoDoan ? 1 : 0,
-                        namChucDanh: item.namChucDanh,
-                        namHocVi: item.namHocVi,
-                        noiSinh: item.noiSinh,
-                        queQuan: item.nguyenQuan
-                    };
-                    // if (item.noiSinh) {
-                    //     let dsNoiSinh = item.noiSinh.split(/[-,]/);
-                    //     if (dsNoiSinh.length == 1) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[0].toLowerCase()] ? tinhMapping[dsNoiSinh[0].toLowerCase()] : null;
-                    //     } else if (dsNoiSinh.length == 2) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[1].toLowerCase().trim()] ? xaMapping[dsNoiSinh[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNoiSinh) canBo.maHuyenNoiSinh = huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNoiSinh.length == 3) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[2].toLowerCase().trim()] ? xaMapping[dsNoiSinh[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNoiSinh) canBo.maHuyenNoiSinh = huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNoiSinh) canBo.maXaNoiSinh = xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNoiSinh.length == 4) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[3].toLowerCase().trim()] ? xaMapping[dsNoiSinh[3].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNoiSinh) canBo.maHuyenNoiSinh = huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[2].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNoiSinh) canBo.maXaNoiSinh = xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] : null;
-                    //     }
-                    // }
-                    // if (item.nguyenQuan) {
-                    //     let dsNguyenQuan = item.nguyenQuan.split(/[-,]/);
-                    //     if (dsNguyenQuan.length == 1) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[0].toLowerCase()] ? tinhMapping[dsNguyenQuan[0].toLowerCase()] : null;
-                    //     } else if (dsNguyenQuan.length == 2) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[1].toLowerCase().trim()] ? xaMapping[dsNguyenQuan[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNguyenQuan) canBo.maHuyenNguyenQuan = huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNguyenQuan.length == 3) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[2].toLowerCase().trim()] ? xaMapping[dsNguyenQuan[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNguyenQuan) canBo.maHuyenNguyenQuan = huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNguyenQuan) canBo.maXaNguyenQuan = xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNguyenQuan.length == 4) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[3].toLowerCase().trim()] ? xaMapping[dsNguyenQuan[3].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNguyenQuan) canBo.maHuyenNguyenQuan = huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[2].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNguyenQuan) canBo.maXaNguyenQuan = xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] : null;
-                    //     }
-                    // }
-                    if (canBo.shcc) {
-                        app.model.canBo.get({ shcc: canBo.shcc }, (error, cbItem) => {
-                            if (cbItem == null) {
-                                app.model.canBo.create(canBo, (error2, newCb) => {
-                                    if (!error2 && newCb) {
-                                        if (item.quanHe && item.quanHe.length > 0) {
-                                            const handleQuanHe = (index = 0) => {
-                                                let quanHe = item.quanHe[index];
-                                                if (index < item.quanHe.length) {
-                                                    let newQuanHe = {
-                                                        hoTen: quanHe.hoTen,
-                                                        moiQuanHe: quanHeMapping[quanHe.quanHe.toLowerCase()],
-                                                        namSinh: new Date(quanHe.namSinh).getTime(),
-                                                        queQuan: quanHe.queQuan,
-                                                        diaChi: quanHe.diaChi,
-                                                        type: quanHe.type,
-                                                        shcc: newCb.shcc,
-                                                        ngheNghiep: quanHe.ngheNghiep
-                                                    };
-                                                    app.model.quanHeCanBo.create(newQuanHe, () => {
-                                                        handleQuanHe(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQuanHe();
-                                        }
-
-                                        if (item.trinhDoNgoaiNgu && item.trinhDoNgoaiNgu.length > 0) {
-                                            const handleNgoaiNgu = (index = 0) => {
-                                                let ngoaiNgu = item.trinhDoNgoaiNgu[index];
-                                                if (index < item.trinhDoNgoaiNgu.length) {
-                                                    let newNgoaiNgu = {
-                                                        loaiNgonNgu: ngoaiNguMapping[ngoaiNgu.loaiNgonNgu.toLowerCase()],
-                                                        shcc: newCb.shcc,
-                                                        trinhDo: ngoaiNgu.trinhDo
-                                                    };
-                                                    app.model.trinhDoNgoaiNgu.create(newNgoaiNgu, () => {
-                                                        handleNgoaiNgu(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleNgoaiNgu();
-                                        }
-
-                                        if (item.qtHtct && item.qtHtct.length > 0) {
-                                            const handleQTHTCT = (index = 0) => {
-                                                let htct = item.qtHtct[index];
-                                                if (index < item.qtHtct.length) {
-                                                    const newHtct = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: htct.batDau,
-                                                        ketThuc: htct.ketThuc,
-                                                        batDauType: htct.batDauType,
-                                                        ketThucType: htct.ketThucType,
-                                                        noiDung: htct.noiDung
-                                                    };
-                                                    app.model.qtHocTapCongTac.create(newHtct, () => {
-                                                        handleQTHTCT(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTHTCT();
-                                        }
-
-                                        if (item.qtDaoTao && item.qtDaoTao.length > 0) {
-                                            const handleQTDaoTao = (index = 0) => {
-                                                let daoTao = item.qtDaoTao[index];
-                                                if (index < item.qtDaoTao.length) {
-                                                    const newDaoTao = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: daoTao.batDau,
-                                                        ketThuc: daoTao.ketThuc,
-                                                        batDauType: daoTao.batDauType,
-                                                        ketThucType: daoTao.ketThucType,
-                                                        tenTruong: daoTao.tenTruong,
-                                                        chuyenNganh: daoTao.chuyenNganh,
-                                                        hinhThuc: daoTao.hinhThuc,
-                                                        loaiBangCap: daoTao.loaiBangCap,
-                                                        thoiGian: daoTao.thoiGian
-                                                    };
-                                                    app.model.qtDaoTao.create(newDaoTao, () => {
-                                                        handleQTDaoTao(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTDaoTao();
-                                        }
-
-                                        if (item.qtNuocNgoai && item.qtNuocNgoai.length > 0) {
-                                            const handleQTNuocNgoai = (index = 0) => {
-                                                let nuocNgoai = item.qtNuocNgoai[index];
-                                                if (index < item.qtNuocNgoai.length) {
-                                                    const newNuocNgoai = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: nuocNgoai.batDau,
-                                                        ketThuc: nuocNgoai.ketThuc,
-                                                        batDauType: nuocNgoai.batDauType,
-                                                        ketThucType: nuocNgoai.ketThucType,
-                                                        quocGia: nuocNgoai.quocGia,
-                                                        noiDung: nuocNgoai.noiDung
-                                                    };
-                                                    app.model.qtNuocNgoai.create(newNuocNgoai, () => {
-                                                        handleQTNuocNgoai(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTNuocNgoai();
-                                        }
-
-                                        if (item.qtKhenThuong && item.qtKhenThuong.length > 0) {
-                                            const handleQTKhenThuong = (index = 0) => {
-                                                let khenThuong = item.qtKhenThuong[index];
-                                                if (index < item.qtKhenThuong.length) {
-                                                    const newKhenThuong = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: khenThuong.batDau,
-                                                        ketThuc: khenThuong.ketThuc,
-                                                        batDauType: khenThuong.batDauType,
-                                                        ketThucType: khenThuong.ketThucType,
-                                                        capQuyetDinh: khenThuong.capQuyetDinh,
-                                                        noiDung: khenThuong.noiDung
-                                                    };
-                                                    app.model.qtKhenThuong.create(newKhenThuong, () => {
-                                                        handleQTKhenThuong(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTKhenThuong();
-                                        }
-
-                                        if (item.qtKyLuat && item.qtKyLuat.length > 0) {
-                                            const handleQTKyLuat = (index = 0) => {
-                                                let kyLuat = item.qtKyLuat[index];
-                                                if (index < item.qtKyLuat.length) {
-                                                    const newKyLuat = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: kyLuat.batDau,
-                                                        ketThuc: kyLuat.ketThuc,
-                                                        batDauType: kyLuat.batDauType,
-                                                        ketThucType: kyLuat.ketThucType,
-                                                        capQuyetDinh: kyLuat.capQuyetDinh,
-                                                        lyDoHinhThuc: kyLuat.lyDoHinhThuc
-                                                    };
-                                                    app.model.qtKyLuat.create(newKyLuat, () => {
-                                                        handleQTKyLuat(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTKyLuat();
-                                        }
-
-                                        if (item.qtNCKH && item.qtNCKH.length > 0) {
-                                            const handleQTNCKH = (index = 0) => {
-                                                let nckh = item.qtNCKH[index];
-                                                if (index < item.qtNCKH.length) {
-                                                    const newNckh = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: nckh.batDau,
-                                                        ketThuc: nckh.ketThuc,
-                                                        batDauType: nckh.batDauType,
-                                                        ketThucType: nckh.ketThucType,
-                                                        tenDeTai: nckh.tenDeTai,
-                                                        maSoCapQuanLy: nckh.maSoCapQuanLy,
-                                                        kinhPhi: nckh.kinhPhi,
-                                                        vaiTro: nckh.vaiTro,
-                                                        ketQua: nckh.ketQua,
-                                                        thoiGian: nckh.thoiGian,
-                                                        ngayNghiemThu: nckh.ngayNghiemThu,
-                                                        ngayNghiemThuType: nckh.ngayNghiemThuType
-                                                    };
-                                                    app.model.qtNghienCuuKhoaHoc.create(newNckh, () => {
-                                                        handleQTNCKH(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTNCKH();
-                                        }
-
-                                        if (item.qtHuongDan && item.qtHuongDan.length > 0) {
-                                            const handleHuongDan = (index = 0) => {
-                                                let huongDan = item.qtHuongDan[index];
-                                                if (index < item.qtHuongDan.length) {
-                                                    const newHuongDan = {
-                                                        shcc: newCb.shcc,
-                                                        hoTen: huongDan.hoTen,
-                                                        tenLuanVan: huongDan.tenLuanVan,
-                                                        namTotNghiep: huongDan.namTotNghiep,
-                                                        sanPham: huongDan.sanPham,
-                                                        bacDaoTao: huongDan.bacDaoTao
-                                                    };
-                                                    app.model.qtHuongDanLuanVan.create(newHuongDan, () => {
-                                                        handleHuongDan(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleHuongDan();
-                                        }
-
-                                        if (item.sachGiaoTrinh && item.sachGiaoTrinh.length > 0) {
-                                            const handleSachGiaoTrinh = (index = 0) => {
-                                                let sach = item.sachGiaoTrinh[index];
-                                                if (index < item.sachGiaoTrinh.length) {
-                                                    const newSach = {
-                                                        shcc: newCb.shcc,
-                                                        ten: sach.ten,
-                                                        theLoai: sach.theLoai,
-                                                        nhaSanXuat: sach.nhaSanXuat,
-                                                        namSanXuat: sach.namSanXuat,
-                                                        chuBien: sach.chuBien,
-                                                        sanPham: sach.sanPham,
-                                                        butDanh: sach.butDanh,
-                                                        quocTe: sach.quocTe
-                                                    };
-                                                    app.model.sachGiaoTrinh.create(newSach, () => {
-                                                        handleSachGiaoTrinh(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleSachGiaoTrinh();
-                                        }
-
-                                        if (item.baiVietKhoaHoc && item.baiVietKhoaHoc.length > 0) {
-                                            const handleBaiViet = (index = 0) => {
-                                                let baiViet = item.baiVietKhoaHoc[index];
-                                                if (index < item.baiVietKhoaHoc.length) {
-                                                    const newBaiViet = {
-                                                        shcc: newCb.shcc,
-                                                        tenTacGia: baiViet.tenTacGia,
-                                                        namXuatBan: baiViet.namXuatBan,
-                                                        tenBaiViet: baiViet.tenBaiViet,
-                                                        tenTapChi: baiViet.tenTapChi,
-                                                        soHieuIssn: baiViet.soHieuIssn,
-                                                        sanPham: baiViet.sanPham,
-                                                        diemIf: baiViet.diemIf,
-                                                        quocTe: baiViet.quocTe
-                                                    };
-                                                    app.model.qtBaiVietKhoaHoc.create(newBaiViet, () => {
-                                                        handleBaiViet(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleBaiViet();
-                                        }
-
-                                        if (item.kyYeu && item.kyYeu.length > 0) {
-                                            const handleKyYeu = (index = 0) => {
-                                                let kYeu = item.kyYeu[index];
-                                                if (index < item.kyYeu.length) {
-                                                    const newKYeu = {
-                                                        shcc: newCb.shcc,
-                                                        tenTacGia: kYeu.tenTacGia,
-                                                        tenHoiNghi: kYeu.tenHoiNghi,
-                                                        tenBaiViet: kYeu.tenBaiViet,
-                                                        noiToChuc: kYeu.noiToChuc,
-                                                        soHieuIssn: kYeu.soHieuIssn,
-                                                        thoiGian: kYeu.thoiGian,
-                                                        sanPham: kYeu.sanPham,
-                                                        quocTe: kYeu.quocTe
-                                                    };
-                                                    app.model.qtKyYeu.create(newKYeu, () => {
-                                                        handleKyYeu(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleKyYeu();
-                                        }
-
-                                        if (item.giaiThuong && item.giaiThuong.length > 0) {
-                                            const handleGiaiThuong = (index = 0) => {
-                                                let gt = item.giaiThuong[index];
-                                                if (index < item.giaiThuong.length) {
-                                                    const newGT = {
-                                                        shcc: newCb.shcc,
-                                                        tenGiaiThuong: gt.tenGiaiThuong,
-                                                        noiDung: gt.noiDung,
-                                                        noiCap: gt.noiCap,
-                                                        namCap: gt.namCap
-                                                    };
-                                                    app.model.qtGiaiThuong.create(newGT, () => {
-                                                        handleGiaiThuong(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleGiaiThuong();
-                                        }
-
-                                        if (item.bangPMSC && item.bangPMSC.length > 0) {
-                                            const handleBangPMSC = (index = 0) => {
-                                                let bang = item.bangPMSC[index];
-                                                if (index < item.bangPMSC.length) {
-                                                    const newBang = {
-                                                        shcc: newCb.shcc,
-                                                        tenBang: bang.tenBang,
-                                                        soHieu: bang.soHieu,
-                                                        namCap: bang.namCap,
-                                                        noiCap: bang.noiCap,
-                                                        tacGia: bang.tacGia,
-                                                        sanPham: bang.sanPham,
-                                                        loaiBang: bang.loaiBang
-                                                    };
-                                                    app.model.qtBangPhatMinh.create(newBang, () => {
-                                                        handleBangPMSC(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleBangPMSC();
-                                        }
-
-                                        if (item.ungDungThuongMai && item.ungDungThuongMai.length > 0) {
-                                            const handleUngDungThuongMai = (index = 0) => {
-                                                let ungDung = item.ungDungThuongMai[index];
-                                                if (index < item.ungDungThuongMai.length) {
-                                                    const newUngDung = {
-                                                        shcc: newCb.shcc,
-                                                        tenCongNghe: ungDung.tenCongNghe,
-                                                        hinhThuc: ungDung.hinhThuc,
-                                                        namChuyenGia: ungDung.namChuyenGia,
-                                                        sanPham: ungDung.sanPham
-                                                    };
-                                                    app.model.qtUngDungThuongMai.create(newUngDung, () => {
-                                                        handleUngDungThuongMai(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleUngDungThuongMai();
-                                        }
-
-                                        if (item.lamViecNgoai && item.lamViecNgoai.length > 0) {
-                                            const handleLamViecNgoai = (index = 0) => {
-                                                let LVN = item.lamViecNgoai[index];
-                                                if (index < item.lamViecNgoai.length) {
-                                                    const newLVN = {
-                                                        shcc: newCb.shcc,
-                                                        noiLamViec: LVN.noiLamViec,
-                                                        noiDung: LVN.noiDung,
-                                                        batDau: LVN.batDau,
-                                                        ketThuc: LVN.ketThuc,
-                                                        batDauType: LVN.batDauType,
-                                                        ketThucType: LVN.ketThucType
-                                                    };
-                                                    app.model.qtLamViecNgoai.create(newLVN, () => {
-                                                        handleLamViecNgoai(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleLamViecNgoai();
-                                        }
-                                    }
-                                    handleCanBo(index + 1);
-                                });
-                            } else {
-                                handleCanBo(index + 1);
-                            }
-                        });
-                    } else {
-                        handleCanBo(index + 1);
-                    }
-                } else {
-                    res.send({ error: null });
-                }
-            };
-
-            handleCanBo();
-        });
-
-    });
 
     app.getCanBoProfile = (res, canBo) => {
         let result = app.clone(canBo),
@@ -858,13 +309,11 @@ module.exports = app => {
                 resolve();
             });
         }).then(() => new Promise(resolve => {
-            app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
+            app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, quanHeCanBo) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin quan hệ cán bộ !' });
-                } else if (items == null) {
-                    result = app.clone(result, { items: null });
+                    res.send({ error: 'Lỗi khi lấy thông tin quan hệ gia đình cán bộ !' });
                 } else {
-                    result = app.clone(result, { items: items.rows });
+                    result = app.clone(result, { quanHeCanBo: quanHeCanBo?.rows || [] });
                 }
                 resolve();
             });
@@ -883,10 +332,8 @@ module.exports = app => {
             app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
-                } else if (toChucKhac == null) {
-                    result = app.clone(result, { toChucKhac: null });
                 } else {
-                    result = app.clone(result, { toChucKhac });
+                    result = app.clone(result, { toChucKhac: toChucKhac || [] });
                 }
                 resolve();
             });
@@ -902,57 +349,11 @@ module.exports = app => {
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getTDCT(canBo.shcc, (error, llct) => {
+            app.model.qtDaoTao.getHV(canBo.shcc, (error, daoTaoBoiDuong) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
-                } else if (llct == null || llct.rows.length == 0) {
-                    result = app.clone(result, { llct: null });
+                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo, bồi dưỡng!' });
                 } else {
-                    result = app.clone(result, { llct: llct.rows[0] });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getQLNN(canBo.shcc, (error, qlnn) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
-                } else if (qlnn == null || qlnn.length == 0) {
-                    result = app.clone(result, { qlnn: null });
-                } else {
-                    result = app.clone(result, { qlnn: qlnn.rows[0] });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getHV(canBo.shcc, (error, hocViCB) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ học vấn, đào tạo !' });
-                } else if (hocViCB == null || hocViCB.length == 0) {
-                    result = app.clone(result, { hocViCB: null });
-                } else {
-                    result = app.clone(result, { hocViCB: hocViCB.rows });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getCC(canBo.shcc, (error, chungChi) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ cử nhân !' });
-                } else if (chungChi == null || chungChi.length == 0) {
-                    result = app.clone(result, { chungChi: null });
-                } else {
-                    result = app.clone(result, { chungChi: chungChi.rows });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
-                } else if (tinHoc == null || tinHoc.length == 0) {
-                    result = app.clone(result, { tinHoc: null });
-                } else {
-                    result = app.clone(result, { tinHoc: tinHoc.rows[0] });
+                    result = app.clone(result, { daoTaoBoiDuong: daoTaoBoiDuong.rows || [] });
                 }
                 resolve();
             });
@@ -961,47 +362,42 @@ module.exports = app => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
                 }
-                else if (trinhDoNN == null) {
-                    result = app.clone(result, { trinhDoNN: null });
-                } else {
-                    result = app.clone(result, { trinhDoNN: trinhDoNN });
+                else {
+                    result = app.clone(result, { trinhDoNN: trinhDoNN || [] });
                 }
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            let dataCV = [];
+            let chucVuChinhQuyen = [], chucVuDoanThe = [];
             app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ !' });
-                } else if (chucVu == null) {
-                    result = app.clone(result, { chucVu: [] });
+                    res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ!' });
                 } else {
-                    chucVu.rows.forEach(i => {
-                        dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
-                    });
-                    result = app.clone(result, { chucVu: dataCV });
+                    chucVuChinhQuyen = chucVu.rows.filter(i => i.loaiChucVu == 1);
+                    chucVuDoanThe = chucVu.rows.filter(i => i.loaiChucVu != 1);
+                    result = app.clone(result, { chucVuChinhQuyen, chucVuDoanThe });
                 }
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            app.model.qtHopDongLaoDong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hopDongLD) => {
+            app.model.qtHopDongLaoDong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, canBoLD) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng lao động !' });
-                } else if (!hopDongLD) {
-                    result = app.clone(result, { hopDongCanBo: 'VC' });
+                } else if (!canBoLD) {
+                    result = app.clone(result, { canBoCanBo: 'VC' });
                 } else {
-                    result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: hopDongLD.ngayKyHopDong, loaiHopDongCanBo: hopDongLD.loaiHopDong });
+                    result = app.clone(result, { canBoCanBo: 'LĐ', canBoCanBoNgay: canBoLD.ngayKyHopDong, loaiHopDongCanBo: canBoLD.loaiHopDong });
                 }
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hopDongVC) => {
+            app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, canBoVC) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng làm việc !' });
-                } else if (!hopDongVC)
-                    result = app.clone(result, { hopDongCanBo: 'LĐ' });
+                } else if (!canBoVC)
+                    result = app.clone(result, { canBoCanBo: 'LĐ' });
                 else {
-                    result = app.clone(result, { hopDongCanBo: 'VC', hopDongCanBoNgay: hopDongVC.ngayKyHopDong, loaiHopDongCanBo: hopDongVC.loaiHopDong });
+                    result = app.clone(result, { canBoCanBo: 'VC', canBoCanBoNgay: canBoVC.ngayKyHopDong, loaiHopDongCanBo: canBoVC.loaiHopDong });
                 }
                 resolve();
             });
@@ -1024,319 +420,126 @@ module.exports = app => {
     app.get('/api/can-bo-ky/:shcc', checkGetStaffPermission, (req, res) => {
         app.model.canBo.getCanBoBenA(req.params.shcc, (error, item) => res.send({ error, item }));
     });
-    app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            const changes = req.body.changes, email = req.session.user.email;
-            app.model.canBo.get({ email }, (error, canBo) => {
-                if (!canBo) {
-                    changes.email = req.session.user.email;
-                    app.model.canBo.create(changes, (error, item) => {
-                        res.send({ error, item });
-                    });
-                } else {
-                    app.model.canBo.update({ email }, changes, (error, item) => {
-                        if (item && !error) app.notification.send({ toEmail: email, title: 'Cập nhật lý lịch cán bộ thành công', icon: 'fa-check-square-o', iconColor: 'success' });
-                        res.send({ error, item });
-                    });
-                }
-            });
 
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.post('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = req.body.data;
-            app.model.quanHeCanBo.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.put('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.quanHeCanBo.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = req.body.changes;
-                        app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.delete('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.quanHeCanBo.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error));
-                    } else {
-                        res.send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.get('/user/staff/:shcc/word', app.permission.check('staff:login'), (req, res) => {
-        if (req.params && req.params.shcc) {
-            app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
-                if (error || canBo == null) {
+    app.get('/api/staff/get-ly-lich/:shcc', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.params.shcc);
+        if (shcc) {
+            app.model.canBo.getLyLich(shcc, (error, item) => {
+                if (error || !item || !item.rows || !item.rows.length || !item.rows[0]) {
                     res.send({ error });
                 } else {
-                    const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
-                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
-                        trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
+                    let canBo = item.rows[0],
+                        { qtChucVu, qtDaoTao, qtHocTapCongTac, quanHeGiaDinh, toChucKhac } = item;
+
+                    qtDaoTao.map(item => {
+                        item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
+                        item.ketThuc = item.ketThuc == -1 ? 'nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType);
+                        return item;
+                    });
+
+                    const getMaxDaoTao = (ten) => {
+                        let data = qtDaoTao.filter(item => item.chuyenNganh == ten);
+                        if (!data.length) return '';
+                        else return data.reduce((prev, cur) => {
+                            return (prev.batDau > cur.batDau && prev.ketThuc != -1) ? prev : cur;
+                        });
+                    };
+
+                    let llct = getMaxDaoTao('Lý luận chính trị'),
+                        qlnn = getMaxDaoTao('Quản lý nhà nước'),
+                        tinHoc = getMaxDaoTao('Tin học');
+
+                    qtHocTapCongTac.map(item => {
+                        item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
+                        item.ketThuc = item.ketThuc == -1 ? 'nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType);
+                        return item;
+                    });
+
+                    quanHeGiaDinh.map(item => {
+                        item.namSinh = new Date(item.namSinh).getFullYear();
+                        item.ngheNghiep = item.ngheNghiep || '';
+                        item.noiCongTac = item.noiCongTac || '';
+                        return item;
+                    });
+                    if (!toChucKhac.length) {
+                        toChucKhac = [{
+                            tenToChuc: '',
+                            ngayThamGia: '',
+                            moTa: ''
+                        }];
+                    }
                     const source = app.path.join(__dirname, 'resource', 'Mau-2C-BNV-2008.docx');
-
-                    new Promise(resolve => {
-                        app.model.dmDanToc.getAll((error, items) => {
-                            (items || []).forEach(item => danTocMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    }).then(() => new Promise(resolve => {
-                        app.model.dmTonGiao.getAll((error, items) => {
-                            (items || []).forEach(item => tonGiaoMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDoLyLuanChinhTri.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoLyLuanChinhTriMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmDonVi.getAll((error, items) => {
-                            (items || []).forEach(item => donViMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmChucVu.getAll((error, items) => {
-                            (items || []).forEach(item => chucVuMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTinhThanhPho.getAll((error, items) => {
-                            (items || []).forEach(item => tinhMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmQuanHuyen.getAll((error, items) => {
-                            (items || []).forEach(item => huyenMapping[item.ma] = item.tenQuanHuyen);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmPhuongXa.getAll((error, items) => {
-                            (items || []).forEach(item => xaMapping[item.ma] = item.tenPhuongXa);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmQuocGia.getAll((error, items) => {
-                            (items || []).forEach(item => quocGiaMapping[item.maCode] = item.tenQuocGia);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmChucDanhKhoaHoc.getAll((error, items) => {
-                            (items || []).forEach(item => chucDanhMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDo.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDoQuanLyNhaNuoc.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoQuanLyNhaNuocMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDoTinHoc.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoTinHocMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmQuanHeGiaDinh.getAll((error, items) => {
-                            (items || []).forEach(item => quanHeMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmNgoaiNgu.getAll((error, items) => {
-                            (items || []).forEach(item => ngoaiNguMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        const data = {
-                            HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
-                            otherName: canBo.biDanh ? canBo.biDanh : '',
-                            cmnd: canBo.cmnd ? canBo.cmnd : '',
-                            ngayCap: app.date.viDateFormat(new Date(canBo.cmndNgayCap)),
-                            dob: new Date(canBo.ngaySinh).getDate(),
-                            mob: new Date(canBo.ngaySinh).getMonth() + 1,
-                            yob: new Date(canBo.ngaySinh).getFullYear(),
-                            sex: canBo.phai == '01' ? 'Nam' : canBo.phai == '02' ? 'Nữ' : '',
-                            // gioi tinh 00 sua lai -> neu ko co data thi de trong
-                            // nsXa: canBo.maXaNoiSinh ? xaMapping[canBo.maXaNoiSinh] + ',' : '',
-                            // nsHuyen: canBo.maHuyenNoiSinh ? huyenMapping[canBo.maHuyenNoiSinh] + ',' : '',
-                            // nsTinh: canBo.tinhNoiSinh ? tinhMapping[canBo.maTinhNoiSinh] : '',
-                            // qqXa: canBo.maXaNguyenQuan ? xaMapping[canBo.xaNguyenQuan] + ',' : '',
-                            // qqHuyen: canBo.maHuyenNguyenQuan ? huyenMapping[canBo.maHuyenNguyenQuan] + ',' : '',
-                            // qqTinh: canBo.maTinhNguyenQuan ? tinhMapping[canBo.maTinhNguyenQuan] : '',
-                            noiSinh: canBo.noiSinh ? canBo.noiSinh : '',
-                            queQuan: canBo.queQuan ? canBo.queQuan : '',
-                            danToc: canBo.danToc ? danTocMapping[canBo.danToc] : '',
-                            tonGiao: canBo.tonGiao ? tonGiaoMapping[canBo.tonGiao] : 'Không',
-                            hoKhau: canBo.hoKhau ? canBo.hoKhau : '',
-                            diaChiHienTai: canBo.diaChiHienTai ? canBo.diaChiHienTai : '',
-                            ngheNghiepCu: canBo.ngheNghiepCu ? canBo.ngheNghiepCu : '',
-                            ngayBatDauCongTac: canBo.ngayBatDauCongTac ? app.date.viDateFormat(new Date(canBo.ngayBatDauCongTac)) : '',
-                            ngayBienChe: canBo.ngayBienChe ? app.date.viDateFormat(new Date(canBo.ngayBienChe)) : '',
-                            // ngach_cong_chuc: canBo.tenNgach ? canBo.tenNgach : '',
-                            // ma_ngach: canBo.maNgach ? canBo.maNgach : '',
-                            // bac_luong: canBo.bacLuong ? canBo.bacLuong : '',
-                            // he_so_luong: canBo.heSoLuong ? canBo.heSoLuong : '',
-                            // ngay_huong_luong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
-                            // phu_cap_cv: canBo.phuCapCongViec ? canBo.phuCapCongViec : '',
-                            trinh_do_llct: canBo.maTrinhDoLlct ? trinhDoLyLuanChinhTriMapping[canBo.maTrinhDoLlct] : '',
-                            trinh_do_qlnn: canBo.maTrinhDoQlnn ? trinhDoQuanLyNhaNuocMapping[canBo.maTrinhDoQlnn] : '',
-                            trinhDoPhoThong: canBo.trinhDoPhoThong ? canBo.trinhDoPhoThong : '',
-                            // trinh_do_nn: canBo.trinhDoNn ? canBo.trinhDoQlnn : '',
-                            trinh_do_tin_hoc: canBo.maTrinhDoTinHoc ? trinhDoTinHocMapping[canBo.maTrinhDoTinHoc] : '',
-                            trinh_do: canBo.hocVi ? trinhDoMapping[canBo.hocVi] : '',
-                            chucVu: canBo.maChucVu ? chucVuMapping[canBo.maChucVu] : '',
-                            donVi: canBo.maDonVi ? donViMapping[canBo.maDonVi] : '',
-                            quanhe: [],
-                            quanHeInLaw: [],
-                            ngoaiNgu: [],
-                            daoTao: [],
-                            htct: [],
-                            // chuyenngach0: chuyenngach && chuyenngach[0] ? chuyenngach[0] : null,
-                            // chuyenngach1: chuyenngach && chuyenngach[1] ? chuyenngach[1] : null,
-                            // chuyenngach2: chuyenngach && chuyenngach[2] ? chuyenngach[2] : null,
-                            // chuyenngach3: chuyenngach && chuyenngach[3] ? chuyenngach[3] : null,
-                            nhomMau: canBo.nhomMau ? canBo.nhomMau : '',
-                            sucKhoe: canBo.sucKhoe ? canBo.sucKhoe : '',
-                            canNang: canBo.canNang ? canBo.canNang : '',
-                            chieuCao: canBo.chieuCao ? Math.floor(Number(canBo.chieuCao) / 100) + 'm' + (Number(canBo.chieuCao) % 100) : '',
-                            ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
-                            ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(new Date(canBo.ngayVaoDangChinhThuc)) : '',
-                            danhHieu: canBo.danhHieu ? canBo.danhHieu : '',
-                            soTruong: canBo.soTruong ? canBo.soTruong : '',
-                            bhxh: canBo.soBhxh ? canBo.soBhxh : '',
-                            ngayNhapNgu: canBo.ngayNhapNgu ? app.date.viDateFormat(new Date(canBo.ngayNhapNgu)) : '',
-                            ngayXuatNgu: canBo.ngayXuatNgu ? app.date.viDateFormat(new Date(canBo.ngayXuatNgu)) : '',
-                            quanHam: canBo.quanHam ? canBo.quanHam : '',
-                            hangThuongBinh: canBo.hangThuongBinh ? canBo.hangThuongBinh : '',
-                            giaDinhChinhSach: canBo.giaDinhChinhSach ? canBo.giaDinhChinhSach : ''
-                        };
-                        resolve(data);
-
-                    })).then((data) => new Promise(resolve => {
-                        app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, qhItems) => {
-                            if (!error && qhItems && qhItems.length > 0) {
-                                const handleQuanHe = (index = 0) => {
-                                    let item = qhItems[index];
-                                    if (index < qhItems.length) {
-                                        if (item.type == 0) data.quanhe.push({
-                                            moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
-                                            hoTen: item.hoTen,
-                                            namSinh: item.namSinh ? new Date(item.namSinh).getFullYear() : '',
-                                            queQuan: item.queQuan ? item.queQuan : '',
-                                            ngheNghiep: item.ngheNghiep ? item.ngheNghiep : '',
-                                            diaChi: item.diaChi ? item.diaChi : ''
-                                        }); else data.quanHeInLaw.push({
-                                            moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
-                                            hoTen: item.hoTen,
-                                            namSinh: item.namSinh ? new Date(item.namSinh).getFullYear() : '',
-                                            queQuan: item.queQuan ? item.queQuan : '',
-                                            ngheNghiep: item.ngheNghiep ? item.ngheNghiep : '',
-                                            diaChi: item.diaChi ? item.diaChi : ''
-                                        });
-                                        handleQuanHe(index + 1);
-                                    }
-                                };
-                                handleQuanHe();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => new Promise(resolve => {
-                        app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, nnItems) => {
-                            if (!error && nnItems && nnItems.length > 0) {
-                                const handleNgoaiNgu = (index = 0) => {
-                                    let item = nnItems[index];
-                                    if (index < nnItems.length) {
-                                        if (item.loaiNgonNgu) data.ngoaiNgu.push({
-                                            ngonNgu: ngoaiNguMapping[item.loaiNgonNgu],
-                                            trinhDo: item.trinhDo
-                                        });
-                                        handleNgoaiNgu(index + 1);
-                                    }
-                                };
-                                handleNgoaiNgu();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => new Promise(resolve => {
-                        app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, dtItems) => {
-                            if (!error && dtItems && dtItems.length > 0) {
-                                const handleDaoTao = (index = 0) => {
-                                    let item = dtItems[index];
-                                    if (index < dtItems.length) {
-                                        data.daoTao.push({
-                                            coSo: item.tenTruong,
-                                            chuyenNganh: item.chuyenNganh ? item.chuyenNganh : '',
-                                            batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
-                                            ketThuc: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '',
-                                            hinhThuc: item.hinhThuc ? item.hinhThuc : '',
-                                            vanBang: item.loaiBangCap ? item.loaiBangCap : '',
-                                            thoiGian: item.thoiGian ? item.thoiGian + ' tháng' : ''
-                                        });
-                                        handleDaoTao(index + 1);
-                                    }
-                                };
-                                handleDaoTao();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => new Promise(resolve => {
-                        app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, htctItems) => {
-                            if (!error && htctItems && htctItems.length > 0) {
-                                const handleHtct = (index = 0) => {
-                                    let item = htctItems[index];
-                                    if (index < htctItems.length) {
-                                        data.htct.push({
-                                            noiDung: item.noiDung ? item.noiDung : '',
-                                            batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
-                                            ketThuc: item.ketThuc ? item.ketThuc == -1 ? 'đến nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''
-                                        });
-                                        handleHtct(index + 1);
-                                    }
-                                };
-                                handleHtct();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => {
-                        app.docx.generateFile(source, data, (error, data) => {
-                            res.send({ error, data });
-                        });
+                    const data = {
+                        HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
+                        otherName: '',
+                        cmnd: canBo.cmnd,
+                        ngayCap: app.date.viDateFormat(new Date(canBo.ngayCapCmnd)),
+                        dob: new Date(canBo.ngaySinh).getDate(),
+                        mob: new Date(canBo.ngaySinh).getMonth() + 1,
+                        yob: new Date(canBo.ngaySinh).getFullYear(),
+                        sex: canBo.gioiTinh,
+                        nsXa: canBo.xaNoiSinh ? canBo.xaNoiSinh + ',' : '',
+                        nsHuyen: canBo.huyenNoiSinh ? canBo.huyenNoiSinh + ',' : '',
+                        nsTinh: canBo.tinhNoiSinh ? canBo.tinhNoiSinh : '',
+                        qqXa: canBo.xaNguyenQuan ? canBo.xaNguyenQuan + ',' : '',
+                        qqHuyen: canBo.huyenNguyenQuan ? canBo.huyenNguyenQuan + ',' : '',
+                        qqTinh: canBo.tinhNguyenQuan ? canBo.tinhNguyenQuan : '',
+                        hienTai: (canBo.soNhaHienTai ? canBo.soNhaHienTai + ', ' : '')
+                            + (canBo.xaHienTai ? canBo.xaHienTai + ', ' : '')
+                            + (canBo.huyenHienTai ? canBo.huyenHienTai + ', ' : '')
+                            + (canBo.tinhHienTai ? canBo.tinhHienTai : ''),
+                        thuongTru: (canBo.soNhaThuongTru ? canBo.soNhaThuongTru + ', ' : '')
+                            + (canBo.xaThuongTru ? canBo.xaThuongTru + ', ' : '')
+                            + (canBo.huyenThuongTru ? canBo.huyenThuongTru + ', ' : '')
+                            + (canBo.tinhThuongTru ? canBo.tinhThuongTru : ''),
+                        ngheTuyen: canBo.ngheTuyen || '',
+                        ngayTuyen: canBo.ngayTuyen ? app.date.viDateFormat(new Date(canBo.ngayTuyen)) : '',
+                        coQuanTuyen: canBo.coQuanTuyen || 'Đại học KHXH&NV HCM',
+                        maNgach: canBo.maNgach || '',
+                        tenNgach: canBo.tenNgach || '',
+                        bacLuong: canBo.bacLuong || '',
+                        heSoLuong: canBo.heSoLuong || '',
+                        ngayHuongLuong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
+                        danToc: canBo.danToc || '',
+                        tonGiao: canBo.tonGiao || '',
+                        phuCapChucVu: qtChucVu[0].phuCapChucVu,
+                        chucVu: qtChucVu[0].chucVu,
+                        donVi: qtChucVu[0].donVi,
+                        phoThong: canBo.phoThong || '',
+                        hocVi: canBo.hocVi || '',
+                        ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(canBo.ngayVaoDang) : '',
+                        ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(canBo.ngayVaoDangChinhThuc) : '',
+                        ngayNhapNgu: canBo.ngayNhapNgu ? app.date.viDateFormat(new Date(canBo.ngayNhapNgu)) : '',
+                        ngayXuatNgu: canBo.ngayXuatNgu ? app.date.viDateFormat(new Date(canBo.ngayXuatNgu)) : '',
+                        quanHam: canBo.quanHam || '',
+                        soTruong: canBo.soTruong || '',
+                        sucKhoe: canBo.sucKhoe || '',
+                        chieuCao: canBo.chieuCao || '',
+                        canNang: canBo.canNang || '',
+                        nhomMau: canBo.nhomMau || '',
+                        hangThuongBinh: canBo.hangThuongBinh || '',
+                        giaDinhChinhSach: canBo.giaDinhChinhSach || '',
+                        bhxh: canBo.soBaoHiemXaHoi || '',
+                        toChucKhac,
+                        qtDaoTao,
+                        llct: llct.tenTrinhDo || '',
+                        tinHoc: tinHoc.tenTrinhDo || '',
+                        qlnn: qlnn.tenTrinhDo || '',
+                        qtHocTapCongTac,
+                        ngoaiNgu: canBo.ngoaiNgu,
+                        quanHe: quanHeGiaDinh.filter(i => i.loai == 0),
+                        quanHeInLaw: quanHeGiaDinh.filter(i => i.loai == 1),
+                        danhHieu: ''
+                    };
+                    app.docx.generateFile(source, data, (error, data) => {
+                        if (error)
+                            res.send({ error });
+                        else
+                            res.send({ data });
                     });
                 }
             });
-        }
+        } else res.send({ error: 'No permission' });
     });
 
     app.get('/user/staff/:shcc/word-llkh', app.permission.check('staff:login'), (req, res) => {
@@ -2247,7 +1450,7 @@ module.exports = app => {
                     worksheet = workbook.addWorksheet('Sheet1');
                 new Promise(resolve => {
                     let cells = [
-                        // Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, chucVuDoanThe, chucVuDang, chucVuKiemNhiem, hoKhau, diaChiHienTai, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, hopDongCanBo, hopDongCanBoNgay, userModified, lastModified, dangNghiThaiSan, ngayBatDauNghiThaiSan, ngayKetThucNghiThaiSan, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, dangNghiKhongHuongLuong, ngayBatDauNghiKhongHuongLuong, ngayKetThucNghiKhongHuongLuong, lyDoNghiKhongHuongLuong, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, phuCapChucVu, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, loaiHopDong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh }
+                        // Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, chucVuDoanThe, chucVuDang, chucVuKiemNhiem, hoKhau, diaChiHienTai, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, canBoCanBo, canBoCanBoNgay, userModified, lastModified, dangNghiThaiSan, ngayBatDauNghiThaiSan, ngayKetThucNghiThaiSan, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, dangNghiKhongHuongLuong, ngayBatDauNghiKhongHuongLuong, ngayKetThucNghiKhongHuongLuong, lyDoNghiKhongHuongLuong, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, phuCapChucVu, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, loaiHopDong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh }
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
                         { cell: 'B1', value: 'MÃ SỐ CÁN BỘ', bold: true, border: '1234' },
                         { cell: 'C1', value: 'HỌ', bold: true, border: '1234' },
@@ -2288,5 +1491,23 @@ module.exports = app => {
 
     app.get('/api/staff/by-email/:email', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
+    });
+
+    app.post('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        if (shcc) {
+            let data = { ...req.body.data, shcc };
+            app.model.quanHeCanBo.create(data, (error, item) => res.send({ error, item }));
+        } else res.send({ error: 'No permission' });
+    });
+
+    app.put('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.quanHeCanBo.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
+    });
+
+    app.delete('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error)) : res.send({ error: 'No permission' });
     });
 };

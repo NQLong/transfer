@@ -68,49 +68,19 @@ module.exports = app => {
         app.model.qtDaoTao.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.post('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = req.body.data;
-            app.model.qtDaoTao.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.qtDaoTao.create(req.body.data, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.put('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.qtDaoTao.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            const changes = req.body.changes;
-                            app.model.qtDaoTao.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
-                        }
-                    });
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        console.log(req.body.changes, shcc);
+        shcc ? app.model.qtDaoTao.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.delete('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtDaoTao.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            app.model.qtDaoTao.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
-                        }
-                    });
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.qtDaoTao.delete({ id: req.body.id }, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.get('/api/qua-trinh/dao-tao/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listLoaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
@@ -169,4 +139,54 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/api/qua-trinh/dao-tao/download/:shcc/:fileName', app.permission.orCheck('staff:read', 'staff:login'), (req, res) => {
+        const { shcc, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/minhChungHocVi/${shcc}`);
+
+        if (app.fs.existsSync(dir)) {
+            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+            for (const serverFileName of serverFileNames) {
+                const clientFileIndex = serverFileName.indexOf(fileName);
+                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                    return res.sendFile(app.path.join(dir, serverFileName));
+                }
+            }
+        }
+        res.send('Không tìm thấy tập tin');
+    });
+
+    app.createFolder(app.path.join(app.assetPath, '/minhChungHocVi'));
+
+    app.uploadHooks.add('minhChungHocVi', (req, fields, files, params, done) =>
+        app.permission.has(req, () => minhChungHocVi(req, fields, files, params, done), done, 'staff:login'));
+
+    const minhChungHocVi = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('minhChungHocVi') && files.minhChungHocVi && files.minhChungHocVi.length > 0) {
+            const srcPath = files.minhChungHocVi[0].path,
+                userData = fields.userData[0],
+                shcc = userData.substring(userData.indexOf(':') + 1),
+                originalFilename = files.minhChungHocVi[0].originalFilename,
+                filePath = '/' + shcc + '/' + (new Date().getTime()).toString() + '_' + originalFilename,
+                destPath = app.assetPath + '/minhChungHocVi' + filePath,
+                validUploadFileType = ['.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg', '.heic'],
+                baseNamePath = app.path.extname(srcPath);
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/minhChungHocVi/' + shcc)
+                );
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error) {
+                        done({ error });
+                    } else {
+                        done({ data: filePath });
+                    }
+                });
+            }
+        }
+    };
+
 };

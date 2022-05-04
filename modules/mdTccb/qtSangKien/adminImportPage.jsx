@@ -6,14 +6,19 @@ import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell,
 import { SelectAdapter_FwCanBo } from '../../mdTccb/tccbCanBo/redux';
 import { createMultiQtSangKien } from './redux';
 
+const listCapAnhHuong = [
+    { id: 1, text: 'Cấp bộ' },
+    { id: 2, text: 'Cấp cơ sở' }
+];
+
 class EditModal extends AdminModal {
     state = {
         index: null,
     };
 
     onShow = (item) => {
-        let { shcc, maSo, tenSangKien, soQuyetDinh } = item && item.item ? item.item : {
-            id: '', shcc: '', maSo: '', tenSangKien: '', soQuyetDinh: ''
+        let { shcc, maSo, tenSangKien, soQuyetDinh, capAnhHuong } = item && item.item ? item.item : {
+            id: '', shcc: '', maSo: '', tenSangKien: '', soQuyetDinh: '', capAnhHuong: '',
         }, index = item.index;
 
         this.setState({
@@ -23,6 +28,7 @@ class EditModal extends AdminModal {
             this.maSo.value(maSo ? maSo : '');
             this.tenSangKien.value(tenSangKien ? tenSangKien : '');
             this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
+            this.capAnhHuong.value(capAnhHuong ? capAnhHuong : '');
         });
     };
 
@@ -47,9 +53,8 @@ class EditModal extends AdminModal {
                 maSo: this.maSo.value(),
                 tenSangKien: this.tenSangKien.value(),
                 soQuyetDinh: this.soQuyetDinh.value(),
+                capAnhHuong: this.capAnhHuong.value(),
             };
-            console.log(changes);
-            console.log(this.state.index);
             this.props.update(this.state.index, changes, this.hide);
         }
     }
@@ -64,6 +69,7 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
                 <FormTextBox className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} required />
                 <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required />
+                <FormSelect className='col-md-6' ref={e => this.capAnhHuong = e} label='Cấp ảnh hưởng' data={listCapAnhHuong} readOnly={readOnly} />
             </div>
         });
     }
@@ -91,7 +97,6 @@ class QtSangKienImportPage extends AdminPage {
     update = (index, changes, done) => {
         const qtSangKien = this.state.qtSangKien, currentValue = qtSangKien[index];
         const updateValue = Object.assign({}, currentValue, changes);
-        console.log(qtSangKien);
         qtSangKien.splice(index, 1, updateValue);
         this.setState({ qtSangKien }
         , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
@@ -155,6 +160,7 @@ class QtSangKienImportPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
                     <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp ảnh hưởng</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
@@ -170,6 +176,7 @@ class QtSangKienImportPage extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />
                     <TableCell type='text' content={(item.tenSangKien || '')} />
                     <TableCell type='text' content={(item.soQuyetDinh || '')} />
+                    <TableCell type='text' content={(item.capAnhHuong == 1 ? 'Cấp bộ' : (item.capAnhHuong == 2 ? 'Cấp cơ sở' : ''))} />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ index, item })} onDelete={this.delete}> 

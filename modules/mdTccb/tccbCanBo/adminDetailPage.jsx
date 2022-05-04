@@ -2,8 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
-    getStaffEdit, createStaff, updateStaff,
-    createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo
+    getStaffEdit, createStaff, updateStaff
 } from './redux';
 import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import ComponentCaNhan from './componentCaNhan';
@@ -13,6 +12,7 @@ import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
 class CanBoPage extends AdminPage {
+    urlSHCC = null
     state = { item: null, create: false, load: true }
     componentDidMount() {
         T.hideSearchBox();
@@ -21,8 +21,10 @@ class CanBoPage extends AdminPage {
                 shcc = route.parse(window.location.pathname).shcc;
             this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
             if (this.urlSHCC) {
-                this.setState({ create: false });
-                this.props.getStaffEdit(shcc, data => {
+                this.setState({
+                    shcc: this.urlSHCC
+                });
+                this.props.getStaffEdit(this.urlSHCC, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                     }
@@ -30,18 +32,16 @@ class CanBoPage extends AdminPage {
                         this.setUp(data.item);
                     }
                 });
-            } else {
-                this.setState({ create: true });
             }
-            this.setState({ load: false });
         });
     }
 
     setUp = (item) => {
-        this.componentCaNhan.value(item);
-        this.componentTTCongTac.value(item);
-        this.componentQuanHe.value(item.email, item.phai, item.shcc);
-        this.componentTrinhDo.value(item);
+        this.componentCaNhan?.value(item);
+        this.componentTTCongTac?.value(item);
+        this.componentQuanHe?.value(item.email, item.phai, item.shcc);
+        this.componentTrinhDo?.value(item);
+        this.setState({ load: false });
     }
 
     save = () => {
@@ -57,31 +57,21 @@ class CanBoPage extends AdminPage {
 
 
     render() {
-        const item = this.props.staff?.selectedItem,
-            permission = this.getUserPermission('staff');
+        const permission = this.getUserPermission('staff');
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Hồ sơ cá nhân',
-            subTitle: <span style={{ color: 'blue' }}>{item ? `Cán bộ: ${item?.ho} ${item?.ten} (${item?.shcc} - ${item?.email})` : ''}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/staff'>Cán bộ</Link>,
                 'Lý lịch cán bộ',
             ],
-            content:
-                <>
-                    {this.state.load && <Loading />}
-                    {!this.state.create ? <>
-                        <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} />
-                        <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
-                        <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
-                        <ComponentTrinhDo ref={e => this.componentTrinhDo = e} readOnly={!permission.write} userEdit={false} tccb={true} />
-                    </> :
-                        <>
-                            <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} create />
-                            <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} create />
-                        </>
-                    }
-                </>,
+            content: <>
+                {this.state.load && <Loading />}
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={this.state.shcc} />
+                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} />
+                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />
+            </>,
             backRoute: '/user/tccb/staff',
             onSave: this.save,
         });
@@ -92,6 +82,5 @@ class CanBoPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,
-    createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo
 };
 export default connect(mapStateToProps, mapActionsToProps)(CanBoPage);

@@ -56,4 +56,10 @@ module.exports = app => {
             }
         });
     };
+
+
+    app.model.canBo.validShcc = (req, shcc) => {
+        if (req.session.user.permissions.includes('staff:write') || shcc == req.session.user.staff.shcc) return shcc;
+        return null;
+    };
 };
