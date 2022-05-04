@@ -163,6 +163,6 @@ export const SelectAdapter_DmPhong = {
     ajax: true,
     url: '/api/danh-muc/phong/page/1/20',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ten, text: item.ten })) : [] }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ten, text: `${item.ten}: ${item.sucChua}`, sucChua: item.sucChua })) : [] }),
     fetchOne: (ten, done) => (getDmPhong(ten, item => done && done({ id: item.ten, text: `${item.ten}` })))(),
 };

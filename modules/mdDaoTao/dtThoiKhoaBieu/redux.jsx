@@ -116,8 +116,8 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data);
             } else {
-                T.alert('Điều chỉnh thành công!', 'success', false, 1000);
-                done && done(data);
+                T.notify('Điều chỉnh thành công!', 'success');
+                done && done(data.item);
                 // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));

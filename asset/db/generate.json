@@ -140,6 +140,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88712\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "MA_PL": {
+                    "value": "maPl",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -6628,7 +6635,9 @@
             "methods": {
                 "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
                 "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
-                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi"
+                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
+                "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
+                "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff"
             },
             "columns": {
                 "ID": {
@@ -10185,7 +10194,8 @@
                 "TCCB_DASHBOARD_GET_STAFF_DANG_NUOC_NGOAI_BY_MUC_DICH": "tccbDashboardStaffCurrentlyForeign",
                 "TCCB_DASHBOARD_GET_STAFF_DANG_TRONG_NUOC_BY_MUC_DICH": "tccbDashboardStaffCurrentlyWorkOutside",
                 "TCHC_CAN_BO_GET_GIANG_VIEN": "getGiangVien",
-                "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich"
+                "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich",
+                "TCCB_DASHBOARD_GET_DATA": "getDashboardData"
             },
             "modelName": "canBo",
             "columns": {
@@ -11804,7 +11814,7 @@
             "modelName": "dtThoiKhoaBieu",
             "methods": {
                 "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage",
-                "DT_LICH_PHONG": "getLichPhong"
+                "DT_CALENDAR": "getCalendar"
             },
             "columns": {
                 "ID": {
@@ -11897,6 +11907,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "SO_LUONG_DU_KIEN": {
+                    "value": "soLuongDuKien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "SUC_CHUA": {
+                    "value": "sucChua",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "BUOI": {
+                    "value": "buoi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -12697,7 +12728,7 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "22,0"
                 },
                 "LOAI_B": {
                     "value": "loaiB",
@@ -12711,14 +12742,14 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "22,0"
                 },
                 "CHIEU": {
                     "value": "chieu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -12912,39 +12943,6 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "FW_USER_NOTIFICATION": {
-            "active": true,
-            "moduleName": "fwUserNotification",
-            "modelName": "fwUserNotification",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_111161\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "NOTIFICATION": {
-                    "value": "notification",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "EMAIL": {
-                    "value": "email",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 64
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "DM_TIEP_NHAN_VE_NUOC": {
             "active": true,
             "moduleName": "dmTiepNhanVeNuoc",
@@ -13117,10 +13115,10 @@
                 },
                 "DO_UU_TIEN": {
                     "value": "doUuTien",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 8
                 },
                 "NGAY_TAO": {
                     "value": "ngayTao",

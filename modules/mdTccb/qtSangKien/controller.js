@@ -156,6 +156,7 @@ module.exports = app => {
                         { cell: 'H1', value: 'MÃ SỐ SÁNG KIẾN', bold: true, border: '1234' },
                         { cell: 'I1', value: 'TÊN SÁNG KIẾN', bold: true, border: '1234' },
                         { cell: 'J1', value: 'SỐ QUYẾT ĐỊNH', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'CẤP ẢNH HƯỞNG', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -168,6 +169,7 @@ module.exports = app => {
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.maSo });
                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenSangKien });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.soQuyetDinh });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.capAnhHuong == 1 ? 'Cấp bộ' : (item.capAnhHuong == 2 ? 'Cấp cơ sở' : '') });
                     });
                     resolve(cells);
                 }).then((cells) => {
@@ -189,6 +191,7 @@ module.exports = app => {
                 { header: 'CÁN BỘ', key: 'shcc', width: 15 },
                 { header: 'MÃ SỐ SÁNG KIẾN', key: 'maSo', width: 15 },
                 { header: 'TÊN SÁNG KIẾN', key: 'tenSangKien', width: 30 },
+                { header: 'CẤP ẢNH HƯỞNG \n (Nếu là cấp bộ thì điền 1, cấp cơ sở thì điền 2)', key: 'capAnhHuong', width: 30 },
             ];
             ws.columns = defaultColumns;
             resolve();
@@ -218,6 +221,7 @@ module.exports = app => {
                 let shcc = (worksheet.getCell('B' + index).value || '').toString().trim();
                 let maSo = (worksheet.getCell('C' + index).value || '').toString().trim();
                 let tenSangKien = (worksheet.getCell('D' + index).value || '').toString().trim();
+                let capAnhHuong = (worksheet.getCell('E' + index).value || '').toString().trim();
 
                 if (soQuyetDinh.length == 0) {
                     done({ items });
@@ -231,7 +235,7 @@ module.exports = app => {
                     let hoCanBo = item.ho;
                     let tenCanBo = item.ten;
                     items.push({
-                        soQuyetDinh, maSo, tenSangKien, tenCanBo, hoCanBo, shcc
+                        soQuyetDinh, maSo, tenSangKien, tenCanBo, hoCanBo, shcc, capAnhHuong
                     });
                     getData(index + 1);
                 });
