@@ -134,7 +134,6 @@ module.exports = app => {
                     const daiDienUyQuyen = 'Đại diện cho Trường Đại học Khoa học Xã hội và Nhân văn, Đại học Quốc gia Thành phố Hồ Chí Minh theo Giấy ủy quyền số 297/GUQ-XHNV-TCCB.';
                     new Promise(resolve => {
                         let hopDong = item.rows[0];
-                        console.log(hopDong);
                         const data = {
                             canCuUyQuyen: hopDong.maChucVuNguoiKy == '003' ? canCuUyQuyen : '',
                             daiDienUyQuyen: hopDong.maChucVuNguoiKy == '003' ? daiDienUyQuyen : '',
