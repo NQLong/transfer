@@ -23,7 +23,6 @@ class HDLD_Details extends AdminPage {
                     if (data.error) {
                         T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                     } else {
-                        // console.log(data.item.canBoDuocThue);
                         data.item.qtHopDongLaoDong.isCvdt = data.item.canBoDuocThue.isCvdt;
                         this.phiaTruong.setVal(data.item.qtHopDongLaoDong);
                         this.phiaCanBo.setVal(data.item.canBoDuocThue);
