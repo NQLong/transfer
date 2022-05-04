@@ -138,8 +138,8 @@ module.exports = app => {
             if (error || item == null) {
                 res.send({ error });
             } else {
-                if (item.baoCaoTen && JSON.parse(item.baoCaoTen).length > 0) {
-                    JSON.parse(item.baoCaoTen).map(file => app.deleteFile(app.assetPath + '/baoCaoDiNuocNgoai' + file));
+                if (item.baoCaoTen && app.parse(item.baoCaoTen, []).length > 0) {
+                    app.parse(item.baoCaoTen, []).forEach(file => app.deleteFile(app.assetPath + '/baoCaoDiNuocNgoai' + file));
                     const folderPath = app.assetPath + '/baoCaoDiNuocNgoai/' + item.shcc;
                     if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
                 }
