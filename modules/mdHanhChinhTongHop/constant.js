@@ -16,7 +16,8 @@ module.exports = {
         PUBLISH: 'PUBLISH',
         UPDATE_STATUS: 'UPDATE_STATUS',
         ACCEPT: 'ACCEPT',
-        READ: 'READ'
+        READ: 'READ',
+        SEND: 'SEND'
     },
 
     CONG_VAN_TYPE: 'DEN',

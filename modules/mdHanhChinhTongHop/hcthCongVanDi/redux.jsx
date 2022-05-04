@@ -63,28 +63,11 @@ export function getHcthCongVanDiAll(done) {
     };
 }
 
-export function getHcthCongVanDi(id, done) {
-    return () => {
-        const url = `/api/hcth/cong-van-cac-phong/item/${id}`;
-        T.get(url, { id }, data => {
-            if (data.error) {
-                T.notify('Lấy thông tin đơn vị gửi công văn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (done) done(data.item);
-            }
-        }, error => {
-            console.error(`GET: ${url}.`, error);
-        });
-    };
-}
-
 export function createHcthCongVanDi(data, done) {
     return dispatch => {
         const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
-                // console.log(data);
                 T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
@@ -182,16 +165,14 @@ export function getCongVanDi(id, done) {
 }
 
 export function createPhanHoi(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/hcth/cong-van-cac-phong/phan-hoi';
         T.post(url, { data: data }, res => {
             if (res.error) {
-                // console.log(res);
                 T.notify('Thêm phản hồi bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm phản hồi thành công!', 'success');
-                dispatch(getHcthCongVanDiSearchPage());
                 done && done(data);
             }
         }, () => T.notify('Thêm phản hồi bị lỗi', 'danger'));
@@ -206,7 +187,6 @@ export function createHistory(data, done) {
                 T.notify('Thêm lịch sử bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
             } else {
-                // T.notify('Thêm lịch sử thành công', 'success');
                 done && done(data);
             }
         }, () => T.notify('Thêm lịch sử bị lỗi', 'danger'));
