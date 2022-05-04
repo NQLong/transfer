@@ -362,7 +362,7 @@ const T = {
         months += d2.getMonth();
         return months <= 0 ? 0 : months;
     },
-    
+
     dayDiff: (d1, d2) => { //Difference in Days between two dates
         let result = d2.getTime() - d1.getTime();
         return Math.floor(result / (1000 * 60 * 60 * 24));
@@ -596,6 +596,7 @@ String.prototype.numberWithCommas = function () {
 }
 String.prototype.getFirstLetters = function () {
     const firstLetters = this
+        .toUpperCase()
         .split(' ')
         .map(word => word[0])
         .join('');
