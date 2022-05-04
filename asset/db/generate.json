@@ -11811,7 +11811,7 @@
             "modelName": "dtThoiKhoaBieu",
             "methods": {
                 "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage",
-                "DT_LICH_PHONG": "getLichPhong"
+                "DT_CALENDAR": "getCalendar"
             },
             "columns": {
                 "ID": {
@@ -12725,7 +12725,7 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "22,0"
                 },
                 "LOAI_B": {
                     "value": "loaiB",
@@ -12739,14 +12739,14 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "22,0"
                 },
                 "CHIEU": {
                     "value": "chieu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
