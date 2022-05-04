@@ -99,7 +99,7 @@ module.exports = app => {
         const [{ id, ...changes }] = listFile.splice(0, 1),
             sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.ten}`),
             destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.ten}`);
-        if (!changes.congVan)
+        if (!changes.ma)
             app.fs.rename(sourcePath, destPath, error => {
                 if (error) done && done({ error });
                 else {
