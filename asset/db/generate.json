@@ -10192,7 +10192,8 @@
                 "TCCB_DASHBOARD_GET_STAFF_DANG_NUOC_NGOAI_BY_MUC_DICH": "tccbDashboardStaffCurrentlyForeign",
                 "TCCB_DASHBOARD_GET_STAFF_DANG_TRONG_NUOC_BY_MUC_DICH": "tccbDashboardStaffCurrentlyWorkOutside",
                 "TCHC_CAN_BO_GET_GIANG_VIEN": "getGiangVien",
-                "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich"
+                "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich",
+                "TCCB_DASHBOARD_GET_DATA": "getDashboardData"
             },
             "modelName": "canBo",
             "columns": {
