@@ -121,16 +121,17 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     }
 
     setNamDaoTao = (value, mucTieu, ctdt) => {
+        console.log(ctdt);
         const { data } = value;
         const mucCha = T.parse(data.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         this.setState({ mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao }, chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao } }, () => {
             Object.keys(this.chuongTrinh).forEach(key => {
                 const childs = mucCon.chuongTrinhDaoTao[key] || null;
-                const data = ctdt.filter(item => item.maKhoiKienThuc === parseInt(mucCha.chuongTrinhDaoTao[key].id));
+                const data = ctdt?.filter(item => item.maKhoiKienThuc === parseInt(mucCha.chuongTrinhDaoTao[key].id));
                 this.chuongTrinh[key]?.setVal(data, this.maKhoa, childs);
             });
-            mucTieu.forEach(mt => {
+            mucTieu?.forEach(mt => {
                 this.mucTieu[mt.id]?.value(mt.value);
             });
         });

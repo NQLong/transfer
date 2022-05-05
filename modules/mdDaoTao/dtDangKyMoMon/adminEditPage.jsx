@@ -32,7 +32,7 @@ class SubjectModal extends AdminModal {
             title: 'Bổ sung môn học',
             size: 'elarge',
             body: <div className='row'>
-                <FormSelect ref={e => this.monHoc = e} data={SelectAdapter_DmMonHocAll} className='col-md-12' label='Môn học' onChange={value => this.setState({ item: value.item }, () => {
+                <FormSelect ref={e => this.monHoc = e} data={SelectAdapter_DmMonHocAll(true)} className='col-md-12' label='Môn học' onChange={value => this.setState({ item: value.item }, () => {
                     this.tietLt.value(value.item.tietLt || '0');
                     this.tietTh.value(value.item.tietTh || '0');
                 })} />
@@ -58,6 +58,7 @@ class DtDsMonMoEditPage extends AdminPage {
     }
 
     addRow = (item, index, done) => {
+        console.log(this.state.data);
         let ctdt = this.state.data[index].ctdt;
         this.setState({
             data: {
@@ -88,7 +89,7 @@ class DtDsMonMoEditPage extends AdminPage {
             ...this.state.data, [index]: item
         },
         isLoading: false,
-        isDuyet: item.dotDangKy.isDuyet,
+        isDuyet: item?.dotDangKy?.isDuyet || false,
         hocKy: item.thoiGianMoMon.hocKy,
         khoaDangKy: item.dotDangKy.khoa,
         nam: item.thoiGianMoMon.nam,
@@ -122,6 +123,7 @@ class DtDsMonMoEditPage extends AdminPage {
         }, today = new Date().getTime();
         if (!this.state.data[index]) {
             this.props.getDanhSachMonMo(condition, item => {
+                console.log(item);
                 this.initData(item, index, today, done);
             });
         }
@@ -143,9 +145,11 @@ class DtDsMonMoEditPage extends AdminPage {
                 item.soLuongDuKien = this.soLuongDuKien[index][count].value() || 0;
                 item.maCtdt = ctdt.id;
                 item.maNganh = ctdt.maNganh;
-                item.khoa = ctdt.maKhoa;
+                item.khoa = this.state.khoaDangKy;
+                // item.chuyenNganh = ctdt.maNganh;
                 item.hocKy = this.state.hocKy + index * 2;
                 item.maDangKy = this.id;
+                item.hocKySinhVien = this.state.hocKy + index * 2;
                 return item;
             });
             return data.items;
