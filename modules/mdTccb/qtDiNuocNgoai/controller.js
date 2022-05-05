@@ -134,9 +134,20 @@ module.exports = app => {
     });
 
     app.delete('/api/qua-trinh/di-nuoc-ngoai', app.permission.check('qtDiNuocNgoai:write'), (req, res) => {
-        app.model.qtDiNuocNgoai.delete({ id: req.body.id }, (error) => {
-            app.tccbSaveCRUD(req.session.user.email, 'D', 'Đi nước ngoài');
-            res.send(error);
+        app.model.qtDiNuocNgoai.get({ id: req.body.id }, (error, item) => {
+            if (error || item == null) {
+                res.send({ error });
+            } else {
+                if (item.baoCaoTen && app.parse(item.baoCaoTen, []).length > 0) {
+                    app.parse(item.baoCaoTen, []).forEach(file => app.deleteFile(app.assetPath + '/baoCaoDiNuocNgoai' + file));
+                    const folderPath = app.assetPath + '/baoCaoDiNuocNgoai/' + item.shcc;
+                    if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
+                }
+                app.model.qtDiNuocNgoai.delete({ id: req.body.id }, (error) => {
+                    app.tccbSaveCRUD(req.session.user.email, 'D', 'Đi nước ngoài');
+                    res.send(error);
+                });
+            }
         });
     });
 
@@ -288,16 +299,18 @@ module.exports = app => {
 
         res.status(400).send('Không tìm thấy tập tin');
     });
+    
+    app.createFolder(app.path.join(app.assetPath, '/baoCaoDiNuocNgoai'));
 
     app.uploadHooks.add('baoCaoDiNuocNgoaiStaffFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => baoCaoDiNuocNgoaiStaffFile(req, fields, files, params, done), done, 'staff:login'));
 
     const baoCaoDiNuocNgoaiStaffFile = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('baoCaoDiNuocNgoaiStaffFile') && files.baoCaoDiNuocNgoaiStaffFile && files.baoCaoDiNuocNgoaiStaffFile.length > 0) {
-            const user = req.session.user,
-                srcPath = files.baoCaoDiNuocNgoaiStaffFile[0].path,
+            const srcPath = files.baoCaoDiNuocNgoaiStaffFile[0].path,
+                shcc = fields.userData[0].substring('baoCaoDiNuocNgoaiStaffFile'.length + 1),
                 originalFilename = files.baoCaoDiNuocNgoaiStaffFile[0].originalFilename,
-                filePath = '/' + user.shcc + '/' + (new Date().getTime()).toString() + '_' + originalFilename,
+                filePath = '/' + shcc + '/' + (new Date().getTime()).toString() + '_' + originalFilename,
                 destPath = app.assetPath + '/baoCaoDiNuocNgoai' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
                 baseNamePath = app.path.extname(srcPath);
@@ -306,7 +319,7 @@ module.exports = app => {
                 app.deleteFile(srcPath);
             } else {
                 app.createFolder(
-                    app.path.join(app.assetPath, '/baoCaoDiNuocNgoai/' + user.shcc)
+                    app.path.join(app.assetPath, '/baoCaoDiNuocNgoai/' + shcc)
                 );
                 app.fs.rename(srcPath, destPath, error => {
                     if (error) {
@@ -318,4 +331,20 @@ module.exports = app => {
             }
         }
     };
+
+    //Delete file
+    app.put('/api/qua-trinh/di-nuoc-ngoai/delete-file', app.permission.orCheck('qtDiNuocNgoai:write', 'staff:login'), (req, res) => {
+        const shcc = req.body.shcc,
+            file = req.body.file;
+        const filePath = app.path.join(app.assetPath, '/baoCaoDiNuocNgoai', file);
+        if (app.fs.existsSync(filePath)) {
+            app.deleteFile(filePath, () => {
+                const folderPath = app.assetPath + '/baoCaoDiNuocNgoai/' + shcc;
+                if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
+                res.send({ error: null });
+            });
+        } else {
+            res.send({ error: 'Không tìm thấy đề tài' });
+        }
+    });
 };

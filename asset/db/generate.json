@@ -140,6 +140,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88712\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "MA_PL": {
+                    "value": "maPl",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -10187,7 +10194,8 @@
                 "TCCB_DASHBOARD_GET_STAFF_DANG_NUOC_NGOAI_BY_MUC_DICH": "tccbDashboardStaffCurrentlyForeign",
                 "TCCB_DASHBOARD_GET_STAFF_DANG_TRONG_NUOC_BY_MUC_DICH": "tccbDashboardStaffCurrentlyWorkOutside",
                 "TCHC_CAN_BO_GET_GIANG_VIEN": "getGiangVien",
-                "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich"
+                "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich",
+                "TCCB_DASHBOARD_GET_DATA": "getDashboardData"
             },
             "modelName": "canBo",
             "columns": {
@@ -11806,7 +11814,7 @@
             "modelName": "dtThoiKhoaBieu",
             "methods": {
                 "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage",
-                "DT_LICH_PHONG": "getLichPhong"
+                "DT_CALENDAR": "getCalendar"
             },
             "columns": {
                 "ID": {
@@ -11899,6 +11907,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "SO_LUONG_DU_KIEN": {
+                    "value": "soLuongDuKien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "SUC_CHUA": {
+                    "value": "sucChua",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "BUOI": {
+                    "value": "buoi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -12699,7 +12728,7 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "22,0"
                 },
                 "LOAI_B": {
                     "value": "loaiB",
@@ -12713,14 +12742,14 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "22,0"
                 },
                 "CHIEU": {
                     "value": "chieu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [

@@ -10,7 +10,13 @@ export const DefaultColors = {
     orange: 'rgb(255, 159, 64)',
     grey: 'rgb(201, 203, 207)',
     purple: 'rgb(153, 102, 255)',
-    darkGrey: '#565656'
+    darkGrey: '#565656',
+    lemon: '#DAF7A6',
+    maroon: '#800000',
+    olive: '#808000',
+    navy: '#000080',
+    fuchsia: '#FF00FF',
+    lightGreen: '#40E0D0'
 };
 
 export class AdminChart extends React.Component {
@@ -18,10 +24,14 @@ export class AdminChart extends React.Component {
 
     optionChart = (type, isPercent = null) => {
         return {
-            aspectRatio: 1.7,
+            aspectRatio: this.props.aspectRatio || 1.7,
             events: false,
             legend: {
-                position: 'bottom'
+                position: 'bottom',
+                labels: {
+                    fontStyle: 'bold',
+                    fontFamily: 'Roboto',
+                }
             },
             layout: {
                 padding: {
@@ -41,7 +51,7 @@ export class AdminChart extends React.Component {
                 onComplete: function () {
                     let chartInstance = this.chart,
                         ctx = chartInstance.ctx;
-                    ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                    ctx.font = Chart.helpers.fontString(13, 'bold', Chart.defaults.global.defaultFontFamily);
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'bottom';
                     if (type === 'pie' || type === 'doughnut') {

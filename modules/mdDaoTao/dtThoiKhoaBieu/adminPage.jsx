@@ -74,7 +74,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
     thu = {}
     tietBatDau = {}
     phong = {}
-    state = { page: null, isEdit: {} }
+    soLuongDuKien = {}
+    sucChua = {}
+    state = { page: null, isEdit: {}, sucChua: {} }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.initData(searchText || '');
@@ -88,10 +90,17 @@ class DtThoiKhoaBieuPage extends AdminPage {
             this.setState({ page }, () => {
                 let { pageNumber, pageSize, list } = page;
                 list.forEach((item, index) => {
-                    this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
-                    this.thu[(pageNumber - 1) * pageSize + index + 1].value(item.thu);
-                    this.tietBatDau[(pageNumber - 1) * pageSize + index + 1].value(item.tietBatDau);
-                    this.phong[(pageNumber - 1) * pageSize + index + 1].value(item.phong);
+                    let line = (pageNumber - 1) * pageSize + index + 1;
+                    this.soTiet[line].value(item.soTiet);
+                    this.thu[line].value(item.thu);
+                    this.tietBatDau[line].value(item.tietBatDau);
+                    this.phong[line].value(item.phong);
+                    this.soLuongDuKien[line].value(item.soLuongDuKien);
+                    this.sucChua[line] = item.sucChua;
+                    // item.sucChua && console.log(line, item.sucChua);
+                    // console.log(item.sucChua, line);
+                    // this.setState({ sucChua: { ...this.state.sucChua, [index]: item.sucChua } }, () => console.log(line, this.state.sucChua));
+                    if (index == list.length - 1) this.setState({ sucChua: this.sucChua });
                 });
             });
         });
@@ -109,16 +118,20 @@ class DtThoiKhoaBieuPage extends AdminPage {
     }
 
     updateSoTiet = (index, item) => {
-        if (!this.soTiet[index].value() || !this.thu[index].value() || !this.tietBatDau[index].value() || !this.phong[index].value()) T.notify('Vui lòng nhập giá trị', 'danger');
-        else {
+        if (this.phong[index].value() || this.thu[index].value() || this.tietBatDau[index].value() || this.soTiet[index].value() || this.soLuongDuKien[index].value())
             this.props.updateDtThoiKhoaBieu(item.id, {
                 soTiet: this.soTiet[index].value(),
                 phong: this.phong[index].value(),
                 tietBatDau: this.tietBatDau[index].value(),
-                thu: this.thu[index].value()
+                thu: this.thu[index].value(),
+                sucChua: this.state.sucChua[index],
+                soLuongDuKien: this.soLuongDuKien[index].value()
+            }, (item) => {
+                this.tietBatDau[index].value(item.tietBatDau);
+                this.phong[index].value(item.phong);
+                this.thu[index].value(item.thu);
             });
-            location.reload();
-        }
+        // location.reload();
     };
 
     render() {
@@ -135,11 +148,11 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Học kỳ</th>
                         <th rowSpan='2' style={{ width: '25%', textAlign: 'center', verticalAlign: 'middle' }}>Mã</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Môn học</th>
-                        <th rowSpan='2' style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Phòng</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Lớp</th>
-                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian
-                        </th>
-                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Khoa <br />Bộ môn</th>
+                        <th rowSpan='2' style={{ width: '25%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Phòng</th>
+                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>SLDK</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Khoa <br />Bộ môn</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Giảng viên</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
@@ -158,8 +171,17 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
                         <i> {item.tenKhoaBoMon}</i>
                     </>} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={
-                        <FormSelect ref={e => this.phong[(pageNumber - 1) * pageSize + index + 1] = e} style={{ marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={SelectAdapter_DmPhong} placeholder='Phòng' />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nhom} />
+                    <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
+                        <>
+                            <FormSelect ref={e => this.phong[(pageNumber - 1) * pageSize + index + 1] = e} style={{ marginBottom: '0', width: '120px' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={SelectAdapter_DmPhong} placeholder='Phòng' onChange={value => this.setState({
+                                sucChua: {
+                                    ...this.state.sucChua,
+                                    [(pageNumber - 1) * pageSize + index + 1]: value.sucChua
+                                }
+                            })} />
+                            <div>{this.state.sucChua[(pageNumber - 1) * pageSize + index + 1]}</div>
+                        </>
                     } onClick={e => {
                         e.preventDefault();
                         if (e.type == 'click') this.setState({
@@ -167,7 +189,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         }, () => this.phong[(pageNumber - 1) * pageSize + index + 1].focus());
                     }}
                     />
-                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nhom} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
                         <FormSelect ref={e => this.thu[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '70px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
                     }
@@ -190,9 +211,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     />
                     <TableCell style={{ textAlign: 'center' }} content={
                         <FormTextBox type='number' ref={e => this.soTiet[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '50px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]}
-                            onKeyPress={e => e.key == 'Enter' && this.setState({ isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: false } }, () => {
-                                this.updateSoTiet((pageNumber - 1) * pageSize + index + 1, item);
-                            })}
                         />
                     }
                         onClick={e => {
@@ -202,6 +220,18 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             }, () => this.soTiet[(pageNumber - 1) * pageSize + index + 1].focus());
                         }}
                     />
+                    <TableCell content={
+                        <FormTextBox type='number' ref={e => this.soLuongDuKien[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '70px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]}
+                            onKeyPress={e => e.key == 'Enter' && this.setState({ isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: false } }, () => {
+                                this.updateSoTiet((pageNumber - 1) * pageSize + index + 1, item);
+                            })}
+                        />
+                    } onClick={e => {
+                        e.preventDefault();
+                        if (e.type == 'click') this.setState({
+                            isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
+                        }, () => this.soLuongDuKien[(pageNumber - 1) * pageSize + index + 1].focus());
+                    }} />
                     <TableCell style={{}} content={item.tenKhoaDangKy.getFirstLetters().toUpperCase()} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
