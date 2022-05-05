@@ -374,7 +374,7 @@ module.exports = (app) => {
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi?.rows || [],
+                    phanHoi: phanHoi || [],
                     donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     danhSachChiDao: chiDao?.rows || [],
@@ -450,8 +450,8 @@ module.exports = (app) => {
     app.get('/api/hcth/cong-van-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const phanHoi = await app.model.hcthPhanHoi.getPhanHoi(id, CONG_VAN_TYPE);
-            res.send({ error: null, items: phanHoi.items });
+            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
+            res.send({ error: null, items: phanHoi });
         }
         catch (error) {
             res.send({ error });
