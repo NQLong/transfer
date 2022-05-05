@@ -488,7 +488,7 @@ module.exports = app => {
             if (error) reject(error);
             else {
                 const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `user/hcth/cong-van-cac-phong/${item.id}` }, error => {
+                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` }, error => {
                     if (error) reject(error);
                     else resolve();
                 });
