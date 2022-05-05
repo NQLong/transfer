@@ -1,6 +1,6 @@
-// Table name: DM_BO_MON { ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu, ma }
+// Table name: DM_BO_MON { ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu, ma, maPl }
 const keys = ['MA'];
-const obj2Db = { 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'maDv': 'MA_DV', 'qdThanhLap': 'QD_THANH_LAP', 'qdXoaTen': 'QD_XOA_TEN', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'ma': 'MA' };
+const obj2Db = { 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'maDv': 'MA_DV', 'qdThanhLap': 'QD_THANH_LAP', 'qdXoaTen': 'QD_XOA_TEN', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'ma': 'MA', 'maPl': 'MA_PL' };
 
 module.exports = app => {
     app.model.dmBoMon = {
