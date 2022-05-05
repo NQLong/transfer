@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell, FormCheckbox } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell, FormCheckbox, FormFileBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
     getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createQtDiNuocNgoai,
-    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich
+    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich, deleteFile
 }
     from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -51,7 +51,8 @@ class EditModal extends AdminModal {
         daTiepNhan: false,
         baoCaoTinhTrang: 0,
         listFile: [],
-        noNeedTiepNhan: false, 
+        noNeedTiepNhan: false,
+        shcc: '',
     };
     // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc, baoCaoTen, baoCaoNgayNop, baoCaoTinhTrang, baoCaoLyDoTraVe }
 
@@ -69,7 +70,8 @@ class EditModal extends AdminModal {
             daTiepNhan: soQdTiepNhan ? true : false,
             baoCaoTinhTrang,
             listFile,
-            noNeedTiepNhan: ngayDi && ngayVe ? (T.dayDiff(new Date(ngayDi), new Date(ngayVe)) < 30 ? true : false) : false
+            noNeedTiepNhan: ngayDi && ngayVe ? (T.dayDiff(new Date(ngayDi), new Date(ngayVe)) < 30 ? true : false) : false,
+            shcc,
         }, () => {
             this.shcc.value(shcc);
             if (quocGia) {
@@ -107,21 +109,30 @@ class EditModal extends AdminModal {
             this.noiDungTiepNhan.value(noiDungTiepNhan || '');
             this.ngayVeNuoc.value(ngayVeNuoc || '');
             this.baoCaoLyDoTraVe.value(baoCaoLyDoTraVe || '');
-            // this.fileBox.setData('baoCaoDiNuocNgoaiStaffFile:' + item.shcc);
+            this.fileBox?.setData('baoCaoDiNuocNgoaiStaffFile:' + shcc);
         });
     };
 
-    deleteFile = (e, index) => {
+    deleteFile = (e, data) => {
+        const { index, shcc, file } = data;
         e.preventDefault();
         T.confirm('Xóa dữ liệu', 'Bạn có muốn xóa tập tin này không?', 'warning', true, isConfirm => {
-            if (isConfirm) {
+            isConfirm && this.props.deleteFile(shcc, file, () => {
                 let listFile = this.state.listFile;
                 listFile.splice(index, 1);
-                this.setState({ listFile },
-                () => T.notify('Xóa dữ liệu thành công', 'success'));
-            }
+                this.setState({ listFile });
+            });
         });
     };
+
+    onSuccess = (response) => {
+        if (response.data) {
+            let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
+            listFile.push(response.data);
+            this.setState({ listFile });
+        } else if (response.error) T.notify(response.error, 'danger');
+    }
+
     // format: /shcc/dateCreated_nameFile
     split = (input) => {
         let arr = input.split('/');
@@ -145,7 +156,7 @@ class EditModal extends AdminModal {
                 </tr>
             ),
             renderRow: (item, index) => {
-                let { date, name } = this.split(item);
+                let { shcc, date, name } = this.split(item);
                 return (
                     <tr key={index}>
                         <TableCell style={{ textAlign: 'right' }} content={index + 1} />
@@ -154,7 +165,7 @@ class EditModal extends AdminModal {
                         </>
                         } />
                         <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(date), 'dd/mm/yyyy HH:MM')}></TableCell>
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index)}>
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, { index, shcc, file: item })}>
                             <a className='btn btn-info' href={'/api/di-nuoc-ngoai/download' + item} download>
                                 <i className='fa fa-lg fa-download' />
                             </a>
@@ -246,17 +257,23 @@ class EditModal extends AdminModal {
         this.baoCaoCheck.value(value);
         value ? $('#baoCaoText').show() : $('#baoCaoText').hide();
     }
+
+    handleCanBo = (value) => {
+        this.setState({ shcc: value.id }, () => {
+            this.fileBox.setData('baoCaoDiNuocNgoaiStaffFile:' + value.id);
+        });
+    }
     render = () => {
         const permission = {
             write: true,
-            delete: false
+            delete: true
         };
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình đi nước ngoài' : 'Tạo mới quá trình đi nước ngoài',
             size: 'elarge',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required onChange={this.handleCanBo} />
                 <FormTextBox className='col-md-3' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
                 <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
@@ -289,10 +306,10 @@ class EditModal extends AdminModal {
                 <div className='form-group col-12'>
                     <h3 className='tile-title'>Danh sách tập tin báo cáo</h3>
                     <div className='tile-body row'>
-                        <div className='form-group col-md-12'>
+                        <div className='form-group col-md-7'>
                             {this.tableListFile(this.state.listFile, permission)}
                         </div>
-                        {/* <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} /> */}
+                        {this.state.shcc && <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
                     </div>
                 </div>
                 <FormCheckbox label={'Bấm vào đây nếu báo cáo không hợp lệ'} onChange={this.handleBaoCao} className='form-group col-md-6' ref={e => this.baoCaoCheck = e} readOnly={readOnly} />
@@ -304,20 +321,81 @@ class EditModal extends AdminModal {
     }
 }
 
+class ThongKeMucDichModal extends AdminModal {
+    state = {
+        data: [],
+        totalItem: 0,
+    }
+
+    tableListMucDich = (data) => {
+        return renderTable({
+            getDataSource: () => data,
+            stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
+                    <th style={{ width: '100%' }}>Mục đích</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Số lượng</th>
+                </tr>
+            ),
+            renderRow: (item, index) => {
+                return (
+                    <tr key={index}>
+                        <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ color: 'blue', whiteSpace: 'nowrap' }} content={item.id} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.len} />
+                    </tr>
+                );
+            }
+        });
+    }
+
+    setUp = (data = [], keyGroup) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        let filterData = [];
+        let totalItem = 0;
+        Object.keys(dataGroupBy).filter(item => dataGroupBy[item].length > 0).map(item => {
+            filterData.push({ id: item, len: dataGroupBy[item].length });
+            totalItem += dataGroupBy[item].length;
+        });
+        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+            return -(a.len - b.len);
+        });
+        return [filterData, totalItem];
+    }
+
+    onShow = () => {
+        this.props.thongKeMucDich(this.props.pageC, this.props.filter, data => {
+            let dataSetUp = this.setUp(data, 'tenMucDich');
+            this.setState({
+                data: dataSetUp[0],
+                totalItem: dataSetUp[1]
+            });
+        });
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thống kê',
+            size: 'large',
+            body: <div className='row'>
+                <div className='form-group col-md-12' style={{ marginTop: '20px' }}>
+                    <div>{this.tableListMucDich(this.state.data)}</div>
+                    <big><b>{'Tổng cộng: ' + this.state.totalItem.toString()}</b></big>
+                </div>
+            </div>
+        });
+    }
+}
+
 class QtDiNuocNgoai extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
-    state = { filter: {}, visibleTime: false, listMucDich: [] };
+    state = { filter: {}, visibleTime: false };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => {
-                this.thongKeMucDich(searchText, this.state.filter, (items) => {
-                    this.setState({ listMucDich: this.setUp(items, 'tenMucDich') }, () => {
-                        this.getPage(undefined, undefined, searchText || '');
-                    });
-                });
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 let filterCookie = T.getCookiePage('pageQtDiNuocNgoai', 'F'), {
                     timeType = '', fromYear = '', toYear = '', listDv = '', listShcc = '', tinhTrangCongTac = '', loaiHocVi = '', mucDich = '', tinhTrangBaoCao = '' } = filterCookie;
@@ -342,22 +420,6 @@ class QtDiNuocNgoai extends AdminPage {
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
-    }
-
-    setUp = (data = [], keyGroup) => {
-        let dataGroupBy = data.groupBy(keyGroup);
-        let filterData = [];
-        Object.keys(dataGroupBy).filter(item => dataGroupBy[item].length > 0).map(item => {
-            filterData.push({ id: item, len: dataGroupBy[item].length });
-        });
-        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
-            return -(a.len - b.len);
-        });
-        let result = [];
-        filterData.forEach(item => {
-            result.push(<div key={item.id}><b><span>{' - ' + item.id + ': ' + item.len}</span></b></div>);
-        });
-        return result;
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
@@ -385,42 +447,36 @@ class QtDiNuocNgoai extends AdminPage {
         const mucDich = this.mucDich.value().toString() || '';
         const tinhTrangBaoCao = this.tinhTrangBaoCao.value() == '' ? null : this.tinhTrangBaoCao.value();
         const pageFilter = (isInitial || isReset) ? {} : { listDv, fromYear, toYear, listShcc, tinhTrangCongTac, timeType, loaiHocVi, mucDich, tinhTrangBaoCao };
-        this.thongKeMucDich(pageCondition, pageFilter, (items) => {
-            this.setState({ filter: pageFilter, listMucDich: this.setUp(items, 'tenMucDich') }, () => {
-                this.getPage(pageNumber, pageSize, pageCondition, (page) => {
-                    if (isInitial) {
-                        const filter = page.filter || {};
-                        const filterCookie = T.getCookiePage('pageQtDiNuocNgoai', 'F');
-                        this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    const filterCookie = T.getCookiePage('pageQtDiNuocNgoai', 'F');
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
-                        this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
-                        this.toYear?.value(filter.toYear || filterCookie.toYear || '');
-                        this.maDonVi.value(filter.listDv || filterCookie.listDv || '');
-                        this.mulCanBo.value(filter.listShcc || filterCookie.listShcc || '');
-                        this.timeType.value(filter.timeType || filterCookie.timeType || '');
-                        this.tinhTrangCongTac.value(filter.tinhTrangCongTac || filterCookie.tinhTrangCongTac || '');
-                        this.loaiHocVi.value(filter.loaiHocVi || filterCookie.loaiHocVi || '');
-                        this.mucDich.value(filter.mucDich || filterCookie.mucDich || '');
-                        this.tinhTrangBaoCao.value(filter.tinhTrangBaoCao || filterCookie.tinhTrangBaoCao || '');
-                        if (this.fromYear?.value() || this.toYear?.value() || this.mulCanBo.value() || this.maDonVi.value() || this.timeType.value() || this.tinhTrangCongTac.value() || this.loaiHocVi.value() || this.mucDich.value() || this.tinhTrangBaoCao.value()) this.showAdvanceSearch();
-                    } else if (isReset) {
-                        this.fromYear?.value('');
-                        this.toYear?.value('');
-                        this.maDonVi.value('');
-                        this.mulCanBo.value('');
-                        this.timeType.value('');
-                        this.tinhTrangCongTac.value('');
-                        this.loaiHocVi.value('');
-                        this.mucDich.value('');
-                        this.tinhTrangBaoCao.value('');
-                    }
-                });
+                    this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
+                    this.toYear?.value(filter.toYear || filterCookie.toYear || '');
+                    this.maDonVi.value(filter.listDv || filterCookie.listDv || '');
+                    this.mulCanBo.value(filter.listShcc || filterCookie.listShcc || '');
+                    this.timeType.value(filter.timeType || filterCookie.timeType || '');
+                    this.tinhTrangCongTac.value(filter.tinhTrangCongTac || filterCookie.tinhTrangCongTac || '');
+                    this.loaiHocVi.value(filter.loaiHocVi || filterCookie.loaiHocVi || '');
+                    this.mucDich.value(filter.mucDich || filterCookie.mucDich || '');
+                    this.tinhTrangBaoCao.value(filter.tinhTrangBaoCao || filterCookie.tinhTrangBaoCao || '');
+                    // if (this.fromYear?.value() || this.toYear?.value() || this.mulCanBo.value() || this.maDonVi.value() || this.timeType.value() || this.tinhTrangCongTac.value() || this.loaiHocVi.value() || this.mucDich.value() || this.tinhTrangBaoCao.value()) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.fromYear?.value('');
+                    this.toYear?.value('');
+                    this.maDonVi.value('');
+                    this.mulCanBo.value('');
+                    this.timeType.value('');
+                    this.tinhTrangCongTac.value('');
+                    this.loaiHocVi.value('');
+                    this.mucDich.value('');
+                    this.tinhTrangBaoCao.value('');
+                }
             });
         });
-    }
-
-    thongKeMucDich = (pageC, filter, done) => {
-        this.props.getThongKeMucDich(pageC, filter, done);
     }
 
     getPage = (pageN, pageS, pageC, done) => {
@@ -531,11 +587,11 @@ class QtDiNuocNgoai extends AdminPage {
                             </>
                         )}
                         />}
-                        {this.checked && <TableCell type='text' content={item.soQuaTrinh} />}
+                        {this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.soQuaTrinh} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachMucDich, item.danhSachNgayDi, item.danhSachNgayVe, item.danhSachNgayDiType, item.danhSachNgayVeType, item.soQuaTrinh)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><i>Đang ở<br/>nước ngoài</i></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
+                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><b><i>Đang ở<br/>nước ngoài</i></b></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
                             </>
                         )}></TableCell>}
                         {!this.checked && <TableCell type='text' style={{ color: item.baoCaoTinhTrang == 0 ? 'red' : 'blue'}} content={mapperBaoCaoTinhTrang[item.baoCaoTinhTrang]}></TableCell>}
@@ -588,6 +644,9 @@ class QtDiNuocNgoai extends AdminPage {
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-info' type='button' style={{ marginRight: '10px' }} onClick={e => e.preventDefault() || this.thongKeMucDich.show()}>
+                            <i className='fa fa-fw fa-lg fa-th-list' />Thống kê mục đích
+                        </button>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                         </button>
@@ -598,22 +657,16 @@ class QtDiNuocNgoai extends AdminPage {
                 </div>
             </>,
             content: <>
-                {!this.checked && <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <div>{this.state.listMucDich}</div>
-                    <big><b>{'Tổng cộng: ' + totalItem.toString()}</b></big>
-                </div>}
                 <div className='tile'>
                     <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} deleteFile={this.props.deleteFile}
                     create={this.props.createQtDiNuocNgoai} update={this.props.updateQtDiNuocNgoai}
                 />
+                <ThongKeMucDichModal ref={e => this.thongKeMucDich = e} thongKeMucDich={this.props.getThongKeMucDich} filter={this.state.filter} pageC={pageCondition} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
@@ -633,6 +686,6 @@ class QtDiNuocNgoai extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtDiNuocNgoai: state.tccb.qtDiNuocNgoai });
 const mapActionsToProps = {
     getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createQtDiNuocNgoai,
-    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich
+    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich, deleteFile
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDiNuocNgoai);

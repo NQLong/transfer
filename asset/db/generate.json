@@ -6635,7 +6635,9 @@
             "methods": {
                 "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
                 "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
-                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi"
+                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
+                "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
+                "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff"
             },
             "columns": {
                 "ID": {
@@ -12933,39 +12935,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "5,0"
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "FW_USER_NOTIFICATION": {
-            "active": true,
-            "moduleName": "fwUserNotification",
-            "modelName": "fwUserNotification",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_111161\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "NOTIFICATION": {
-                    "value": "notification",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "EMAIL": {
-                    "value": "email",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 64
                 }
             },
             "primaryKeys": [

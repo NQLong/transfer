@@ -47,6 +47,7 @@ class QtSangKien extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp ảnh hưởng</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -55,6 +56,7 @@ class QtSangKien extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.maSo || ''}</b>)} />  
                         <TableCell type='text' content={(<span style={{ padding: '10px' }}>{item.tenSangKien || ''}</span>)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.soQuyetDinh || '')} />
+                        <TableCell type='text' content={(item.capAnhHuong == 1 ? 'Cấp bộ' : (item.capAnhHuong == 2 ? 'Cấp cơ sở': ''))} />
                     </tr>
                 )
             });
