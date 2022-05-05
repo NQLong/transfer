@@ -117,6 +117,6 @@ module.exports = app => {
 
     app.get('/api/dao-tao/get-schedule/:phong', app.permission.check('dtThoiKhoaBieu:read'), (req, res) => {
         let phong = req.params.phong;
-        app.model.dtThoiKhoaBieu.getLichPhong(phong, (error, items) => res.send({ error, items: items.rows }));
+        app.model.dtThoiKhoaBieu.getCalendar(phong, (error, items) => res.send({ error, items: items.rows }));
     });
 };

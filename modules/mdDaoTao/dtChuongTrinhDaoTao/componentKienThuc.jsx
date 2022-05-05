@@ -132,7 +132,7 @@ export class ComponentKienThuc extends AdminPage {
     selectMh = (item, idx, childId, childText) => {
         return (
             <>
-                {item.id != -1 ? <FormTextBox ref={e => this.rows[idx].tenMonHoc = e} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal /> : <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value, childId, childText)} />}
+                {item.id != -1 ? <FormTextBox ref={e => this.rows[idx].tenMonHoc = e} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal /> : <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll()} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value, childId, childText)} />}
                 <FormSelect ref={e => this.rows[idx].khoa = e} data={SelectAdapter_DmDonViFaculty_V2} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal />
             </>
         );

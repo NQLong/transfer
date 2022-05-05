@@ -116,9 +116,13 @@ module.exports = app => {
     app.get('/api/dao-tao/mon-hoc/page-all/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:read', 'dmMonHoc:read'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '';
+            isDangKyMoMon = req.query.isDangKyMoMon,
+            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
+            statement = 'lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm';
+        if (isDangKyMoMon) statement = `khoa != 33 AND (${statement})`;
+        console.log(statement);
         app.model.dmMonHoc.getPage(pageNumber, pageSize, {
-            statement: 'lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm',
+            statement,
             parameter: { searchTerm }
         }, '*', 'khoa,ten,ma', (error, page) => {
             res.send({ error, page });

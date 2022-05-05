@@ -1,6 +1,6 @@
 
 module.exports = app => {
-
+    const MA_PDT = 33;
     app.get('/api/dao-tao/danh-sach-mon-mo/all', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             yearth = req.query.yearth,
@@ -17,18 +17,18 @@ module.exports = app => {
                 let thoiGianDangKy = dotDangKy.thoiGian || null;
                 let year = thoiGianMoMon.nam - yearth,
                     semester = thoiGianMoMon.hocKy + yearth * 2;
-                app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: year }, (error, item) => {
+                app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: year }, (error, cauTrucKhung) => {
                     if (error) {
                         res.send({ error: `Lỗi lấy dữ liệu năm ${year}` });
                         return;
-                    } else if (!item) {
-                        res.send({ warning: `Chưa có dữ liệu năm ${year}` });
-                        return;
+                    } else if (!cauTrucKhung) {
+                        res.send({ warning: `Chưa có dữ liệu năm ${year}`, item: { dotDangKy, thoiGianMoMon, items: [], ctdt: [] } });
+                        // return;
                     }
-                    app.model.dtKhungDaoTao.get({ namDaoTao: item.id }, (error, item) => {
+                    app.model.dtKhungDaoTao.get({ namDaoTao: cauTrucKhung.id, maNganh: dotDangKy.maNganh }, (error, item) => {
                         if (error) {
                             res.send({ error: `Lỗi lấy CTDT năm ${year}` }); return;
-                        } else if (!item) {
+                        } else if (!item && cauTrucKhung) {
                             res.send({ warning: `Năm ${year} không tồn tại CTDT nào!`, item: { items: [], ctdt: [], dotDangKy, thoiGianMoMon } }); return;
                         } else {
                             app.model.dtDanhSachMonMo.getAll({ maDangKy: id, hocKy }, (error, items) => {
@@ -43,7 +43,7 @@ module.exports = app => {
                                                 res.send({ error });
                                                 return;
                                             } else {
-                                                res.send({ item: app.clone({}, { items, ctdt: item, thoiGianMoMon, dotDangKy }) });
+                                                res.send({ item: app.clone({}, { items: items.filter(item => item.khoa != MA_PDT), ctdt: item, thoiGianMoMon, dotDangKy }) });
                                             }
                                         });
                                     }

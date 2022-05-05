@@ -117,7 +117,7 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
                 done && done(data);
             } else {
                 T.notify('Điều chỉnh thành công!', 'success');
-                done && done(data.item);
+                done && done(data);
                 // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));

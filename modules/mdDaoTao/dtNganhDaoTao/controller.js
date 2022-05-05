@@ -38,6 +38,18 @@ module.exports = app => {
         app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/dao-tao/nganh-dao-tao/filter', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        console.log(req.query);
+        app.model.dtNganhDaoTao.getAll(
+            {
+                statement: '(:khoa IS NULL OR khoa = :khoa) AND (lower(tenNganh) LIKE :searchText OR lower(maNganh) LIKE :searchText)',
+                parameter: {
+                    khoa: req.query.donVi,
+                    searchText: `%${req.query.condition || ''}%`
+                }
+            }, (error, items) => res.send({ error, items }));
+    });
+
     app.post('/api/dao-tao/nganh-dao-tao', app.permission.check('dtNganhDaoTao:write'), (req, res) => {
         let data = req.body.data;
         app.model.dtNganhDaoTao.get({ maNganh: data.maNganh }, (error, item) => {
