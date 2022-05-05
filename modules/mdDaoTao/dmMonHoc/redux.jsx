@@ -192,13 +192,15 @@ export const SelectAdapter_DmMonHocFacultyFilter = (donVi, selectedItems) => {
     };
 };
 
-export const SelectAdapter_DmMonHocAll = {
-    ajax: true,
-    url: '/api/dao-tao/mon-hoc/page-all/1/20',
-    data: params => ({ searchTerm: params.term || '' }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}`, item, tenVi: T.parse(item.ten, { vi: '' }).vi })) : [] }),
-    fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({
-        id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}`,
-        tenVi: T.parse(item.ten, { vi: '' }).vi
-    })))(),
-};   
+export const SelectAdapter_DmMonHocAll = (isDangKyMoMon = null) => {
+    return ({
+        ajax: true,
+        url: '/api/dao-tao/mon-hoc/page-all/1/20',
+        data: params => ({ searchTerm: params.term || '', isDangKyMoMon }),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}`, item, tenVi: T.parse(item.ten, { vi: '' }).vi })) : [] }),
+        fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({
+            id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}`,
+            tenVi: T.parse(item.ten, { vi: '' }).vi
+        })))(),
+    });
+};

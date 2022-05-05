@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu, initSchedule } from './redux';
 import { Link } from 'react-router-dom';
-import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
 import { AdminModal, AdminPage, CirclePageButton, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
@@ -10,6 +10,7 @@ import Pagination from 'view/component/Pagination';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
 import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DtNganhDaoTao } from '../dtNganhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 class AdjustModal extends AdminModal {
@@ -76,18 +77,29 @@ class DtThoiKhoaBieuPage extends AdminPage {
     phong = {}
     soLuongDuKien = {}
     sucChua = {}
-    state = { page: null, isEdit: {}, sucChua: {} }
+    state = { page: null, isEdit: {}, sucChua: {}, filter: {} }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.initData(searchText || '');
-            T.showSearchBox();
+            T.showSearchBox(() => { });
         });
         this.initData();
     }
 
-    initData = (searchText) => {
+    initData = (searchText = '', filter = this.state.filter) => {
         this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText, page => {
-            this.setState({ page }, () => {
+            let { nam = null, hocKy = null, maKhoaBoMon = null, maNganh = null } = filter;
+            page.list = page.list.filter(item => {
+                return (!maNganh || item.maNganh == maNganh)
+                    && (!maKhoaBoMon || item.maKhoaBoMon == maKhoaBoMon)
+                    && (!nam || item.nam == nam)
+                    && (!hocKy || item.hocKy == hocKy);
+            });
+            this.setState({
+                page,
+                listYear: Object.keys(page.list.groupBy('nam')).sort().filter((value, index, list) => !index || value != list[index - 1]),
+                listHocKy: Object.keys(page.list.groupBy('hocKy')).sort().filter((value, index, list) => !index || value != list[index - 1]),
+            }, () => {
                 let { pageNumber, pageSize, list } = page;
                 list.forEach((item, index) => {
                     let line = (pageNumber - 1) * pageSize + index + 1;
@@ -97,9 +109,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     this.phong[line].value(item.phong);
                     this.soLuongDuKien[line].value(item.soLuongDuKien);
                     this.sucChua[line] = item.sucChua;
-                    // item.sucChua && console.log(line, item.sucChua);
-                    // console.log(item.sucChua, line);
-                    // this.setState({ sucChua: { ...this.state.sucChua, [index]: item.sucChua } }, () => console.log(line, this.state.sucChua));
                     if (index == list.length - 1) this.setState({ sucChua: this.sucChua });
                 });
             });
@@ -146,6 +155,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <tr>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Học kỳ</th>
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Ngành</th>
                         <th rowSpan='2' style={{ width: '25%', textAlign: 'center', verticalAlign: 'middle' }}>Mã</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Môn học</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Lớp</th>
@@ -166,6 +176,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ width: 'auto', textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={<>{item.nam} <br /> {'HK' + item.hocKy}</>} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={<>{item.maNganh} <br /> {item.tenNganh.getFirstLetters()}</>} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
                     <TableCell style={{}} contentClassName='multiple-lines-4' content={<>
                         <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
@@ -287,12 +298,31 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     update={this.props.updateDtThoiKhoaBieu}
                     initData={this.initData}
                 />
-                <CirclePageButton type='custom' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
+                <CirclePageButton type='custom' customClassName='btn-success' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
                     || this.taoThoiKhoaBieu()} />
             </>,
             backRoute: '/user/dao-tao',
-            onCreate: null, //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
-            // permission && permission.write ? (e) => this.showModal(e) : null,
+            advanceSearch: <div className='row'>
+                <FormSelect ref={e => this.namFilter = e} className='col-md-2' label='Chọn năm' data={this.state.listYear || []} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value.id } })} />
+                <FormSelect ref={e => this.hocKyFilter = e} className='col-md-2' label='Chọn học kỳ' data={this.state.listHocKy || []} onChange={value => this.setState({ filter: { ...this.state.filter, hocKy: value.id } })} />
+                <FormSelect ref={e => this.khoaFilter = e} className='col-md-4' label='Chọn khoa' data={SelectAdapter_DmDonVi} onChange={value => this.setState({ filter: { ...this.state.filter, maKhoaBoMon: value.id } })} />
+                <FormSelect ref={e => this.nganhFilter = e} className='col-md-4' label='Chọn ngành' data={SelectAdapter_DtNganhDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, maNganh: value.id } })} />
+                <div style={{ display: 'flex', justifyContent: 'end' }} className='form-group col-md-12'>
+                    <button className='btn btn-secondary' onClick={
+                        e => e.preventDefault() || this.setState({ filter: {} }, () => {
+                            this.initData('', this.state.filter);
+                            this.namFilter.value('');
+                            this.hocKyFilter.value('');
+                            this.khoaFilter.value('');
+                            this.nganhFilter.value('');
+                        })} style={{ marginRight: '15px' }}>
+                        <i className='fa fa-lg fa-times' /> Reset
+                    </button>
+                    <button className='btn btn-success' onClick={e => e.preventDefault() || this.initData('', this.state.filter)}>
+                        <i className='fa fa-lg fa-search-plus' /> Tìm
+                    </button>
+                </div>
+            </div>,
         });
     }
 }
