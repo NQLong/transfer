@@ -1,5 +1,3 @@
-// const permission = require('config/permission');
-
 module.exports = app => {
     const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
@@ -7,14 +5,14 @@ module.exports = app => {
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            531: { title: 'Công văn giữa các phòng', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
+            502: { title: 'Công văn các phòng', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
 
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1053: { title: 'Công văn giữa các phòng', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
+            1053: { title: 'Công văn các phòng', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
         },
     };
     app.permission.add(
@@ -496,6 +494,32 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/hcth/cong-van-cac-phong/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber);
+        const pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        console.log(pageNumber, pageSize);
+        const { ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
+
+        const data = { ids, excludeIds, hasIds, fromTime, toTime };
+        let filterParam;
+        try {
+            filterParam = JSON.stringify(data);
+        } catch {
+            res.send('Lọc dữ liệu lỗi');
+            return;
+        } finally {
+            app.model.hcthCongVanDi.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+                if (error || !page) res.send({ error });
+                else {
+                    const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                    const pageCondition = searchTerm;
+                    res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+                }
+            });
+        }
+    });
+
     // Đang gửi cho cô Lan
     const createSchoolAdministratorNotification = (item, status) => new Promise((resolve, reject) => {
         app.model.canBo.get({ shcc: '001.0068' }, 'email', '', (error, staff) => {
@@ -580,4 +604,3 @@ module.exports = app => {
         resolve();
     }));
 };
-

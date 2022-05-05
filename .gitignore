@@ -19,6 +19,7 @@ asset/db/tables
 asset/congVanDen
 asset/congVanDi
 asset/nhiemVu
+dump.rdb
 
 public/img/*
 !public/img/*.*

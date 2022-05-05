@@ -232,7 +232,7 @@ export function getPhanHoi(id, done) {
         T.get(url, res => {
             if (res.error) {
                 T.notify('Lấy danh sách phản hồi lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('GET: ' + url + '. ', res.error);
             } else {
                 dispatch({ type: HcthCongVanDenGetPhanHoi, phanHoi: res.items });
                 done && done(res.items);
@@ -271,10 +271,3 @@ export function getChiDao(id, done) {
     };
 }
 
-export const SelectAdapter_CongVanDen = {
-    ajax: true,
-    url: '/api/hcth/cong-van-den/page/1/20',
-    data: params => ({ condition: params.term }),
-    processResults: response => ({ results: console.log(response) || response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })) : [] }),
-    fetchOne: (id, done) => (getCongVanDen(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))()
-};

@@ -121,12 +121,12 @@ export class TableHeader extends React.Component {
 
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
-    renderHead = () => null, renderRow = () => null, header = 'thead-dark'
+    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {},
 }) {
     const list = getDataSource();
     if (list == null) {
         return (
-            <div className='overlay' style={{ minHeight: '120px' }}>
+            <div className={(loadingOverlay ? 'overlay' : '') + loadingClassName} style={{ minHeight: '120px', ...loadingStyle }}>
                 <div className='m-loader mr-4'>
                     <svg className='m-circular' viewBox='25 25 50 50'>
                         <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
@@ -201,7 +201,7 @@ export function renderComment({
                 gap: '15px'
             };
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'scroll' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'auto', paddingRight: '10px', }}>
                 {
                     list.map((item, index) => {
                         return (
@@ -697,12 +697,12 @@ export class FormSelect extends React.Component {
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '', readOnlyNormal = false } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '', readOnlyNormal = false, disabled = false } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
                 {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? (readOnlyNormal ? (this.state.valueText || readOnlyEmptyText) : <b>{this.state.valueText || readOnlyEmptyText}</b>) : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
-                    <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
+                    <select ref={e => this.input = e} multiple={multiple} disabled={readOnly || disabled} />
                 </div>
             </div>
         );
