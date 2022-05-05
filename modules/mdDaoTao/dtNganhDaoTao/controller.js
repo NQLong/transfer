@@ -39,12 +39,13 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/nganh-dao-tao/filter', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        console.log(req.query);
         app.model.dtNganhDaoTao.getAll(
             {
-                statement: 'khoa = :khoa AND lower(ten) LIKE :searchText',
+                statement: '(:khoa IS NULL OR khoa = :khoa) AND (lower(tenNganh) LIKE :searchText OR lower(maNganh) LIKE :searchText)',
                 parameter: {
                     khoa: req.query.donVi,
-                    searchText: `%${req.query.condition}%`
+                    searchText: `%${req.query.condition || ''}%`
                 }
             }, (error, items) => res.send({ error, items }));
     });

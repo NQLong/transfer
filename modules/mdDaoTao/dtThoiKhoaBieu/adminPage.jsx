@@ -10,7 +10,7 @@ import Pagination from 'view/component/Pagination';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
 import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
-import { SelectAdapter_DtNganhDaoTao } from '../dtNganhDaoTao/redux';
+import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 class AdjustModal extends AdminModal {
@@ -306,7 +306,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <FormSelect ref={e => this.namFilter = e} className='col-md-2' label='Chọn năm' data={this.state.listYear || []} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value.id } })} />
                 <FormSelect ref={e => this.hocKyFilter = e} className='col-md-2' label='Chọn học kỳ' data={this.state.listHocKy || []} onChange={value => this.setState({ filter: { ...this.state.filter, hocKy: value.id } })} />
                 <FormSelect ref={e => this.khoaFilter = e} className='col-md-4' label='Chọn khoa' data={SelectAdapter_DmDonVi} onChange={value => this.setState({ filter: { ...this.state.filter, maKhoaBoMon: value.id } })} />
-                <FormSelect ref={e => this.nganhFilter = e} className='col-md-4' label='Chọn ngành' data={SelectAdapter_DtNganhDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, maNganh: value.id } })} />
+                <FormSelect ref={e => this.nganhFilter = e} className='col-md-4' label='Chọn ngành' data={SelectAdapter_DtNganhDaoTaoFilter(this.state.filter.maKhoaBoMon)} onChange={value => this.setState({ filter: { ...this.state.filter, maNganh: value.id } })} />
                 <div style={{ display: 'flex', justifyContent: 'end' }} className='form-group col-md-12'>
                     <button className='btn btn-secondary' onClick={
                         e => e.preventDefault() || this.setState({ filter: {} }, () => {
