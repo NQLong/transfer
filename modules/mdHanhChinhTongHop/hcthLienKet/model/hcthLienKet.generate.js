@@ -139,5 +139,12 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_get_all_lien_ket(:key, :loai); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, key, loai }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getAllFrom: (targeta, targettypea, targetb, targettypeb, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_lien_ket_get_all_from(:targeta, :targettypea, :targetb, :targettypeb); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, targeta, targettypea, targetb, targettypeb }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+
     };
 };

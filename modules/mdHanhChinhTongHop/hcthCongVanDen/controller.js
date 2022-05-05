@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH } = require('../constant');
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, canBoType, handleResult } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -97,7 +97,7 @@ module.exports = (app) => {
             const [{ id, ...changes }] = listFile.splice(0, 1),
                 sourcePath = app.path.join(app.assetPath, `/congVanDen/new/${changes.ten}`),
                 destPath = app.path.join(app.assetPath, `/congVanDen/${congVanId}/${changes.ten}`);
-            if (!changes.congVan)
+            if (!changes.ma)
                 app.fs.rename(sourcePath, destPath, error => {
                     if (error) done && done({ error });
                     else
@@ -374,7 +374,7 @@ module.exports = (app) => {
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi?.rows || [],
+                    phanHoi: phanHoi || [],
                     donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     danhSachChiDao: chiDao?.rows || [],
@@ -450,10 +450,11 @@ module.exports = (app) => {
     app.get('/api/hcth/cong-van-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const phanHoi = await app.model.hcthPhanHoi.getPhanHoi(id, CONG_VAN_TYPE);
+            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
             res.send({ error: null, items: phanHoi.items });
         }
         catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
@@ -665,4 +666,35 @@ module.exports = (app) => {
             }
         }
     };
+
+
+    app.get('/api/hcth/cong-van-den/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const userPermissions = req.session.user?.permissions || [];
+        const donViCanBo = (req.session?.user?.staff?.donViQuanly || []).map(item => item.maDonVi);
+        const { status = '', ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
+        const data = {
+            staffType: userPermissions.includes('hcth:login') ? canBoType.HCTH : userPermissions.includes('rectors:login') ? canBoType.RECTOR : null,
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDen:read') ? req.session.user?.staff?.maDonVi : '') || '',
+            shccCanBo: req.session.user?.shcc,
+            fromTime, toTime, status, ids, hasIds, excludeIds
+        }
+        console.log(data);
+        let filterParam;
+        try {
+            filterParam = JSON.stringify(data);
+        } catch {
+            res.send({ error: 'Dữ liệu lọc lỗi!' });
+        }
+        app.model.hcthCongVanDen.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+            if (error || !page) res.send({ error });
+            else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
 };

@@ -232,7 +232,7 @@ export function getPhanHoi(id, done) {
         T.get(url, res => {
             if (res.error) {
                 T.notify('Lấy danh sách phản hồi lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('GET: ' + url + '. ', res.error);
             } else {
                 dispatch({ type: HcthCongVanDenGetPhanHoi, phanHoi: res.items });
                 done && done(res.items);

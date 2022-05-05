@@ -1,89 +1,95 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const HcthGiaoNhiemVuGetAll = 'HcthGiaoNhiemVu:GetAll';
-const HcthGiaoNhiemVuGetPage = 'HcthGiaoNhiemVu:GetPage';
-const HcthGiaoNhiemVuSearchPage = 'HcthGiaoNhiemVu:SearchPage';
-const HcthGiaoNhiemVuGet = 'HcthGiaoNhiemVu:Get';
-const HcthGiaoNhiemVuGetPhanHoi = 'HcthGiaoNhiemVu:GetPhanHoi';
-const HcthGiaoNhiemVuGetLienKet = 'HcthGiaoNhiemVu:GetLienKet';
-const HcthGiaoNhiemVuUpdateLienKet = 'HcthGiaoNhiemVu:UpdateLienKet';
-const HcthGiaoNhiemVuGetCanBoNhan = 'HcthGiaoNhiemVu:GetCanBoNhan';
+const HcthNhiemVuGetAll = 'HcthNhiemVu:GetAll';
+const HcthNhiemVuGetPage = 'HcthNhiemVu:GetPage';
+const HcthNhiemVuSearchPage = 'HcthNhiemVu:SearchPage';
+const HcthNhiemVuGet = 'HcthNhiemVu:Get';
+const HcthNhiemVuGetPhanHoi = 'HcthNhiemVu:GetPhanHoi';
+const HcthNhiemVuGetLienKet = 'HcthNhiemVu:GetLienKet';
+const HcthNhiemVuUpdateLienKet = 'HcthNhiemVu:UpdateLienKet';
+const HcthNhiemVuGetCanBoNhan = 'HcthNhiemVu:GetCanBoNhan';
+const HcthHcthNhiemVuCVDSelector = 'HcthNhiemVu:CVDSelector';
+const HcthHcthNhiemVuCVCPSelector = 'HcthNhiemVu:CVCPSelector';
 
-export default function HcthGiaoNhiemVuReducer(state = null, data) {
+export default function HcthNhiemVuReducer(state = null, data) {
     switch (data.type) {
-        case HcthGiaoNhiemVuGet:
+        case HcthNhiemVuGet:
             return Object.assign({}, state, { item: data.item });
-        case HcthGiaoNhiemVuGetAll:
+        case HcthNhiemVuGetAll:
             return Object.assign({}, state, { items: data.items });
-        case HcthGiaoNhiemVuGetPage:
+        case HcthNhiemVuGetPage:
             return Object.assign({}, state, { page: data.page });
-        case HcthGiaoNhiemVuGetPhanHoi:
-            return Object.assign({}, state, { item: { ...(state.item || {}), phanHoi: data.phanHoi } });
-        case HcthGiaoNhiemVuGetLienKet:
-            return Object.assign({}, state, { item: { ...(state.item || {}), lienKet: data.lienKet } });
-        case HcthGiaoNhiemVuGetCanBoNhan:
-            return Object.assign({}, state, { item: { ...(state.item || {}), canBoNhanNhiemVu: data.canBoNhan } });
-        case HcthGiaoNhiemVuSearchPage:
+        case HcthNhiemVuGetPhanHoi:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), phanHoi: data.phanHoi } });
+        case HcthNhiemVuGetLienKet:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), lienKet: data.lienKet } });
+        case HcthNhiemVuGetCanBoNhan:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), canBoNhan: data.canBoNhan } });
+        case HcthNhiemVuSearchPage:
             return Object.assign({}, state, { page: data.page });
+        case HcthHcthNhiemVuCVDSelector:
+            return Object.assign({}, state, { cvdPage: data.page });
+        case HcthHcthNhiemVuCVCPSelector:
+            return Object.assign({}, state, { cvcpPage: data.page });
         default:
             return state;
     }
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageHcthGiaoNhiemVu');
-export function getHcthGiaoNhiemVuPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageHcthGiaoNhiemVu', pageNumber, pageSize, pageCondition);
+T.initPage('pageHcthNhiemVu');
+export function getHcthNhiemVuPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageHcthNhiemVu', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/hcth/giao-nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hcth/nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nhiệm vụ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                dispatch({ type: HcthGiaoNhiemVuGetPage, page: data.page });
+                dispatch({ type: HcthNhiemVuGetPage, page: data.page });
                 done && done(data.page);
             }
         }, () => T.notify('Lấy danh sách nhiệm vụ bị lỗi!', 'danger'));
     };
 }
 
-export function createHcthGiaoNhiemVu(data, done) {
+export function createNhiemVu(data, done) {
     return dispatch => {
-        const url = '/api/hcth/giao-nhiem-vu';
-        T.post(url, { data }, res => {
+        const url = '/api/hcth/nhiem-vu';
+        T.post(url, data, res => {
             if (res.error) {
                 T.notify('Thêm nhiệm vụ bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('POST: ' + url + '. ', res.error);
             } else {
                 T.notify('Thêm nhiệm vụ thành công!', 'success');
-                dispatch(getHcthGiaoNhiemVuSearchPage());
+                dispatch(searchNhiemVu());
                 done && done(data);
             }
         }, () => T.notify('Thêm nhiệm vụ bị lỗi', 'danger'));
     };
 }
 
-export function getHcthGiaoNhiemVuAll(done) {
+export function getHcthNhiemVuAll(done) {
     return dispatch => {
-        const url = '/api/hcth/giao-nhiem-vu/all';
+        const url = '/api/hcth/nhiem-vu/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin giao nhiệm vụ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                dispatch({ type: HcthGiaoNhiemVuGetAll, items: data.items ? data.items : [] });
+                dispatch({ type: HcthNhiemVuGetAll, items: data.items ? data.items : [] });
                 done && done(data.items);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };
 }
 
-export function updateHcthGiaoNhiemVu(id, changes, done) {
+export function updateNhiemVu(id, changes, done) {
     return dispatch => {
-        const url = '/api/hcth/giao-nhiem-vu';
+        const url = `/api/hcth/nhiem-vu`;
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật nhiệm vụ bị lỗi!', 'danger');
@@ -91,36 +97,36 @@ export function updateHcthGiaoNhiemVu(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật nhiệm vụ thành công!', 'success');
-                dispatch(getHcthGiaoNhiemVuSearchPage());
+                dispatch(searchNhiemVu());
                 done && done();
             }
         }, () => T.notify('Cập nhật nhiệm vụ học bị lỗi!', 'danger'));
     };
 }
 
-export function deleteHcthGiaoNhiemVu(id) {
+export function deleteNhiemVu(id) {
     return dispatch => {
-        const url = '/api/hcth/giao-nhiem-vu';
+        const url = '/api/hcth/nhiem-vu';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa giao nhiệm vụ bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.notify('Xóa giao nhiệm vụ thành công!', 'success');
-                dispatch(getHcthGiaoNhiemVuSearchPage());
+                dispatch(searchNhiemVu());
             }
         }, () => T.notify('Xóa giao nhiệm vụ bị lỗi!', 'danger'));
     };
 }
 
-export function getHcthGiaoNhiemVuSearchPage(pageNumber, pageSize, pageCondition, filter, done) {
+export function searchNhiemVu(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageHcthGiaoNhiemVu', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageHcthNhiemVu', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/hcth/giao-nhiem-vu/search/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hcth/nhiem-vu/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nhiệm vụ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -128,7 +134,7 @@ export function getHcthGiaoNhiemVuSearchPage(pageNumber, pageSize, pageCondition
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (page.filter) data.page.filter = page.filter;
-                dispatch({ type: HcthGiaoNhiemVuSearchPage, page: data.page });
+                dispatch({ type: HcthNhiemVuSearchPage, page: data.page });
                 done && done(data.page);
             }
         }, error => console.error(`GET: ${url}.`, error));
@@ -137,7 +143,7 @@ export function getHcthGiaoNhiemVuSearchPage(pageNumber, pageSize, pageCondition
 
 export function deleteFile(id, index, file, done) {
     return () => {
-        const url = '/api/hcth/giao-nhiem-vu/delete-file';
+        const url = '/api/hcth/nhiem-vu/delete-file';
         T.put(url, { id, index, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
@@ -151,15 +157,15 @@ export function deleteFile(id, index, file, done) {
 }
 
 
-export function getGiaoNhiemVu(id, done) {
+export function getNhiemVu(id, done) {
     return dispatch => {
-        const url = `/api/hcth/giao-nhiem-vu/${id}`;
+        const url = `/api/hcth/nhiem-vu/${id}`;
         T.get(url, data => {
             if (data.error) {
                 console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy nhiệm vụ bị lỗi!', 'danger');
             } else {
-                dispatch({ type: HcthGiaoNhiemVuGet, item: data.item });
+                dispatch({ type: HcthNhiemVuGet, item: data.item });
                 done && done(data.item);
             }
         }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
@@ -168,11 +174,11 @@ export function getGiaoNhiemVu(id, done) {
 
 export function createPhanHoi(data, done) {
     return () => {
-        const url = '/api/hcth/giao-nhiem-vu/phan-hoi';
+        const url = '/api/hcth/nhiem-vu/phan-hoi';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Thêm phản hồi bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('POST: ' + url, res.error);
             } else {
                 T.notify('Thêm phản hồi thành công!', 'success');
                 done && done(data);
@@ -183,13 +189,13 @@ export function createPhanHoi(data, done) {
 
 export function getPhanHoi(id, done) {
     return dispatch => {
-        const url = `/api/hcth/giao-nhiem-vu/phan-hoi/${id}`;
+        const url = `/api/hcth/nhiem-vu/phan-hoi/${id}`;
         T.get(url, res => {
             if (res.error) {
                 T.notify('Lấy danh sách phản hồi lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                dispatch({type: HcthGiaoNhiemVuGetPhanHoi, phanHoi: res.items});
+                dispatch({ type: HcthNhiemVuGetPhanHoi, phanHoi: res.items });
                 done && done(res.items);
             }
         }, () => T.notify('Lấy danh sách phản hồi lỗi', 'danger'));
@@ -200,8 +206,8 @@ export function getPhanHoi(id, done) {
 
 export function createLienKet(id, data, done) {
     return dispatch => {
-        const url = '/api/hcth/giao-nhiem-vu/lien-ket';
-        T.post(url, { data }, res => {
+        const url = '/api/hcth/nhiem-vu/lien-ket';
+        T.post(url, data, res => {
             if (res.error) {
                 T.notify('Thêm liên kết lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
@@ -216,7 +222,7 @@ export function createLienKet(id, data, done) {
 
 export function updateLienKet(id, changes, done) {
     return dispatch => {
-        const url = '/api/hcth/giao-nhiem-vu/lien-ket';
+        const url = '/api/hcth/nhiem-vu/lien-ket';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật liên kết bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -225,7 +231,7 @@ export function updateLienKet(id, changes, done) {
             } else {
                 T.notify('Cập nhật liên kết thành công!', 'success');
                 done && done();
-                dispatch({ type: HcthGiaoNhiemVuUpdateLienKet, lienKet: data.item });
+                dispatch({ type: HcthNhiemVuUpdateLienKet, lienKet: data.item });
             }
         }, (error) => T.notify('Cập nhật liên kết bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
@@ -233,58 +239,75 @@ export function updateLienKet(id, changes, done) {
 
 export function getLienKet(id, done) {
     return dispatch => {
-        const url = `/api/hcth/giao-nhiem-vu/lien-ket/${id}`;
+        dispatch({ type: HcthNhiemVuGetLienKet, lienKet: null });
+        const url = `/api/hcth/nhiem-vu/lien-ket/${id}`;
         T.get(url, res => {
             if (res.error) {
                 T.notify('Lấy danh sách liên kết lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                dispatch({ type: HcthGiaoNhiemVuGetLienKet, lienKet: res.items });
+                dispatch({ type: HcthNhiemVuGetLienKet, lienKet: res.items });
                 done && done(res.items);
             }
         }, () => T.notify('Lấy danh sách liên kết lỗi', 'danger'));
     };
 }
 
+
+export function deleteLienKet(id, done) {
+    return () => {
+        const url = `/api/hcth/nhiem-vu/lien-ket/`;
+        T.delete(url, { id }, res => {
+            if (res.error) {
+                T.notify('Xoá liên kết không thành công', 'danger');
+                console.error('DELETE: ' + url + '. ', res.error);
+            } else {
+                T.notify('Xoá liên thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Xoá liên kết không thành công', 'danger'));
+    };
+}
+
 // Cán bộ nhận nhiệm vụ
 
-export function createCanBoNhanNhiemVu(data, done){
+export function createCanBoNhanNhiemVu(ma, canBoNhan, vaiTro, done) {
     return () => {
-        const url = '/api/hcth/giao-nhiem-vu/can-bo-nhan-nhiem-vu';
-        T.post(url, { data }, res => {
+        const url = '/api/hcth/nhiem-vu/can-bo-nhan';
+        T.post(url, { ma, canBoNhan, vaiTro }, res => {
             if (res.error) {
                 T.notify('Thêm cán bộ bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('POST: ' + url, res.error);
             } else {
                 T.notify('Tạo cán bộ thành công', 'success');
-                done && done();
+                done && done(res.items);
             }
         }, () => T.notify('Tạo cán bộ bị lỗi', 'danger'));
     };
 }
 
-export function getCanBoNhanNhiemVu(id, done) {
+export function getListCanBoNhanNhiemVu({ ma = null, ids = null }, done) {
     return dispatch => {
-        const url = `/api/hcth/giao-nhiem-vu/can-bo-nhan-nhiem-vu/${id}`;
-        T.get(url, res => {
+        const url = '/api/hcth/nhiem-vu/can-bo-nhan/list';
+        T.post(url, { ma, ids }, res => {
             if (res.error) {
                 T.notify('Lấy danh sách cán bộ lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                dispatch({ type: HcthGiaoNhiemVuGetCanBoNhan, canBoNhan: res.items });
+                dispatch({ type: HcthNhiemVuGetCanBoNhan, canBoNhan: res.items });
                 done && done(res.items);
             }
         }, () => T.notify('Lấy danh sách cán bộ lỗi', 'danger'));
     };
 }
 
-export function removeCanBoNhanNhiemVu(data, done) {
+export function removeCanBoNhanNhiemVu(id, done) {
     return () => {
-        const url = '/api/hcth/giao-nhiem-vu/can-bo-nhan-nhiem-vu';
-        T.put(url, { data }, res => {
+        const url = `/api/hcth/nhiem-vu/can-bo-nhan/`;
+        T.delete(url, { id }, res => {
             if (res.error) {
                 T.notify('Xoá cán bộ bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('DELETE: ' + url + '. ', res.error);
             } else {
                 T.notify('Xoá cán bộ thành công', 'success');
                 done && done();
@@ -293,3 +316,50 @@ export function removeCanBoNhanNhiemVu(data, done) {
     };
 }
 
+T.initPage('pageLienKetCongVanDen');
+export function getCongVanDenSelector(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageLienKetCongVanDen', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        dispatch({ type: HcthHcthNhiemVuCVDSelector, page: { list: null } });
+        const url = `/api/hcth/cong-van-den/selector/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách công văn đến bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (page.filter) data.page.filter = page.filter;
+                dispatch({ type: HcthHcthNhiemVuCVDSelector, page: data.page });
+                done && done(data.page);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+T.initPage('pageLienKetCongVanDi');
+export function getCongVanCacPhongSelector(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageLienKetCongVanDi', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        dispatch({ type: HcthHcthNhiemVuCVCPSelector, page: { list: null } });
+        const url = `/api/hcth/cong-van-cac-phong/selector/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách công văn đến bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (page.filter) data.page.filter = page.filter;
+                dispatch({ type: HcthHcthNhiemVuCVCPSelector, page: data.page });
+                done && done(data.page);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}

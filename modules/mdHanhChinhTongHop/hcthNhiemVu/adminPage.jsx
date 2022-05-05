@@ -1,31 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createHcthGiaoNhiemVu, getHcthGiaoNhiemVuSearchPage, getHcthGiaoNhiemVuPage, updateHcthGiaoNhiemVu, deleteHcthGiaoNhiemVu } from './redux';
+import { createNhiemVu, searchNhiemVu, getHcthNhiemVuPage, updateNhiemVu, deleteNhiemVu } from './redux';
 import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/AdminPage';
-// import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
-const dsDoUuTien = [
-    {
-        id: 1,
-        text: 'Thường',
-        color: 'blue'
-    },
-    {
-        id: 2,
-        text: 'Khẩn cấp',
-        color: 'red'
-    }
-];
-class hcthGiaoNhiemVuPage extends AdminPage {
+const { doUuTienMapper } = require('../constant');
+class hcthNhiemVuPage extends AdminPage {
     state = { searching: false, loaiDonVi: [] };
 
     componentDidMount() {
-        T.ready(window.location.pathname.startsWith('/user/hcth') ? '/user/hcth' : '/user', () => {
+        T.ready(this.getSiteSetting().readyUrl, () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -33,20 +19,38 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                 this.canBoNhan?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            // this.getPage();
             this.changeAdvancedSearch(true);
-            //this.props.getHcthGiaoNhiemVuPage();
         });
     }
 
+    getSiteSetting = () => {
+        const pathName = window.location.pathname;
+        if (pathName.startsWith('/user/hcth'))
+            return {
+                readyUrl: '/user/hcth',
+                breadcrumb: [
+                    <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
+                    'Danh sách nhiệm vụ',
+                ],
+                backRoute: '/user/nhiem-vu/hcth'
+            }
+        else
+            return {
+                readyUrl: '/user',
+                breadcrumb: [
+                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    'Danh sách nhiệm vụ',
+                ],
+                backRoute: '/user'
+            }
+    }
+
+
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ? this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.HcthNhiemVu && this.props.HcthNhiemVu.page ? this.props.HcthNhiemVu.page : { pageNumber: 1, pageSize: 50 };
         let donViNhan = this.donViNhan?.value().toString() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
-        // let timeType = this.timeType?.value() || null;
-        // let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
-        const userId = this.props.system.user.shcc;
-        const pageFilter = isInitial ? { userId } : { donViNhan, canBoNhan, userId };
+        const pageFilter = isInitial ? {} : { donViNhan, canBoNhan };
 
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -55,8 +59,6 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
-                    // this.timeType?.value(filter.timeType || '');
-                    // this.fromTime?.value(filter.fromTime || '');
 
                     if (!$.isEmptyObject(filter) && filter && (filter.donViNhan || filter.canBoNhan)) this.showAdvanceSearch();
                 }
@@ -65,7 +67,7 @@ class hcthGiaoNhiemVuPage extends AdminPage {
     };
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getHcthGiaoNhiemVuSearchPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.searchNhiemVu(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -73,37 +75,32 @@ class hcthGiaoNhiemVuPage extends AdminPage {
         this.modal.show();
     }
 
-    changeActive = item => this.props.updateHcthGiaoNhiemVu(item.id, { id: item.id, kichHoat: item.kichHoat ? 0 : 1 });
+    changeActive = item => this.props.updateNhiemVu(item.id, { id: item.id, kichHoat: item.kichHoat ? 0 : 1 });
 
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa danh mục đơn vị', 'Bạn có chắc bạn muốn xóa đơn vị gửi công văn này?', true, isConfirm =>
-            isConfirm && this.props.deleteHcthGiaoNhiemVu(item.id));
+            isConfirm && this.props.deleteNhiemVu(item.id));
     }
 
     formatText = (str, numOfChar) => {
         return str.length > numOfChar ? `${str.slice(0, numOfChar)}...` : str;
     }
 
-    render() {
-        //const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [], 
-        const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']),
-            presidentPermission = this.getUserPermission('president', ['login']),
-            managerPermision = this.getUserPermission('manager', ['write']),
-            rectorPermission = this.getUserPermission('rectors', ['login']),
-            hcthPermission = this.getUserPermission('hcth', ['login']);
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ?
-            this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-        const doUuTienMapObj = dsDoUuTien.reduce((acc, ele) => {
-            acc[ele.id] = ele;
-            return acc;
-        }, {});
+    getItems = () => {
+        return this.state.loading ? null : (this.props.hcthNhiemVu?.page?.list || []);
+    }
 
-        // let table = 'Không có danh sách nhiệm vụ!';
-        // if (list && list.length > 0) {
+    render() {
+        const
+            currentPermissions = this.getCurrentPermissions(),
+            { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list = null } = this.props.hcthNhiemVu?.page || { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null },
+            canCreate = currentPermissions.includes('rectors:login') || currentPermissions.includes('manager:write');
+
         let table = renderTable({
             emptyTable: 'Không có danh sách nhiệm vụ!',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => list,
+            stickyHead: false,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
@@ -125,8 +122,8 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' content={<Link to={`/user/hcth/giao-nhiem-vu/${item.id}`}>{item.tieuDe ? this.formatText(item.tieuDe, 20) : ''}</Link>} />
-                        <TableCell type='text' content={item.noiDung ? this.formatText(item.noiDung, 30) : ''} />
+                        <TableCell type='text' contentClassName='multiple-lines-2' contentStyle={{ width: '100%' }} content={<Link to={`/user/hcth/nhiem-vu/${item.id}`}>{item.tieuDe}</Link>} />
+                        <TableCell type='text' contentClassName='multiple-lines-2' contentStyle={{ width: '100%' }} content={item.noiDung} />
                         <TableCell type='text' content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
@@ -145,8 +142,8 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                                 }</span>
                             </>
                         } style={{ whiteSpace: 'nowrap' }} />
-                        <TableCell type='text' content={item.doUuTien ? doUuTienMapObj[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapObj[item.doUuTien].color : '#000000' }} />
-                        <TableCell type='text' content={item.isNhiemVuLienPhong ? 'Liên phòng' : 'Thường'} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={item.doUuTien ? doUuTienMapper[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapper[item.doUuTien].color : '#000000' }} />
+                        <TableCell type='text' content={item.lienPhong ? 'Liên phòng' : 'Thường'} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.tenNguoiTao} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                             item.ngayTao ? (<>
@@ -165,8 +162,8 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                             </>) : null
                         } />
 
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.props.history.push({ pathname: `/user/hcth/giao-nhiem-vu/${item.id}`, state: { nguoiTao: item.ngayTao } })} onDelete={e => this.delete(e, item)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{}}
+                            onEdit={`/user/hcth/nhiem-vu/${item.id}`} onDelete={e => this.delete(e, item)} />
                     </tr>
                 );
             }
@@ -177,44 +174,26 @@ class hcthGiaoNhiemVuPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Giao nhiệm vụ',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Giao nhiệm vụ'
+                <Link key={0} to='/user/'>Danh mục</Link>,
+                'Nhiệm vụ'
             ],
             advanceSearch: <>
                 <div className='row'>
-                    {/* <div className='col-12 col-md-12 row'>
-                        <FormCheckbox className='col-md-6' ref={e => this.isTimeSearch = e} label='Theo thời gian hết hạn' isSwitch={false} />
-            
-                        {this.isTimeSearch?.value() === true && (<>
-                            <FormDatePicker type='date' className='col-md-3' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
-                            <FormDatePicker type='date' className='col-md-3' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
-                        </>)}
-                    </div> */}
-
-                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
+                    {/* <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} /> */}
                 </div>
             </>,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                {/* <EditModal ref={e => this.modal = e}
-                    permission={permission}
-                    create={this.props.createHcthGiaoNhiemVu}
-                    update={this.props.updateHcthGiaoNhiemVu}
-                    permissions={currentPermissions}
-                /> */}
             </>,
             backRoute: '/user/hcth',
-            onCreate: ((managerPermision && managerPermision.write)
-                || (presidentPermission && presidentPermission.login)
-                || (rectorPermission && rectorPermission.login)
-                || (hcthPermission && hcthPermission.login)) ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
+            onCreate: canCreate ? () => this.props.history.push('/user/hcth/nhiem-vu/new') : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, hcthGiaoNhiemVu: state.hcth.hcthGiaoNhiemVu });
-const mapActionsToProps = { getHcthGiaoNhiemVuPage, getHcthGiaoNhiemVuSearchPage, createHcthGiaoNhiemVu, updateHcthGiaoNhiemVu, deleteHcthGiaoNhiemVu, getDmLoaiDonViAll };
-export default connect(mapStateToProps, mapActionsToProps)(hcthGiaoNhiemVuPage);
+const mapStateToProps = state => ({ system: state.system, hcthNhiemVu: state.hcth.hcthNhiemVu });
+const mapActionsToProps = { getHcthNhiemVuPage, searchNhiemVu, createNhiemVu, updateNhiemVu, deleteNhiemVu, getDmLoaiDonViAll };
+export default connect(mapStateToProps, mapActionsToProps)(hcthNhiemVuPage);

@@ -121,12 +121,13 @@ export class TableHeader extends React.Component {
 
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
-    renderHead = () => null, renderRow = () => null, header = 'thead-dark'
+    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {},
 }) {
     const list = getDataSource();
     if (list == null) {
+        console.log('hello');
         return (
-            <div className='overlay' style={{ minHeight: '120px' }}>
+            <div className={(loadingOverlay ? 'overlay' : '') + loadingClassName} style={{ minHeight: '120px', ...loadingStyle }}>
                 <div className='m-loader mr-4'>
                     <svg className='m-circular' viewBox='25 25 50 50'>
                         <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
@@ -201,7 +202,7 @@ export function renderComment({
                 gap: '15px'
             };
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'scroll' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'auto', paddingRight: '10px', }}>
                 {
                     list.map((item, index) => {
                         return (

@@ -5,7 +5,7 @@ module.exports = app => {
 
     app.model.hcthPhanHoi.getAllPhanHoiFrom = (target, type) => new Promise((resolve, reject) => {
         app.model.hcthPhanHoi.getAllFrom(target, type, (error, item) => {
-            handleResult(resolve, reject, item.rows || [], error);
+            handleResult(resolve, reject, item?.rows || [], error);
         });
     });
 };

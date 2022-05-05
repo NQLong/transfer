@@ -98,9 +98,11 @@ module.exports = app => {
         update: (condition, changes, done) => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
+            console.log({condition, changes});
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
                 const sql = 'UPDATE HCTH_CAN_BO_NHAN SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                console.log({sql});
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.hcthCanBoNhan.get({ rowId: resultSet.lastRowid }, done);
@@ -135,9 +137,9 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        getAllCanBoNhan: (nhiemvuid, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_get_all_can_bo_nhan(:nhiemvuid); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhiemvuid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        getAllFrom: (target, targettype, ids, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_can_bo_nhan_get_all_from(:target, :targettype, :ids); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, target, targettype, ids }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

@@ -132,7 +132,7 @@ class StaffEditPage extends AdminPage {
 
     componentDidMount() {
         const isHcthMenu = window.location.pathname.startsWith('/user/hcth');
-        T.ready(isHcthMenu ? '/user/hcth' : '/user', () => {
+        T.ready('/user/hcth', () => {
             const params = T.routeMatcher(isHcthMenu ? '/user/hcth/cong-van-den/:id' : '/user/cong-van-den/:id').parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '' },
                 { shcc, staff, image } = user;
