@@ -218,11 +218,14 @@ class HcthCongVanDi extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn giữa các phòng',
-            breadcrumb: [
+            breadcrumb: window.location.pathname.startsWith('/user/hcth') ? [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hơp</Link>,
                 'Công văn giữa các phòng'
+            ] : [
+                <Link key={0} to='/user'>Trang cá nhân</Link>,
+                'Công văn giữa các phòng'
             ],
-            onCreate: (permission && permission.write) ? () => this.props.history.push('/user/hcth/cong-van-cac-phong/new') : null,
+            onCreate: (permission && permission.write) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
                 <FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '16px' }} ref={e => this.congVanLaySo = e} placeholder="Công văn" data={selectCongVanV2} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
                 <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />

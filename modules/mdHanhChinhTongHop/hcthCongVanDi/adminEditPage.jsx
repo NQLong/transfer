@@ -357,7 +357,7 @@ class AdminEditPage extends AdminPage {
                 }
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
-                this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-cac-phong'));
+                this.props.createHcthCongVanDi(changes, () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong') : this.props.history.push('/user/cong-van-cac-phong')));
             }
         }
     }
@@ -481,11 +481,11 @@ class AdminEditPage extends AdminPage {
     });
 
     canAccept = () => {
-        return this.state.id && this.state.trangThai == '2' && this.getUserPermission('hcth', ['login', 'manage']).manage;
+        return this.state.id && this.state.trangThai == '2' && this.getUserPermission('hcthCongVanDi', ['manage']).manage;
     }
 
     canApprove = () => {
-        return this.state.id && this.state.trangThai == '3' && this.getUserPermission('president', ['login']).login;
+        return this.state.id && this.state.trangThai == '3' && this.getUserPermission('rectors', ['login']).login;
     }
 
     addFile = () => {
@@ -496,7 +496,9 @@ class AdminEditPage extends AdminPage {
         const permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
             isNew = !this.state.id,
             presidentPermission = this.getUserPermission('president', ['login']),
+            rectorsPermission = this.getUserPermission('rectors', ['login']),
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
+            hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
             unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']);
 
         const titleText = !isNew ? 'Cập nhật' : 'Tạo mới';
@@ -583,7 +585,7 @@ class AdminEditPage extends AdminPage {
                         <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.noiBo = e} label='Công văn nội bộ' readOnly={readCondition} onChange={value => this.setState({ noiBo: value })}></FormCheckbox>
                         <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.laySo = e} label='Công văn lấy số' readOnly={readCondition} onChange={value => this.setState({ laySo: value })}></FormCheckbox>
                         {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
-                        {!this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Đơn vị nhận' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
+                        {!this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận bên ngoài' placeholder='Đơn vị nhận' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
                         {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Cán bộ nhận' placeholder='Cán bộ nhận' ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readCondition} readOnlyEmptyText='Chưa có cán bộ nhận' /> : null}
                         <FormSelect className='col-md-12' allowClear={true} label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có loại công văn' />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readCondition} required readOnlyEmptyText=': Chưa có trích yếu' />
@@ -617,8 +619,8 @@ class AdminEditPage extends AdminPage {
                                             <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
                                                 Thêm
                                             </button>
-                                            {((this.state.trangThai == '2' && hcthStaffPermission && hcthStaffPermission.login) ||
-                                                (this.state.trangThai == '3' && presidentPermission && presidentPermission.login))
+                                            {((this.state.trangThai == '2' && hcthManagePermission && hcthManagePermission.manage) ||
+                                                (this.state.trangThai == '3' && rectorsPermission && rectorsPermission.login))
                                                 && <button type='submit' className='btn btn-danger' onClick={this.onReturnCvDi}>
                                                     Trả lại
                                                 </button>}
@@ -650,8 +652,8 @@ class AdminEditPage extends AdminPage {
 
             </>),
             backRoute: window.location.pathname.startsWith('/user/hcth') ? '/user/hcth/cong-van-cac-phong' : '/user/cong-van-cac-phong',
-            onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4') && ((unitManagePermission && unitManagePermission.manage) || (hcthStaffPermission && hcthStaffPermission.login)) ? this.save : null,
-            buttons: !readTrangThai && (hcthStaffPermission.login || (unitManagePermission.manage && lengthDv != 0)) && !isNew && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onSend }],
+            onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4') && ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? this.save : null,
+            buttons: !readTrangThai && (hcthManagePermission.manage || (unitManagePermission.manage && lengthDv != 0)) && !isNew && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onSend }],
         });
     }
 }
