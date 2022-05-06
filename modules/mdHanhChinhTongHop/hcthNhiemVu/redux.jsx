@@ -379,3 +379,10 @@ export function getCongVanCacPhongSelector(pageNumber, pageSize, pageCondition, 
         }, error => console.error(`GET: ${url}.`, error));
     };
 }
+
+export function clearHcthNhiemVu(done) {
+    return dispatch => {
+        dispatch({ type: HcthNhiemVuGet, item: {} });
+        done && done();
+    };
+}
