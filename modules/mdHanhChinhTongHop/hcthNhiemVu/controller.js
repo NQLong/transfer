@@ -111,7 +111,7 @@ module.exports = (app) => {
         }
     });
 
-    app.put('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'rectors:login', 'hcth:manage', 'president:login'), async (req, res) => {
+    app.put('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'rectors:login', 'hcth:manage', 'president:login', 'staff:login'), async (req, res) => {
         try {
             const
                 { id, changes } = req.body,

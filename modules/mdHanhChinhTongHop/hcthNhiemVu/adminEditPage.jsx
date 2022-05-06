@@ -242,7 +242,7 @@ class AdminEditPage extends AdminPage {
                     </div>
 
                     <div className='tile-body row'>
-                        <FormTextBox type="text" className="col-md-12" ref={e => this.tieuDe = e} label="Tiêu đề" required readOnly={!sitePermission.editGeneral} />
+                        <FormTextBox type='text' className='col-md-12' ref={e => this.tieuDe = e} label='Tiêu đề' required readOnly={!sitePermission.editGeneral} />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={!sitePermission.editGeneral} required />
                         {this.state.id && <>
                             <FormSelect className='col-md-6' ref={(e => this.nguoiTao = e)} label='Người tạo' data={SelectAdapter_FwCanBo} readOnly={true} />

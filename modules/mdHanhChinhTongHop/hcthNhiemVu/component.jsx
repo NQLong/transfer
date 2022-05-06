@@ -142,14 +142,14 @@ export class CanBoNhan extends AdminPage {
                     <h3 className='tile-title'>Cán bộ tham gia nhiệm vụ</h3>
                     <div className='tile-body row'>
                         {this.canAdd() && (<div className='col-md-12 row'>
-                            <FormSelect className='col-md-6' multiple={true} ref={e => this.canBoNhan = e} data={this.getAdapter()} placeholder="Chọn cán bộ tham gia" />
-                            <FormSelect className='col-md-3' ref={e => this.vaiTro = e} data={this.getRoleData()} placeholder="Vai trò cán bộ" />
+                            <FormSelect className='col-md-6' multiple={true} ref={e => this.canBoNhan = e} data={this.getAdapter()} placeholder='Chọn cán bộ tham gia' />
+                            <FormSelect className='col-md-3' ref={e => this.vaiTro = e} data={this.getRoleData()} placeholder='Vai trò cán bộ' />
                             <button type='button' className='btn btn-primary col-md-3 form-group' onClick={this.onSubmit}>
-                                <i className="fa fa-plus"></i> Thêm nhân viên
+                                <i className='fa fa-plus'></i> Thêm nhân viên
                             </button>
                         </div>)
                         }
-                        <div className="col-md-12" style={{ maxHeight: '50vh', overflowY: 'auto', paddingLeft: '10px' }}>
+                        <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto', paddingLeft: '10px' }}>
                             {this.tableCanBoNhan(this.props.isCreator)}
                         </div>
                     </div>
@@ -495,7 +495,7 @@ export class LienKet extends React.Component {
             <TableCell type='text' style={{}} content={item.trichYeuDen} />
             <TableCell type='buttons' permission={{ delete: canDelete }} onDelete={(e) => this.onDelete(e, item)}>
                 <Link className='btn btn-primary' role='button' to={`/user/cong-van-den/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
-                    <i className="fa fa-eye"></i>
+                    <i className='fa fa-eye'></i>
                 </Link>
             </TableCell>
         </tr>);
@@ -505,7 +505,7 @@ export class LienKet extends React.Component {
         return (<tr key={index}>
             <TableCell style={{ textAlign: 'right' }} content={index + 1} />
             <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                <Link to={`/user/cong-van-den/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
+                <Link to={`/user/cong-van-cac-phong/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
                     {item.soDi || 'Chưa có'}
                 </Link>
             }
@@ -515,7 +515,7 @@ export class LienKet extends React.Component {
             <TableCell type='text' style={{}} content={item.trichYeuDi} />
             <TableCell type='buttons' permission={{ delete: canDelete }} onDelete={(e) => this.onDelete(e, item)}>
                 <Link className='btn btn-primary' role='button' to={`/user/cong-van-cac-phong/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
-                    <i className="fa fa-eye"></i>
+                    <i className='fa fa-eye'></i>
                 </Link>
             </TableCell>
 
@@ -563,7 +563,7 @@ export class LienKet extends React.Component {
                     {this.tableLienKet(this.props.hcthNhiemVu?.item?.lienKet)}
                 </div>
             </div>
-            {this.props.sitePermission?.editGeneral && <div className="d-flex justify-content-end">
+            {this.props.sitePermission?.editGeneral && <div className='d-flex justify-content-end'>
                 <button type='submit' className='btn btn-primary' onClick={(e) => this.showModal(e)}>
                     Thêm
                 </button>
