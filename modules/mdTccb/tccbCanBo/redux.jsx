@@ -250,6 +250,23 @@ export function downloadWordLlkh(shcc, done) {
     };
 }
 
+export function downloadExcel(pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    return () => {
+        const url = '/api/staff/download-excel-all';
+        T.get(url, { condition: pageCondition, filter }, data => {
+            if (data.error) {
+                T.notify('Download bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data.items);
+            }
+        }, () => T.notify('Download bị lỗi', 'danger'));
+    };
+}
 // User Actions ------------------------------------------------------------------------------------------------------------
 export function userGetStaff(email, done) {
     return dispatch => {
