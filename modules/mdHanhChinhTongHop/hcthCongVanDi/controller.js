@@ -1,7 +1,7 @@
 // const permission = require('config/permission');
 
 module.exports = app => {
-    const { MA_HCTH } = require('../constant');
+    // const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
 
     const staffMenu = {
