@@ -9,8 +9,7 @@ import TaoThoiGianMoMon from '../dtThoiGianMoMon/ThoiGianMoMonModal';
 import { getDtDangKyMoMonPage, createDangKyMoMon } from './redux';
 
 class NganhModal extends AdminModal {
-    onShow = (userDaoTao = null) => {
-        if (userDaoTao) this.setState({ userDaoTao });
+    onShow = () => {
         const { batDau, ketThuc, hocKy, nam } = this.props.thoiGianMoMon;
         this.batDau.value(T.dateToText(batDau, 'dd/mm/yyyy'));
         this.ketThuc.value(T.dateToText(ketThuc, 'dd/mm/yyyy'));
@@ -20,7 +19,7 @@ class NganhModal extends AdminModal {
 
     onSubmit = e => {
         e && e.preventDefault();
-        if (!this.state.userDaoTao && !this.nganh.value()) {
+        if (!this.nganh.value()) {
             T.notify('Chưa chọn Ngành', 'danger');
             this.nganh.focus();
             return;
@@ -30,8 +29,8 @@ class NganhModal extends AdminModal {
             hocKy: this.hocKy.value(),
             batDau: this.props.thoiGianMoMon.batDau,
             ketThuc: this.props.thoiGianMoMon.ketThuc,
-            khoa: this.state.userDaoTao ? this.state.userDaoTao.staff.maDonVi : this.state.khoa,
-            maNganh: this.state.userDaoTao ? 'DT' : this.nganh.value(),
+            khoa: this.state.khoa,
+            maNganh: this.nganh.value(),
         };
         this.props.create(data, item => {
             this.hide();
@@ -48,7 +47,7 @@ class NganhModal extends AdminModal {
                 <FormTextBox className='col-md-6' ref={e => this.namHoc = e} readOnly label='Năm' />
                 <FormTextBox className='col-md-6' ref={e => this.batDau = e} readOnly label='Mở ngày' />
                 <FormTextBox className='col-md-6' ref={e => this.ketThuc = e} readOnly label='Đóng ngày' />
-                <FormSelect className='col-md-12' ref={e => this.nganh = e} label='Chọn ngành' data={SelectAdapter_DtNganhDaoTao} onChange={value => this.setState({ khoa: value.khoa })} style={{ display: this.state.userDaoTao ? 'none' : 'block' }} />
+                <FormSelect className='col-md-12' ref={e => this.nganh = e} label='Chọn ngành' data={SelectAdapter_DtNganhDaoTao} onChange={value => this.setState({ khoa: value.khoa })} />
             </div>
         });
     }
@@ -145,9 +144,7 @@ class DtDangKyMoMonPage extends AdminPage {
                 e.preventDefault();
                 if (permissionDaoTao.manage) {
                     this.nganhModal.show();
-                } else if (permissionDaoTao.write) {
-                    this.nganhModal.show(this.props.system.user);
-                } else null;
+                } else T.notify('Bạn không có quyền đăng ký tại đây!', 'danger');
             }
         });
     }

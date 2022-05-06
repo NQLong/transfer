@@ -99,14 +99,14 @@ class DtDsMonMoEditPage extends AdminPage {
         endTime: T.dateToText(item.thoiGianMoMon.ketThuc, 'dd/mm/yyyy')
     }, () => {
         this.soTiet[index].forEach((monHoc, count) => {
-            monHoc.value(item.items[count].soTietBuoi || '0');
+            monHoc.value(item.items[count].soTietBuoi || '1');
         });
         this.soNhom[index].forEach((monHoc, count) => {
-            monHoc.value(item.items[count].soNhom || '0');
+            monHoc.value(item.items[count].soNhom || '1');
         }); this.soBuoi[index].forEach((monHoc, count) => {
-            monHoc.value(item.items[count].soBuoiTuan || '0');
+            monHoc.value(item.items[count].soBuoiTuan || '1');
         }); this.soLuongDuKien[index].forEach((monHoc, count) => {
-            monHoc.value(item.items[count].soLuongDuKien || '0');
+            monHoc.value(item.items[count].soLuongDuKien || '50');
         });
         !this.props.system.user.permissions.includes('dtDangKyMoMon:write') && (!this.nganh.value() && this.nganh.value(this.state.data[index].dotDangKy.maNganh));
         !this.donViDangKy.value() && this.donViDangKy.value(this.state.data[index].dotDangKy.khoa);
