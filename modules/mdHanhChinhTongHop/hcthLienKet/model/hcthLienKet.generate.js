@@ -134,5 +134,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM HCTH_LIEN_KET' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        getAllFrom: (targeta, targettypea, targetb, targettypeb, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_lien_ket_get_all_from(:targeta, :targettypea, :targetb, :targettypeb); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, targeta, targettypea, targetb, targettypeb }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

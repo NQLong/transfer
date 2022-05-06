@@ -488,7 +488,7 @@ module.exports = app => {
             if (error) reject(error);
             else {
                 const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `user/hcth/cong-van-cac-phong/${item.id}` }, error => {
+                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` }, error => {
                     if (error) reject(error);
                     else resolve();
                 });
@@ -563,12 +563,12 @@ module.exports = app => {
         }
     });
 
-    app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
-        if (staff.donViQuanLy && staff.donViQuanLy.length > 0 && staff.maDonVi == MA_HCTH) {
-            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:manage', 'hcth:manage');
-        }
-        resolve();
-    }));
+    // app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
+    //     if (staff.donViQuanLy && staff.donViQuanLy.length > 0 && staff.maDonVi == MA_HCTH) {
+    //         app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:manage', 'hcth:manage');
+    //     }
+    //     resolve();
+    // }));
 
     app.permissionHooks.add('assignRole', 'checkRoleHcthQuanLyCongVanDi', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == hcthQuanLyCongVanDiRole);

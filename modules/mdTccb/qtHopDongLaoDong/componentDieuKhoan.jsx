@@ -37,7 +37,7 @@ export class ComponentDieuKhoan extends React.Component {
 
     setVal = (data = null) => {
         if (data) {
-            let { ma, loaiHopDong, ngayKyHopDong, batDauLamViec, ketThucHopDong, diaDiemLamViec,
+            let { ma, loaiHopDong, batDauLamViec, ketThucHopDong, diaDiemLamViec,
                 congViecDuocGiao, maNgach, heSo, bac, phanTramHuong, chiuSuPhanCong, ngayKyHdTiepTheo, thoiGianLamViec, 
                 dungCuDuocCapPhat, phuongTienDiLaiLamViec, hinhThucTraLuong, cheDoNghiNgoi, boiThuongVatChat, isCvdt } = data;
             this.setState({ ma, maNgach });
@@ -52,8 +52,8 @@ export class ComponentDieuKhoan extends React.Component {
 
                         }
                     });
-                    this.tuNgay.value(ngayKyHopDong ? ngayKyHopDong : batDauLamViec);
-                    this.batDauLamViec.value(batDauLamViec ? batDauLamViec : ngayKyHopDong);
+                    this.tuNgay.value(batDauLamViec ? batDauLamViec : batDauLamViec);
+                    this.batDauLamViec.value(batDauLamViec ? batDauLamViec : batDauLamViec);
                     this.denNgay.value(ketThucHopDong);
                     this.donVi.value(diaDiemLamViec);
                     this.congViecDuocGiao.value(congViecDuocGiao ? congViecDuocGiao : defaultValue.congViecDuocGiao);
@@ -146,6 +146,7 @@ export class ComponentDieuKhoan extends React.Component {
                 ma: this.state.ma,
                 loaiHopDong: this.validate(this.loaiHopDong),
                 batDauLamViec: this.validate(this.batDauLamViec).getTime(),
+                ngayKyHopDong: this.validate(this.tuNgay).getTime(),
                 ketThucHopDong: this.validate(this.denNgay).getTime(),
                 diaDiemLamViec: this.validate(this.donVi),
                 maNgach: this.validate(this.chucDanh),
@@ -230,7 +231,7 @@ export class ComponentDieuKhoan extends React.Component {
                     <div className='col-12 form-group'>
                         <h5 className='control-label' style={{ fontWeight: 'bold' }}>2. Nghĩa vụ: </h5>
                     </div>
-                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' className='col-xl-6 col-md-6' />
+                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' readOnly={readOnly} className='col-xl-6 col-md-6' maxLength={200} />
                     <FormTextBox ref={e => this.boiThuong = e} label='Bồi thường vi phạm và vật chất' className='col-xl-6 col-md-6' />
                 </div>
             </div>
