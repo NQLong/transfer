@@ -39,7 +39,6 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/nganh-dao-tao/filter', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        console.log(req.query);
         app.model.dtNganhDaoTao.getAll(
             {
                 statement: '(:khoa IS NULL OR khoa = :khoa) AND (lower(tenNganh) LIKE :searchText OR lower(maNganh) LIKE :searchText)',

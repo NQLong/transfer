@@ -92,8 +92,8 @@ export function createDtThoiKhoaBieu(item, done) {
     };
 }
 
-export function deleteDtThoiKhoaBieu(id) {
-    return dispatch => {
+export function deleteDtThoiKhoaBieu(id, done) {
+    return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function deleteDtThoiKhoaBieu(id) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Thời khoá biểu đã xóa thành công!', 'success', false, 800);
-                dispatch(getDtThoiKhoaBieuPage());
+                done && done();
             }
         }, () => T.notify('Xóa thời khoá biểu bị lỗi!', 'danger'));
     };

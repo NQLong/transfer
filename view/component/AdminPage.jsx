@@ -608,6 +608,7 @@ export class FormSelect extends React.Component {
 
     value = function (value, done = null) {
         const dropdownParent = this.props.dropdownParent || $('.modal-body').has(this.input)[0] || $('.tile-body').has(this.input)[0];
+        if (!value) this.setState({ valueText: '' });
         if (arguments.length) {
             this.clear();
             let hasInit = this.hasInit;
@@ -679,7 +680,7 @@ export class FormSelect extends React.Component {
             // Set readOnly text
             if (!this.props.multiple) {
                 if (!data || !data.fetchOne) {
-                    this.setState({ valueText: $(this.input).find(':selected').text() });
+                    this.setState({ valueText: $(this.input).find(':selected').text() || '' });
                 }
             }
         } else {
@@ -701,6 +702,7 @@ export class FormSelect extends React.Component {
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
                 {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? (readOnlyNormal ? (this.state.valueText || readOnlyEmptyText) : <b>{this.state.valueText || readOnlyEmptyText}</b>) : ''}
+
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
                     <select ref={e => this.input = e} multiple={multiple} disabled={readOnly || disabled} />
                 </div>

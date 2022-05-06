@@ -506,7 +506,7 @@ module.exports = (app) => {
 
     app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
-            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:manage', 'hcth:manage');
+            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:manage', 'hcth:manage', 'hcthCongVanDi:manage');
         }
         resolve();
     }));
