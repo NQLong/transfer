@@ -6527,7 +6527,8 @@
                 "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage",
                 "HCTH_CONG_VAN_DEN_GET_NOTIFICATION": "getNotification",
                 "HCTH_CONG_VAN_DEN_GET_RELATED_STAFF": "getRelatedStaff",
-                "HCTH_CONG_VAN_DEN_GET_AUTHORIZED_STAFF": "getAuthorizedStaff"
+                "HCTH_CONG_VAN_DEN_GET_AUTHORIZED_STAFF": "getAuthorizedStaff",
+                "hcth_cong_van_den_search_selector": "searchSelector"
             },
             "columns": {
                 "ID": {
@@ -6617,7 +6618,7 @@
                 "NHAC_NHO": {
                     "value": "nhacNho",
                     "dataType": "NUMBER",
-                    "dataDefault": "1",
+                    "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
                 }
@@ -6637,7 +6638,8 @@
                 "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
                 "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
-                "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff"
+                "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
+                "hcth_cong_van_di_search_selector": "searchSelector"
             },
             "columns": {
                 "ID": {
@@ -8537,7 +8539,8 @@
             "moduleName": "hcthCanBoNhan",
             "modelName": "hcthCanBoNhan",
             "methods": {
-                "HCTH_GIAO_NHIEM_VU_GET_ALL_CAN_BO_NHAN": "getAllCanBoNhan"
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_CAN_BO_NHAN": "getAllCanBoNhan",
+                "hcth_can_bo_nhan_get_all_from": "getAllFrom"
             },
             "columns": {
                 "ID": {
@@ -10073,7 +10076,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 5
+                    "size": 16
                 }
             },
             "primaryKeys": [
@@ -11894,8 +11897,8 @@
                     "nullable": true,
                     "size": "3,0"
                 },
-                "KHOA": {
-                    "value": "khoa",
+                "CHUYEN_NGANH": {
+                    "value": "chuyenNganh",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -11928,6 +11931,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "2,0"
+                },
+                "HOC_KY_SINH_VIEN": {
+                    "value": "hocKySinhVien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "LOAI_MON_HOC": {
+                    "value": "loaiMonHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -12706,7 +12730,8 @@
             "moduleName": "hcthLienKet",
             "modelName": "hcthLienKet",
             "methods": {
-                "HCTH_GIAO_NHIEM_VU_GET_ALL_LIEN_KET": "getAllLienKet"
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_LIEN_KET": "getAllLienKet",
+                "hcth_lien_ket_get_all_from": "getAllFrom"
             },
             "columns": {
                 "ID": {
@@ -13026,17 +13051,17 @@
                 },
                 "THANG_DO_MIN": {
                     "value": "thangDoMin",
-                    "dataType": "NVARCHAR2",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 5
+                    "size": "10,2"
                 },
                 "THANG_DO_MAX": {
                     "value": "thangDoMax",
-                    "dataType": "NVARCHAR2",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 5
+                    "size": "10,2"
                 },
                 "MO_TA": {
                     "value": "moTa",
@@ -13063,6 +13088,9 @@
             "active": true,
             "moduleName": "hcthNhiemVu",
             "modelName": "hcthNhiemVu",
+            "methods": {
+                "hcth_nhiem_vu_search_page": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -13133,6 +13161,53 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "10,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 16
+                },
+                "TIEN_DO": {
+                    "value": "tienDo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "8,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_USER_NOTIFICATION": {
+            "active": true,
+            "moduleName": "fwUserNotification",
+            "modelName": "fwUserNotification",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_111161\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NOTIFICATION": {
+                    "value": "notification",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
                 }
             },
             "primaryKeys": [

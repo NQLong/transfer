@@ -139,5 +139,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_get_all_can_bo_nhan(:nhiemvuid); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhiemvuid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getAllFrom: (target, targettype, ids, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_can_bo_nhan_get_all_from(:target, :targettype, :ids); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, target, targettype, ids }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
