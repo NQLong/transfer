@@ -1,5 +1,4 @@
 module.exports = app => {
-    const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
 
     const staffMenu = {
