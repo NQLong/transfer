@@ -46,6 +46,7 @@ module.exports = app => {
     app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         let item = req.body.item || [];
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
         const onCreate = (index, monHoc) => new Promise(resolve => {
             const save = (i, m) => {
                 if (i > parseInt(m.soNhom)) {
@@ -56,7 +57,7 @@ module.exports = app => {
                     if (!error && !tkb) {
                         m.nhom = i;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi, buoi: i }, () => { });
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i }, () => { });
                         }
                     }
                     save(i + 1, m);
@@ -66,7 +67,6 @@ module.exports = app => {
         });
         let listPromise = item.map(monHoc => item = onCreate(1, monHoc));
         Promise.all(listPromise).then((values) => {
-            // app.model.dtThoiKhoaBieu.init();
             res.send({ item: values });
         });
     });

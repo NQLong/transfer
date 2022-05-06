@@ -231,27 +231,33 @@ const T = {
             title,
             text,
             icon,
+            closeOnClickOutside: false,
+            closeOnEsc: false,
+            dangerMode: true,
             buttons: {
-                text: buttonText,
-                closeModal: false,
+                cancel: 'Hủy',
+                confirm: buttonText,
+                // closeModal: false,
             },
         })
-            .then(() => {
-                swal({
-                    title: "Loading",
-                    text: "Vui lòng giữ nguyên trang",
-                    icon: "warning",
-                    button: null,
-                });
-                done().then((data) => {
+            .then((value) => {
+                if (value) {
                     swal({
-                        title: data.success ? successText : failText,
-                        text: data.success ? data.success : data.error.message,
-                        icon: data.success ? "success" : "error",
+                        title: "Loading",
+                        text: "Vui lòng giữ nguyên trang",
+                        icon: "warning",
                         button: null,
-                        timer: 3000
                     });
-                });
+                    done().then((data) => {
+                        swal({
+                            title: data.success ? successText : failText,
+                            text: data.success ? data.success : data.error.message,
+                            icon: data.success ? "success" : "error",
+                            button: null,
+                            timer: 3000
+                        });
+                    });
+                }
             });
     },
 
