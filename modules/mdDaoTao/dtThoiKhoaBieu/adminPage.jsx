@@ -2,10 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu, initSchedule } from './redux';
 import { Link } from 'react-router-dom';
-import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { } from '../dmMonHoc/redux';
+import { getDmDonViAll, SelectAdapter_DmDonVi, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
-import { AdminModal, AdminPage, CirclePageButton, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, CirclePageButton, FormCheckbox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
@@ -13,6 +13,86 @@ import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+class AddingModal extends AdminModal {
+    onShow = () => {
+        // this.khoaDangKy.value(maPhongDaoTao);
+        this.soNhom.value(1);
+        this.soTiet.value(1);
+        this.soBuoi.value(1);
+        this.soLuongDuKien.value(50);
+    }
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const data = {
+
+            maMonHoc: this.maMonHoc.value(),
+            soTietBuoi: this.soTiet.value(),
+            soNhom: this.soNhom.value(),
+            soBuoiTuan: this.soBuoi.value(),
+            khoaDangKy: this.khoaDangKy.value(),
+            maNganh: this.maNganh.value(),
+            hocKySinhVien: this.hocKySinhVien.value(),
+            soLuongDuKien: this.soLuongDuKien.value(),
+            loaiMonHoc: Number(this.loaiMonHoc.value())
+        };
+
+        if (!data.maMonHoc) {
+            T.notify('Môn học bị trống', 'danger');
+            this.maMonHoc.focus();
+        } else if (!data.soTietBuoi || data.soTietBuoi <= 0) {
+            T.notify('Số tiết không hợp lệ', 'danger');
+            this.soTiet.focus();
+        } else if (!data.soNhom || data.soNhom <= 0) {
+            T.notify('Số nhóm không hợp lệ', 'danger');
+            this.soNhom.focus();
+        } else if (!data.soBuoiTuan || data.soBuoiTuan <= 0) {
+            T.notify('Số buổi không hợp lệ', 'danger');
+            this.soBuoi.focus();
+        } else if (!data.khoaDangKy) {
+            T.notify('Khoa đăng ký bị trống', 'danger');
+            this.khoaDangKy.focus();
+        } else if (!data.maNganh) {
+            T.notify('Mã ngành bị trống', 'danger');
+            this.maNganh.focus();
+        } else if (!data.hocKySinhVien) {
+            T.notify('Học kỳ SV bị trống', 'danger');
+            this.hocKySinhVien.focus();
+        } else if (!data.soLuongDuKien || data.soLuongDuKien <= 0) {
+            T.notify('Số lượng dự kiến không hợp lệ', 'danger');
+            this.soLuongDuKien.focus();
+        } else this.props.create([data], () => {
+            this.props.initData();
+            this.hide();
+        });
+    }
+
+    handleDonVi = (value) => {
+        this.setState({ khoaDangKy: value.id });
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Mở môn học',
+            size: 'elarge',
+            submitText: 'Mở môn học',
+            body: <div className='row'>
+                <FormTextBox type='year' ref={e => this.nam = e} className='col-md-4' label='Năm' />
+                <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-4' />
+                <FormSelect ref={e => this.hocKySinhVien = e} data={[1, 2, 3, 4, 5, 6, 7, 8]} label='Học kỳ SV' className='col-md-4' />
+                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' label='Khoa mở' onChange={this.handleDonVi} />
+                <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoFilter(this.state.khoaDangKy || null)} className='col-md-6' label='Chuyên ngành' />
+                <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' />
+                <FormCheckbox ref={e => this.loaiMonHoc = e} label='Tự chọn' style={{ marginBottom: '0' }} className='col-md-2' />
+                <FormTextBox type='number' ref={e => this.soNhom = e} className='col-md-3' label='Số nhóm' />
+                <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' />
+                <FormTextBox type='number' ref={e => this.soBuoi = e} className='col-md-3' label='Số buổi /tuần' />
+                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} className='col-md-3' label='Số lượng SV dự kiến /lớp' />
+            </div>
+        });
+    }
+}
 class AdjustModal extends AdminModal {
 
     onShow = (item) => {
@@ -53,6 +133,7 @@ class AdjustModal extends AdminModal {
             });
         }
     }
+
     render = () => {
         let readOnly = this.props.readOnly;
         return this.renderModal({
@@ -106,15 +187,24 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     this.soTiet[line].value(item.soTiet);
                     this.thu[line].value(item.thu);
                     this.tietBatDau[line].value(item.tietBatDau);
-                    this.phong[line].value(item.phong);
+                    this.phong[line].value(item.phong || '');
                     this.soLuongDuKien[line].value(item.soLuongDuKien);
                     this.sucChua[line] = item.sucChua;
+
                     if (index == list.length - 1) this.setState({ sucChua: this.sucChua });
                 });
             });
         });
     };
 
+
+    delete = (item) => {
+        T.confirm('Xóa môn học', `Bạn sẽ xóa môn ${item.maMonHoc} - Lớp ${item.nhom}`, 'warning', 'true', isConfirm => {
+            if (isConfirm) {
+                this.props.deleteDtThoiKhoaBieu(item.id, this.initData());
+            }
+        });
+    }
 
     taoThoiKhoaBieu = () => {
         T.confirmLoading('Tạo thời khóa biểu', 'Xác nhận tạo thời khóa biểu tự động?', 'Tạo thời khóa biểu thành công', 'Tạo thời khóa biểu thất bại', 'info', 'Tạo', () =>
@@ -182,10 +272,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
                         <i> {item.tenKhoaBoMon}</i>
                     </>} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nhom} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.nhom}${item.buoi > 1 ? ` (${item.buoi})` : ''} `} />
                     <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
                         <>
-                            <FormSelect ref={e => this.phong[(pageNumber - 1) * pageSize + index + 1] = e} style={{ marginBottom: '0', width: '120px' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={SelectAdapter_DmPhong} placeholder='Phòng' onChange={value => this.setState({
+                            <FormSelect ref={e => this.phong[(pageNumber - 1) * pageSize + index + 1] = e} style={{ marginBottom: '0', width: '120px' }} readOnly={true} data={SelectAdapter_DmPhong} placeholder='Phòng' onChange={value => this.setState({
                                 sucChua: {
                                     ...this.state.sucChua,
                                     [(pageNumber - 1) * pageSize + index + 1]: value.sucChua
@@ -193,12 +283,13 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             })} />
                             <div>{this.state.sucChua[(pageNumber - 1) * pageSize + index + 1]}</div>
                         </>
-                    } onClick={e => {
-                        e.preventDefault();
-                        if (e.type == 'click') this.setState({
-                            isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
-                        }, () => this.phong[(pageNumber - 1) * pageSize + index + 1].focus());
-                    }}
+                    }
+                    // onClick={e => {
+                    //     e.preventDefault();
+                    //     if (e.type == 'click') this.setState({
+                    //         isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
+                    //     }, () => this.phong[(pageNumber - 1) * pageSize + index + 1].focus());
+                    // }}
                     />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
                         <FormSelect ref={e => this.thu[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '70px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
@@ -268,6 +359,11 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                 <i className='fa fa-lg fa-cog' />
                             </button>
                         </Tooltip>}
+                        {item.phong && <Tooltip title='Xóa' arrow>
+                            <button className='btn btn-danger' onClick={e => e.preventDefault() || this.delete(item)}>
+                                <i className='fa fa-lg fa-trash' />
+                            </button>
+                        </Tooltip>}
                     </TableCell>
                 </tr>)
         });
@@ -298,8 +394,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     update={this.props.updateDtThoiKhoaBieu}
                     initData={this.initData}
                 />
-                <CirclePageButton type='custom' customClassName='btn-success' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
-                    || this.taoThoiKhoaBieu()} />
+                <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} initData={this.initData} />
+                <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
+                    || this.taoThoiKhoaBieu()} style={{ marginRight: '60px' }} />
             </>,
             backRoute: '/user/dao-tao',
             advanceSearch: <div className='row'>
@@ -323,6 +420,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     </button>
                 </div>
             </div>,
+            onCreate: permission.write ? (e) => e.preventDefault() || this.addingModal.show() : null
         });
     }
 }

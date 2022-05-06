@@ -52,13 +52,13 @@ class DtDsMonMoEditPage extends AdminPage {
     id = null
     cookieTab = 0
     componentDidMount() {
+        // let userPermission = this.props.system.user.permissions;
         T.ready('/user/dao-tao', () => {
             [0, 1, 2, 3].forEach(item => this.setData(item));
         });
     }
 
     addRow = (item, index, done) => {
-        console.log(this.state.data);
         let ctdt = this.state.data[index].ctdt;
         this.setState({
             data: {
@@ -108,7 +108,7 @@ class DtDsMonMoEditPage extends AdminPage {
         }); this.soLuongDuKien[index].forEach((monHoc, count) => {
             monHoc.value(item.items[count].soLuongDuKien || '0');
         });
-        !this.nganh.value() && this.nganh.value(this.state.data[index].dotDangKy.maNganh);
+        !this.props.system.user.permissions.includes('dtDangKyMoMon:write') && (!this.nganh.value() && this.nganh.value(this.state.data[index].dotDangKy.maNganh));
         !this.donViDangKy.value() && this.donViDangKy.value(this.state.data[index].dotDangKy.khoa);
         done && done();
     })
@@ -123,7 +123,6 @@ class DtDsMonMoEditPage extends AdminPage {
         }, today = new Date().getTime();
         if (!this.state.data[index]) {
             this.props.getDanhSachMonMo(condition, item => {
-                console.log(item);
                 this.initData(item, index, today, done);
             });
         }
@@ -251,7 +250,7 @@ class DtDsMonMoEditPage extends AdminPage {
             icon: 'fa fa-paper-plane-o',
             subTitle: <div className='row'>
                 <FormSelect label='Khoa, bộ môn' ref={e => this.donViDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} readOnly style={{ marginBottom: '0', marginTop: '10px' }} className='col-12' />
-                <FormSelect label='Ngành' ref={e => this.nganh = e} data={SelectAdapter_DtNganhDaoTao} readOnly style={{ marginBottom: '0' }} className='col-12' />
+                {!permission.write && <FormSelect label='Ngành' ref={e => this.nganh = e} data={SelectAdapter_DtNganhDaoTao} readOnly style={{ marginBottom: '0' }} className='col-12' />}
             </div>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
