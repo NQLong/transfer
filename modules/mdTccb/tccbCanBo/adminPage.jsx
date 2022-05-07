@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { PageName, getStaffPage, deleteStaff, SelectAdapter_FwCanBo } from './redux';
+import { PageName, getStaffPage, deleteStaff, SelectAdapter_FwCanBo, downloadExcel } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, FormSelect, FormDatePicker, FormTextBox } from 'view/component/AdminPage';
@@ -15,7 +15,7 @@ import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import T from 'view/js/common';
 
 class StaffPage extends AdminPage {
-    state = { filter: {}, visibleCVDT: false, visibleHDTN: false };
+    state = { filter: {}, visibleCVDT: false, visibleHDTN: false, listChuyenNganh: [] };
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
@@ -44,6 +44,11 @@ class StaffPage extends AdminPage {
             });
             this.changeAdvancedSearch(true);
         });
+    }
+
+    setUp = (data = [], keyGroup) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        return Object.keys(dataGroupBy);
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
@@ -77,33 +82,39 @@ class StaffPage extends AdminPage {
             loaiChuyenVien = this.loaiChuyenVien?.value() || '',
             listQuocGia = this.listQuocGia.value().toString() || '',
             fromAge = this.fromAge.value() ? Number(this.fromAge.value()) : '',
-            toAge = this.toAge.value() ? Number(this.toAge.value()) : '';
-        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge };
+            toAge = this.toAge.value() ? Number(this.toAge.value()) : '',
+            listChuyenNganh = this.listChuyenNganh.value().toString() || '';
+        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
-                    // Initial
-                    const filter = page.filter || {};
-                    const filterCookie = T.getCookiePage(PageName, 'F');
-                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge } = filter;
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.filterChuyenNganh('', {}, data => {
+                        this.setState({ listChuyenNganh: this.setUp(data, 'chuyenNganh') }, () => {
+                            // Initial
+                            const filter = page.filter || {};
+                            const filterCookie = T.getCookiePage(PageName, 'F');
+                            let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh } = filter;
+                            this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
-                    this.listShcc.value(listShcc || filterCookie.listShcc || '');
-                    this.listDonVi.value(listDonVi || filterCookie.listDonVi || '');
-                    this.gender.value(gender || filterCookie.gender || '');
-                    this.listNgach.value(listNgach || filterCookie.listNgach || '');
-                    this.listHocVi.value(listHocVi || filterCookie.listHocVi || '');
-                    this.listChucDanh.value(listChucDanh || filterCookie.listChucDanh || '');
-                    this.isBienChe.value(isBienChe || filterCookie.listChucDanh || '');
-                    this.fromYear.value(fromYear || filterCookie.fromYear || '');
-                    this.toYear.value(toYear || filterCookie.toYear || '');
-                    this.listDanToc.value(listDanToc || filter.listDanToc || '');
-                    this.listTonGiao.value(listTonGiao || filter.listTonGiao || '');
-                    this.loaiHopDong?.value(loaiHopDong || filter.loaiHopDong || '');
-                    this.loaiChuyenVien?.value(loaiChuyenVien || filter.loaiChuyenVien || '');
-                    this.listQuocGia.value(listQuocGia || filter.listQuocGia || '');
-                    this.fromAge.value(fromAge || filter.fromAge || '');
-                    this.toAge.value(toAge || filter.toAge || '');
+                            this.listShcc.value(listShcc || filterCookie.listShcc || '');
+                            this.listDonVi.value(listDonVi || filterCookie.listDonVi || '');
+                            this.gender.value(gender || filterCookie.gender || '');
+                            this.listNgach.value(listNgach || filterCookie.listNgach || '');
+                            this.listHocVi.value(listHocVi || filterCookie.listHocVi || '');
+                            this.listChucDanh.value(listChucDanh || filterCookie.listChucDanh || '');
+                            this.isBienChe.value(isBienChe || filterCookie.listChucDanh || '');
+                            this.fromYear.value(fromYear || filterCookie.fromYear || '');
+                            this.toYear.value(toYear || filterCookie.toYear || '');
+                            this.listDanToc.value(listDanToc || filter.listDanToc || '');
+                            this.listTonGiao.value(listTonGiao || filter.listTonGiao || '');
+                            this.loaiHopDong?.value(loaiHopDong || filter.loaiHopDong || '');
+                            this.loaiChuyenVien?.value(loaiChuyenVien || filter.loaiChuyenVien || '');
+                            this.listQuocGia.value(listQuocGia || filter.listQuocGia || '');
+                            this.fromAge.value(fromAge || filter.fromAge || '');
+                            this.toAge.value(toAge || filter.toAge || '');
+                            this.listChuyenNganh.value(listChuyenNganh || filter.listChuyenNganh || '');
+                        });
+                    });
                 } else if (isReset) {
                     this.listShcc.value('');
                     this.listDonVi.value('');
@@ -121,10 +132,14 @@ class StaffPage extends AdminPage {
                     this.listQuocGia.value('');
                     this.fromAge.value('');
                     this.toAge.value('');
+                    this.listChuyenNganh.value('');
                 }
             });
         });
+    }
 
+    filterChuyenNganh = (pageC, filter, done) => {
+        this.props.downloadExcel(pageC, filter, done);
     }
 
     getPage = (pageN, pageS, pageC, done) => {
@@ -233,20 +248,22 @@ class StaffPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect ref={e => this.listDonVi = e} className='col-md-6' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
-                    <FormSelect ref={e => this.listShcc = e} className='col-md-6' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.listDonVi = e} className='col-md-5' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.listShcc = e} className='col-md-5' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
 
-                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear />
+                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-2' minimumResultsForSearch={-1} allowClear />
                     <FormSelect className='col-md-3' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
+                    <FormSelect className='col-md-6' ref={e => this.listChuyenNganh = e} data={this.state.listChuyenNganh} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chuyên ngành' />
                     <FormSelect className='col-md-3' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
                     <FormSelect className='col-md-3' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh khoa học' />
 
+                    <FormSelect className='col-md-6' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
+
                     <FormSelect ref={e => this.isBienChe = e} data={
                         [{ id: 0, text: 'Biên chế' }, { id: 1, text: 'Hợp đồng' }]
-                    } className='col-md-6' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
+                    } className='col-md-3' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
                     {this.state.visibleHDTN == true && <FormSelect className='col-md-6' ref={e => this.loaiHopDong = e} data={[{ id: 0, text: 'Viên chức + Lao động' }, { id: 1, text: 'Trách nhiệm' }]} minimumResultsForSearch={-1} allowClear label='Lọc theo loại hợp đồng' />}
 
-                    <FormSelect className='col-md-6' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
                     {this.state.visibleCVDT && <FormSelect className='col-md-6' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên' />}
 
 
@@ -301,5 +318,5 @@ class StaffPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
-const mapActionsToProps = { getStaffPage, deleteStaff, getDmDonViAll };
+const mapActionsToProps = { getStaffPage, deleteStaff, getDmDonViAll, downloadExcel };
 export default connect(mapStateToProps, mapActionsToProps)(StaffPage);

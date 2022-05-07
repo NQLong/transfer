@@ -140,7 +140,12 @@ class DtDangKyMoMonPage extends AdminPage {
                 }
             </>,
             backRoute: '/user/dao-tao',
-            onCreate: permission.write ? ((e) => e.preventDefault() || this.nganhModal.show()) : null
+            onCreate: (e) => {
+                e.preventDefault();
+                if (permissionDaoTao.manage) {
+                    this.nganhModal.show();
+                } else T.notify('Bạn không có quyền đăng ký tại đây!', 'danger');
+            }
         });
     }
 }

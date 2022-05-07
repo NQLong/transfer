@@ -1440,7 +1440,18 @@ module.exports = app => {
 
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
-
+        
+    app.get('/api/staff/download-excel-all', checkGetStaffPermission, (req, res) => {
+        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const filter = app.stringify(req.query.filter);
+        app.model.canBo.download(filter, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                res.send({ error, items: page.rows });
+            }
+        });
+    });
     app.get('/api/staff/download-excel/:filter/:searchTerm', checkGetStaffPermission, (req, res) => {
         let searchTerm = req.params.searchTerm;
         if (searchTerm == 'null') searchTerm = '';
