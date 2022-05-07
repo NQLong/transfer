@@ -10943,6 +10943,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "MOC_BAC_LUONG_CUOI_CUNG": {
+                    "value": "mocBacLuongCuoiCung",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -11950,6 +11957,13 @@
                     "value": "loaiMonHoc",
                     "dataType": "NUMBER",
                     "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "IS_MO": {
+                    "value": "isMo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
                 }
