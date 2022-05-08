@@ -10,16 +10,15 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'dtCauTrucKhungDaoTao:read', menu },
-        { name: 'dtCauTrucKhungDaoTao:manage', menu },
         { name: 'dtCauTrucKhungDaoTao:write' },
         { name: 'dtCauTrucKhungDaoTao:delete' },
     );
 
-    app.get('/user/dao-tao/cau-truc-khung-dao-tao', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtCauTrucKhungDaoTao:manage'), app.templates.admin);
-    app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtCauTrucKhungDaoTao:manage'), app.templates.admin);
+    app.get('/user/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
+    app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtCauTrucKhungDaoTao:manage'), (req, res) => {
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.check('dtCauTrucKhungDaoTao:read'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
@@ -32,33 +31,35 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/all', app.permission.check('dmKhoiKienThuc:read'), (req, res) => {
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/all', app.permission.check('dtCauTrucKhungDaoTao:read'), (req, res) => {
         app.model.dtCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtCauTrucKhungDaoTao:manage'), (req, res) => {
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:read'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dtCauTrucKhungDaoTao.get(condition, '*', 'id ASC', (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.orCheck('dtCauTrucKhungDaoTao:write', 'dtCauTrucKhungDaoTao:manage'), (req, res) => {
+    app.post('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:write'), (req, res) => {
         const item = req.body.item;
         const namDaoTao = item?.namDaoTao;
         app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namDaoTao }, (error, ctKhungDt) => {
             if (!error && !ctKhungDt) {
                 const data = { namDaoTao, mucCha: item.mucCha, mucCon: item.mucCon };
-                app.model.dtCauTrucKhungDaoTao.create(data, (error, item) => {
+                app.model.dtCauTrucKhungDaoTao.create(data, async (error, item) => {
                     if (!error) {
-                        res.send({ error, item });
-                    } else res.send({ error });
+                        //TODO: Send Email - Notification;
+                        // let listEmail = await app.model.qtChucVu.getAllTruongKhoaEmail();
+                    }
+                    res.send({ error, item });
                 });
             } else res.send({ error: `Năm ${namDaoTao} đã tồn tại!` });
         });
 
     });
 
-    app.post('/api/dao-tao/cau-truc-khung-dao-tao/multiple', app.permission.orCheck('dtCauTrucKhungDaoTao:write', 'manager:write'), (req, res) => {
+    app.post('/api/dao-tao/cau-truc-khung-dao-tao/multiple', app.permission.check('dtCauTrucKhungDaoTao:write'), (req, res) => {
         const { data } = req.body;
         const { items, namDaoTao, maKhoa, id: idKhungDt } = data;
         const dataImported = [];
@@ -126,7 +127,7 @@ module.exports = app => {
 
     });
 
-    app.put('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.orCheck('dtCauTrucKhungDaoTao:write', 'manager:write'), async (req, res) => {
+    app.put('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:write'), async (req, res) => {
         let id = req.body.id, changes = req.body.changes;
         try {
             app.model.dtCauTrucKhungDaoTao.update({ id }, changes, (error, item) => res.send({ error, item }));
@@ -135,11 +136,11 @@ module.exports = app => {
         }
     });
 
-    app.delete('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.orCheck('dtCauTrucKhungDaoTao:delete', 'manager:write'), (req, res) => {
+    app.delete('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:delete'), (req, res) => {
         app.model.dtCauTrucKhungDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
-    app.delete('/api/dao-tao/cau-truc-khung-dao-tao/multiple', app.permission.orCheck('dtCauTrucKhungDaoTao:delete', 'manager:write'), (req, res) => {
+    app.delete('/api/dao-tao/cau-truc-khung-dao-tao/multiple', app.permission.check('dtCauTrucKhungDaoTao:delete'), (req, res) => {
         const { data } = req.body;
         const { items } = data;
         const handleDelete = (index) => {

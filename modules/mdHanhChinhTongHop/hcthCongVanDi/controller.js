@@ -1,7 +1,6 @@
 // const permission = require('config/permission');
 
 module.exports = app => {
-    // const { MA_HCTH } = require('../constant');
     const FILE_TYPE = 'DI';
 
     const staffMenu = {
@@ -21,10 +20,10 @@ module.exports = app => {
         { name: 'hcthCongVanDi:read' },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
-        { name: 'hcthCongVanDi:manage'},
-        { name: 'donViCongVanDi:manage'},
-        { name: 'hcth:login', menu: staffMenu},
-        { name: 'staff:login', menu},
+        { name: 'hcthCongVanDi:manage' },
+        { name: 'donViCongVanDi:manage' },
+        { name: 'hcth:login', menu: staffMenu },
+        { name: 'staff:login', menu },
         { name: 'hcth:manage' }
     );
 
@@ -82,7 +81,7 @@ module.exports = app => {
     });
 
     const createDonViNhan = (listDonViNhan, congVanId, done) => {
-        if ( listDonViNhan && listDonViNhan.length > 0) {
+        if (listDonViNhan && listDonViNhan.length > 0) {
             const [donViNhan] = listDonViNhan.splice(0, 1);
             app.model.hcthDonViNhan.create({ donViNhan, ma: congVanId, loai: 'DI' }, (error) => {
                 if (error) {
@@ -91,7 +90,7 @@ module.exports = app => {
                 else createDonViNhan(listDonViNhan, congVanId, done);
             });
         } else {
-            done && done({ error: null});
+            done && done({ error: null });
         }
     };
 
@@ -196,7 +195,7 @@ module.exports = app => {
                         if (errors)
                             res.send({ errors, item });
                         else {
-                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI'}, () => createDonViNhan(donViNhan, req.body.id, () => {
+                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
                                 updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
                             }));
                         }
@@ -208,7 +207,7 @@ module.exports = app => {
                 if (errors)
                     res.send({ errors, item });
                 else {
-                    app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI'}, () => createDonViNhan(donViNhan, req.body.id, () => {
+                    app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
                         updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
                     }));
                 }
@@ -314,7 +313,7 @@ module.exports = app => {
                     }
                 }
             }
-            throw { status: 404, message: 'Không tìm thấy tập tin!'};
+            throw { status: 404, message: 'Không tìm thấy tập tin!' };
         } catch (error) {
             res.status(error.status || 400).send(error.message || 'Không tìm thấy tập tin');
         }
@@ -378,9 +377,9 @@ module.exports = app => {
 
     const getMessage = (status) => {
         switch (status) {
-            case '4': 
+            case '4':
                 return 'Bạn có công văn đi bị trả lại';
-            case '5': 
+            case '5':
                 return 'Bạn đã nhận công văn đi mới';
             default:
                 return '';
@@ -398,8 +397,8 @@ module.exports = app => {
         }
     };
 
-    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), async(req, res) => {
-        try{
+    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), async (req, res) => {
+        try {
             const {
                 loai,
                 key,
@@ -408,7 +407,7 @@ module.exports = app => {
                 thoiGian,
                 trangThai
             } = req.body.data;
-    
+
             const newHistory = {
                 loai,
                 key: Number(key),
@@ -435,13 +434,13 @@ module.exports = app => {
             }
             if (after == '2') {
                 // console.log('đã nhận');
-                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
             } else if (after == '3') {
-                createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+                createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => { throw error; });
             } else if (after == '5') {
-                createStaffNotification(item, after).then(() => resolve()).catch(error => {throw error;});
+                createStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
             } else if (after == '4') {
-                createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => {throw error;});
+                createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => { throw error; });
             }
         } catch (error) {
             console.error(error);
@@ -469,7 +468,7 @@ module.exports = app => {
             if (error) return reject(error);
             else {
                 const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}`}, error => {
+                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` }, error => {
                     error ? reject(error) : resolve();
                 });
             }
@@ -522,7 +521,7 @@ module.exports = app => {
     // Phân quyền Quản lý công văn đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
 
-    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý công văn đi trong đơn vị'});
+    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý công văn đi trong đơn vị' });
 
     app.assignRoleHooks.addHook(quanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -551,9 +550,9 @@ module.exports = app => {
 
 
     // Phân quyền hành chính tổng hợp - Quản lí công văn đi
-    
+
     const hcthQuanLyCongVanDiRole = 'hcthQuanLyCongVanDi';
-    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đi'});
+    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đi' });
 
     app.assignRoleHooks.addHook(hcthQuanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];

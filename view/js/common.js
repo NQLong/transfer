@@ -226,11 +226,12 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
-    confirmLoading: (title, text, successText = 'Thành công', failText = 'Thất bại', icon, buttonText, done) => {
+    confirmLoading: (title, text, successText = 'Thành công', failText = 'Thất bại', icon, buttonText, content, done) => {
         swal({
             title,
             text,
             icon,
+            content,
             closeOnClickOutside: false,
             closeOnEsc: false,
             dangerMode: true,
@@ -248,7 +249,7 @@ const T = {
                         icon: "warning",
                         button: null,
                     });
-                    done().then((data) => {
+                    done(value).then((data) => {
                         swal({
                             title: data.success ? successText : failText,
                             text: data.success ? data.success : data.error.message,

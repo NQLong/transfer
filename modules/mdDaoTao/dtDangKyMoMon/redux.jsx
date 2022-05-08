@@ -96,17 +96,15 @@ export function changeThoiGianDangKyMoMon(item) {
 }
 
 export function saveDangKyMoMon(id, data, done) {
-    return () => {
-        const url = '/api/dao-tao/dang-ky-mo-mon';
-        T.put(url, { id, data }, result => {
-            if (result.error) {
-                T.notify(`Lỗi: ${result.error.message}`, 'danger');
-                console.error(result.error.message);
-            } else {
-                T.alert('Lưu thành công', 'success', false, 1000);
-                done && done(result.item);
-            }
-        });
-    };
+    const url = '/api/dao-tao/dang-ky-mo-mon';
+    T.put(url, { id, data }, result => {
+        if (result.error) {
+            T.notify(`Lỗi: ${result.error.message}`, 'danger');
+            console.error(result.error.message);
+        } else {
+            !done && T.alert('Lưu thành công', 'success', false, 1000);
+            done && done(result.item);
+        }
+    });
 }
 

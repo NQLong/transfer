@@ -124,9 +124,26 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
     };
 }
 
-export function initSchedule(done) {
+export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
     return () => {
-        T.get('/api/dao-tao/init-schedule', data => {
+        const url = '/api/dao-tao/thoi-khoa-bieu-condition';
+        T.put(url, { condition, changes }, data => {
+            if (data.error) {
+                T.alert(`Lỗi: ${data.error.message}`, 'error', false, 2000);
+                console.error(`PUT ${url}. ${data.error}`);
+                done && done(data);
+            } else {
+                T.notify('Điều chỉnh thành công!', 'success');
+                done && done(data);
+                // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
+            }
+        }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
+    };
+}
+
+export function initSchedule(ngayBatDau, done) {
+    return () => {
+        T.get('/api/dao-tao/init-schedule', { ngayBatDau }, data => {
             done && done(data);
         });
     };
@@ -138,12 +155,12 @@ export function changeDtThoiKhoaBieu(item) {
 
 export function getDtLichDayHoc(phong, done) {
     return () => {
-        T.get(`/api/dao-tao/get-schedule/${phong}`, data => {
+        T.get('/api/dao-tao/get-schedule/', { phong }, data => {
             if (data.error) {
                 T.notify(`Lỗi: ${data.error.message}`, 'danger');
                 console.error(data.error.message);
             } else {
-                done && done(data.items);
+                done && done(data);
             }
         });
     };

@@ -5,6 +5,7 @@ import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
+import { Tooltip } from '@mui/material';
 
 
 class DtCauTrucKhungDaoTaoPage extends AdminPage {
@@ -29,11 +30,7 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
     }
 
     render() {
-        const permissionDaoTao = this.getUserPermission('dtCauTrucKhungDaoTao', ['read', 'write', 'delete', 'manage']);
-        let permission = {
-            write: permissionDaoTao.write || permissionDaoTao.manage,
-            delete: permissionDaoTao.delete || permissionDaoTao.manage
-        };
+        const permission = this.getUserPermission('dtCauTrucKhungDaoTao');
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtCauTrucKhungDaoTao && this.props.dtCauTrucKhungDaoTao.page ?
             this.props.dtCauTrucKhungDaoTao.page : {
                 pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, list: [], pageCondition: {
@@ -47,7 +44,9 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>STT</th>
-                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm ĐT</th>
+                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm đào tạo</th>
+                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Bắt đầu đăng ký</th>
+                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Kết thúc đăng ký</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
@@ -55,9 +54,17 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.batDauDangKy} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ketThucDangKy} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`) : null}
-                        onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)} />
+                        onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)}>
+                        <Tooltip title='Sao chép' arrow>
+                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)}>
+                                <i className='fa fa-lg fa-clone ' />
+                            </a>
+                        </Tooltip>
+                    </TableCell>
                 </tr>
             )
         });

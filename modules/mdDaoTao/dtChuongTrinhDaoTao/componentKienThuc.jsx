@@ -66,6 +66,10 @@ export class ComponentKienThuc extends AdminPage {
         if (!this.rows[idx] || !this.rows[idx].maMonHoc.value()) {
             T.notify('Vui lòng chọn môn học!', 'danger');
             return;
+        } else if (!this.rows[idx].hocKyDuKien.value()) {
+            T.notify('Vui lòng nhập học kỳ!', 'danger');
+            !this.rows[idx].hocKyDuKien.focus();
+            return;
         }
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
         if (permission.write || permission.manage) {
@@ -171,9 +175,16 @@ export class ComponentKienThuc extends AdminPage {
         const keys = Object.keys(this.rows);
         const updateDatas = [];
         const deleteDatas = [];
+        let flag = true;
         keys.forEach((key, index, array) => {
             const id = this.state.datas[key].id;
             const childId = this.state.datas[key].childId;
+            if (this.rows[key].hocKyDuKien && !this.rows[key].hocKyDuKien.value() && this.rows[key].ma.value()) {
+                T.notify('Vui lòng nhập học kỳ', 'danger');
+                flag = false;
+                this.rows[key].hocKyDuKien.focus();
+                return;
+            }
             const item = {
                 id: id,
                 maMonHoc: this.rows[key].ma?.value(),
@@ -199,7 +210,7 @@ export class ComponentKienThuc extends AdminPage {
 
             if (index == array.length - 1) return ({ updateDatas, deleteDatas });
         });
-        return ({ updateDatas, deleteDatas });
+        return flag ? { updateDatas, deleteDatas } : null;
     }
 
     setVal = (data = [], maKhoa, childs) => {

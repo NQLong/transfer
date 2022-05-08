@@ -1,6 +1,6 @@
-// Table name: DT_DANH_SACH_MON_MO { khoa, maMonHoc, tenMonHoc, loaiMonHoc, soTietLyThuyet, soTietThucHanh, soTietBuoi, soBuoiTuan, maNganh, maCtdt, nam, hocKy, id, maDangKy, soNhom, soLuongDuKien }
+// Table name: DT_DANH_SACH_MON_MO { monHocKhoa, maMonHoc, tenMonHoc, loaiMonHoc, soTietLyThuyet, soTietThucHanh, soTietBuoi, soBuoiTuan, maNganh, maCtdt, nam, hocKy, id, maDangKy, soNhom, soLuongDuKien, khoaSinhVien }
 const keys = ['ID'];
-const obj2Db = { 'khoa': 'KHOA', 'maMonHoc': 'MA_MON_HOC', 'tenMonHoc': 'TEN_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'soTietLyThuyet': 'SO_TIET_LY_THUYET', 'soTietThucHanh': 'SO_TIET_THUC_HANH', 'soTietBuoi': 'SO_TIET_BUOI', 'soBuoiTuan': 'SO_BUOI_TUAN', 'maNganh': 'MA_NGANH', 'maCtdt': 'MA_CTDT', 'nam': 'NAM', 'hocKy': 'HOC_KY', 'id': 'ID', 'maDangKy': 'MA_DANG_KY', 'soNhom': 'SO_NHOM', 'soLuongDuKien': 'SO_LUONG_DU_KIEN' };
+const obj2Db = { 'monHocKhoa': 'MON_HOC_KHOA', 'maMonHoc': 'MA_MON_HOC', 'tenMonHoc': 'TEN_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'soTietLyThuyet': 'SO_TIET_LY_THUYET', 'soTietThucHanh': 'SO_TIET_THUC_HANH', 'soTietBuoi': 'SO_TIET_BUOI', 'soBuoiTuan': 'SO_BUOI_TUAN', 'maNganh': 'MA_NGANH', 'maCtdt': 'MA_CTDT', 'nam': 'NAM', 'hocKy': 'HOC_KY', 'id': 'ID', 'maDangKy': 'MA_DANG_KY', 'soNhom': 'SO_NHOM', 'soLuongDuKien': 'SO_LUONG_DU_KIEN', 'khoaSinhVien': 'KHOA_SINH_VIEN' };
 
 module.exports = app => {
     app.model.dtDanhSachMonMo = {
@@ -133,6 +133,11 @@ module.exports = app => {
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM DT_DANH_SACH_MON_MO' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
+        },
+
+        getCurrent: (tgMoMon, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_danh_sach_mon_mo_get_current(:tgMoMon, :chuongTrinhDaoTao, :thongTin); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, tgMoMon, chuongTrinhDaoTao: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, thongTin: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

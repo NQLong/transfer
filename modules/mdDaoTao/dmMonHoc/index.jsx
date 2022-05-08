@@ -10,10 +10,6 @@ export default {
         reducers: { dmMonHoc }
     },
     routes: [
-        // {
-        //     path: '/user/dao-tao/upload-mon-hoc',
-        //     component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
-        // },
         {
             path: '/user/dao-tao/mon-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })

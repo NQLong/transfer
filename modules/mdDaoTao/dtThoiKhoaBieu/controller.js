@@ -10,6 +10,7 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'dtThoiKhoaBieu:read', menu },
+        { name: 'dtThoiKhoaBieu:manage', menu },
         { name: 'dtThoiKhoaBieu:write' },
         { name: 'dtThoiKhoaBieu:delete' }
     );
@@ -107,16 +108,27 @@ module.exports = app => {
         else app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
+    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
+        let { condition, changes } = req.body,
+            { nam, hocKy, maMonHoc, khoaDangKy, maNganh } = condition;
+        app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, khoaDangKy, maNganh }, changes, (error, item) => res.send({ error, item }));
+    });
+
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
         app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
     app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        app.model.dtThoiKhoaBieu.init((status) => res.send(status));
+        let ngayBatDau = req.query.ngayBatDau;
+        app.model.dtThoiKhoaBieu.init(ngayBatDau, (status) => res.send(status));
     });
 
-    app.get('/api/dao-tao/get-schedule/:phong', app.permission.check('dtThoiKhoaBieu:read'), (req, res) => {
-        let phong = req.params.phong;
-        app.model.dtThoiKhoaBieu.getCalendar(phong, (error, items) => res.send({ error, items: items.rows }));
+    app.get('/api/dao-tao/get-schedule', app.permission.check('dtThoiKhoaBieu:read'), async (req, res) => {
+        let phong = req.query.phong;
+        const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let listNgayLe = await app.model.dmNgayLe.getAllNgayLeTrongNam(thoiGianMoMon.khoa);
+        app.model.dtThoiKhoaBieu.getCalendar(phong, thoiGianMoMon.nam, thoiGianMoMon.hocKy, (error, items) => {
+            res.send({ error, items: items?.rows || [], listNgayLe });
+        });
     });
 };
