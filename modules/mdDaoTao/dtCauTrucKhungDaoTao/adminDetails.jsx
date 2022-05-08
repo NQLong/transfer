@@ -30,15 +30,15 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
 
     getData = (id, isClone = false) => {
         this.props.getDtCauTrucKhungDaoTao(id, (ctkdt) => {
-            if (isClone) {
-                ctkdt.namDaoTao = parseInt(ctkdt.namDaoTao) + 1;
-            }
+            // if (isClone) {
+            //     ctkdt.namDaoTao = tkdt.namDaoTao) + 1;
+            // }
             let { namDaoTao, batDauDangKy, ketThucDangKy } = ctkdt;
             namDaoTao = namDaoTao?.split(' - ') || [];
-            this.namDaoTaoStart.value(namDaoTao[0]);
-            this.namDaoTaoEnd.value(namDaoTao[1]);
-            this.batDauDangKy.value(batDauDangKy);
-            this.ketThucDangKy.value(ketThucDangKy);
+            this.namDaoTaoStart.value(isClone ? (Number(namDaoTao[0]) + 1) : namDaoTao[0]);
+            this.namDaoTaoEnd.value(isClone ? (Number(namDaoTao[1]) + 1) : namDaoTao[1]);
+            this.batDauDangKy.value(isClone ? new Date().getTime() : batDauDangKy);
+            this.ketThucDangKy.value(isClone ? new Date().getTime() : ketThucDangKy);
             const mucCha = T.parse(ctkdt.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
             const mucCon = T.parse(ctkdt.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
             this.mucTieuDaoTao.setVal({ parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao });
