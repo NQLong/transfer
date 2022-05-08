@@ -43,7 +43,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </label>
                 </td>);
         } else if (type == 'buttons') {
-            const { onSwap, onEdit, onDelete, onClone, children } = this.props;
+            const { onSwap, onEdit, onDelete, children } = this.props;
             return (
                 <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>
                     <div className='btn-group'>
@@ -57,10 +57,6 @@ export class TableCell extends React.Component { // type = number | date | link 
                                 <a className='btn btn-primary' href='#' onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a>
                             </Tooltip> : null
                         }
-                        {permission.write && onClone && typeof onClone == 'function' ?
-                            <Tooltip title='Sao chép' arrow placeholder='bottom' >
-                                <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || onClone(e, content)}><i className='fa fa-lg fa-clone' /></a>
-                            </Tooltip> : null}
                         {onEdit && typeof onEdit == 'string' ?
                             <Tooltip title='Chỉnh sửa' arrow placeholder='bottom'>
                                 <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link>
