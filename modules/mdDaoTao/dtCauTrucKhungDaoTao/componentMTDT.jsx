@@ -129,8 +129,8 @@ export class ComponentMTDT extends AdminPage {
     }
 
     insertTextBox = (parentId, idx, type) => {
-        const permission = this.getUserPermission(this.props.prefixPermission || 'dtCauTrucKhungDaoTao', ['read', 'manage', 'write', 'delete']);
-        const readOnly = !(permission.write || permission.manage);
+        const permission = this.getUserPermission(this.props.prefixPermission || 'dtCauTrucKhungDaoTao');
+        const readOnly = !permission.write;
         const isParent = type === 'parent';
         if (!isParent && !this.childRows[parentId]) {
             this.childRows[parentId] = {};
@@ -144,7 +144,7 @@ export class ComponentMTDT extends AdminPage {
                 <FormTextBox ref={e => ref.value = e} type='text' readOnly={readOnly} className='form-group col-9' />
                 <div className='form-group col-2'>
                     {
-                        (permission.write || permission.manage) && isMinus ?
+                        permission.write && isMinus ?
                             <Tooltip title='Xoá mục tiêu' arrow >
                                 <a className='btn' href='#' onClick={e => e.preventDefault() || this.onRemoveRow(e, parentId, idx, type)}><i className='fa fa-lg fa-minus' /></a>
                             </Tooltip> :

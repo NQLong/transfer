@@ -81,75 +81,7 @@ module.exports = app => {
 
     });
 
-    app.post('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
-        const { data } = req.body;
-        const { items, namDaoTao, maKhoa, id: idKhungDt } = data;
-        const dataImported = [];
-
-        const handleCreate = (index, idKhungDt) => {
-            if (index >= items.length) res.send({ items: dataImported });
-            else app.model.dtChuongTrinhDaoTao.get({ id: items[index].id }, (error, item) => {
-                const currentData = { ...items[index], ...{ maKhungDaoTao: idKhungDt } };
-                delete currentData['id'];
-                if (error) res.send({ error });
-                else if (item) {
-                    app.model.dtChuongTrinhDaoTao.update({ id: items[index].id }, currentData, (error, item) => {
-                        if (error) res.send({ error });
-                        else {
-                            dataImported.push(item);
-                        }
-                    });
-                    handleCreate(index + 1, idKhungDt);
-                }
-                else {
-                    app.model.dtChuongTrinhDaoTao.create(currentData, (error, item) => {
-                        if (error) res.send({ error });
-                        else {
-                            dataImported.push(item);
-                            handleCreate(index + 1);
-                        }
-                    });
-                }
-            });
-        };
-        if (idKhungDt > 0) {
-            app.model.dtKhungDaoTao.get({ id: idKhungDt }, (error, item) => {
-                if (error) res.send({ error });
-                else if (item) {
-                    const { id: idKhungDt, namDaoTao: dbNamDaoTao, maKhoa: dbMaKhoa } = item;
-                    const changes = {};
-                    if (namDaoTao != dbNamDaoTao) {
-                        changes[namDaoTao] = namDaoTao;
-                    }
-                    if (maKhoa != dbMaKhoa) {
-                        changes[maKhoa] = maKhoa;
-                    }
-                    app.model.dtKhungDaoTao.update({ id: idKhungDt }, changes, () => { });
-                    handleCreate(0, idKhungDt);
-                }
-                else {
-                    app.model.dtKhungDaoTao.create({ namDaoTao, maKhoa }, (error, item) => {
-                        if (error) res.send({ error });
-                        else {
-                            const { id: idKhungDt } = item;
-                            handleCreate(0, idKhungDt);
-                        }
-                    });
-                }
-            });
-        } else {
-            app.model.dtKhungDaoTao.create({ namDaoTao, maKhoa }, (error, item) => {
-                if (error) res.send({ error });
-                else {
-                    const { id: idKhungDt } = item;
-                    handleCreate(0, idKhungDt);
-                }
-            });
-        }
-
-    });
-
-    app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), async (req, res) => {
+    app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {
         let id = req.body.id, changes = req.body.changes;
         const updateCTDT = (listMonHoc) => new Promise((resolve, reject) => {
             app.model.dtChuongTrinhDaoTao.delete({ maKhungDaoTao: id }, (error) => {
@@ -188,20 +120,8 @@ module.exports = app => {
         });
     });
 
-    app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
+    app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtChuongTrinhDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
-    });
-
-    app.delete('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
-        const { data } = req.body;
-        const { items } = data;
-        const handleDelete = (index) => {
-            if (index >= items.length) res.send();
-            app.model.dtChuongTrinhDaoTao.delete({ id: items[index].id }, (errors) => {
-                if (errors) res.send({ errors });
-            });
-        };
-        handleDelete(0);
     });
 
     //Phân quyền ------------------------------------------------------------------------------------------
@@ -218,7 +138,7 @@ module.exports = app => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'daoTao');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dtChuongTrinhDaoTao:manage') {
-                app.permissionHooks.pushUserPermission(user, 'dtChuongTrinhDaoTao:manage');
+                app.permissionHooks.pushUserPermission(user, 'dtChuongTrinhDaoTao:manage', 'dMonHoc:manage', 'dtDanhSachChuyenNganh:manage', 'dtNganhDaoTao:manage');
             }
         });
         resolve();

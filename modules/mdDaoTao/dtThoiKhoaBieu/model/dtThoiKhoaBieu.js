@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.dtThoiKhoaBieu.foo = () => { };
-    const MAX_DEVIANT = 20;
+    const MAX_DEVIANT = 20,
+        DATE_UNIX = 24 * 60 * 60 * 1000;
 
     /**
      * Lesson: Tiết
@@ -10,7 +11,7 @@ module.exports = app => {
      * 
      * Condition: 
      */
-    app.model.dtThoiKhoaBieu.init = async (done) => {
+    app.model.dtThoiKhoaBieu.init = async (ngayBatDau, done) => {
         const listDays = [2, 3, 4, 5, 6, 7];
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         let { hocKy, nam } = thoiGianMoMon;
@@ -26,23 +27,47 @@ module.exports = app => {
                             if (error) {
                                 return error;
                             } else {
-                                let data = await getDataGenerateSchedule(lisSubjectsOfSemester, listDays, listLessons, listRooms);
+                                let data = await getDataGenerateSchedule(lisSubjectsOfSemester.filter(item => item.isMo), listDays, listLessons, listRooms);
                                 if (data.error) done(data);
                                 else {
-                                    let dataArray = Object.keys(data.data);
-                                    const update = (index = 0) => {
-                                        if (index == dataArray.length) {
-                                            done({ success: 'Tạo thời khóa biểu thành công' });
-                                        } else {
-                                            let id = dataArray[index],
-                                                changes = data.data[id];
-                                            app.model.dtThoiKhoaBieu.update({ id }, changes, (error, item) => {
-                                                if (error || !item) done({ error: 'Lỗi khi tạo thời khóa biểu' });
-                                                else update(index + 1);
-                                            });
+                                    app.model.dmNgayLe.getAll({
+                                        statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
+                                        parameter: {
+                                            startDateOfYear: new Date(nam, 0, 1).setHours(0, 0, 0, 1),
+                                            endDateOfYear: new Date(nam, 11, 31).setHours(23, 59, 59, 999)
                                         }
-                                    };
-                                    update();
+                                    }, (error, listNgayLe) => {
+                                        if (!error) {
+                                            listNgayLe = listNgayLe.map(item => {
+                                                item.ngay = new Date(item.ngay).setHours(0, 0, 0);
+                                                return item;
+                                            });
+                                            let dataArray = Object.keys(data.data);
+                                            const update = async (index = 0) => {
+                                                if (index == dataArray.length) {
+                                                    done({ success: 'Tạo thời khóa biểu thành công' });
+                                                } else {
+                                                    let id = dataArray[index],
+                                                        changes = data.data[id];
+                                                    let startDate = new Date(ngayBatDau),
+                                                        currentDay = startDate.getDay() + 1,
+                                                        distance = changes.thu - currentDay;
+                                                    if (distance < 0) distance += 7;
+                                                    changes.ngayBatDau = new Date(startDate.getTime() + distance * DATE_UNIX).setHours(0, 0, 0);
+                                                    if (listNgayLe.some(item => item.ngay == changes.ngayBatDau)) {
+                                                        changes.ngayBatDau = changes.ngayBatDau + 7 * DATE_UNIX;
+                                                    }
+                                                    changes.ngayKetThuc = await app.model.dtThoiKhoaBieu.calculateEndDate(changes, listNgayLe);
+                                                    app.model.dtThoiKhoaBieu.update({ id }, changes, (error, item) => {
+                                                        if (error || !item) done({ error: 'Lỗi khi tạo thời khóa biểu' });
+                                                        else update(index + 1);
+                                                    });
+                                                }
+                                            };
+                                            update();
+                                        }
+                                    });
+
                                 }
                             }
                         });
@@ -77,55 +102,53 @@ module.exports = app => {
                 } else if (isValid == false) {
                     continue;
                 }
-                else
-                    for (let day of listDays) {
-                        //Nếu môn học là bắt buộc
-                        if (subject.loaiMonHoc == 0) {
+                else for (let day of listDays) {
+                    //Nếu môn học là bắt buộc
+                    if (subject.loaiMonHoc == 0) {
+                        /**
+                         * Check lịch cho sinh viên có thể đăng ký được tất cả các môn bắt buộc
+                         *    - Nếu ngành mở hơn 1 môn bắt buộc:
+                         */
+                        if (Object.keys(nganhBox).length > 1) {
                             /**
-                             * Check lịch cho sinh viên có thể đăng ký được tất cả các môn bắt buộc
-                             *    - Nếu ngành mở hơn 1 môn bắt buộc:
+                             *  - Check các môn bắt buộc còn lại xem có trùng lịch hay không
+                             *      + Nếu trùng và môn đó chỉ mở 1 lớp thì phải thay đổi
                              */
-                            if (Object.keys(nganhBox).length > 1) {
-                                /**
-                                 *  - Check các môn bắt buộc còn lại xem có trùng lịch hay không
-                                 *      + Nếu trùng và môn đó chỉ mở 1 lớp thì phải thay đổi
-                                 */
-                                let currentTime = { thu: day, tietBatDau: subject.tietBatDau, tietKetThuc: parseInt(lesson.ten) + parseInt(subject.soTiet) - 1 };
+                            let currentTime = { thu: subject.thu || day, tietBatDau: parseInt(subject.tietBatDau) || parseInt(lesson.ten), tietKetThuc: (parseInt(subject.tietBatDau) || parseInt(lesson.ten)) + parseInt(subject.soTiet) - 1 };
 
-                                let nganhBoxExceptCurrentSubject = Object.keys(nganhBox).filter(maMonHoc => maMonHoc != subject.maMonHoc);
-                                for (let maMonHoc of nganhBoxExceptCurrentSubject) {
-                                    if (nganhBox[maMonHoc].length == 1 && nganhBox[maMonHoc].some(ma => {
-                                        let monKhac = nganhBox[ma];
-                                        if (currentTime.thu == monKhac.thu && ((currentTime.tietBatDau >= monKhac.tietBatDau && currentTime.tietBatDau <= monKhac.tietKetThuc) || (currentTime.tietBatDau <= monKhac.tietBatDau && currentTime.tietKetThuc <= monKhac.tietKetThuc))) return false;
-                                    })) {
-                                        continue lessonLoop;
-                                    }
+                            let nganhBoxExceptCurrentSubject = Object.keys(nganhBox).filter(maMonHoc => maMonHoc != subject.maMonHoc);
+                            for (let maMonHoc of nganhBoxExceptCurrentSubject) {
+                                if (nganhBox[maMonHoc].length == 1 && nganhBox[maMonHoc].some(monKhac => {
+                                    if (monKhac.thu && currentTime.thu == monKhac.thu && ((currentTime.tietBatDau >= monKhac.tietBatDau && currentTime.tietBatDau <= monKhac.tietKetThuc) || (currentTime.tietBatDau <= monKhac.tietBatDau && currentTime.tietKetThuc <= monKhac.tietKetThuc))) return false;
+                                })) {
+                                    continue lessonLoop;
                                 }
                             }
                         }
-                        let listRoomsAvailable = [];
-                        for (let room of listRooms) {
-                            if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, lisSubjectsOfSemester, {
-                                tietBatDau: parseInt(lesson.ten), soTiet: parseInt(subject.soTiet), day
-                            })) listRoomsAvailable.push(room);
-                        }
-                        let roomResult = app.model.dtThoiKhoaBieu.bestFit(subject, listRoomsAvailable);
-                        if (roomResult) {
-                            data[subject.id] = { tietBatDau: parseInt(lesson.ten), thu: day, phong: roomResult.ten, sucChua: roomResult.sucChua };
-                            subject.loaiMonHoc == 0 && dataNganh[subject.maNganh][subject.maMonHoc].push({ thu: day, tietBatDau: parseInt(lesson.ten), tietKetThuc: parseInt(lesson.ten) + parseInt(subject.soTiet) - 1 });
-                            let newList = lisSubjectsOfSemester.map(item => {
-                                if (item.id == subject.id) {
-                                    item.tietBatDau = parseInt(lesson.ten);
-                                    item.thu = day;
-                                    item.phong = roomResult.ten;
-                                    item.sucChua = roomResult.sucChua;
-                                    return item;
-                                }
-                                return item;
-                            });
-                            return setRoomForSubject(0, newList);
-                        }
                     }
+                    let listRoomsAvailable = [];
+                    for (let room of listRooms) {
+                        if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, lisSubjectsOfSemester, {
+                            tietBatDau: subject.tietBatDau || parseInt(lesson.ten), soTiet: parseInt(subject.soTiet), day: subject.thu || day
+                        })) listRoomsAvailable.push(room);
+                    }
+                    let roomResult = app.model.dtThoiKhoaBieu.bestFit(subject, listRoomsAvailable);
+                    if (roomResult) {
+                        data[subject.id] = { tietBatDau: subject.tietBatDau || parseInt(lesson.ten), thu: subject.thu || day, phong: roomResult.ten, sucChua: roomResult.sucChua, maMonHoc: subject.maMonHoc, soTiet: subject.soTiet };
+                        subject.loaiMonHoc == 0 && dataNganh[subject.maNganh][subject.maMonHoc].push({ thu: day, tietBatDau: parseInt(lesson.ten), tietKetThuc: parseInt(lesson.ten) + parseInt(subject.soTiet) - 1 });
+                        let newList = lisSubjectsOfSemester.map(item => {
+                            if (item.id == subject.id) {
+                                item.tietBatDau = parseInt(lesson.ten);
+                                item.thu = day;
+                                item.phong = roomResult.ten;
+                                item.sucChua = roomResult.sucChua;
+                                return item;
+                            }
+                            return item;
+                        });
+                        return setRoomForSubject(0, newList);
+                    }
+                }
             }
             setRoomForSubject(index + 1, list);
         };
@@ -165,8 +188,6 @@ module.exports = app => {
         return true;
     };
 
-    // const isValidTime = (lesson, )
-
     app.model.dtThoiKhoaBieu.bestFit = (monHoc, listRooms) => {
         let { soLuongDuKien } = monHoc,
             sizeResult = 10000000, roomResult = null;
@@ -178,4 +199,22 @@ module.exports = app => {
         }
         return roomResult;
     };
+
+    app.model.dtThoiKhoaBieu.calculateEndDate = (monHoc, listNgayLe) => new Promise(resolve => {
+        app.model.dtDanhSachMonMo.get({ maMonHoc: monHoc.maMonHoc }, (error, item) => {
+            if (error) {
+                resolve({ error: 'Invalid Subject' });
+            } else {
+                let { soTietLyThuyet, soTietThucHanh, soBuoiTuan } = item,
+                    tongTiet = soTietLyThuyet + soTietThucHanh,
+                    soTuan = Math.ceil(tongTiet / (monHoc.soTiet * soBuoiTuan));
+
+                let ngayKetThuc = monHoc.ngayBatDau + soTuan * 7 * DATE_UNIX;
+                for (let ngayLe of listNgayLe) {
+                    if (ngayLe.ngay > monHoc.ngayBatDau && ngayLe.ngay <= ngayKetThuc && new Date(ngayLe.ngay).getDay() == monHoc.thu - 1) ngayKetThuc += 7 * DATE_UNIX;
+                }
+                resolve(ngayKetThuc);
+            }
+        });
+    });
 };
