@@ -1,12 +1,175 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDtChuongTrinhDaoTaoPage } from './redux';
+import { getDtChuongTrinhDaoTaoPage, getDtChuongTrinhDaoTao } from './redux';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
+import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
+
+class EditModal extends AdminModal {
+    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [] }
+    componentDidMount() {
+
+    }
+
+    onShow = (item) => {
+        const { idNamDaoTao, tenNganh, id, namDaoTao } = item;
+        this.namDaoTao = namDaoTao;
+        this.tenNganh = tenNganh;
+        this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
+            SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(idNamDaoTao, (rs) => {
+                const { data } = rs;
+                const mucCha = T.parse(data.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
+                const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
+                const { chuongTrinhDaoTao: chuongTrinhDaoTaoCha } = mucCha;
+                const { chuongTrinhDaoTao: chuongTrinhDaoTaoCon } = mucCon;
+                this.setState({ monHoc: ctdt, chuongTrinhDaoTaoCha: chuongTrinhDaoTaoCha, chuongTrinhDaoTaoCon: chuongTrinhDaoTaoCon });
+            });
+        });
+    };
+
+    initLevelMonHoc = (tenMonHoc, hasLevel3 = true) => {
+        return (
+            <li>
+                <p className={`${hasLevel3 ? 'level-4' : 'level-4-no-level-3'} rectangle`}>{tenMonHoc}</p>
+            </li>
+        );
+    }
+
+    initLevelMucCon = (text, idCha, idCon) => {
+        const { monHoc } = this.state;
+        const monHocByKey = monHoc.filter(mh => {
+            return mh.maKhoiKienThucCon >= 0
+                ? parseInt(mh.maKhoiKienThuc) === parseInt(idCha) && parseInt(mh.maKhoiKienThucCon) === parseInt(idCon)
+                : parseInt(mh.maKhoiKienThuc) === parseInt(idCha);
+        }) || [];
+        return (
+            <li>
+                <p className={`${monHocByKey.length > 0 ? 'level-3' : 'level-3-no-level-4'} rectangle`}>{text}</p>
+                <ol className={`${monHocByKey.length > 0 ? 'level-4-wrapper' : 'level-4-wrapper-no-child'}`}>
+                    {monHocByKey.map((monHoc, idx) => {
+                        const { tenMonHoc } = monHoc;
+                        return (<React.Fragment key={idx}>
+                            {this.initLevelMonHoc(tenMonHoc)}
+                        </React.Fragment>);
+                    })
+                    }
+                </ol>
+            </li>
+        );
+    }
+
+    initLevelMucCha = (ctdt, idCha, mucCon = {}) => {
+        const mucConLength = Object.keys(mucCon).length;
+        const { monHoc } = this.state;
+        const styleLevel3Wrapper = {
+            gridTemplateColumns: `repeat(${mucConLength}, 1fr)`,
+            '--level-3-wrapper-left': `${(100 - 2 * (mucConLength - 1)) / (mucConLength * 2)}%`,
+            '--level-3-wrapper-width': `${100 - ((100 - 2 * (mucConLength - 1)) / mucConLength)}%`,
+        };
+        let monHocByKey = [];
+        if (mucConLength <= 0) {
+            monHocByKey = monHoc.filter(mh => {
+                return parseInt(mh.maKhoiKienThuc) === parseInt(idCha);
+            }) || [];
+        }
+
+        return (
+            <li>
+                <p className={`${mucConLength > 0 ? 'level-2' : 'level-2-no-level-3'} rectangle`}>{ctdt}</p>
+                {
+                    mucConLength > 0 ?
+                        (<ol className="level-3-wrapper" style={styleLevel3Wrapper}>
+                            {
+                                mucCon && Object.keys(mucCon).map((key, idx) => {
+                                    const { value: { text }, id: idCon } = mucCon[key];
+                                    return (<React.Fragment key={idx}>
+                                        {this.initLevelMucCon(text, idCha, idCon)}
+                                    </React.Fragment>
+                                    );
+                                })
+                            }
+
+                        </ol>) : (
+                            <ol className={`${monHocByKey.length > 0 ? 'level-4-wrapper-no-level-3' : null}`}>
+                                {monHocByKey.map((monHoc, idx) => {
+                                    const { tenMonHoc } = monHoc;
+                                    return (<React.Fragment key={idx}>
+                                        {this.initLevelMonHoc(tenMonHoc, false)}
+                                    </React.Fragment>);
+                                })
+                                }
+                            </ol>
+                        )
+                }
+
+            </li>
+        );
+    }
 
 
+    initLevel2 = (itemCha, key, hasNextRow = false) => {
+        const { chuongTrinhDaoTaoCon } = this.state;
+        const mucChaLength = Object.keys(itemCha).length;
+        const left = (parseInt(key) - 1) > 0 ? 0 : 100 * (1 / (2 * mucChaLength));
+        const width = !hasNextRow ? (parseInt(key) - 1) > 0 ? 100 - 100 / (mucChaLength * 2) : 100 * (1 - 1 / mucChaLength) : 100 - left;
+        const styleLevel2Wrapper = {
+            gridTemplateColumns: `repeat(${mucChaLength}, 1fr)`,
+            '--level-2-wrapper-left': `${left}%`,
+            '--level-2-wrapper-width': `${width}%`,
+            marginTop: `${(parseInt(key) - 1) * 50}px`,
+        };
+        return (
+            <ol className="level-2-wrapper" style={styleLevel2Wrapper} key={key}>
+                {itemCha && Object.keys(itemCha).map((key, idx) => {
+                    const { text: ctdt, id } = itemCha[key];
+                    const mucCon = chuongTrinhDaoTaoCon[key];
+                    return (<React.Fragment key={idx}>
+                        {this.initLevelMucCha(ctdt, id, mucCon)}
+                    </React.Fragment>
+                    );
+                })
+                }
+            </ol>
+        );
+    }
+
+    init = () => {
+        const { chuongTrinhDaoTaoCha } = this.state;
+        let item = {};
+        let row = 0;
+        return (
+            chuongTrinhDaoTaoCha && Object.keys(chuongTrinhDaoTaoCha).map((key, idx) => {
+                item[key] = chuongTrinhDaoTaoCha[key];
+                const isLast = idx === Object.keys(chuongTrinhDaoTaoCha).length - 1;
+                if (Object.keys(item).length >= 3 || (Object.keys(item).length > 0 && isLast)) {
+                    const temp = { ...item };
+                    item = {};
+                    row++;
+                    return (this.initLevel2(temp, row, !isLast));
+                }
+            })
+        );
+    }
+
+
+    render = () => {
+        // const readOnly = this.props.readOnly;
+        // const isDaoTao = this.props.permission.write;
+        return this.renderModal({
+            title: `Chương trình năm học - ${this.namDaoTao}`,
+            size: 'elarge',
+            body: <div className='row'>
+                <div className="container organization-tree">
+                    <p className="level-1 rectangle">{this.tenNganh}</p>
+                    {this.init()}
+
+                </div>
+            </div>
+        });
+    }
+}
 class DtChuongTrinhDaoTaoPage extends AdminPage {
     state = { donViFilter: '' }
     componentDidMount() {
@@ -68,7 +231,9 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={item.thoiGianDaoTao + ' năm'} />
                     <TableCell content={item.tenKhoaBoMon} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
+                        onView={() => this.modal.show(item)}
                         onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/${item.id}`) : null}
+                    // onEdit={() => this.modal.show(item)}
                     // onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/new?id=${item.id}`)}
                     />
                 </tr>
@@ -94,6 +259,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtChuongTrinhDaoTaoPage} />
+                <EditModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write} getDtChuongTrinhDaoTao={this.props.getDtChuongTrinhDaoTao} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/dao-tao/chuong-trinh-dao-tao/new') : null
@@ -102,5 +268,5 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = { getDtChuongTrinhDaoTaoPage, getDmDonViAll };
+const mapActionsToProps = { getDtChuongTrinhDaoTaoPage, getDtChuongTrinhDaoTao, getDmDonViAll };
 export default connect(mapStateToProps, mapActionsToProps)(DtChuongTrinhDaoTaoPage);

@@ -43,7 +43,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </label>
                 </td>);
         } else if (type == 'buttons') {
-            const { onSwap, onEdit, onDelete, onClone, children } = this.props;
+            const { onSwap, onEdit, onDelete, onClone, onView, children } = this.props;
             return (
                 <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>
                     <div className='btn-group'>
@@ -52,6 +52,10 @@ export class TableCell extends React.Component { // type = number | date | link 
                             <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || onSwap(e, content, true)}><i className='fa fa-lg fa-arrow-up' /></a> : null}
                         {permission.write && onSwap ?
                             <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || onSwap(e, content, false)}><i className='fa fa-lg fa-arrow-down' /></a> : null}
+                        {onView && typeof onView == 'function' ?
+                            <Tooltip title='Xem' arrow placeholder='bottom' >
+                                <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || onView(e, content)}><i className='fa fa-lg fa-eye' /></a>
+                            </Tooltip> : null}
                         {onEdit && typeof onEdit == 'function' ?
                             <Tooltip title={permission.write ? 'Chỉnh sửa' : 'Xem'} arrow placeholder='bottom'>
                                 <a className='btn btn-primary' href='#' onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a>
