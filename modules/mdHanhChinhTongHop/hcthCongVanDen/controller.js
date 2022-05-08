@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH } = require('../constant');
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, canBoType } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -32,7 +32,7 @@ module.exports = (app) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.orCheck('hcthCongVanDen:read', 'hcth:manage'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -665,4 +665,35 @@ module.exports = (app) => {
             }
         }
     };
+
+
+    app.get('/api/hcth/cong-van-den/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const userPermissions = req.session.user?.permissions || [];
+        const donViCanBo = (req.session?.user?.staff?.donViQuanly || []).map(item => item.maDonVi);
+        const { status = '', ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
+        const data = {
+            staffType: userPermissions.includes('hcth:login') ? canBoType.HCTH : userPermissions.includes('rectors:login') ? canBoType.RECTOR : null,
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDen:read') ? req.session.user?.staff?.maDonVi : '') || '',
+            shccCanBo: req.session.user?.shcc,
+            fromTime, toTime, status, ids, hasIds, excludeIds
+        };
+
+        let filterParam;
+        try {
+            filterParam = JSON.stringify(data);
+        } catch {
+            res.send({ error: 'Dữ liệu lọc lỗi!' });
+        }
+        app.model.hcthCongVanDen.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+            if (error || !page) res.send({ error });
+            else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
 };

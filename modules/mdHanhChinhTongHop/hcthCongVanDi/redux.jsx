@@ -179,6 +179,14 @@ export function createPhanHoi(data, done) {
     };
 }
 
+export const SelectAdapter_CongVanDi = {
+    ajax: true,
+    url: '/api/hcth/cong-van-cac-phong/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: console.log(response) || response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })) : [] }),
+    fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
+};
+
 export function createHistory(data, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/lich-su';

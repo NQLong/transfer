@@ -9,9 +9,6 @@ import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbo
 export class EditModal extends AdminModal {
     state = { active: true };
 
-    componentDidMount() {
-        T.ready(() => this.onShown(() => this.ten.focus()));
-    }
 
     onShow = (item) => {
         const { id, ten, kichHoat } = item ? item : { id: null, ten: '', kichHoat: true };
@@ -57,6 +54,7 @@ class DmDonViGuiCvPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/category', () => {
+            T.clearSearchBox();
             T.onSearch = (searchText) => this.props.getDmDonViGuiCongVanPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmDonViGuiCongVanPage();
