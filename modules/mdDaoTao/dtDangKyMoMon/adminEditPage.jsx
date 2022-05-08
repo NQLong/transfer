@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminModal, AdminPage, CirclePageButton, FormCheckbox, FormSelect, FormTabs, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { createDangKyMoMon, saveDangKyMoMon } from './redux';
-import { getDanhSachMonMo, getDtDanhSachMonMoCurrent, createDtDanhSachMonMo, deleteDtDanhSachMonMo } from '../dtDanhSachMonMo/redux';
+import { getDtDanhSachMonMoCurrent, createDtDanhSachMonMo, deleteDtDanhSachMonMo } from '../dtDanhSachMonMo/redux';
 import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { createDtThoiKhoaBieu } from '../dtThoiKhoaBieu/redux';
@@ -252,6 +252,6 @@ class DtDsMonMoEditPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, dtDanhSachMonMo: state.daoTao.dtDanhSachMonMo });
 const mapActionsToProps = {
-    createDangKyMoMon, getDanhSachMonMo, saveDangKyMoMon, createDtThoiKhoaBieu, getDtDanhSachMonMoCurrent, createDtDanhSachMonMo, deleteDtDanhSachMonMo
+    createDangKyMoMon, saveDangKyMoMon, createDtThoiKhoaBieu, getDtDanhSachMonMoCurrent, createDtDanhSachMonMo, deleteDtDanhSachMonMo
 };
 export default connect(mapStateToProps, mapActionsToProps)(DtDsMonMoEditPage);

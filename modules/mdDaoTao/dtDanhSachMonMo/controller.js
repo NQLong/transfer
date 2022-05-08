@@ -1,69 +1,14 @@
 
 module.exports = app => {
-    const MA_PDT = 33;
-    app.get('/api/dao-tao/danh-sach-mon-mo/all', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            yearth = req.query.yearth,
-            hocKy = thoiGianMoMon.hocKy + yearth * 2,
-            nam = thoiGianMoMon.nam,
-            id = req.query.id;
-        // khoa = req.session.user.staff ? req.session.user.staff.maDonVi : null;
-        let condition = id ? { id } : { nam, hocKy };
-        app.model.dtDangKyMoMon.get(condition, (error, dotDangKy) => {
-            if (error) {
-                res.send({ error });
-                return;
-            } else {
-                let thoiGianDangKy = dotDangKy.thoiGian || null;
-                let year = thoiGianMoMon.nam - yearth,
-                    semester = thoiGianMoMon.hocKy + yearth * 2;
-                app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: year }, (error, cauTrucKhung) => {
-                    if (error) {
-                        res.send({ error: `Lỗi lấy dữ liệu năm ${year}` });
-                        return;
-                    } else if (!cauTrucKhung) {
-                        res.send({ warning: `Chưa có dữ liệu năm ${year}`, item: { dotDangKy, thoiGianMoMon, items: [], ctdt: [] } });
-                        // return;
-                    }
-                    app.model.dtKhungDaoTao.get({ namDaoTao: cauTrucKhung.id, maNganh: dotDangKy.maNganh }, (error, item) => {
-                        if (error) {
-                            res.send({ error: `Lỗi lấy CTDT năm ${year}` }); return;
-                        } else if (!item && cauTrucKhung) {
-                            res.send({ warning: `Năm ${year} không tồn tại CTDT nào!`, item: { items: [], ctdt: [], dotDangKy, thoiGianMoMon } }); return;
-                        } else {
-                            app.model.dtDanhSachMonMo.getAll({ maDangKy: id, hocKy }, (error, items) => {
-                                if (error) { res.send({ error }); return; } else {
-                                    if (!items.length) {
-                                        let condition = {
-                                            statement: 'maKhungDaoTao = (:id) AND hocKyDuKien = (:semester)',
-                                            parameter: { id: item.id, semester }
-                                        };
-                                        !thoiGianDangKy && app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
-                                            if (error) {
-                                                res.send({ error });
-                                                return;
-                                            } else {
-                                                res.send({ item: app.clone({}, { items: items.filter(item => item.khoa != MA_PDT), ctdt: item, thoiGianMoMon, dotDangKy }) });
-                                            }
-                                        });
-                                    }
-                                    else res.send({ item: { items, ctdt: item, dotDangKy, thoiGianMoMon } });
-                                }
-                            });
-                        }
-                    });
-                });
-
-            }
-        });
-
-    });
-
     app.post('/api/dao-tao/danh-sach-mon-mo', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            hocKy = thoiGianMoMon.hocKy,
-            nam = thoiGianMoMon.nam;
+            { hocKy, nam, batDau, ketThuc } = thoiGianMoMon,
+            now = new Date().getTime();
         let data = req.body.data;
+        if (now < batDau || now > ketThuc) {
+            res.send({ error: 'Không thuộc thời gian cho phép thao tác' });
+            return;
+        }
         const create = (index = 0) => {
             if (index == data.length) {
                 res.send('Done');
@@ -80,7 +25,7 @@ module.exports = app => {
         create();
     });
 
-    app.get('/api/dao-tao/danh-sach-mon-mo/get-current', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
+    app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             idDangKyMoMon = req.query.id;
         const condition = { ...thoiGianMoMon, idDangKyMoMon };
@@ -90,7 +35,7 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/dao-tao/danh-sach-mon-mo/create-current', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
+    app.post('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
         const data = req.body.data,
             thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             now = new Date().getTime();
@@ -108,7 +53,6 @@ module.exports = app => {
             thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             now = new Date().getTime();
         let { batDau, ketThuc } = thoiGianMoMon;
-        console.log(id);
         if (now < batDau || now > ketThuc) {
             res.send({ error: 'Không thuộc thời gian cho phép thao tác' });
         }

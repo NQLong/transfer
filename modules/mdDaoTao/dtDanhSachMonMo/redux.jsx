@@ -34,7 +34,7 @@ export default function dashboardTccbReducer(state = null, data) {
 }
 export function getDtDanhSachMonMoCurrent(id, done) {
     return dispatch => {
-        const url = '/api/dao-tao/danh-sach-mon-mo/get-current';
+        const url = '/api/dao-tao/danh-sach-mon-mo/current';
         T.get(url, { id }, data => {
             if (data.error) {
                 T.notify(`Lỗi: ${data.error.message}`, 'danger');
@@ -69,7 +69,7 @@ export function getDtDanhSachMonMoCurrent(id, done) {
 
 export function createDtDanhSachMonMo(data, done) {
     return dispatch => {
-        const url = '/api/dao-tao/danh-sach-mon-mo/create-current';
+        const url = '/api/dao-tao/danh-sach-mon-mo/current';
         T.post(url, { data }, result => {
             if (result.error) {
                 T.notify(`Lỗi: ${result.error.message}`, 'danger');
@@ -95,23 +95,6 @@ export function deleteDtDanhSachMonMo(id, done) {
                 T.notify('Xóa thành công', 'success');
                 dispatch({ type: dtDanhSachMonMoDelete, item: { id } });
                 done && done(result);
-            }
-        });
-    };
-}
-export function getDanhSachMonMo(condition, done) {
-    return () => {
-        const url = '/api/dao-tao/danh-sach-mon-mo/all';
-        T.get(url, { yearth: condition?.yearth, id: condition?.id }, data => {
-            if (data.error) {
-                T.notify(`Lỗi: ${data.error.message}`, 'danger');
-                console.error(data.error.message);
-            } else if (data.warning) {
-                T.notify(`Cảnh báo: ${data.warning}`, 'warning');
-                console.warn(data.warning);
-                done && done(data.item);
-            } else {
-                done && done(data.item);
             }
         });
     };

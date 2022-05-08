@@ -213,18 +213,18 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>STT</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm ĐT</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Mã ngành</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên ngành</th>
+                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên ngành</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Trình độ</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Loại hình</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
-                    <th style={{ width: '100%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namDaoTao} />
                     <TableCell style={{ textAlign: 'center' }} content={item.maNganh} />
                     <TableCell content={item.tenNganh} />
                     <TableCell style={{ textAlign: 'center' }} content={item.trinhDoDaoTao} />
