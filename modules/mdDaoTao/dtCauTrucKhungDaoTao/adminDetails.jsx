@@ -95,7 +95,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
             let updateDatas = { ...{ mucCha: T.stringify(mucCha) }, ...{ mucCon: T.stringify(mucCon) } };
             // const deleteDatas = { items: deleteItems };
             if (this.ma == 'new') {
-                updateDatas = { ...updateDatas, ...{ namDaoTao: data.namDaoTao } };
+                updateDatas = { ...updateDatas, ...data };
                 this.props.createDtCauTrucKhungDaoTao(updateDatas, (item) => {
                     window.location = `/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`;
                 });
@@ -125,8 +125,8 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ năm)' className='col-md-2' required readOnly={readOnly} />
-                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến năm)' className='col-md-2' required readOnly={readOnly} />
+                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ)' className='col-md-2' required readOnly={readOnly} />
+                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến)' className='col-md-2' required readOnly={readOnly} />
 
                             <FormDatePicker type='date-mask' ref={e => this.batDauDangKy = e} className='col-md-4' label='Bắt đầu đăng ký' required readOnly={readOnly} />
                             <FormDatePicker type='date-mask' ref={e => this.ketThucDangKy = e} className='col-md-4' label='Kết thúc đăng ký' required readOnly={readOnly} />

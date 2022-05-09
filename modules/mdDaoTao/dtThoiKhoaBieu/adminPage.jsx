@@ -463,7 +463,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 'Thời khoá biểu'
             ],
             content: <>
-                <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div>
+                {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null}
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtThoiKhoaBieuPage} done={(page) => {
