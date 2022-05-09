@@ -703,7 +703,7 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION DT_CALENDAR(room IN STRING) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION DT_CALENDAR(room IN STRING, idNam IN NUMBER, hocKy IN NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
 BEGIN
@@ -711,6 +711,8 @@ BEGIN
         SELECT *
         FROM (SELECT TKB.MA_MON_HOC          AS "maMonHoc",
                      TKB.TIET_BAT_DAU        AS "tietBatDau",
+                     TKB.NGAY_BAT_DAU        AS "ngayBatDau",
+                     TKB.NGAY_KET_THUC       AS "ngayKetThuc",
                      TKB.SO_TIET             AS "soTiet",
                      TKB.GIANG_VIEN          AS "giangVien",
                      TKB.NHOM                AS "nhom",
@@ -720,7 +722,7 @@ BEGIN
               FROM DT_THOI_KHOA_BIEU TKB
                        LEFT JOIN DM_CA_HOC TIETBD on TIETBD.TEN = TKB.TIET_BAT_DAU AND TIETBD.MA_CO_SO = 2
               LEFT JOIN DM_CA_HOC TIETKT on TO_NUMBER(TIETKT.TEN) = TO_NUMBER(TKB.TIET_BAT_DAU) + TO_NUMBER(TKB.SO_TIET) AND TIETKT.MA_CO_SO = 2
-              WHERE room = TKB.PHONG);
+              WHERE room = TKB.PHONG AND idNam = TKB.NAM AND hocKy = TKB.HOC_KY);
     RETURN my_cursor;
 
 end;
@@ -729,8 +731,8 @@ end;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION DT_CAU_TRUC_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                              searchTerm IN STRING,
-                                              totalItem OUT NUMBER, pageTotal OUT NUMBER)
+                                                      searchTerm IN STRING,
+                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER)
     RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -749,16 +751,16 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (
-                 SELECT cauTrucKhungDt.ID       as                     "id",
-                        cauTrucKhungDt.MUC_CHA      as                "mucCha",
-                        cauTrucKhungDt.MUC_CON as                     "mucCon",
-                        cauTrucKhungDt.NAM_DAO_TAO   as               "namDaoTao",
-                        ROW_NUMBER() OVER (ORDER BY cauTrucKhungDt.NAM_DAO_TAO) R
-                 FROM DT_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
-                 WHERE searchTerm = ''
-                   OR cauTrucKhungDt.NAM_DAO_TAO LIKE st
-             )
+        FROM (SELECT cauTrucKhungDt.ID               as                      "id",
+                     cauTrucKhungDt.BAT_DAU_DANG_KY  as                      "batDauDangKy",
+                     cauTrucKhungDt.KET_THUC_DANG_KY as                      "ketThucDangKy",
+                     cauTrucKhungDt.MUC_CHA          as                      "mucCha",
+                     cauTrucKhungDt.MUC_CON          as                      "mucCon",
+                     cauTrucKhungDt.NAM_DAO_TAO      as                      "namDaoTao",
+                     ROW_NUMBER() OVER (ORDER BY cauTrucKhungDt.NAM_DAO_TAO) R
+              FROM DT_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
+              WHERE searchTerm = ''
+                 OR cauTrucKhungDt.NAM_DAO_TAO LIKE st)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 END;
@@ -870,6 +872,81 @@ END;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION DT_DANH_SACH_MON_MO_GET_CURRENT(TG_MO_MON IN STRING, CHUONG_TRINH_DAO_TAO OUT SYS_REFCURSOR,
+                                                THONG_TIN OUT SYS_REFCURSOR)
+    RETURN SYS_REFCURSOR
+AS
+    DANH_SACH_MON_MO  SYS_REFCURSOR;
+    KHOA_SINH_VIEN    NUMBER(4);
+    HOC_KY_MO_MON     NUMBER(1);
+    ID_DANG_KY_MO_MON NUMBER;
+BEGIN
+    SELECT JSON_VALUE(TG_MO_MON, '$.khoa') INTO KHOA_SINH_VIEN FROM DUAL;
+    SELECT JSON_VALUE(TG_MO_MON, '$.hocKy') INTO HOC_KY_MO_MON FROM DUAL;
+    SELECT JSON_VALUE(TG_MO_MON, '$.idDangKyMoMon') INTO ID_DANG_KY_MO_MON FROM DUAL;
+
+    OPEN THONG_TIN FOR
+        SELECT DKMM.KHOA     AS "khoaDangKy",
+               DKMM.MA_NGANH AS "maNganh",
+               NDT.TEN_NGANH AS "tenNganh",
+               DV.TEN        AS "tenKhoaDangKy"
+        FROM DT_DANG_KY_MO_MON DKMM
+                 LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = DKMM.MA_NGANH
+                 LEFT JOIN DM_DON_VI DV ON DV.MA = DKMM.KHOA
+        WHERE DKMM.ID = ID_DANG_KY_MO_MON;
+
+    OPEN CHUONG_TRINH_DAO_TAO FOR
+        SELECT CTDT.MA_MON_HOC        AS "maMonHoc",
+               MH.TEN                 AS "tenMonHoc",
+               CTDT.SO_TIET_LY_THUYET AS "soTietLyThuyet",
+               CTDT.SO_TIET_THUC_HANH AS "soTietThucHanh",
+               CTDT.HOC_KY_DU_KIEN    AS "hocKyDuKien",
+               CTDT.LOAI_MON_HOC      AS "loaiMonHoc",
+               CTDT.KHOA              AS "khoa",
+               MH.KHOA                AS "monHocKhoa",
+               CTDT.TONG_SO_TIET      AS "tongSoTiet",
+               CTKDT.KHOA             AS "khoaSinhVien"
+
+        FROM DT_CHUONG_TRINH_DAO_TAO CTDT
+                 LEFT JOIN DT_KHUNG_DAO_TAO KDT ON KDT.ID = CTDT.MA_KHUNG_DAO_TAO
+                 LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT on KDT.NAM_DAO_TAO = CTKDT.ID
+                 LEFT JOIN DT_DANG_KY_MO_MON DKMM ON DKMM.MA_NGANH = KDT.MA_NGANH
+                 LEFT JOIN DM_MON_HOC MH ON MH.MA = CTDT.MA_MON_HOC
+        WHERE DKMM.ID = ID_DANG_KY_MO_MON
+            AND MH.KHOA != 33
+            AND
+            --E.g: Current Semester: 1, Current Year: 2022
+              (CTKDT.KHOA = KHOA_SINH_VIEN AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON)         -- Student 2022 - Sem 1
+           OR (CTKDT.KHOA = KHOA_SINH_VIEN - 1 AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON + 2) -- Student 2021 - Sem 3
+           OR (CTKDT.KHOA = KHOA_SINH_VIEN - 2 AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON + 4) -- Student 2021 - Sem 3
+           OR (CTKDT.KHOA = KHOA_SINH_VIEN - 3 AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON + 6) -- Student 2021 - Sem 3
+    ;
+
+
+    OPEN DANH_SACH_MON_MO FOR
+        SELECT DS.MA_MON_HOC        as "maMonHoc",
+               DS.TEN_MON_HOC       AS "tenMonHoc",
+               DS.LOAI_MON_HOC      AS "loaiMonHoc",
+               DS.SO_TIET_LY_THUYET AS "soTietLyThuyet",
+               DS.SO_TIET_THUC_HANH AS "soTietThucHanh",
+               DS.NAM               AS "nam",
+               DS.HOC_KY            AS "hocKy",
+               DS.MA_NGANH          AS "maNganh",
+               DS.ID                AS "id",
+               DS.SO_NHOM           AS "soNhom",
+               DS.SO_BUOI_TUAN      AS "soBuoiTuan",
+               DS.SO_TIET_BUOI      AS "soTietBuoi",
+               DS.SO_LUONG_DU_KIEN  AS "soLuongDuKien",
+               DS.MON_HOC_KHOA      AS "monHocKhoa",
+               DS.KHOA_SINH_VIEN    AS "khoaSinhVien"
+        FROM DT_DANH_SACH_MON_MO DS;
+
+    return DANH_SACH_MON_MO;
+END;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION DT_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, donVi IN STRING,
                                              searchTerm IN STRING,
                                              totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
@@ -900,6 +977,7 @@ BEGIN
         SELECT *
         FROM (
                  SELECT KDT.MA_KHOA           AS                     "maKhoa",
+                        KDT.NAM_DAO_TAO       AS                     "idNamDaoTao",
                         KHUNG.NAM_DAO_TAO       AS                     "namDaoTao",
                         KDT.ID                AS                     "id",
                         KDT.MA_NGANH          AS                     "maNganh",
@@ -995,8 +1073,10 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, searchTerm IN STRING,
-                                              totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, donVi IN STRING,
+                                              searchTerm IN STRING,
+                                              totalItem OUT NUMBER, pageTotal OUT NUMBER,
+                                              thoiGianPhanCong OUT SYS_REFCURSOR) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(502) := '%' || lower(searchTerm) || '%';
@@ -1004,25 +1084,62 @@ BEGIN
     SELECT COUNT(*)
     INTO totalItem
     FROM DT_THOI_KHOA_BIEU TKB
+             LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
              LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
              LEFT JOIN DM_MON_HOC DMMH ON DMMH.MA = TKB.MA_MON_HOC
              LEFT JOIN DM_DON_VI DV ON DV.MA = DMMH.KHOA
              LEFT JOIN TCHC_CAN_BO CB on TKB.GIANG_VIEN = CB.SHCC
+             LEFT JOIN DM_NGACH_CDNN NGACH on CB.NGACH = NGACH.MA
+             LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
              LEFT JOIN DT_NGANH_DAO_TAO NDT on TKB.MA_NGANH = NDT.MA_NGANH
-
-    WHERE searchTerm = ''
-       OR LOWER(TRIM(DMMH.TEN)) LIKE sT
-       OR LOWER(TRIM(DV.TEN)) LIKE sT
-       OR LOWER(TRIM(TKB.MA_MON_HOC)) LIKE sT
-       OR LOWER(TRIM(TKB.HOC_KY)) LIKE sT
-       OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
-       OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm)
-       OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE sT;
+             LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
+    WHERE (TGMM.KICH_HOAT = 1)
+      AND (donVi IS NULL OR donVi = '' OR donVi = TKB.KHOA_DANG_KY)
+      AND (searchTerm = ''
+        OR LOWER(TRIM(DMMH.TEN)) LIKE sT
+        OR LOWER(TRIM(DV.TEN)) LIKE sT
+        OR LOWER(TRIM(TKB.MA_MON_HOC)) LIKE sT
+        OR LOWER(TRIM(TKB.HOC_KY)) LIKE sT
+        OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
+        OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm)
+        OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE sT);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
     pageTotal := CEIL(totalItem / pageSize);
     pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN thoiGianPhanCong FOR
+        SELECT *
+        FROM (SELECT TGPC.BAT_DAU                         AS "batDau",
+                     TGPC.KET_THUC                        AS "ketThuc",
+                     TGPC.DON_VI                          AS "donVi",
+                     DV.TEN                               AS "tenDonVi",
+                     CTKDT.NAM_DAO_TAO                    AS "namDaoTao",
+                     TGMM.HOC_KY                          AS "hocKy",
+
+                     (SELECT COUNT(*)
+                      FROM DT_THOI_KHOA_BIEU TKB
+                               LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
+                               LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
+                               LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
+                      WHERE (TGMM.KICH_HOAT = 1)
+                        AND TKB.KHOA_DANG_KY = DV.MA)     AS "tongSoLop",
+
+                     (SELECT COUNT(*)
+                      FROM DT_THOI_KHOA_BIEU TKB
+                               LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
+                               LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
+                               LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
+                      WHERE (TGMM.KICH_HOAT = 1)
+                        AND TKB.KHOA_DANG_KY = DV.MA
+                        AND (TKB.GIANG_VIEN IS NOT NULL)) AS "daPhanCong"
+
+              FROM DT_THOI_GIAN_PHAN_CONG TGPC
+                       LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TGPC.NAM
+                       LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
+                       LEFT JOIN DM_DON_VI DV ON DV.MA = TGPC.DON_VI
+              WHERE (donVi IS NULL OR donVi = '' OR donVi = TGPC.DON_VI));
 
     OPEN my_cursor FOR
         SELECT *
@@ -1035,11 +1152,14 @@ BEGIN
                      TKB.NAM              AS              "nam",
                      TKB.MA_MON_HOC       AS              "maMonHoc",
                      TKB.NGAY_BAT_DAU     AS              "ngayBatDau",
+                     TKB.NGAY_KET_THUC    AS              "ngayKetThuc",
                      TKB.NHOM             AS              "nhom",
                      TKB.SO_LUONG_DU_KIEN AS              "soLuongDuKien",
                      DV.TEN               AS              "tenKhoaBoMon",
                      DV.MA                AS              "maKhoaBoMon",
                      DMMH.TEN             AS              "tenMonHoc",
+                     DMMH.TONG_TIET       AS              "tongTiet",
+                     TKB.KHOA_DANG_KY     AS              "khoaDangKy",
                      DV1.TEN              AS              "tenKhoaDangKy",
                      CB.HO                AS              "hoGiangVien",
                      CB.TEN               AS              "tenGiangVien",
@@ -1049,8 +1169,11 @@ BEGIN
                      TKB.MA_NGANH         AS              "maNganh",
                      NDT.TEN_NGANH        AS              "tenNganh",
                      TKB.BUOI             AS              "buoi",
+                     TKB.IS_MO            AS              "isMo",
+                     CTKDT.NAM_DAO_TAO    AS              "namDaoTao",
                      ROW_NUMBER() OVER (ORDER BY TKB.THU) R
               FROM DT_THOI_KHOA_BIEU TKB
+                       LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
                        LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
                        LEFT JOIN DM_MON_HOC DMMH ON DMMH.MA = TKB.MA_MON_HOC
                        LEFT JOIN DM_DON_VI DV ON DV.MA = DMMH.KHOA
@@ -1058,14 +1181,17 @@ BEGIN
                        LEFT JOIN DM_NGACH_CDNN NGACH on CB.NGACH = NGACH.MA
                        LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
                        LEFT JOIN DT_NGANH_DAO_TAO NDT on TKB.MA_NGANH = NDT.MA_NGANH
-              WHERE searchTerm = ''
-                 OR LOWER(TRIM(DMMH.TEN)) LIKE sT
-                 OR LOWER(TRIM(DV.TEN)) LIKE sT
-                 OR LOWER(TRIM(TKB.MA_MON_HOC)) LIKE sT
-                 OR LOWER(TRIM(TKB.HOC_KY)) LIKE sT
-                 OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
-                 OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm)
-                 OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE sT
+                       LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
+              WHERE (TGMM.KICH_HOAT = 1)
+                AND (donVi IS NULL OR donVi = '' OR donVi = TKB.KHOA_DANG_KY)
+                AND (searchTerm = ''
+                  OR LOWER(TRIM(DMMH.TEN)) LIKE sT
+                  OR LOWER(TRIM(DV.TEN)) LIKE sT
+                  OR LOWER(TRIM(TKB.MA_MON_HOC)) LIKE sT
+                  OR LOWER(TRIM(TKB.HOC_KY)) LIKE sT
+                  OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
+                  OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm)
+                  OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE sT)
               ORDER BY TKB.THU, TKB.KHOA_DANG_KY)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
