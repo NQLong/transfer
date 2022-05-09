@@ -1116,7 +1116,7 @@ BEGIN
                      TGPC.DON_VI                          AS "donVi",
                      DV.TEN                               AS "tenDonVi",
                      CTKDT.NAM_DAO_TAO                    AS "namDaoTao",
-                     TGMM.HOC_KY                          AS "hocKy",
+                     TGPC.HOC_KY                          AS "hocKy",
 
                      (SELECT COUNT(*)
                       FROM DT_THOI_KHOA_BIEU TKB

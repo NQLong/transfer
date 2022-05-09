@@ -1,104 +1,3 @@
-CREATE OR REPLACE FUNCTION DT_CAU_TRUC_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                      searchTerm IN STRING,
-                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER)
-    RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-    FROM DT_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
-    WHERE searchTerm = ''
-       OR cauTrucKhungDt.NAM_DAO_TAO LIKE st;
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (SELECT cauTrucKhungDt.ID               as                      "id",
-                     cauTrucKhungDt.BAT_DAU_DANG_KY  as                      "batDauDangKy",
-                     cauTrucKhungDt.KET_THUC_DANG_KY as                      "ketThucDangKy",
-                     cauTrucKhungDt.MUC_CHA          as                      "mucCha",
-                     cauTrucKhungDt.MUC_CON          as                      "mucCon",
-                     cauTrucKhungDt.NAM_DAO_TAO      as                      "namDaoTao",
-                     ROW_NUMBER() OVER (ORDER BY cauTrucKhungDt.NAM_DAO_TAO) R
-              FROM DT_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
-              WHERE searchTerm = ''
-                 OR cauTrucKhungDt.NAM_DAO_TAO LIKE st)
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-END;
-
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION DT_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, donVi IN STRING,
-                                             searchTerm IN STRING,
-                                             totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(502) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-    FROM DT_KHUNG_DAO_TAO KDT
-             LEFT JOIN DM_DON_VI DV ON DV.MA = KDT.MA_KHOA
-             LEFT JOIN DT_NGANH_DAO_TAO DNDT on KDT.MA_NGANH = DNDT.MA_NGANH
-            LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO KHUNG ON KHUNG.ID = KDT.NAM_DAO_TAO
-
-    WHERE (donVi IS NULL OR donVi = '' OR TO_NUMBER(donVi) = KDT.MA_KHOA)
-      AND (searchTerm = ''
-        OR LOWER(TRIM(DNDT.MA_NGANH)) LIKE sT
-        OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
-        OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
-        OR LOWER(TRIM(DV.TEN)) LIKE sT);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT KDT.MA_KHOA           AS                     "maKhoa",
-                        KDT.NAM_DAO_TAO       AS                     "idNamDaoTao",
-                        KHUNG.NAM_DAO_TAO       AS                     "namDaoTao",
-                        KDT.ID                AS                     "id",
-                        KDT.MA_NGANH          AS                     "maNganh",
-                        DNDT.TEN_NGANH        AS                     "tenNganh",
-                        BDT.TEN_BAC           AS                     "trinhDoDaoTao",
-                        LHDT.TEN              AS                     "loaiHinhDaoTao",
-                        KDT.THOI_GIAN_DAO_TAO AS                     "thoiGianDaoTao",
-                        DV.TEN                AS                     "tenKhoaBoMon",
-
-                        ROW_NUMBER() OVER (ORDER BY KDT.NAM_DAO_TAO DESC) R
-                 FROM DT_KHUNG_DAO_TAO KDT
-                          LEFT JOIN DM_DON_VI DV ON DV.MA = KDT.MA_KHOA
-                          LEFT JOIN DT_NGANH_DAO_TAO DNDT on KDT.MA_NGANH = DNDT.MA_NGANH
-                            LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO KHUNG ON KHUNG.ID = KDT.NAM_DAO_TAO
-
-                          LEFT JOIN DM_SV_BAC_DAO_TAO BDT ON BDT.MA_BAC = KDT.TRINH_DO_DAO_TAO
-                          LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = KDT.LOAI_HINH_DAO_TAO
-                 WHERE (donVi IS NULL OR donVi = '' OR TO_NUMBER(donVi) = KDT.MA_KHOA)
-                   AND (searchTerm = ''
-                     OR LOWER(TRIM(DNDT.MA_NGANH)) LIKE sT
-                     OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
-                     OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
-                     OR LOWER(TRIM(DV.TEN)) LIKE sT)
-                 ORDER BY KDT.NAM_DAO_TAO DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-END;
-
-/
---EndMethod--
-
 CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, donVi IN STRING,
                                               searchTerm IN STRING,
                                               totalItem OUT NUMBER, pageTotal OUT NUMBER,
@@ -142,7 +41,7 @@ BEGIN
                      TGPC.DON_VI                          AS "donVi",
                      DV.TEN                               AS "tenDonVi",
                      CTKDT.NAM_DAO_TAO                    AS "namDaoTao",
-                     TGMM.HOC_KY                          AS "hocKy",
+                     TGPC.HOC_KY                          AS "hocKy",
 
                      (SELECT COUNT(*)
                       FROM DT_THOI_KHOA_BIEU TKB
