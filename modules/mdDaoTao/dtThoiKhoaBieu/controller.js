@@ -15,21 +15,27 @@ module.exports = app => {
         { name: 'dtThoiKhoaBieu:delete' }
     );
 
-    app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
+    app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
 
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        const user = req.session.user, permissions = user.permissions;
+        let donVi = '';
+        if (!permissions.includes('dtThoiKhoaBieu:read')) {
+            if (user.staff?.maDonVi) donVi = user.maDonVi;
+            else return res.send({ error: 'Permission denied!' });
+        }
+        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, donVi, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
                 const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
             }
         });
     });
@@ -108,10 +114,14 @@ module.exports = app => {
         else app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        let { condition, changes } = req.body,
-            { nam, hocKy, maMonHoc, khoaDangKy, maNganh } = condition;
-        app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, khoaDangKy, maNganh }, changes, (error, item) => res.send({ error, item }));
+    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), (req, res) => {
+        let { condition, changes } = req.body;
+        if (condition.id) app.model.dtThoiKhoaBieu.update(condition, changes);
+        if (typeof condition == 'object') {
+            let { nam, hocKy, maMonHoc, khoaDangKy, maNganh } = condition;
+            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, khoaDangKy, maNganh }, changes, (error, item) => res.send({ error, item }));
+        }
+        else app.model.dtThoiKhoaBieu.update({ id: condition }, changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
@@ -131,4 +141,14 @@ module.exports = app => {
             res.send({ error, items: items?.rows || [], listNgayLe });
         });
     });
+
+    //Quyền của đơn vị------------------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('daoTao', { id: 'dtThoiKhoaBieu:manage', text: 'Đào tạo: Phân công giảng dạy' });
+
+    app.permissionHooks.add('staff', 'checkRoleDTPhanCongGiangDay', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
+            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:manage');
+        }
+        resolve();
+    }));
 };

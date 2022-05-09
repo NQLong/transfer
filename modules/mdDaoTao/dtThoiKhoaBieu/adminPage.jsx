@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll, SelectAdapter_DmDonVi, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { createDtThoiGianPhanCong } from '../dtThoiGianPhanCong/redux';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
-import { AdminModal, AdminPage, CirclePageButton, FormCheckbox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, CirclePageButton, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
@@ -14,6 +15,40 @@ import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+class ThoiGianPhanCongGiangDay extends AdminModal {
+    onSubmit = (e) => {
+        e && e.preventDefault();
+        const data = {
+            donVi: this.donVi.value(),
+            batDau: this.batDau.value().setHours(0, 0, 0, 0),
+            ketThuc: this.ketThuc.value().setHours(23, 59, 59, 999)
+        };
+        if (!data.donVi) {
+            T.notify('Đơn vị trống', 'danger');
+            this.donVi.focus();
+        } else if (!data.batDau) {
+            T.notify('Ngày mở trống', 'danger');
+            this.batDau.focus();
+        } else if (!data.ketThuc) {
+            T.notify('Ngày đóng trống', 'danger');
+            this.ketThuc.focus();
+        } else {
+            this.props.create(data, this.hide);
+            location.reload();
+        }
+    }
+    render = () => {
+        return this.renderModal({
+            title: 'Thời gian các đơn vị phân công giảng dạy',
+            size: 'large',
+            body: <div className='row'>
+                <FormSelect className='col-md-12' ref={e => this.donVi = e} label='Đơn vị' data={SelectAdapter_DmDonViFaculty_V2} />
+                <FormDatePicker type='date-mask' ref={e => this.batDau = e} label='Từ ngày' className='col-md-6' />
+                <FormDatePicker type='date-mask' ref={e => this.ketThuc = e} label='Đến ngày' className='col-md-6' />
+            </div>
+        });
+    }
+}
 class AddingModal extends AdminModal {
     onShow = () => {
         // this.khoaDangKy.value(maPhongDaoTao);
@@ -26,7 +61,6 @@ class AddingModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const data = {
-
             maMonHoc: this.maMonHoc.value(),
             soTietBuoi: this.soTiet.value(),
             soNhom: this.soNhom.value(),
@@ -94,7 +128,6 @@ class AddingModal extends AdminModal {
     }
 }
 class AdjustModal extends AdminModal {
-
     onShow = (item) => {
         let { id, giangVien, maMonHoc, tenMonHoc, nhom, tenKhoaBoMon, phong, thu, tietBatDau, soTiet } = item;
         this.setState({ id, soTiet });
@@ -135,7 +168,7 @@ class AdjustModal extends AdminModal {
     }
 
     render = () => {
-        let readOnly = this.props.readOnly;
+        let quanLyKhoa = this.props.quanLyKhoa;
         return this.renderModal({
             title: 'Điều chỉnh',
             size: 'large',
@@ -143,10 +176,10 @@ class AdjustModal extends AdminModal {
                 <FormTextBox ref={e => this.monHoc = e} className='form-group col-md-12' readOnly label='Môn' />
                 <FormTextBox ref={e => this.nhom = e} className='form-group col-md-4' readOnly label='Lớp' />
                 <FormTextBox ref={e => this.khoa = e} className='form-group col-md-8' readOnly label='Khoa, bộ môn' />
-                <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={readOnly} />
-                <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={readOnly} />
-                <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={dataTiet} readOnly={readOnly} />
-                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' readOnly={readOnly} />
+                <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={quanLyKhoa} />
+                <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={quanLyKhoa} />
+                <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={dataTiet} readOnly={quanLyKhoa} />
+                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' readOnly={!quanLyKhoa} />
             </div>
         });
     }
@@ -179,6 +212,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
             });
             this.setState({
                 page,
+                thoiGianPhanCong: page.thoiGianPhanCong,
                 listYear: Object.keys(page.list.groupBy('nam')).sort().filter((value, index, list) => !index || value != list[index - 1]),
                 listHocKy: Object.keys(page.list.groupBy('hocKy')).sort().filter((value, index, list) => !index || value != list[index - 1]),
             }, () => {
@@ -244,8 +278,37 @@ class DtThoiKhoaBieuPage extends AdminPage {
         this.props.updateDtThoiKhoaBieuCondition(item, { isMo: Number(value) }, data => data.item && this.initData());
     }
 
+    renderThoiGianPhanCong = (data) => {
+        return renderTable({
+            emptyTable: 'Chưa có thời gian phân công',
+            getDataSource: () => data,
+            header: 'thead-light',
+            stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Học kỳ</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Khoa/Bộ môn</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bắt đầu</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Kết thúc</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đã phân công</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<>{item.namDaoTao} <br /> {'HK' + item.hocKy}</>} />
+                    <TableCell content={item.tenDonVi} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ whiteSpace: 'nowrap' }} content={item.batDau} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ whiteSpace: 'nowrap' }} content={item.ketThuc} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={`${item.daPhanCong}/${item.tongSoLop}`} />
+                </tr>
+            )
+        });
+    }
+
     render() {
-        const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete', 'manage']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition } = this.state.page ? this.state.page : { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '' };
         let table = renderTable({
             emptyTable: 'Không có dữ liệu thời khóa biểu',
@@ -400,6 +463,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 'Thời khoá biểu'
             ],
             content: <>
+                <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtThoiKhoaBieuPage} done={(page) => {
@@ -415,13 +479,16 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         });
                     }}
                 />
-                <AdjustModal ref={e => this.modal = e} readOnly={!permission.write}
-                    update={this.props.updateDtThoiKhoaBieu}
+                <AdjustModal ref={e => this.modal = e} quanLyKhoa={permission.manage}
+                    update={this.props.updateDtThoiKhoaBieuCondition}
                     initData={this.initData}
                 />
+                <ThoiGianPhanCongGiangDay ref={e => this.thoiGianModal = e} create={this.props.createDtThoiGianPhanCong} />
                 <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} initData={this.initData} />
-                <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
-                    || this.taoThoiKhoaBieu()} style={{ marginRight: '60px' }} />
+                {permission.write && <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
+                    || this.taoThoiKhoaBieu()} style={{ marginRight: '60px' }} />}
+                {permission.write && <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-thumb-tack' tooltip='Tạo thời gian phân công giảng dạy' onClick={e => e.preventDefault()
+                    || this.thoiGianModal.show()} style={{ marginRight: '120px' }} />}
             </>,
             backRoute: '/user/dao-tao',
             advanceSearch: <div className='row'>
@@ -451,5 +518,5 @@ class DtThoiKhoaBieuPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
-const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule };
+const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule, createDtThoiGianPhanCong };
 export default connect(mapStateToProps, mapActionsToProps)(DtThoiKhoaBieuPage);

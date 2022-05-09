@@ -5,7 +5,7 @@ module.exports = app => {
         DATE_UNIX = 24 * 60 * 60 * 1000;
 
     /**
-     * Lesson: Tiết
+     * Period: Tiết
      * Room: Phòng
      * Subject: Môn học
      * 
@@ -19,7 +19,7 @@ module.exports = app => {
             if (error) {
                 return error;
             } else {
-                app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten', (error, listLessons) => {
+                app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten', (error, listPeriods) => {
                     if (error) {
                         return error;
                     } else {
@@ -27,7 +27,7 @@ module.exports = app => {
                             if (error) {
                                 return error;
                             } else {
-                                let data = await getDataGenerateSchedule(lisSubjectsOfSemester.filter(item => item.isMo), listDays, listLessons, listRooms);
+                                let data = await getDataGenerateSchedule(lisSubjectsOfSemester.filter(item => item.isMo), listDays, listPeriods, listRooms);
                                 if (data.error) done(data);
                                 else {
                                     app.model.dmNgayLe.getAll({
@@ -77,7 +77,7 @@ module.exports = app => {
         });
     };
 
-    const getDataGenerateSchedule = (lisSubjectsOfSemester, listDays, listLessons, listRooms) => new Promise(resolve => {
+    const getDataGenerateSchedule = (lisSubjectsOfSemester, listDays, listPeriods, listRooms) => new Promise(resolve => {
         let data = {}, dataNganh = {};
         Object.keys(lisSubjectsOfSemester.groupBy('maNganh')).forEach(maNganh => {
             dataNganh[maNganh] = {};
@@ -95,14 +95,16 @@ module.exports = app => {
             }
             let subject = danhSachKhongPhong[index],
                 nganhBox = dataNganh[subject.maNganh];
-            lessonLoop: for (let lesson of listLessons) {
-                let isValid = isValidLesson(parseInt(lesson.ten), parseInt(subject.soTiet));
+            lessonLoop: for (let period of listPeriods) {
+                let startedPeriod = parseInt(period.ten),
+                    isValid = isValidPeriod(startedPeriod, parseInt(subject.soTiet));
                 if (isValid == undefined) {
                     setRoomForSubject(index + 1, list);
                 } else if (isValid == false) {
                     continue;
                 }
-                else for (let day of listDays) {
+                else {
+                    let day = parseInt(listDays.sample());
                     //Nếu môn học là bắt buộc
                     if (subject.loaiMonHoc == 0) {
                         /**
@@ -114,8 +116,21 @@ module.exports = app => {
                              *  - Check các môn bắt buộc còn lại xem có trùng lịch hay không
                              *      + Nếu trùng và môn đó chỉ mở 1 lớp thì phải thay đổi
                              */
-                            let currentTime = { thu: subject.thu || day, tietBatDau: parseInt(subject.tietBatDau) || parseInt(lesson.ten), tietKetThuc: (parseInt(subject.tietBatDau) || parseInt(lesson.ten)) + parseInt(subject.soTiet) - 1 };
+                            let currentTime = {
+                                thu: subject.thu || day,
+                                tietBatDau: parseInt(subject.tietBatDau) || startedPeriod,
+                                tietKetThuc: (parseInt(subject.tietBatDau) || startedPeriod) + parseInt(subject.soTiet) - 1,
+                                buoi: subject.buoi,
+                                nhom: subject.nhom
+                            };
 
+                            if (nganhBox[subject.maMonHoc].length) {
+                                //Cùng môn, cùng buổi, khác nhóm mà cùng giờ thì continue
+                                if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi == currentTime.buoi && item.nhom != currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
+
+                                //Cùng môn, khác buổi, cùng nhóm mà cùng ngày thì continue
+                                else if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi != currentTime.buoi && item.nhom == currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
+                            }
                             let nganhBoxExceptCurrentSubject = Object.keys(nganhBox).filter(maMonHoc => maMonHoc != subject.maMonHoc);
                             for (let maMonHoc of nganhBoxExceptCurrentSubject) {
                                 if (nganhBox[maMonHoc].length == 1 && nganhBox[maMonHoc].some(monKhac => {
@@ -129,16 +144,21 @@ module.exports = app => {
                     let listRoomsAvailable = [];
                     for (let room of listRooms) {
                         if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, lisSubjectsOfSemester, {
-                            tietBatDau: subject.tietBatDau || parseInt(lesson.ten), soTiet: parseInt(subject.soTiet), day: subject.thu || day
+                            tietBatDau: subject.tietBatDau || startedPeriod, soTiet: parseInt(subject.soTiet), day: subject.thu || day
                         })) listRoomsAvailable.push(room);
                     }
-                    let roomResult = app.model.dtThoiKhoaBieu.bestFit(subject, listRoomsAvailable);
+                    let roomResult = bestFit(subject, listRoomsAvailable);
                     if (roomResult) {
-                        data[subject.id] = { tietBatDau: subject.tietBatDau || parseInt(lesson.ten), thu: subject.thu || day, phong: roomResult.ten, sucChua: roomResult.sucChua, maMonHoc: subject.maMonHoc, soTiet: subject.soTiet };
-                        subject.loaiMonHoc == 0 && dataNganh[subject.maNganh][subject.maMonHoc].push({ thu: day, tietBatDau: parseInt(lesson.ten), tietKetThuc: parseInt(lesson.ten) + parseInt(subject.soTiet) - 1 });
+                        data[subject.id] = { tietBatDau: subject.tietBatDau || startedPeriod, thu: subject.thu || day, phong: roomResult.ten, sucChua: roomResult.sucChua, maMonHoc: subject.maMonHoc, soTiet: subject.soTiet };
+                        subject.loaiMonHoc == 0 && dataNganh[subject.maNganh][subject.maMonHoc].push({
+                            thu: day,
+                            tietBatDau: startedPeriod,
+                            tietKetThuc: startedPeriod + parseInt(subject.soTiet) - 1,
+                            nhom: subject.nhom, buoi: subject.buoi
+                        });
                         let newList = lisSubjectsOfSemester.map(item => {
                             if (item.id == subject.id) {
-                                item.tietBatDau = parseInt(lesson.ten);
+                                item.tietBatDau = startedPeriod;
                                 item.thu = day;
                                 item.phong = roomResult.ten;
                                 item.sucChua = roomResult.sucChua;
@@ -164,12 +184,12 @@ module.exports = app => {
         else {
             for (let timeAtPresentOfRoomId of listPresentStatus) {
                 if (!timeAtPresentOfRoomId) return true;
-                else if ((timeAtPresentOfRoomId && tietBatDau >= timeAtPresentOfRoomId.tietBatDau && tietBatDau <= timeAtPresentOfRoomId.tietKetThuc) || (tietBatDau <= timeAtPresentOfRoomId.tietBatDau && tietKetThuc <= timeAtPresentOfRoomId.tietKetThuc)) return false;
+                else if ((timeAtPresentOfRoomId && isCoincidentTime({ tietBatDau, tietKetThuc }, timeAtPresentOfRoomId))) return false;
             }
         }
     };
 
-    const isValidLesson = (tietBatDau, soTiet) => {
+    const isValidPeriod = (tietBatDau, soTiet) => {
         /**
          * Sáng 5 tiết: từ 1 tới 5
          * Chiều 4 tiết: từ 6 tới 9
@@ -178,8 +198,8 @@ module.exports = app => {
         //Case 1: Nếu số tiết >= 6 => Undefinded
         if (soTiet >= 6) return undefined;
 
-        //Case 2: Nếu số tiết = 5 mà bắt đầu trong buổi chiều => False
-        else if (soTiet == 5 && tietBatDau > 5) return false;
+        //Case 2: Nếu số tiết = 5 mà bắt đầu trong từ tiết 2 tới chiều => False
+        else if (soTiet == 5 && tietBatDau >= 2) return false;
 
         //Case 3: Nếu số tiết >= 4 mà bắt đầu từ tiết 3,4,5,7,8,9 => False
         else if (soTiet >= 4 && tietBatDau != 6 && tietBatDau >= 3) return false;
@@ -188,7 +208,11 @@ module.exports = app => {
         return true;
     };
 
-    app.model.dtThoiKhoaBieu.bestFit = (monHoc, listRooms) => {
+    const isCoincidentTime = (subjectA, subject) => {
+        return ((subjectA.tietBatDau >= subject.tietBatDau && subjectA.tietBatDau <= subject.tietKetThuc) || (subjectA.tietBatDau <= subject.tietBatDau && subjectA.tietKetThuc <= subject.tietKetThuc));
+    };
+
+    const bestFit = (monHoc, listRooms) => {
         let { soLuongDuKien } = monHoc,
             sizeResult = 10000000, roomResult = null;
         for (let room of listRooms) {
