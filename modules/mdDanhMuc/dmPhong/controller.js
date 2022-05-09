@@ -23,7 +23,7 @@ module.exports = app => {
     app.get('/user/danh-muc/phong/upload', app.permission.check('dmPhong:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/phong/page/:pageNumber/:pageSize', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
+    app.get('/api/danh-muc/phong/page/:pageNumber/:pageSize', app.permission.orCheck('dmPhong:read', 'dtPhong:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmPhong.getPage(pageNumber, pageSize, {
@@ -34,7 +34,7 @@ module.exports = app => {
         }, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/phong/all', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
+    app.get('/api/danh-muc/phong/all', app.permission.orCheck('dmPhong:read', 'dtPhong:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
         let condition = {};
         if (req.query.condition) {
             condition = {
@@ -47,7 +47,7 @@ module.exports = app => {
         app.model.dmPhong.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/phong/item/:ten', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
+    app.get('/api/danh-muc/phong/item/:ten', app.permission.orCheck('dmPhong:read', 'dtPhong:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
         app.model.dmPhong.get({ ten: req.params.ten }, (error, item) => res.send({ error, item }));
     });
 
