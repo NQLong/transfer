@@ -46,8 +46,7 @@ module.exports = app => {
         const namDaoTao = item?.namDaoTao;
         app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namDaoTao }, (error, ctKhungDt) => {
             if (!error && !ctKhungDt) {
-                const data = { namDaoTao, mucCha: item.mucCha, mucCon: item.mucCon };
-                app.model.dtCauTrucKhungDaoTao.create(data, async (error, item) => {
+                app.model.dtCauTrucKhungDaoTao.create(item, async (error, item) => {
                     if (!error) {
                         //TODO: Send Email - Notification;
                         // let listEmail = await app.model.qtChucVu.getAllTruongKhoaEmail();
