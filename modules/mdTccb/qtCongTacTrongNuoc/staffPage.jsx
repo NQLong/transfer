@@ -127,9 +127,9 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox className='col-md-3' ref={e => this.soCv = e} type='text' label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
-                <FormSelect className='col-md-6' ref={e => this.vietTat = e} label='Mục đích' data={SelectAdapter_DmMucDichTrongNuoc} />
+                <FormSelect className='col-md-6' ref={e => this.vietTat = e} label='Mục đích' data={SelectAdapter_DmMucDichTrongNuoc} readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.lyDo = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác trong nước (tối đa 500 ký tự)' required maxLength={500} />
-                <FormSelect className='col-md-12' multiple={true} ref={e => this.noiDen = e} label='Nơi đến' data={SelectAdapter_DmTinhThanhPhoV2} required />
+                <FormSelect className='col-md-12' multiple={true} ref={e => this.noiDen = e} label='Nơi đến' data={SelectAdapter_DmTinhThanhPhoV2} required readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.kinhPhi = e} rows={2} type='text' label='Kinh phí' readOnly={readOnly} placeholder='Nhập kinh phí (tối đa 200 ký tự)' maxLength={200}/>
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Ngày đi'
@@ -139,14 +139,14 @@ class EditModal extends AdminModal {
                             onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' />
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' readOnly={readOnly} />
                 <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Ngày về'
                     label={
                         <div style={{ display: 'flex' }}>Ngày về (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
 
                 <FormTextBox className='col-md-12' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
             </div>
@@ -188,8 +188,8 @@ class QtCongTacTrongNuocUserPage extends AdminPage {
         let permission = this.getUserPermission('staff', ['login']);
         if (permission.login == true) {
             permission = {
-                write: true,
-                delete: true
+                write: false,
+                delete: false
             };
         }
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
