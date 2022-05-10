@@ -113,6 +113,18 @@ class CreateListYear extends AdminPage {
         listData: [],
     }
 
+    delete = (index, done) => {
+        T.confirm('Xóa dữ liệu', 'Bạn có chắc bạn muốn xóa dữ liệu này?', 'warning', true, isConfirm => {
+            if (isConfirm) {
+                const listData = this.state.listData;
+                listData.splice(index, 1);
+                this.setState({ listData }
+                , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
+                done && done();
+            }
+        });
+    };
+
     tableList = (data, permission) => {
         return renderTable({
             getDataSource: () => data,
@@ -154,7 +166,7 @@ class CreateListYear extends AdminPage {
                     />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({ index, item })} onDelete={this.delete} >
+                            onEdit={() => this.modal.show({ index, item })} onDelete={() => this.delete(index)} >
                         </TableCell>
                     }
                 </tr>
