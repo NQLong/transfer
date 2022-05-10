@@ -549,7 +549,7 @@ const run = () => {
                 if (tyLeVuotKhung) {
                     tyLeVuotKhung = parseInt(tyLeVuotKhung * 100);
                 }
-                let mocNangLuong = worksheet.getCell('U' + row).value;
+                let mocNangLuong = worksheet.getCell('P' + row).value;
                 if (mocNangLuong) {
                     mocNangLuong = mocNangLuong.toString().trim();
                     mocNangLuong = new Date(mocNangLuong);
@@ -576,18 +576,18 @@ const run = () => {
                         app.model.canBo.get({ shcc }, (error2, item) => {
                             if (error2 || item == null) console.log("failed = ", ho, ten, maDv, error);
                             else {
-                                //console.log("test = ", heSoLuong, tyLeVuotKhung, mocNangLuong);
-                                // app.model.canBo.update({ shcc }, { ngach, heSoLuong, tyLeVuotKhung, mocNangLuong }, (error, item) => {
-                                //     if (error || item == null) {
-                                //         console.log("Update failed: ", shcc, error);
-                                //     }
-                                //     updateLuongMoi(row + 1);
-                                // });
-                                console.log("test = ", shcc);
-                                console.log(ho, ten, maDv);
-                                console.log(item.ho, item.ten, item.maDonVi);
+                                //console.log("test = ", shcc, ho, ten, ngach, bacLuong, heSoLuong, tyLeVuotKhung, mocNangLuong);
+                                app.model.canBo.update({ shcc }, { ngach, heSoLuong, bacLuong, tyLeVuotKhung, mocNangLuong }, (error, item) => {
+                                    if (error || item == null) {
+                                        console.log("Update failed: ", shcc, error);
+                                    }
+                                    updateLuongMoi(row + 1);
+                                });
+                                // console.log("test = ", shcc);
+                                // console.log(ho, ten, maDv);
+                                // console.log(item.ho, item.ten, item.maDonVi);
                             }
-                            updateLuongMoi(row + 1);
+                            //updateLuongMoi(row + 1);
                         });
                     });
                 });
