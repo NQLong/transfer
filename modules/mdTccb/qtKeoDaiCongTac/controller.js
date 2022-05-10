@@ -199,9 +199,10 @@ module.exports = app => {
         const yearCalc = req.query.year;
         const firstYear = new Date(yearCalc, 0, 1, 0, 0, 0, 0);
         const endYear = new Date(yearCalc, 11, 31, 23, 59, 59, 999);
+        // 1419120000000 = 45 * 365 * 24 * 3600 * 10000 (45 năm)
         app.model.canBo.getAll({
-            statement: 'ngayNghi IS NULL',
-            parameter: {}
+            statement: 'ngayNghi IS NULL AND (ngaySinh IS NULL OR ngaySinh + 1419120000000 <= :year)',
+            parameter: { year: endYear.getTime() }
         }, (error, data) => {
             if (error) {
                 res.send({ error, items: null });
