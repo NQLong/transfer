@@ -10,8 +10,6 @@ module.exports = app => {
                 endDateOfYear: new Date(nam, 11, 31).setHours(23, 59, 59, 999)
             }
         }, (error, listNgayLe) => {
-            console.log('##Error Ngày lễ:', error);
-            console.log('##Ngày lễ', listNgayLe);
             if (!error) resolve(listNgayLe);
             else resolve({ error: 'Lấy danh sách ngày lễ trong năm lỗi' });
         });

@@ -64,13 +64,14 @@ export function getDtThoiKhoaBieuAll(condition, done) {
 T.initPage('pageDtThoiKhoaBieu');
 export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition);
-    return () => {
+    return dispatch => {
         const url = `/api/dao-tao/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
+                dispatch({ type: DtThoiKhoaBieuGetPage, page: data.page });
                 if (done) done(data.page);
             }
         });

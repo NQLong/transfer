@@ -15,7 +15,7 @@ module.exports = app => {
         const listDays = [2, 3, 4, 5, 6, 7];
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         let { hocKy, nam } = thoiGianMoMon;
-        app.model.dtThoiKhoaBieu.getAll({ hocKy, nam }, '*', 'soLuongDuKien DESC', (error, lisSubjectsOfSemester) => {
+        app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, isMo: 1 }, '*', 'soLuongDuKien DESC', (error, lisSubjectsOfSemester) => {
             if (error) {
                 return error;
             } else {
