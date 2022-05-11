@@ -165,6 +165,32 @@ class AdminEditPage extends AdminPage {
         });
     }
 
+    getSiteSetting = () => {
+        const pathName = window.location.pathname;
+        if (pathName.startsWith('/user/hcth'))
+            return {
+                readyUrl: '/user/hcth',
+                routeMatcherUrl: '/user/hcth/cong-van-cac-phong/:id',
+                breadcrumb: [
+                    <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
+                    <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                ],
+                backRoute: '/user/hcth/cong-van-cac-phong'
+            };
+        else
+            return {
+                routeMatcherUrl: '/user/cong-van-cac-phong/:id',
+                readyUrl: '/user',
+                breadcrumb: [
+                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                ],
+                backRoute: '/user/cong-van-cac-phong'
+            };
+    }
+
     renderPhanHoi = (listPhanHoi) => {
         return renderComment({
             getDataSource: () => listPhanHoi,
@@ -499,7 +525,8 @@ class AdminEditPage extends AdminPage {
             rectorsPermission = this.getUserPermission('rectors', ['login']),
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
-            unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']);
+            unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
+            {breadcrumb, backRoute} = this.getSiteSetting();
 
         const titleText = !isNew ? 'Cập nhật' : 'Tạo mới';
         const listTrangThaiCv = Object.keys(listTrangThai).map(item =>
@@ -555,11 +582,7 @@ class AdminEditPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
             title: 'Công văn giữa các phòng',
-            breadcrumb: [
-                <Link key={0} to='/user/hcth'>Hành chính tổng hợp </Link>,
-                <Link key={1} to='/user/hcth/cong-van-cac-phong'>Công văn giữa các phòng</Link>,
-                !isNew ? 'Cập nhật' : 'Tạo mới'
-            ],
+            breadcrumb,
             content: this.state.isLoading ? loading : (<>
                 <div className='tile'>
                     <div className='clearfix'>
@@ -651,7 +674,7 @@ class AdminEditPage extends AdminPage {
                 }
 
             </>),
-            backRoute: window.location.pathname.startsWith('/user/hcth') ? '/user/hcth/cong-van-cac-phong' : '/user/cong-van-cac-phong',
+            backRoute,
             onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4') && ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? this.save : null,
             buttons: !readTrangThai && (hcthManagePermission.manage || (unitManagePermission.manage && lengthDv != 0)) && !isNew && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onSend }],
         });
