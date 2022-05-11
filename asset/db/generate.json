@@ -13245,13 +13245,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 16
-                },
-                "TIEN_DO": {
-                    "value": "tienDo",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "8,0"
                 }
             },
             "primaryKeys": [

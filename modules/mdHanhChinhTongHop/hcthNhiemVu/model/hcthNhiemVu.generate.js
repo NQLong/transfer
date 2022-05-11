@@ -1,6 +1,6 @@
-// Table name: HCTH_NHIEM_VU { id, nguoiTao, donViNhan, noiDung, tieuDe, ngayBatDau, ngayKetThuc, doUuTien, ngayTao, lienPhong, trangThai, tienDo }
+// Table name: HCTH_NHIEM_VU { id, nguoiTao, donViNhan, noiDung, tieuDe, ngayBatDau, ngayKetThuc, doUuTien, ngayTao, lienPhong, trangThai }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'donViNhan': 'DON_VI_NHAN', 'noiDung': 'NOI_DUNG', 'tieuDe': 'TIEU_DE', 'ngayBatDau': 'NGAY_BAT_DAU', 'ngayKetThuc': 'NGAY_KET_THUC', 'doUuTien': 'DO_UU_TIEN', 'ngayTao': 'NGAY_TAO', 'lienPhong': 'LIEN_PHONG', 'trangThai': 'TRANG_THAI', 'tienDo': 'TIEN_DO' };
+const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'donViNhan': 'DON_VI_NHAN', 'noiDung': 'NOI_DUNG', 'tieuDe': 'TIEU_DE', 'ngayBatDau': 'NGAY_BAT_DAU', 'ngayKetThuc': 'NGAY_KET_THUC', 'doUuTien': 'DO_UU_TIEN', 'ngayTao': 'NGAY_TAO', 'lienPhong': 'LIEN_PHONG', 'trangThai': 'TRANG_THAI' };
 
 module.exports = app => {
     app.model.hcthNhiemVu = {
