@@ -14,6 +14,10 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
+            path: '/user/tccb/qua-trinh/keo-dai-cong-tac/create-list',
+            component: Loadable({ loading: Loading, loader: () => import('./adminCreatePage') })
+        },
+        {
             path: '/user/tccb/qua-trinh/keo-dai-cong-tac',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
