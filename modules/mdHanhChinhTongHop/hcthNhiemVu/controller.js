@@ -1,6 +1,6 @@
 module.exports = (app) => {
 
-    const { canBoType, handleResult, trangThaiNhiemVu } = require('../constant');
+    const { canBoType, handleResult, trangThaiNhiemVu, action } = require('../constant');
 
     const menu = {
         parentMenu: app.parentMenu.user,
@@ -24,11 +24,40 @@ module.exports = (app) => {
         { name: 'staff:login', menu },
     );
 
+
+
     app.get('/user/hcth/nhiem-vu', app.permission.check('hcth:login'), app.templates.admin);
     app.get('/user/hcth/nhiem-vu/:id', app.permission.check('hcth:login'), app.templates.admin);
 
     app.get('/user/nhiem-vu', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/nhiem-vu/:id', app.permission.check('staff:login'), app.templates.admin);
+
+    //utils
+    const laNguoiThamGia = (req, nhiemVu) => {
+        const shcc = req.session.user?.staff?.shcc;
+        const canBoNhan = nhiemVu.canBoNhan;
+        return canBoNhan.some(item => item.shccCanBoNhan == shcc);
+    };
+
+    const laTruongDonViNhan = (req, nhiemVu) => {
+        const donViQuanLy = req.session.user?.staff?.donViQuanLy || [];
+        if (donViQuanLy.length == 0)
+            return false;
+        const donViNhan = nhiemVu.donViNhan;
+        return donViQuanLy.some(item => donViNhan.some(donVi => donVi.donViNhan == item.maDonVi));
+    };
+
+
+    const checkNhiemVuPermission = (req, nhiemVu) => {
+        const permissions = req.session.user?.permissions || [];
+        return (
+            permissions.includes('rectors:login') ||
+            permissions.includes('hcth:manage') ||
+            req.session.user?.staff.shcc == nhiemVu.nguoiTao ||
+            laTruongDonViNhan(req, nhiemVu) ||
+            laNguoiThamGia(req, nhiemVu)
+        );
+    };
 
     //api
 
@@ -66,17 +95,6 @@ module.exports = (app) => {
             await app.model.hcthDonViNhan.createFromList(diff, ma, 'NHIEM_VU');
     };
 
-    // const deleteNhiemVu = (id, done) => {
-    //     app.model.hcthFile.delete({ ma: id, loai: 'NHIEM_VU' }, (error) => {
-    //         if (error) done && done({ error });
-    //         else
-    //             app.model.hcthNhiemVu.delete({ id }, error => {
-    //                 app.deleteFolder(app.assetPath + '/nhiemVu/' + id);
-    //                 done && done({ error });
-    //             });
-    //     });
-    // };
-
 
     const createCanBoNhan = (danhSachCanBo, nguoiTao, vaiTro, id) => {
         const promises = danhSachCanBo.map(canBo => new Promise((resolve, reject) => {
@@ -105,13 +123,14 @@ module.exports = (app) => {
             await updateCanBoNhan(canBoNhan, nhiemVu.id);
             app.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
             await updateListFile(fileList, nhiemVu.id);
+            await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
             res.send({ error: null });
         } catch (error) {
             res.send({ error });
         }
     });
 
-    app.put('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'rectors:login', 'hcth:manage', 'president:login', 'staff:login'), async (req, res) => {
+    app.put('/api/hcth/nhiem-vu', app.permission.orCheck('staff:login'), async (req, res) => {
         try {
             const
                 { id, changes } = req.body,
@@ -119,9 +138,9 @@ module.exports = (app) => {
             const nhiemVu = app.model.hcthNhiemVu.asyncUpdate({ id }, data);
             await updateDonViNhan(await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', ''), donViNhan, id);
             await updateListFile(fileList, id);
+            await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
             res.send({ error: null, item: nhiemVu });
         } catch (error) {
-            console.error(error);
             res.send({ error });
         }
     });
@@ -230,26 +249,43 @@ module.exports = (app) => {
         res.status(400).send('Không tìm thấy tập tin');
     });
 
+
+    const readNhiemVu = async (nhiemVuId, shccCanBo, creator) => {
+        if (!shccCanBo || shccCanBo == creator) return;
+        const lichSuDoc = await app.model.hcthHistory.asyncGet({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccCanBo, hanhDong: action.READ });
+        if (!lichSuDoc) {
+            return await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccCanBo, hanhDong: action.READ });
+        }
+        return lichSuDoc;
+    };
+
     app.get('/api/hcth/nhiem-vu/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = req.params.id;
-            const nhiemVu = await app.model.hcthNhiemVu.asyncGet({ id });
+            const nhiemVuItem = await app.model.hcthNhiemVu.asyncGet({ id });
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, 'NHIEM_VU');
             const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, 'NHIEM_VU');
             const listFile = await app.model.hcthFile.getAllFile({ ma: id, loai: 'NHIEM_VU' }, '*', 'thoiGian');
             const lienKet = await app.model.hcthLienKet.getAllLienKet(id, 'NHIEM_VU', null, null);
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', 'id');
 
-            res.send({
-                error: null, item: {
-                    ...nhiemVu,
-                    phanHoi: phanHoi || [],
-                    listFile: listFile || [],
-                    canBoNhan: canBoNhan?.rows || [],
-                    lienKet: lienKet?.rows || [],
-                    donViNhan: donViNhan || []
-                }
-            });
+            const nhiemVu = {
+                ...nhiemVuItem,
+                phanHoi: phanHoi || [],
+                listFile: listFile || [],
+                canBoNhan: canBoNhan?.rows || [],
+                lienKet: lienKet?.rows || [],
+                donViNhan: donViNhan || []
+            };
+            if (!checkNhiemVuPermission(req, nhiemVu)) {
+                return res.send({ error: { status: 401, message: 'Bạn không có đủ quyền để xem nhiệm vu này' } });
+            }
+            else if (laNguoiThamGia(req, nhiemVu) || laTruongDonViNhan(req, nhiemVu))
+                await readNhiemVu(nhiemVu.id, req.session.user.shcc, nhiemVu.nguoiTao);
+
+            const history = await app.model.hcthHistory.getAllHistoryFrom(nhiemVu.id, 'NHIEM_VU');
+            nhiemVu.history = history?.rows || [];
+            res.send({ error: null, item: nhiemVu });
         } catch (error) {
             res.send({ error });
         }

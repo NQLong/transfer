@@ -205,8 +205,8 @@ export function renderComment({
                                 <div >{renderAvatar(item)}</div>
                                 <div style={{ ...contentStyle, ...getItemStyle(item) }}>
                                     <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...flexRow }}>
-                                        <b style={{ flex: 1 }}>{renderName(item)}</b>
-                                        <span>{renderTime(item)}</span>
+                                        <b style={{ flex: 1, whiteSpace: 'nowrap' }}>{renderName(item)}</b>
+                                        <span style={{ whiteSpace: 'nowrap' }}>{renderTime(item)}</span>
                                     </div>
                                     <div style={{ paddingTop: '5px' }}>{renderContent(item)}</div>
                                 </div>
