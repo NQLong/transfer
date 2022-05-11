@@ -434,7 +434,7 @@ module.exports = (app) => {
             }
             else {
                 const newCongVan = await updateCongvanDen(id, { trangThai });
-                await app.model.hcthHistory.createHistory({
+                await app.model.hcthHistory.asyncCreate({
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });

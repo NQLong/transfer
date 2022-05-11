@@ -17,7 +17,7 @@ module.exports = {
         UPDATE_STATUS: 'UPDATE_STATUS',
         ACCEPT: 'ACCEPT',
         READ: 'READ',
-        SEND: 'SEND'
+        SEND: 'SEND',
     },
 
     CONG_VAN_TYPE: 'DEN',

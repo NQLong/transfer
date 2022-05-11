@@ -414,7 +414,7 @@ module.exports = app => {
                 thoiGian: Number(thoiGian)
             };
             const congVan = await app.model.hcthCongVanDi.getCVD({ id: key });
-            await app.model.hcthHistory.createHistory(newHistory);
+            await app.model.hcthHistory.asyncCreate(newHistory);
 
             const beforeStatus = congVan.trangThai;
             const afterStatus = trangThai;

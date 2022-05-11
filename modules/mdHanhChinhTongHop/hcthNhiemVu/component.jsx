@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdminPage, AdminModal, FormCheckbox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, TableCell, FormTabs } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, FormCheckbox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, TableCell, FormTabs, renderTimeline } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { Link } from 'react-router-dom';
@@ -452,11 +452,11 @@ export class LienKetModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiLienKet = e} label='Loại liên kết' data={Object.keys(loaiLienKet).map(key => ({ id: loaiLienKet[key]?.id, text: loaiLienKet[key]?.text }))} onChange={(value) => this.setState({ loaiLienKet: value })} required />
                 {
-                    this.loaiLienKet?.value() == loaiLienKet.CONG_VAN_DEN.id &&
+                    this.state.loaiLienKet == loaiLienKet.CONG_VAN_DEN.id &&
                     <CongVanDenSelector {...this.props} ref={e => this.lienKet = e} />
                 }
                 {
-                    this.loaiLienKet?.value() == loaiLienKet.CONG_VAN_DI.id &&
+                    this.state.loaiLienKet == loaiLienKet.CONG_VAN_DI.id &&
                     <CongVanDiSelector {...this.props} ref={e => this.lienKet = e} />
                 }
             </div>
@@ -569,6 +569,41 @@ export class LienKet extends React.Component {
                 </button>
             </div>}
             <LienKetModal {...this.props} ref={e => this.modal = e} permission={this.props.permission} create={this.props.createLienKet} update={this.props.updateLienKet} get={this.props.getLienKet} permissions={this.props.currentPermissions} target={this.props.target} />
+        </div>);
+    }
+}
+
+export class History extends React.Component {
+    actionText = {
+        CREATE: 'tạo',
+        READ: 'đọc',
+        UPDATE: 'cập nhật'
+    }
+
+    actionColor = {
+        CREATE: '#149414',
+        READ: 'blue',
+        UPDATE: 'blue'
+
+    }
+
+    render = () => {
+        return (<div className='tile'>
+            <h3 className='tile-header'>Lịch sử</h3>
+            <div className='tile-body row'>
+                <div className='col-md-12'>
+                    {renderTimeline({
+                        getDataSource: () => this.props.data,
+                        handleItem: (item) => ({
+                            // className: item.hanhDong == action.RETURN ? 'danger' : '',
+                            component: <>
+                                <span className='time'>{T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM')}</span>
+                                <p><b style={{ color: 'blue' }}>{(item.ho?.normalizedName() || '') + ' '} {item.ten?.normalizedName() || ''}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>{this.actionText[item.hanhDong]}</b> nhiệm vụ này.</p>
+                            </>
+                        })
+                    })}
+                </div>
+            </div>
         </div>);
     }
 }

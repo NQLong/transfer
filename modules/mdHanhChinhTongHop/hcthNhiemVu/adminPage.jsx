@@ -148,11 +148,7 @@ class hcthNhiemVuPage extends AdminPage {
                         <TableCell type='text' content={item.doUuTien ? doUuTienMapper[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapper[item.doUuTien].color : '#000000' }} />
                         <TableCell type='text' content={item.tenNguoiTao.normalizedName()} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={
-                            <>
-                                <div style={{ color: item.trangThai && trangThaiNhiemVu[item.trangThai]?.color, textAlign: 'center' }}>{item.trangThai && trangThaiNhiemVu[item.trangThai]?.text}</div>
-                                {item.trangThai != trangThaiNhiemVu.MOI.id && <div>Tiến độ: <span style={{ color: 'blue' }}>{`${item.tienDo || 0}%`}</span></div>}
-                            </>
-
+                            <div style={{ color: item.trangThai && trangThaiNhiemVu[item.trangThai]?.color, textAlign: 'center' }}>{item.trangThai && trangThaiNhiemVu[item.trangThai]?.text}</div>
                         } style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                             item.ngayBatDau ? (<>
