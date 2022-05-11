@@ -577,11 +577,13 @@ export class History extends React.Component {
     actionText = {
         CREATE: 'tạo',
         READ: 'đọc',
-        UPDATE: 'cập nhật'
+        UPDATE: 'cập nhật',
+        COMPLETE : 'hoàn thành',
     }
 
     actionColor = {
         CREATE: '#149414',
+        COMPLETE: '#149414',
         READ: 'blue',
         UPDATE: 'blue'
 

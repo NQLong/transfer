@@ -412,4 +412,26 @@ module.exports = (app) => {
             }
         });
     });
+
+    app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'NHIEM_VU', (error, items) => res.send({ error, items: items?.rows || [] }));
+    });
+
+    app.get('/api/hcth/nhiem-vu/hoan-thanh/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const nhiemVuItem = await app.model.hcthNhiemVu.asyncGet({ id });
+            const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, 'NHIEM_VU');
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', 'id');
+            if (laNguoiThamGia(req, {
+                ...nhiemVuItem, canBoNhan: canBoNhan?.rows || [],
+                donViNhan: donViNhan || []
+            })) {
+                await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: id, shcc: req.session.user?.shcc, hanhDong: action.COMPLETE });
+                res.send({ error: null });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };

@@ -1004,7 +1004,7 @@ export class AdminPage extends React.Component {
             right += 60;
         }
         if (buttons) {
-            if (buttons.length) {
+            if (Array.isArray(buttons)) {
                 customButtons = buttons.map((item, index) => {
                     right += 60;
                     return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;

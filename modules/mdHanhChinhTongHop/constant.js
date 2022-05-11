@@ -18,6 +18,7 @@ module.exports = {
         ACCEPT: 'ACCEPT',
         READ: 'READ',
         SEND: 'SEND',
+        COMPLETE: 'COMPLETE',
     },
 
     CONG_VAN_TYPE: 'DEN',
