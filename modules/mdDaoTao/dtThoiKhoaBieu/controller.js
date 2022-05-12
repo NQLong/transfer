@@ -137,7 +137,10 @@ module.exports = app => {
         let phong = req.query.phong;
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         let listNgayLe = await app.model.dmNgayLe.getAllNgayLeTrongNam(thoiGianMoMon.khoa);
+        console.log('##Thời gian mở môn:', thoiGianMoMon);
         app.model.dtThoiKhoaBieu.getCalendar(phong, thoiGianMoMon.nam, thoiGianMoMon.hocKy, (error, items) => {
+            console.log('##get calendar error:', error);
+            console.log('##items calendar:', items);
             res.send({ error, items: items?.rows || [], listNgayLe });
         });
     });

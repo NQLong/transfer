@@ -266,11 +266,12 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 thu: this.thu[index].value(),
                 sucChua: this.state.sucChua[index],
                 soLuongDuKien: this.soLuongDuKien[index].value()
-            }, (data) => {
-                let item = data.item;
-                this.tietBatDau[index].value(item.tietBatDau);
-                this.thu[index].value(item.thu);
-                this.soTiet[index].value(item.soTiet);
+            }, () => {
+                // let item = data.item;
+                // this.tietBatDau[index].value(item.tietBatDau);
+                // this.thu[index].value(item.thu);
+                // this.soTiet[index].value(item.soTiet);
+                location.reload();
             });
     };
 
@@ -349,7 +350,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             <FormCheckbox ref={e => this.check[indexOfItem] = e} onChange={value => this.handleCheck(value, item)} readOnly={!!item.phong} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={<>{item.namDaoTao} <br /> {'HK' + item.hocKy}</>} />
-                        <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={<>{item.maNganh} <br /> {item.tenNganh.getFirstLetters()}</>} />
+                        <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={<>{item.maNganh} <br /> {item.tenNganh?.getFirstLetters()}</>} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
                         <TableCell style={{}} contentClassName='multiple-lines-4' content={<>
                             <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
@@ -420,7 +421,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                 isEdit: { ...this.state.isEdit, [indexOfItem]: !item.phong }
                             }, () => this.soLuongDuKien[indexOfItem].focus());
                         }} />
-                        <TableCell style={{}} content={item.tenKhoaDangKy.getFirstLetters().toUpperCase()} />
+                        <TableCell style={{}} content={item.tenKhoaDangKy?.getFirstLetters().toUpperCase()} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                         >
