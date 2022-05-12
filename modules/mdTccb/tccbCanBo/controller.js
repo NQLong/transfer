@@ -507,8 +507,8 @@ module.exports = app => {
                         donVi: qtChucVu[0].donVi,
                         phoThong: canBo.phoThong || '',
                         hocVi: canBo.hocVi || '',
-                        ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(canBo.ngayVaoDang) : '',
-                        ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(canBo.ngayVaoDangChinhThuc) : '',
+                        ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
+                        ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(new Date(canBo.ngayVaoDangChinhThuc)) : '',
                         ngayNhapNgu: canBo.ngayNhapNgu ? app.date.viDateFormat(new Date(canBo.ngayNhapNgu)) : '',
                         ngayXuatNgu: canBo.ngayXuatNgu ? app.date.viDateFormat(new Date(canBo.ngayXuatNgu)) : '',
                         quanHam: canBo.quanHam || '',
@@ -1440,7 +1440,7 @@ module.exports = app => {
 
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
-        
+
     app.get('/api/staff/download-excel-all', checkGetStaffPermission, (req, res) => {
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const filter = app.stringify(req.query.filter);
@@ -1573,38 +1573,38 @@ module.exports = app => {
 
     app.get('/api/staff/download-monthly-report', checkGetStaffPermission, (req, res) => {
         const workbook = app.excel.create(),
-              worksheet = workbook.addWorksheet('Sheet1');
+            worksheet = workbook.addWorksheet('Sheet1');
         const promiseCalDonVi = new Promise((resolve) => {
             let cells = [{ cell: 'A1', value: 'Thống kê Đơn vị thuộc Trường', border: '1234', bold: true }];
             cells.push({ cell: 'B1', value: 'Số lượng', border: '1234', bold: true });
             app.model.dmDonVi.getAll((error, data) => {
                 data = data.groupBy('maPl');
-                cells.push({ cell: 'A2', value: 'Phòng chức năng, Thư viện, Bảo tàng, CS.TĐ', border: '1234'});
+                cells.push({ cell: 'A2', value: 'Phòng chức năng, Thư viện, Bảo tàng, CS.TĐ', border: '1234' });
                 cells.push({ cell: 'B2', number: data['2']?.length, border: '1234' });
                 cells.push({ cell: 'A3', value: 'Khoa', border: '1234' });
                 cells.push({ cell: 'B3', number: data['1']?.length, border: '1234' });
-                cells.push({ cell: 'A4', value: 'Bộ môn', border: '1234'} );
-                cells.push({ cell: 'B4', number: data['5']?.length, border: '1234'} );
-                cells.push({ cell: 'A5', value: 'Trung tâm', border: '1234'});
+                cells.push({ cell: 'A4', value: 'Bộ môn', border: '1234' });
+                cells.push({ cell: 'B4', number: data['5']?.length, border: '1234' });
+                cells.push({ cell: 'A5', value: 'Trung tâm', border: '1234' });
                 cells.push({ cell: 'B5', number: data['3']?.length, border: '1234' });
-                cells.push({ cell: 'A6', value: 'Công ty', border: '1234'});
+                cells.push({ cell: 'A6', value: 'Công ty', border: '1234' });
                 cells.push({ cell: 'B6', number: data['6']?.length, border: '1234' });
-                cells.push({ cell: 'A7', value: 'Đoàn thể', border: '1234'});
+                cells.push({ cell: 'A7', value: 'Đoàn thể', border: '1234' });
                 cells.push({ cell: 'B7', number: data['4']?.length, border: '1234' });
                 resolve(cells);
             });
         });
-        
+
         const promiseCalBoMon = new Promise((resolve) => {
             let cells = [{ cell: 'A8', value: 'Thống kê Đơn vị thuộc Phòng/Khoa/Trung tâm', border: '1234', bold: true }];
             app.model.dmBoMon.getAll((error, data) => {
                 data = data.groupBy('maPl');
-                cells.push({ cell: 'A9', value: 'Bộ môn thuộc Khoa/Trung tâm', border: '1234'});
+                cells.push({ cell: 'A9', value: 'Bộ môn thuộc Khoa/Trung tâm', border: '1234' });
                 cells.push({ cell: 'B9', number: data['1']?.length, border: '1234' });
                 cells.push({ cell: 'A10', value: 'Phòng thuộc Khoa', border: '1234' });
                 cells.push({ cell: 'B10', number: data['2']?.length, border: '1234' });
-                cells.push({ cell: 'A11', value: 'Bộ Trung tâm thuộc Khoa/Phòng', border: '1234'} );
-                cells.push({ cell: 'B11', number: data['3']?.length, border: '1234'} );
+                cells.push({ cell: 'A11', value: 'Bộ Trung tâm thuộc Khoa/Phòng', border: '1234' });
+                cells.push({ cell: 'B11', number: data['3']?.length, border: '1234' });
                 resolve(cells);
             });
         });
@@ -1671,7 +1671,7 @@ module.exports = app => {
                 cells.push({ cell: 'C20', value: Number.parseFloat(calHopDong * 100 / total).toFixed(2), border: '1234' });
                 cells.push({ cell: 'D20', number: calHopDongNu, border: '1234' });
                 cells.push({ cell: 'E20', value: Number.parseFloat(calHopDongNu * 100 / (calBienCheNu + calHopDongNu)).toFixed(2), border: '1234' });
-                cells.push({ cell: 'A21', value: 'Tổng cộng', border: '1234', bold: true});
+                cells.push({ cell: 'A21', value: 'Tổng cộng', border: '1234', bold: true });
                 cells.push({ cell: 'B21', number: total, border: '1234', bold: true });
                 cells.push({ cell: 'C21', value: 100.00, border: '1234', bold: true });
                 cells.push({ cell: 'D21', number: calBienCheNu + calHopDongNu, border: '1234', bold: true });
@@ -1762,12 +1762,12 @@ module.exports = app => {
             }, (error, data) => {
                 let dataHocVi = data.groupBy('hocVi');
                 let dataChucDanh = data.groupBy('chucDanh');
-                ['01', '02', '03', '04', '05'].forEach((key, ) => {
+                ['01', '02', '03', '04', '05'].forEach((key,) => {
                     if (!(key in dataHocVi)) {
                         dataHocVi[key] = [];
                     }
                 });
-                ['01', '02'].forEach((key, ) => {
+                ['01', '02'].forEach((key,) => {
                     if (!(key in dataChucDanh)) {
                         dataChucDanh[key] = [];
                     }
@@ -1868,12 +1868,12 @@ module.exports = app => {
             }, (error, data) => {
                 let dataHocVi = data.groupBy('hocVi');
                 let dataChucDanh = data.groupBy('chucDanh');
-                ['01', '02', '03', '04'].forEach((key, ) => {
+                ['01', '02', '03', '04'].forEach((key,) => {
                     if (!(key in dataHocVi)) {
                         dataHocVi[key] = [];
                     }
                 });
-                ['01', '02'].forEach((key, ) => {
+                ['01', '02'].forEach((key,) => {
                     if (!(key in dataChucDanh)) {
                         dataChucDanh[key] = [];
                     }
@@ -1938,7 +1938,7 @@ module.exports = app => {
         const promiseUpdateNhanSu = new Promise(resolve => {
             let currentDate = new Date();
             currentDate.setDate(1);
-            currentDate.setMonth(currentDate.getMonth()-1);
+            currentDate.setMonth(currentDate.getMonth() - 1);
             let monthYear = currentDate.getMonth() + '/' + currentDate.getFullYear();
             let cells = [{ cell: 'A48', value: 'Cập nhật tình hình về nhân sự trong Tháng ' + monthYear, border: '1234', bold: true }];
             cells.push({ cell: 'B48', value: 'Số lượng', border: '1234', bold: true });
@@ -1955,7 +1955,7 @@ module.exports = app => {
         const promiseCalcCongTac = new Promise(resolve => {
             let currentDate = new Date();
             currentDate.setDate(1);
-            currentDate.setMonth(currentDate.getMonth()-1);
+            currentDate.setMonth(currentDate.getMonth() - 1);
             let monthYear = currentDate.getMonth() + '/' + currentDate.getFullYear();
             let cells = [{ cell: 'A56', value: 'Quyết định cử đi học trong Tháng ' + monthYear, border: '1234', bold: true }];
             cells.push({ cell: 'B56', value: 'Nước ngoài', border: '1234', bold: true });

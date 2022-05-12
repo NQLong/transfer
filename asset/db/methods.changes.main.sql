@@ -119,17 +119,18 @@ BEGIN
                      nv.NGUOI_TAO                                         AS "nguoiTao",
                      nv.LIEN_PHONG                                        AS "lienPhong",
                      nv.TRANG_THAI                                        AS "trangThai",
-                     nv.TIEN_DO                                           AS "tienDo",
+
+                     (select MAX(nvh.THOI_GIAN) from HCTH_HISTORY nvh where nvh.LOAI= 'NHIEM_VU' and nvh.KEY = nv.ID) as chinhSuaLanCuoi,
 
 
                      (SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
-                            order by dvn.TEN
-                            )
-                         FROM DM_DON_VI dvn
-                                  LEFT JOIN HCTH_DON_VI_NHAN hcthdvn on dvn.MA = hcthdvn.DON_VI_NHAN
-                         WHERE hcthdvn.MA = nv.ID
-                           AND hcthdvn.LOAI = 'NHIEM_VU'
-                        )                     AS "danhSachDonViNhan",
+                         order by dvn.TEN
+                         )
+                      FROM DM_DON_VI dvn
+                               LEFT JOIN HCTH_DON_VI_NHAN hcthdvn on dvn.MA = hcthdvn.DON_VI_NHAN
+                      WHERE hcthdvn.MA = nv.ID
+                        AND hcthdvn.LOAI = 'NHIEM_VU'
+                     )                                                    AS "danhSachDonViNhan",
 
 
                      (SELECT LISTAGG(
