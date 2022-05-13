@@ -53,8 +53,8 @@ class DaoTaoDetail extends AdminPage {
                         <TableCell content={item.tenCoSoDaoTao} />
                         <TableCell content={item.tenHinhThuc} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
-                            {item.batDau && <>Từ <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span> - </>}
-                            {item.ketThuc && <>Đến <span style={{ color: 'blue' }}>{item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : 'nay'}</span></>}
+                            {item.batDau && <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span>}
+                            {item.ketThuc && <> - <span style={{ color: 'blue' }}>{item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : 'nay'}</span></>}
                         </>} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, shcc: this.props.shcc })}

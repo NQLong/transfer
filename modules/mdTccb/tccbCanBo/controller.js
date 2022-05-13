@@ -433,7 +433,7 @@ module.exports = app => {
 
                     qtDaoTao.map(item => {
                         item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
-                        item.ketThuc = item.ketThuc == -1 ? 'nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType);
+                        item.ketThuc = item.ketThuc ? (item.ketThuc == -1 ? ' - nay' : ' - ' + app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType)) : '';
                         return item;
                     });
 
@@ -448,8 +448,14 @@ module.exports = app => {
                     let llct = getMaxDaoTao('Lý luận chính trị'),
                         qlnn = getMaxDaoTao('Quản lý nhà nước'),
                         tinHoc = getMaxDaoTao('Tin học');
-
-                    qtHocTapCongTac.map(item => {
+                    if (!qtHocTapCongTac.length) {
+                        qtHocTapCongTac = [{
+                            batDau: '',
+                            ketThuc: '',
+                            noiDung: ''
+                        }];
+                    }
+                    else qtHocTapCongTac.map(item => {
                         item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
                         item.ketThuc = item.ketThuc == -1 ? 'nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType);
                         return item;
@@ -467,7 +473,10 @@ module.exports = app => {
                             ngayThamGia: '',
                             moTa: ''
                         }];
-                    }
+                    } else toChucKhac.map(item => {
+                        item.ngayThamGia = item.ngayThamGia ? app.date.dateTimeFormat(new Date(item.ngayThamGia), 'dd/mm/yyyy') : '';
+                    });
+
                     const source = app.path.join(__dirname, 'resource', 'Mau-2C-BNV-2008.docx');
                     const data = {
                         HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
