@@ -153,7 +153,7 @@ export class EditModal extends AdminModal {
 
 class QtChucVu extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
-    state = { filter: {} };
+    state = { filter: {}, timeType: 0 };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -261,6 +261,10 @@ class QtChucVu extends AdminPage {
         e.preventDefault();
     }
 
+    checkTimeType = (value) => {
+        this.setState({ timeType: value });
+    }
+
     render() {
         const permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
@@ -356,9 +360,9 @@ class QtChucVu extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ'/>}
-                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' /> : <div className='col-lg-9' />} 
+                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={value => {this.checkTimeType(value);}} />
+                    {this.state.timeType != 0 && <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ'/>}
+                    {(this.state.timeType != 0) ? <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' /> : <div className='col-lg-9' />} 
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-4' data={[
