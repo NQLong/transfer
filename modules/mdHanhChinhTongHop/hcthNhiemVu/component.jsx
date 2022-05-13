@@ -267,7 +267,6 @@ class CongVanDenSelector extends React.Component {
         e.preventDefault();
         this.year.value('');
         this.search.value('');
-        this.status.value('');
         this.changeSearch();
     }
 
@@ -366,7 +365,6 @@ class CongVanDiSelector extends React.Component {
     resetSearch = () => {
         this.year.value('');
         this.search.value('');
-        this.status.value('');
         this.changeSearch();
     }
 
@@ -452,11 +450,11 @@ export class LienKetModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiLienKet = e} label='Loại liên kết' data={Object.keys(loaiLienKet).map(key => ({ id: loaiLienKet[key]?.id, text: loaiLienKet[key]?.text }))} onChange={(value) => this.setState({ loaiLienKet: value })} required />
                 {
-                    this.state.loaiLienKet == loaiLienKet.CONG_VAN_DEN.id &&
+                    this.state.loaiLienKet?.id == loaiLienKet.CONG_VAN_DEN.id &&
                     <CongVanDenSelector {...this.props} ref={e => this.lienKet = e} />
                 }
                 {
-                    this.state.loaiLienKet == loaiLienKet.CONG_VAN_DI.id &&
+                    this.state.loaiLienKet?.id == loaiLienKet.CONG_VAN_DI.id &&
                     <CongVanDiSelector {...this.props} ref={e => this.lienKet = e} />
                 }
             </div>

@@ -73,12 +73,12 @@ class ComponentQuanHe extends AdminPage {
 
     editQuanHe = (e, item) => {
         e.preventDefault();
-        this.modal.show({ item, shcc: this.state.shcc });
+        this.modal.show({ item, shcc: this.props.shcc });
     }
 
     deleteQuanHe = (e, item) => {
         T.confirm('Xóa thông tin người thân', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && (this.props.deleteQuanHeCanBo(item.id, this.state.shcc)));
+            isConfirm && (this.props.deleteQuanHeCanBo(item.id, this.props.shcc)));
         e.preventDefault();
     }
 

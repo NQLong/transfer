@@ -497,7 +497,6 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber);
         const pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        console.log(pageNumber, pageSize);
         const { ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
 
         const data = { ids, excludeIds, hasIds, fromTime, toTime };

@@ -13153,6 +13153,13 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [

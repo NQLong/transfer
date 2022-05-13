@@ -3145,6 +3145,8 @@ BEGIN
                      nv.LIEN_PHONG                                        AS "lienPhong",
                      nv.TRANG_THAI                                        AS "trangThai",
 
+                     (select MAX(nvh.THOI_GIAN) from HCTH_HISTORY nvh where nvh.LOAI= 'NHIEM_VU' and nvh.KEY = nv.ID) as chinhSuaLanCuoi,
+
 
                      (SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
                          order by dvn.TEN
