@@ -48,15 +48,35 @@ module.exports = (app) => {
     };
 
 
-    const checkNhiemVuPermission = (req, nhiemVu) => {
-        const permissions = req.session.user?.permissions || [];
-        return (
-            permissions.includes('rectors:login') ||
-            permissions.includes('hcth:manage') ||
-            req.session.user?.staff.shcc == nhiemVu.nguoiTao ||
-            laTruongDonViNhan(req, nhiemVu) ||
-            laNguoiThamGia(req, nhiemVu)
-        );
+    const checkNhiemVuPermission = async (req, nhiemVu, nhiemVuId) => {
+        try {
+
+            const permissions = req.session.user?.permissions || [];
+            if (!nhiemVu) {
+                nhiemVu = await app.model.hcthNhiemVu.asyncGet({ id: nhiemVuId });
+                const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: nhiemVuId, loai: 'NHIEM_VU' }, '*', 'id');
+                const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(nhiemVuId, 'NHIEM_VU');
+                nhiemVu.canBoNhan = canBoNhan?.rows || [];
+                nhiemVu.donViNhan = donViNhan || [];
+            }
+            return (
+                permissions.includes('rectors:login') ||
+                permissions.includes('hcth:manage') ||
+                req.session.user?.staff.shcc == nhiemVu.nguoiTao ||
+                laTruongDonViNhan(req, nhiemVu) ||
+                laNguoiThamGia(req, nhiemVu)
+            );
+        }
+        catch (error) {
+            console.error(error);
+            return false;
+        }
+    };
+
+    app.hcthNhiemVu = {
+        laNguoiThamGia,
+        laTruongDonViNhan,
+        checkNhiemVuPermission,
     };
 
     //api
@@ -138,8 +158,10 @@ module.exports = (app) => {
             const nhiemVu = app.model.hcthNhiemVu.asyncUpdate({ id }, data);
             await updateDonViNhan(await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', ''), donViNhan, id);
             await updateListFile(fileList, id);
-            await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
+            await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: id, shcc: req.session.user.shcc, hanhDong: action.UPDATE });
+
             res.send({ error: null, item: nhiemVu });
+
         } catch (error) {
             res.send({ error });
         }
@@ -277,7 +299,7 @@ module.exports = (app) => {
                 lienKet: lienKet?.rows || [],
                 donViNhan: donViNhan || []
             };
-            if (!checkNhiemVuPermission(req, nhiemVu)) {
+            if (!await checkNhiemVuPermission(req, nhiemVu)) {
                 return res.send({ error: { status: 401, message: 'Bạn không có đủ quyền để xem nhiệm vu này' } });
             }
             else if (laNguoiThamGia(req, nhiemVu) || laTruongDonViNhan(req, nhiemVu))

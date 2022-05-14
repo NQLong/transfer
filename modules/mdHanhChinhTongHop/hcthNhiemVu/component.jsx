@@ -576,7 +576,7 @@ export class History extends React.Component {
         CREATE: 'tạo',
         READ: 'đọc',
         UPDATE: 'cập nhật',
-        COMPLETE : 'hoàn thành',
+        COMPLETE: 'hoàn thành',
     }
 
     actionColor = {
@@ -591,7 +591,7 @@ export class History extends React.Component {
         return (<div className='tile'>
             <h3 className='tile-header'>Lịch sử</h3>
             <div className='tile-body row'>
-                <div className='col-md-12'>
+                <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                     {renderTimeline({
                         getDataSource: () => this.props.data,
                         handleItem: (item) => ({
