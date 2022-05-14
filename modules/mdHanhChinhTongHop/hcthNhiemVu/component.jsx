@@ -1,10 +1,9 @@
 import React from 'react';
-import { AdminPage, AdminModal, FormCheckbox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, TableCell, FormTabs, renderTimeline } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, FormCheckbox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, TableCell, FormTabs, renderTimeline, FormFileBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_FwCanBo, SelectAdapter_FwCanBoByDonVi } from 'modules/mdTccb/tccbCanBo/redux';
-
 const { vaiTro, loaiLienKet } = require('../constant');
 const vaiTroSelector = Object.keys(vaiTro).map(key => ({ id: key, text: vaiTro[key].text }));
 
@@ -603,5 +602,95 @@ export class History extends React.Component {
                 </div>
             </div>
         </div>);
+    }
+}
+export class ListFiles extends React.Component {
+    listFileRefs = {};
+
+    componentDidUpdate() {
+        this.props.files.map((item) => this.listFileRefs[item.id]?.value(item.viTri || ''));
+        this.fileBox?.setData('hcthNhiemVuFile:' + (this.props.id ? this.props.id : 'new'));
+    }
+
+    onSuccess = (response) => {
+        if (response.error) T.notify(response.error, 'danger');
+        else if (response.item) {
+            let listFile = this.props.files.length ? [...this.props.files] : [];
+            listFile.push(response.item);
+            this.props.updateListFile(listFile);
+        }
+    }
+
+    onViTriChange = (e, id, index) => {
+        e.preventDefault();
+        let listFile = [...this.props.files];
+        listFile[index].viTri = this.listFileRefs[id].value() || '';
+        setTimeout(() => this.props.updateListFile(listFile), 500);
+    }
+
+    onDeleteFile = (e, index, item) => {
+        e.preventDefault();
+        const { id: fileId, ten: file } = item;
+        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
+            isConfirm && this.props.deleteFile(this.props.id ? this.props.id : null, fileId, file, () => {
+                let listFile = [...this.props.files];
+                listFile.splice(index, 1);
+                this.props.updateListFile(listFile);
+            }));
+    }
+    tableListFile = (data, id, sitePermission) => renderTable({
+        getDataSource: () => data,
+        stickyHead: false,
+        emptyTable: 'Chưa có tập tin nào!',
+        renderHead: () => (
+            <tr>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
+                <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Tên tập tin</th>
+                <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+            </tr>
+        ),
+        renderRow: (item, index) => {
+            const
+                timeStamp = item.thoiGian,
+                originalName = item.ten,
+                linkFile = `/api/hcth/nhiem-vu/download/${id || 'new'}/${originalName}`;
+            return (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
+                        <a href={linkFile} download>{originalName}</a>
+                    </>
+                    } />
+                    <TableCell content={(
+                        sitePermission.editGeneral ? <FormTextBox type='text' placeholder='Nhập ghi chú' style={{ marginBottom: 0 }} ref={e => this.listFileRefs[item.id] = e} onChange={e => this.onViTriChange(e, item.id, index)} /> : item.viTri
+                    )} />
+                    <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ delete: sitePermission.delete }} onDelete={!sitePermission.delete ? null : e => this.onDeleteFile(e, index, item)}>
+                        <a className='btn btn-info' href={linkFile} download title='Tải về'>
+                            <i className='fa fa-lg fa-download' />
+                        </a>
+                    </TableCell>
+                </tr>
+            );
+        }
+    });
+    render() {
+        const { id, sitePermission } = this.props;
+       
+        return (
+            <div className='tile'>
+                <div className='form-group'>
+                    <h3 className='tile-title'>Danh sách tập tin</h3>
+                    <div className='tile-body row'>
+                        <div className={'form-group ' + (!sitePermission.editGeneral ? 'col-md-12' : 'col-md-8')}>
+                            {this.tableListFile(this.props.files, id, sitePermission)}
+                         </div>
+                        {sitePermission.editGeneral && <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin nhiệm vụ' postUrl='/user/upload' uploadType='hcthNhiemVuFile' userData='hcthNhiemVuFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
+                    </div>
+                </div>
+            </div>
+        );
     }
 }

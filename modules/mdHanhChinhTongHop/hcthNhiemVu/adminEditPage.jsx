@@ -3,8 +3,8 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
-import { CanBoNhan, LienKet, PhanHoi, History } from './component';
+import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { CanBoNhan, LienKet, PhanHoi, History, ListFiles} from './component';
 import { clearHcthNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu } from './redux';
 const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 
@@ -13,17 +13,6 @@ const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 class AdminEditPage extends AdminPage {
     listFileRefs = {};
     state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.MOI.id }
-
-    deleteFile = (e, index, item) => {
-        e.preventDefault();
-        const { id: fileId, ten: file } = item;
-        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteFile(this.state.id ? this.state.id : null, fileId, file, () => {
-                let listFile = [...this.state.listFile];
-                listFile.splice(index, 1);
-                this.setState({ listFile });
-            }));
-    }
 
     tableListFile = (data, id, sitePermission) => renderTable({
         getDataSource: () => data,
@@ -65,6 +54,7 @@ class AdminEditPage extends AdminPage {
     });
 
     componentDidMount() {
+        console.log(this.props.system.user);
         const { readyUrl, routeMatcherUrl } = this.getSiteSetting();
         T.ready(readyUrl, () => {
             const params = T.routeMatcher(routeMatcherUrl).parse(window.location.pathname),
@@ -122,6 +112,7 @@ class AdminEditPage extends AdminPage {
     };
 
     save = () => {
+        console.log(this.state.listFile);
         let changes = {
             nguoiTao: this.props.system.user.shcc,
             tieuDe: this.tieuDe.value(),
@@ -158,22 +149,6 @@ class AdminEditPage extends AdminPage {
     getTrangThaiAdapter = (current) => {
         const currentValue = trangThaiNhiemVu[current].value;
         return Object.keys(trangThaiNhiemVu).filter(key => trangThaiNhiemVu[key].value >= currentValue).map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text }));
-    }
-
-    onSuccess = (response) => {
-        if (response.error) T.notify(response.error, 'danger');
-        else if (response.item) {
-            let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
-            listFile.push(response.item);
-            this.setState({ listFile });
-        }
-    }
-
-    onViTriChange = (e, id, index) => {
-        e.preventDefault();
-        let listFile = [...this.state.listFile];
-        listFile[index].viTri = this.listFileRefs[id].value() || '';
-        setTimeout(() => this.setState({ listFile }), 500);
     }
 
     getDonViAdapater = () => {
@@ -230,7 +205,6 @@ class AdminEditPage extends AdminPage {
 
         // const nextTrangThai = trangThaiNhiemVu[this.state.trangThai]?.next || [];
         // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
-
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Giao nhiệm vụ',
@@ -264,17 +238,7 @@ class AdminEditPage extends AdminPage {
                 {this.state.id && <PhanHoi {...this.props} target={this.state.id} sitePermission={sitePermission} />}
                 {this.state.id && <LienKet {...this.props} sitePermission={sitePermission} target={this.state.id} data={this.props.hcthNhiemVu?.cvdPage?.list} />}
 
-                <div className='tile'>
-                    <div className='form-group'>
-                        <h3 className='tile-title'>Danh sách tập tin</h3>
-                        <div className='tile-body row'>
-                            <div className={'form-group ' + (!sitePermission.editGeneral ? 'col-md-12' : 'col-md-8')}>
-                                {this.tableListFile(this.state.listFile, this.state.id, sitePermission)}
-                            </div>
-                            {sitePermission.editGeneral && <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin nhiệm vụ' postUrl='/user/upload' uploadType='hcthNhiemVuFile' userData='hcthNhiemVuFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
-                        </div>
-                    </div>
-                </div>
+                <ListFiles files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} deleteFile={this.props.deleteFile} updateListFile={(newList) => this.setState({ listFile: newList}) }/>
 
                 {this.state.id && <History data={this.props.hcthNhiemVu?.item?.history} />}
             </>,
