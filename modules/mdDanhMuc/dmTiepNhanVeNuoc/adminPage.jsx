@@ -47,9 +47,9 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật tiếp nhận về nước' : 'Tạo mới tiếp nhận về nước',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã khen thưởng' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã' 
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên khen thưởng' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên tiếp nhận' 
                     readOnly={readOnly} required />
             </div>
         });
