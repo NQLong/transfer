@@ -27,7 +27,7 @@ class EditModal extends AdminModal {
             ten: getValue(this.ten),
             thangDoMin: getValue(this.thangDoMin),
             thangDoMax: getValue(this.thangDoMax),
-            moTa: this.moTa.value(),
+            moTa: getValue(this.moTa),
             kichHoat: Number(getValue(this.kichHoat)),
         };
 
@@ -51,7 +51,7 @@ class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.thangDoMin = e} label='Thang đo Min ' readOnly={readOnly} placeholder='Thang đo Min 0-5' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.thangDoMax = e} label='Thang đo Max ' readOnly={readOnly} placeholder='Thang đo Max 0-5' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.moTa = e} label='Mô tả' readOnly={readOnly} placeholder='Mô tả' />
+                <FormTextBox type='text' className='col-12' ref={e => this.moTa = e} label='Mô tả' readOnly={readOnly} placeholder='Mô tả' required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} required />
             </div>
         }
@@ -79,42 +79,39 @@ class DtChuanDauRaPage extends AdminPage {
                 else T.alert(`Xoá chuẩn đầu ra ${item.ten} thành công!`, 'success', false, 800);
             });
         });
-        e.preventDefault();
     }
 
     render() {
-        const permission = this.getUserPermission('dtChuanDauRa', ['read', 'write', 'delete']);
-        let list = this.props.dtChuanDauRa && this.props.dtChuanDauRa.item ? this.props.dtChuanDauRa.item : [];
-        const table = !(list && list.length > 0) ? 'Không có dữ liệu chuẩn đầu ra!' :
-            renderTable({
-                getDataSource: () => list, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                        <th style={{ width: '30%' }} nowrap='true'>Tên</th>
-                        <th style={{ width: '10%' }} nowrap='true'>Thang Đo Min</th>
-                        <th style={{ width: '10%' }} nowrap='true'>Thang Đo Max</th>
-                        <th style={{ width: '50%' }} nowrap='true'>Mô tả</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+        const permission = this.getUserPermission('dtChuanDauRa');
+        let list = this.props.dtChuanDauRa && this.props.dtChuanDauRa.items? this.props.dtChuanDauRa.items : []; 
+        const table = renderTable({
+            getDataSource: () => list, stickyHead: false,
+            emptyTable: 'Không có dữ liệu chuẩn đầu ra!',
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
+                    <th style={{ width: '30%' }} nowrap='true'>Tên</th>
+                    <th style={{ width: '10%' }} nowrap='true'>Thang Đo Min</th>
+                    <th style={{ width: '10%' }} nowrap='true'>Thang Đo Max</th>
+                    <th style={{ width: '50%' }} nowrap='true'>Mô tả</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
 
-                    </tr>),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='text' content={item.ten} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={parseFloat(item.thangDoMin).toFixed(1)} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={parseFloat(item.thangDoMax).toFixed(1)} />
-                        <TableCell type='text' content={item.moTa} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDtChuanDauRa(item.id, { kichHoat: Number(value) })} />
-                        <TableCell type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete}
-                            //onDelete={(e) => this.delete(e, item.id)} param is direct item.id, can not get other properties of item[].
-                            onChanged={value => this.props.updateDtChuanDauRa(item.id, { kichHoat: Number(value) })} />
-                    </tr>
-                )
-            });
+                </tr>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell content={item.ten} />
+                    <TableCell style={{ textAlign: 'center' }} content={parseFloat(item.thangDoMin).toFixed(1)} />
+                    <TableCell style={{ textAlign: 'center' }} content={parseFloat(item.thangDoMax).toFixed(1)} />
+                    <TableCell content={item.moTa} />
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDtChuanDauRa(item.id, { kichHoat: Number(value) })} />
+                    <TableCell type='buttons' content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                </tr>
+            )
+        });
 
         return this.renderPage({
             icon: 'fa fa-graduation-cap',

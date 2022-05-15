@@ -19,11 +19,11 @@ module.exports = app => {
     );
 
     //     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/user/dao-tao/chuan-dau-ra', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/dao-tao/chuan-dau-ra', app.permission.check('dtChuanDauRa:read'), app.templates.admin);
 
-    app.get('/api/dao-tao/chuan-dau-ra/all', app.permission.orCheck('dtChuanDauRa:read'), (req, res) => {
-        app.model.dtChuanDauRa.getAll({}, '*', 'thangDoMin asc', (error, item) => {
-            res.send({ error, item });
+    app.get('/api/dao-tao/chuan-dau-ra/all', app.permission.check('dtChuanDauRa:read'), (req,res) => {
+        app.model.dtChuanDauRa.getAll({}, '*', 'thangDoMin asc', (error, items) => {
+            res.send({ error, items});
         });
     });
 
@@ -37,7 +37,6 @@ module.exports = app => {
 
     app.put('/api/dao-tao/chuan-dau-ra', app.permission.check('dtChuanDauRa:write'), (req, res) => {
         let changes = req.body.changes;
-        console.log('check update');
         app.model.dtChuanDauRa.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
     });
 };
