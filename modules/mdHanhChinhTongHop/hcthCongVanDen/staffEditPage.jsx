@@ -131,7 +131,7 @@ class StaffEditPage extends AdminPage {
 
 
     componentDidMount() {
-        const {readyUrl, routeMatcherUrl} = this.getSiteSetting();
+        const { readyUrl, routeMatcherUrl } = this.getSiteSetting();
         T.ready(readyUrl, () => {
             const params = T.routeMatcher(routeMatcherUrl).parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '' },
@@ -275,7 +275,11 @@ class StaffEditPage extends AdminPage {
 
     getData = () => {
         if (this.state.id) {
-            this.props.getCongVanDen(Number(this.state.id), (item) => this.setState({ isLoading: false }, () => this.setData(item)));
+            const queryParams = new URLSearchParams(window.location.search);
+            const nhiemVu = queryParams.get('nhiemVu');
+            const context = {};
+            if (nhiemVu) context.nhiemVu = nhiemVu;
+            this.props.getCongVanDen(Number(this.state.id), context, (item) => this.setState({ isLoading: false }, () => this.setData(item)));
         } else this.setData();
     }
 
@@ -638,7 +642,8 @@ class StaffEditPage extends AdminPage {
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             criticalStatus = [trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id],
             item = this.state.id ? this.getItem() : {},
-            {breadcrumb, backRoute} = this.getSiteSetting();
+            { breadcrumb, backRoute } = this.getSiteSetting();
+
 
         const loading = (
             <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

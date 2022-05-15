@@ -188,7 +188,7 @@ module.exports = app => {
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.noiDung });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenChuyenNganh });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenCoSoDaoTao });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTruong });
                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: timeRange });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.hocKyHoTro });
                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.soTien });

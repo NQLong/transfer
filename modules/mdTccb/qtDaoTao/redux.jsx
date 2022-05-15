@@ -127,8 +127,8 @@ export function updateQtDaoTao(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật quá trình đào tạo thành công!', 'success');
-                done && done(data.item);
                 dispatch(getQtDaoTaoPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật quá trình đào tạo bị lỗi', 'danger'));
     };
@@ -266,5 +266,19 @@ export function deleteQtDaoTaoStaffPage(id, done) {
                 dispatch(getQtDaoTaoStaffPage());
             }
         }, () => T.notify('Xoá đào tạo bị lỗi', 'danger'));
+    };
+}
+
+export function getItemQtDaoTao(id, done) {
+    return () => {
+        const url = `/api/tccb/qua-trinh/dao-tao/${id}`;
+        T.get(url, result => {
+            if (result.error) {
+                T.notify('Lỗi lấy quá trình đào tạo', 'danger');
+                console.error(result.error);
+            } else {
+                done && done(result.item);
+            }
+        });
     };
 }

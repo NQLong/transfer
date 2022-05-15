@@ -1,21 +1,17 @@
-import { AdminModal, FormCheckbox, FormFileBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, FormCheckbox, FormDatePicker, FormFileBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import React from 'react';
 import { SelectApdater_DmBangDaoTao } from 'modules/mdDanhMuc/dmBangDaoTao/redux';
 import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
 import { SelectAdapter_DmHinhThucDaoTaoV2 } from 'modules/mdDanhMuc/dmHinhThucDaoTao/redux';
-import { DateInput } from 'view/component/Input';
 import Dropdown from 'view/component/Dropdown';
+import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 
-const EnumDateType = {
-    0: { text: '' },
-    1: { text: 'dd/mm/yyyy' },
-    2: { text: 'mm/yyyy' },
-    3: { text: 'yyyy' },
-}, typeMapper = {
-    'yyyy': 'year',
-    'mm/yyyy': 'month',
-    'dd/mm/yyyy': 'date'
-};
+const EnumDateType = ['dd/mm/yyyy', 'mm/yyyy', 'yyyy'],
+    typeMapper = {
+        'yyyy': 'year-mask',
+        'mm/yyyy': 'month-mask',
+        'dd/mm/yyyy': 'date-mask'
+    };
 
 const chuyenNganhSupportText = {
     5: 'Ngoại ngữ',
@@ -37,53 +33,52 @@ export class DaoTaoModal extends AdminModal {
         listFile: []
     }
 
-    onShow = (item) => {
-        let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenCoSoDaoTao, hinhThuc, loaiBangCap, minhChung }
-            = item && item.item ? item.item :
-                {
-                    id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
-                    tenCoSoDaoTao: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: '', minhChung: '[]'
-                };
+    onShow = (data) => {
+        //data for adminPage, daoTaoDetail: data: { item: }
+        //data for support: data: { data: {}, qtId }
+        let item = data.item || data.data || null;
+        let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenTruong, hinhThuc, loaiBangCap, minhChung, shcc } = item || {
+            id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
+            tenTruong: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: '', minhChung: '[]', shcc: ''
+        };
         let listFile = T.parse(minhChung || '[]');
+        data.data && this.setState({ item, qtId: data.qtId });
         this.setState({
-            batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
-            ketThucType: ketThuc ? ketThucType : 'dd/mm/yyyy',
-            listFile,
-            shcc: item.shcc, id, batDau, ketThuc, loaiBangCap: loaiBangCap ? loaiBangCap : (item.loaiBangCap ? item.loaiBangCap : ''),
-            item: item.item, denNay: item.ketThuc == -1 ? true : false
+            batDauType, ketThucType,
+            batDau: Number(batDau), ketThuc: Number(ketThuc), listFile, shcc, id, loaiBangCap, denNay: ketThuc == -1
         }, () => {
+            this.canBo.value(this.state.shcc || '');
             this.loaiBangCap.value(this.state.loaiBangCap);
-            this.trinhDo?.value(trinhDo ? trinhDo : (item.trinhDo ? item.trinhDo : ''));
-            this.chuyenNganh?.value(chuyenNganh ? chuyenNganh : (chuyenNganhSupportText[this.state.loaiBangCap] || ''));
-            this.tenCoSoDaoTao?.value(tenCoSoDaoTao ? tenCoSoDaoTao : '');
-            this.hinhThuc?.value(hinhThuc ? hinhThuc : '');
-            if (this.state.ketThuc == -1) {
-                this.setState({ denNay: true });
-                this.denNayCheck.value(true);
-                $('#ketThucDate').hide();
-                $('#denNayCheck').show();
-            }
-            this.batDauType?.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
-            this.ketThucType?.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.batDau?.setVal(batDau ? batDau : '');
-            this.ketThuc?.setVal(ketThuc ? ketThuc : '');
-            this.fileBox.setData('minhChungHocVi:' + this.props.shcc);
+            this.trinhDo?.value(trinhDo || '');
+            this.chuyenNganh?.value(chuyenNganh || '');
+            this.tenTruong?.value(tenTruong || '');
+            this.hinhThuc?.value(hinhThuc || '');
+            this.batDauType?.setText({ text: batDauType || 'dd/mm/yyyy' });
+            this.ketThucType?.setText({ text: ketThucType || 'dd/mm/yyyy' });
+            this.batDau?.value(this.state.batDau || '');
+            this.state.ketThuc != -1 && this.ketThuc?.value(this.state.ketThuc || '');
+            this.fileBox.setData('minhChungHocVi:' + this.state.shcc);
         });
     }
 
     onSubmit = () => {
         const changes = {
-            shcc: this.props.shcc,
-            batDau: this.batDau.getVal(),
-            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
+            shcc: this.canBo.value(),
+            batDau: this.batDau.value().getTime(),
+            ketThuc: !this.state.denNay ? this.ketThuc.value().getTime() : -1,
             batDauType: this.state.batDauType,
             ketThucType: this.state.ketThucType,
-            tenTruong: this.tenCoSoDaoTao.value(),
+            tenTruong: this.tenTruong.value(),
             chuyenNganh: this.chuyenNganh.value(),
             hinhThuc: this.hinhThuc.value(),
             loaiBangCap: this.loaiBangCap.value(),
             trinhDo: this.trinhDo.value(),
-            minhChung: T.stringify(this.state.listFile, '[]')
+            minhChung: T.stringify(this.state.listFile, '[]'),
+        };
+        const tccbSupport = {
+            qtId: this.state.id,
+            qt: 'qtDaoTao',
+            type: this.state.id ? 'update' : 'create'
         };
 
         if (!changes.loaiBangCap) {
@@ -92,13 +87,24 @@ export class DaoTaoModal extends AdminModal {
         } else if (!changes.chuyenNganh) {
             T.notify('Nội dung bị trống!', 'danger');
             this.chuyenNganh.focus();
-        } else this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        }
+        else if (!changes.batDau) {
+            T.notify('Thời gian bắt đầu trống!', 'danger');
+            this.batDau.focus();
+        }
+        else {
+            if (!this.props.readOnly) {
+                this.props.create(changes, tccbSupport, this.hide);
+            }
+            else {
+                this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+            }
+        }
     }
 
     handleBang = (value) => {
         this.setState({ loaiBangCap: value.id }, () => {
-            this.trinhDo?.value(this.state.item?.trinhDo ? this.state.item?.trinhDo : '');
-            this.chuyenNganh?.value(this.state.item?.chuyenNganh ? this.state.item?.chuyenNganh : chuyenNganhSupportText[value.id]);
+            this.chuyenNganh?.value(chuyenNganhSupportText[value.id]);
         });
     }
 
@@ -107,16 +113,15 @@ export class DaoTaoModal extends AdminModal {
     };
 
     handleKetThuc = (value) => {
-        console.log($('#ketThucDate'));
-        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value });
-        if (!value) {
-            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
-        } else {
-            this.ketThucType?.setText({ text: '' });
-        }
+        this.setState({ denNay: value }, () => {
+            if (!value) {
+                this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+            } else {
+                this.ketThuc.clear();
+                this.ketThucType?.setText({ text: '' });
+            }
+        });
     }
-
 
     deleteFile = (e, index) => {
         e.preventDefault();
@@ -147,10 +152,19 @@ export class DaoTaoModal extends AdminModal {
         return { shcc, date, name };
     };
 
+    onChangeViewMode = (value) => {
+        if (value) {
+            this.props.getItemQtDaoTao(this.state.qtId, data => {
+                this.onShow({ item: data });
+            });
+        } else this.onShow({ data: this.state.item, qtId: this.state.qtId });
+    }
+
     tableListFile = (data, permission) => {
         return renderTable({
             getDataSource: () => data,
             stickyHead: false,
+            header: 'thead-light',
             emptyTable: 'Chưa có file minh chứng nào!',
             renderHead: () => (
                 <tr>
@@ -182,50 +196,51 @@ export class DaoTaoModal extends AdminModal {
     }
 
     render = () => {
-        let readOnly = this.props.isCanBo || true;
+        let readOnly = this.props.readOnly || this.props.isSupport;
         const displayElement = this.state.loaiBangCap == '' ? 'none' : 'block';
         return this.renderModal({
-            title: `Thông tin quá trình đào tạo ${this.props.title}`,
-            size: 'elarge',
+            title: <>Thông tin quá trình đào tạo {this.props.title || ''}</>,
+            size: 'large',
+            buttons: this.props.isSupport && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
+            submitText: 'Gửi yêu cầu',
             body: <div className='row'>
-                <FormSelect className='form-group col-md-12' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required />
+                <FormSelect className='form-group col-md-12' ref={e => this.canBo = e} label='Cán bộ' readOnly={readOnly || this.state.shcc} data={SelectAdapter_FwCanBo} />
+                <FormSelect className='form-group col-md-12' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required readOnly={readOnly} />
                 {
                     (this.state.loaiBangCap != '5' && this.state.loaiBangCap != '9') ?
                         <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
-                            className='col-md-6' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' />
+                            className='col-md-6' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' readOnly={readOnly} />
                         :
-                        <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-6' label='Trình độ/Kết quả' required />
+                        <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-6' label='Trình độ/Kết quả' required readOnly={readOnly} />
                 }
-                <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-6' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }} />
-                <FormTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Chuyên ngành/Nội dung' style={{ display: displayElement }} required readOnly={!!chuyenNganhSupportText[this.state.loaiBangCap]} />
-                <FormTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} />
-                <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
-                    label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (<Dropdown ref={e => this.batDauType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                    }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+                <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-6' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }} readOnly={readOnly} />
+                <FormTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Chuyên ngành/Nội dung' style={{ display: displayElement }} required readOnly={!!chuyenNganhSupportText[this.state.loaiBangCap] || readOnly} />
+                <FormTextBox ref={e => this.tenTruong = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} readOnly={readOnly} />
+                <FormDatePicker style={{ display: displayElement }} placeholder='Thời gian bắt đầu' ref={e => this.batDau = e} type={typeMapper[this.state.batDauType]} className='col-md-6' label={
+                    <div style={{ display: 'flex' }}>Thời gian bắt đầu:&nbsp;&nbsp;<Dropdown ref={e => this.batDauType = e}
+                        items={EnumDateType}
+                        onSelected={item => this.setState({ batDauType: item }, () => {
+                            this.batDau.clear();
+                            this.batDau.focus();
+                        })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                } readOnly={readOnly} />
+                <FormDatePicker style={{ display: displayElement }} placeholder='Thời gian kết thúc' ref={e => this.ketThuc = e} type={typeMapper[this.state.ketThucType]} className='col-md-6' label={
+                    <div style={{ display: 'flex' }}>Thời gian kết thúc:&nbsp;&nbsp;<Dropdown ref={e => this.ketThucType = e}
+                        items={EnumDateType}
+                        onSelected={item => this.setState({ ketThucType: item }, () => {
+                            this.ketThuc.clear();
+                            this.ketThuc.focus();
+                        })} readOnly={readOnly || this.state.denNay} /></div>
+                } readOnly={readOnly || this.state.denNay} />
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra (Chưa kết thúc)' onChange={this.handleKetThuc} style={{ display: displayElement }} className='form-group col-md-6' readOnly={readOnly} />
 
-                <div id='denNayCheck' style={{ display: displayElement }} className='form-group col-md-6' >
-                    <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra' onChange={this.handleKetThuc} />
-                </div>
-
-                <div id='ketThucDate' className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
-                    label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc (<Dropdown ref={e => this.ketThucType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={this.state.denNay} />)</div>
-                    }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={this.state.denNay} />
-                </div>
                 <div className='form-group col-12'>
                     <p>Danh sách minh chứng</p>
                     <div className='tile-body row'>
                         <div className='form-group col-md-7'>
-                            {this.tableListFile(this.state.listFile || [], readOnly)}
+                            {this.tableListFile(this.state.listFile || [], !readOnly)}
                         </div>
-                        <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên file minh chứng (word, hình ảnh, pdf)'} postUrl='/user/upload' uploadType='minhChungHocVi' userData='minhChungHocVi' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />
+                        <FormFileBox className='col-md-5' ref={e => this.fileBox = e} postUrl='/user/upload' uploadType='minhChungHocVi' userData='minhChungHocVi' style={{ width: '100%', backgroundColor: '#fdfdfd', display: readOnly ? 'none' : 'block' }} onSuccess={this.onSuccess} description='Nhấp hoặc kéo thả file minh chứng' />
                     </div>
                 </div>
 

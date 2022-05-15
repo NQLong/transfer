@@ -251,7 +251,7 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                         )} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />
                         <TableCell type='text' content={(<i> {item.noiDung || ''}</i>)} />
-                        <TableCell type='text' content={(<b> {item.tenCoSoDaoTao || ''}</b>)} />
+                        <TableCell type='text' content={(<b> {item.tenTruong || ''}</b>)} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -283,10 +283,10 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} allowClear={true} />
                     {(this.timeType && this.timeType.value() >= 1) &&
-                    <>
-                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    </>}
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng' data={[
                         { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
                     ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />

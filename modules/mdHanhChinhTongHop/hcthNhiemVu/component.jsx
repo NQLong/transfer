@@ -267,7 +267,6 @@ class CongVanDenSelector extends React.Component {
         e.preventDefault();
         this.year.value('');
         this.search.value('');
-        this.status.value('');
         this.changeSearch();
     }
 
@@ -366,7 +365,6 @@ class CongVanDiSelector extends React.Component {
     resetSearch = () => {
         this.year.value('');
         this.search.value('');
-        this.status.value('');
         this.changeSearch();
     }
 
@@ -452,11 +450,11 @@ export class LienKetModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiLienKet = e} label='Loại liên kết' data={Object.keys(loaiLienKet).map(key => ({ id: loaiLienKet[key]?.id, text: loaiLienKet[key]?.text }))} onChange={(value) => this.setState({ loaiLienKet: value })} required />
                 {
-                    this.state.loaiLienKet == loaiLienKet.CONG_VAN_DEN.id &&
+                    this.state.loaiLienKet?.id == loaiLienKet.CONG_VAN_DEN.id &&
                     <CongVanDenSelector {...this.props} ref={e => this.lienKet = e} />
                 }
                 {
-                    this.state.loaiLienKet == loaiLienKet.CONG_VAN_DI.id &&
+                    this.state.loaiLienKet?.id == loaiLienKet.CONG_VAN_DI.id &&
                     <CongVanDiSelector {...this.props} ref={e => this.lienKet = e} />
                 }
             </div>
@@ -577,11 +575,13 @@ export class History extends React.Component {
     actionText = {
         CREATE: 'tạo',
         READ: 'đọc',
-        UPDATE: 'cập nhật'
+        UPDATE: 'cập nhật',
+        COMPLETE: 'hoàn thành',
     }
 
     actionColor = {
         CREATE: '#149414',
+        COMPLETE: '#149414',
         READ: 'blue',
         UPDATE: 'blue'
 
@@ -591,7 +591,7 @@ export class History extends React.Component {
         return (<div className='tile'>
             <h3 className='tile-header'>Lịch sử</h3>
             <div className='tile-body row'>
-                <div className='col-md-12'>
+                <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                     {renderTimeline({
                         getDataSource: () => this.props.data,
                         handleItem: (item) => ({

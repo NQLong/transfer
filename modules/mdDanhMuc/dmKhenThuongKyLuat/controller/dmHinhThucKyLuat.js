@@ -1,16 +1,16 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.category,
-        // menus: {
-        //     4033: { title: 'Hình thức kỷ luật', link: '/user/dm-hinh-thuc-ky-luat' },
-        // },
-    };
-    app.permission.add(
-        { name: 'dmHinhThucKyLuat:read', menu },
-        { name: 'dmHinhThucKyLuat:write' },
-        { name: 'dmHinhThucKyLuat:delete' },
-    );
-    app.get('/user/dm-hinh-thuc-ky-luat', app.permission.check('dmHinhThucKyLuat:read'), app.templates.admin);
+    // const menu = {
+    //     parentMenu: app.parentMenu.category,
+    //     // menus: {
+    //     //     4033: { title: 'Hình thức kỷ luật', link: '/user/dm-hinh-thuc-ky-luat' },
+    //     // },
+    // };
+    // app.permission.add(
+    //     { name: 'dmHinhThucKyLuat:read', menu },
+    //     { name: 'dmHinhThucKyLuat:write' },
+    //     { name: 'dmHinhThucKyLuat:delete' },
+    // );
+    // app.get('/user/dm-hinh-thuc-ky-luat', app.permission.check('dmHinhThucKyLuat:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dm-hinh-thuc-ky-luat/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
