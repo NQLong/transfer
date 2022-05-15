@@ -22,11 +22,9 @@ export class PhanHoiModal extends AdminModal {
                     noiDung: getValue(this.phanHoi),
                     thoiGian: new Date().getTime()
                 };
-                this.props.createTccbSupportReply(dataPhanHoi, result => {
-                    if (result.item) {
-                        this.phanHoi.clear();
-                        T.notify('Tạo phản hồi thành công', 'success');
-                    }
+                this.props.createTccbSupportReply(dataPhanHoi, () => {
+                    this.phanHoi.clear();
+                    T.notify('Tạo phản hồi thành công', 'success');
                 });
             }
         });

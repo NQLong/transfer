@@ -523,6 +523,7 @@ export class FormRichTextBox extends React.Component {
 
     focus = () => this.input.focus();
 
+    clear = () => this.input.clear();
     render() {
         const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = '', icon = '' } = this.props;
         let displayElement = '';
