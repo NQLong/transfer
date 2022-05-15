@@ -110,8 +110,8 @@ export function getStaffEdit(shcc, done) {
                 T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data);
                 dispatch({ type: StaffGet, item: data.item });
+                if (done) done(data);
             }
         }, () => T.notify('Lấy thông tin cán bộ bị lỗi', 'danger'));
     };
@@ -192,7 +192,7 @@ export const SelectAdapter_FwCanBo = {
 export const SelectAdapter_FwCanBoByDonVi = (listDonVi) => ({
     ajax: true,
     url: '/api/staff/page/1/20',
-    data: params => ({ condition: params.term , filter: {listDonVi }}),
+    data: params => ({ condition: params.term, filter: { listDonVi } }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })) : [] }),
     fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })))(),
 });
@@ -233,7 +233,6 @@ export function downloadWord(shcc, done) {
     return () => {
         const url = `/api/staff/get-ly-lich/${shcc}`;
         T.get(url, data => {
-            console.log(data);
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);

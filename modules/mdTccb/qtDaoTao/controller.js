@@ -74,13 +74,16 @@ module.exports = app => {
 
     app.put('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
-        console.log(req.body.changes, shcc);
         shcc ? app.model.qtDaoTao.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.delete('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
         shcc ? app.model.qtDaoTao.delete({ id: req.body.id }, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
+    });
+
+    app.get('/api/tccb/qua-trinh/dao-tao/:id', app.permission.check('staff:login'), (req, res) => {
+        app.model.qtDaoTao.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
     app.get('/api/qua-trinh/dao-tao/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listLoaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
@@ -123,7 +126,7 @@ module.exports = app => {
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenLoaiBangCap });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTrinhDo });
                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.chuyenNganh });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenCoSoDaoTao });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenTruong });
                         cells.push({ cell: 'K' + (index + 2), alignment: 'left', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'L' + (index + 2), alignment: 'left', border: '1234', value: (item.ketThuc != null && item.ketThuc != 0) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.tenHinhThuc });

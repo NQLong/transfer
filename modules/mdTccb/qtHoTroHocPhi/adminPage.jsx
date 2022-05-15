@@ -283,8 +283,8 @@ class QtHoTroHocPhi extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHoTroHocPhi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-                this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.pageGr ?
-                    this.props.qtHoTroHocPhi.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+            this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.pageGr ?
+                this.props.qtHoTroHocPhi.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.page ? this.props.qtHoTroHocPhi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -328,7 +328,7 @@ class QtHoTroHocPhi extends AdminPage {
                         )} />
                         {!this.checked && <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />}
                         {!this.checked && <TableCell type='text' content={(<i> {item.noiDung || ''}</i>)} />}
-                        {!this.checked && <TableCell type='text' content={(<b> {item.tenCoSoDaoTao || ''}</b>)} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.tenTruong || ''}</b>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -368,10 +368,10 @@ class QtHoTroHocPhi extends AdminPage {
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} allowClear={true} />
                     {(this.timeType && this.timeType.value() >= 1) &&
-                    <>
-                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    </>}
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
                     <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-4' data={[
                         { id: '04', text: 'Cử nhân' },
                         { id: '03', text: 'Thạc sĩ' },

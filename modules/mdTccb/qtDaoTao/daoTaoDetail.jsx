@@ -3,10 +3,17 @@ import { connect } from 'react-redux';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import { DaoTaoModal } from './daoTaoModal';
 import { createQtDaoTaoStaff, updateQtDaoTaoStaff } from './redux';
-
+import { createTccbSupport } from '../tccbSupport/redux';
 class DaoTaoDetail extends AdminPage {
     loaiBangCap = ''
     trinhDo = ''
+
+    delete = (e, item) => {
+        e.preventDefault();
+        T.confirm('Xóa quá trình đào tạo, bồi dưỡng', 'Bạn muốn gửi yêu cầu xóa quá trình đào tạo, bồi dưỡng này?', 'warning', false, isConfirm => {
+            isConfirm && this.props.createTccbSupport(item, { qtId: item.id, type: 'delete', qt: 'qtDaoTao' });
+        });
+    }
     render = () => {
         let chungChi = this.props.chungChi, hocVi = this.props.hocVi;
         let dataDaoTao = this.props.staff?.dataStaff?.daoTaoBoiDuong.filter(i => {
@@ -15,7 +22,7 @@ class DaoTaoDetail extends AdminPage {
         }),
             curPermission = this.getUserPermission('staff', ['login', 'delete']),
             permission = {
-                read: curPermission.login, write: curPermission.login, delete: curPermission.delete
+                read: curPermission.login, write: curPermission.login, delete: curPermission.login
             };
         if (hocVi) switch (hocVi) {
             case 'Cử nhân': this.loaiBangCap = 3; this.trinhDo = 1; break;
@@ -50,14 +57,14 @@ class DaoTaoDetail extends AdminPage {
                         <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{item.tenTrinhDo} <br /> {item.minhChung && item.minhChung != '[]' ? <i style={{ color: 'blue' }}>Đã có minh chứng</i> : <i style={{ color: 'red' }}>Chưa có minh chứng</i>}</>} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={item.chuyenNganh} />
-                        <TableCell content={item.tenCoSoDaoTao} />
+                        <TableCell content={item.tenTruong} />
                         <TableCell content={item.tenHinhThuc} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
                             {item.batDau && <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span>}
                             {item.ketThuc && <> - <span style={{ color: 'blue' }}>{item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : 'nay'}</span></>}
                         </>} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show({ item, shcc: this.props.shcc })}
+                            onEdit={() => this.modal.show({ item: { ...item, shcc: this.props.shcc } })}
                             onDelete={this.delete}></TableCell>
                     </tr>
                 )
@@ -69,14 +76,15 @@ class DaoTaoDetail extends AdminPage {
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <button className='btn btn-info' onClick={e => {
                         e.preventDefault();
-                        this.modal.show({ shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo });
+                        this.modal.show({
+                            item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
+                        });
                     }}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm
                     </button>
                 </div>
-                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={curPermission.login} shcc={this.props.shcc}
-                    update={this.props.updateQtDaoTaoStaff}
-                    create={this.props.createQtDaoTaoStaff} />
+                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={true} shcc={this.props.shcc}
+                    create={this.props.createTccbSupport} />
             </div>
         );
     }
@@ -84,6 +92,6 @@ class DaoTaoDetail extends AdminPage {
 
 const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
-    createQtDaoTaoStaff, updateQtDaoTaoStaff
+    createQtDaoTaoStaff, updateQtDaoTaoStaff, createTccbSupport
 };
 export default connect(mapStateToProps, mapActionsToProps)(DaoTaoDetail);

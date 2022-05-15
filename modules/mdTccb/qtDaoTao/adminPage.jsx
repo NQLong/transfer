@@ -14,6 +14,7 @@ import { SelectApdater_DmBangDaoTao } from 'modules/mdDanhMuc/dmBangDaoTao/redux
 import { SelectAdapter_DmHinhThucDaoTaoV2 } from 'modules/mdDanhMuc/dmHinhThucDaoTao/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
+import { DaoTaoModal } from './daoTaoModal';
 
 const chuyenNganhSupportText = {
     5: 'Ngoại ngữ',
@@ -52,9 +53,9 @@ class EditModal extends AdminModal {
 
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
-        let { shcc, tenCoSoDaoTao, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id,
+        let { shcc, tenTruong, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id,
             batDauType, ketThucType, trinhDo, kinhPhi } = item ? item : {
-                shcc: '', tenCoSoDaoTao: '', chuyenNganh: '', batDau: '', ketThuc: '', hinhThuc: '', loaiBangCap: '', id: null,
+                shcc: '', tenTruong: '', chuyenNganh: '', batDau: '', ketThuc: '', hinhThuc: '', loaiBangCap: '', id: null,
                 batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', thoiGian: '', trinhDo: '', kinhPhi: ''
             };
 
@@ -69,7 +70,7 @@ class EditModal extends AdminModal {
                 this.loaiBangCap.value(loaiBangCap ? loaiBangCap : '');
                 this.trinhDo?.value(trinhDo ? trinhDo : '');
                 this.chuyenNganh?.value(chuyenNganh ? chuyenNganh : (this.state.loaiBangCap ? chuyenNganhSupportText[this.state.loaiBangCap] : ''));
-                this.tenCoSoDaoTao?.value(tenCoSoDaoTao ? tenCoSoDaoTao : '');
+                this.tenTruong?.value(tenTruong ? tenTruong : '');
                 this.hinhThuc?.value(hinhThuc ? hinhThuc : '');
                 this.batDauType?.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
                 this.ketThucType?.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
@@ -99,7 +100,7 @@ class EditModal extends AdminModal {
             listMa.forEach((ma, index) => {
                 const changes = {
                     shcc: ma,
-                    tenCoSoDaoTao: this.tenCoSoDaoTao.value(),
+                    tenTruong: this.tenTruong.value(),
                     chuyenNganh: this.chuyenNganh.value(),
                     batDau: Number(this.batDau.getVal()),
                     ketThuc: Number(this.ketThuc.getVal()),
@@ -152,7 +153,7 @@ class EditModal extends AdminModal {
                         <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-6' label='Trình độ/Kết quả' required={this.state.loaiBangCap != '9'} />
                 }
                 <FormRichTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Nội dung bồi dưỡng, đào tạo' style={{ display: displayElement }} required />
-                <FormRichTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} />
+                <FormRichTextBox ref={e => this.tenTruong = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} />
                 <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-6' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }} />
                 <FormTextBox ref={e => this.kinhPhi = e} className='form-group col-md-6' label='Kinh phí' style={{ display: displayElement }} />
                 <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
@@ -253,8 +254,7 @@ class QtDaoTao extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete']);
         let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtDaoTao && this.props.qtDaoTao.pageGr ?
@@ -270,7 +270,7 @@ class QtDaoTao extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung đào tạo, bồi dưỡng</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên cơ sở đào tạo, bồi dưỡng</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức</th>}
@@ -285,7 +285,7 @@ class QtDaoTao extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show({ item })} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                 {item.shcc}
@@ -300,7 +300,7 @@ class QtDaoTao extends AdminPage {
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' style={{}} content={item.chuyenNganh} />}
-                        {!this.checked && <TableCell type='text' style={{}} content={item.tenCoSoDaoTao} />}
+                        {!this.checked && <TableCell type='text' style={{}} content={item.tenTruong} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.tenHinhThuc || ''} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
                             {item.batDau && <span>Bắt đầu: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}
@@ -315,7 +315,7 @@ class QtDaoTao extends AdminPage {
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachChuyenNganh, item.soQuaTrinh, item.soQuaTrinh)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} > </TableCell>
+                                onEdit={() => this.modal.show({ item, shcc: item.shcc })} onDelete={e => this.delete(e, item)} > </TableCell>
                         }
                         {
                             this.checked &&
@@ -353,9 +353,8 @@ class QtDaoTao extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtDaoTaoGroupPage : this.props.getQtDaoTaoPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <DaoTaoModal ref={e => this.modal = e} isCanBo={false}
                     create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao}
-                    permissions={currentPermissions}    
                 />
             </>,
             backRoute: '/user/tccb',

@@ -36,7 +36,7 @@ class ComponentTrinhDo extends AdminPage {
                 <tr key={index}>
                     <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell type='text' style={{}} content={item.chuyenNganh} />
-                    <TableCell type='text' style={{}} content={item.tenCoSoDaoTao} />
+                    <TableCell type='text' style={{}} content={item.tenTruong} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                         <>
                             {item.batDau && <span>Bắt đầu: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}
