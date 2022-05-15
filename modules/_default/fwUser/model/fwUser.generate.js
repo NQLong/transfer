@@ -1,6 +1,6 @@
-// Table name: FW_USER { ma, lastName, firstName, email, isStaff, shcc, studentId, image, isStudent, active, maDonVi, ngaySinh, phai, dienThoai }
+// Table name: FW_USER { lastName, firstName, email, isStaff, shcc, studentId, image, isStudent, active, maDonVi, ngaySinh, phai, dienThoai, ma }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'lastName': 'LAST_NAME', 'firstName': 'FIRST_NAME', 'email': 'EMAIL', 'isStaff': 'IS_STAFF', 'shcc': 'SHCC', 'studentId': 'STUDENT_ID', 'image': 'IMAGE', 'isStudent': 'IS_STUDENT', 'active': 'ACTIVE', 'maDonVi': 'MA_DON_VI', 'ngaySinh': 'NGAY_SINH', 'phai': 'PHAI', 'dienThoai': 'DIEN_THOAI' };
+const obj2Db = { 'lastName': 'LAST_NAME', 'firstName': 'FIRST_NAME', 'email': 'EMAIL', 'isStaff': 'IS_STAFF', 'shcc': 'SHCC', 'studentId': 'STUDENT_ID', 'image': 'IMAGE', 'isStudent': 'IS_STUDENT', 'active': 'ACTIVE', 'maDonVi': 'MA_DON_VI', 'ngaySinh': 'NGAY_SINH', 'phai': 'PHAI', 'dienThoai': 'DIEN_THOAI', 'ma': 'MA' };
 
 module.exports = app => {
     app.model.fwUser = {
