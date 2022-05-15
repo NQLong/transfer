@@ -7,7 +7,7 @@ import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
-    getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createQtDiNuocNgoai,
+    getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createMultipleQtDiNuocNgoai,
     updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich, deleteFile
 }
     from './redux';
@@ -321,6 +321,115 @@ class EditModal extends AdminModal {
     }
 }
 
+class CreateModal extends AdminModal {
+    state = {
+        id: null,
+        ngayDi: '',
+        ngayVe: null,
+        ngayDiType: 'dd/mm/yyyy',
+        ngayVeType: 'dd/mm/yyyy',
+    };
+    // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc, baoCaoTen, baoCaoNgayNop, baoCaoTinhTrang, baoCaoLyDoTraVe }
+
+    onShow = () => {
+        this.shcc.value('');
+        this.quocGia.value('');
+        this.mucDich.value('');
+        this.noiDung.value('');
+        this.chiPhi.value('');
+        this.ghiChu.value( '');
+        this.soQuyetDinh.value('');
+        this.ngayQuyetDinh.value('');
+
+        this.ngayDiType.setText({ text: 'dd/mm/yyyy' });
+        this.ngayDi.setVal('');
+        this.ngayVeType.setText({ text: 'dd/mm/yyyy' });
+        this.ngayVe.setVal('');
+    };
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const changes = {
+            listShcc: this.shcc.value(),
+            quocGia: this.quocGia.value().toString(),
+            mucDich: this.mucDich.value(),
+            noiDung: this.noiDung.value(),
+            chiPhi: this.chiPhi.value(),
+            ghiChu: this.ghiChu.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
+            ngayQuyetDinh: this.ngayQuyetDinh.value() ? Number(this.ngayQuyetDinh.value()) : '',
+
+            ngayDiType: this.state.ngayDiType,
+            ngayDi: this.ngayDi.getVal(),
+            ngayVeType: this.state.ngayVeType,
+            ngayVe: this.ngayVe.getVal(),
+
+            soQdTiepNhan: null,
+            ngayQdTiepNhan: null,
+            noiDungTiepNhan: null,
+            ngayVeNuoc: null,
+
+            baoCaoTinhTrang: 0,
+            baoCaoTen: '[]',
+            baoCaoLyDoTraVe: '',
+        };
+        if (!this.shcc.value().length) {
+            T.notify('Danh sách cán bộ trống', 'danger');
+            this.shcc.focus();
+        } else if (!this.noiDung.value()) {
+            T.notify('Nội dung đi nước ngoài trống', 'danger');
+            this.noiDung.focus();
+        } else if (!this.quocGia.value().length) {
+            T.notify('Danh sách quốc gia trống', 'danger');
+            this.quocGia.focus();
+        } else if (!this.ngayDi.getVal()) {
+            T.notify('Ngày đi nước ngoài trống', 'danger');
+            this.ngayDi.focus();
+        } else if (!this.ngayVe.getVal()) {
+            T.notify('Ngày về nước trống', 'danger');
+            this.ngayVe.focus();
+        } else if (this.ngayDi.getVal() > this.ngayVe.getVal()) {
+            T.notify('Ngày đi lớn hơn ngày về', 'danger');
+            this.ngayDi.focus();
+        } else {
+            this.props.create(changes, this.hide);
+            this.quocGia.reset();
+        }
+    }
+
+    render = () => {
+        const readOnly = this.props.readOnly;
+        return this.renderModal({
+            title: 'Tạo mới quá trình đi nước ngoài',
+            size: 'elarge',
+            body: <div className='row'>
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required multiple={true} />
+                <FormTextBox className='col-md-3' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={readOnly} />
+                <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
+
+                <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
+                    label={
+                        <div style={{ display: 'flex' }}>Ngày đi (&nbsp; <Dropdown ref={e => this.ngayDiType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ ngayDiType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
+                    label={
+                        <div style={{ display: 'flex' }}>Ngày về (&nbsp; <Dropdown ref={e => this.ngayVeType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ ngayVeType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.ngayVeType ? typeMapper[this.state.ngayVeType] : null} readOnly={readOnly} /></div>
+            </div>
+        });
+    }
+}
 class ThongKeMucDichModal extends AdminModal {
     state = {
         data: [],
@@ -420,6 +529,11 @@ class QtDiNuocNgoai extends AdminPage {
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
+    }
+
+    showCreateModal = (e) => {
+        e.preventDefault();
+        this.createModal.show();
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
@@ -664,12 +778,15 @@ class QtDiNuocNgoai extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write} deleteFile={this.props.deleteFile}
-                    create={this.props.createQtDiNuocNgoai} update={this.props.updateQtDiNuocNgoai}
+                    update={this.props.updateQtDiNuocNgoai}
+                />
+                <CreateModal ref={e => this.createModal = e} readOnly={!permission.write}
+                    create={this.props.createMultipleQtDiNuocNgoai}
                 />
                 <ThongKeMucDichModal ref={e => this.thongKeMucDich = e} thongKeMucDich={this.props.getThongKeMucDich} filter={this.state.filter} pageC={pageCondition} />
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write && !this.checked ? (e) => this.showCreateModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
                 let { pageCondition } = this.props && this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.page ? this.props.qtDiNuocNgoai.page : { pageCondition: {} };
@@ -685,7 +802,7 @@ class QtDiNuocNgoai extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtDiNuocNgoai: state.tccb.qtDiNuocNgoai });
 const mapActionsToProps = {
-    getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createQtDiNuocNgoai,
+    getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createMultipleQtDiNuocNgoai,
     updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich, deleteFile
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDiNuocNgoai);

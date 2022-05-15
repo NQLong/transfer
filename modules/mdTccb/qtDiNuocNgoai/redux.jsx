@@ -168,6 +168,24 @@ export function createQtDiNuocNgoai(data, done) {
     };
 }
 
+export function createMultipleQtDiNuocNgoai(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/di-nuoc-ngoai-multiple';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                if (done) {
+                    T.notify('Thêm thông tin quá trình đi nước ngoài thành công!', 'info');
+                    dispatch(getQtDiNuocNgoaiPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+    };
+}
+
 export function updateQtDiNuocNgoai(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/di-nuoc-ngoai';

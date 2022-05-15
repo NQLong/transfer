@@ -126,6 +126,25 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/qua-trinh/di-nuoc-ngoai-multiple', app.permission.check('qtDiNuocNgoai:write'), (req, res) => {
+        let errorList = [];
+        const solve = (index = 0) => {
+            if (index >= req.body.data.listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Đi nước ngoài');
+                res.send({ errorList });
+                return;
+            }
+            const shcc = req.body.data.listShcc[index];
+            let data = req.body.data;
+            data.shcc = shcc;
+            app.model.qtDiNuocNgoai.create(req.body.data, (error, item) => {
+                if (error || item == null) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/qua-trinh/di-nuoc-ngoai', app.permission.check('qtDiNuocNgoai:write'), (req, res) => {
         app.model.qtDiNuocNgoai.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Đi nước ngoài');
