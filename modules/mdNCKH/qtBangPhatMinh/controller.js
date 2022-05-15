@@ -127,13 +127,24 @@ module.exports = app => {
         });
     });
     
-    app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => 
-        app.model.qtBangPhatMinh.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        app.model.qtBangPhatMinh.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Bằng phát minh');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) =>
-        app.model.qtBangPhatMinh.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) =>
-        app.model.qtBangPhatMinh.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        app.model.qtBangPhatMinh.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Bằng phát minh');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        app.model.qtBangPhatMinh.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Bằng phát minh');
+            res.send(error);
+        });
+    });
 
 };

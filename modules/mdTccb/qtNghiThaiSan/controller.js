@@ -62,15 +62,23 @@ module.exports = app => {
     });
 
     app.post('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.create(req.body.data, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ thai sản');
+            res.send({ error, item });
+        });
     });
 
     app.put('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghỉ thai sản');
+            res.send({ error, item });
+        });
     });
-
     app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
-        app.model.qtNghiThaiSan.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.qtNghiThaiSan.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ thai sản');
+            res.send(error);
+        });
     });
 
     // //User Actions:

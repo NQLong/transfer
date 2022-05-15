@@ -85,14 +85,25 @@ module.exports = app => {
         app.model.qtHuongDanLuanVan.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
-        app.model.qtHuongDanLuanVan.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        app.model.qtHuongDanLuanVan.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hướng dẫn luận văn');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
-        app.model.qtHuongDanLuanVan.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
-        app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        app.model.qtHuongDanLuanVan.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hướng dẫn luận văn');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hướng dẫn luận văn');
+            res.send(error);
+        });
+    });
 
     app.post('/api/user/qua-trinh/hdlv', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {

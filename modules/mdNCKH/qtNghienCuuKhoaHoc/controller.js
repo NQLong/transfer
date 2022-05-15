@@ -90,14 +90,25 @@ module.exports = app => {
         app.model.qtNghienCuuKhoaHoc.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
-        app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghiên cứu khoa học');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
-        app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
-        app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghiên cứu khoa học');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghiên cứu khoa học');
+            res.send(error);
+        });
+    });
 
     app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo/:timeType', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
         let { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0 };

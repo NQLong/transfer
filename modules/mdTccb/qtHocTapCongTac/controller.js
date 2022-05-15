@@ -120,14 +120,25 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/qua-trinh/htct', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHocTapCongTac.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/htct', app.permission.check('qtHocTapCongTac:write'), (req, res) => {
+        app.model.qtHocTapCongTac.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Học tập công tác');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/htct', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHocTapCongTac.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/htct', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHocTapCongTac.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/htct', app.permission.check('qtHocTapCongTac:write'), (req, res) => {
+        app.model.qtHocTapCongTac.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Học tập công tác');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/htct', app.permission.check('qtHocTapCongTac:write'), (req, res) => {
+        app.model.qtHocTapCongTac.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Học tập công tác');
+            res.send(error);
+        });
+    });
 
     app.post('/api/user/qua-trinh/htct', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
