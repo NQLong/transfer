@@ -135,9 +135,9 @@ class CreateListYear extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghỉ hưu</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
-                    <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày nghỉ hưu</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
@@ -151,12 +151,12 @@ class CreateListYear extends AdminPage {
                         </>
                     )} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.phai == '01' ? 'Nam' : 'Nữ'} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngaySinh} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
+                    <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.ngaySinh} />
                     <TableCell type='text' content={<>
                         {item.tenChucDanh && <span> {item.tenChucDanh}<br /></span>}
                         {item.tenHocVi}
                     </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
                     <TableCell type='text' content={(
                         <>
                             {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -218,9 +218,11 @@ class CreateListYear extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-hourglass-start',
             title: 'Tạo danh sách kéo dài công tác',
-            breadcrumb: [<Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài công tác</Link>, 'Import'],
+            header: <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} placeholder='Năm' onChange={this.handleTime} data={yearSelector} />,
+            breadcrumb: [
+                <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài công tác</Link>, 'Import'
+            ],
             content: <>
-                <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} placeholder='Năm' onChange={this.handleTime} data={yearSelector} />
                 <div className='tile'>{this.tableList(listData, permission)}</div>
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update} />
             </>,
