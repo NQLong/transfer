@@ -54,7 +54,6 @@ class AdminEditPage extends AdminPage {
     });
 
     componentDidMount() {
-        console.log(this.props.system.user);
         const { readyUrl, routeMatcherUrl } = this.getSiteSetting();
         T.ready(readyUrl, () => {
             const params = T.routeMatcher(routeMatcherUrl).parse(window.location.pathname),
@@ -112,7 +111,6 @@ class AdminEditPage extends AdminPage {
     };
 
     save = () => {
-        console.log(this.state.listFile);
         let changes = {
             nguoiTao: this.props.system.user.shcc,
             tieuDe: this.tieuDe.value(),
@@ -124,7 +122,7 @@ class AdminEditPage extends AdminPage {
             fileList: this.state.listFile || [],
             lienPhong: Number(this.lienPhong.value()),
             donViNhan: this.state.lienPhong ? this.listDonViNhan?.value() : (this.donViNhan?.value() ? [this.donViNhan?.value()] : []),
-            canBoNhan: (this.props.hcthNhiemVu?.item?.canBoNhan || []).map(item => item.id),
+            canBoNhan: (this.props.hcthNhiemVu?.item?.canBoNhan || []).map(item => item.id)
             // trangThai: this.trangThai?.value(),
             // tienDo: this.tienDo?.value() || 0
         };
@@ -238,9 +236,9 @@ class AdminEditPage extends AdminPage {
                 {this.state.id && <PhanHoi {...this.props} target={this.state.id} sitePermission={sitePermission} />}
                 {this.state.id && <LienKet {...this.props} sitePermission={sitePermission} target={this.state.id} data={this.props.hcthNhiemVu?.cvdPage?.list} />}
 
-                <ListFiles files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} deleteFile={this.props.deleteFile} updateListFile={(newList) => this.setState({ listFile: newList}) }/>
+                <ListFiles {...this.props} files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} updateListFile={(newList) => this.setState({ listFile: newList}) }/>
 
-                {this.state.id && <History data={this.props.hcthNhiemVu?.item?.history} />}
+                {this.state.id && <History {...this.props} data={this.props.hcthNhiemVu?.item?.history} />}
             </>,
             backRoute: siteSetting.backRoute,
             onSave: this.save

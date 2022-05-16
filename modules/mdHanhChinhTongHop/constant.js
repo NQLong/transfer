@@ -18,6 +18,9 @@ module.exports = {
         ACCEPT: 'ACCEPT',
         READ: 'READ',
         SEND: 'SEND',
+        ADD_EMPLOYEES: 'ADD_EMPLOYEES',
+        REMOVE_EMPOYEE: 'REMOVE_EMPLOYEE',
+        CHANGE_ROLE: 'CHANGE_ROLE'
     },
 
     CONG_VAN_TYPE: 'DEN',
