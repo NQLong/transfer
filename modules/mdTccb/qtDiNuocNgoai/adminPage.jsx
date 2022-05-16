@@ -235,7 +235,7 @@ class EditModal extends AdminModal {
             T.notify('Lý do báo cáo bị trả về bị trống', 'danger');
             this.baoCaoLyDoTraVe.focus();
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+            this.props.update(this.state.id, changes, this.hide);
             this.quocGia.reset();
         }
     }
@@ -270,7 +270,7 @@ class EditModal extends AdminModal {
         };
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Cập nhật quá trình đi nước ngoài' : 'Tạo mới quá trình đi nước ngoài',
+            title: 'Cập nhật quá trình đi nước ngoài',
             size: 'elarge',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required onChange={this.handleCanBo} />
