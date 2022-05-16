@@ -134,7 +134,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/lam-viec-ngoai', app.permission.check('staff:write'), (req, res) =>
         app.model.qtLamViecNgoai.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Làm việc ngoài');
-            res.send(error);
+            res.send({ error });
         }));
 
 };

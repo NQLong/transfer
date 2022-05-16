@@ -119,13 +119,23 @@ module.exports = app => {
     //     });
     // });
     
-    app.post('/api/qua-trinh/nghi-khong-luong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiKhongLuong.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/nghi-khong-luong', app.permission.check('qtNghiKhongLuong:write'), (req, res) => {
+        app.model.qtNghiKhongLuong.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ không lương');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/nghi-khong-luong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiKhongLuong.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/nghi-khong-luong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiKhongLuong.delete({ id: req.body.id }, (error) => res.send(error)));
-
+    app.put('/api/qua-trinh/nghi-khong-luong', app.permission.check('qtNghiKhongLuong:write'), (req, res) => {
+        app.model.qtNghiKhongLuong.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghỉ không lương');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/nghi-khong-luong', app.permission.check('qtNghiKhongLuong:write'), (req, res) => {
+        app.model.qtNghiKhongLuong.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ không lương');
+            res.send({ error });
+        });
+    });
 };

@@ -151,7 +151,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Kỷ luật');
-            res.send(error);
+            res.send({ error });
         });
     });
 
