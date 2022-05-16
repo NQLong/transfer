@@ -8418,7 +8418,8 @@
             "modelName": "qtKeoDaiCongTac",
             "methods": {
                 "QT_KEO_DAI_CONG_TAC_SEARCH_PAGE": "searchPage",
-                "QT_KEO_DAI_CONG_TAC_GROUP_PAGE": "groupPage"
+                "QT_KEO_DAI_CONG_TAC_GROUP_PAGE": "groupPage",
+                "QT_KEO_DAI_CONG_TAC_DOWNLOAD_EXCEL": "download"
             },
             "columns": {
                 "ID": {
