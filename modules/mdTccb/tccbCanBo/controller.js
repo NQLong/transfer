@@ -127,6 +127,28 @@ module.exports = app => {
         app.model.canBo.getGiangVien(searchTerm, (error, items) => res.send({ items: items.rows }));
     });
 
+    app.get('/api/staff/get-chuyen-nganh-all', app.permission.check('staff:login'), (req, res) => {
+        let condition = { statement: 'ngayNghi IS NULL', parameter: {} };
+        if (req.query && req.query.condition) {
+            if (typeof (req.query.condition) == 'object') {
+                if (req.query.condition.searchText) {
+                    condition = {
+                        statement: 'ngayNghi IS NULL AND lower(chuyenNganh) LIKE :searchText',
+                        parameter: { searchText: `%${req.query.condition.searchText.toLowerCase()}%` }
+                    };
+                }
+            } else {
+                condition = {
+                    statement: 'ngayNghi IS NULL AND lower(chuyenNganh) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
+                };
+            }
+        }
+        app.model.canBo.getAll(condition, 'chuyenNganh', '', (error, items) => {
+            res.send({ error, items });
+        });
+    });
+
     // app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
     //     app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
     //         res.send({ error, shcc });
@@ -1450,17 +1472,6 @@ module.exports = app => {
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
 
-    app.get('/api/staff/download-excel-all', checkGetStaffPermission, (req, res) => {
-        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
-        app.model.canBo.download(filter, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                res.send({ error, items: page.rows });
-            }
-        });
-    });
     app.get('/api/staff/download-excel/:filter/:searchTerm', checkGetStaffPermission, (req, res) => {
         let searchTerm = req.params.searchTerm;
         if (searchTerm == 'null') searchTerm = '';

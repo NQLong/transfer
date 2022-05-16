@@ -220,6 +220,20 @@ export const SelectAdapter_FwCanBoFemale = {
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
 };
 
+export const SelectAdapter_ChuyenNganhAll = {
+    ajax: true,
+    url: '/api/staff/get-chuyen-nganh-all',
+    data: params => ({ condition: params.term }),
+    processResults: response => {
+        let listChuyenNganh = [];
+        if (response && response.items) {
+            let chuyenNganhGroupBy = response.items.groupBy('chuyenNganh');
+            listChuyenNganh = Object.keys(chuyenNganhGroupBy);
+        }
+        return { results: listChuyenNganh.map(item => ({ id: item, text: item })) };
+    },
+};
+
 export function createMultiCanBo(canBoList, done) {
     return () => {
         const url = '/api/staff/multiple';
@@ -262,23 +276,6 @@ export function downloadWordLlkh(shcc, done) {
     };
 }
 
-export function downloadExcel(pageCondition, filter, done) {
-    if (typeof filter === 'function') {
-        done = filter;
-        filter = {};
-    }
-    return () => {
-        const url = '/api/staff/download-excel-all';
-        T.get(url, { condition: pageCondition, filter }, data => {
-            if (data.error) {
-                T.notify('Download bị lỗi', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
-                done(data.items);
-            }
-        }, () => T.notify('Download bị lỗi', 'danger'));
-    };
-}
 // User Actions ------------------------------------------------------------------------------------------------------------
 export function userGetStaff(email, done) {
     return dispatch => {
