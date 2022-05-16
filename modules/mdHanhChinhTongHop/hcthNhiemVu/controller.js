@@ -575,7 +575,7 @@ module.exports = (app) => {
     });
 
     // history
-    app.post('/api/hcth/nhiem-vu/history/list', app.permission.check('staff:login'), async (req, res) => {
+    app.post('/api/hcth/nhiem-vu/lich-su/list', app.permission.check('staff:login'), async (req, res) => {
         const { id } = req.body;
         app.model.hcthHistory.getAllFrom(id, 'NHIEM_VU', (error, result) => {
             res.send({ error: error, items: result?.rows });
