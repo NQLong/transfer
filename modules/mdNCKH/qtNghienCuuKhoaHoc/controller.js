@@ -14,10 +14,10 @@ module.exports = app => {
     };
 
     const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        // menus: {
-        //     1003: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#ed9d34', groupIndex: 4 },
-        // },
+        parentMenu: app.parentMenu.khcn,
+        menus: {
+            9501: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#1999C2' },
+        },
     };
 
     app.permission.add(
