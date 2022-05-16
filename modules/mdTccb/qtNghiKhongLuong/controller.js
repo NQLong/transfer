@@ -135,7 +135,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nghi-khong-luong', app.permission.check('qtNghiKhongLuong:write'), (req, res) => {
         app.model.qtNghiKhongLuong.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ không lương');
-            res.send(error);
+            res.send({ error });
         });
     });
 };

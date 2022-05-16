@@ -179,7 +179,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:write'), (req, res) => {
         app.model.qtKeoDaiCongTac.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Kéo dài công tác');
-            res.send(error);
+            res.send({ error });
         });
     });
 

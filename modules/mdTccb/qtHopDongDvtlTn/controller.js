@@ -77,7 +77,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('qtHopDongDvtlTn:write'), (req, res) => {
         app.model.qtHopDongDvtlTn.delete({ ma: req.body.ma }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng đơn vị trả lương - trách nhiệm');
-            res.send(error);
+            res.send({ error });
         });
     });
 

@@ -106,7 +106,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghiên cứu khoa học');
-            res.send(error);
+            res.send({ error });
         });
     });
 

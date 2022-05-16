@@ -135,7 +135,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('qtCongTacTrongNuoc:write'), (req, res) => {
         app.model.qtCongTacTrongNuoc.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Công tác trong nước');
-            res.send(error);
+            res.send({ error });
         });
     });
 

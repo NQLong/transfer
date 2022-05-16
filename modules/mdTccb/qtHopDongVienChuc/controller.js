@@ -109,7 +109,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/hop-dong-vien-chuc', app.permission.check('qtHopDongVienChuc:delete'), (req, res) => {
         app.model.qtHopDongVienChuc.delete({ ma: req.body.ma }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng viên chức');
-            res.send(error);
+            res.send({ error });
         });
     });
 

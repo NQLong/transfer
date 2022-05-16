@@ -69,7 +69,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:delete'), (req, res) => {
         app.model.qtNghiViec.delete({ ma: req.body.ma }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ việc');
-            res.send(error);
+            res.send({ error });
         });
     });
 

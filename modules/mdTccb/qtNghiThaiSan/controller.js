@@ -77,7 +77,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
         app.model.qtNghiThaiSan.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ thai sản');
-            res.send(error);
+            res.send({ error });
         });
     });
 

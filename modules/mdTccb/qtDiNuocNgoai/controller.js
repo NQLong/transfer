@@ -164,7 +164,7 @@ module.exports = app => {
                 }
                 app.model.qtDiNuocNgoai.delete({ id: req.body.id }, (error) => {
                     app.tccbSaveCRUD(req.session.user.email, 'D', 'Đi nước ngoài');
-                    res.send(error);
+                    res.send({ error });
                 });
             }
         });

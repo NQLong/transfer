@@ -59,7 +59,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) => {
         app.model.qtSangKien.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Sáng kiến');
-            res.send(error);
+            res.send({ error });
         });
     });
 

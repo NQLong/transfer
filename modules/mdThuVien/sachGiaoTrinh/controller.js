@@ -136,7 +136,7 @@ module.exports = app => {
     app.delete('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
         app.model.sachGiaoTrinh.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Sách giáo trình');
-            res.send(error);
+            res.send({ error });
         });
     });
 

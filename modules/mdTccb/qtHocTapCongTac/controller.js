@@ -136,7 +136,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/htct', app.permission.check('qtHocTapCongTac:write'), (req, res) => {
         app.model.qtHocTapCongTac.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Học tập công tác');
-            res.send(error);
+            res.send({ error });
         });
     });
 

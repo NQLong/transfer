@@ -143,7 +143,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
         app.model.qtBangPhatMinh.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Bằng phát minh');
-            res.send(error);
+            res.send({ error });
         });
     });
 

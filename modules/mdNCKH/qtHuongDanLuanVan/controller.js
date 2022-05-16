@@ -101,7 +101,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
         app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Hướng dẫn luận văn');
-            res.send(error);
+            res.send({ error });
         });
     });
 

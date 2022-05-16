@@ -135,7 +135,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('qtHoTroHocPhi:write'), (req, res) => {
         app.model.qtHoTroHocPhi.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Hỗ trợ học phí');
-            res.send(error);
+            res.send({ error });
         });
     });
 

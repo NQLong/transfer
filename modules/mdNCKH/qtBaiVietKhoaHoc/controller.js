@@ -141,7 +141,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) => {
         app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Bài viết khoa học');
-            res.send(error);
+            res.send({ error });
         });
     });
 

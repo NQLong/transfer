@@ -127,7 +127,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:delete'), (req, res) => {
         app.model.qtHopDongLaoDong.delete({ ma: req.body.ma }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng lao động');
-            res.send(error);
+            res.send({ error });
         });
     });
 
