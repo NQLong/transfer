@@ -20,7 +20,8 @@ module.exports = {
         SEND: 'SEND',
         ADD_EMPLOYEES: 'ADD_EMPLOYEES',
         REMOVE_EMPOYEE: 'REMOVE_EMPLOYEE',
-        CHANGE_ROLE: 'CHANGE_ROLE'
+        CHANGE_ROLE: 'CHANGE_ROLE',
+        COMPLETE: 'COMPLETE',
     },
 
     CONG_VAN_TYPE: 'DEN',
@@ -80,7 +81,12 @@ module.exports = {
         DA_HUY: { id: 'DA_HUY', value: 2, text: 'Đã hủy', color: 'red', next: ['DA_HUY',] },
         DA_XU_LY: { id: 'DA_XU_LY', text: 'Đã xử lý', value: 2, color: '#149414', next: ['DA_XU_LY'] },
         TAM_HOAN: { id: 'TAM_HOAN', text: 'Tạm hoãn', value: 1, color: 'red', next: ['TAM_HOAN', 'DANG_XU_LY', 'DA_HUY'] },
+    },
+
+    nhiemVuSelector : {
+        NHIEM_VU_CAC_DON_VI: {id:'NHIEM_VU_CAC_DON_VI', text:'Nhiệm vụ các đơn vị'},
+        NHIEM_VU_CUA_BAN: {id: 'NHIEM_VU_CUA_BAN', text:'Nhiệm vụ của bạn'},
+        NHIEM_VU_THAM_GIA: {id: 'NHIEM_VU_DUOC_GIAO', text:'Nhiệm vụ tham gia'},
+        TAT_CA_NHIEM_VU: {id: 'TAT_CA_NHIEM_VU', text:'Tất cả nhiệm vụ'}
     }
-
-
 };

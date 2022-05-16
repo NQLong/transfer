@@ -4,8 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
-import { CanBoNhan, LienKet, PhanHoi, History, ListFiles} from './component';
-import { clearHcthNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu } from './redux';
+import { CanBoNhan, History, LienKet, ListFiles, PhanHoi } from './component';
+import { clearHcthNhiemVu, completeNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getHistory, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu } from './redux';
 const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 
 // const tienDoSelector = [...Array(11).keys()].map(i => ({ id: i * 10, text: `${i * 10}%` }));
@@ -185,22 +185,33 @@ class AdminEditPage extends AdminPage {
     getSitePermission = () => {
         //permission to edit general information like tieuDe, noiDung, file, lienKet, ...  
         const userPermission = this.getCurrentPermissions(),
-            primePermission = userPermission.some(item => ['hcth:manage', 'rectors:login'].includes(item));
+            primePermission = userPermission.some(item => ['hcth:manage', 'rectors:login'].includes(item)),
+            canBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [],
+            shcc = this.props.system.user?.shcc;
         return {
             primePermission,
+            isParticipant: this.state.id && canBoNhan.some(item => item.shccCanBoNhan === shcc),
             editGeneral: this.state.isCreator || this.state.isManager,
             editTrangThai: primePermission || this.state.isCreator || this.state.isManager,
             delete: this.state.isCreator || this.state.isManager,
         };
     }
 
+    onComplete = () => {
+        T.confirm('Hoàn thành nhiệm vụ', 'Hệ thống sẽ ghi nhận bạn đã hoàn thành phần nhiệm vụ.', true,
+            isConfirm => isConfirm && this.props.completeNhiemVu(this.state.id)
+        );
+    }
 
     render() {
         const
             isNew = !this.state.id,
             sitePermission = this.getSitePermission(),
-            siteSetting = this.getSiteSetting();
+            siteSetting = this.getSiteSetting(),
+            buttons = [];
 
+        if (sitePermission.isParticipant) 
+        buttons.push({icon:'fa-check', onClick:this.onComplete, className: 'btn-success'});
         // const nextTrangThai = trangThaiNhiemVu[this.state.trangThai]?.next || [];
         // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
         return this.renderPage({
@@ -241,11 +252,12 @@ class AdminEditPage extends AdminPage {
                 {this.state.id && <History {...this.props} data={this.props.hcthNhiemVu?.item?.history} />}
             </>,
             backRoute: siteSetting.backRoute,
-            onSave: this.save
+            onSave: this.save,
+            buttons
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthNhiemVu: state.hcth.hcthNhiemVu });
-const mapActionsToProps = { clearHcthNhiemVu, updateCanBoNhanNhiemVu, deleteFile, deleteLienKet, getCongVanCacPhongSelector, createNhiemVu, updateNhiemVu, deleteNhiemVu, searchNhiemVu, getNhiemVu, createPhanHoi, getPhanHoi, createLienKet, updateLienKet, getLienKet, createCanBoNhanNhiemVu, getListCanBoNhanNhiemVu, removeCanBoNhanNhiemVu, getCongVanDenSelector };
+const mapActionsToProps = { completeNhiemVu, getHistory, clearHcthNhiemVu, updateCanBoNhanNhiemVu, deleteFile, deleteLienKet, getCongVanCacPhongSelector, createNhiemVu, updateNhiemVu, deleteNhiemVu, searchNhiemVu, getNhiemVu, createPhanHoi, getPhanHoi, createLienKet, updateLienKet, getLienKet, createCanBoNhanNhiemVu, getListCanBoNhanNhiemVu, removeCanBoNhanNhiemVu, getCongVanDenSelector };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

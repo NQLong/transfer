@@ -121,7 +121,7 @@ class EditModal extends AdminModal {
                         <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-6' label='Trình độ/Kết quả' required />
                 }
                 <FormRichTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Nội dung bồi dưỡng, đào tạo' style={{ display: displayElement }} required />
-                <FormTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} />
+                <FormTextBox ref={e => this.tenTruong = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} />
                 <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-6' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }} />
                 <FormTextBox ref={e => this.kinhPhi = e} className='form-group col-md-6' label='Kinh phí' style={{ display: displayElement }} />
                 <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
@@ -189,7 +189,7 @@ class QtDaoTaoGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung bồi dưỡng</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên cơ sở</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức</th>
@@ -217,7 +217,7 @@ class QtDaoTaoGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='text' style={{}} content={item.chuyenNganh} />
-                        <TableCell type='text' style={{}} content={item.tenCoSoDaoTao} />
+                        <TableCell type='text' style={{}} content={item.tenTruong} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHinhThuc || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
                             {item.batDau && <span>Từ: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}

@@ -6387,13 +6387,6 @@
                 "FW_USER_GET_USER_ROLES": "getUserRoles"
             },
             "columns": {
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89017\".nextval",
-                    "nullable": false,
-                    "size": "10,0"
-                },
                 "LAST_NAME": {
                     "value": "lastName",
                     "dataType": "NVARCHAR2",
@@ -6484,6 +6477,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_120844\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -8210,6 +8210,27 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89057\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "SO_HOP_DONG": {
+                    "value": "soHopDong",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "NAM_TOT_NGHIEP": {
+                    "value": "namTotNghiep",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "NGHE_NGHIEP_TRUOC_TUYEN_DUNG": {
+                    "value": "ngheNghiepTruocTuyenDung",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
                 }
             },
             "primaryKeys": [
@@ -13386,6 +13407,148 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_SUPPORT": {
+            "active": true,
+            "moduleName": "tccbSupport",
+            "modelName": "tccbSupport",
+            "methods": {
+                "TCCB_SUPPORT_SEARCH_PAGE": "searchPage"
+            },
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_120758\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "DATA": {
+                    "value": "data",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "SHCC_ASSIGN": {
+                    "value": "shccAssign",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "MODIFIED_DATE": {
+                    "value": "modifiedDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TYPE": {
+                    "value": "type",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "DELETED": {
+                    "value": "deleted",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "QT_ID": {
+                    "value": "qtId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "APPROVED": {
+                    "value": "approved",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "QT": {
+                    "value": "qt",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "SENT_DATE": {
+                    "value": "sentDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_SUPPORT_REPLY": {
+            "active": true,
+            "moduleName": "tccbSupport",
+            "modelName": "tccbSupportReply",
+            "methods": {
+                "TCCB_SUPPORT_REPLY_GET_ALL": "getTccbSupportReply"
+            },
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_120826\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_YEU_CAU": {
+                    "value": "maYeuCau",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NGUOI_PHAN_HOI": {
+                    "value": "nguoiPhanHoi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "THOI_GIAN": {
+                    "value": "thoiGian",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NOI_DUNG": {
+                    "value": "noiDung",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
                 }
             },
             "primaryKeys": [

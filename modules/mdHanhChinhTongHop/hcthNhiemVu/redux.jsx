@@ -408,3 +408,35 @@ export function clearHcthNhiemVu(done) {
         done && done();
     };
 }
+
+export function getHistory(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/nhiem-vu/lich-su/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy lịch sử nhiệm vụ lỗi', 'danger');
+                console.error('GET: ' + url + '. ' + res.error);
+            } else {
+                dispatch({ type: HcthNhiemVuGetHistory, history: res.items });
+                done && done(res.items);
+            }
+        }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
+    };
+}
+
+export function completeNhiemVu(id, done) {
+    return (dispatch) => {
+        const url = `/api/hcth/nhiem-vu/hoan-thanh/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Cập nhật lịch sử lỗi', 'danger');
+                console.error('GET: ' + url + '. ', res.error);
+            } else {
+                T.notify('Cập nhật lịch sử thành công', 'success');
+                dispatch(getHistory(id));
+                done && done(res.items);
+            }
+        }, () => T.notify('Cập nhật lịch sử lỗi', 'danger'));
+    };
+}
+

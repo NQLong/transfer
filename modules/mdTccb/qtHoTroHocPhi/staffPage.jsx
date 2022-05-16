@@ -201,7 +201,7 @@ class QtHoTroHocPhiUserPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />
                         <TableCell type='text' content={(<i> {item.noiDung || ''}</i>)} />
-                        <TableCell type='text' content={(<b> {item.tenCoSoDaoTao || ''}</b>)} />
+                        <TableCell type='text' content={(<b> {item.tenTruong || ''}</b>)} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
