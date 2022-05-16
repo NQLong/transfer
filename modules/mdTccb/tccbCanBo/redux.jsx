@@ -1,5 +1,4 @@
 import T from 'view/js/common';
-
 // Reducer ------------------------------------------------------------------------------------------------------------
 const StaffGetAll = 'Staff:GetAll';
 const StaffGetPage = 'Staff:GetPage';
@@ -183,12 +182,16 @@ export const SelectAdapter_FwCanBo = {
     ajax: true,
     url: '/api/staff/page/1/20',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac, data: {
-        phai: item.phai, 
-        ngaySinh: item.ngaySinh,
-        hocVi: item.hocVi,
-        chucDanh: item.chucDanh,
-    }})) : [] }),
+    processResults: response => ({
+        results: response && response.page && response.page.list ? response.page.list.map(item => ({
+            id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac, data: {
+                phai: item.phai,
+                ngaySinh: item.ngaySinh,
+                hocVi: item.hocVi,
+                chucDanh: item.chucDanh,
+            }
+        })) : []
+    }),
     getOne: getStaff,
     fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })))(),
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
@@ -218,6 +221,20 @@ export const SelectAdapter_FwCanBoFemale = {
     getOne: getStaff,
     fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}` })))(),
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
+};
+
+export const SelectAdapter_ChuyenNganhAll = {
+    ajax: true,
+    url: '/api/staff/get-chuyen-nganh-all',
+    data: params => ({ condition: params.term }),
+    processResults: response => {
+        let listChuyenNganh = [];
+        if (response && response.items) {
+            let chuyenNganhGroupBy = response.items.groupBy('chuyenNganh');
+            listChuyenNganh = Object.keys(chuyenNganhGroupBy);
+        }
+        return { results: listChuyenNganh.map(item => ({ id: item, text: item })) };
+    },
 };
 
 export function createMultiCanBo(canBoList, done) {
@@ -259,24 +276,6 @@ export function downloadWordLlkh(shcc, done) {
                 done(data.data);
             }
         }, () => T.notify('Tải file word bị lỗi', 'danger'));
-    };
-}
-
-export function downloadExcel(pageCondition, filter, done) {
-    if (typeof filter === 'function') {
-        done = filter;
-        filter = {};
-    }
-    return () => {
-        const url = '/api/staff/download-excel-all';
-        T.get(url, { condition: pageCondition, filter }, data => {
-            if (data.error) {
-                T.notify('Download bị lỗi', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
-                done(data.items);
-            }
-        }, () => T.notify('Download bị lỗi', 'danger'));
     };
 }
 // User Actions ------------------------------------------------------------------------------------------------------------
@@ -337,3 +336,20 @@ export function getStaffByEmail(email, done) {
         });
     };
 }
+
+export const SelectAdapter_ChuyenNganhCanBo =
+{
+    ajax: true,
+    url: '/api/staff/get-all-chuyen-nganh',
+    data: params => ({ condition: params.term }),
+    processResults: response => {
+        let results = [];
+        if (response && response.items) {
+            let tempResults = Object.keys(response.items.filter(item => item.chuyenNganh).groupBy('chuyenNganh'));
+            results = tempResults.map(item => ({ id: item, text: item }));
+        }
+        return { results };
+
+    },
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.chuyenNganh, text: item.chuyenNganh })))(),
+};

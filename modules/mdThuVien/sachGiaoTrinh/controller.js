@@ -119,14 +119,26 @@ module.exports = app => {
             }
         });
     });
-    app.post('/api/staff/sach-giao-trinh', app.permission.check('staff:write'), (req, res) =>
-        app.model.sachGiaoTrinh.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/staff/sach-giao-trinh', app.permission.check('staff:write'), (req, res) =>
-        app.model.sachGiaoTrinh.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.post('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        app.model.sachGiaoTrinh.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Sách giáo trình');
+            res.send({ error, item });
+        });
+    });
 
-    app.delete('/api/staff/sach-giao-trinh', app.permission.check('staff:write'), (req, res) =>
-        app.model.sachGiaoTrinh.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        app.model.sachGiaoTrinh.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Sách giáo trình');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        app.model.sachGiaoTrinh.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Sách giáo trình');
+            res.send({ error });
+        });
+    });
 
     app.post('/api/user/staff/sach-giao-trinh', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {

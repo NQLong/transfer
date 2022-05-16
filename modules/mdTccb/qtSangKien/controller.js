@@ -43,14 +43,25 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
-        app.model.qtSangKien.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) => {
+        app.model.qtSangKien.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Sáng kiến');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
-        app.model.qtSangKien.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
-        app.model.qtSangKien.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) => {
+        app.model.qtSangKien.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Sáng kiến');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) => {
+        app.model.qtSangKien.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Sáng kiến');
+            res.send({ error });
+        });
+    });
 
     app.post('/api/tccb/qua-trinh/sang-kien/multiple', app.permission.check('qtSangKien:write'), (req, res) => {
         const qtSangKien = req.body.qtSangKien;

@@ -119,14 +119,25 @@ module.exports = app => {
             }
         });
     });
-    app.post('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtCongTacTrongNuoc.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('qtCongTacTrongNuoc:write'), (req, res) => {
+        app.model.qtCongTacTrongNuoc.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Công tác trong nước');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtCongTacTrongNuoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtCongTacTrongNuoc.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('qtCongTacTrongNuoc:write'), (req, res) => {
+        app.model.qtCongTacTrongNuoc.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Công tác trong nước');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('qtCongTacTrongNuoc:write'), (req, res) => {
+        app.model.qtCongTacTrongNuoc.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Công tác trong nước');
+            res.send({ error });
+        });
+    });
 
     app.get('/api/qua-trinh/cong-tac-trong-nuoc/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi/:mucDich', app.permission.check('qtCongTacTrongNuoc:read'), (req, res) => {
         let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };

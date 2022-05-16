@@ -47,20 +47,30 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
+    app.post('/api/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:write'), (req, res) => {
         app.model.qtNghiViec.create(req.body.data, (error, item) => {
             if (!error) {
                 app.model.canBo.update({ shcc: item.shcc }, { daNghi: 1 }, (e) => {
                     if (e) res.send({ error: e });
                 } );
             }
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ việc');
             res.send({ error, item });
-        }));
+        });
+    });
 
-    app.put('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiViec.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.put('/api/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:write'), (req, res) => {
+        app.model.qtNghiViec.update({ ma: req.body.ma }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghỉ việc');
+            res.send({ error, item });
+        });
+    });
 
-    app.delete('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiViec.delete({ ma: req.body.ma }, (error) => res.send(error)));
+    app.delete('/api/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:delete'), (req, res) => {
+        app.model.qtNghiViec.delete({ ma: req.body.ma }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ việc');
+            res.send({ error });
+        });
+    });
 
 };

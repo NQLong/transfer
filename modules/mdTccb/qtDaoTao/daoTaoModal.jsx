@@ -36,13 +36,13 @@ export class DaoTaoModal extends AdminModal {
     onShow = (data) => {
         //data for adminPage, daoTaoDetail: data: { item: }
         //data for support: data: { data: {}, qtId }
-        let item = data.item || data.data || null;
+        let item = data?.item || data?.data || null;
         let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenTruong, hinhThuc, loaiBangCap, minhChung, shcc } = item || {
             id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
             tenTruong: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: '', minhChung: '[]', shcc: ''
         };
         let listFile = T.parse(minhChung || '[]');
-        data.data && this.setState({ item, qtId: data.qtId });
+        data?.data && this.setState({ item, qtId: data.qtId });
         this.setState({
             batDauType, ketThucType,
             batDau: Number(batDau), ketThuc: Number(ketThuc), listFile, shcc, id, loaiBangCap, denNay: ketThuc == -1
@@ -93,7 +93,7 @@ export class DaoTaoModal extends AdminModal {
             this.batDau.focus();
         }
         else {
-            if (!this.props.readOnly) {
+            if (!this.props.readOnly && this.props.isCanBo) {
                 this.props.create(changes, tccbSupport, this.hide);
             }
             else {
@@ -117,7 +117,7 @@ export class DaoTaoModal extends AdminModal {
             if (!value) {
                 this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
             } else {
-                this.ketThuc.clear();
+                this.ketThuc.value('');
                 this.ketThucType?.setText({ text: '' });
             }
         });
@@ -202,12 +202,12 @@ export class DaoTaoModal extends AdminModal {
             title: <>Thông tin quá trình đào tạo {this.props.title || ''}</>,
             size: 'large',
             buttons: this.props.isSupport && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
-            submitText: 'Gửi yêu cầu',
+            submitText: this.props.isSupport && 'Gửi yêu cầu',
             body: <div className='row'>
                 <FormSelect className='form-group col-md-12' ref={e => this.canBo = e} label='Cán bộ' readOnly={readOnly || this.state.shcc} data={SelectAdapter_FwCanBo} />
                 <FormSelect className='form-group col-md-12' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required readOnly={readOnly} />
                 {
-                    (this.state.loaiBangCap != '5' && this.state.loaiBangCap != '9') ?
+                    (!['5', '99', '9'].includes(this.state.loaiBangCap)) ?
                         <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
                             className='col-md-6' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' readOnly={readOnly} />
                         :
@@ -220,7 +220,7 @@ export class DaoTaoModal extends AdminModal {
                     <div style={{ display: 'flex' }}>Thời gian bắt đầu:&nbsp;&nbsp;<Dropdown ref={e => this.batDauType = e}
                         items={EnumDateType}
                         onSelected={item => this.setState({ batDauType: item }, () => {
-                            this.batDau.clear();
+                            this.batDau.value('');
                             this.batDau.focus();
                         })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                 } readOnly={readOnly} />
@@ -228,13 +228,13 @@ export class DaoTaoModal extends AdminModal {
                     <div style={{ display: 'flex' }}>Thời gian kết thúc:&nbsp;&nbsp;<Dropdown ref={e => this.ketThucType = e}
                         items={EnumDateType}
                         onSelected={item => this.setState({ ketThucType: item }, () => {
-                            this.ketThuc.clear();
+                            this.ketThuc.value('');
                             this.ketThuc.focus();
                         })} readOnly={readOnly || this.state.denNay} /></div>
                 } readOnly={readOnly || this.state.denNay} />
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra (Chưa kết thúc)' onChange={this.handleKetThuc} style={{ display: displayElement }} className='form-group col-md-6' readOnly={readOnly} />
 
-                <div className='form-group col-12'>
+                <div className='form-group col-12' style={{ display: this.state.id ? 'block' : 'none' }}>
                     <p>Danh sách minh chứng</p>
                     <div className='tile-body row'>
                         <div className='form-group col-md-7'>
