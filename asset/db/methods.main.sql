@@ -3030,14 +3030,14 @@ CREATE OR REPLACE FUNCTION HCTH_NHIEM_VU_SEARCH_PAGE(
     totalItem OUT NUMBER,
     pageTotal OUT NUMBER
 ) RETURN SYS_REFCURSOR AS
-    my_cursor  SYS_REFCURSOR;
-    sT         STRING(500) := '%' || lower(searchTerm) || '%';
-    donViNhan  Number;
-    canBoNhan  String(128);
-    shccCanBo  String(24);
-    donViCanBo String(128);
-    canBoType  String(24);
-
+    my_cursor   SYS_REFCURSOR;
+    sT          STRING(500) := '%' || lower(searchTerm) || '%';
+    donViNhan   Number;
+    canBoNhan   String(128);
+    shccCanBo   String(32);
+    donViCanBo  String(128);
+    canBoType   String(32);
+    nhiemVuType String(32);
 BEGIN
 
     SELECT JSON_VALUE(filterParam, '$.donViNhan') INTO donViNhan FROM DUAL;
@@ -3053,74 +3053,55 @@ BEGIN
 -- LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
     WHERE
 -- check if user is related to mission
-(
-    -- RECTOR or HCTH staff can see all mission
-            canBoType = 'HCTH' or canBoType = 'RECTOR' OR
-        -- other staff mission permission check
-            nv.NGUOI_TAO = shccCanBo or EXISTS(select cbn.id
-                                               from HCTH_CAN_BO_NHAN cbn
-                                               where cbn.LOAI = 'NHIEM_VU'
-                                                 and cbn.MA = nv.ID
-                                                 and cbn.CAN_BO_NHAN = shccCanBo)
-        or (donViCanBo is not null and Exists(
-            select dvn.id
-            from HCTH_DON_VI_NHAN dvn
-            where dvn.MA = nv.id
-              and dvn.LOAI = 'NHIEM_VU'
-              and dvn.DON_VI_NHAN in
-                  (select regexp_substr(donViCanBo, '[^,]+', 1, level)
-                   from dual
-                   connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
-        ))
-    )
-    --     ((
---         userShcc is not null AND nv.NGUOI_TAO = userShcc
---     ) OR
---     (
---         hcthcbn.CAN_BO_NHAN IS NOT NULL AND
---         INSTR(hcthcbn.CAN_BO_NHAN, userShcc) != 0
---      ) OR
---      (
---         userShcc is null
---     ))
---     AND
---     ((
---         donViNhan IS NULL
---         AND canBoNhan IS NULL
---     )
---     OR (
---         canBoNhan is NOT NULL
---         AND INSTR(hcthcbn.CAN_BO_NHAN, canBoNhan) != 0
---     )
---     OR (
---         donViNhan IS NOT NULL
---         AND nv.DON_VI_NHAN is not NULL
---         AND (
---             (
---                 select count(id2)
---                 from (
---                         select *
---                         from (
---                                 (
---                                     SELECT to_number(COLUMN_VALUE) as id1
---                                     FROM xmltable(donViNhan)
---                                     ORDER BY id1
---                                 ) t1
---                                 LEFT JOIN (
---                                     SELECT to_number(COLUMN_VALUE) as id2
---                                     FROM xmltable(nv.DON_VI_NHAN)
---                                     ORDER BY id2
---                                 ) t2 ON id1 = id2
---                             )
---                     )
---             ) != 0
---         )
---     ))
---     AND (
---         sT = ''
---         OR LOWER(nv.NOI_DUNG) LIKE sT
---     )
-    ;
+        (
+            -- RECTOR or HCTH staff can see all mission
+                    canBoType = 'HCTH' or canBoType = 'RECTOR' OR
+                -- other staff mission permission check
+                    nv.NGUOI_TAO = shccCanBo or EXISTS(select cbn.id
+                                                       from HCTH_CAN_BO_NHAN cbn
+                                                       where cbn.LOAI = 'NHIEM_VU'
+                                                         and cbn.MA = nv.ID
+                                                         and cbn.CAN_BO_NHAN = shccCanBo)
+                or (donViCanBo is not null and Exists(
+                    select dvn.id
+                    from HCTH_DON_VI_NHAN dvn
+                    where dvn.MA = nv.id
+                      and dvn.LOAI = 'NHIEM_VU'
+                      and dvn.DON_VI_NHAN in
+                          (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                           from dual
+                           connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
+                ))
+            )
+      and
+      -- filter
+        (
+                    sT = ''
+                OR LOWER(nv.NOI_DUNG) LIKE sT
+                OR LOWER(nv.TIEU_DE) LIKE sT
+            )
+      and (
+                nhiemVuType is NULL or
+                (nhiemVuType = 'NHIEM_VU_CAC_DON_VI' and nv.LIEN_PHONG = 0 and
+                 Exists(SELECT dvn.id from HCTH_DON_VI_NHAN dvn where dvn.LOAI = 'NHIEM_VU' and dvn.MA = nv.id)) or
+                (nhiemVuType = 'NHIEM_VU_LIEN_PHONG' and nv.LIEN_PHONG = 1) or
+                (nhiemVuType = 'NHIEM_VU_CUA_BAN' and nv.NGUOI_TAO = shccCanBo) or
+                (nhiemVuType = 'NHIEM_VU_THAM_GIA' and (EXISTS(select cbn.id
+                                                               from HCTH_CAN_BO_NHAN cbn
+                                                               where cbn.LOAI = 'NHIEM_VU'
+                                                                 and cbn.MA = nv.ID
+                                                                 and cbn.CAN_BO_NHAN = shccCanBo)
+                    or (donViCanBo is not null and Exists(
+                            select dvn.id
+                            from HCTH_DON_VI_NHAN dvn
+                            where dvn.MA = nv.id
+                              and dvn.LOAI = 'NHIEM_VU'
+                              and dvn.DON_VI_NHAN in
+                                  (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                   from dual
+                                   connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
+                        )))
+                    ));
     IF pageNumber < 1 THEN
         pageNumber := 1;
     END IF;
@@ -3144,7 +3125,10 @@ BEGIN
                      nv.LIEN_PHONG                                        AS "lienPhong",
                      nv.TRANG_THAI                                        AS "trangThai",
 
-                     (select MAX(nvh.THOI_GIAN) from HCTH_HISTORY nvh where nvh.LOAI= 'NHIEM_VU' and nvh.KEY = nv.ID) as chinhSuaLanCuoi,
+                     (select MAX(nvh.THOI_GIAN)
+                      from HCTH_HISTORY nvh
+                      where nvh.LOAI = 'NHIEM_VU'
+                        and nvh.KEY = nv.ID)                              as chinhSuaLanCuoi,
 
 
                      (SELECT LISTAGG(dvn.TEN, '; ') WITHIN GROUP (
@@ -3193,81 +3177,59 @@ BEGIN
                          ORDER BY nv.ID DESC
                          )                                                   R
               FROM HCTH_NHIEM_VU nv
-              WHERE (
-                        -- RECTOR or HCTH staff can see all mission
-                                canBoType = 'HCTH'
-                            or canBoType = 'RECTOR'
-                            OR
-                            -- other staff mission permission check
-                                nv.NGUOI_TAO = shccCanBo
-                            or EXISTS(select cbn.id
-                                      from HCTH_CAN_BO_NHAN cbn
-                                      where cbn.LOAI = 'NHIEM_VU'
-                                        and cbn.MA = nv.ID
-                                        and cbn.CAN_BO_NHAN = shccCanBo)
-                            or (donViCanBo is not null
-                            and Exists(
-                                        select dvn.id
-                                        from HCTH_DON_VI_NHAN dvn
-                                        where dvn.MA = nv.id
-                                          and dvn.LOAI = 'NHIEM_VU'
-                                          and dvn.DON_VI_NHAN in
-                                              (select regexp_substr(donViCanBo, '[^,]+', 1, level)
-                                               from dual
-                                               connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
-                                    ))
-                        ))
---         ((
---             userShcc is not null and
---             nv.NGUOI_TAO = userShcc
---         ) OR
---         (
---             hcthcbn.CAN_BO_NHAN IS NOT NULL AND
---             INSTR(hcthcbn.CAN_BO_NHAN, userShcc) != 0
---         ) OR
---         (
---              userShcc is null
---         ))
---         AND
---         (
---             (
---                 canBoNhan IS NULL
---                 AND donViNhan IS NULL
---             )
---             OR (
---                 canBoNhan is NOT NULL
---                 AND INSTR(hcthcbn.CAN_BO_NHAN, canBoNhan) != 0
---             )
---             OR (
---                 donViNhan IS NOT NULL
---                 AND nv.DON_VI_NHAN is not NULL
---                 AND (
---                     (
---                         select count(id2)
---                         from (
---                                 select *
---                                 from (
---                                         (
---                                             SELECT to_number(COLUMN_VALUE) as id1
---                                             FROM xmltable(donViNhan)
---                                             ORDER BY id1
---                                         ) t1
---                                         LEFT JOIN (
---                                             SELECT to_number(COLUMN_VALUE) as id2
---                                             FROM xmltable(nv.DON_VI_NHAN)
---                                             ORDER BY id2
---                                         ) t2 ON id1 = id2
---                                     )
---                             )
---                     ) != 0
---                 )
---             ))
---         AND (
---             sT = ''
---             OR LOWER(nv.NOI_DUNG) LIKE sT
---             )
---         ORDER BY nv.ID DESC
---     )
+              WHERE
+-- check if user is related to mission
+                  (
+                      -- RECTOR or HCTH staff can see all mission
+                              canBoType = 'HCTH' or canBoType = 'RECTOR' OR
+                          -- other staff mission permission check
+                              nv.NGUOI_TAO = shccCanBo or EXISTS(select cbn.id
+                                                                 from HCTH_CAN_BO_NHAN cbn
+                                                                 where cbn.LOAI = 'NHIEM_VU'
+                                                                   and cbn.MA = nv.ID
+                                                                   and cbn.CAN_BO_NHAN = shccCanBo)
+                          or (donViCanBo is not null and Exists(
+                              select dvn.id
+                              from HCTH_DON_VI_NHAN dvn
+                              where dvn.MA = nv.id
+                                and dvn.LOAI = 'NHIEM_VU'
+                                and dvn.DON_VI_NHAN in
+                                    (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                     from dual
+                                     connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
+                          ))
+                      )
+                and
+                -- filter
+                  (
+                              sT = ''
+                          OR LOWER(nv.NOI_DUNG) LIKE sT
+                          OR LOWER(nv.TIEU_DE) LIKE sT
+                      )
+                and (
+                          nhiemVuType is NULL or
+                          (nhiemVuType = 'NHIEM_VU_CAC_DON_VI' and nv.LIEN_PHONG = 0 and
+                           Exists(SELECT dvn.id
+                                  from HCTH_DON_VI_NHAN dvn
+                                  where dvn.LOAI = 'NHIEM_VU' and dvn.MA = nv.id)) or
+                          (nhiemVuType = 'NHIEM_VU_LIEN_PHONG' and nv.LIEN_PHONG = 1) or
+                          (nhiemVuType = 'NHIEM_VU_CUA_BAN' and nv.NGUOI_TAO = shccCanBo) or
+                          (nhiemVuType = 'NHIEM_VU_THAM_GIA' and (EXISTS(select cbn.id
+                                                                         from HCTH_CAN_BO_NHAN cbn
+                                                                         where cbn.LOAI = 'NHIEM_VU'
+                                                                           and cbn.MA = nv.ID
+                                                                           and cbn.CAN_BO_NHAN = shccCanBo)
+                              or (donViCanBo is not null and Exists(
+                                      select dvn.id
+                                      from HCTH_DON_VI_NHAN dvn
+                                      where dvn.MA = nv.id
+                                        and dvn.LOAI = 'NHIEM_VU'
+                                        and dvn.DON_VI_NHAN in
+                                            (select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                             from dual
+                                             connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null)
+                                  )))
+                              )))
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
         ORDER BY 'id' DESC;
     RETURN my_cursor;
@@ -12103,7 +12065,7 @@ BEGIN
                              WHEN CB.NGAY_BIEN_CHE IS NULL THEN 'Hợp đồng'
                              ELSE 'Biên chế'
                             END)                 AS "loaiCanBo",
-                        (select rtrim(xmlagg(xmlelement(e, dmqg.MA_CODE, '-').extract('//text()') order by null).getclobval(), '-')
+                        (select rtrim(xmlagg(xmlelement(e, dmqg.TEN_QUOC_GIA, '-').extract('//text()') order by null).getclobval(), '-')
                          FROM DM_QUOC_GIA dmqg
                          WHERE INSTR(CB.HOC_VI_NOI_TOT_NGHIEP, dmqg.MA_CODE) != 0
                         ) AS "danhSahcQuocGiaHocViNoiTotNghiep",
@@ -12357,7 +12319,7 @@ BEGIN
                              WHEN CB.NGAY_BIEN_CHE IS NULL THEN 'Hợp đồng'
                              ELSE 'Biên chế'
                             END)                 AS "loaiCanBo",
-                        (select rtrim(xmlagg(xmlelement(e, dmqg.MA_CODE, '-').extract('//text()') order by null).getclobval(), '-')
+                        (select rtrim(xmlagg(xmlelement(e, dmqg.TEN_QUOC_GIA, '-').extract('//text()') order by null).getclobval(), '-')
                          FROM DM_QUOC_GIA dmqg
                          WHERE INSTR(CB.HOC_VI_NOI_TOT_NGHIEP, dmqg.MA_CODE) != 0
                         ) AS "danhSahcQuocGiaHocViNoiTotNghiep",
