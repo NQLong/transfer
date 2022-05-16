@@ -127,6 +127,28 @@ module.exports = app => {
         app.model.canBo.getGiangVien(searchTerm, (error, items) => res.send({ items: items.rows }));
     });
 
+    app.get('/api/staff/get-chuyen-nganh-all', app.permission.check('staff:login'), (req, res) => {
+        let condition = { statement: 'ngayNghi IS NULL', parameter: {} };
+        if (req.query && req.query.condition) {
+            if (typeof (req.query.condition) == 'object') {
+                if (req.query.condition.searchText) {
+                    condition = {
+                        statement: 'ngayNghi IS NULL AND lower(chuyenNganh) LIKE :searchText',
+                        parameter: { searchText: `%${req.query.condition.searchText.toLowerCase()}%` }
+                    };
+                }
+            } else {
+                condition = {
+                    statement: 'ngayNghi IS NULL AND lower(chuyenNganh) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
+                };
+            }
+        }
+        app.model.canBo.getAll(condition, 'chuyenNganh', '', (error, items) => {
+            res.send({ error, items });
+        });
+    });
+
     // app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
     //     app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
     //         res.send({ error, shcc });

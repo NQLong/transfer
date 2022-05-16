@@ -61,14 +61,25 @@ module.exports = app => {
         app.model.qtHopDongDvtlTn.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHopDongDvtlTn.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('qtHopDongDvtlTn:write'), (req, res) => {
+        app.model.qtHopDongDvtlTn.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hợp đồng đơn vị trả lương - trách nhiệm');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHopDongDvtlTn.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHopDongDvtlTn.delete({ ma: req.body.ma }, (error) => res.send(error)));
+    app.put('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('qtHopDongDvtlTn:write'), (req, res) => {
+        app.model.qtHopDongDvtlTn.update({ ma: req.body.ma }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hợp đồng đơn vị trả lương - trách nhiệm');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('qtHopDongDvtlTn:write'), (req, res) => {
+        app.model.qtHopDongDvtlTn.delete({ ma: req.body.ma }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng đơn vị trả lương - trách nhiệm');
+            res.send({ error });
+        });
+    });
 
     // app.post('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
     //     if (req.body.data && req.session.user) {

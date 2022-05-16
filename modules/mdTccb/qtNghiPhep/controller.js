@@ -158,7 +158,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
         app.model.qtNghiPhep.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ phép');
-            res.send(error);
+            res.send({ error });
         })
     );
 

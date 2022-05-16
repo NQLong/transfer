@@ -112,15 +112,23 @@ module.exports = app => {
     });
 
     app.post('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.create(req.body.item, (error, item) => res.send({ error, item }));
+        app.model.qtHopDongLaoDong.create(req.body.item, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hợp đồng lao động');
+            res.send({ error, item });
+        });
     });
 
     app.put('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.update({ ma: req.body.ma }, req.body.changes, (error, items) => res.send({ error, items }));
+        app.model.qtHopDongLaoDong.update({ ma: req.body.ma }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hợp đồng lao động');
+            res.send({ error, item });
+        });
     });
-
     app.delete('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:delete'), (req, res) => {
-        app.model.qtHopDongLaoDong.delete({ ma: req.body.ma }, errors => res.send({ errors }));
+        app.model.qtHopDongLaoDong.delete({ ma: req.body.ma }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng lao động');
+            res.send({ error });
+        });
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/:ma', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {

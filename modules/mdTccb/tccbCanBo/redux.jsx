@@ -223,6 +223,20 @@ export const SelectAdapter_FwCanBoFemale = {
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
 };
 
+export const SelectAdapter_ChuyenNganhAll = {
+    ajax: true,
+    url: '/api/staff/get-chuyen-nganh-all',
+    data: params => ({ condition: params.term }),
+    processResults: response => {
+        let listChuyenNganh = [];
+        if (response && response.items) {
+            let chuyenNganhGroupBy = response.items.groupBy('chuyenNganh');
+            listChuyenNganh = Object.keys(chuyenNganhGroupBy);
+        }
+        return { results: listChuyenNganh.map(item => ({ id: item, text: item })) };
+    },
+};
+
 export function createMultiCanBo(canBoList, done) {
     return () => {
         const url = '/api/staff/multiple';

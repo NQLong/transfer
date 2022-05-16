@@ -15,7 +15,7 @@ import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import T from 'view/js/common';
 
 class StaffPage extends AdminPage {
-    state = { filter: {}, visibleCVDT: false, visibleHDTN: false, listChuyenNganh: [] };
+    state = { filter: {}, visibleCVDT: false, visibleHDTN: false };
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
@@ -46,10 +46,6 @@ class StaffPage extends AdminPage {
         });
     }
 
-    setUp = (data = [], keyGroup) => {
-        let dataGroupBy = data.groupBy(keyGroup);
-        return Object.keys(dataGroupBy);
-    }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
         //listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien
