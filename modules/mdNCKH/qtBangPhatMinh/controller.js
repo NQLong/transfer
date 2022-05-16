@@ -2,20 +2,20 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#00e34c' },
+            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#FFE47A' },
         },
     };
     const menuStaff = {
-        parentMenu: app.parentMenu.user,
+        parentMenu: app.parentMenu.khcn,
         menus: {
-            1030: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 4 },
+            9503: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#FFE47A', color: '#000000' },
         },
     };
 
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3014: { title: 'Bằng phát minh', link: '/user/tccb/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 5 },
+            3014: { title: 'Bằng phát minh', link: '/user/tccb/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#FFE47A', color: '#000000', groupIndex: 5 },
         },
     };
 
@@ -94,13 +94,13 @@ module.exports = app => {
         });
     });
     ///END USER ACTIONS
-    
+
     app.get('/api/khcn/qua-trinh/bang-phat-minh/page/:pageNumber/:pageSize', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null };
-        app.model.qtBangPhatMinh.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear,  searchTerm, (error, page) => {
+        app.model.qtBangPhatMinh.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -126,7 +126,7 @@ module.exports = app => {
             }
         });
     });
-    
+
     app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
         app.model.qtBangPhatMinh.create(req.body.data, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'C', 'Bằng phát minh');

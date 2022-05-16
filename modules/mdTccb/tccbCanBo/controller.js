@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 }
+            1001: { title: 'Thông tin cán bộ', link: '/user/profile', icon: 'fa-address-card-o', backgroundColor: '#456578', pin: true }
         }
     };
 
@@ -533,9 +533,9 @@ module.exports = app => {
                         ngayHuongLuong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
                         danToc: canBo.danToc || '',
                         tonGiao: canBo.tonGiao || '',
-                        phuCapChucVu: qtChucVu[0].phuCapChucVu,
-                        chucVu: qtChucVu[0].chucVu,
-                        donVi: qtChucVu[0].donVi,
+                        phuCapChucVu: qtChucVu[0]?.phuCapChucVu,
+                        chucVu: qtChucVu[0]?.chucVu,
+                        donVi: qtChucVu[0]?.donVi,
                         phoThong: canBo.phoThong || '',
                         hocVi: canBo.hocVi || '',
                         ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',

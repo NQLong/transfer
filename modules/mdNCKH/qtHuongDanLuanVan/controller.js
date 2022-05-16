@@ -2,21 +2,21 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9054: { title: 'Quá trình hướng dẫn luận văn', link: '/user/khcn/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37' },
+            9054: { title: 'Quá trình hướng dẫn đề tài', link: '/user/khcn/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37' },
         },
     };
 
     const menuStaff = {
-        parentMenu: app.parentMenu.user,
+        parentMenu: app.parentMenu.khcn,
         menus: {
-            1003: { title: 'Hướng dẫn luận văn', link: '/user/huong-dan-luan-van', icon: 'fa-university', backgroundColor: '#decf45', groupIndex: 4 },
+            9054: { title: 'Hướng dẫn đề tài', link: '/user/huong-dan-luan-van', icon: 'fa-university', backgroundColor: '#E19443' },
         },
     };
 
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 5 },
+            3018: { title: 'Quá trình hướng dẫn đề tài', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 5 },
         },
     };
 

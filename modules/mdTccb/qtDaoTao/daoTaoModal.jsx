@@ -44,13 +44,14 @@ export class DaoTaoModal extends AdminModal {
         let listFile = T.parse(minhChung || '[]');
         data?.data && this.setState({ item, qtId: data.qtId });
         this.setState({
-            batDauType, ketThucType,
+            batDauType: batDauType || 'dd/mm/yyyy',
+            ketThucType: ketThucType || 'dd/mm/yyyy',
             batDau: Number(batDau), ketThuc: Number(ketThuc), listFile, shcc, id, loaiBangCap, denNay: ketThuc == -1
         }, () => {
             this.canBo.value(this.state.shcc || '');
             this.loaiBangCap.value(this.state.loaiBangCap);
             this.trinhDo?.value(trinhDo || '');
-            this.chuyenNganh?.value(chuyenNganh || '');
+            this.chuyenNganh?.value(chuyenNganh || chuyenNganhSupportText[this.state.loaiBangCap] || '');
             this.tenTruong?.value(tenTruong || '');
             this.hinhThuc?.value(hinhThuc || '');
             this.batDauType?.setText({ text: batDauType || 'dd/mm/yyyy' });
@@ -202,7 +203,7 @@ export class DaoTaoModal extends AdminModal {
             title: <>Thông tin quá trình đào tạo {this.props.title || ''}</>,
             size: 'large',
             buttons: this.props.isSupport && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
-            submitText: this.props.isSupport && 'Gửi yêu cầu',
+            submitText: this.props.isCanBo && 'Gửi yêu cầu',
             body: <div className='row'>
                 <FormSelect className='form-group col-md-12' ref={e => this.canBo = e} label='Cán bộ' readOnly={readOnly || this.state.shcc} data={SelectAdapter_FwCanBo} />
                 <FormSelect className='form-group col-md-12' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required readOnly={readOnly} />
@@ -216,6 +217,8 @@ export class DaoTaoModal extends AdminModal {
                 <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-6' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }} readOnly={readOnly} />
                 <FormTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Chuyên ngành/Nội dung' style={{ display: displayElement }} required readOnly={!!chuyenNganhSupportText[this.state.loaiBangCap] || readOnly} />
                 <FormTextBox ref={e => this.tenTruong = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} readOnly={readOnly} />
+                <small className='form-group col-md-12' style={{ color: 'red' }}><i>Nếu thầy, cô chỉ thi lấy chứng chỉ/chứng nhận mà không có quá trình đào tạo thì <b>CHỈ NHẬP</b> ô <b>Thời gian bắt đầu</b></i></small>
+
                 <FormDatePicker style={{ display: displayElement }} placeholder='Thời gian bắt đầu' ref={e => this.batDau = e} type={typeMapper[this.state.batDauType]} className='col-md-6' label={
                     <div style={{ display: 'flex' }}>Thời gian bắt đầu:&nbsp;&nbsp;<Dropdown ref={e => this.batDauType = e}
                         items={EnumDateType}

@@ -8,11 +8,13 @@ import React from 'react';
 import { AdminModal, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
 export class SupportModal extends AdminModal {
     onShow = (data) => {
+        //For Staff: data = { item: {} }
+        //For TCCB Staff: data = { data: {} }
         let item = data.item || data.data || null;
+
         let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh } = item;
-
         data.data && this.setState({ item, qtId: data.qtId });
-
+        data.item && this.setState({ shcc: item.shcc });
         this.ho.value(ho);
         this.ten.value(ten);
         this.phai.value(phai);
@@ -26,13 +28,13 @@ export class SupportModal extends AdminModal {
         this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
 
         this.ngheNghiepCu.value(ngheNghiepCu || '');
-        this.ngayBatDauCongTac.value(ngayBatDauCongTac || '');
+        this.ngayBatDauCongTac.value(Number(ngayBatDauCongTac) || '');
         this.ngayBienChe.value(ngayBienChe && ngayBienChe != 1 ? ngayBienChe : '');
         this.donViTuyenDung.value(donViTuyenDung ? donViTuyenDung : JSON.parse(this.props.system.schoolName).vi);
 
         this.soBhxh.value(soBhxh || '');
-        this.ngayBatDauBhxh.value(ngayBatDauBhxh || '');
-        this.ngayKetThucBhxh.value(ngayKetThucBhxh || '');
+        this.ngayBatDauBhxh.value(Number(ngayBatDauBhxh) || '');
+        this.ngayKetThucBhxh.value(Number(ngayKetThucBhxh) || '');
     }
 
     onSubmit = (e) => {
@@ -62,7 +64,7 @@ export class SupportModal extends AdminModal {
         };
         let dataSupport = {
             qt: 'canBo',
-            qtId: this.shcc.value(),
+            qtId: this.state.shcc,
             type: 'update'
         };
         this.props.create(data, dataSupport, this.hide);

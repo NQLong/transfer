@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1031: { title: 'Đi nước ngoài', subTitle: 'Công tác, đào tạo, du lịch, ...', link: '/user/di-nuoc-ngoai', icon: 'fa-globe', backgroundColor: '#4297ff', groupIndex: 0 },
+            1003: { title: 'Đi nước ngoài', subTitle: 'Công tác, đào tạo, du lịch, ...', link: '/user/di-nuoc-ngoai', icon: 'fa-globe', backgroundColor: '#4297ff', groupIndex: 1 },
         },
     };
 
@@ -211,7 +211,7 @@ module.exports = app => {
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
@@ -271,7 +271,7 @@ module.exports = app => {
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
@@ -318,7 +318,7 @@ module.exports = app => {
 
         res.status(400).send('Không tìm thấy tập tin');
     });
-    
+
     app.createFolder(app.path.join(app.assetPath, '/baoCaoDiNuocNgoai'));
 
     app.uploadHooks.add('baoCaoDiNuocNgoaiStaffFile', (req, fields, files, params, done) =>

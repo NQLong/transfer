@@ -5,15 +5,15 @@ module.exports = app => {
             3033: { title: 'Quá trình học tập, công tác', link: '/user/tccb/qua-trinh/hoc-tap-cong-tac', icon: 'fa-calendar', backgroundColor: '#30a17f', groupIndex: 5 },
         },
     };
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1012: { title: 'Học tập, công tác', subTitle: 'Tiểu sử', link: '/user/hoc-tap-cong-tac', icon: 'fa-calendar', backgroundColor: '#fb8f04', groupIndex: 0 },
-        },
-    };
+    // const menuStaff = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1012: { title: 'Học tập, công tác', subTitle: 'Tiểu sử', link: '/user/hoc-tap-cong-tac', icon: 'fa-calendar', backgroundColor: '#fb8f04', groupIndex: 0 },
+    //     },
+    // };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        // { name: 'staff:login', menu: menuStaff },
         { name: 'qtHocTapCongTac:read', menu },
         { name: 'qtHocTapCongTac:write' },
         { name: 'qtHocTapCongTac:delete' },
@@ -21,7 +21,6 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/group/:shcc', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/hoc-tap-cong-tac', app.permission.check('staff:login'), app.templates.admin);
-
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:

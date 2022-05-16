@@ -4,6 +4,7 @@ import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import { DaoTaoModal } from './daoTaoModal';
 import { createQtDaoTaoStaff, updateQtDaoTaoStaff } from './redux';
 import { createTccbSupport } from '../tccbSupport/redux';
+import { Tooltip } from '@mui/material';
 class DaoTaoDetail extends AdminPage {
     loaiBangCap = ''
     trinhDo = ''
@@ -56,7 +57,7 @@ class DaoTaoDetail extends AdminPage {
                     <tr key={index}>
                         <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{item.tenTrinhDo} <br /> {item.minhChung && item.minhChung != '[]' ? <i style={{ color: 'blue' }}>Đã có minh chứng</i> : <i style={{ color: 'red' }}>Chưa có minh chứng</i>}</>} />
-                        <TableCell style={{ whiteSpace: 'nowrap' }} content={item.chuyenNganh} />
+                        <TableCell contentClassName='multiple-lines-3' content={item.chuyenNganh} />
                         <TableCell content={item.tenTruong} />
                         <TableCell content={item.tenHinhThuc} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
@@ -74,14 +75,16 @@ class DaoTaoDetail extends AdminPage {
             <div className='col-md-12 form-group' style={this.props.style}>
                 <div className='tile-body'>{renderData(dataDaoTao)}</div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <button className='btn btn-info' onClick={e => {
-                        e.preventDefault();
-                        this.modal.show({
-                            item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
-                        });
-                    }}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm
-                    </button>
+                    <Tooltip title='Gửi yêu cầu cho phòng TCCB' arrow>
+                        <button className='btn btn-info' onClick={e => {
+                            e.preventDefault();
+                            this.modal.show({
+                                item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
+                            });
+                        }}>
+                            <i className='fa fa-fw fa-lg fa-plus' />Thêm
+                        </button>
+                    </Tooltip>
                 </div>
                 <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={true} shcc={this.props.shcc}
                     create={this.props.createTccbSupport} />

@@ -6,9 +6,9 @@ module.exports = app => {
         },
     };
     const menuStaff = {
-        parentMenu: app.parentMenu.user,
+        parentMenu: app.parentMenu.khcn,
         menus: {
-            1014: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
+            9502: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
         },
     };
     const menuTCCB = {
