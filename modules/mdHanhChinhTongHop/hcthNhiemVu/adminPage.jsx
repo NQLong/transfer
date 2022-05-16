@@ -1,18 +1,24 @@
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { createNhiemVu, searchNhiemVu, getHcthNhiemVuPage, updateNhiemVu, deleteNhiemVu } from './redux';
-import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
-import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import Pagination from 'view/component/Pagination';
+import { createNhiemVu, deleteNhiemVu, getHcthNhiemVuPage, searchNhiemVu, updateNhiemVu } from './redux';
 
-const { doUuTienMapper, trangThaiNhiemVu } = require('../constant');
+const { doUuTienMapper, nhiemVuSelector } = require('../constant');
 
 class hcthNhiemVuPage extends AdminPage {
     state = { searching: false, loaiDonVi: [] };
 
     componentDidMount() {
         T.ready(this.getSiteSetting().readyUrl, () => {
+            const currentPermissions = this.getCurrentPermissions();
+            if (currentPermissions.some(item => ['rectors:login', 'hcth:manage'].includes(item))) {
+                this.loaiNhiemVu?.value(nhiemVuSelector.NHIEM_VU_CUA_BAN.id);
+            }
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -51,9 +57,13 @@ class hcthNhiemVuPage extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.HcthNhiemVu && this.props.HcthNhiemVu.page ? this.props.HcthNhiemVu.page : { pageNumber: 1, pageSize: 50 };
-        let donViNhan = this.donViNhan?.value().toString() || null;
+        let donViNhan = this.donViNhan?.value() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
-        const pageFilter = isInitial ? {} : { donViNhan, canBoNhan };
+        let lienPhong = this.lienPhong?.value() || null;
+        let loaiNhiemVu = this.loaiNhiemVu?.value() || null;
+        let doUuTien = this.doUuTien?.value() || null;
+        let nguoiTao = this.nguoiTao?.value() || null;
+        const pageFilter = isInitial ? { loaiNhiemVu } : { nguoiTao, doUuTien, lienPhong, donViNhan, canBoNhan, loaiNhiemVu };
 
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -94,6 +104,16 @@ class hcthNhiemVuPage extends AdminPage {
         return this.state.loading ? null : (this.props.hcthNhiemVu?.page?.list || []);
     }
 
+    clearAdvanceSearch = (e) => {
+        e.preventDefault();
+        this.donViNhan?.clear();
+        this.canBoNhan?.clear();
+        this.nguoiTao?.clear();
+        this.lienPhong?.clear();
+        this.doUuTien?.clear();
+        this.changeAdvancedSearch();
+    }
+
     render() {
         const
             currentPermissions = this.getCurrentPermissions(),
@@ -113,7 +133,7 @@ class hcthNhiemVuPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Độ ưu tiên</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Người tạo</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th>
+                    {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th> */}
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày kết thúc</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -147,9 +167,6 @@ class hcthNhiemVuPage extends AdminPage {
                         } style={{ whiteSpace: 'nowrap' }} contentClassName='multiple-lines-5' contentStyle={{ width: '100%' }} />
                         <TableCell type='text' content={item.doUuTien ? doUuTienMapper[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapper[item.doUuTien].color : '#000000' }} />
                         <TableCell type='text' content={item.tenNguoiTao.normalizedName()} style={{ whiteSpace: 'nowrap' }} />
-                        <TableCell type='text' content={
-                            <div style={{ color: item.trangThai && trangThaiNhiemVu[item.trangThai]?.color, textAlign: 'center' }}>{item.trangThai && trangThaiNhiemVu[item.trangThai]?.text}</div>
-                        } style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                             item.ngayBatDau ? (<>
                                 <span style={{ color: 'blue' }}> {T.dateToText(item.ngayBatDau, 'dd/mm/yyyy')}</span>
@@ -167,18 +184,42 @@ class hcthNhiemVuPage extends AdminPage {
                 );
             }
         });
-        // }
+
+        const nhiemVuTypeSelector = [];
+        if (currentPermissions.some(item => ['rectors:login', 'hcth:manage'].includes(item))) {
+            nhiemVuTypeSelector.push(nhiemVuSelector.NHIEM_VU_CAC_DON_VI);
+        }
+        if (currentPermissions.includes('manager:write')) {
+            nhiemVuTypeSelector.push(nhiemVuSelector.NHIEM_VU_DON_VI);
+        }
+        if (currentPermissions.some(item => ['manager:write', 'rectors:login', 'hcth:manage'].includes(item))) {
+            nhiemVuTypeSelector.push(nhiemVuSelector.NHIEM_VU_CUA_BAN, nhiemVuSelector.NHIEM_VU_THAM_GIA);
+        }
+
+        const advanceSearch = (<div className='col-12 row form-group'>
+            <FormSelect data={SelectAdapter_FwCanBo} ref={e => this.nguoiTao = e} allowClear={true} className='col-md-4' label='Người tạo' />
+            <FormSelect data={[{ id: 0, text: 'Thường' }, { id: 1, text: 'Liên phòng' }]} ref={e => this.lienPhong = e} allowClear={true} className='col-md-4' label='Loại nhiệm vụ' />
+            <FormSelect data={Object.keys(doUuTienMapper).map(key => doUuTienMapper[key])} ref={e => this.doUuTien = e} allowClear={true} className='col-md-4' label='Độ ưu tiên' />
+            <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.donViNhan = e} allowClear={true} className='col-md-6' label='Đơn vị nhận' />
+            <FormSelect data={SelectAdapter_FwCanBo} ref={e => this.canBoNhan = e} allowClear={true} className='col-md-6' label='Cán bộ nhận' />
+            <div className='col-md-12 form-group d-flex justify-content-end' style={{ gap: '10px' }}>
+                <button type='submit' className='btn btn-danger' onClick={this.clearAdvanceSearch}>
+                    <i className='fa fa-times' /> Xóa bộ lọc
+                </button>
+                <button type='submit' className='btn btn-success' onClick={() => this.changeAdvancedSearch()}>
+                    <i className='fa fa-search' /> Tìm kiếm
+                </button>
+            </div>
+        </div>);
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Giao nhiệm vụ',
+            title: 'Nhiệm vụ',
             breadcrumb,
-            advanceSearch: <>
-                <div className='row'>
-                    {/* <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} /> */}
-                </div>
+            header: <>
+                {nhiemVuTypeSelector.length > 0 && <FormSelect onChange={() => this.changeAdvancedSearch()} ref={e => this.loaiNhiemVu = e} allowClear={true} placeholder='Loại nhiệm vụ' data={nhiemVuTypeSelector} style={{ margin: 0, minWidth: '250px' }} />}
             </>,
+            advanceSearch,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
