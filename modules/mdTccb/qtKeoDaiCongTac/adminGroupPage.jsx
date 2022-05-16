@@ -226,10 +226,10 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghỉ hưu</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày nghỉ hưu</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -244,8 +244,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.phai == '01' ? 'Nam' : 'Nữ'} />
-                        <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngaySinh} />
-                        <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
+                        <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.ngaySinh} />
                         <TableCell type='text' content={<>
                             {item.tenChucDanh && <span> {item.tenChucDanh}<br /></span>}
                             {item.tenHocVi}
@@ -257,6 +256,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
+                        <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}

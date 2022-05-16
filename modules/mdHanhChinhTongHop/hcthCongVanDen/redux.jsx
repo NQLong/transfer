@@ -160,10 +160,15 @@ export function deleteFile(id, fileId, file, done) {
 }
 
 
-export function getCongVanDen(id, done) {
+export function getCongVanDen(id, context, done) {
+
+    if (typeof context === 'function') {
+        done = context;
+        context = {};
+    }
     return dispatch => {
         const url = `/api/hcth/cong-van-den/${id}`;
-        T.get(url, data => {
+        T.get(url, context || {}, data => {
             if (data.error) {
                 if (data.error.status == 401) {
                     dispatch({ type: HcthCongVanDenGetError, error: 401 });

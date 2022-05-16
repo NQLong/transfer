@@ -523,8 +523,9 @@ export class FormRichTextBox extends React.Component {
 
     focus = () => this.input.focus();
 
+    clear = () => this.input.clear();
     render() {
-        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = '' } = this.props;
+        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = '', icon = '' } = this.props;
         let displayElement = '';
         if (label) {
             displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> :
@@ -535,7 +536,8 @@ export class FormRichTextBox extends React.Component {
         return (
             <div className={'form-group ' + (className ? className : '')} style={style}>
                 {displayElement}
-                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
+                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block', position: 'relative' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
+                {icon}
             </div>);
     }
 }
@@ -713,8 +715,8 @@ export class FormDatePicker extends React.Component {
     mask = {
         'time-mask': '39/19/2099 h9:59',
         'date-mask': '39/19/2099',
-        'month-mask': '19/2099',
         'year-mask': '2099',
+        'month-mask': '19/2099',
         'date-month': '39/19'
     };
 
@@ -810,12 +812,12 @@ export class FormFileBox extends React.Component {
     setData = data => this.fileBox.setData(data);
 
     render() {
-        let { label = '', className = '', pending = false, style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', onDelete = null, onSuccess = null } = this.props;
+        let { label = '', className = '', pending = false, style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', onDelete = null, onSuccess = null, description = null } = this.props;
         return (
             <div className={'form-group ' + className} style={style}>
                 {label && <label>{label}&nbsp;</label>}
                 {!readOnly && onDelete ? <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
-                <FileBox ref={e => this.fileBox = e} pending={pending} postUrl={postUrl} uploadType={uploadType} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
+                <FileBox ref={e => this.fileBox = e} pending={pending} postUrl={postUrl} uploadType={uploadType} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} description={description} />
             </div>);
     }
 }
@@ -1004,7 +1006,7 @@ export class AdminPage extends React.Component {
             right += 60;
         }
         if (buttons) {
-            if (buttons.length) {
+            if (Array.isArray(buttons)) {
                 customButtons = buttons.map((item, index) => {
                     right += 60;
                     return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;
