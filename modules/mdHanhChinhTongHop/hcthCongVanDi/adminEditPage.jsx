@@ -174,7 +174,7 @@ class AdminEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                     <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/hcth/cong-van-cac-phong'
             };
@@ -185,7 +185,7 @@ class AdminEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
                     <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/cong-van-cac-phong'
             };
@@ -526,7 +526,7 @@ class AdminEditPage extends AdminPage {
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
             unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
-            {breadcrumb, backRoute} = this.getSiteSetting();
+            { breadcrumb, backRoute } = this.getSiteSetting();
 
         const titleText = !isNew ? 'Cập nhật' : 'Tạo mới';
         const listTrangThaiCv = Object.keys(listTrangThai).map(item =>

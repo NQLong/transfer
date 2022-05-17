@@ -192,7 +192,7 @@ class AdminEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                     <Link key={1} to='/user/hcth/nhiem-vu'>Danh sách nhiệm vụ</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/hcth/nhiem-vu'
             };
@@ -203,7 +203,7 @@ class AdminEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
                     <Link key={1} to='/user/nhiem-vu'>Danh sách nhiệm vụ</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/nhiem-vu'
             };
@@ -237,8 +237,8 @@ class AdminEditPage extends AdminPage {
             siteSetting = this.getSiteSetting(),
             buttons = [];
 
-        if (sitePermission.isParticipant) 
-        buttons.push({icon:'fa-check', onClick:this.onComplete, className: 'btn-success'});
+        if (sitePermission.isParticipant)
+            buttons.push({ icon: 'fa-check', onClick: this.onComplete, className: 'btn-success' });
         // const nextTrangThai = trangThaiNhiemVu[this.state.trangThai]?.next || [];
         // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
 

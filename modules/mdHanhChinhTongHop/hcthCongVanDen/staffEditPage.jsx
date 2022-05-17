@@ -66,7 +66,6 @@ class PhanHoi extends React.Component {
         });
     }
 
-    canPhanHoi = () => true;
 
     onCreatePhanHoi = (e) => {
         e.preventDefault();
@@ -161,7 +160,7 @@ class StaffEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                     <Link key={1} to='/user/hcth/cong-van-den'>Danh sách công văn đến</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/hcth/cong-van-den'
             };
@@ -172,7 +171,7 @@ class StaffEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
                     <Link key={1} to='/user/cong-van-den'>Danh sách công văn đến</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/cong-van-den'
             };
@@ -604,9 +603,9 @@ class StaffEditPage extends AdminPage {
 
     isRelated = () => {
         const currentPermission = this.getCurrentPermissions();
-        let { maDonViNhan, maCanBoNhan } = this.getItem() || {};
-        maDonViNhan = maDonViNhan?.split(',') || [];
-        maCanBoNhan = maCanBoNhan?.split(',') || [];
+        let { donViNhan, canBoNhan } = this.getItem() || {};
+        let maDonViNhan = donViNhan?.split(',') || [];
+        let maCanBoNhan = canBoNhan?.split(',') || [];
         return currentPermission.includes('rectors:login') || currentPermission.includes('hcth:login') || this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) || maCanBoNhan.includes(this.state.shcc);
     }
 
