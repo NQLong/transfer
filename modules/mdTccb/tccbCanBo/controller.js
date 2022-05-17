@@ -456,6 +456,8 @@ module.exports = app => {
                     qtDaoTao.map(item => {
                         item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
                         item.ketThuc = item.ketThuc ? (item.ketThuc == -1 ? ' - nay' : ' - ' + app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType)) : '';
+                        item.tenTrinhDo = item.tenTrinhDo || item.trinhDo || '';
+                        item.tenHinhThuc = item.tenHinhThuc || '';
                         return item;
                     });
 
@@ -503,7 +505,7 @@ module.exports = app => {
                     const data = {
                         HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
                         otherName: '',
-                        cmnd: canBo.cmnd,
+                        cmnd: canBo.cmnd || '',
                         ngayCap: app.date.viDateFormat(new Date(canBo.ngayCapCmnd)),
                         dob: new Date(canBo.ngaySinh).getDate(),
                         mob: new Date(canBo.ngaySinh).getMonth() + 1,
