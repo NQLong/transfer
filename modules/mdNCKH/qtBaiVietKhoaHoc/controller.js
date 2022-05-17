@@ -1,14 +1,14 @@
 module.exports = app => {
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9502: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
+    //     },
+    // };
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9502: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
-        },
-    };
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1014: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
+            9502: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
         },
     };
     const menuTCCB = {
@@ -19,14 +19,14 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu },
         { name: 'qtBaiVietKhoaHoc:read', menu },
         { name: 'qtBaiVietKhoaHoc:readOnly', menu: menuTCCB },
         { name: 'qtBaiVietKhoaHoc:write' },
         { name: 'qtBaiVietKhoaHoc:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:readOnly'), app.templates.admin);
     app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -125,14 +125,25 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
-        app.model.qtBaiVietKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) => {
+        app.model.qtBaiVietKhoaHoc.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Bài viết khoa học');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
-        app.model.qtBaiVietKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
-        app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) => {
+        app.model.qtBaiVietKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Bài viết khoa học');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) => {
+        app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Bài viết khoa học');
+            res.send({ error });
+        });
+    });
 
     app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:listShcc/:listDv/:fromYear/:toYear/:xuatBanRange', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), (req, res) => {
         let { listShcc, listDv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, xuatBanRange: null };

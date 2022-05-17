@@ -5,7 +5,7 @@ module.exports = (app) => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1054: { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-tasks', backgroundColor: '#de602f', groupIndex: 4 },
+            1054: { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f', pin: true },
         },
     };
 
@@ -276,10 +276,12 @@ module.exports = (app) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViNhan, canBoNhan } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+        let { donViNhan, canBoNhan, loaiNhiemVu, lienPhong = null, doUuTien = null, nguoiTao = null } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
             { donViNhan: null, canBoNhan: null, ngayHetHan: null };
         donViNhan = donViNhan || null;
         canBoNhan = canBoNhan || null;
+        loaiNhiemVu = loaiNhiemVu || null;
+
         const user = req.session.user;
         const permissions = user.permissions;
         let shccCanBo = user.shcc;
@@ -291,7 +293,7 @@ module.exports = (app) => {
             _canBoType = canBoType.RECTOR;
         }
 
-        const data = { donViNhan, canBoNhan, shccCanBo, donViCanBo, canBoType: _canBoType || null };
+        const data = { nguoiTao, donViNhan, canBoNhan, shccCanBo, donViCanBo, lienPhong, doUuTien, loaiNhiemVu, canBoType: _canBoType || null };
         let filterParam;
         try {
             filterParam = JSON.stringify(data);

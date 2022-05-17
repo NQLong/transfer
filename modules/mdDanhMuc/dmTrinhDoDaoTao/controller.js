@@ -25,7 +25,7 @@ module.exports = app => {
         app.model.dmTrinhDoDaoTao.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/trinh-do-dao-tao/filter/:loai/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/trinh-do-dao-tao/filter/:loai/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             loai = req.params.loai,
@@ -45,7 +45,7 @@ module.exports = app => {
         } else {
             if (loai != '00') {
                 condition = {
-                    statement: 'loai =:loai',
+                    statement: 'loai = :loai',
                     parameter: { loai },
                 };
             }

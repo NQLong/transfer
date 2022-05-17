@@ -1,6 +1,6 @@
-// Table name: QT_KEO_DAI_CONG_TAC { id, batDau, batDauType, ketThuc, ketThucType, soHieuVanBan, shcc, ho, ten }
+// Table name: QT_KEO_DAI_CONG_TAC { id, batDau, batDauType, ketThuc, ketThucType, soQuyetDinh, shcc, ho, ten, ngayQuyetDinh }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'soHieuVanBan': 'SO_HIEU_VAN_BAN', 'shcc': 'SHCC', 'ho': 'HO', 'ten': 'TEN' };
+const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'soQuyetDinh': 'SO_QUYET_DINH', 'shcc': 'SHCC', 'ho': 'HO', 'ten': 'TEN', 'ngayQuyetDinh': 'NGAY_QUYET_DINH' };
 
 module.exports = app => {
     app.model.qtKeoDaiCongTac = {
@@ -143,6 +143,11 @@ module.exports = app => {
         groupPage: (pagenumber, pagesize, filter, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=qt_keo_dai_cong_tac_group_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        download: (filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_keo_dai_cong_tac_download_excel(:filter, :searchterm); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

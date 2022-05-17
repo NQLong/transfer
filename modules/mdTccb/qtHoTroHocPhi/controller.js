@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3045: { title: 'Quá trình hỗ trợ học phí', link: '/user/tccb/qua-trinh/ho-tro-hoc-phi', icon: 'fa fa-usd', backgroundColor: '#99ccff', groupIndex: 0 },
+            // 3045: { title: 'Quá trình hỗ trợ học phí', link: '/user/tccb/qua-trinh/ho-tro-hoc-phi', icon: 'fa fa-usd', backgroundColor: '#99ccff', groupIndex: 0 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1033: { title: 'Hỗ trợ học phí', link: '/user/ho-tro-hoc-phi', icon: 'fa fa-usd', color: '#000000', backgroundColor: '#6699ff', groupIndex: 4 },
+            // 1033: { title: 'Hỗ trợ học phí', link: '/user/ho-tro-hoc-phi', icon: 'fa fa-usd', color: '#000000', backgroundColor: '#6699ff', groupIndex: 4 },
         },
     };
 
@@ -119,14 +119,25 @@ module.exports = app => {
             }
         });
     });
-    app.post('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHoTroHocPhi.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('qtHoTroHocPhi:write'), (req, res) => {
+        app.model.qtHoTroHocPhi.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hỗ trợ học phí');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHoTroHocPhi.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtHoTroHocPhi.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('qtHoTroHocPhi:write'), (req, res) => {
+        app.model.qtHoTroHocPhi.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hỗ trợ học phí');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('qtHoTroHocPhi:write'), (req, res) => {
+        app.model.qtHoTroHocPhi.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hỗ trợ học phí');
+            res.send({ error });
+        });
+    });
 
     app.get('/api/qua-trinh/ho-tro-hoc-phi/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi', app.permission.check('qtHoTroHocPhi:read'), (req, res) => {
         let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang, loaiHocVi } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null };

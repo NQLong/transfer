@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1005: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 2 },
+            1007: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#E36273', groupIndex: 2 },
         },
     };
 
@@ -151,7 +151,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Kỷ luật');
-            res.send(error);
+            res.send({ error });
         });
     });
 
@@ -188,7 +188,7 @@ module.exports = app => {
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenKyLuat });
                         cells.push({ cell: 'I' + (index + 2), alignment: 'center', border: '1234', value: item.noiDung });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.soQuyetDinh });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ngayRaQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayRaQuyetDinh), 'dd/mm/yyyy') : ''  });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ngayRaQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayRaQuyetDinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.diemThiDua });
                     });
                     resolve(cells);
