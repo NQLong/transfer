@@ -1,14 +1,13 @@
+import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
+import { createDmDonViGuiCv, SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
+import { getStaffPage, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, renderTable, FormTextBox, FormSelect, TableCell, FormRichTextBox, FormFileBox, FormCheckbox, renderComment, renderTimeline } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
-import { createHcthCongVanDen, updateHcthCongVanDen, deleteFile, getCongVanDen, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao } from './redux';
-import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_FwCanBo, getStaffPage } from 'modules/mdTccb/tccbCanBo/redux';
-import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
-import { createDmDonViGuiCv } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, renderTimeline, TableCell } from 'view/component/AdminPage';
+import { createChiDao, createHcthCongVanDen, createPhanHoi, deleteFile, getChiDao, getCongVanDen, getHistory, getPhanHoi, updateHcthCongVanDen, updateStatus } from './redux';
 
 const { action, MA_BAN_GIAM_HIEU, MA_CHUC_VU_HIEU_TRUONG, trangThaiSwitcher } = require('../constant.js');
 
@@ -99,7 +98,7 @@ class PhanHoi extends React.Component {
                                 <FormRichTextBox type='text' className='col-md-12' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
                                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
                                     <button type='submit' className='btn btn-primary' onClick={this.onCreatePhanHoi}>
-                                        Gửi
+                                        <i className='fa fa-paper-plane' /> Gửi
                                     </button>
                                 </div>
                             </>)
@@ -194,6 +193,34 @@ class StaffEditPage extends AdminPage {
     };
 
     renderChiDao = (readOnly) => {
+        const buttons = [];
+        if (this.canPublish()) {
+            buttons.push(
+                <button key='publish-decline' type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_HCTH.id)}>
+                    <i className='fa fa-undo' /> Trả lại
+                </button>,
+                <button key='publish-accept' type='submit' className='btn btn-success' onClick={this.onPublish}>
+                    <i className='fa fa-paper-plane' /> Phân phối
+                </button>
+            );
+        }
+        else if (this.canApprove()) {
+            buttons.push(
+                <button key='approve-decline' type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_BGH.id)}>
+                    <i className='fa fa-undo' /> Trả lại
+                </button>,
+                <button key='approve-accept' type='submit' className='btn btn-success' onClick={this.onAprrove}>
+                    <i className='fa fa-check' /> Duyệt
+                </button>
+            );
+        } else {
+            buttons.push(
+                <button key='chiDao-add' type='submit' className='btn btn-primary' onClick={this.onCreateChiDao}>
+                    <i className='fa fa-lg fa-plus' /> Thêm
+                </button>
+            );
+        }
+
         const canChiDao = this.canChiDao();
         return (
             <div className='tile'>
@@ -216,27 +243,9 @@ class StaffEditPage extends AdminPage {
                         </div>
                         {
                             canChiDao && (<>
-                                {(this.canPublish() || this.canApprove()) && <FormRichTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Thêm chỉ đạo' readOnly={readOnly && !canChiDao} />}
+                                <FormRichTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Thêm chỉ đạo' readOnly={readOnly && !canChiDao} />
                                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
-                                    {
-                                        this.canPublish() && <>
-                                            <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_HCTH.id)}>
-                                                Trả lại
-                                            </button>
-                                            <button type='submit' className='btn btn-success' onClick={this.onPublish}>
-                                                Phân phối
-                                            </button>
-                                        </>
-                                    }
-                                    {this.canApprove() && <>
-                                        <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_BGH.id)}>
-                                            Trả lại
-                                        </button>
-                                        <button type='submit' className='btn btn-success' onClick={this.onAprrove}>
-                                            Duyệt
-                                        </button>
-                                    </>
-                                    }
+                                    {buttons}
                                 </div>
                             </>)
                         }
