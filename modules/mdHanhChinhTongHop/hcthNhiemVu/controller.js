@@ -12,7 +12,7 @@ module.exports = (app) => {
     const hcthMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            503: { title: 'Nhiệm vụ', link: '/user/hcth/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f' },
+            503: { title: 'Nhiệm vụ', link: '/user/hcth/nhiem-vu', icon: 'fa-tasks', backgroundColor: '#de602f' },
         },
     };
     app.permission.add(
@@ -134,6 +134,75 @@ module.exports = (app) => {
         });
     });
 
+    const vaiTroCanBoNhan = {
+        PARTICIPANT: 'PARTICIPANT',
+        MANAGER: 'MANAGER'
+    };
+
+    const CAN_BO_NHAN_ACTION = {
+        ADD: 'add',
+        REMOVE: 'remove',
+        CHANGE_ROLE: 'changeRole'
+    };
+
+    const createNotification = (emails, notification, done) => {
+        const prmomises = [];
+        emails.forEach(email => {
+            prmomises.push(app.notification.send({
+                toEmail: email,
+                ...notification
+            }));
+        });
+        Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
+    };
+
+    const onCreateCanBoNhanNotification = ({ maNhiemVu, nguoiTaoShcc, canBoNhan, vaiTro = '', hanhDong }) => new Promise((resolve, reject) => {
+        try {
+            let listEmployees = [];
+            listEmployees.push(nguoiTaoShcc);
+            listEmployees = listEmployees.concat(canBoNhan);
+            app.model.canBo.getAll({
+                statement: 'shcc IN (:dsCanBo)',
+                parameter: {
+                    dsCanBo: [...listEmployees]
+                }
+            }, 'email, ho, ten, shcc', 'email', (error, canBos) => {
+                if (error) reject(error);
+                else {
+                    const nguoiTao = canBos.find(canBo => canBo.shcc === nguoiTaoShcc);
+                    const dsNguoiNhan = canBos.filter(canBo => canBo.shcc !== nguoiTaoShcc);
+                    const hoTenNguoiTao = nguoiTao?.ho + ' ' + nguoiTao?.ten;
+                    const tenVaiTro = vaiTro === '' ? '' : vaiTro === 'PARTICIPANT' ? 'người tham gia' : 'quản trị viên';
+                    let subTitle = '';
+                    let iconColor = '';
+                    let icon = '';
+                    switch (hanhDong) {
+                        case CAN_BO_NHAN_ACTION.ADD:
+                            subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã thêm bạn vào nhiệm vụ #${maNhiemVu} với vai trò ${tenVaiTro}.`;
+                            iconColor = 'success';
+                            icon = 'fa-tasks';
+                            break;
+                        case CAN_BO_NHAN_ACTION.REMOVE:
+                            subTitle  = `${hoTenNguoiTao.trim().normalizedName()} đã xoá bạn ra khỏi nhiệm vụ #${maNhiemVu}.`;
+                            iconColor = 'danger';
+                            icon = 'fa-tasks';
+                            break;
+                        default:
+                            subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã thay đổi vai trò của bạn sang ${tenVaiTro} trong nhiêm vụ #${maNhiemVu}.`;
+                            iconColor = vaiTro === 'PARTICIPANT' ? 'infor' : 'warning';
+                            icon = vaiTro === 'PARTICIPANT' ? 'fa-user-times' : 'fa-user-plus';
+                    }
+                    createNotification(dsNguoiNhan.map(item => item.email), { title: 'Nhiệm vụ', icon, iconColor, subTitle, link: `/user/nhiem-vu/${maNhiemVu}` }, (error) => {
+                        if (error) reject(error);
+                        else resolve();
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('fail to send notification', error);
+            resolve(); 
+        }
+    });
 
     app.post('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'htch:manage', 'rectors:login'), async (req, res) => {
         try {
@@ -144,6 +213,35 @@ module.exports = (app) => {
             app.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
             await updateListFile(fileList, nhiemVu.id);
             await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
+            if (canBoNhan.length > 0) {
+                app.model.hcthCanBoNhan.getAll({
+                    statement: 'id IN (:canBoNhan)',
+                    parameter: {
+                        canBoNhan: [...canBoNhan.map(item => Number(item))]
+                    }
+                }, 'canBoNhan, vaiTro', 'canBoNhan', (error, listCanBoNhans) => {
+                    if (error) throw error;
+                    else {
+                        Promise.all(Object.values(vaiTroCanBoNhan).map(async (vaiTro) => {
+                            const canBoInVaiTro = listCanBoNhans.filter(canBo => canBo.vaiTro === vaiTro);
+                            if (canBoInVaiTro.length > 0) {
+                                const note = {
+                                    quantity: canBoInVaiTro.length,
+                                    role: vaiTro
+                                };
+                                await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note)});
+                                onCreateCanBoNhanNotification({
+                                    maNhiemVu: nhiemVu.id, 
+                                    nguoiTaoShcc: req.session.user.shcc, 
+                                    canBoNhan: canBoInVaiTro.map(item => item.canBoNhan),
+                                    vaiTro, 
+                                    hanhDong: CAN_BO_NHAN_ACTION.ADD
+                                });
+                            }
+                        })); 
+                    }                  
+                });
+            }
             res.send({ error: null });
         } catch (error) {
             res.send({ error });
@@ -342,16 +440,29 @@ module.exports = (app) => {
             else resolve(false);
         });
     });
-
-
+    
     app.post('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.orCheck('manager:write', 'rectors:login', 'staff:login'), async (req, res) => {
-        const { ma, canBoNhan, vaiTro } = req.body;
+        const { ma, canBoNhan, nguoiTao, vaiTro } = req.body;
         try {
             const canBo = await isCanBoNhanExists(canBoNhan, ma);
             if (canBo) {
                 res.send({ error: `Cán bộ (${canBo.canBoNhan}) đã tồn tại` });
             } else {
                 const canBos = await createCanBoNhan(canBoNhan, req.session.user?.shcc, vaiTro, ma);
+                if (ma) {
+                    const note = {
+                        quantity: canBoNhan.length,
+                        role: vaiTro
+                    };
+                    await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: ma, shcc: nguoiTao, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note)});
+                    onCreateCanBoNhanNotification({
+                        maNhiemVu: ma, 
+                        nguoiTaoShcc: nguoiTao, 
+                        canBoNhan,
+                        vaiTro, 
+                        hanhDong: CAN_BO_NHAN_ACTION.ADD
+                    });
+                }
                 res.send({ error: null, items: canBos });
             }
         } catch (error) {
@@ -359,18 +470,46 @@ module.exports = (app) => {
         }
     });
 
-    app.put('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.check('staff:login'), async (req, res) => {
-        const { id, vaiTroMoi } = req.body;
-        app.model.hcthCanBoNhan.update({ id }, { vaiTro: vaiTroMoi }, (error, item) => {
-            res.send({ error, item });
+    app.put('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.check('staff:login'), (req, res) => {
+        const { id, nhiemVuId, shccCanBoNhan, shccNguoiTao, vaiTroMoi, hoCanBo, tenCanBo } = req.body;
+        app.model.hcthCanBoNhan.update({ id }, { vaiTro: vaiTroMoi }, async (error, item) => {
+            if (error) throw error;
+            else {
+                const note = {
+                    name: (hoCanBo + ' ' + tenCanBo).trim().normalizedName(),
+                    role: vaiTroMoi
+                };
+                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.CHANGE_ROLE, ghiChu: JSON.stringify(note)});
+                onCreateCanBoNhanNotification({
+                    maNhiemVu: nhiemVuId, 
+                    nguoiTaoShcc: shccNguoiTao, 
+                    canBoNhan: shccCanBoNhan, 
+                    vaiTro: vaiTroMoi, 
+                    hanhDong: CAN_BO_NHAN_ACTION.CHANGE_ROLE
+                });
+                res.send({ error, item, history });
+            }
         });
     });
 
 
     app.delete('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.check('staff:login'), (req, res) => {
-        const { id } = req.body;
-        app.model.hcthCanBoNhan.delete({ id }, (error, item) => {
-            res.send({ error, item });
+        const { id, nhiemVuId, shccCanBoNhan, shccNguoiTao, hoNguoiXoa, tenNguoiXoa} = req.body;
+        app.model.hcthCanBoNhan.delete({ id }, async (error, item) => {
+            if (error) throw error;
+            else {
+                const note = {
+                    name: (hoNguoiXoa + ' ' + tenNguoiXoa).trim().normalizedName()
+                };
+                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.REMOVE_EMPOYEE, ghiChu: JSON.stringify(note)});
+                onCreateCanBoNhanNotification({
+                    maNhiemVu: nhiemVuId, 
+                    nguoiTaoShcc: shccNguoiTao, 
+                    canBoNhan: shccCanBoNhan, 
+                    hanhDong: CAN_BO_NHAN_ACTION.REMOVE
+                });
+                res.send({ error, item, history});
+            }
         });
     });
 
@@ -437,6 +576,14 @@ module.exports = (app) => {
         });
     });
 
+    // history
+    app.post('/api/hcth/nhiem-vu/lich-su/list', app.permission.check('staff:login'), async (req, res) => {
+        const { id } = req.body;
+        app.model.hcthHistory.getAllFrom(id, 'NHIEM_VU', (error, result) => {
+            res.send({ error: error, items: result?.rows });
+        });
+    });
+    
     app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'NHIEM_VU', (error, items) => res.send({ error, items: items?.rows || [] }));
     });
@@ -459,3 +606,4 @@ module.exports = (app) => {
         }
     });
 };
+

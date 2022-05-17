@@ -7,11 +7,11 @@ const HcthNhiemVuSearchPage = 'HcthNhiemVu:SearchPage';
 const HcthNhiemVuGet = 'HcthNhiemVu:Get';
 const HcthNhiemVuGetPhanHoi = 'HcthNhiemVu:GetPhanHoi';
 const HcthNhiemVuGetLienKet = 'HcthNhiemVu:GetLienKet';
+const HcthNhiemVuGetHistory = 'HcthNhiemVu:GetHistory';
 const HcthNhiemVuUpdateLienKet = 'HcthNhiemVu:UpdateLienKet';
 const HcthNhiemVuGetCanBoNhan = 'HcthNhiemVu:GetCanBoNhan';
 const HcthHcthNhiemVuCVDSelector = 'HcthNhiemVu:CVDSelector';
 const HcthHcthNhiemVuCVCPSelector = 'HcthNhiemVu:CVCPSelector';
-const HcthNhiemVuGetHistory = 'HcthNhiemVu:GetHistory';
 
 export default function HcthNhiemVuReducer(state = null, data) {
     switch (data.type) {
@@ -273,32 +273,50 @@ export function deleteLienKet(id, done) {
     };
 }
 
+// // History
+export function getListHistory(id , done) {
+    return dispatch => {
+        const url = '/api/hcth/nhiem-vu/lich-su/list';
+        T.post(url, { id }, res => {
+            if (res.error) {
+                T.notify('Lấy danh sách lịch sử lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                dispatch({ type: HcthNhiemVuGetHistory, history: res.items });
+                done && done(res.items);
+            }
+        }, () => T.notify('Lấy danh sách lịch sử lỗi', 'danger'));
+    };
+}
+
 // Cán bộ nhận nhiệm vụ
 
-export function createCanBoNhanNhiemVu(ma, canBoNhan, vaiTro, done) {
-    return () => {
+export function createCanBoNhanNhiemVu(ma, nguoiTao, canBoNhan, vaiTro, done) {
+    return dispatch => {
         const url = '/api/hcth/nhiem-vu/can-bo-nhan';
-        T.post(url, { ma, canBoNhan, vaiTro }, res => {
+        T.post(url, { ma, nguoiTao, canBoNhan, vaiTro }, res => {
             if (res.error) {
                 T.notify('Thêm cán bộ bị lỗi', 'danger');
                 console.error('POST: ' + url, res.error);
             } else {
                 T.notify('Tạo cán bộ thành công', 'success');
+                if (ma) dispatch(getListHistory(ma));
                 done && done(res.items);
             }
         }, () => T.notify('Tạo cán bộ bị lỗi', 'danger'));
     };
 }
 
-export function updateCanBoNhanNhiemVu(id, vaiTroMoi, done) {
-    return () => {
+export function updateCanBoNhanNhiemVu(data, done) {
+    return dispatch => {
         const url = '/api/hcth/nhiem-vu/can-bo-nhan';
-        T.put(url, { id, vaiTroMoi }, res => {
+        T.put(url, data, res => {
             if (res.error) {
                 T.notify('Cập nhật vai trò cán bộ bị lỗi', 'danger');
                 console.error('PUT: ' + url, res.error);
             } else {
                 T.notify('Cập nhật vai trò cán bộ thành công', 'success');
+                dispatch(getListHistory(data.nhiemVuId));
                 done && done(res.item);
             }
         }, () => T.notify('Cập nhật vai trò cán bộ bị lỗi', 'danger'));
@@ -320,15 +338,16 @@ export function getListCanBoNhanNhiemVu({ ma = null, ids = null }, done) {
     };
 }
 
-export function removeCanBoNhanNhiemVu(id, done) {
-    return () => {
+export function removeCanBoNhanNhiemVu(data, done) {
+    return dispatch => {
         const url = '/api/hcth/nhiem-vu/can-bo-nhan';
-        T.delete(url, { id }, res => {
+        T.delete(url, data, res => {
             if (res.error) {
                 T.notify('Xoá cán bộ bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ', res.error);
             } else {
                 T.notify('Xoá cán bộ thành công', 'success');
+                dispatch(getListHistory(data.nhiemVuId));
                 done && done();
             }
         }, () => T.notify('Xoá cán bộ bị lỗi', 'danger'));
