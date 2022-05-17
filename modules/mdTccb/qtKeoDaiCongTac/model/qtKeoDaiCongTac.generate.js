@@ -1,6 +1,6 @@
-// Table name: QT_KEO_DAI_CONG_TAC { id, batDau, batDauType, ketThuc, ketThucType, soHieuVanBan, shcc, ho, ten }
+// Table name: QT_KEO_DAI_CONG_TAC { id, batDau, batDauType, ketThuc, ketThucType, soQuyetDinh, shcc, ho, ten, ngayQuyetDinh }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'soHieuVanBan': 'SO_HIEU_VAN_BAN', 'shcc': 'SHCC', 'ho': 'HO', 'ten': 'TEN' };
+const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'soQuyetDinh': 'SO_QUYET_DINH', 'shcc': 'SHCC', 'ho': 'HO', 'ten': 'TEN', 'ngayQuyetDinh': 'NGAY_QUYET_DINH' };
 
 module.exports = app => {
     app.model.qtKeoDaiCongTac = {
