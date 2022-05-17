@@ -1,6 +1,6 @@
-// Table name: QT_HOP_DONG_DON_VI_TRA_LUONG { id, shcc, loaiHopDong, nguoiKy, ngayKyHopDong, batDauLamViec, ketThucHopDong, ngayTaiKy, donViTraLuong, chucDanh, ngach, bac, heSo, phanTramHuong }
+// Table name: QT_HOP_DONG_DON_VI_TRA_LUONG { id, shcc, loaiHopDong, nguoiKy, ngayKyHopDong, batDauLamViec, ketThucHopDong, ngayTaiKy, donViTraLuong, chucDanh, ngach, bac, heSo, phanTramHuong, soHopDong }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'loaiHopDong': 'LOAI_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayTaiKy': 'NGAY_TAI_KY', 'donViTraLuong': 'DON_VI_TRA_LUONG', 'chucDanh': 'CHUC_DANH', 'ngach': 'NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'phanTramHuong': 'PHAN_TRAM_HUONG' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'loaiHopDong': 'LOAI_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayTaiKy': 'NGAY_TAI_KY', 'donViTraLuong': 'DON_VI_TRA_LUONG', 'chucDanh': 'CHUC_DANH', 'ngach': 'NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'phanTramHuong': 'PHAN_TRAM_HUONG', 'soHopDong': 'SO_HOP_DONG' };
 
 module.exports = app => {
     app.model.qtHopDongDonViTraLuong = {

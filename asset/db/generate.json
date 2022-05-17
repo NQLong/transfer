@@ -13716,6 +13716,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "3,0"
+                },
+                "SO_HOP_DONG": {
+                    "value": "soHopDong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
