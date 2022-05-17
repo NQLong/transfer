@@ -206,7 +206,7 @@ export class DaoTaoModal extends AdminModal {
             title: <>Thông tin quá trình đào tạo {this.props.title || ''}</>,
             size: 'large',
             buttons: this.props.isSupport && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
-            submitText: this.props.isCanBo && 'Gửi yêu cầu',
+            submitText: this.props.isCanBo ? 'Gửi yêu cầu' : 'Lưu',
             body: <div className='row'>
 
                 <FormSelect className='form-group col-md-12' ref={e => this.canBo = e} label='Cán bộ' readOnly={readOnly || this.state.shcc} data={SelectAdapter_FwCanBo} />
