@@ -1,10 +1,10 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.khcn,
-        menus: {
-            9501: { title: 'Quá trình nghiên cứu khoa học', link: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9501: { title: 'Quá trình nghiên cứu khoa học', link: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
+    //     },
+    // };
 
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
@@ -13,7 +13,7 @@ module.exports = app => {
         },
     };
 
-    const menuStaff = {
+    const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
             9501: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#1999C2' },
@@ -21,16 +21,16 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu },
         { name: 'qtNghienCuuKhoaHoc:readOnly', menu: menuTCCB },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
         { name: 'qtNghienCuuKhoaHoc:delete' },
     );
 
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
 
     app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);

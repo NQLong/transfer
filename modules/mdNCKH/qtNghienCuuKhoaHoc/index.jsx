@@ -14,11 +14,11 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./staffEditPage') })
         },
         {
-            path: '/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc',
+            path: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
-            path: '/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc',
+            path: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {

@@ -9,16 +9,16 @@ export default {
         reducers: { qtBaiVietKhoaHoc }
     },
     routes: [
+        // {
+        //     path: '/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc',
+        //     component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        // },
+        // {
+        //     path: '/user/:khcn/qua-trinh/bai-viet-khoa-hoc',
+        //     component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        // },
         {
-            path: '/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
-        },
-        {
-            path: '/user/:khcn/qua-trinh/bai-viet-khoa-hoc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-        {
-            path: '/user/:tccb/qua-trinh/bai-viet-khoa-hoc',
+            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {

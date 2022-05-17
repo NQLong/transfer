@@ -1,11 +1,11 @@
 module.exports = app => {
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#FFE47A' },
+    //     },
+    // };
     const menu = {
-        parentMenu: app.parentMenu.khcn,
-        menus: {
-            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#FFE47A' },
-        },
-    };
-    const menuStaff = {
         parentMenu: app.parentMenu.khcn,
         menus: {
             9503: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#FFE47A', color: '#000000' },
@@ -20,14 +20,14 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu },
         { name: 'qtBangPhatMinh:readOnly', menu: menuTCCB },
         { name: 'qtBangPhatMinh:read', menu },
         { name: 'qtBangPhatMinh:write' },
         { name: 'qtBangPhatMinh:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/bang-phat-minh', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/bang-phat-minh/group/:shcc', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bang-phat-minh/group/:shcc', app.permission.check('qtBangPhatMinh:readOnly'), app.templates.admin);
     app.get('/user/bang-phat-minh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
