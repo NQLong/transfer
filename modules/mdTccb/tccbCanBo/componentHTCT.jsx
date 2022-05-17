@@ -105,7 +105,7 @@ class EditModal extends AdminModal {
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu: <Dropdown ref={e => this.batDauType = e}
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu:&nbsp;<Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
@@ -113,7 +113,7 @@ class EditModal extends AdminModal {
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' />
                 <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc: <Dropdown ref={e => this.ketThucType = e}
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc:&nbsp;<Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} /></div>
                     }
@@ -201,14 +201,14 @@ export class ComponentHTCT extends AdminPage {
             <div className='tile'>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <h4 className='tile-title'>Quá trình học tập, công tác</h4>
-                    <div> <Pagination style={{ position: 'initial' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                        getPage={this.getPage()} /></div>
+                    <div><Pagination style={{ position: 'initial' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                        getPage={e => e.preventDefault() || this.getPage()} /></div>
                 </div>
                 <div className='tile-body'>{table}</div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <Tooltip title='Thêm quá trình học tập - công tác' arrow>
                         <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show({ shcc: this.state.filter.listShcc })}>
-                            <i className='fa fa-lg fa-plus' /> Thêm
+                            <i className='fa fa-lg fa-plus' /> Thêm thông tin học tập - công tác
                         </button>
                     </Tooltip>
                 </div>

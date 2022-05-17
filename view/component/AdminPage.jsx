@@ -835,6 +835,7 @@ export function getValue(input) {
         case 'richTextBox':
         case 'editor':
         case 'datePicker': {
+            console.log(data);
             if (data && data !== '') return data;
             throw input;
         }
