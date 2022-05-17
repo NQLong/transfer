@@ -8,7 +8,7 @@ import {
     deleteQtDaoTaoStaffPage, createQtDaoTaoStaffPage
 } from './redux';
 import { DaoTaoModal } from './daoTaoModal';
-
+import { createTccbSupport } from '../tccbSupport/redux';
 class QtDaoTao extends AdminPage {
     state = { filter: {} };
 
@@ -67,8 +67,8 @@ class QtDaoTao extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{}} content={item.chuyenNganh} />
-                        <TableCell type='text' style={{}} content={item.tenTruong} />
+                        <TableCell type='link' content={item.chuyenNganh} onClick={e => e.preventDefault() || this.daoTaoModal.show({ item, shcc })} />
+                        <TableCell type='text' contentClassName='multiple-lines-3' content={item.tenTruong} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHinhThuc || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
                             {item.batDau && <span>Bắt đầu: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}
@@ -103,9 +103,8 @@ class QtDaoTao extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtDaoTaoStaffPage} />
-                <DaoTaoModal ref={e => this.daoTaoModal = e} shcc={this.state.filter.shcc}
-                    update={this.props.updateQtDaoTaoStaff}
-                    create={this.props.createQtDaoTaoStaff} />
+                <DaoTaoModal ref={e => this.daoTaoModal = e} shcc={this.state.filter.shcc} isCanBo={true}
+                    create={this.props.createTccbSupport} />
             </>,
             backRoute: '/user',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
@@ -116,6 +115,6 @@ class QtDaoTao extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.tccb.qtDaoTao });
 const mapActionsToProps = {
     getQtDaoTaoStaffPage, deleteQtDaoTaoStaffPage, createQtDaoTaoStaffPage,
-    updateQtDaoTaoStaffPage
+    updateQtDaoTaoStaffPage, createTccbSupport
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDaoTao);

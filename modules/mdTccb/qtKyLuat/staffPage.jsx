@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
 
-        let { id, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item && item.item ? item.item : {
+        let { id, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh } = item && item.item ? item.item : {
             id: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
@@ -63,7 +63,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} required />
-                <FormDatePicker className='col-md-4' type='date-mask'  ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
+                <FormDatePicker className='col-md-4' type='date-mask' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
                 <FormSelect className='col-md-4' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={readOnly} required />
 
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={10} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 1000 ký tự)' />
@@ -137,7 +137,7 @@ class QtKyLuatUserPage extends AdminPage {
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
                         <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
-                        <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
+                        <TableCell type='date' style={{ color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, maCanBo: shcc })} onDelete={this.delete} >
@@ -148,7 +148,7 @@ class QtKyLuatUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
+            icon: 'fa fa-ban',
             title: 'Quá trình kỷ luật',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
@@ -156,12 +156,12 @@ class QtKyLuatUserPage extends AdminPage {
                 'Kỷ luật'
             ],
             content: <>
-                <div className='tile'>
+                {/* <div className='tile'>
                     <h3 className='tile-title'>
                         Thống kê
                     </h3>
                     <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>
+                </div> */}
                 <div className='tile'>
                     {table}
                 </div>

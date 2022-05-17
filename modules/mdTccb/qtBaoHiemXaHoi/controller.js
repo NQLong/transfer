@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3037: { title: 'Quá trình Bảo hiểm xã hội', link: '/user/tccb/qua-trinh/bao-hiem-xa-hoi', icon: 'fa-life-ring', backgroundColor: '#02006e', groupIndex: 0 },
+            // 3037: { title: 'Quá trình Bảo hiểm xã hội', link: '/user/tccb/qua-trinh/bao-hiem-xa-hoi', icon: 'fa-life-ring', backgroundColor: '#02006e', groupIndex: 0 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1009: { title: 'Bảo hiểm xã hội', link: '/user/bao-hiem-xa-hoi', icon: 'fa-life-ring', color: '#ffffff', backgroundColor: '#4faa45', groupIndex: 0 },
+            // 1009: { title: 'Bảo hiểm xã hội', link: '/user/bao-hiem-xa-hoi', icon: 'fa-life-ring', color: '#ffffff', backgroundColor: '#4faa45', groupIndex: 0 },
         },
     };
 

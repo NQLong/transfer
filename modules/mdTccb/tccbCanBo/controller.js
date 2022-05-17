@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 }
+            1001: { title: 'Thông tin cán bộ', link: '/user/profile', icon: 'fa-address-card-o', backgroundColor: '#456578', pin: true }
         }
     };
 
@@ -456,6 +456,8 @@ module.exports = app => {
                     qtDaoTao.map(item => {
                         item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
                         item.ketThuc = item.ketThuc ? (item.ketThuc == -1 ? ' - nay' : ' - ' + app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType)) : '';
+                        item.tenTrinhDo = item.tenTrinhDo || item.trinhDo || '';
+                        item.tenHinhThuc = item.tenHinhThuc || '';
                         return item;
                     });
 
@@ -503,7 +505,7 @@ module.exports = app => {
                     const data = {
                         HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
                         otherName: '',
-                        cmnd: canBo.cmnd,
+                        cmnd: canBo.cmnd || '',
                         ngayCap: app.date.viDateFormat(new Date(canBo.ngayCapCmnd)),
                         dob: new Date(canBo.ngaySinh).getDate(),
                         mob: new Date(canBo.ngaySinh).getMonth() + 1,
@@ -533,9 +535,9 @@ module.exports = app => {
                         ngayHuongLuong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
                         danToc: canBo.danToc || '',
                         tonGiao: canBo.tonGiao || '',
-                        phuCapChucVu: qtChucVu[0].phuCapChucVu,
-                        chucVu: qtChucVu[0].chucVu,
-                        donVi: qtChucVu[0].donVi,
+                        phuCapChucVu: qtChucVu[0]?.phuCapChucVu,
+                        chucVu: qtChucVu[0]?.chucVu,
+                        donVi: qtChucVu[0]?.donVi,
                         phoThong: canBo.phoThong || '',
                         hocVi: canBo.hocVi || '',
                         ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',

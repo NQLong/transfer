@@ -787,7 +787,7 @@ export class FormDatePicker extends React.Component {
                 {(type.endsWith('-mask') || type == 'date-month') ? (
                     <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
                 ) : (
-                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
+                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: placeholder || label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
                 )}
             </div>);
     }

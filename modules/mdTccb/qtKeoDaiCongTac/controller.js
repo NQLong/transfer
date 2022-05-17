@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1007: { title: 'Kéo dài công tác', link: '/user/keo-dai-cong-tac', icon: 'fa-hourglass-start', color: '#000000', backgroundColor: '#eab676', groupIndex: 0 },
+            1005: { title: 'Kéo dài công tác', link: '/user/keo-dai-cong-tac', icon: 'fa-hourglass-start', color: '#000000', backgroundColor: '#eab676', groupIndex: 1 },
         },
     };
 
@@ -218,7 +218,7 @@ module.exports = app => {
             if (error) {
                 res.send({ error, items: null });
                 return;
-            } 
+            }
             let items = [];
             const solve = (index = 0) => {
                 if (index >= data.length) {
@@ -239,7 +239,7 @@ module.exports = app => {
                                 end.setFullYear(end.getFullYear() + canExtend);
                                 if (start.getFullYear() < yearCalc) start = firstYear;
                                 if (end.getFullYear() != yearCalc) end = endYear;
-        
+
                                 let dataAdd = {
                                     shcc: item.shcc,
                                     hoCanBo: item.ho,

@@ -6,15 +6,15 @@ module.exports = app => {
         },
     };
 
-    // const menuStaff = {
-    //     parentMenu: app.parentMenu.user,
-    //     menus: {
-    //         1015: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 0 },
-    //     },
-    // };
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1008: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 4 },
+        },
+    };
 
     app.permission.add(
-        // { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtDaoTao:read', menu },
         { name: 'qtDaoTao:write' },
         { name: 'qtDaoTao:delete' },
