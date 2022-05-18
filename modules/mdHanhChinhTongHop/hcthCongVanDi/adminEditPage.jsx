@@ -38,9 +38,7 @@ import {
     SelectAdapter_DmLoaiCongVan
 } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { getSoCongVan } from './adminPage';
 const { action } = require('../constant.js');
-// import { getSoCongVan } from './adminPage'
 
 const listTrangThai = {
     '1': {
@@ -163,6 +161,32 @@ class AdminEditPage extends AdminPage {
                 maDonVi: [maDonVi]
             }, () => this.getData());
         });
+    }
+
+    getSiteSetting = () => {
+        const pathName = window.location.pathname;
+        if (pathName.startsWith('/user/hcth'))
+            return {
+                readyUrl: '/user/hcth',
+                routeMatcherUrl: '/user/hcth/cong-van-cac-phong/:id',
+                breadcrumb: [
+                    <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
+                    <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
+                ],
+                backRoute: '/user/hcth/cong-van-cac-phong'
+            };
+        else
+            return {
+                routeMatcherUrl: '/user/cong-van-cac-phong/:id',
+                readyUrl: '/user',
+                breadcrumb: [
+                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
+                ],
+                backRoute: '/user/cong-van-cac-phong'
+            };
     }
 
     renderPhanHoi = (listPhanHoi) => {
@@ -332,7 +356,7 @@ class AdminEditPage extends AdminPage {
             donViNhanNgoai: !this.state.noiBo && this.getValue(this.donViNhanNgoai) ? this.donViNhanNgoai.value().toString() : '',
             loaiCongVan: this.loaiCongVan.value() ? this.loaiCongVan.value().toString() : '',
             fileList: this.state.listFile || [],
-            trangThai: this.state.trangThai,
+            trangThai: this.state.trangThai
         };
         if (!changes.trichYeu) {
             T.notify('Trích yếu bị trống', 'danger');
@@ -499,7 +523,9 @@ class AdminEditPage extends AdminPage {
             rectorsPermission = this.getUserPermission('rectors', ['login']),
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
-            unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']);
+            unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
+            buttons = [],
+            { breadcrumb, backRoute } = this.getSiteSetting();
 
         const titleText = !isNew ? 'Cập nhật' : 'Tạo mới';
         const listTrangThaiCv = Object.keys(listTrangThai).map(item =>
@@ -539,8 +565,7 @@ class AdminEditPage extends AdminPage {
             checkDaDoc = false;
         }
 
-        const tenVietTatDonViGui = this.props.hcthCongVanDi?.item?.tenVietTatDonViGui;
-        const tenVietTatLoaiCongVanDi = this.props.hcthCongVanDi?.item?.tenVietTatLoaiCongVan ? this.props.hcthCongVanDi.item.tenVietTatLoaiCongVan.tenVietTat : null;
+        const soCongVan = this.props.hcthCongVanDi?.item?.soCongVan;
 
         const loading = (
             <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -552,14 +577,21 @@ class AdminEditPage extends AdminPage {
                 <h4 className='l-text'>Đang tải...</h4>
             </div>);
 
+
+        if (!readTrangThai && (hcthManagePermission.manage || (unitManagePermission.manage && lengthDv != 0)) && !isNew) {
+            buttons.push({ className: 'btn-success', icon: 'fa-solid fa-paper-plane', onClick: this.onSend });
+        } else if (this.canAccept()) {
+            buttons.push({ className: 'btn-success', icon: 'fa-check', onClick: this.onAcceptCvDi });
+        } else if (this.canApprove()) {
+            buttons.push({ className: 'btn-success', icon: 'fa-check', onClick: this.onApproveCvDi });
+        } else if (checkDaDoc) {
+            buttons.push({ className: 'btn-success', icon: 'fa-solid fa-bookmark', onClick: this.onReadCvDi });
+        }
+
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
             title: 'Công văn giữa các phòng',
-            breadcrumb: [
-                <Link key={0} to='/user/hcth'>Hành chính tổng hợp </Link>,
-                <Link key={1} to='/user/hcth/cong-van-cac-phong'>Công văn giữa các phòng</Link>,
-                !isNew ? 'Cập nhật' : 'Tạo mới'
-            ],
+            breadcrumb,
             content: this.state.isLoading ? loading : (<>
                 <div className='tile'>
                     <div className='clearfix'>
@@ -577,7 +609,7 @@ class AdminEditPage extends AdminPage {
                     <div className='tile-body row'>
                         {
                             this.state.trangThai == '7' &&
-                            <FormTextBox type='text' className='col-md-12' readOnlyEmptyText={getSoCongVan(this.state.soDi, tenVietTatDonViGui, tenVietTatLoaiCongVanDi)} label='Số công văn' readOnly={true} />
+                            <FormTextBox type='text' className='col-md-12' readOnlyEmptyText={soCongVan} label='Số công văn' readOnly={true} />
                         }
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readCondition} readOnlyEmptyText='Chưa có ngày gửi' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readCondition} readOnlyEmptyText='Chưa có ngày ký' />
@@ -590,7 +622,7 @@ class AdminEditPage extends AdminPage {
                         <FormSelect className='col-md-12' allowClear={true} label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có loại công văn' />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readCondition} required readOnlyEmptyText=': Chưa có trích yếu' />
                     </div>
-                    <div className='tile-body row d-flex justify-content-end'>
+                    {/* <div className='tile-body row d-flex justify-content-end'>
                         {this.canAccept() && <button className='btn btn-success mr-2' type='button' onClick={this.onAcceptCvDi}>Chấp nhận</button>
                         }
                         {this.canApprove() && <button className='btn btn-success mr-2' type='button' onClick={this.onApproveCvDi}>Duyệt</button>
@@ -599,7 +631,7 @@ class AdminEditPage extends AdminPage {
                             <button className='btn btn-success mr-2' type='submit' onClick={this.onReadCvDi}>
                                 Đã đọc
                             </button>}
-                    </div>
+                    </div> */}
                 </div>
 
                 {!isNew && readPhanHoi &&
@@ -651,9 +683,9 @@ class AdminEditPage extends AdminPage {
                 }
 
             </>),
-            backRoute: window.location.pathname.startsWith('/user/hcth') ? '/user/hcth/cong-van-cac-phong' : '/user/cong-van-cac-phong',
+            backRoute,
             onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4') && ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? this.save : null,
-            buttons: !readTrangThai && (hcthManagePermission.manage || (unitManagePermission.manage && lengthDv != 0)) && !isNew && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onSend }],
+            buttons
         });
     }
 }

@@ -43,7 +43,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </label>
                 </td>);
         } else if (type == 'buttons') {
-            const { onSwap, onEdit, onDelete, onClone, children } = this.props;
+            const { onSwap, onEdit, onDelete, children } = this.props;
             return (
                 <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>
                     <div className='btn-group'>
@@ -57,10 +57,6 @@ export class TableCell extends React.Component { // type = number | date | link 
                                 <a className='btn btn-primary' href='#' onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a>
                             </Tooltip> : null
                         }
-                        {permission.write && onClone && typeof onClone == 'function' ?
-                            <Tooltip title='Sao chép' arrow placeholder='bottom' >
-                                <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || onClone(e, content)}><i className='fa fa-lg fa-clone' /></a>
-                            </Tooltip> : null}
                         {onEdit && typeof onEdit == 'string' ?
                             <Tooltip title='Chỉnh sửa' arrow placeholder='bottom'>
                                 <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link>
@@ -121,12 +117,12 @@ export class TableHeader extends React.Component {
 
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
-    renderHead = () => null, renderRow = () => null, header = 'thead-dark'
+    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {},
 }) {
     const list = getDataSource();
     if (list == null) {
         return (
-            <div className='overlay' style={{ minHeight: '120px' }}>
+            <div className={(loadingOverlay ? 'overlay' : '') + loadingClassName} style={{ minHeight: '120px', ...loadingStyle }}>
                 <div className='m-loader mr-4'>
                     <svg className='m-circular' viewBox='25 25 50 50'>
                         <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
@@ -201,7 +197,7 @@ export function renderComment({
                 gap: '15px'
             };
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'scroll' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'auto', paddingRight: '10px', }}>
                 {
                     list.map((item, index) => {
                         return (
@@ -209,8 +205,8 @@ export function renderComment({
                                 <div >{renderAvatar(item)}</div>
                                 <div style={{ ...contentStyle, ...getItemStyle(item) }}>
                                     <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...flexRow }}>
-                                        <b style={{ flex: 1 }}>{renderName(item)}</b>
-                                        <span>{renderTime(item)}</span>
+                                        <b style={{ flex: 1, whiteSpace: 'nowrap' }}>{renderName(item)}</b>
+                                        <span style={{ whiteSpace: 'nowrap' }}>{renderTime(item)}</span>
                                     </div>
                                     <div style={{ paddingTop: '5px' }}>{renderContent(item)}</div>
                                 </div>
@@ -527,8 +523,9 @@ export class FormRichTextBox extends React.Component {
 
     focus = () => this.input.focus();
 
+    clear = () => this.input.clear();
     render() {
-        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = '' } = this.props;
+        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = '', icon = '' } = this.props;
         let displayElement = '';
         if (label) {
             displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> :
@@ -539,7 +536,8 @@ export class FormRichTextBox extends React.Component {
         return (
             <div className={'form-group ' + (className ? className : '')} style={style}>
                 {displayElement}
-                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
+                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block', position: 'relative' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
+                {icon}
             </div>);
     }
 }
@@ -698,13 +696,13 @@ export class FormSelect extends React.Component {
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '', readOnlyNormal = false } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '', readOnlyNormal = false, disabled = false } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
                 {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? (readOnlyNormal ? (this.state.valueText || readOnlyEmptyText) : <b>{this.state.valueText || readOnlyEmptyText}</b>) : ''}
 
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
-                    <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
+                    <select ref={e => this.input = e} multiple={multiple} disabled={readOnly || disabled} />
                 </div>
             </div>
         );
@@ -717,8 +715,8 @@ export class FormDatePicker extends React.Component {
     mask = {
         'time-mask': '39/19/2099 h9:59',
         'date-mask': '39/19/2099',
-        'month-mask': '19/2099',
         'year-mask': '2099',
+        'month-mask': '19/2099',
         'date-month': '39/19'
     };
 
@@ -789,7 +787,7 @@ export class FormDatePicker extends React.Component {
                 {(type.endsWith('-mask') || type == 'date-month') ? (
                     <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
                 ) : (
-                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
+                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: placeholder || label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
                 )}
             </div>);
     }
@@ -814,12 +812,12 @@ export class FormFileBox extends React.Component {
     setData = data => this.fileBox.setData(data);
 
     render() {
-        let { label = '', className = '', pending = false, style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', onDelete = null, onSuccess = null } = this.props;
+        let { label = '', className = '', pending = false, style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', onDelete = null, onSuccess = null, description = null } = this.props;
         return (
             <div className={'form-group ' + className} style={style}>
                 {label && <label>{label}&nbsp;</label>}
                 {!readOnly && onDelete ? <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
-                <FileBox ref={e => this.fileBox = e} pending={pending} postUrl={postUrl} uploadType={uploadType} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
+                <FileBox ref={e => this.fileBox = e} pending={pending} postUrl={postUrl} uploadType={uploadType} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} description={description} />
             </div>);
     }
 }
@@ -1008,7 +1006,7 @@ export class AdminPage extends React.Component {
             right += 60;
         }
         if (buttons) {
-            if (buttons.length) {
+            if (Array.isArray(buttons)) {
                 customButtons = buttons.map((item, index) => {
                     right += 60;
                     return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;

@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH } = require('../constant');
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, canBoType } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -32,7 +32,7 @@ module.exports = (app) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.orCheck('hcthCongVanDen:read', 'hcth:manage'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -317,7 +317,7 @@ module.exports = (app) => {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
-            if (!isRelated(congVan, donViNhan, req)) {
+            if (!await isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
             } else {
                 const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
@@ -341,10 +341,20 @@ module.exports = (app) => {
         app.model.hcthPhanHoi.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
-    const isRelated = (congVan, donViNhan, req) => {
+    const isRelated = async (congVan, donViNhan, req) => {
         const permissions = req.session.user.permissions;
         if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
             return true;
+        }
+        else if (req.query.nhiemVu) {
+            const count = (await app.model.hcthLienKet.asyncCount({
+                keyA: req.query.nhiemVu,
+                loaiA: 'NHIEM_VU',
+                loaiB: 'CONG_VAN_DEN',
+                keyB: req.params.id
+            }));
+            return await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
+                && count && count.rows[0] && count.rows[0]['COUNT(*)'];
         }
         else {
             const canBoNhan = congVan.canBoNhan;
@@ -365,7 +375,7 @@ module.exports = (app) => {
                 throw { status: 400, message: 'Invalid id' };
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
-            if (!isRelated(congVan, donViNhan, req))
+            if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
             const files = await app.model.hcthFile.getAllFile({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
@@ -386,7 +396,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage'), (req, res) => {
+    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
@@ -434,7 +444,7 @@ module.exports = (app) => {
             }
             else {
                 const newCongVan = await updateCongvanDen(id, { trangThai });
-                await app.model.hcthHistory.createHistory({
+                await app.model.hcthHistory.asyncCreate({
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
@@ -665,4 +675,35 @@ module.exports = (app) => {
             }
         }
     };
+
+
+    app.get('/api/hcth/cong-van-den/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const userPermissions = req.session.user?.permissions || [];
+        const donViCanBo = (req.session?.user?.staff?.donViQuanly || []).map(item => item.maDonVi);
+        const { status = '', ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
+        const data = {
+            staffType: userPermissions.includes('hcth:login') ? canBoType.HCTH : userPermissions.includes('rectors:login') ? canBoType.RECTOR : null,
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDen:read') ? req.session.user?.staff?.maDonVi : '') || '',
+            shccCanBo: req.session.user?.shcc,
+            fromTime, toTime, status, ids, hasIds, excludeIds
+        };
+
+        let filterParam;
+        try {
+            filterParam = JSON.stringify(data);
+        } catch {
+            res.send({ error: 'Dữ liệu lọc lỗi!' });
+        }
+        app.model.hcthCongVanDen.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+            if (error || !page) res.send({ error });
+            else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
 };

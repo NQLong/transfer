@@ -4,7 +4,7 @@ import { createMultiDtCauTrucKhungDaoTao, createDtCauTrucKhungDaoTao, updateDtCa
 import { Link } from 'react-router-dom';
 import ComponentMTDT from './componentMTDT';
 import ComponentCTDT from './componentCTDT';
-import { AdminPage, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, FormTextBox } from 'view/component/AdminPage';
 import Loading from 'view/component/Loading';
 class DtCauTrucKhungDaoTaoDetails extends AdminPage {
     state = { isLoading: true }
@@ -30,10 +30,15 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
 
     getData = (id, isClone = false) => {
         this.props.getDtCauTrucKhungDaoTao(id, (ctkdt) => {
-            if (isClone) {
-                ctkdt.namDaoTao = parseInt(ctkdt.namDaoTao) + 1;
-            }
-            this.namDaoTao.value(ctkdt.namDaoTao);
+            // if (isClone) {
+            //     ctkdt.namDaoTao = tkdt.namDaoTao) + 1;
+            // }
+            let { namDaoTao, batDauDangKy, ketThucDangKy } = ctkdt;
+            namDaoTao = namDaoTao?.split(' - ') || [];
+            this.namDaoTaoStart.value(isClone ? (Number(namDaoTao[0]) + 1) : namDaoTao[0]);
+            this.namDaoTaoEnd.value(isClone ? (Number(namDaoTao[1]) + 1) : namDaoTao[1]);
+            this.batDauDangKy.value(isClone ? new Date().getTime() : batDauDangKy);
+            this.ketThucDangKy.value(isClone ? new Date().getTime() : ketThucDangKy);
             const mucCha = T.parse(ctkdt.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
             const mucCon = T.parse(ctkdt.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
             this.mucTieuDaoTao.setVal({ parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao });
@@ -52,7 +57,10 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
     getValue = () => {
         try {
             const data = {
-                namDaoTao: this.validation(this.namDaoTao),
+                khoa: this.validation(this.namDaoTaoStart),
+                namDaoTao: `${this.validation(this.namDaoTaoStart)} - ${this.validation(this.namDaoTaoEnd)}`,
+                batDauDangKy: this.validation(this.batDauDangKy).setHours(0, 0, 0, 0),
+                ketThucDangKy: this.validation(this.ketThucDangKy).setHours(23, 59, 59, 999)
             };
             return data;
         } catch (selector) {
@@ -87,10 +95,9 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
             let updateDatas = { ...{ mucCha: T.stringify(mucCha) }, ...{ mucCon: T.stringify(mucCon) } };
             // const deleteDatas = { items: deleteItems };
             if (this.ma == 'new') {
-                updateDatas = { ...updateDatas, ...{ namDaoTao: data.namDaoTao } };
+                updateDatas = { ...updateDatas, ...data };
                 this.props.createDtCauTrucKhungDaoTao(updateDatas, (item) => {
-                    location.replace('/new', `/${item.id}`);
-                    location.reload();
+                    window.location = `/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`;
                 });
             } else {
                 this.props.updateDtCauTrucKhungDaoTao(this.ma, { ...updateDatas, ...data }, () => {
@@ -100,8 +107,8 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
         }
     }
     render() {
-        const permission = this.getUserPermission('dtCauTrucKhungDaoTao', ['read', 'write', 'delete', 'manage']);
-        const readOnly = !(permission.write || permission.manage);
+        const permission = this.getUserPermission('dtCauTrucKhungDaoTao');
+        const readOnly = !permission.write;
 
         return this.renderPage({
             icon: 'fa fa-university',
@@ -117,7 +124,13 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body'>
-                        <FormTextBox type='year' ref={e => this.namDaoTao = e} label='Khóa' className='col-md-3' required readOnly={readOnly} />
+                        <div className='row'>
+                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ)' className='col-md-2' required readOnly={readOnly} />
+                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến)' className='col-md-2' required readOnly={readOnly} />
+
+                            <FormDatePicker type='date-mask' ref={e => this.batDauDangKy = e} className='col-md-4' label='Bắt đầu đăng ký' required readOnly={readOnly} />
+                            <FormDatePicker type='date-mask' ref={e => this.ketThucDangKy = e} className='col-md-4' label='Kết thúc đăng ký' required readOnly={readOnly} />
+                        </div>
                     </div>
                 </div>
                 <div className='tile'>
@@ -134,7 +147,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                 </div>
             </>,
             backRoute: '/user/dao-tao/cau-truc-khung-dao-tao',
-            onSave: permission.write || permission.manage ? this.save : null,
+            onSave: permission.write ? this.save : null,
         });
     }
 }

@@ -5,9 +5,9 @@ module.exports = app => {
     );
 
     app.get('/api/dao-tao/page/thoi-gian-mo-mon/:pageNumber/:pageSize', app.permission.orCheck('dtThoiGianMoMon:read', 'dtChuongTrinhDaoTao:manage', 'dtChuongTrinhDaoTao:read'), (req, res) => {
-        let pageSize = req.params.pageSize,
-            pageNumber = req.params.pageNumber;
-        app.model.dtThoiGianMoMon.getPage(pageNumber, pageSize, (error, page) => {
+        // let pageSize = req.params.pageSize,
+        //     pageNumber = req.params.pageNumber;
+        app.model.dtThoiGianMoMon.getPage(1, 4, (error, page) => {
             res.send({ error, page });
         });
     });

@@ -6,6 +6,7 @@ const hcthCongVanDiGetPage = 'hcthCongVanDi:GetPage';
 const hcthCongVanDiSearchPage = 'hcthCongVanDi:SearchPage';
 const hcthCongVanDiGet = 'hcthCongVanDi:Get';
 const hcthCongVanDiGetHistory = 'hcthCongVanDi:GetHistory';
+const hcthCongVanDiGetError = 'hcthCongVanDi:GetError';
 
 export default function hcthCongVanDiReducer(state = null, data) {
     switch (data.type) {
@@ -19,6 +20,8 @@ export default function hcthCongVanDiReducer(state = null, data) {
             return Object.assign({}, state, { item: data.item });
         case hcthCongVanDiGetHistory:
             return Object.assign({}, state, { item: { ...(state?.item || {}), history: data.history } });
+        case hcthCongVanDiGetError:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), error: data.error } });
         default:
             return state;
     }
@@ -154,6 +157,9 @@ export function getCongVanDi(id, done) {
         const url = `/api/hcth/cong-van-cac-phong/${id}`;
         T.get(url, data => {
             if (data.error) {
+                if (data.error.status == 401) {
+                    dispatch({ type: hcthCongVanDiGetError, error: 401 });
+                }
                 console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy công văn giữa các phòng bị lỗi!', 'danger');
             } else {
@@ -178,6 +184,14 @@ export function createPhanHoi(data, done) {
         }, () => T.notify('Thêm phản hồi bị lỗi', 'danger'));
     };
 }
+
+export const SelectAdapter_CongVanDi = {
+    ajax: true,
+    url: '/api/hcth/cong-van-cac-phong/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: console.log(response) || response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })) : [] }),
+    fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
+};
 
 export function createHistory(data, done) {
     return () => {

@@ -106,7 +106,6 @@ export class ComponentPhiaCanBo extends React.Component {
 
     checkNewEmail = () => {
         let newEmail = this.email.value();
-        console.log(newEmail);
         this.props.getStaffByEmail(newEmail, (item) => {
             if (item) {
                 T.notify(`Email ${newEmail} đã được sử dụng, vui lòng nhập email khác!`, 'danger');
@@ -185,7 +184,7 @@ export class ComponentPhiaCanBo extends React.Component {
                             <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày sinh' required readOnly={readOnly} />
                         </>
                     }
-                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' data={SelectAdapter_DmGioiTinhV2} className='col-xl-3 col-md-6'required />
+                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' data={SelectAdapter_DmGioiTinhV2} className='col-xl-3 col-md-6' required />
                     <FormTextBox ref={e => this.cmnd = e} className='col-md-3' label='CMND/CCCD' required />
                     <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' className='col-md-3' label='Ngày cấp' />
                     <FormTextBox ref={e => this.cmndNoiCap = e} className='col-md-6' label='Nơi cấp' />

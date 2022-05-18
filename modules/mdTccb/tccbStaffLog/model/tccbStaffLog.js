@@ -7,7 +7,7 @@ module.exports = app => {
             if (error || !tccbStaff) {
                 app.model.tccbStaffLog.create({ email, thaoTac: crud, quaTrinh, ngay: now }, () => { });
             }
-            else app.model.tccbStaffLog.update({ email, quaTrinh }, { thaoTac: crud, quaTrinh, ngay: now }, () => { });
+            else app.model.tccbStaffLog.update({ email }, { thaoTac: crud, quaTrinh, ngay: now }, () => { });
         });
     };
 };

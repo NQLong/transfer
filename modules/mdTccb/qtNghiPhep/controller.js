@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1026: { title: 'Nghỉ phép', link: '/user/nghi-phep', icon: 'fa fa-pause', backgroundColor: '#322f01', groupIndex: 3 },
+            1004: { title: 'Nghỉ phép', subTitle: 'Đăng ký nghỉ phép', link: '/user/nghi-phep', icon: 'fa fa-pause', backgroundColor: '#828593', groupIndex: 1 },
         },
     };
 
@@ -158,7 +158,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
         app.model.qtNghiPhep.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ phép');
-            res.send(error);
+            res.send({ error });
         })
     );
 

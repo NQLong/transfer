@@ -1,6 +1,6 @@
-// Table name: QT_NGHIEN_CUU_KHOA_HOC { id, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, shcc, batDau, ketThuc, batDauType, ketThucType, ngayNghiemThuType, thoiGian, fileMinhChung, inLlkh }
+// Table name: QT_NGHIEN_CUU_KHOA_HOC { id, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, shcc, batDau, ketThuc, batDauType, ketThucType, ngayNghiemThuType, thoiGian, fileMinhChung, inLlkh, hinhThuc, tinhTrang, maSo, capQuanLy, quyMo }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'tenDeTai': 'TEN_DE_TAI', 'maSoCapQuanLy': 'MA_SO_CAP_QUAN_LY', 'kinhPhi': 'KINH_PHI', 'vaiTro': 'VAI_TRO', 'ngayNghiemThu': 'NGAY_NGHIEM_THU', 'ketQua': 'KET_QUA', 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'ngayNghiemThuType': 'NGAY_NGHIEM_THU_TYPE', 'thoiGian': 'THOI_GIAN', 'fileMinhChung': 'FILE_MINH_CHUNG', 'inLlkh': 'IN_LLKH' };
+const obj2Db = { 'id': 'ID', 'tenDeTai': 'TEN_DE_TAI', 'maSoCapQuanLy': 'MA_SO_CAP_QUAN_LY', 'kinhPhi': 'KINH_PHI', 'vaiTro': 'VAI_TRO', 'ngayNghiemThu': 'NGAY_NGHIEM_THU', 'ketQua': 'KET_QUA', 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'ngayNghiemThuType': 'NGAY_NGHIEM_THU_TYPE', 'thoiGian': 'THOI_GIAN', 'fileMinhChung': 'FILE_MINH_CHUNG', 'inLlkh': 'IN_LLKH', 'hinhThuc': 'HINH_THUC', 'tinhTrang': 'TINH_TRANG', 'maSo': 'MA_SO', 'capQuanLy': 'CAP_QUAN_LY', 'quyMo': 'QUY_MO' };
 
 module.exports = app => {
     app.model.qtNghienCuuKhoaHoc = {

@@ -3,20 +3,30 @@ import { connect } from 'react-redux';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import { DaoTaoModal } from './daoTaoModal';
 import { createQtDaoTaoStaff, updateQtDaoTaoStaff } from './redux';
-
+import { createTccbSupport } from '../tccbSupport/redux';
+import { Tooltip } from '@mui/material';
 class DaoTaoDetail extends AdminPage {
     loaiBangCap = ''
     trinhDo = ''
+
+    delete = (e, item) => {
+        e.preventDefault();
+        T.confirm('Xóa quá trình đào tạo, bồi dưỡng', 'Bạn muốn gửi yêu cầu xóa quá trình đào tạo, bồi dưỡng này?', 'warning', false, isConfirm => {
+            isConfirm && this.props.createTccbSupport(item, { qtId: item.id, type: 'delete', qt: 'qtDaoTao' });
+        });
+    }
     render = () => {
         let chungChi = this.props.chungChi, hocVi = this.props.hocVi;
         let dataDaoTao = this.props.staff?.dataStaff?.daoTaoBoiDuong.filter(i => {
             if (hocVi) return i.tenTrinhDo === hocVi;
+            else if (chungChi == 'Ngoại ngữ') return i.loaiBangCap == 5;
             else if (chungChi != 'Hiện tại') return i.chuyenNganh === chungChi;
         }),
             curPermission = this.getUserPermission('staff', ['login', 'delete']),
             permission = {
-                read: curPermission.login, write: curPermission.login, delete: curPermission.delete
+                read: curPermission.login, write: curPermission.login, delete: curPermission.login
             };
+
         if (hocVi) switch (hocVi) {
             case 'Cử nhân': this.loaiBangCap = 3; this.trinhDo = 1; break;
             case 'Thạc sĩ': this.loaiBangCap = 4; this.trinhDo = 3; break;
@@ -25,6 +35,7 @@ class DaoTaoDetail extends AdminPage {
             case 'Tin học': this.loaiBangCap = 6; break;
             case 'Lý luận chính trị': this.loaiBangCap = 7; break;
             case 'Quản lý nhà nước': this.loaiBangCap = 8; break;
+            case 'Ngoại ngữ': this.loaiBangCap = 5; break;
         }
 
         if (chungChi == 'Hiện tại') dataDaoTao = this.props.staff?.dataStaff?.daoTaoCurrent || [];
@@ -48,42 +59,51 @@ class DaoTaoDetail extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{item.tenTrinhDo} <br /> {item.minhChung && item.minhChung != '[]' ? <i style={{ color: 'blue' }}>Đã có minh chứng</i> : <i style={{ color: 'red' }}>Chưa có minh chứng</i>}</>} />
-                        <TableCell style={{ whiteSpace: 'nowrap' }} content={item.chuyenNganh} />
-                        <TableCell content={item.tenCoSoDaoTao} />
+                        <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{item.tenTrinhDo || item.trinhDo} <br /> {item.minhChung && item.minhChung != '[]' ? <i style={{ color: 'blue' }}>Đã có minh chứng</i> : <i style={{ color: 'red' }}>Chưa có minh chứng</i>}</>} />
+                        <TableCell contentClassName='multiple-lines-3' content={item.chuyenNganh} />
+                        <TableCell content={item.tenTruong} />
                         <TableCell content={item.tenHinhThuc} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
-                            {item.batDau && <>Từ <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span> - </>}
-                            {item.ketThuc && <>Đến <span style={{ color: 'blue' }}>{item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : 'nay'}</span></>}
+                            {item.batDau && <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span>}
+                            {item.ketThuc && <> - <span style={{ color: 'blue' }}>{item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : 'nay'}</span></>}
                         </>} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show({ item, shcc: this.props.shcc })}
+                            onEdit={(e) => e.preventDefault() || this.modal.show({ item: { ...item, shcc: this.props.shcc } })}
                             onDelete={this.delete}></TableCell>
                     </tr>
                 )
             })
         );
         return (
-            <div className='col-md-12 form-group' style={this.props.style}>
-                <div className='tile-body'>{renderData(dataDaoTao)}</div>
-                <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <button className='btn btn-info' onClick={e => {
-                        e.preventDefault();
-                        this.modal.show({ shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo });
-                    }}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm
-                    </button>
+            <div className='col-md-12 form-group' style={this.props.style}
+                onMouseEnter={e => e.preventDefault() || this.setState({ display: 'initial' })}
+                onMouseLeave={e => e.preventDefault() || this.setState({ display: 'none' })}>
+                <div className='tile-body'>
+                    {renderData(dataDaoTao)}
                 </div>
-                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={curPermission.login} shcc={this.props.shcc}
-                    update={this.props.updateQtDaoTaoStaff}
-                    create={this.props.createQtDaoTaoStaff} />
-            </div>
+                <div className='tile-footer' style={{ textAlign: 'right' }}>
+                    <span style={{ display: this.state?.display || 'none' }}>
+                        <Tooltip title='Gửi yêu cầu cho phòng TCCB' arrow >
+                            <button className='btn btn-danger' onClick={e => {
+                                e.preventDefault();
+                                this.modal.show({
+                                    item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
+                                });
+                            }}>
+                                <i className='fa fa-fw fa-lg fa-plus' />Gửi yêu cầu
+                            </button>
+                        </Tooltip>
+                    </span>
+                </div>
+                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={true} shcc={this.props.shcc}
+                    create={this.props.createTccbSupport} />
+            </div >
         );
     }
 }
 
 const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
-    createQtDaoTaoStaff, updateQtDaoTaoStaff
+    createQtDaoTaoStaff, updateQtDaoTaoStaff, createTccbSupport
 };
 export default connect(mapStateToProps, mapActionsToProps)(DaoTaoDetail);

@@ -1,6 +1,6 @@
-// Table name: DT_CHUAN_DAU_RA { id, thangDoMin, thangDoMax, moTa, kichHoat }
+// Table name: DT_CHUAN_DAU_RA { id, thangDoMin, thangDoMax, moTa, kichHoat, ten }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'thangDoMin': 'THANG_DO_MIN', 'thangDoMax': 'THANG_DO_MAX', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT' };
+const obj2Db = { 'id': 'ID', 'thangDoMin': 'THANG_DO_MIN', 'thangDoMax': 'THANG_DO_MAX', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'ten': 'TEN' };
 
 module.exports = app => {
     app.model.dtChuanDauRa = {

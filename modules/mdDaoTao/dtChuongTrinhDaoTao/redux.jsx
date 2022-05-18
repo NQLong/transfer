@@ -109,7 +109,7 @@ export function getDtKhungDaoTao(id, done) {
     };
 }
 
-
+//Xoas
 export function createMultiDtChuongTrinhDaoTao(data, done) {
     return () => {
         const url = '/api/dao-tao/chuong-trinh-dao-tao/multiple';
@@ -124,6 +124,7 @@ export function createMultiDtChuongTrinhDaoTao(data, done) {
     };
 }
 
+//Xoas
 export function deleteMultiDtChuongTrinhDaoTao(data, done) {
     return () => {
         const url = '/api/dao-tao/chuong-trinh-dao-tao/multiple';

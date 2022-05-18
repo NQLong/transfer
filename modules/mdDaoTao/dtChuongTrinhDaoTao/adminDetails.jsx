@@ -110,18 +110,14 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 updateItems = [...updateItems, ...kienThuc];
             });
             const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
-            this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
-                location.replace('/new', `/${item.id}`);
-                location.reload();
-            }) : this.props.updateDtChuongTrinhDaoTao(this.ma, updateDatas, () => {
-                // location.reload();
-            });
-            // this.props.deleteMultiDtChuongTrinhDaoTao(deleteDatas, () => { });
+            this.ma == 'new' ? (updateItems.length && this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
+                window.location = `/user/dao-tao/chuong-trinh-dao-tao/${item.id}`;
+            })) : (updateItems.length && this.props.updateDtChuongTrinhDaoTao(this.ma, updateDatas, () => {
+            }));
         }
     }
 
     setNamDaoTao = (value, mucTieu, ctdt) => {
-        console.log(ctdt);
         const { data } = value;
         const mucCha = T.parse(data.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });

@@ -1,5 +1,4 @@
 import T from 'view/js/common';
-
 // Reducer ------------------------------------------------------------------------------------------------------------
 const StaffGetAll = 'Staff:GetAll';
 const StaffGetPage = 'Staff:GetPage';
@@ -110,8 +109,8 @@ export function getStaffEdit(shcc, done) {
                 T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data);
                 dispatch({ type: StaffGet, item: data.item });
+                if (done) done(data);
             }
         }, () => T.notify('Lấy thông tin cán bộ bị lỗi', 'danger'));
     };
@@ -183,11 +182,28 @@ export const SelectAdapter_FwCanBo = {
     ajax: true,
     url: '/api/staff/page/1/20',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })) : [] }),
+    processResults: response => ({
+        results: response && response.page && response.page.list ? response.page.list.map(item => ({
+            id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac, data: {
+                phai: item.phai,
+                ngaySinh: item.ngaySinh,
+                hocVi: item.hocVi,
+                chucDanh: item.chucDanh,
+            }
+        })) : []
+    }),
     getOne: getStaff,
     fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })))(),
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
 };
+
+export const SelectAdapter_FwCanBoByDonVi = (listDonVi) => ({
+    ajax: true,
+    url: '/api/staff/page/1/20',
+    data: params => ({ condition: params.term, filter: { listDonVi } }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })) : [] }),
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })))(),
+});
 
 export const SelectAdapter_FwCanBoGiangVien = {
     ajax: true,
@@ -205,6 +221,20 @@ export const SelectAdapter_FwCanBoFemale = {
     getOne: getStaff,
     fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}` })))(),
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
+};
+
+export const SelectAdapter_ChuyenNganhAll = {
+    ajax: true,
+    url: '/api/staff/get-chuyen-nganh-all',
+    data: params => ({ condition: params.term }),
+    processResults: response => {
+        let listChuyenNganh = [];
+        if (response && response.items) {
+            let chuyenNganhGroupBy = response.items.groupBy('chuyenNganh');
+            listChuyenNganh = Object.keys(chuyenNganhGroupBy);
+        }
+        return { results: listChuyenNganh.map(item => ({ id: item, text: item })) };
+    },
 };
 
 export function createMultiCanBo(canBoList, done) {
@@ -225,7 +255,6 @@ export function downloadWord(shcc, done) {
     return () => {
         const url = `/api/staff/get-ly-lich/${shcc}`;
         T.get(url, data => {
-            console.log(data);
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -249,7 +278,6 @@ export function downloadWordLlkh(shcc, done) {
         }, () => T.notify('Tải file word bị lỗi', 'danger'));
     };
 }
-
 // User Actions ------------------------------------------------------------------------------------------------------------
 export function userGetStaff(email, done) {
     return dispatch => {
@@ -308,3 +336,20 @@ export function getStaffByEmail(email, done) {
         });
     };
 }
+
+export const SelectAdapter_ChuyenNganhCanBo =
+{
+    ajax: true,
+    url: '/api/staff/get-all-chuyen-nganh',
+    data: params => ({ condition: params.term }),
+    processResults: response => {
+        let results = [];
+        if (response && response.items) {
+            let tempResults = Object.keys(response.items.filter(item => item.chuyenNganh).groupBy('chuyenNganh'));
+            results = tempResults.map(item => ({ id: item, text: item }));
+        }
+        return { results };
+
+    },
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.chuyenNganh, text: item.chuyenNganh })))(),
+};

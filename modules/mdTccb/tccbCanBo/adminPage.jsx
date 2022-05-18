@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { PageName, getStaffPage, deleteStaff, SelectAdapter_FwCanBo } from './redux';
+import { PageName, getStaffPage, deleteStaff, SelectAdapter_FwCanBo, SelectAdapter_ChuyenNganhCanBo } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormSelect, FormDatePicker, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormSelect, FormDatePicker, FormTextBox, CirclePageButton } from 'view/component/AdminPage';
 import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmNgachCdnnV3 } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
@@ -46,6 +46,7 @@ class StaffPage extends AdminPage {
         });
     }
 
+
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
         //listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.staff && this.props.staff.page ? this.props.staff.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
@@ -77,15 +78,15 @@ class StaffPage extends AdminPage {
             loaiChuyenVien = this.loaiChuyenVien?.value() || '',
             listQuocGia = this.listQuocGia.value().toString() || '',
             fromAge = this.fromAge.value() ? Number(this.fromAge.value()) : '',
-            toAge = this.toAge.value() ? Number(this.toAge.value()) : '';
-        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge };
+            toAge = this.toAge.value() ? Number(this.toAge.value()) : '',
+            listChuyenNganh = this.listChuyenNganh.value().toString() || '';
+        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
-                    // Initial
                     const filter = page.filter || {};
                     const filterCookie = T.getCookiePage(PageName, 'F');
-                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge } = filter;
+                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
                     this.listShcc.value(listShcc || filterCookie.listShcc || '');
@@ -104,6 +105,7 @@ class StaffPage extends AdminPage {
                     this.listQuocGia.value(listQuocGia || filter.listQuocGia || '');
                     this.fromAge.value(fromAge || filter.fromAge || '');
                     this.toAge.value(toAge || filter.toAge || '');
+                    this.listChuyenNganh.value(listChuyenNganh || filter.listChuyenNganh || '');
                 } else if (isReset) {
                     this.listShcc.value('');
                     this.listDonVi.value('');
@@ -121,10 +123,10 @@ class StaffPage extends AdminPage {
                     this.listQuocGia.value('');
                     this.fromAge.value('');
                     this.toAge.value('');
+                    this.listChuyenNganh.value('');
                 }
             });
         });
-
     }
 
     getPage = (pageN, pageS, pageC, done) => {
@@ -165,19 +167,20 @@ class StaffPage extends AdminPage {
             this.props.staff.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         const table = renderTable({
             getDataSource: () => list, stickyHead: true,
+            header: 'thead-light',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phái</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Phái</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quê quán</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Dân tộc</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tôn giáo</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Chuyên ngành</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Quốc gia<br />tốt nghiệp</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Trình độ</th>
+                    <th style={{ width: 'auto' }}>Chuyên ngành</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quốc gia<br />tốt nghiệp</th>
+                    <th style={{ width: 'auto' }}>CDNN</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Email</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu<br />công tác</th>
@@ -194,28 +197,28 @@ class StaffPage extends AdminPage {
                         <span>{`${item.ho} ${item.ten}`}<br /></span>
                         {item.shcc}
                     </>} url={`/user/tccb/staff/${item.shcc}`} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.phai ? (item.phai == '01' ? 'Nam' : 'Nữ') : ''} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.ngaySinh ? T.dateToText(item.ngaySinh, 'dd/mm/yyyy') : ''} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.queQuan} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.tenDanToc} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.tenTonGiao} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={<>
+                    <TableCell content={item.phai ? (item.phai == '01' ? 'Nam' : 'Nữ') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell content={item.ngaySinh ? T.dateToText(item.ngaySinh, 'dd/mm/yyyy') : ''} style={{ whiteSpace: 'nowrap' }} />
+                    <TableCell content={item.queQuan} style={{ whiteSpace: 'nowrap' }} />
+                    <TableCell content={item.tenDanToc} style={{ whiteSpace: 'nowrap' }} />
+                    <TableCell content={item.tenTonGiao} contentClassName='multiple-lines-2' />
+                    <TableCell content={<>
                         {item.hocHam && <span> {item.hocHam}<br /></span>}
                         {item.hocVi ? item.hocVi : item.trinhDoPhoThong}
-                    </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell type='text' content={item.chuyenNganh} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.danhSahcQuocGiaHocViNoiTotNghiep} />
-                    <TableCell type='text' content={item.tenChucDanhNgheNghiep + ((item.ngach == '01.003' && item.isCvdt) ? ' (CVPVĐT & NCKH)' : '')} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={<>
+                    </>} contentClassName='multiple-lines-2' />
+                    <TableCell content={item.chuyenNganh} contentClassName='multiple-lines-2' />
+                    <TableCell content={item.danhSahcQuocGiaHocViNoiTotNghiep?.normalizedName()} />
+                    <TableCell content={item.tenChucDanhNgheNghiep + ((item.ngach == '01.003' && item.isCvdt) ? ' (CVPVĐT & NCKH)' : '')} contentClassName='multiple-lines-2' />
+                    <TableCell content={<>
                         {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh}<br /></span>}
                         {item.tenDonVi && item.tenDonVi.normalizedName()}
                     </>} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.email} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.email} />
                     <TableCell type='date' style={{ color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayBatDauCongTac} />
-                    <TableCell type='text' content={item.cmnd} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell type='text' content={item.ngach} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell content={item.cmnd} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell content={item.ngach} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='number' content={item.heSoLuong?.toFixed(2)} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell type='text' content={
+                    <TableCell content={
                         <>
                             <span>{item.loaiCanBo + (item.loaiCanBo == 'Hợp đồng' && item.isHdtn ? ' (Trách nhiệm)' : '')}<br /></span>
                             <small style={{ color: 'blue' }}>{(item.ngayBienChe && item.ngayBienChe != 1) ? T.dateToText(item.ngayBienChe, 'dd/mm/yyyy') : ''}</small>
@@ -233,20 +236,22 @@ class StaffPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect ref={e => this.listDonVi = e} className='col-md-6' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
-                    <FormSelect ref={e => this.listShcc = e} className='col-md-6' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.listDonVi = e} className='col-md-5' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.listShcc = e} className='col-md-5' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
 
-                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear />
+                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-2' minimumResultsForSearch={-1} allowClear />
                     <FormSelect className='col-md-3' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
+                    <FormSelect className='col-md-6' ref={e => this.listChuyenNganh = e} data={SelectAdapter_ChuyenNganhCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chuyên ngành' />
                     <FormSelect className='col-md-3' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
                     <FormSelect className='col-md-3' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh khoa học' />
 
+                    <FormSelect className='col-md-6' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
+
                     <FormSelect ref={e => this.isBienChe = e} data={
                         [{ id: 0, text: 'Biên chế' }, { id: 1, text: 'Hợp đồng' }]
-                    } className='col-md-6' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
+                    } className='col-md-3' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
                     {this.state.visibleHDTN == true && <FormSelect className='col-md-6' ref={e => this.loaiHopDong = e} data={[{ id: 0, text: 'Viên chức + Lao động' }, { id: 1, text: 'Trách nhiệm' }]} minimumResultsForSearch={-1} allowClear label='Lọc theo loại hợp đồng' />}
 
-                    <FormSelect className='col-md-6' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
                     {this.state.visibleCVDT && <FormSelect className='col-md-6' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên' />}
 
 
@@ -274,27 +279,21 @@ class StaffPage extends AdminPage {
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />
+                    <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tải xuống báo cáo hàng tháng' customIcon='fa-th-list' onClick={e => {
+                        e.preventDefault();
+                        T.download(T.url('/api/staff/download-monthly-report'), 'BAO_CAO_HANG_THANG.xlsx');
+                    }} />
                 </div>
             </>,
             backRoute: '/user/tccb',
             onCreate: permission ? e => this.create(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                T.confirm3('Tải dữ liệu xuống', 'Vui lòng chọn tên file bạn muốn tải', 'info', 'Danh sách cán bộ', 'Báo cáo hàng tháng', isChoose => {
-                    if (isChoose !== null) {
-                        if (isChoose) {
-                            T.download(T.url('/api/staff/download-monthly-report'), 'Bao cao hang thang.xlsx');
-
-                        } else {
-                            const filter = T.stringify(this.state.filter);
-                            let pageC = pageCondition;
-                            pageC = typeof pageC === 'string' ? pageC : '';
-                            if (pageC.length == 0) pageC = null;
-            
-                            T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'Danh sach can bo.xlsx');
-                        }
-                    }
-                });
+                const filter = T.stringify(this.state.filter);
+                let pageC = pageCondition;
+                pageC = typeof pageC === 'string' ? pageC : '';
+                if (pageC.length == 0) pageC = null;
+                T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'DANH_SACH_CAN_BO.xlsx');
             }
         });
     }
