@@ -13625,6 +13625,9 @@
             "active": true,
             "moduleName": "qtHopDongDonViTraLuong",
             "modelName": "qtHopDongDonViTraLuong",
+            "methods": {
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
