@@ -615,7 +615,18 @@ module.exports = app => {
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const { ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
 
-        const data = { ids, excludeIds, hasIds, fromTime, toTime };
+        const donViCanBo = (req.session?.user?.staff?.donViQuanly || []).map(item => item.maDonVi);
+        const userPermissions = req.session.user?.permissions || [];
+        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
+        const hcthPermission = getUserPermission(req, 'hcth', ['login']);
+        const staffType = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
+
+        const data = { ids, excludeIds, hasIds, fromTime, toTime,
+            shccCanBo: req.session.user?.shcc,
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDi:manage') ? req.session.user?.staff?.maDonVi : '') || '',
+            staffType
+        };
+        // console.log(data);
         let filterParam;
         try {
             filterParam = JSON.stringify(data);
@@ -624,6 +635,7 @@ module.exports = app => {
             return;
         } finally {
             app.model.hcthCongVanDi.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+                // console.log(error);
                 if (error || !page) res.send({ error });
                 else {
                     const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
