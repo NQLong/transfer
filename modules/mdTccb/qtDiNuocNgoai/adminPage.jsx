@@ -279,7 +279,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={readOnly} />
                 <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
-                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)' />
                 <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
@@ -337,7 +337,7 @@ class CreateModal extends AdminModal {
         this.mucDich.value('');
         this.noiDung.value('');
         this.chiPhi.value('');
-        this.ghiChu.value( '');
+        this.ghiChu.value('');
         this.soQuyetDinh.value('');
         this.ngayQuyetDinh.value('');
 
@@ -409,7 +409,7 @@ class CreateModal extends AdminModal {
                 <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={readOnly} />
                 <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
-                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)' />
                 <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
@@ -467,7 +467,7 @@ class ThongKeMucDichModal extends AdminModal {
             filterData.push({ id: item, len: dataGroupBy[item].length });
             totalItem += dataGroupBy[item].length;
         });
-        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+        filterData.sort(function (a, b) { //sắp xếp theo số lượng giảm dần
             return -(a.len - b.len);
         });
         return [filterData, totalItem];
@@ -623,7 +623,7 @@ class QtDiNuocNgoai extends AdminPage {
             s += ngayVes[i] ? (ngayVes[i] != '-1' ? T.dateToText(Number(ngayVes[i]), ngayVeTypes[i] ? ngayVeTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
             results.push(<div key={results.length}> <span>
-                Lần {i+1}. {s}
+                Lần {i + 1}. {s}
             </span></div>);
         }
         return results;
@@ -658,15 +658,15 @@ class QtDiNuocNgoai extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mục đích</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nội dung</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng công tác</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng báo cáo</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng công tác</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng báo cáo</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -689,9 +689,9 @@ class QtDiNuocNgoai extends AdminPage {
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
-                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />}
+                        {!this.checked && <TableCell type='text' style={{ color: 'blue' }} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />}
                         {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
-                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachQuocGia || '')} />}
+                        {!this.checked && <TableCell type='text' style={{ color: 'blue' }} content={(item.danhSachQuocGia || '')} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />}
                         {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />}
                         {!this.checked && <TableCell type='text' content={(
@@ -705,10 +705,10 @@ class QtDiNuocNgoai extends AdminPage {
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachMucDich, item.danhSachNgayDi, item.danhSachNgayVe, item.danhSachNgayDiType, item.danhSachNgayVeType, item.soQuaTrinh)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><b><i>Đang ở<br/>nước ngoài</i></b></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
+                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><b><i>Đang ở<br />nước ngoài</i></b></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br />về nước</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br />chưa tiếp nhận </span>} </span>
                             </>
                         )}></TableCell>}
-                        {!this.checked && <TableCell type='text' style={{ color: item.baoCaoTinhTrang == 0 ? 'red' : 'blue'}} content={mapperBaoCaoTinhTrang[item.baoCaoTinhTrang]}></TableCell>}
+                        {!this.checked && <TableCell type='text' style={{ color: item.baoCaoTinhTrang == 0 ? 'red' : 'blue' }} content={mapperBaoCaoTinhTrang[item.baoCaoTinhTrang]}></TableCell>}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -735,8 +735,8 @@ class QtDiNuocNgoai extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} allowClear={true} onChange={this.handleTime} />
-                    {this.state.visibleTime && 
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} allowClear={true} onChange={this.handleTime} />
+                    {this.state.visibleTime &&
                         <>
                             <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' />
                             <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' />
@@ -751,7 +751,7 @@ class QtDiNuocNgoai extends AdminPage {
                             { id: 1, text: 'Đã tiếp nhận về nước' },
                             { id: 2, text: 'Hết hạn và chưa tiếp nhận' },
                             { id: 3, text: 'Đang ở nước ngoài' },
-                            { id: 4, text: 'Chưa diễn ra'},
+                            { id: 4, text: 'Chưa diễn ra' },
                         ]} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrangBaoCao = e} label='Tình trạng báo cáo' data={listBaoCaoTinhTrang} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />

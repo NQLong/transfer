@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox, AdminPage } from 'view/component/AdminPage';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
@@ -13,10 +13,12 @@ import ComponentToChucKhac from '../tccbToChucKhac/componentToChucKhac';
 import { getStaffEdit } from './redux';
 import { SelectAdapter_DmHangThuongBinh } from 'modules/mdDanhMuc/dmHangThuongBinh/redux';
 
-class ComponentCaNhan extends React.Component {
+class ComponentCaNhan extends AdminPage {
     state = { image: '', dangVien: 0, doanVien: 0, congDoan: 0 };
     // shcc = ''; email = '';
-
+    componentDidMount() {
+        this.props.shcc && this.props.getStaffEdit(this.props.shcc, item => this.value(item.item));
+    }
     handleHo = (e) => {
         this.ho.value(e.target.value.toUpperCase());
     }
@@ -25,7 +27,9 @@ class ComponentCaNhan extends React.Component {
         this.ten.value(e.target.value.toUpperCase());
     }
 
-    value = function (item) {
+    value = (item) => {
+        console.log(item);
+        // item = this.props.staff || item;
         this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan }, () => {
             this.shcc = item.shcc;
             this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
@@ -106,8 +110,8 @@ class ComponentCaNhan extends React.Component {
         return '';
     };
 
-    handleNewShcc = (value) => {
-        let curShcc = value.currentTarget.value;
+    handleNewShcc = () => {
+        let curShcc = this.maTheCanBo.value();
         if (curShcc && curShcc != '' && curShcc.length == 8 && curShcc != this.shcc) {
             this.props.getStaffEdit(curShcc, data => {
                 if (data.item && !data.error) {
@@ -150,7 +154,7 @@ class ComponentCaNhan extends React.Component {
                     cmndNoiCap: this.getValue(this.cmndNoiCap),
                     dienThoaiCaNhan: this.getValue(this.soDienThoaiCaNhan),
                     dienThoaiBaoTin: this.getValue(this.soDienThoaiBaoTin),
-                    emailTruong,
+                    email: emailTruong,
                     emailCaNhan: this.getValue(this.emailCaNhan),
                     quocGia: this.getValue(this.quocTich),
                     danToc: this.getValue(this.danToc),

@@ -331,9 +331,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.getMaxShccByDonVi(req.params.maDonVi, (error, item) => {
-            res.send({ error, preShcc: item && item.outBinds && item.outBinds.ret ? item.outBinds.ret + 1 : 1 });
-        });
+    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), async (req, res) => {
+        let result = await app.model.qtHopDongLaoDong.getShccAuto(req.params.maDonVi);
+        res.send(result);
     });
 };

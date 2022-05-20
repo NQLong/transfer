@@ -606,7 +606,6 @@ export class FormSelect extends React.Component {
 
     value = function (value, done = null) {
         const dropdownParent = this.props.dropdownParent || $('.modal-body').has(this.input)[0] || $('.tile-body').has(this.input)[0];
-        if (!value) this.setState({ valueText: '' });
         if (arguments.length) {
             this.clear();
             let hasInit = this.hasInit;
