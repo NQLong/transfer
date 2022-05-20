@@ -244,8 +244,12 @@ class AdminEditPage extends AdminPage {
 
     getData = () => {
         if (this.state.id) {
+            const queryParams = new URLSearchParams(window.location.search);
+            const nhiemVu = queryParams.get('nhiemVu');
+            const context = {};
+            if (nhiemVu) context.nhiemVu = nhiemVu;
             this.setState({ isLoading: false });
-            this.props.getCongVanDi(Number(this.state.id), (item) => this.setData(item));
+            this.props.getCongVanDi(Number(this.state.id), context, (item) => this.setData(item));
         }
         else this.setData();
     }

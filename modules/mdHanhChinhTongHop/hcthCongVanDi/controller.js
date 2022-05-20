@@ -324,11 +324,25 @@ module.exports = app => {
 
     // Cần sửa lại
     const isRelated = async (congVan, donViNhan, req) => {
-        const permissions = req.session.user.permissions;
-        const maDonVi = req.session.user.staff.maDonVi;
-        if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
-            return true;
-        } else {
+        try {
+
+            const permissions = req.session.user.permissions;
+            const maDonVi = req.session.user.staff.maDonVi;
+            if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
+                return true;
+            }
+            if (req.query.nhiemVu) {
+                const count = (await app.model.hcthLienKet.asyncCount({
+                    keyA: req.query.nhiemVu,
+                    loaiA: 'NHIEM_VU',
+                    loaiB: 'CONG_VAN_DI',
+                    keyB: req.params.id
+                }));
+                if (await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
+                    && count && count.rows[0] && count.rows[0]['COUNT(*)'])
+                    return true;
+            }
+
             const canBoNhan = congVan.canBoNhan;
             const donViGui = congVan.donViGui;
             let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
@@ -341,7 +355,10 @@ module.exports = app => {
                 let maDonViNhan = donViNhan.map((item) => item.donViNhan);
                 return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDi:manage') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
             }
+        } catch {
+            return false;
         }
+
     };
 
 
