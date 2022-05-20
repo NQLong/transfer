@@ -32,6 +32,11 @@ class CanBoPage extends AdminPage {
                         this.setUp(data.item);
                     }
                 });
+            } else {
+                this.setState({
+                    create: true,
+                    load: false
+                });
             }
         });
     }
@@ -39,15 +44,14 @@ class CanBoPage extends AdminPage {
     setUp = (item) => {
         this.componentCaNhan?.value(item);
         this.componentTTCongTac?.value(item);
-        this.componentQuanHe?.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo?.value(item);
-        this.setState({ load: false });
+        this.setState({ load: false, phai: item.phai });
     }
 
     save = () => {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
-        const trinhDoData = this.componentTrinhDo.getAndValidate();
+        const trinhDoData = !this.state.create ? this.componentTrinhDo.getAndValidate() : {};
         if (this.urlSHCC) {
             caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
         } else {
@@ -58,6 +62,7 @@ class CanBoPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('staff');
+        console.log(this.state.shcc);
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Hồ sơ cá nhân',
@@ -68,9 +73,9 @@ class CanBoPage extends AdminPage {
             content: <>
                 {this.state.load && <Loading />}
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={this.state.shcc} />
-                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />
+                {!this.state.create && <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} phai={this.state.phai} />}
+                {!this.state.create && <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />}
+                {!this.state.create && <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />}
             </>,
             backRoute: '/user/tccb/staff',
             onSave: this.save,

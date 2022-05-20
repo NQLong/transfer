@@ -420,7 +420,7 @@ export function getHistory(id, done) {
                 dispatch({ type: HcthNhiemVuGetHistory, history: res.items });
                 done && done(res.items);
             }
-        }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
+        }, () => T.notify('Lấy lịch sử nhiệm vụ lỗi', 'danger'));
     };
 }
 

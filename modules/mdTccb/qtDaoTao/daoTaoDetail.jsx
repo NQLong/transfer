@@ -22,7 +22,7 @@ class DaoTaoDetail extends AdminPage {
             else if (chungChi == 'Ngoại ngữ') return i.loaiBangCap == 5;
             else if (chungChi != 'Hiện tại') return i.chuyenNganh === chungChi;
         }),
-            curPermission = this.getUserPermission('staff', ['login', 'delete']),
+            curPermission = this.getUserPermission('staff', ['login', 'write', 'delete']),
             permission = {
                 read: curPermission.login, write: curPermission.login, delete: curPermission.login
             };
@@ -90,13 +90,13 @@ class DaoTaoDetail extends AdminPage {
                                     item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
                                 });
                             }}>
-                                <i className='fa fa-fw fa-lg fa-plus' />Gửi yêu cầu
+                                <i className='fa fa-fw fa-lg fa-plus' />{curPermission.write ? 'Lưu' : 'Gửi yêu cầu'}
                             </button>
                         </Tooltip>
                     </span>
                 </div>
-                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={true} shcc={this.props.shcc}
-                    create={this.props.createTccbSupport} />
+                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={!curPermission.write} shcc={this.props.shcc} update={curPermission ? this.props.updateQtDaoTaoStaff : null}
+                    create={curPermission.write ? this.props.createQtDaoTaoStaff : this.props.createTccbSupport} />
             </div >
         );
     }
