@@ -2777,7 +2777,7 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_SEARCH_SELECTOR(
+CREATE OR REPLACE function HCTH_CONG_VAN_DI_SEARCH_SELECTOR(
     pageNumber IN OUT NUMBER,
     pageSize IN OUT NUMBER,
     filterParam in STRING,
@@ -2791,7 +2791,7 @@ CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_SEARCH_SELECTOR(
     shccCanBo  STRING(24);
     fromTime   NUMBER(20);
     toTime     NUMBER(20);
-    staffType  STRING(16);
+    staffType  NUMBER(4);
     status     NUMBER(4);
     ids        STRING(64);
     hasIds     NUMBER(1);
@@ -2808,15 +2808,51 @@ BEGIN
     SELECT JSON_VALUE(filterParam, '$.excludeIds') INTO excludeIds FROM DUAL;
     SELECT JSON_VALUE(filterParam, '$.hasIds') INTO hasIds FROM DUAL;
 
-    select 1 into totalItem from dual;
-    select 1 into pageTotal from dual;
+
     SELECT COUNT(*)
     INTO totalItem
     FROM HCTH_CONG_VAN_DI hcthcvd
     WHERE
       -- permisssion check
         (
-            1 = 1
+                (staffType = 1 AND (hcthcvd.TRANG_THAI != '1' OR hcthcvd.TRANG_THAI IS NULL)) OR
+                (staffType = 2 AND (
+                        (hcthcvd.TRANG_THAI != '1' AND hcthcvd.TRANG_THAI != '4')
+                        OR ((hcthcvd.TRANG_THAI = '1' OR hcthcvd.TRANG_THAI = '4') AND hcthcvd.DON_VI_GUI = '29')
+                        OR hcthcvd.TRANG_THAI IS NULL
+                    )) OR
+                (staffType = 0 AND (donViCanBo IS NOT NULL AND EXISTS(
+                        SELECT hcthDVN.ID
+                        FROM HCTH_DON_VI_NHAN hcthDVN
+                        WHERE hcthDVN.MA = hcthcvd.ID
+                          AND hcthDVN.LOAI = 'DI'
+                          AND hcthDVN.DON_VI_NHAN IN
+                              (
+                                  select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                  from dual
+                                  connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null
+                              )
+                    )
+                    AND hcthcvd.TRANG_THAI != '1'
+                    AND hcthcvd.TRANG_THAI != '4'
+                    )
+                    OR (donViCanBo IS NOT NULL AND hcthcvd.DON_VI_GUI IN
+                                                   (
+                                                       SELECT regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                                       from dual
+                                                       connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is NOT NULL
+                                                   )
+                     )
+                    OR (
+                             shccCanBo IS NOT NULL AND shccCanBo IN
+                                                       (
+                                                           SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                           from dual
+                                                           connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                       )
+                         AND hcthcvd.TRANG_THAI != '1'
+                     )
+                    )
             ) --filter
       and (fromTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI > fromTime))
       AND (toTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI < toTime))
@@ -2854,9 +2890,47 @@ BEGIN
               FROM HCTH_CONG_VAN_DI hcthcvd
                        LEFT JOIN DM_DON_VI dvg on hcthcvd.DON_VI_GUI = dvg.MA
               WHERE
-                -- condition check
+                -- permisssion check
                   (
-                      1 = 1
+                          (staffType = 1 AND (hcthcvd.TRANG_THAI != '1' OR hcthcvd.TRANG_THAI IS NULL)) OR
+                          (staffType = 2 AND (
+                                  (hcthcvd.TRANG_THAI != '1' AND hcthcvd.TRANG_THAI != '4')
+                                  OR
+                                  ((hcthcvd.TRANG_THAI = '1' OR hcthcvd.TRANG_THAI = '4') AND hcthcvd.DON_VI_GUI = '29')
+                                  OR hcthcvd.TRANG_THAI IS NULL
+                              )) OR
+                          (staffType = 0 AND (donViCanBo IS NOT NULL AND EXISTS(
+                                  SELECT hcthDVN.ID
+                                  FROM HCTH_DON_VI_NHAN hcthDVN
+                                  WHERE hcthDVN.MA = hcthcvd.ID
+                                    AND hcthDVN.LOAI = 'DI'
+                                    AND hcthDVN.DON_VI_NHAN IN
+                                        (
+                                            select regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                            from dual
+                                            connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is not null
+                                        )
+                              )
+                              AND hcthcvd.TRANG_THAI != '1'
+                              AND hcthcvd.TRANG_THAI != '4'
+                              )
+                              OR (donViCanBo IS NOT NULL AND hcthcvd.DON_VI_GUI IN
+                                                             (
+                                                                 SELECT regexp_substr(donViCanBo, '[^,]+', 1, level)
+                                                                 from dual
+                                                                 connect by regexp_substr(donViCanBo, '[^,]+', 1, level) is NOT NULL
+                                                             )
+                               )
+                              OR (
+                                       shccCanBo IS NOT NULL AND shccCanBo IN
+                                                                 (
+                                                                     SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                                     from dual
+                                                                     connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                                 )
+                                   AND hcthcvd.TRANG_THAI != '1'
+                               )
+                              )
                       ) --filter
                 and (fromTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI > fromTime))
                 AND (toTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI < toTime))
