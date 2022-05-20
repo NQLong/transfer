@@ -65,6 +65,7 @@ module.exports = app => {
     app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.data.shcc);
         app.model.qtChucVu.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Chức vụ');
             app.session.refresh(targetEmail);
             res.send({ error, item });
         });
@@ -72,7 +73,10 @@ module.exports = app => {
 
     app.put('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.changes.shcc);
-        app.model.qtChucVu.update({ stt: req.body.stt }, req.body.changes, (error, item) => {
+        let changes = req.body.changes;
+        if (changes && changes.thoiChucVu == 1) changes.chucVuChinh = 0; 
+        app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Chức vụ');
             app.session.refresh(targetEmail);
             res.send({ error, item });
         });
@@ -81,6 +85,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.shcc);
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Chức vụ');
             app.session.refresh(targetEmail);
             res.send({ error });
         });
