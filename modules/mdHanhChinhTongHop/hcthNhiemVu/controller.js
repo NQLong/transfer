@@ -183,7 +183,7 @@ module.exports = (app) => {
                             icon = 'fa-tasks';
                             break;
                         case CAN_BO_NHAN_ACTION.REMOVE:
-                            subTitle  = `${hoTenNguoiTao.trim().normalizedName()} đã xoá bạn ra khỏi nhiệm vụ #${maNhiemVu}.`;
+                            subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã xoá bạn ra khỏi nhiệm vụ #${maNhiemVu}.`;
                             iconColor = 'danger';
                             icon = 'fa-tasks';
                             break;
@@ -200,7 +200,7 @@ module.exports = (app) => {
             });
         } catch (error) {
             console.error('fail to send notification', error);
-            resolve(); 
+            resolve();
         }
     });
 
@@ -229,17 +229,17 @@ module.exports = (app) => {
                                     quantity: canBoInVaiTro.length,
                                     role: vaiTro
                                 };
-                                await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note)});
+                                await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note) });
                                 onCreateCanBoNhanNotification({
-                                    maNhiemVu: nhiemVu.id, 
-                                    nguoiTaoShcc: req.session.user.shcc, 
+                                    maNhiemVu: nhiemVu.id,
+                                    nguoiTaoShcc: req.session.user.shcc,
                                     canBoNhan: canBoInVaiTro.map(item => item.canBoNhan),
-                                    vaiTro, 
+                                    vaiTro,
                                     hanhDong: CAN_BO_NHAN_ACTION.ADD
                                 });
                             }
-                        })); 
-                    }                  
+                        }));
+                    }
                 });
             }
             res.send({ error: null });
@@ -399,11 +399,13 @@ module.exports = (app) => {
                 lienKet: lienKet?.rows || [],
                 donViNhan: donViNhan || []
             };
+
             if (!await checkNhiemVuPermission(req, nhiemVu)) {
                 return res.send({ error: { status: 401, message: 'Bạn không có đủ quyền để xem nhiệm vu này' } });
             }
-            else if (laNguoiThamGia(req, nhiemVu) || laTruongDonViNhan(req, nhiemVu))
+            else if (laNguoiThamGia(req, nhiemVu) || laTruongDonViNhan(req, nhiemVu)) {
                 await readNhiemVu(nhiemVu.id, req.session.user.shcc, nhiemVu.nguoiTao);
+            }
 
             const history = await app.model.hcthHistory.getAllHistoryFrom(nhiemVu.id, 'NHIEM_VU');
             nhiemVu.history = history?.rows || [];
@@ -440,7 +442,7 @@ module.exports = (app) => {
             else resolve(false);
         });
     });
-    
+
     app.post('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.orCheck('manager:write', 'rectors:login', 'staff:login'), async (req, res) => {
         const { ma, canBoNhan, nguoiTao, vaiTro } = req.body;
         try {
@@ -454,12 +456,12 @@ module.exports = (app) => {
                         quantity: canBoNhan.length,
                         role: vaiTro
                     };
-                    await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: ma, shcc: nguoiTao, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note)});
+                    await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: ma, shcc: nguoiTao, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note) });
                     onCreateCanBoNhanNotification({
-                        maNhiemVu: ma, 
-                        nguoiTaoShcc: nguoiTao, 
+                        maNhiemVu: ma,
+                        nguoiTaoShcc: nguoiTao,
                         canBoNhan,
-                        vaiTro, 
+                        vaiTro,
                         hanhDong: CAN_BO_NHAN_ACTION.ADD
                     });
                 }
@@ -479,12 +481,12 @@ module.exports = (app) => {
                     name: (hoCanBo + ' ' + tenCanBo).trim().normalizedName(),
                     role: vaiTroMoi
                 };
-                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.CHANGE_ROLE, ghiChu: JSON.stringify(note)});
+                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.CHANGE_ROLE, ghiChu: JSON.stringify(note) });
                 onCreateCanBoNhanNotification({
-                    maNhiemVu: nhiemVuId, 
-                    nguoiTaoShcc: shccNguoiTao, 
-                    canBoNhan: shccCanBoNhan, 
-                    vaiTro: vaiTroMoi, 
+                    maNhiemVu: nhiemVuId,
+                    nguoiTaoShcc: shccNguoiTao,
+                    canBoNhan: shccCanBoNhan,
+                    vaiTro: vaiTroMoi,
                     hanhDong: CAN_BO_NHAN_ACTION.CHANGE_ROLE
                 });
                 res.send({ error, item, history });
@@ -494,21 +496,21 @@ module.exports = (app) => {
 
 
     app.delete('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.check('staff:login'), (req, res) => {
-        const { id, nhiemVuId, shccCanBoNhan, shccNguoiTao, hoNguoiXoa, tenNguoiXoa} = req.body;
+        const { id, nhiemVuId, shccCanBoNhan, shccNguoiTao, hoNguoiXoa, tenNguoiXoa } = req.body;
         app.model.hcthCanBoNhan.delete({ id }, async (error, item) => {
             if (error) throw error;
             else {
                 const note = {
                     name: (hoNguoiXoa + ' ' + tenNguoiXoa).trim().normalizedName()
                 };
-                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.REMOVE_EMPOYEE, ghiChu: JSON.stringify(note)});
+                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.REMOVE_EMPOYEE, ghiChu: JSON.stringify(note) });
                 onCreateCanBoNhanNotification({
-                    maNhiemVu: nhiemVuId, 
-                    nguoiTaoShcc: shccNguoiTao, 
-                    canBoNhan: shccCanBoNhan, 
+                    maNhiemVu: nhiemVuId,
+                    nguoiTaoShcc: shccNguoiTao,
+                    canBoNhan: shccCanBoNhan,
                     hanhDong: CAN_BO_NHAN_ACTION.REMOVE
                 });
-                res.send({ error, item, history});
+                res.send({ error, item, history });
             }
         });
     });
@@ -583,7 +585,7 @@ module.exports = (app) => {
             res.send({ error: error, items: result?.rows });
         });
     });
-    
+
     app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'NHIEM_VU', (error, items) => res.send({ error, items: items?.rows || [] }));
     });

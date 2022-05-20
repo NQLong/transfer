@@ -357,7 +357,7 @@ module.exports = (app) => {
                 && count && count.rows[0] && count.rows[0]['COUNT(*)'];
         }
         else {
-            const canBoNhan = congVan.canBoNhan;
+            const canBoNhan = congVan.canBoNhan || '';
             if (canBoNhan.split(',').includes(req.session.user.shcc))
                 return true;
             else {
