@@ -1,6 +1,6 @@
-// Table name: QT_NGHI_VIEC { shcc, hoTen, ngayNghi, soQuyetDinh, ghiChu, dienNghi, noiDung, ma }
+// Table name: QT_NGHI_VIEC { shcc, hoTen, ngayNghi, soQuyetDinh, ghiChu, dienNghi, noiDung, ma, ngayQuyetDinh, lyDoNghi }
 const keys = ['MA'];
-const obj2Db = { 'shcc': 'SHCC', 'hoTen': 'HO_TEN', 'ngayNghi': 'NGAY_NGHI', 'soQuyetDinh': 'SO_QUYET_DINH', 'ghiChu': 'GHI_CHU', 'dienNghi': 'DIEN_NGHI', 'noiDung': 'NOI_DUNG', 'ma': 'MA' };
+const obj2Db = { 'shcc': 'SHCC', 'hoTen': 'HO_TEN', 'ngayNghi': 'NGAY_NGHI', 'soQuyetDinh': 'SO_QUYET_DINH', 'ghiChu': 'GHI_CHU', 'dienNghi': 'DIEN_NGHI', 'noiDung': 'NOI_DUNG', 'ma': 'MA', 'ngayQuyetDinh': 'NGAY_QUYET_DINH', 'lyDoNghi': 'LY_DO_NGHI' };
 
 module.exports = app => {
     app.model.qtNghiViec = {

@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3040: { title: 'Quá trình Làm việc ngoài', link: '/user/tccb/qua-trinh/lam-viec-ngoai', icon: 'fa fa-external-link ', color: '#000000', backgroundColor: '#cc6c6c', groupIndex: 1 },
+            // 3040: { title: 'Quá trình Làm việc ngoài', link: '/user/tccb/qua-trinh/lam-viec-ngoai', icon: 'fa fa-external-link ', color: '#000000', backgroundColor: '#cc6c6c', groupIndex: 1 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1025: { title: 'Làm việc ngoài', subTitle: 'Được mời đi làm việc tại các nơi khác', link: '/user/lam-viec-ngoai', icon: 'fa fa-external-link ', color: '#000000', backgroundColor: '#9cff67', groupIndex: 0 },
+            // 1025: { title: 'Làm việc ngoài', subTitle: 'Được mời đi làm việc tại các nơi khác', link: '/user/lam-viec-ngoai', icon: 'fa fa-external-link ', color: '#000000', backgroundColor: '#9cff67', groupIndex: 0 },
         },
     };
 
@@ -134,7 +134,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/lam-viec-ngoai', app.permission.check('staff:write'), (req, res) =>
         app.model.qtLamViecNgoai.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Làm việc ngoài');
-            res.send(error);
+            res.send({ error });
         }));
 
 };

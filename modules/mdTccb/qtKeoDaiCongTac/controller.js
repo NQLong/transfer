@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1007: { title: 'Kéo dài công tác', link: '/user/keo-dai-cong-tac', icon: 'fa-hourglass-start', color: '#000000', backgroundColor: '#eab676', groupIndex: 0 },
+            1005: { title: 'Kéo dài công tác', link: '/user/keo-dai-cong-tac', icon: 'fa-hourglass-start', color: '#000000', backgroundColor: '#eab676', groupIndex: 1 },
         },
     };
 
@@ -163,14 +163,25 @@ module.exports = app => {
             }
         });
     });
-    app.post('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtKeoDaiCongTac.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:write'), (req, res) => {
+        app.model.qtKeoDaiCongTac.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Kéo dài công tác');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtKeoDaiCongTac.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtKeoDaiCongTac.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:write'), (req, res) => {
+        app.model.qtKeoDaiCongTac.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Kéo dài công tác');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:write'), (req, res) => {
+        app.model.qtKeoDaiCongTac.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Kéo dài công tác');
+            res.send({ error });
+        });
+    });
 
     app.post('/api/tccb/qua-trinh/keo-dai-cong-tac/multiple', app.permission.check('qtKeoDaiCongTac:write'), (req, res) => {
         const listData = req.body.listData, errorList = [];
@@ -207,7 +218,7 @@ module.exports = app => {
             if (error) {
                 res.send({ error, items: null });
                 return;
-            } 
+            }
             let items = [];
             const solve = (index = 0) => {
                 if (index >= data.length) {
@@ -228,7 +239,7 @@ module.exports = app => {
                                 end.setFullYear(end.getFullYear() + canExtend);
                                 if (start.getFullYear() < yearCalc) start = firstYear;
                                 if (end.getFullYear() != yearCalc) end = endYear;
-        
+
                                 let dataAdd = {
                                     shcc: item.shcc,
                                     hoCanBo: item.ho,

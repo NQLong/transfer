@@ -10,11 +10,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/:khcn/qua-trinh/bang-phat-minh/group/:shcc',
+            path: '/user/tccb/qua-trinh/bang-phat-minh/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
-            path: '/user/:khcn/qua-trinh/bang-phat-minh',
+            path: '/user/tccb/qua-trinh/bang-phat-minh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {

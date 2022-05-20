@@ -8,8 +8,10 @@
       display: none;
     }
     .app-sidebar__user-avatar {
+      border-radius: 20% !important;
       width: 30px;
       height: 30px;
+      object-fit: cover;
     }
     .app-content {
       margin-left: 50px;

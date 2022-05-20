@@ -317,7 +317,7 @@ module.exports = (app) => {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
-            if (!isRelated(congVan, donViNhan, req)) {
+            if (!await isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
             } else {
                 const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
@@ -341,10 +341,20 @@ module.exports = (app) => {
         app.model.hcthPhanHoi.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
-    const isRelated = (congVan, donViNhan, req) => {
+    const isRelated = async (congVan, donViNhan, req) => {
         const permissions = req.session.user.permissions;
         if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
             return true;
+        }
+        else if (req.query.nhiemVu) {
+            const count = (await app.model.hcthLienKet.asyncCount({
+                keyA: req.query.nhiemVu,
+                loaiA: 'NHIEM_VU',
+                loaiB: 'CONG_VAN_DEN',
+                keyB: req.params.id
+            }));
+            return await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
+                && count && count.rows[0] && count.rows[0]['COUNT(*)'];
         }
         else {
             const canBoNhan = congVan.canBoNhan;
@@ -365,7 +375,7 @@ module.exports = (app) => {
                 throw { status: 400, message: 'Invalid id' };
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
-            if (!isRelated(congVan, donViNhan, req))
+            if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
             const files = await app.model.hcthFile.getAllFile({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
@@ -386,7 +396,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage'), (req, res) => {
+    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 

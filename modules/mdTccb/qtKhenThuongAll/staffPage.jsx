@@ -156,12 +156,12 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 'Khen thưởng'
             ],
             content: <>
-                <div className='tile'>
+                {/* <div className='tile'>
                     <h3 className='tile-title'>
                         Thống kê
                     </h3>
                     <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>
+                </div> */}
                 <div className='tile'>
                     {table}
                 </div>

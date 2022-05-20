@@ -20,4 +20,10 @@ module.exports = app => {
             handleResult(resolve, reject, item, error);
         });
     });
+
+    app.model.hcthHistory.getStaff = (condition, selectedColumns, orderBy) => new Promise((resolve, reject) => {
+        app.model.hcthHistory.get(condition, selectedColumns, orderBy, (error, item) => {
+            handleResult(resolve, reject, item, error);
+        });
+    });
 };

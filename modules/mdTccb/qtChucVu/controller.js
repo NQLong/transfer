@@ -82,7 +82,7 @@ module.exports = app => {
         let targetEmail = await app.getEmailByShcc(req.body.shcc);
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => {
             app.session.refresh(targetEmail);
-            res.send(error);
+            res.send({ error });
         });
     });
 

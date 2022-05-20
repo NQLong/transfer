@@ -1,10 +1,10 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.khcn,
-        menus: {
-            9501: { title: 'Quá trình nghiên cứu khoa học', link: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9501: { title: 'Quá trình nghiên cứu khoa học', link: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
+    //     },
+    // };
 
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
@@ -13,24 +13,24 @@ module.exports = app => {
         },
     };
 
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
+    const menu = {
+        parentMenu: app.parentMenu.khcn,
         menus: {
-            1002: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#ed9d34', groupIndex: 4 },
+            9501: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#1999C2' },
         },
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu },
         { name: 'qtNghienCuuKhoaHoc:readOnly', menu: menuTCCB },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
         { name: 'qtNghienCuuKhoaHoc:delete' },
     );
 
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
 
     app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);
@@ -90,14 +90,25 @@ module.exports = app => {
         app.model.qtNghienCuuKhoaHoc.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
-        app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghiên cứu khoa học');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
-        app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
-        app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghiên cứu khoa học');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghiên cứu khoa học');
+            res.send({ error });
+        });
+    });
 
     app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo/:timeType', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
         let { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0 };

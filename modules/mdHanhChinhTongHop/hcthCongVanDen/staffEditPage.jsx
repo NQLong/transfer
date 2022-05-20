@@ -1,14 +1,13 @@
+import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
+import { createDmDonViGuiCv, SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
+import { getStaffPage, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, renderTable, FormTextBox, FormSelect, TableCell, FormRichTextBox, FormFileBox, FormCheckbox, renderComment, renderTimeline } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
-import { createHcthCongVanDen, updateHcthCongVanDen, deleteFile, getCongVanDen, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao } from './redux';
-import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_FwCanBo, getStaffPage } from 'modules/mdTccb/tccbCanBo/redux';
-import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
-import { createDmDonViGuiCv } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, renderTimeline, TableCell } from 'view/component/AdminPage';
+import { createChiDao, createHcthCongVanDen, createPhanHoi, deleteFile, getChiDao, getCongVanDen, getHistory, getPhanHoi, updateHcthCongVanDen, updateStatus } from './redux';
 
 const { action, MA_BAN_GIAM_HIEU, MA_CHUC_VU_HIEU_TRUONG, trangThaiSwitcher } = require('../constant.js');
 
@@ -66,7 +65,6 @@ class PhanHoi extends React.Component {
         });
     }
 
-    canPhanHoi = () => true;
 
     onCreatePhanHoi = (e) => {
         e.preventDefault();
@@ -100,7 +98,7 @@ class PhanHoi extends React.Component {
                                 <FormRichTextBox type='text' className='col-md-12' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
                                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
                                     <button type='submit' className='btn btn-primary' onClick={this.onCreatePhanHoi}>
-                                        Gửi
+                                        <i className='fa fa-paper-plane' /> Gửi
                                     </button>
                                 </div>
                             </>)
@@ -131,7 +129,7 @@ class StaffEditPage extends AdminPage {
 
 
     componentDidMount() {
-        const {readyUrl, routeMatcherUrl} = this.getSiteSetting();
+        const { readyUrl, routeMatcherUrl } = this.getSiteSetting();
         T.ready(readyUrl, () => {
             const params = T.routeMatcher(routeMatcherUrl).parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '' },
@@ -161,7 +159,7 @@ class StaffEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                     <Link key={1} to='/user/hcth/cong-van-den'>Danh sách công văn đến</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/hcth/cong-van-den'
             };
@@ -172,7 +170,7 @@ class StaffEditPage extends AdminPage {
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
                     <Link key={1} to='/user/cong-van-den'>Danh sách công văn đến</Link>,
-                    this.state.id ? 'Tạo mới' : 'Cập nhật'
+                    this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/cong-van-den'
             };
@@ -195,6 +193,34 @@ class StaffEditPage extends AdminPage {
     };
 
     renderChiDao = (readOnly) => {
+        const buttons = [];
+        if (this.canPublish()) {
+            buttons.push(
+                <button key='publish-decline' type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_HCTH.id)}>
+                    <i className='fa fa-undo' /> Trả lại
+                </button>,
+                <button key='publish-accept' type='submit' className='btn btn-success' onClick={this.onPublish}>
+                    <i className='fa fa-paper-plane' /> Phân phối
+                </button>
+            );
+        }
+        else if (this.canApprove()) {
+            buttons.push(
+                <button key='approve-decline' type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_BGH.id)}>
+                    <i className='fa fa-undo' /> Trả lại
+                </button>,
+                <button key='approve-accept' type='submit' className='btn btn-success' onClick={this.onAprrove}>
+                    <i className='fa fa-check' /> Duyệt
+                </button>
+            );
+        } else {
+            buttons.push(
+                <button key='chiDao-add' type='submit' className='btn btn-primary' onClick={this.onCreateChiDao}>
+                    <i className='fa fa-lg fa-plus' /> Thêm
+                </button>
+            );
+        }
+
         const canChiDao = this.canChiDao();
         return (
             <div className='tile'>
@@ -217,27 +243,9 @@ class StaffEditPage extends AdminPage {
                         </div>
                         {
                             canChiDao && (<>
-                                {(this.canPublish() || this.canApprove()) && <FormRichTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Thêm chỉ đạo' readOnly={readOnly && !canChiDao} />}
+                                <FormRichTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Thêm chỉ đạo' readOnly={readOnly && !canChiDao} />
                                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
-                                    {
-                                        this.canPublish() && <>
-                                            <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_HCTH.id)}>
-                                                Trả lại
-                                            </button>
-                                            <button type='submit' className='btn btn-success' onClick={this.onPublish}>
-                                                Phân phối
-                                            </button>
-                                        </>
-                                    }
-                                    {this.canApprove() && <>
-                                        <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_BGH.id)}>
-                                            Trả lại
-                                        </button>
-                                        <button type='submit' className='btn btn-success' onClick={this.onAprrove}>
-                                            Duyệt
-                                        </button>
-                                    </>
-                                    }
+                                    {buttons}
                                 </div>
                             </>)
                         }
@@ -275,7 +283,11 @@ class StaffEditPage extends AdminPage {
 
     getData = () => {
         if (this.state.id) {
-            this.props.getCongVanDen(Number(this.state.id), (item) => this.setState({ isLoading: false }, () => this.setData(item)));
+            const queryParams = new URLSearchParams(window.location.search);
+            const nhiemVu = queryParams.get('nhiemVu');
+            const context = {};
+            if (nhiemVu) context.nhiemVu = nhiemVu;
+            this.props.getCongVanDen(Number(this.state.id), context, (item) => this.setState({ isLoading: false }, () => this.setData(item)));
         } else this.setData();
     }
 
@@ -600,9 +612,9 @@ class StaffEditPage extends AdminPage {
 
     isRelated = () => {
         const currentPermission = this.getCurrentPermissions();
-        let { maDonViNhan, maCanBoNhan } = this.getItem() || {};
-        maDonViNhan = maDonViNhan?.split(',') || [];
-        maCanBoNhan = maCanBoNhan?.split(',') || [];
+        let { donViNhan, canBoNhan } = this.getItem() || {};
+        let maDonViNhan = donViNhan?.split(',') || [];
+        let maCanBoNhan = canBoNhan?.split(',') || [];
         return currentPermission.includes('rectors:login') || currentPermission.includes('hcth:login') || this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) || maCanBoNhan.includes(this.state.shcc);
     }
 
@@ -638,7 +650,8 @@ class StaffEditPage extends AdminPage {
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             criticalStatus = [trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id],
             item = this.state.id ? this.getItem() : {},
-            {breadcrumb, backRoute} = this.getSiteSetting();
+            { breadcrumb, backRoute } = this.getSiteSetting();
+
 
         const loading = (
             <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

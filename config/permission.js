@@ -230,6 +230,7 @@ module.exports = app => {
                                 listChucVu: [],
                                 maDonVi: item.maDonVi,
                             };
+                            if (item.tienSi) app.permissionHooks.pushUserPermission(user, 'doctor:login');
                             const condition = {
                                 statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
                                 parameter: {
