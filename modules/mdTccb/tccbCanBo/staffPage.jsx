@@ -20,12 +20,16 @@ class StaffUserPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user', () => {
+            T.hideSearchBox();
             if (this.props.system && this.props.system.user && this.props.system.user.staff) {
                 const staff = this.props.system.user.staff;
                 if (!staff.shcc) {
                     T.notify('Cán bộ chưa có mã thẻ', 'danger');
                     this.props.history.goBack();
-                } else this.shcc = staff.shcc;
+                } else {
+                    this.shcc = staff.shcc;
+                    this.email = staff.email;
+                }
                 this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
@@ -43,7 +47,7 @@ class StaffUserPage extends AdminPage {
     }
 
     setUp = (item) => {
-        this.componentCaNhan.value(item);
+        // this.componentCaNhan.value(item);
         this.componentTTCongTac.value(item);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
@@ -54,12 +58,12 @@ class StaffUserPage extends AdminPage {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
-        this.props.updateStaff(this.shcc, {
-            ...caNhanData
-        });
-        if (this.emailCanBo) {
+        // this.props.updateStaff(this.shcc, {
+        //     ...caNhanData
+        // });
+        if (this.shcc) {
             if (caNhanData && congTacData && trinhDoData) {
-                this.props.updateStaff(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
+                this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.email, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
             }
         }
     }
