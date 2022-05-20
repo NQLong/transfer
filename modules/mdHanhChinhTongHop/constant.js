@@ -18,6 +18,9 @@ module.exports = {
         ACCEPT: 'ACCEPT',
         READ: 'READ',
         SEND: 'SEND',
+        ADD_EMPLOYEES: 'ADD_EMPLOYEES',
+        REMOVE_EMPOYEE: 'REMOVE_EMPLOYEE',
+        CHANGE_ROLE: 'CHANGE_ROLE',
         COMPLETE: 'COMPLETE',
     },
 
@@ -80,10 +83,10 @@ module.exports = {
         TAM_HOAN: { id: 'TAM_HOAN', text: 'Tạm hoãn', value: 1, color: 'red', next: ['TAM_HOAN', 'DANG_XU_LY', 'DA_HUY'] },
     },
 
-    nhiemVuSelector : {
-        NHIEM_VU_CAC_DON_VI: {id:'NHIEM_VU_CAC_DON_VI', text:'Nhiệm vụ các đơn vị'},
-        NHIEM_VU_CUA_BAN: {id: 'NHIEM_VU_CUA_BAN', text:'Nhiệm vụ của bạn'},
-        NHIEM_VU_THAM_GIA: {id: 'NHIEM_VU_DUOC_GIAO', text:'Nhiệm vụ tham gia'},
-        TAT_CA_NHIEM_VU: {id: 'TAT_CA_NHIEM_VU', text:'Tất cả nhiệm vụ'}
+    nhiemVuSelector: {
+        NHIEM_VU_CAC_DON_VI: { id: 'NHIEM_VU_CAC_DON_VI', text: 'Nhiệm vụ các đơn vị' },
+        NHIEM_VU_DON_VI: { id: 'NHIEM_VU_DON_VI', text: 'Nhiệm vụ của đơn vị' },
+        NHIEM_VU_CUA_BAN: { id: 'NHIEM_VU_CUA_BAN', text: 'Nhiệm vụ của bạn' },
+        NHIEM_VU_THAM_GIA: { id: 'NHIEM_VU_THAM_GIA', text: 'Nhiệm vụ đang tham gia' },
     }
 };

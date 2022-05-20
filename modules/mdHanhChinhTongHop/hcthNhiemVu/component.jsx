@@ -1,10 +1,9 @@
 import React from 'react';
-import { AdminPage, AdminModal, FormCheckbox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, TableCell, FormTabs, renderTimeline } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, FormCheckbox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, TableCell, FormTabs, renderTimeline, FormFileBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_FwCanBo, SelectAdapter_FwCanBoByDonVi } from 'modules/mdTccb/tccbCanBo/redux';
-
 const { vaiTro, loaiLienKet } = require('../constant');
 const vaiTroSelector = Object.keys(vaiTro).map(key => ({ id: key, text: vaiTro[key].text }));
 
@@ -45,8 +44,16 @@ export class CanBoNhan extends AdminPage {
     }
 
     onDelete = (item) => {
+        const deleteData = {
+            id: item.id,
+            nhiemVuId: this.props.target,
+            shccCanBoNhan: item.shccCanBoNhan,
+            shccNguoiTao: this.props.system?.user?.staff?.shcc,
+            hoNguoiXoa: item.hoCanBoNhan,
+            tenNguoiXoa: item.tenCanBoNhan
+        };
         T.confirm('Xóa cán bộ tham gia', `Bạn có chắc bạn muốn xóa cán bộ ${(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()}?`, true,
-            isConfirm => isConfirm && this.props.removeCanBoNhanNhiemVu(item.id, () => {
+            isConfirm => isConfirm && this.props.removeCanBoNhanNhiemVu(deleteData, () => {
                 const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
                 const currentId = currentCanBoNhan.map(item => item.id);
                 this.props.getList({ ma: this.props.target, ids: currentId });
@@ -56,8 +63,17 @@ export class CanBoNhan extends AdminPage {
 
     updatePermission = (e, item, vaiTroMoi) => {
         e.preventDefault();
+        const updateData = {
+            id: item.id, 
+            nhiemVuId: this.props.target,
+            shccCanBoNhan: item.shccCanBoNhan, 
+            shccNguoiTao: this.props.system.user.staff.shcc, 
+            hoCanBo: item.hoCanBoNhan,
+            tenCanBo: item.tenCanBoNhan,
+            vaiTroMoi
+        };
         T.confirm('Thay đổi quyền cán bộ', `Bạn có chắc bạn muốn thay đổi quyền cán bộ ${(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()} thành ${vaiTro[vaiTroMoi].text}?`, true,
-            isConfirm => isConfirm && this.props.updateCanBoNhanNhiemVu(item.id, vaiTroMoi, () => {
+            isConfirm => isConfirm && this.props.updateCanBoNhanNhiemVu(updateData, () => {
                 const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
                 const currentId = currentCanBoNhan.map(item => item.id);
                 this.props.getList({ ma: this.props.target, ids: currentId });
@@ -113,6 +129,7 @@ export class CanBoNhan extends AdminPage {
         const currentId = currentCanBoNhan.map(item => item.id);
         const currentShcc = currentCanBoNhan.map(item => item.shccCanBoNhan);
         const leapShcc = shccs.find(item => currentShcc.includes(item));
+        const nguoiTao = this.props.system?.user?.staff?.shcc;
         if (shccs.length == 0) {
             T.notify('Chưa chọn cán bộ', 'danger');
             this.canBoNhan.focus();
@@ -124,7 +141,7 @@ export class CanBoNhan extends AdminPage {
             T.notify(`Cán bộ (${leapShcc}) đã có trong danh sách tham gia!`, 'danger');
         }
         else {
-            this.props.create(this.props.target, shccs, vaiTro, (items) => {
+            this.props.create(this.props.target, nguoiTao, shccs, vaiTro, (items) => {
                 this.canBoNhan.clear();
                 this.props.getList({ ma: this.props.target, ids: [...currentId, ...items.map(item => item.id)] });
             });
@@ -579,31 +596,158 @@ export class History extends React.Component {
         COMPLETE: 'hoàn thành',
     }
 
+    canBoNhanAction = {
+        ADD_EMPLOYEES: 'ADD_EMPLOYEES',
+        REMOVE_EMPLOYEE: 'REMOVE_EMPLOYEE',
+        CHANGE_ROLE: 'CHANGE_ROLE'
+    }
+
     actionColor = {
         CREATE: '#149414',
         COMPLETE: '#149414',
         READ: 'blue',
-        UPDATE: 'blue'
+        UPDATE: 'blue',
+        ADD_EMPLOYEES: '#28a745',
+        REMOVE_EMPLOYEE: 'red',
+        CHANGE_ROLE: '#007bff'
+    }
 
+    roleName = {
+        MANAGER: {
+            text: 'quản trị viên',
+            color: '#c9a536'
+        },
+        PARTICIPANT: {
+            text: 'người tham gia',
+            color: '#17a2b8'
+        }
     }
 
     render = () => {
+        let historyData = this.props.data?.map(item => item.ghiChu ? ({...item, ghiChu: JSON.parse(item.ghiChu)}) : ({...item}));
+        const loginShcc = this.props.system?.user?.staff?.shcc;
+        const renderChangeCanBoNhanContent = (action, item) => {
+            switch (action) {
+                case 'ADD_EMPLOYEES':
+                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.roleName[item.ghiChu.role].color}}>thêm {item.ghiChu.quantity} {this.roleName[item.ghiChu.role].text}</b> vào nhiệm vụ này.</span>;
+                case 'REMOVE_EMPLOYEE':
+                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>xoá {item.ghiChu.name}</b> ra khỏi nhiệm vụ.</span>;
+                case 'CHANGE_ROLE':
+                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>thay đổi vai trò của {item.ghiChu.name}</b> thành <b style={{ color: this.roleName[item.ghiChu.role].color}}>{this.roleName[item.ghiChu.role].text}</b>.</span>;
+                default:
+                    return null;
+            }
+        };
         return (<div className='tile'>
             <h3 className='tile-header'>Lịch sử</h3>
             <div className='tile-body row'>
                 <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                     {renderTimeline({
-                        getDataSource: () => this.props.data,
+                        getDataSource: () => historyData,
                         handleItem: (item) => ({
                             // className: item.hanhDong == action.RETURN ? 'danger' : '',
                             component: <>
                                 <span className='time'>{T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM')}</span>
-                                <p><b style={{ color: 'blue' }}>{(item.ho?.normalizedName() || '') + ' '} {item.ten?.normalizedName() || ''}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>{this.actionText[item.hanhDong]}</b> nhiệm vụ này.</p>
+                                {
+                                    item.hanhDong !== this.canBoNhanAction.ADD_EMPLOYEES && item.hanhDong !== this.canBoNhanAction.REMOVE_EMPLOYEE && item.hanhDong !== this.canBoNhanAction.CHANGE_ROLE ? 
+                                    <p><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>{this.actionText[item.hanhDong]}</b> nhiệm vụ này.</p> :
+                                    <p>{renderChangeCanBoNhanContent(item.hanhDong, item)}</p>
+                                }
                             </>
                         })
                     })}
                 </div>
             </div>
         </div>);
+    }
+}
+export class ListFiles extends React.Component {
+    listFileRefs = {};
+
+    componentDidUpdate() {
+        this.props.files.map((item) => this.listFileRefs[item.id]?.value(item.viTri || ''));
+        this.fileBox?.setData('hcthNhiemVuFile:' + (this.props.id ? this.props.id : 'new'));
+    }
+
+    onSuccess = (response) => {
+        if (response.error) T.notify(response.error, 'danger');
+        else if (response.item) {
+            let listFile = this.props.files.length ? [...this.props.files] : [];
+            listFile.push(response.item);
+            this.props.updateListFile(listFile);
+        }
+    }
+
+    onViTriChange = (e, id, index) => {
+        e.preventDefault();
+        let listFile = [...this.props.files];
+        listFile[index].viTri = this.listFileRefs[id].value() || '';
+        setTimeout(() => this.props.updateListFile(listFile), 500);
+    }
+
+    onDeleteFile = (e, index, item) => {
+        e.preventDefault();
+        const { id: fileId, ten: file } = item;
+        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
+            isConfirm && this.props.deleteFile(this.props.id ? this.props.id : null, fileId, file, () => {
+                let listFile = [...this.props.files];
+                listFile.splice(index, 1);
+                this.props.updateListFile(listFile);
+            }));
+    }
+    tableListFile = (data, id, sitePermission) => renderTable({
+        getDataSource: () => data,
+        stickyHead: false,
+        emptyTable: 'Chưa có tập tin nào!',
+        renderHead: () => (
+            <tr>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
+                <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Tên tập tin</th>
+                <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+            </tr>
+        ),
+        renderRow: (item, index) => {
+            const
+                timeStamp = item.thoiGian,
+                originalName = item.ten,
+                linkFile = `/api/hcth/nhiem-vu/download/${id || 'new'}/${originalName}`;
+            return (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
+                        <a href={linkFile} download>{originalName}</a>
+                    </>
+                    } />
+                    <TableCell content={(
+                        sitePermission.editGeneral ? <FormTextBox type='text' placeholder='Nhập ghi chú' style={{ marginBottom: 0 }} ref={e => this.listFileRefs[item.id] = e} onChange={e => this.onViTriChange(e, item.id, index)} /> : item.viTri
+                    )} />
+                    <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ delete: sitePermission.delete }} onDelete={!sitePermission.delete ? null : e => this.onDeleteFile(e, index, item)}>
+                        <a className='btn btn-info' href={linkFile} download title='Tải về'>
+                            <i className='fa fa-lg fa-download' />
+                        </a>
+                    </TableCell>
+                </tr>
+            );
+        }
+    });
+    render() {
+        const { id, sitePermission } = this.props;
+       
+        return (
+            <div className='tile'>
+                <div className='form-group'>
+                    <h3 className='tile-title'>Danh sách tập tin</h3>
+                    <div className='tile-body row'>
+                        <div className={'form-group ' + (!sitePermission.editGeneral ? 'col-md-12' : 'col-md-8')}>
+                            {this.tableListFile(this.props.files, id, sitePermission)}
+                         </div>
+                        {sitePermission.editGeneral && <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin nhiệm vụ' postUrl='/user/upload' uploadType='hcthNhiemVuFile' userData='hcthNhiemVuFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
+                    </div>
+                </div>
+            </div>
+        );
     }
 }

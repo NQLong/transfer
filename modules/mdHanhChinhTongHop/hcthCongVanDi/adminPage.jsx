@@ -64,13 +64,6 @@ const selectCongVanV2 = [
     { id: 2, text: 'Không lấy số' }
 ];
 
-export function getSoCongVan(soDi, donVi, loai) {
-    if (loai == null) {
-        return soDi + '/' + 'XHNV-' + donVi;
-    }
-    return soDi + '/' + loai + '-XHNV-' + donVi;
-}
-
 class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
 
@@ -85,6 +78,7 @@ class HcthCongVanDi extends AdminPage {
                 this.maDonViNhan?.value('');
                 this.maCanBoNhan?.value('');
                 this.donViNhanNgoai?.value('');
+                this.status?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
@@ -123,11 +117,12 @@ class HcthCongVanDi extends AdminPage {
         let loaiCongVan = this.loaiCongVan?.value() || null;
         let congVanLaySo = this.congVanLaySo?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
+        let status = this.status?.value() || null;
 
         let permissions = this.props.system?.user?.permissions;
         let hcthStaff = permissions.includes('hcth:login') ? { congVanLaySo: 1 } : {};
 
-        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo };
+        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo, status };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 // console.log(page.filter);
@@ -139,6 +134,7 @@ class HcthCongVanDi extends AdminPage {
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     this.loaiCongVan?.value(filter.loaiCongVan || '');
                     this.congVanLaySo?.value(filter.congVanLaySo || '');
+                    this.status?.value(filter.status || '');
                     this.donViNhanNgoai?.value(filter.donViNhanNgoai || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.loaiCongVan || filter.donViNhanNgoai)) this.showAdvanceSearch();
                 }
@@ -159,9 +155,15 @@ class HcthCongVanDi extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
-            {baseUrl, breadcrumb, backRoute} = this.getSiteSetting();
+            { baseUrl, breadcrumb, backRoute } = this.getSiteSetting();
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
+
+        const selectStatus = Object.keys(listTrangThai).map(item =>
+        ({
+            id: item,
+            text: listTrangThai[item].status
+        }));
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu công văn các phòng',
@@ -186,7 +188,7 @@ class HcthCongVanDi extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`${baseUrl}/${item.id}`)} content={item.soDi && item.tenVietTatDonViGui ? getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : 'Chưa có số công văn'} />
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`${baseUrl}/${item.id}`)} content={item.soCongVan ? item.soCongVan : 'Chưa có số công văn'} />
                         <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.trichYeu || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
@@ -261,7 +263,8 @@ class HcthCongVanDi extends AdminPage {
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanNgoai = e} label='Đơn vị nhận bên ngoài' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.loaiCongVan = e} label='Loại công văn' data={selectCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-6' ref={e => this.loaiCongVan = e} label='Loại công văn' data={selectCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-6' ref={e => this.status = e} label='Trạng thái' data={selectStatus} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>
 

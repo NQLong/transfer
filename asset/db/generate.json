@@ -2393,13 +2393,6 @@
                     "nullable": false,
                     "size": "1,0"
                 },
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "20,0"
-                },
                 "TEN": {
                     "value": "ten",
                     "dataType": "NVARCHAR2",
@@ -2413,6 +2406,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 1000
+                },
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88837\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -6732,6 +6732,13 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "SO_CONG_VAN": {
+                    "value": "soCongVan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [
@@ -13618,6 +13625,9 @@
             "active": true,
             "moduleName": "qtHopDongDonViTraLuong",
             "modelName": "qtHopDongDonViTraLuong",
+            "methods": {
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -13716,6 +13726,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "3,0"
+                },
+                "SO_HOP_DONG": {
+                    "value": "soHopDong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
