@@ -21,7 +21,7 @@ export function getDtChuanDauRaAll(done) {
                 T.notify('Lấy thông tin bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                dispatch({ type: DtChuanDauRaAll, items: data.items }); 
+                dispatch({ type: DtChuanDauRaAll, items: data.items });
                 if (done) done(data);
             }
         }, error => console.error(`GET: ${url}.`, error));
@@ -38,7 +38,7 @@ export function createDtChuanDauRa(item, done) {
                 if (done) done(data.error);
             } else {
                 T.notify('Tạo mới thông tin chuẩn đầu ra thành công!', 'success');
-                dispatch(getDtChuanDauRaAll(done));
+                dispatch(getDtChuanDauRaAll());
                 done && done();
             }
         }, () => T.notify('Tạo chuẩn đầu ra bị lỗi!', 'danger'));
@@ -70,7 +70,7 @@ export function updateDtChuanDauRa(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin chuẩn đầu ra thành công!', 'success');
-                dispatch(getDtChuanDauRaAll(done));
+                dispatch(getDtChuanDauRaAll());
                 done && done();
             }
         }, () => T.notify('Cập nhật thông tin chuẩn đầu ra bị lỗi!', 'danger'));

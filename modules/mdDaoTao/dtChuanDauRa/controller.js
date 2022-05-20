@@ -19,23 +19,23 @@ module.exports = app => {
     );
 
     //     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/user/dao-tao/chuan-dau-ra', app.permission.check('dtChuanDauRa:read'), app.templates.admin);
+    app.get('/user/dao-tao/chuan-dau-ra', app.permission.orCheck('dtChuanDauRa:read','dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
-    app.get('/api/dao-tao/chuan-dau-ra/all', app.permission.check('dtChuanDauRa:read'), (req,res) => {
+    app.get('/api/dao-tao/chuan-dau-ra/all', app.permission.orCheck('dtChuanDauRa:read','dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtChuanDauRa.getAll({}, '*', 'thangDoMin asc', (error, items) => {
-            res.send({ error, items});
+            res.send({ error, items });
         });
     });
 
-    app.post('/api/dao-tao/chuan-dau-ra', app.permission.check('dtChuanDauRa:write'), (req, res) => {
+    app.post('/api/dao-tao/chuan-dau-ra', app.permission.orCheck('dtChuanDauRa:write','dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtChuanDauRa.create(req.body.data, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/dao-tao/chuan-dau-ra', app.permission.check('dtChuanDauRa:delete'), (req, res) => {
+    app.delete('/api/dao-tao/chuan-dau-ra', app.permission.orCheck('dtChuanDauRa:delete','dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtChuanDauRa.delete({ id: req.body.id }, error => res.send({ error }));
     });
 
-    app.put('/api/dao-tao/chuan-dau-ra', app.permission.check('dtChuanDauRa:write'), (req, res) => {
+    app.put('/api/dao-tao/chuan-dau-ra', app.permission.orCheck('dtChuanDauRa:write','dtChuongTrinhDaoTao:manage'), (req, res) => {
         let changes = req.body.changes;
         app.model.dtChuanDauRa.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
     });

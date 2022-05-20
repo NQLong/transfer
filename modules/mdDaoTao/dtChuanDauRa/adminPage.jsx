@@ -6,9 +6,9 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBo
 class EditModal extends AdminModal {
     //Always begin with componentDidMount
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
+        this.onShown(() => {
             this.ten.focus();
-        }));
+        });
 
     }
     onShow = (item) => {
@@ -74,19 +74,16 @@ class DtChuanDauRaPage extends AdminPage {
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa chuẩn đầu ra', `Bạn có chắc bạn muốn xóa chuẩn đầu ra ${item.ten ? `<b>${item.ten}</b>` : 'này'} ?`, true, isConfirm => {
-            isConfirm && this.props.deleteDtChuanDauRa(item.id, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá chuẩn đầu ra ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá chuẩn đầu ra ${item.ten} thành công!`, 'success', false, 800);
-            });
+            isConfirm && this.props.deleteDtChuanDauRa(item.id);
         });
     }
 
     render() {
         const permission = this.getUserPermission('dtChuanDauRa');
-        let list = this.props.dtChuanDauRa && this.props.dtChuanDauRa.items? this.props.dtChuanDauRa.items : []; 
+        let list = this.props.dtChuanDauRa && this.props.dtChuanDauRa.items ? this.props.dtChuanDauRa.items : null;
         const table = renderTable({
             getDataSource: () => list, stickyHead: false,
-            emptyTable: 'Không có dữ liệu chuẩn đầu ra!',
+            emptyTable: 'Chưa có dữ liệu chuẩn đầu ra!',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto' }} nowrap='true'>#</th>
@@ -122,7 +119,7 @@ class DtChuanDauRaPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createDtChuanDauRa} update={this.props.updateDtChuanDauRa} />
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} create={this.props.createDtChuanDauRa} update={this.props.updateDtChuanDauRa} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
