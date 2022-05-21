@@ -183,6 +183,7 @@ module.exports = app => {
                 res.status(500).send({ error });
             } else {
                 app.model.canBo.create(newItem, (error, item) => {
+                    app.tccbSaveCRUD(req.session.user.email, 'C', 'Hồ sơ cán bộ');
                     res.send({ error, item });
                 });
             }
@@ -192,6 +193,7 @@ module.exports = app => {
     app.put('/api/staff', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
         shcc ? app.model.canBo.update({ shcc }, req.body.changes, (error, item) => {
+            req.session.user.permissions.includes('staff:write') && app.tccbSaveCRUD(req.session.user.email, 'U', 'Hồ sơ cán bộ');
             // if (item && !error) app.notification.send({ toEmail: item.email, title: 'Lý lịch được cập nhật thành công', subTitle: `Bởi ${req.session.user.lastName} ${req.session.user.firstName}`, icon: 'fa-check-square-o', iconColor: 'success' });
             res.send({ error, item });
         }) : res.send({ error: 'No permission' });
@@ -201,6 +203,7 @@ module.exports = app => {
 
     app.delete('/api/staff', app.permission.check('staff:delete'), (req, res) => {
         app.model.canBo.delete({ shcc: req.body.shcc }, error => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hồ sơ cán bộ');
             new Promise(resolve => {
                 app.model.quanHeCanBo.delete({ shcc: req.body.shcc }, () => {
                     resolve();
