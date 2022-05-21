@@ -12,7 +12,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/hop-dong-vien-chuc/group/:shcc'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/hop-dong-lam-viec/group/:shcc'),
                 shcc = route.parse(window.location.pathname);
             T.onSearch = (searchText) => {
                 this.props.getQtHopDongVienChucPage(undefined, undefined, searchText || '', shcc.shcc);
@@ -64,7 +64,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
                     <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
-                            <a href={'/user/tccb/qua-trinh/hop-dong-vien-chuc/' + item.ma}>
+                            <a href={'/user/tccb/qua-trinh/hop-dong-lam-viec/' + item.ma}>
                                 <span>{(item.hoBenB ? item.hoBenB : '') + ' ' + (item.tenBenB ? item.tenBenB : '')}</span><br />
                                 <span>{item.shcc}</span></a>
                         </>
@@ -95,7 +95,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
                             {item.shccNguoiKy ? <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link> : null}
                         </>
                     )} />
-                    <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-vien-chuc/${item.ma}`} onDelete={this.delete} permission={permission} >
+                    <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lam-viec/${item.ma}`} onDelete={this.delete} permission={permission} >
                         {/* <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                             <i className='fa fa-lg fa-file-word-o' />
                         </a> */}
@@ -110,7 +110,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
             title: 'Hợp đồng cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/qua-trinh/ky-hop-dong'>Hợp đồng viên chức</Link>,
+                <Link key={1} to='/user/tccb/qua-trinh/ky-hop-dong'>Hợp đồng làm việc</Link>,
                 'Hợp đồng cán bộ'
             ],
             content: <>
@@ -121,8 +121,8 @@ class QtHopDongVienChucGroupPage extends AdminPage {
                     {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtHopDongVienChucPage} />
             </>,
-            backRoute: '/user/tccb/qua-trinh/hop-dong-vien-chuc',
-            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-vien-chuc/new') : null
+            backRoute: '/user/tccb/qua-trinh/hop-dong-lam-viec',
+            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-lam-viec/new') : null
             ,
         });
     }

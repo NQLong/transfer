@@ -199,7 +199,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
                 <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
                 <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
-                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly}/>
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly} />
 
                 <div className='form-group col-md-4'>Các mốc thời gian: </div>
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Chưa kết thúc' onChange={this.handleKetThuc} className='form-group col-md-4' readOnly={readOnly} />
@@ -358,7 +358,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -460,7 +460,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             </>,
             backRoute: '/user/' + this.menu,
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.read ? (e) => {
                 e.preventDefault();
                 const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : {
                     maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0,

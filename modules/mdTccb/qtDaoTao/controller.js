@@ -2,7 +2,9 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3016: { title: 'Quá trình đào tạo, bồi dưỡng', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 5 },
+            3016: {
+                title: 'Quá trình đào tạo, bồi dưỡng', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#7ae6e6', groupIndex: 0, color: '#000000'
+            },
         },
     };
 

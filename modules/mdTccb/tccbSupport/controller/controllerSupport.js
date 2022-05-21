@@ -8,14 +8,14 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3049: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/tccb/support', icon: 'fa-universal-access', backgroundColor: '#49BDAA', pin: true },
+            3049: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/tccb/support', icon: 'fa-universal-access', backgroundColor: '#FE894F', pin: true },
         },
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1010: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/support', icon: 'fa-universal-access', backgroundColor: '#49BDAA', pin: true, subTitle: 'Phòng Tổ chức cán bộ' },
+            1010: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/support', icon: 'fa-universal-access', backgroundColor: '#FE894F', pin: true, subTitle: 'Phòng Tổ chức cán bộ' },
         },
     };
 
