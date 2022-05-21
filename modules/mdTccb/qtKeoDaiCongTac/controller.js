@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3035: { title: 'Quá trình kéo dài công tác', link: '/user/tccb/qua-trinh/keo-dai-cong-tac', icon: 'fa-hourglass-start', backgroundColor: '#9e4d4d', groupIndex: 1 },
+            3035: { title: 'Quá trình kéo dài công tác', link: '/user/tccb/qua-trinh/keo-dai-cong-tac', icon: 'fa-hourglass-start', backgroundColor: '#C68C2A', groupIndex: 1 },
         },
     };
     const menuStaff = {

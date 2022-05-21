@@ -985,6 +985,12 @@ export class AdminPage extends React.Component {
 
     showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
 
+    hideAdvanceSearch = () => {
+        $(this.advanceSearchBox).removeClass('show');
+        $(this.advanceSearchBox).addClass('hide');
+    }
+
+
     renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
 
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
