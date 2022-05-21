@@ -7,7 +7,6 @@ import { getTccbReply, createTccbSupportReply } from './redux';
 
 export class PhanHoiModal extends AdminModal {
     onShow = (item) => {
-        console.log(item);
         this.setState({ shcc: item.shcc });
         this.maYeuCau.value(item.maYeuCau);
         this.canBoYeuCau.value(item.canBoYeuCau);
