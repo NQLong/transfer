@@ -178,12 +178,20 @@ module.exports = app => {
         const newItem = req.body.canBo;
         app.model.canBo.get({ shcc: newItem.shcc }, (error, item) => {
             if (item) {
-                res.status(403).send({ error: { exist: true, message: 'Cán bộ ' + newItem.shcc.toString() + ' đã tồn tại' } });
+                res.send({ error: { exist: true, message: 'Cán bộ ' + newItem.shcc.toString() + ' đã tồn tại' } });
             } else if (error) {
-                res.status(500).send({ error });
+                res.send({ error });
             } else {
                 app.model.canBo.create(newItem, (error, item) => {
                     app.tccbSaveCRUD(req.session.user.email, 'C', 'Hồ sơ cán bộ');
+                    app.model.fwUser.create({
+                        email: item.email,
+                        active: 1,
+                        isStaff: 1,
+                        firstName: item.ho,
+                        lastName: item.ten,
+                        shcc: item.shcc
+                    });
                     res.send({ error, item });
                 });
             }
