@@ -84,14 +84,9 @@ class AdminSupportPage extends AdminPage {
                         : ''}</>} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={APPROVED_MAPPER[item.approved]} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<>
-                        {item.approved == 0 && <Tooltip title='Duyệt' arrow>
-                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.duyetYeuCau(item)}>
-                                <i className='fa fa-lg fa-check' />
-                            </button>
-                        </Tooltip>}
                         {item.approved != 1 && <Tooltip title='Phản hồi' arrow>
-                            <button className='btn btn-danger' onClick={e => e.preventDefault() || this.phanHoi.show({ maYeuCau: item.id, canBoYeuCau: item.canBoYeuCau, quaTrinh: QT_MAPPER[item.qt], shcc: item.shcc })}>
-                                <i className='fa fa-lg fa-times' />
+                            <button className='btn btn-danger' onClick={e => e.preventDefault() || this.phanHoi.show({ maYeuCau: item.id, canBoYeuCau: item.canBoYeuCau, quaTrinh: QT_MAPPER[item.qt] })}>
+                                <i className='fa fa-lg fa-comments-o' />
                             </button>
                         </Tooltip>}
                     </>
@@ -104,17 +99,17 @@ class AdminSupportPage extends AdminPage {
             title: 'Xử lý yêu cầu thông tin',
             icon: 'fa fa-universal-access',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Xử lý yêu cầu thông tin'
             ],
-            backRoute: '/user/tccb',
+            backRoute: '/user',
             content: <div className='tile'>
                 {table}
                 <Pagination getPage={this.props.getPageTccbSupport} {...{ pageNumber, pageSize, pageTotal, totalItem }} style={{ marginLeft: '70px' }} />
                 <DaoTaoModal ref={e => this.qtDaoTao = e} isSupport={true} readOnly={true} getItemQtDaoTao={this.props.getItemQtDaoTao} />
                 <SupportModal ref={e => this.canBo = e} readOnly={true} isSupport={true} getStaffEdit={this.props.getStaffEdit} />
                 <PhanHoiModal ref={e => this.phanHoi = e} permission={permission} />
-            </div>,
+            </div>
         });
     }
 }

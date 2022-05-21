@@ -103,8 +103,11 @@ export function getStaffAll(done) {
 
 export function getStaffEdit(shcc, done) {
     return dispatch => {
-        const url = `/api/staff/edit/item/${shcc}`;
-        T.get(url, data => {
+        let condition = {};
+        if (typeof shcc == 'object') condition = shcc;
+        else condition = { shcc };
+        const url = '/api/staff/edit/item';
+        T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);

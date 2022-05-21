@@ -1,4 +1,10 @@
 module.exports = app => {
+    let constant = require('../constantTccbSupport'),
+        { QT_MAPPER, ACTIONS } = constant;
+
+    const EMAIL_OF_SUPPORTERS = [
+        'doanthihong@hcmussh.edu.vn'
+    ];
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
@@ -6,19 +12,32 @@ module.exports = app => {
         },
     };
 
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1010: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/support', icon: 'fa-universal-access', backgroundColor: '#49BDAA', pin: true, subTitle: 'Phòng Tổ chức cán bộ' },
+        },
+    };
+
     app.permission.add(
         { name: 'tccbSupport:read', menu },
+        { name: 'staff:login', menu: menuStaff },
         { name: 'tccbSupport:write' },
         { name: 'tccbSupport:delete' },
     );
 
     app.get('/user/tccb/support', app.permission.check('tccbSupport:read'), app.templates.admin);
+    app.get('/user/support', app.permission.check('staff:login'), app.templates.admin);
 
     //APIs-------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/support/page/:pageNumber/:pageSize', app.permission.check('tccbSupport:read'), (req, res) => {
+    app.get('/api/tccb/support/page/:pageNumber/:pageSize', app.permission.orCheck('tccbSupport:read', 'staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        app.model.tccbSupport.searchPage(pageNumber, pageSize, '{}', '', (error, page) => {
+            pageSize = parseInt(req.params.pageSize),
+            permissions = req.session.user.permissions;
+        let shcc = req.session.user.staff.shcc;
+        if (permissions.includes('tccbSupport:read')) shcc = '';
+        let condition = { shcc };
+        app.model.tccbSupport.searchPage(pageNumber, pageSize, app.stringify(condition), '', (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -36,7 +55,25 @@ module.exports = app => {
             shcc = req.session.user.shcc;
         data = app.stringify(data);
         shcc ? app.model.tccbSupport.create({ data, ...dataTccbSupport, shcc, sentDate }, (error, item) => {
-            res.send({ error, item });
+            {
+                const sendNotification = (index = 0) => {
+                    if (index > EMAIL_OF_SUPPORTERS.length - 1) {
+                        res.send({ error, item });
+                        return;
+                    }
+                    else {
+                        app.notification.send({
+                            toEmail: EMAIL_OF_SUPPORTERS[index],
+                            title: 'Yêu cầu hỗ trợ',
+                            subTitle: `${ACTIONS[dataTccbSupport.type].text} ${QT_MAPPER[dataTccbSupport.qt]}`,
+                            icon: 'fa-universal-access',
+                            iconColor: ACTIONS[dataTccbSupport.type].background,
+                            link: '/user/tccb/support',
+                        }).then(() => sendNotification(index + 1));
+                    }
+                };
+                sendNotification();
+            }
         }) : res.send({ error: 'No permission!' });
     });
 
@@ -54,14 +91,13 @@ module.exports = app => {
         let changes = req.query.data, shcc = req.session.user?.shcc || '';
         let data = app.parse(changes.data);
         let { qt, type, qtId, id } = changes;
-
         const updateApproved = () => {
             app.model.tccbSupport.update({ id }, {
                 shccAssign: shcc,
                 modifiedDate: new Date().getTime(),
                 approved: 1
             }, (error, item) => {
-                res.send(error, item);
+                res.send({ error, item });
             });
         };
 
@@ -71,7 +107,6 @@ module.exports = app => {
             if (type == 'update') {
                 if (!qtId) {
                     res.send({ error: 'Invalid parameters' });
-                    return;
                 } else {
                     let condition = {};
                     switch (qt) {
@@ -81,8 +116,8 @@ module.exports = app => {
                             break;
                     }
                     app.model[qt][type](condition, data, (error, item) => {
-                        if (error || !item) {
-                            res.send({ error });
+                        if (error) {
+                            res.send({ error, item });
                         } else updateApproved();
                     });
                 }

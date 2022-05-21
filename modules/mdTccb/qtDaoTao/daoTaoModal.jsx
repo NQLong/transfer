@@ -215,7 +215,7 @@ export class DaoTaoModal extends AdminModal {
                 {
                     this.state.loaiBangCap ? ((![5, 99, 9].includes(this.state.loaiBangCap)) ?
                         <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
-                            className='col-md-6' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' readOnly={readOnly} />
+                            className='col-md-6' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label={this.state.loaiBangCap == 8 ? 'Chức danh nghề nghiệp' : 'Trình độ'} readOnly={readOnly} />
                         :
                         <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-6' label='Trình độ/Kết quả' required readOnly={readOnly} />) : null
                 }

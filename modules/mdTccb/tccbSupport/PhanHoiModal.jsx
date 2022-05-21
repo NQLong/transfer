@@ -7,6 +7,8 @@ import { getTccbReply, createTccbSupportReply } from './redux';
 
 export class PhanHoiModal extends AdminModal {
     onShow = (item) => {
+        console.log(item);
+        this.setState({ shcc: item.shcc });
         this.maYeuCau.value(item.maYeuCau);
         this.canBoYeuCau.value(item.canBoYeuCau);
         this.qt.value(item.quaTrinh);
@@ -20,7 +22,8 @@ export class PhanHoiModal extends AdminModal {
                 let dataPhanHoi = {
                     maYeuCau: getValue(this.maYeuCau),
                     noiDung: getValue(this.phanHoi),
-                    thoiGian: new Date().getTime()
+                    thoiGian: new Date().getTime(),
+                    canBoYeuCau: this.state.shcc
                 };
                 this.props.createTccbSupportReply(dataPhanHoi, () => {
                     this.phanHoi.clear();
@@ -37,6 +40,7 @@ export class PhanHoiModal extends AdminModal {
             item.content = item.noiDung;
             return item;
         });
+        const permission = this.props.permission;
         return this.renderModal({
             title: 'Phản hồi lý do từ chối yêu cầu',
             size: 'elarge',
@@ -49,13 +53,13 @@ export class PhanHoiModal extends AdminModal {
                 </div>
                 <h5 style={{ marginBottom: '15px' }}>Phản hồi</h5>
                 {comments && comments.length ? comments.map((comment, index) => comment.noiDung && <div key={index}><Comment data={comment} /></div>) : 'Chưa có phản hồi'}
-                <div className='row'>
+                {permission.write && <div className='row'>
                     <FormRichTextBox style={{ marginTop: '15px' }} className='col-md-12' ref={e => this.phanHoi = e} placeholder='Phản hồi' icon={
                         <button className='btn btn-primary' style={{ position: 'absolute', top: '20px', right: '30px' }} onClick={this.onSubmit}>
                             <i className='fa fa-lg fa-paper-plane' />
                         </button>
                     } />
-                </div>
+                </div>}
             </>
         });
     }

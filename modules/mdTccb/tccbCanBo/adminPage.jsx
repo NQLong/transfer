@@ -160,6 +160,17 @@ class StaffPage extends AdminPage {
         }
     }
 
+    export = (e, pageCondition) => {
+        e.preventDefault();
+        if (e.type == 'click') {
+            const filter = T.stringify(this.state.filter);
+            let pageC = pageCondition;
+            pageC = typeof pageC === 'string' ? pageC : '';
+            if (pageC.length == 0) pageC = null;
+            T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'DANH_SACH_CAN_BO.xlsx');
+            this.setState({ exported: true });
+        }
+    }
 
     render() {
         const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
@@ -287,14 +298,7 @@ class StaffPage extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission ? e => this.create(e) : null,
-            onExport: (e) => {
-                e.preventDefault();
-                const filter = T.stringify(this.state.filter);
-                let pageC = pageCondition;
-                pageC = typeof pageC === 'string' ? pageC : '';
-                if (pageC.length == 0) pageC = null;
-                T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'DANH_SACH_CAN_BO.xlsx');
-            }
+            onExport: !this.state.exported ? e => this.export(e, pageCondition) : null
         });
     }
 }
