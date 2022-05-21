@@ -25,11 +25,12 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.setState({ isLoading: false });
             const query = new URLSearchParams(this.props.location.search);
             const id = query.get('id');
+            const khoaDt = query.get('khoaDt');
             if (this.ma !== 'new') {
                 this.getData(this.ma);
             } else {
-                if (id > 0) {
-                    this.getData(id, true);
+                if (id >= 0 && khoaDt >= 0) {
+                    this.getData(id, true, khoaDt);
                     return;
                 }
                 this.maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
@@ -38,10 +39,9 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         });
     }
 
-    getData = (id, isClone = false) => {
+    getData = (id, isClone = false, khoaDt) => {
         this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
-            this.namDaoTao.value(!isClone ? data.namDaoTao : parseInt(data.namDaoTao) + 1);
             this.maNganh.value(data.maNganh);
             this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
             this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
@@ -51,9 +51,11 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
             this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
             const mucTieu = T.parse(data.mucTieu || '{}');
+            this.khoaDt = !isClone ? data.namDaoTao : khoaDt;
             this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
-                SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(data.namDaoTao, (rs) => {
+                SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(this.khoaDt, (rs) => {
                     this.setNamDaoTao(rs, mucTieu, ctdt);
+                    this.namDaoTao.value(rs.id);
                 });
             });
 
@@ -118,7 +120,8 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     }
 
     setNamDaoTao = (value, mucTieu, ctdt) => {
-        const { data } = value;
+        const { data, id } = value;
+        this.khoaDt = id;
         const mucCha = T.parse(data.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         this.setState({ mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao }, chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao } }, () => {
@@ -138,7 +141,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         const readOnly = !(permission.write || permission.manage),
             isPhongDaoTao = permission.write;
         const { mucTieuDaoTao, chuongTrinhDaoTao } = this.state;
-
         return this.renderPage({
             icon: 'fa fa-university',
             title: this.ma !== 'new' ? 'Chỉnh sửa chương trình đào tạo' : 'Tạo mới chương trình đào tạo',
@@ -224,7 +226,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 {
                     chuongTrinhDaoTao && chuongTrinhDaoTao.parents && Object.keys(chuongTrinhDaoTao.parents).map((key) => {
                         const childs = chuongTrinhDaoTao.childs;
-                        const pIdx = parseInt(key) + 1;
+                        const pIdx = `${this.khoaDt}_${key}`;
                         const { id, text } = chuongTrinhDaoTao.parents[key];
                         return (
                             <ComponentKienThuc key={pIdx} title={text} khoiKienThucId={id} childs={childs[key]} ref={e => this.chuongTrinh[key] = e} />

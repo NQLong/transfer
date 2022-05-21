@@ -16,7 +16,7 @@ module.exports = app => {
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3018: { title: 'Quá trình hướng dẫn đề tài', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 5 },
+            3018: { title: 'Quá trình hướng dẫn đề tài', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#E19443', groupIndex: 5 },
         },
     };
 

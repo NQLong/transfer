@@ -8,7 +8,6 @@ class ComponentTrinhDo extends AdminPage {
     state = { shcc: '', email: '' };
 
     value = (item) => {
-        console.log(item);
         item && this.setState({
             tienSi: (item.tienSi || item.daoTaoBoiDuong.some(i => i.tenTrinhDo == 'Tiến sĩ')) ? 1 : 0,
             thacSi: (item.thacSi || item.daoTaoBoiDuong.some(i => i.tenTrinhDo == 'Thạc sĩ')) ? 1 : 0,

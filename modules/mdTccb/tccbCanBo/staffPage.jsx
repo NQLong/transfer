@@ -78,7 +78,6 @@ class StaffUserPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
             shcc = this.props.system.user.staff.shcc;
-        if (permission.login && permission.write) permission.write = false;
 
         return this.renderPage({
             icon: 'fa fa-address-card-o',
@@ -97,8 +96,10 @@ class StaffUserPage extends AdminPage {
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
 
                 <SupportModal ref={e => this.supportModal = e} create={this.props.createTccbSupport} system={this.props.system} />
-                <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '125px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />
+                {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '125px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}
+
                 <CirclePageButton type='custom' tooltip='Tải về lý lịch 2C (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={this.downloadWord} />
+
                 <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
             </>,
             backRoute: '/user',

@@ -216,25 +216,30 @@ export class ComponentKienThuc extends AdminPage {
     setVal = (data = [], maKhoa, childs) => {
         this.maKhoa = maKhoa;
         if (childs) {
-            let length = {};
+            const length = {};
 
-            //add last row
-            const addLast = () => {
+            //add select monhoc row
+            const addSelectRow = () => {
                 let cIdx = 0;
-                const addLastRow = (childId, childText) => {
+                const addEmptySelectRow = (childId, childText) => {
                     if (childId < 0) return;
                     if (!length[childId]) length[childId] = 0;
                     this.addRow(length[childId], null, childId, childText, () => {
                         cIdx++;
-                        addLastRow(childs[cIdx]?.id || -1, childs[cIdx]?.value?.text || '');
+                        addEmptySelectRow(childs[cIdx]?.id || -1, childs[cIdx]?.value?.text || '');
                     });
                 };
-                addLastRow(childs[cIdx].id, childs[cIdx].value.text);
+                addEmptySelectRow(childs[cIdx].id, childs[cIdx].value.text);
             };
 
             const addRow = (item, idx) => {
+                if (item && item.maKhoiKienThucCon >= Object.keys(childs).length) {
+                    idx++;
+                    addRow(data[idx], idx);
+                    return;
+                }
                 if (!item) {
-                    addLast();
+                    addSelectRow();
                     return;
                 }
                 if (!length[item.maKhoiKienThucCon]) {
@@ -247,9 +252,6 @@ export class ComponentKienThuc extends AdminPage {
                 });
             };
             addRow(data[0], 0);
-
-
-
         } else {
             const addRow = (length, item) => {
                 if (!item) {
@@ -270,7 +272,6 @@ export class ComponentKienThuc extends AdminPage {
     render() {
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['read', 'manage', 'write', 'delete']);
         const title = this.props.title;
-
         let styleRow = (idx) => ({ backgroundColor: `${this.state.datas[idx]?.isDeleted ? '#ffdad9' : (!this.state.datas[idx]?.edit ? '#C8F7C8' : null)}` });
         let count = 1;
         const table = renderTable({

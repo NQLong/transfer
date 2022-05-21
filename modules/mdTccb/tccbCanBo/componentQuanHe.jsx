@@ -83,7 +83,6 @@ class ComponentQuanHe extends AdminPage {
     }
 
     value = (item) => {
-        console.log(item);
         this.setState({ phai: item.phai, shcc: item.shcc }, () => {
             this.setState({ voChongText: this.state.phai == '01' ? 'vợ' : 'chồng' });
         });

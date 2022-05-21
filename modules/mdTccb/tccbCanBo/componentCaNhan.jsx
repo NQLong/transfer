@@ -28,9 +28,7 @@ class ComponentCaNhan extends AdminPage {
     }
 
     value = (item) => {
-        console.log(item);
-        // item = this.props.staff || item;
-        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan }, () => {
+        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan, emailTruong: item.email }, () => {
             this.shcc = item.shcc;
             this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
             this.donVi.value(item.maDonVi);
@@ -118,6 +116,20 @@ class ComponentCaNhan extends AdminPage {
                     T.confirm('Cảnh báo', `Mã số <b>${data.item.shcc}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
                         }. <br/><br/> Vui lòng nhập mã số khác!`, 'warning', true, isConfirm => {
                             isConfirm && this.shcc.value('');
+                        });
+                }
+            });
+        }
+    }
+
+    handleEmailHCMUSSH = () => {
+        let curEmail = this.emailTruong.value();
+        if (curEmail && curEmail != '' && T.validateEmail(curEmail) && curEmail != this.state.emailTruong) {
+            this.props.getStaffEdit({ email: curEmail }, data => {
+                if (data.item && !data.error) {
+                    T.confirm('Cảnh báo', `Email <b>${data.item.email}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
+                        }. <br/><br/> Vui lòng nhập email khác!`, 'warning', true, isConfirm => {
+                            isConfirm && this.emailTruong.value('');
                         });
                 }
             });
@@ -229,7 +241,7 @@ class ComponentCaNhan extends AdminPage {
                     <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp' className='form-group col-md-4' />
                     <div className='form-group col-12' />
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân (khác email trường)' className='form-group col-md-6' />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={readOnly} onChange={this.handleEmailHCMUSSH} />
                     <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='SĐT cá nhân' className='col-md-6' maxLength={10} />
                     <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label={<span>SĐT báo tin (<a href='#' onClick={e => e.preventDefault() || (this.soDienThoaiCaNhan.value() ? this.soDienThoaiBaoTin.value(this.soDienThoaiCaNhan.value()) : T.notify('Điện thoại cá nhân trống', 'warning'))}>Nhấn vào đây nếu giống <b>SĐT cá nhân</b></a>)</span>} placeholder='SĐT báo tin' className='col-md-6' maxLength={10} />
 
