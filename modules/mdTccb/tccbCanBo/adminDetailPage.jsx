@@ -2,11 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
-    getStaffEdit, createStaff, updateStaff
+    getStaffEdit, createStaff, updateStaff, downloadWord
 } from './redux';
 import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import ComponentCaNhan from './componentCaNhan';
-import { AdminPage } from 'view/component/AdminPage';
+import { AdminPage, CirclePageButton } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
@@ -41,6 +41,13 @@ class CanBoPage extends AdminPage {
         });
     }
 
+    downloadWord = (e) => {
+        e.preventDefault();
+        this.shcc && this.props.downloadWord(this.shcc, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_2c.docx');
+        });
+    }
+
     setUp = (item) => {
         this.componentCaNhan?.value(item);
         this.componentTTCongTac?.value(item);
@@ -62,7 +69,6 @@ class CanBoPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('staff');
-        console.log(this.state.shcc);
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Hồ sơ cá nhân',
@@ -76,9 +82,10 @@ class CanBoPage extends AdminPage {
                 {!this.state.create && <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} phai={this.state.phai} />}
                 {!this.state.create && <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />}
                 {!this.state.create && <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />}
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch 2C (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={this.downloadWord} />
+                <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
             </>,
             backRoute: '/user/tccb/staff',
-            onSave: this.save,
         });
     }
 
@@ -86,6 +93,6 @@ class CanBoPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
-    getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,
+    getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll, downloadWord
 };
 export default connect(mapStateToProps, mapActionsToProps)(CanBoPage);

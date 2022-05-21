@@ -58,7 +58,7 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ketThucDangKy} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`) : null}
-                        onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)}>
+                    >
                         <Tooltip title='Sao chép' arrow>
                             <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)}>
                                 <i className='fa fa-lg fa-clone ' />

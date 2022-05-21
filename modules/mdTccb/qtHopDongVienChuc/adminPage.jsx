@@ -73,7 +73,7 @@ class QtHopDongVienChucPage extends AdminPage {
 
     download = (e) => {
         e.preventDefault();
-        T.download(T.url('/api/tccb/qua-trinh/hop-dong-vien-chuc/download-excel'), 'HDLD.xlsx');
+        T.download(T.url('/api/tccb/qua-trinh/hop-dong-lam-viec/download-excel'), 'HDLD.xlsx');
     }
 
     delete = (e, item) => {
@@ -120,7 +120,7 @@ class QtHopDongVienChucPage extends AdminPage {
                         <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href={'/user/tccb/qua-trinh/hop-dong-vien-chuc/' + item.ma}>
+                                <a href={'/user/tccb/qua-trinh/hop-dong-lam-viec/' + item.ma}>
                                     <span>{(item.hoBenB ? item.hoBenB : '') + ' ' + (item.tenBenB ? item.tenBenB : '')}</span><br />
                                     <span>{item.shcc}</span></a>
                             </>
@@ -159,7 +159,7 @@ class QtHopDongVienChucPage extends AdminPage {
                         }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={`/user/tccb/qua-trinh/hop-dong-vien-chuc/${item.ma}`} onDelete={this.delete} >
+                                onEdit={`/user/tccb/qua-trinh/hop-dong-lam-viec/${item.ma}`} onDelete={this.delete} >
                                 {/* <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                     <i className='fa fa-lg fa-file-word-o' />
                                 </a> */}
@@ -168,7 +168,7 @@ class QtHopDongVienChucPage extends AdminPage {
                         {
                             this.checked &&
                             <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item} permission={permission} >
-                                <Link className='btn btn-success' to={'/user/tccb/qua-trinh/hop-dong-vien-chuc/group/' + item.shcc} >
+                                <Link className='btn btn-success' to={'/user/tccb/qua-trinh/hop-dong-lam-viec/group/' + item.shcc} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -180,10 +180,10 @@ class QtHopDongVienChucPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-id-badge',
-            title: 'Hợp đồng viên chức',
+            title: 'Hợp đồng làm việc',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Hợp đồng viên chức'
+                'Hợp đồng làm việc'
             ],
             advanceSearch: <>
                 <div className='row'>
@@ -207,7 +207,7 @@ class QtHopDongVienChucPage extends AdminPage {
                 } */}
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-vien-chuc/new') : null
+            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-lam-viec/new') : null
             ,
         });
     }

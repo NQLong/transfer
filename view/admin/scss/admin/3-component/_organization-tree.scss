@@ -59,6 +59,7 @@
   .level-2-wrapper {
     position: relative;
     display: grid;
+    grid-column-gap: 1%;
   }
 
   .level-2-wrapper::before {
@@ -85,6 +86,10 @@
   .level-2-wrapper li {
     position: relative;
   }
+
+  // .lever-2-wrapper>li {
+  //   padding-left: 5px;
+  // }
 
   .level-2-wrapper > li::before {
     content: "";
