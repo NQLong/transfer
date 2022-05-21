@@ -28,7 +28,7 @@ const TYPE_MAPPER = {
 class AdminSupportPage extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user', () => {
             this.props.getPageTccbSupport();
         });
     }
