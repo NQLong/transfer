@@ -124,6 +124,9 @@ class StaffPage extends AdminPage {
                     this.fromAge.value('');
                     this.toAge.value('');
                     this.listChuyenNganh.value('');
+                    this.hideAdvanceSearch();
+                } else {
+                    this.hideAdvanceSearch();
                 }
             });
         });
@@ -275,7 +278,6 @@ class StaffPage extends AdminPage {
                     <FormTextBox className='col-md-2' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
 
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
-                        <div style={{ marginRight: '10px' }}>Tìm thấy: &nbsp;{<b>{totalItem}</b>} cán bộ</div>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                         </button>
@@ -287,6 +289,7 @@ class StaffPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
+                    <div style={{ marginBottom: '10px' }}>Kết quả: {<b>{totalItem}</b>} cán bộ</div>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />

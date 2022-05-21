@@ -34,7 +34,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             permissions = req.session.user.permissions;
-        let shcc = req.session.user.staff.shcc;
+        let shcc = req.session.user?.staff?.shcc;
         if (permissions.includes('tccbSupport:read')) shcc = '';
         let condition = { shcc };
         app.model.tccbSupport.searchPage(pageNumber, pageSize, app.stringify(condition), '', (error, page) => {

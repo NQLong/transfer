@@ -222,6 +222,10 @@ class AdminHeader extends AdminPage {
             this.searchBox && $(this.searchBox).parent().css('display', 'none');
             this.advancedSearch && $(this.advancedSearch).css('display', 'none');
         };
+
+        T.hideAdvancedSearch = () => {
+            this.advancedSearch && $(this.advancedSearch).css('display', 'none');
+        };
         T.clearSearchBox = () => {
             if (this.searchBox) this.searchBox.value = '';
         };

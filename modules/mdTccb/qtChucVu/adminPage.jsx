@@ -114,7 +114,7 @@ export class EditModal extends AdminModal {
             return true;
         }
         return false;
-    }   
+    }
 
     handleThoiChucVu = (value) => {
         value ? $('#soQdThoiChucVu').show() : $('#soQdThoiChucVu').hide();
@@ -158,7 +158,6 @@ class QtChucVu extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.timeType?.value(0);
                 this.fromYear?.value('');
@@ -166,12 +165,10 @@ class QtChucVu extends AdminPage {
                 this.maDonVi?.value('');
                 this.mulCanBo?.value('');
                 this.gioiTinh?.value('');
-                setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
             }
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -188,34 +185,38 @@ class QtChucVu extends AdminPage {
         const listChucDanh = this.mulMaChucDanh?.value().toString() || '';
         const fromAge = this.fromAge?.value();
         const toAge = this.toAge?.value();
-        const pageFilter = isInitial ? null : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
+        const filterCookie = T.storage('pageQtChucVu').F;
+        const pageFilter = isInitial ? filterCookie : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
         this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.listDonVi);
-                    this.mulCanBo?.value(filter.listShcc);
-                    this.timeType?.value(filter.timeType);
-                    this.mulMaChucVu?.value(filter.listChucVu);
-                    this.gioiTinh?.value(filter.gioiTinh);
-                    this.mulMaChucDanh?.value(filter.listChucDanh);
-                    this.fromAge?.value(filter.fromAge);
-                    this.toAge?.value(filter.toAge);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDonVi || filter.timeType || filter.listChucVu || filter.gioiTinh || filter.listChucDanh || filter.fromAge || filter.toYear)) this.showAdvanceSearch();
-                } else if (isReset) {
-                    this.fromYear?.value('');
-                    this.toYear?.value('');
-                    this.maDonVi.value('');
-                    this.mulCanBo.value('');
-                    this.timeType.value('');
-                    this.mulMaChucVu.value('');
-                    this.gioiTinh.value('');
-                    this.mulMaChucDanh.value('');
-                    this.fromAge.value('');
-                    this.toAge.value('');
+                    this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
+                    this.toYear?.value(filter.toYear || filterCookie.toYear || '');
+                    this.maDonVi?.value(filter.listDonVi || filterCookie.listDonVi);
+                    this.mulCanBo?.value(filter.listShcc || filterCookie.listShcc);
+                    this.timeType?.value(filter.timeType || filterCookie.timeType);
+                    this.mulMaChucVu?.value(filter.listChucVu || filterCookie.listChucVu);
+                    this.gioiTinh?.value(filter.gioiTinh || filterCookie.gioiTinh);
+                    this.mulMaChucDanh?.value(filter.listChucDanh || filterCookie.listChucDanh);
+                    this.fromAge?.value(filter.fromAge || filterCookie.fromAge);
+                    this.toAge?.value(filter.toAge || filterCookie.toAge);
+                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && this.showAdvanceSearch();
+                } else {
+                    this.hideAdvanceSearch();
+                    if (isReset) {
+                        this.fromYear?.value('');
+                        this.toYear?.value('');
+                        this.maDonVi.value('');
+                        this.mulCanBo.value('');
+                        this.timeType.value('');
+                        this.mulMaChucVu.value('');
+                        this.gioiTinh.value('');
+                        this.mulMaChucDanh.value('');
+                        this.fromAge.value('');
+                        this.toAge.value('');
+                    }
                 }
             });
         });
@@ -246,7 +247,7 @@ class QtChucVu extends AdminPage {
         for (let i = 0; i < dsChucVuSplitted.length; i++) {
             dsDonViSplitted[i] = dsDonViSplitted[i].trim();
             dsBomonSplitted[i] = dsBomonSplitted[i].trim();
-            danhSach.push(<span key={i}>{i+1}. {dsChucVuSplitted[i]} ({dsBomonSplitted[i] ? dsBomonSplitted[i] : (dsDonViSplitted[i] ? dsDonViSplitted[i] : '')}){i != dsChucVuSplitted.length - 1 ? <br/> : ''}</span>);
+            danhSach.push(<span key={i}>- {dsChucVuSplitted[i]}: {dsBomonSplitted[i] ? dsBomonSplitted[i] : (dsDonViSplitted[i] ? dsDonViSplitted[i] : '')}{i != dsChucVuSplitted.length - 1 ? <br /> : ''}</span>);
         }
         return danhSach;
     }
@@ -272,66 +273,21 @@ class QtChucVu extends AdminPage {
                 this.props.qtChucVu.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
             : (this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let fullTable = renderTable({
-                getDataSource: () => list, stickyHead: true,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh<br/>nghề nghiệp</th>
-                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp trường</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp khoa</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ số phụ cấp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định<br/>bổ nhiệm</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
-                    </tr>
-                ),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{item.ho + ' ' + item.ten}</span><br />
-                                <a href='#' onClick={() => this.modal.show(item)}>{item.shcc}</a>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={item.ngayRaQuyetDinh ? new Date(item.ngaySinh).ddmmyyyy() : ''}/>
-                        <TableCell type='text' content={item.chucDanhNgheNghiep}/>
-                        <TableCell type='text' content={item.tenChucVu}/>
-                        <TableCell type='text' content={item.tenDonVi}/>
-                        <TableCell type='text' content={item.tenBoMon}/>
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.phuCap}/>
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>Số: {item.soQuyetDinh}</span><br />
-                                <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? new Date(item.ngayRaQuyetDinh).ddmmyyyy() : ''}</span></span>
-                            </>
-                        )}
-                        />
-                        <TableCell type='checkbox' content={item.chucVuChinh} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                        </TableCell>
-                    </tr>
-                )
-            });
-
-        let groupTable = renderTable({
             getDataSource: () => list, stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th>
-                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách chức vụ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh<br />nghề nghiệp</th>
+                    <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Chức vụ</th>
+                    <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Đơn vị</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định<br />bổ nhiệm</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
-                <tr>
+                <tr key={index} style={{ backgroundColor: item.chucVuChinh ? '#d4f2dc' : '' }}>
                     <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
@@ -340,7 +296,46 @@ class QtChucVu extends AdminPage {
                         </>
                     )}
                     />
-                    <TableCell type='text' content={item.soChucVu} />
+                    <TableCell type='text' content={item.ngayRaQuyetDinh ? new Date(item.ngaySinh).ddmmyyyy() : ''} />
+                    <TableCell type='text' content={item.chucDanhNgheNghiep} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>{item.tenBoMon ? <>{item.tenBoMon}<br /> </> : ''}  {item.tenDonVi}</>} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span>Số: {item.soQuyetDinh}</span><br />
+                            <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? new Date(item.ngayRaQuyetDinh).ddmmyyyy() : ''}</span></span>
+                        </>
+                    )}
+                    />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                    </TableCell>
+                </tr>
+            )
+        });
+
+        let groupTable = renderTable({
+            getDataSource: () => list, stickyHead: true,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chi tiết chức vụ</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span>{item.ho + ' ' + item.ten}</span><br />
+                            <a href='#' onClick={() => this.modal.show(item)}>{item.shcc}</a>
+                        </>
+                    )}
+                    />
+                    <TableCell type='text' content={item.soChucVu} style={{ textAlign: 'right' }} />
                     <TableCell type='text' content={this.list(item.danhSachChucVu, item.danhSachDonVi, item.danhSachBoMon)} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
                         <Link className='btn btn-success' to={`/user/tccb/qua-trinh/chuc-vu/group/${item.shcc}`} >
@@ -360,9 +355,9 @@ class QtChucVu extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={value => {this.checkTimeType(value);}} />
-                    {this.state.timeType != 0 && <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ'/>}
-                    {(this.state.timeType != 0) ? <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' /> : <div className='col-lg-9' />} 
+                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={value => { this.checkTimeType(value); }} />
+                    {this.state.timeType != 0 && <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ' />}
+                    {(this.state.timeType != 0) ? <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' /> : <div className='col-lg-9' />}
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-4' data={[
@@ -372,11 +367,10 @@ class QtChucVu extends AdminPage {
                     <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucDanh = e} label='Theo chức danh nghề nghiệp' data={SelectAdapter_DmNgachCdnnV2} allowClear={true} minimumResultsForSearch={-1} />
                     <FormTextBox type='number' className='col-md-3' ref={e => this.fromAge = e} label='Từ độ tuổi' />
-                    <FormTextBox type='number' className='col-md-3' ref={e => this.toAge = e} label='Tới độ tuổi'    />
+                    <FormTextBox type='number' className='col-md-3' ref={e => this.toAge = e} label='Tới độ tuổi' />
                     <div className='col-12'>
                         <div className='row justify-content-between'>
-                            <div className='col-md-6'>Tìm thấy: <b>{totalItem}</b> kết quả</div>
-                            <div className='form-group col-md-6' style={{ textAlign:'right' }}>
+                            <div className='form-group col-md-12' style={{ textAlign: 'right' }}>
                                 <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                                     <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                                 </button>
@@ -390,7 +384,11 @@ class QtChucVu extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                        <div style={{ marginBottom: '10px' }}>Tìm thấy: <b>{totalItem}</b> kết quả.</div>
+                    </div>
+
                     {this.checked ? groupTable : fullTable}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
