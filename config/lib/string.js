@@ -16,6 +16,15 @@ module.exports = app => {
         return result.join(' ');
     };
     
+    String.prototype.getFirstLetters = function () {
+        const firstLetters = this
+            .toUpperCase()
+            .split(' ')
+            .map(word => word[0])
+            .join('');
+        return firstLetters;
+    };
+
     app.randomPassword = (length) => Math.random().toString(36).slice(-length);
 
     app.toEngWord = (str) => {
