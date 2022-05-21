@@ -20,12 +20,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let filter = '{}';
-        try {
-            filter = JSON.stringify(req.query.filter || {});
-        } catch (error) {
-            console.log(error);
-        }
+        let filter = app.stringify(req.query.filter || {});
         app.model.qtChucVu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -41,12 +36,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let filter = '{}';
-        try {
-            filter = JSON.stringify(req.query.filter || {});
-        } catch (error) {
-            console.log(error);
-        }
+        let filter = app.stringify(req.query.filter || {});
         app.model.qtChucVu.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

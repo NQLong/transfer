@@ -156,8 +156,9 @@ class QtChucVu extends AdminPage {
     state = { filter: {}, timeType: 0 };
 
     componentDidMount() {
+        T.clearSearchBox();
         T.ready('/user/tccb', () => {
-            T.clearSearchBox();
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.timeType?.value(0);
                 this.fromYear?.value('');
@@ -297,8 +298,8 @@ class QtChucVu extends AdminPage {
                     )}
                     />
                     <TableCell type='text' content={item.ngayRaQuyetDinh ? new Date(item.ngaySinh).ddmmyyyy() : ''} />
-                    <TableCell type='text' content={item.chucDanhNgheNghiep} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu} />
+                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.chucDanhNgheNghiep} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<b>{item.tenChucVu}</b>} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>{item.tenBoMon ? <>{item.tenBoMon}<br /> </> : ''}  {item.tenDonVi}</>} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>

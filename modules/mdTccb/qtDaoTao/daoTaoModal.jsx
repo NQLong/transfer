@@ -47,7 +47,7 @@ export class DaoTaoModal extends AdminModal {
         this.setState({
             batDauType: batDauType || 'dd/mm/yyyy',
             ketThucType: ketThucType || 'dd/mm/yyyy',
-            batDau: Number(batDau), ketThuc: Number(ketThuc), listFile, shcc, id, loaiBangCap: loaiBangCap ? Number(loaiBangCap) : null, denNay: ketThuc == -1
+            batDau: Number(batDau), ketThuc: Number(ketThuc), listFile, shcc: shcc || data.shcc, id, loaiBangCap: loaiBangCap ? Number(loaiBangCap) : null, denNay: ketThuc == -1
         }, () => {
             this.canBo.value(this.state.shcc || '');
             this.loaiBangCap.value(this.state.loaiBangCap);
