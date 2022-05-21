@@ -1,6 +1,8 @@
 module.exports = app => {
     const FILE_TYPE = 'DI';
 
+    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action } = require('../constant');
+
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
@@ -35,8 +37,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo, status } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
-            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null, congVanLaySo: null, status: null },
+        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, status } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null, status: null },
             donViXem = '', canBoXem = '';
 
         const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
@@ -55,7 +57,7 @@ module.exports = app => {
             canBoXem = '';
         }
 
-        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, congVanLaySo, status ? status.toString() : status, searchTerm, (error, page) => {
+        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -193,21 +195,39 @@ module.exports = app => {
                         if (errors)
                             res.send({ errors, item });
                         else {
-                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
-                                updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
+                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_DI_TYPE }, () => createDonViNhan(donViNhan, req.body.id, () => {
+                                updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: action.APPROVE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
+                                    res.send({ error, item });
+                                }));
                             }));
                         }
                     });
                 }
             });
         } else {
-            app.model.hcthCongVanDi.update({ id: req.body.id }, changes, (errors, item) => {
-                if (errors)
-                    res.send({ errors, item });
+            app.model.hcthCongVanDi.get({ id: req.body.id }, (error, congVan) => {
+                if (error) res.send({ error, congVan });
                 else {
-                    app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
-                        updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
-                    }));
+                    app.model.hcthCongVanDi.update({ id: req.body.id }, changes, (errors, item) => {
+                        if (errors)
+                            res.send({ errors, item });
+                        else {
+                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
+                                updateListFile(fileList, req.body.id, () => {
+                                    const trangThaiBefore = congVan.trangThai;
+                                    const trangThaiAfter = item.trangThai;
+                                    let hanhDong;
+                                    if (trangThaiBefore == trangThaiCongVanDi.MOI.id && [trangThaiCongVanDi.CHO_KIEM_TRA.id, trangThaiCongVanDi.DA_GUI.id].includes(trangThaiAfter)) {
+                                        hanhDong = action.SEND;
+                                    } else hanhDong = action.UPDATE;
+                                    app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: hanhDong, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
+                                        onStatusChange(item, trangThaiBefore, trangThaiAfter);
+                                        res.send({ error, item });
+                                    });
+                                }); 
+                            }));
+                        }
+                    });
                 }
             });
         }
@@ -434,56 +454,56 @@ module.exports = app => {
         }
     };
 
-    app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), async (req, res) => {
-        try {
-            const {
-                loai,
-                key,
-                shcc,
-                hanhDong,
-                thoiGian,
-                trangThai
-            } = req.body.data;
+    // app.put('/api/hcth/cong-van-cac-phong/lich-su', app.permission.check('staff:login'), async (req, res) => {
+    //     try {
+    //         const {
+    //             loai,
+    //             key,
+    //             shcc,
+    //             hanhDong,
+    //             thoiGian,
+    //             trangThai
+    //         } = req.body.data;
 
-            const newHistory = {
-                loai,
-                key: Number(key),
-                shcc,
-                hanhDong,
-                thoiGian: Number(thoiGian)
-            };
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id: key });
-            await app.model.hcthHistory.asyncCreate(newHistory);
-            const canBoGui = await app.model.hcthHistory.getStaff({ key: key, hanhDong: 'CREATE' }, 'shcc', '');
+    //         const newHistory = {
+    //             loai,
+    //             key: Number(key),
+    //             shcc,
+    //             hanhDong,
+    //             thoiGian: Number(thoiGian)
+    //         };
+    //         const congVan = await app.model.hcthCongVanDi.getCVD({ id: key });
+    //         await app.model.hcthHistory.asyncCreate(newHistory);
+    //         const canBoGui = await app.model.hcthHistory.getStaff({ key: key, hanhDong: 'CREATE' }, 'shcc', '');
 
-            const beforeStatus = congVan.trangThai;
-            const afterStatus = trangThai;
+    //         const beforeStatus = congVan.trangThai;
+    //         const afterStatus = trangThai;
 
-            await onCreateNotification(congVan, beforeStatus, afterStatus, canBoGui.shcc);
-        } catch (error) {
-            res.send({ error });
-        }
-    });
+    //         await onCreateNotification(congVan, beforeStatus, afterStatus, canBoGui.shcc);
+    //     } catch (error) {
+    //         res.send({ error });
+    //     }
+    // });
 
-    const onCreateNotification = (item, before, after, shcc) => new Promise((resolve) => {
-        try {
-            if (before == after) {
-                resolve();
-            }
-            if (after == '2') {
-                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
-            } else if (after == '3') {
-                createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => { throw error; });
-            } else if (after == '5') {
-                createStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
-            } else if (after == '4') {
-                createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => { throw error; });
-            }
-        } catch (error) {
-            console.error(error);
-            resolve();
-        }
-    });
+    // const onCreateNotification = (item, before, after, shcc) => new Promise((resolve) => {
+    //     try {
+    //         if (before == after) {
+    //             resolve();
+    //         }
+    //         if (after == '2') {
+    //             createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+    //         } else if (after == '3') {
+    //             createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+    //         } else if (after == '5') {
+    //             createStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+    //         } else if (after == '4') {
+    //             createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => { throw error; });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         resolve();
+    //     }
+    // });
 
     app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
@@ -643,6 +663,90 @@ module.exports = app => {
                     res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
                 }
             });
+        }
+    });
+
+    const updateCongVanDi = (id, changes) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDi.update({ id }, changes, (error, item) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(item);
+            }
+        });
+    });
+
+    const statusToAction = (before, after) => {
+        switch (before) {
+            case trangThaiCongVanDi.MOI.id:
+            case trangThaiCongVanDi.TRA_LAI.id:
+                if (before == after) {
+                    return action.UPDATE;
+                }
+                return action.SEND;
+            case trangThaiCongVanDi.CHO_KIEM_TRA.id:
+                if (after == trangThaiCongVanDi.TRA_LAI.id)
+                    return action.RETURN;
+                else
+                    return action.ACCEPT;
+            case trangThaiCongVanDi.CHO_DUYET.id:
+                if (after == trangThaiCongVanDi.TRA_LAI.id)
+                    return action.RETURN;
+                else
+                    return action.APPROVE;
+            case trangThaiCongVanDi.DA_GUI.id:
+                return action.READ;
+            default:
+                return '';
+        }
+    };
+
+    app.put('/api/hcth/cong-van-cac-phong/status', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            let { id, trangThai } = req.body.data;
+            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
+            if (congVan.trangThai == trangThai || !trangThai) {
+                res.send({ error: null, item: congVan });
+            } else {
+                const newCongVan = await updateCongVanDi(id, { trangThai });
+                await app.model.hcthHistory.asyncCreate({
+                    key: id, loai: CONG_VAN_DI_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc, hanhDong: statusToAction(congVan.trangThai, trangThai)
+                });
+                const canBoGui = await app.model.hcthHistory.getStaff({ key: id, hanhDong: 'CREATE' }, 'shcc', '');
+                console.log(canBoGui);
+                await onStatusChange(newCongVan, congVan.trangThai, trangThai, canBoGui.shcc);
+                res.send({ newCongVan });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/hcth/cong-van-cac-phong/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = parseInt(req.params.id);
+            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_DI_TYPE);
+            res.send({ error: null, item: phanHoi });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    const onStatusChange = (item, before, after, shcc) => new Promise((resolve) => {
+        try {
+            if (before == after) resolve();
+            if (after == trangThaiCongVanDi.CHO_KIEM_TRA.id) {
+                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+            } else if (after == trangThaiCongVanDi.CHO_DUYET.id) {
+                createSchoolAdministratorNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+            } else if (after == trangThaiCongVanDi.DA_GUI.id) {
+                createStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+            } else if (after == trangThaiCongVanDi.TRA_LAI.id) {
+                createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch(error => { throw error; });
+            }
+        } catch (error) {
+            console.error(error);
+            resolve();
         }
     });
 };
