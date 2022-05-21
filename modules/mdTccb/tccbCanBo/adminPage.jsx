@@ -149,7 +149,7 @@ class StaffPage extends AdminPage {
 
     handleBienChe = (value) => {
         if (value && value.id == '1') {
-            this.setState({ visibleHDTN: true });
+            this.setState({ visibleHDTN: true }, () => this.loaiHopDong.focus());
         } else {
             this.setState({ visibleHDTN: false });
         }
@@ -157,7 +157,7 @@ class StaffPage extends AdminPage {
 
     handleChucDanhNgheNghiep = () => {
         if (this.listNgach.value().includes('01.003')) {
-            this.setState({ visibleCVDT: true });
+            this.setState({ visibleCVDT: true }, () => this.loaiChuyenVien.focus());
         } else {
             this.setState({ visibleCVDT: false });
         }
@@ -250,32 +250,32 @@ class StaffPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect ref={e => this.listDonVi = e} className='col-md-5' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
-                    <FormSelect ref={e => this.listShcc = e} className='col-md-5' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.listDonVi = e} className='col-md-4' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.listShcc = e} className='col-md-4' label='Lọc theo cán bộ' data={SelectAdapter_FwCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
 
-                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-2' minimumResultsForSearch={-1} allowClear />
-                    <FormSelect className='col-md-3' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
-                    <FormSelect className='col-md-6' ref={e => this.listChuyenNganh = e} data={SelectAdapter_ChuyenNganhCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chuyên ngành' />
-                    <FormSelect className='col-md-3' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
+                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-4' minimumResultsForSearch={-1} allowClear />
                     <FormSelect className='col-md-3' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh khoa học' />
+                    <FormSelect className='col-md-3' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
+                    <FormSelect className='col-md-3' ref={e => this.listChuyenNganh = e} data={SelectAdapter_ChuyenNganhCanBo} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chuyên ngành' />
+                    <FormSelect className='col-md-3' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
 
-                    <FormSelect className='col-md-6' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
-
+                    <FormSelect className='col-md-3' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV3} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' onChange={this.handleChucDanhNgheNghiep} />
+                    {this.state.visibleCVDT ? <FormSelect className='col-md-3' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên' /> : <div className='form-group col-md-3' />}
                     <FormSelect ref={e => this.isBienChe = e} data={
                         [{ id: 0, text: 'Biên chế' }, { id: 1, text: 'Hợp đồng' }]
-                    } className='col-md-3' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' onChange={this.handleBienChe} />
-                    {this.state.visibleHDTN == true && <FormSelect className='col-md-6' ref={e => this.loaiHopDong = e} data={[{ id: 0, text: 'Viên chức + Lao động' }, { id: 1, text: 'Trách nhiệm' }]} minimumResultsForSearch={-1} allowClear label='Lọc theo loại hợp đồng' />}
-
-                    {this.state.visibleCVDT && <FormSelect className='col-md-6' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên' />}
+                    } className='col-md-3' minimumResultsForSearch={-1} allowClear label='Lọc theo loại cán bộ' onChange={this.handleBienChe} />
+                    {this.state.visibleHDTN == true ? <FormSelect className='col-md-3' ref={e => this.loaiHopDong = e} data={[{ id: 0, text: 'Viên chức + Lao động' }, { id: 1, text: 'Trách nhiệm' }]} minimumResultsForSearch={-1} allowClear label='Loại hợp đồng' /> : <div className='form-group col-md-3' />}
 
 
-                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-md-6' label='Từ thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
-                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-md-6' label='Đến thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
 
-                    <FormSelect className='col-md-4' ref={e => this.listDanToc = e} data={SelectAdapter_DmDanTocV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo dân tộc' />
-                    <FormSelect className='col-md-4' ref={e => this.listTonGiao = e} data={SelectAdapter_DmTonGiaoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo tôn giáo' />
-                    <FormTextBox className='col-md-2' type='number' ref={e => this.fromAge = e} label='Từ độ tuổi' />
-                    <FormTextBox className='col-md-2' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
+
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-md-6' label='Từ thời gian (bắt đầu công tác)' />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-md-6' label='Đến thời gian (bắt đầu công tác)' />
+
+                    <FormSelect className='col-md-3' ref={e => this.listDanToc = e} data={SelectAdapter_DmDanTocV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo dân tộc' />
+                    <FormSelect className='col-md-3' ref={e => this.listTonGiao = e} data={SelectAdapter_DmTonGiaoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo tôn giáo' />
+                    <FormTextBox className='col-md-3' type='number' ref={e => this.fromAge = e} label='Từ độ tuổi' />
+                    <FormTextBox className='col-md-3' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
 
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
