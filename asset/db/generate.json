@@ -6712,19 +6712,26 @@
                     "nullable": true,
                     "size": 10
                 },
-                "LAY_SO": {
-                    "value": "laySo",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "LOAI_CONG_VAN": {
                     "value": "loaiCongVan",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "SO_DI": {
+                    "value": "soDi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "SO_CONG_VAN": {
+                    "value": "soCongVan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [
