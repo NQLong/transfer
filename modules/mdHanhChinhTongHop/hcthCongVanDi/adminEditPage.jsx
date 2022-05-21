@@ -14,6 +14,7 @@ import {
     // getHistory
 } from './redux';
 import { Link } from 'react-router-dom';
+import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
 import {
     AdminPage,
     FormDatePicker,
@@ -32,7 +33,8 @@ import {
     SelectAdapter_DmDonViFilter,
 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import {
-    SelectAdapter_DmDonViGuiCongVan
+    SelectAdapter_DmDonViGuiCongVan,
+    createDmDonViGuiCv
 } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import {
     SelectAdapter_DmLoaiCongVan
@@ -468,6 +470,17 @@ class AdminEditPage extends AdminPage {
         }
     }
 
+    onCreateDonviGui = (data, done) => {
+        this.props.createDmDonViGuiCv(data, ({ error, item }) => {
+            if (!error) {
+                const { id } = item;
+                this.donViGui?.value(id);
+                done && done({ error, item });
+            }
+            this.modal.hide();
+        });
+    }
+
     tableListFile = (data, id, permission, addFile) => renderTable({
         getDataSource: () => data,
         stickyHead: false,
@@ -528,6 +541,7 @@ class AdminEditPage extends AdminPage {
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
             unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
+            dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
             buttons = [],
             { breadcrumb, backRoute } = this.getSiteSetting();
 
@@ -617,13 +631,20 @@ class AdminEditPage extends AdminPage {
                         }
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readCondition} readOnlyEmptyText='Chưa có ngày gửi' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readCondition} readOnlyEmptyText='Chưa có ngày ký' />
-                        <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi' readOnly={readCondition ? 1 : 0} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} required readOnlyEmptyText='Chưa có đơn vị gửi' />
+                        <FormSelect className='col-md-12' ref={e => this.donViGui = e} label={(<span onClick={(e) => e.stopPropagation()}>
+                            <span style={{ marginRight: '2px'}}>Đơn vị gửi </span>
+                            {!readCondition && <>
+                                (
+                                <Link to='#' onClick={() => this.modal.show(null)}>Nhấn vào đây để thêm</Link>
+                                ) </>
+                            }
+                        </span>)} readOnly={readCondition} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} required readOnlyEmptyText='Chưa có đơn vị gửi' />
                         <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.noiBo = e} label='Công văn nội bộ' readOnly={readCondition} onChange={value => this.setState({ noiBo: value })}></FormCheckbox>
                         <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.laySo = e} label='Công văn lấy số' readOnly={readCondition} onChange={value => this.setState({ laySo: value })}></FormCheckbox>
                         {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
                         {!this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận bên ngoài' placeholder='Đơn vị nhận' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
                         {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Cán bộ nhận' placeholder='Cán bộ nhận' ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readCondition} readOnlyEmptyText='Chưa có cán bộ nhận' /> : null}
-                        <FormSelect className='col-md-12' allowClear={true} label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có loại công văn' />
+                        <FormSelect className='col-md-12' allowClear={true} label='Loại văn bản' placeholder='Chọn loại văn bản' ref={e => this.loaiCongVan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có loại công văn' />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readCondition} required readOnlyEmptyText=': Chưa có trích yếu' />
                     </div>
                     {/* <div className='tile-body row d-flex justify-content-end'>
@@ -685,6 +706,10 @@ class AdminEditPage extends AdminPage {
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
                     </div>
                 }
+                <EditModal ref={e => this.modal = e}
+                    permissions={dmDonViGuiCvPermission}
+                    create={this.onCreateDonviGui}
+                />
 
             </>),
             backRoute,
@@ -706,6 +731,7 @@ const mapActionsToProps = {
     getCongVanDi,
     createPhanHoi,
     createHistory,
+    createDmDonViGuiCv
     // getHistory
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
