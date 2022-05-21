@@ -22,7 +22,7 @@ import {
     FormRichTextBox,
     FormSelect,
     TableCell,
-    FormCheckbox,
+    // FormCheckbox,
     FormFileBox,
     FormTextBox,
     renderComment,
@@ -70,6 +70,17 @@ const listTrangThai = {
     '7': {
         status: 'Đã duyệt',
         color: 'green'
+    }
+};
+
+const listLoaiCongVan = {
+    CONG_VAN_DON_VI: {
+        id: 1,
+        text: 'Công văn đơn vị' 
+    },
+    CONG_VAN_TRUONG: {
+        id: 2,
+        text: 'Công văn trường'
     }
 };
 
@@ -257,28 +268,27 @@ class AdminEditPage extends AdminPage {
     }
 
     setData = (data = null) => {
-        let { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, noiBo, laySo, history = [], soDi } = data ? data :
-            { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai, trangThai: '', loaiCongVan: '', noiBo: 1, laySo: 1, soDi: '' };
+        let { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi } = data ? data :
+            { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai: '', trangThai: '', loaiVanBan: '',  loaiCongVan: 1, soDi: '' };
 
         this.trichYeu.value(trichYeu);
         this.ngayGui.value(ngayGui);
         this.ngayKy.value(ngayKy);
         this.donViGui.value(donViGui);
-        this.loaiCongVan.value(loaiCongVan ? parseInt(loaiCongVan) : '');
+        
+        this.loaiVanBan.value(loaiVanBan);
         this.phanHoi?.value('');
 
         this.setState({
             soDi,
-            noiBo,
             trangThai,
             id,
             donViGui,
             donViNhan,
-            laySo,
+            loaiCongVan,
             history
         }, () => {
-            this.noiBo.value(this.state.noiBo);
-            this.laySo.value(this.state.laySo);
+            this.loaiCongVan.value(loaiCongVan);
             this.trangThai?.value(trangThai || '');
         });
 
@@ -354,13 +364,12 @@ class AdminEditPage extends AdminPage {
             trichYeu: this.trichYeu.value(),
             ngayGui: Number(this.ngayGui.value()),
             ngayKy: Number(this.ngayKy.value()),
+            loaiCongVan: Number(this.loaiCongVan.value()),
             donViGui: this.donViGui.value(),
-            donViNhan: this.state.noiBo && this.getValue(this.donViNhan) ? this.donViNhan.value() : [],
-            noiBo: Number(this.getValue(this.noiBo)),
-            laySo: Number(this.getValue(this.laySo)),
-            canBoNhan: this.state.noiBo && this.getValue(this.canBoNhan) ? this.canBoNhan.value().toString() : '',
-            donViNhanNgoai: !this.state.noiBo && this.getValue(this.donViNhanNgoai) ? this.donViNhanNgoai.value().toString() : '',
-            loaiCongVan: this.loaiCongVan.value() ? this.loaiCongVan.value().toString() : '',
+            donViNhan: this.getValue(this.donViNhan) ? this.donViNhan.value() : [],
+            canBoNhan: this.state.loaiCongVan == listLoaiCongVan.CONG_VAN_DON_VI.id && this.getValue(this.canBoNhan) ? this.canBoNhan.value().toString() : '',
+            donViNhanNgoai: this.state.loaiCongVan == listLoaiCongVan.CONG_VAN_TRUONG.id && this.getValue(this.donViNhanNgoai) ? this.donViNhanNgoai.value() : [],
+            loaiVanBan: this.loaiVanBan.value() ? this.loaiVanBan.value().toString() : '',
             fileList: this.state.listFile || [],
             trangThai: this.state.trangThai
         };
@@ -378,7 +387,6 @@ class AdminEditPage extends AdminPage {
 
     save = () => {
         const changes = this.getValidatedData();
-
         if (changes) {
             if (!this.state.trangThai) changes.trangThai = '1';
             if (this.state.id) {
@@ -584,6 +592,7 @@ class AdminEditPage extends AdminPage {
         }
 
         const soCongVan = this.props.hcthCongVanDi?.item?.soCongVan;
+        const loaiCongVanArr = Object.values(listLoaiCongVan);
 
         const loading = (
             <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -638,13 +647,14 @@ class AdminEditPage extends AdminPage {
                                 <Link to='#' onClick={() => this.modal.show(null)}>Nhấn vào đây để thêm</Link>
                                 ) </>
                             }
-                        </span>)} readOnly={readCondition} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} required readOnlyEmptyText='Chưa có đơn vị gửi' />
-                        <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.noiBo = e} label='Công văn nội bộ' readOnly={readCondition} onChange={value => this.setState({ noiBo: value })}></FormCheckbox>
-                        <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.laySo = e} label='Công văn lấy số' readOnly={readCondition} onChange={value => this.setState({ laySo: value })}></FormCheckbox>
-                        {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
-                        {!this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận bên ngoài' placeholder='Đơn vị nhận' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
-                        {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Cán bộ nhận' placeholder='Cán bộ nhận' ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readCondition} readOnlyEmptyText='Chưa có cán bộ nhận' /> : null}
-                        <FormSelect className='col-md-12' allowClear={true} label='Loại văn bản' placeholder='Chọn loại văn bản' ref={e => this.loaiCongVan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có loại công văn' />
+                        </span>)} readOnly={readCondition} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} placeholder="Chọn đơn vị gửi" required readOnlyEmptyText='Chưa có đơn vị gửi' />
+                        {/* <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.noiBo = e} label='Công văn nội bộ' readOnly={readCondition} onChange={value => this.setState({ noiBo: value })}></FormCheckbox>
+                        <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.laySo = e} label='Công văn lấy số' readOnly={readCondition} onChange={value => this.setState({ laySo: value })}></FormCheckbox> */}
+                        <FormSelect className='col-md-12' allowClear={true} label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={loaiCongVanArr} readOnly={readCondition} readOnlyEmptyText='Chưa có loại công văn' onChange={value => this.setState({ loaiCongVan: value.id })} required/>
+                        <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' />
+                        {this.state.loaiCongVan == listLoaiCongVan.CONG_VAN_TRUONG.id ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận bên ngoài' placeholder='Chọn đơn vị nhận ngoài' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận' /> : null}
+                        {this.state.loaiCongVan == listLoaiCongVan.CONG_VAN_DON_VI.id ? <FormSelect multiple={true} className='col-md-12' label='Cán bộ nhận' placeholder='Cán bộ nhận' ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readCondition} readOnlyEmptyText='Chưa có cán bộ nhận' /> : null}
+                        <FormSelect className='col-md-12' allowClear={true} label='Loại văn bản' placeholder='Chọn loại văn bản' ref={e => this.loaiVanBan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={readCondition} readOnlyEmptyText='Chưa có loại văn bản' />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readCondition} required readOnlyEmptyText=': Chưa có trích yếu' />
                     </div>
                     {/* <div className='tile-body row d-flex justify-content-end'>

@@ -2459,21 +2459,6 @@ BEGIN
                               )
                       )
                   AND (
-                            congVanLaySo IS NULL
-                        OR (
-                                (
-                                        congVanLaySo = 1
-                                    AND hcthCVD.LAY_SO IS NOT NULL
-                                    AND hcthCVD.LAY_SO = 1
-                                    )
-                                OR (
-                                        congVanLaySo = 2
-                                    AND hcthCVD.LAY_SO IS NOT NULL
-                                    AND hcthCVD.LAY_SO = 0
-                                    )
-                                )
-                      )
-                  AND (
                             (donViXem IS NULL AND canBoXem IS NULL)
                           OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
                                (

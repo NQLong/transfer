@@ -55,8 +55,8 @@ const listTrangThai = {
 };
 
 const selectCongVan = [
-    { id: 1, text: 'Nội bộ' },
-    { id: 2, text: 'Ra ngoài' }
+    { id: 1, text: 'Công văn đơn vị' },
+    { id: 2, text: 'Công văn trường' }
 ];
 
 const selectCongVanV2 = [
@@ -72,7 +72,7 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.congVanLaySo?.value('');
+                //this.congVanLaySo?.value('');
                 this.loaiCongVan?.value('');
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
@@ -115,14 +115,14 @@ class HcthCongVanDi extends AdminPage {
         let donViNhan = this.donViNhan?.value() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         let loaiCongVan = this.loaiCongVan?.value() || null;
-        let congVanLaySo = this.congVanLaySo?.value() || null;
+        //let congVanLaySo = this.congVanLaySo?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
         let status = this.status?.value() || null;
 
-        let permissions = this.props.system?.user?.permissions;
-        let hcthStaff = permissions.includes('hcth:login') ? { congVanLaySo: 1 } : {};
+        // let permissions = this.props.system?.user?.permissions;
+        // let hcthStaff = permissions.includes('hcth:login') ? { congVanLaySo: 1 } : {};
 
-        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo, status };
+        const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, status };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 // console.log(page.filter);
@@ -133,7 +133,7 @@ class HcthCongVanDi extends AdminPage {
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     this.loaiCongVan?.value(filter.loaiCongVan || '');
-                    this.congVanLaySo?.value(filter.congVanLaySo || '');
+                   // this.congVanLaySo?.value(filter.congVanLaySo || '');
                     this.status?.value(filter.status || '');
                     this.donViNhanNgoai?.value(filter.donViNhanNgoai || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.loaiCongVan || filter.donViNhanNgoai)) this.showAdvanceSearch();

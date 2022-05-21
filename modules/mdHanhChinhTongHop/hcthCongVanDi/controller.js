@@ -35,7 +35,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo, status } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, status } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
             { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null, congVanLaySo: null, status: null },
             donViXem = '', canBoXem = '';
 
@@ -55,7 +55,7 @@ module.exports = app => {
             canBoXem = '';
         }
 
-        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, congVanLaySo, status ? status.toString() : status, searchTerm, (error, page) => {
+        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -78,22 +78,27 @@ module.exports = app => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
 
-    const createDonViNhan = (listDonViNhan, congVanId, done) => {
+    const createListDonViNhan = (listDonViNhan, congVanId, done) => {
         if (listDonViNhan && listDonViNhan.length > 0) {
-            const [donViNhan] = listDonViNhan.splice(0, 1);
-            app.model.hcthDonViNhan.create({ donViNhan, ma: congVanId, loai: 'DI' }, (error) => {
-                if (error) {
-                    done && done({ error });
-                }
-                else createDonViNhan(listDonViNhan, congVanId, done);
-            });
+            const promises = listDonViNhan.map(donViNhan => new Promise((resolve, reject) => app.model.hcthDonViNhan.create({
+                    donViNhan: donViNhan.id,
+                    ma: congVanId,
+                    donViNhanNgoai: donViNhan.donViNhanNgoai,
+                    loai: 'DI'
+                }, (error, item) => {
+                    if (error) reject(error);
+                    else resolve(item);
+                })
+            ));
+            Promise.all(promises).then(result => done && done(result))
+            .catch(error => done && done(error));
         } else {
             done && done({ error: null });
         }
     };
 
     app.post('/api/hcth/cong-van-cac-phong', (req, res) => {
-        const { fileList, donViNhan, ...data } = req.body.data;
+        const { fileList, donViNhan, donViNhanNgoai, ...data } = req.body.data;
         app.model.hcthCongVanDi.create({ ...data }, (error, item) => {
             if (error) {
                 res.send({ error, item });
@@ -106,7 +111,10 @@ module.exports = app => {
                             throw error;
                         }
                         else {
-                            createDonViNhan(donViNhan, id, ({ error }) => {
+                            let listDonViNhan = donViNhan.map(item => ({ id: item, donViNhanNgoai: 0 }));
+                            if (donViNhanNgoai && donViNhanNgoai.length > 0) listDonViNhan = listDonViNhan.concat(donViNhanNgoai.map(item => ({ id: item, donViNhanNgoai: 1})));
+
+                            createListDonViNhan(listDonViNhan, id, ({ error }) => {
                                 if (error) {
                                     throw error;
                                 } else {
@@ -175,7 +183,7 @@ module.exports = app => {
 
     // Cần sửa lại
     app.put('/api/hcth/cong-van-cac-phong', app.permission.check('staff:login'), (req, res) => {
-        const { fileList, donViNhan, ...changes } = req.body.changes;
+        const { fileList, donViNhan, donViNhanNgoai, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
         if (isSend) {
@@ -193,7 +201,9 @@ module.exports = app => {
                         if (errors)
                             res.send({ errors, item });
                         else {
-                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
+                            let listDonViNhan = donViNhan.map(item => ({ id: item, donViNhanNgoai: 0 }));
+                            if (donViNhanNgoai && donViNhanNgoai.length > 0) listDonViNhan = listDonViNhan.concat(donViNhanNgoai.map(item => ({ id: item, donViNhanNgoai: 1})));
+                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createListDonViNhan(listDonViNhan, req.body.id, () => {
                                 updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
                             }));
                         }
@@ -205,7 +215,9 @@ module.exports = app => {
                 if (errors)
                     res.send({ errors, item });
                 else {
-                    app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createDonViNhan(donViNhan, req.body.id, () => {
+                    let listDonViNhan = donViNhan.map(item => ({ id: item, donViNhanNgoai: 0 }));
+                            if (donViNhanNgoai && donViNhanNgoai.length > 0) listDonViNhan = listDonViNhan.concat(donViNhanNgoai.map(item => ({ id: item, donViNhanNgoai: 1})));
+                    app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: 'DI' }, () => createListDonViNhan(listDonViNhan, req.body.id, () => {
                         updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
                     }));
                 }
@@ -369,7 +381,7 @@ module.exports = app => {
                 throw { status: 400, message: 'Invalid id' };
             }
             const congVan = await app.model.hcthCongVanDi.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
             if (!await isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'permission denied' };
             }
@@ -381,7 +393,8 @@ module.exports = app => {
                 item: {
                     ...congVan,
                     phanHoi: phanHoi || [],
-                    donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
+                    donViNhan: (donViNhan ? donViNhan.filter(item => item.donViNhanNgoai == 0).map(item => item.donViNhan) : []).toString(),
+                    donViNhanNgoai: (donViNhan ? donViNhan.filter(item => item.donViNhanNgoai == 1).map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     history: history?.rows || [],
                 }
@@ -626,7 +639,6 @@ module.exports = app => {
             donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDi:manage') ? req.session.user?.staff?.maDonVi : '') || '',
             staffType
         };
-        // console.log(data);
         let filterParam;
         try {
             filterParam = JSON.stringify(data);
