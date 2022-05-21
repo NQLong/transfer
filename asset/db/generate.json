@@ -6684,15 +6684,8 @@
                     "nullable": true,
                     "size": 200
                 },
-                "NOI_BO": {
-                    "value": "noiBo",
-                    "dataType": "NUMBER",
-                    "dataDefault": "1",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "LOAI_CONG_VAN": {
-                    "value": "loaiCongVan",
+                "LOAI_VAN_BAN": {
+                    "value": "loaiVanBan",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
@@ -6704,13 +6697,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
-                },
-                "SO_DI": {
-                    "value": "soDi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
                 },
                 "DON_VI_NHAN_NGOAI": {
                     "value": "donViNhanNgoai",
@@ -6733,12 +6719,19 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "SO_CONG_VAN": {
-                    "value": "soCongVan",
+                "LOAI_CONG_VAN": {
+                    "value": "loaiCongVan",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "LOAI_CONG": {
+                    "value": "loaiCong",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -13462,7 +13455,9 @@
             "moduleName": "qtHopDongDonViTraLuong",
             "modelName": "qtHopDongDonViTraLuong",
             "methods": {
-                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage"
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage",
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_GROUP_PAGE": "groupPage",
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SHCC_BY_DON_VI": "getShccByDonVi"
             },
             "columns": {
                 "ID": {
