@@ -18,6 +18,7 @@ module.exports = app => {
         { name: 'qtKeoDaiCongTac:write' },
         { name: 'qtKeoDaiCongTac:delete' },
     );
+    app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/create-list', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/:shcc', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/keo-dai-cong-tac', app.permission.check('staff:login'), app.templates.admin);
