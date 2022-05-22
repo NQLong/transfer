@@ -6712,20 +6712,6 @@
                     "nullable": true,
                     "size": 10
                 },
-                "LOAI_CONG_VAN": {
-                    "value": "loaiCongVan",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "SO_DI": {
-                    "value": "soDi",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 200
-                },
                 "SO_CONG_VAN": {
                     "value": "soCongVan",
                     "dataType": "NVARCHAR2",
@@ -6746,6 +6732,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "SO_DI": {
+                    "value": "soDi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "LOAI_CONG_VAN": {
+                    "value": "loaiCongVan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [
@@ -9423,7 +9423,7 @@
             "modelName": "qtNghiViec",
             "methods": {
                 "QT_NGHI_VIEC_SEARCH_PAGE": "searchPage",
-                "QT_NGHI_VIEC_GROUP_PAGE": "groupPage"
+                "QT_NGHI_VIEC_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "SHCC": {
@@ -9494,7 +9494,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 2
+                    "size": 10
                 }
             },
             "primaryKeys": [
@@ -13441,7 +13441,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 2
+                    "size": 10
                 },
                 "TEN": {
                     "value": "ten",
