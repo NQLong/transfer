@@ -267,10 +267,12 @@ class QtNghiViec extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb',
+            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/nghi-viec/create-list') : '',
             onCreate: (e) => this.showModal(e),
             onExport: (e) => {
                 e.preventDefault();
-                const filter = T.stringify(this.state.filter);
+                let filter = T.stringify(this.state.filter);
+                if (filter.includes('%')) filter = '{}';
 
                 T.download(T.url(`/api/qua-trinh/nghi-viec/download-excel/${filter}`), 'NGHIVIEC.xlsx');
             }

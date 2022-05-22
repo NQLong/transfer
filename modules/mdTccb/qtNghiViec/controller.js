@@ -11,6 +11,7 @@ module.exports = app => {
         { name: 'qtNghiViec:delete' },
     );
     app.get('/user/tccb/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghi-viec/create-list', app.permission.check('qtNghiViec:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/nghi-viec/page/:pageNumber/:pageSize', app.permission.check('qtNghiViec:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -125,6 +126,90 @@ module.exports = app => {
                 });
             }
         });
+    });
+
+    app.get('/api/tccb/qua-trinh/nghi-viec/get-nghi-huu-year', app.permission.check('qtNghiViec:read'), (req, res) => {
+        const yearCalc = req.query.year;
+        const endYear = new Date(yearCalc, 11, 31, 23, 59, 59, 999);
+        // 1419120000000 = 45 * 365 * 24 * 3600 * 10000 (45 năm)
+        app.model.canBo.getAll({
+            statement: 'ngayNghi IS NULL AND (ngaySinh IS NULL OR ngaySinh + 1419120000000 <= :year)',
+            parameter: { year: endYear.getTime() }
+        }, (error, data) => {
+            if (error) {
+                res.send({ error, items: null });
+                return;
+            }
+            let items = [];
+            const solve = (index = 0) => {
+                if (index >= data.length) {
+                    res.send({ error: null, items });
+                    return;
+                }
+                const item = data[index];
+                app.model.dmNghiHuu.getTuoiNghiHuu({ phai: item.phai, ngaySinh: new Date(item.ngaySinh) }, (error, data) => {
+                    if (data && (data.resultDate.getFullYear() == yearCalc)) {
+                        let tenChucDanh = '', tenHocVi = '', tenChucDanhNgheNghiep = '', tenChucVu = '', tenDonVi = '';
+                        app.model.dmChucDanhKhoaHoc.get({ ma: item.chucDanh }, (error, itemCD) => {
+                            app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, itemHV) => {
+                                app.model.dmNgachCdnn.get({ ma: item.ngach }, (error, itemCDNN) => {
+                                    app.model.dmChucVu.get({ ma: item.maChucVu }, (error, itemCV) => {
+                                        app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDV) => {
+                                            if (itemCD) tenChucDanh = itemCD.ten;
+                                            if (itemHV) tenHocVi = itemHV.ten;
+                                            if (itemCDNN) tenChucDanhNgheNghiep = itemCDNN.ten;
+                                            if (itemCV) tenChucVu = itemCV.ten;
+                                            if (itemDV) tenDonVi = itemDV.ten;
+
+                                            let dataAdd = {
+                                                shcc: item.shcc,
+                                                hoCanBo: item.ho,
+                                                tenCanBo: item.ten,
+                                                tenChucDanh,
+                                                tenHocVi,
+                                                tenChucVu,
+                                                tenDonVi,
+                                                tenChucDanhNgheNghiep,
+                                                ngayNghiHuu: data.resultDate,
+                                                ngaySinh: item.ngaySinh,
+                                                phai: item.phai,
+                                                dienNghi: item.ngayBienChe ? 1 : 2,
+                                            };
+                                            items.push(dataAdd);
+                                            solve(index + 1);
+                                        });
+                                    });
+                                });
+                            });
+                        });
+
+                    } else solve(index + 1);
+                });
+            };
+            solve();
+        });
+    });
+
+    app.post('/api/tccb/qua-trinh/nghi-viec/multiple-nghi-huu', app.permission.check('qtNghiViec:write'), (req, res) => {
+        const listData = req.body.listData, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listData.length) {
+                res.send({ error: errorList });
+                return;
+            }
+            const item = listData[index];
+            const data = {
+                shcc: item.shcc,
+                noiDung: 'QĐ về việc nghỉ việc hưởng chế độ hưu trí',
+                lyDoNghi: 'H',
+                dienNghi: item.dienNghi,
+            };
+            app.model.qtNghiViec.create(data, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
     });
 
 };

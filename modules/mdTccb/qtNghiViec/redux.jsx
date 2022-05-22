@@ -111,3 +111,31 @@ export function deleteQtNghiViecStaff(ma) {
         }, () => T.notify('Xóa thông tin nghỉ việc bị lỗi', 'danger'));
     };
 }
+
+export function getListNghiHuuInYear(year, done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/nghi-viec/get-nghi-huu-year';
+        T.get(url, { year }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách dự kiến nghỉ hưu bị lỗi', 'danger');
+                console.error('GET: ' + url + '. ' + data.error);
+            } else {
+                done && done(data.items);
+            }
+        }, () => T.notify('Lấy danh sách dự kiến nghỉ hưu bị lỗi', 'danger'));
+    };
+}
+
+export function createMultiQtNghiViecFromNghiHuu(listData, done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/nghi-viec/multiple-nghi-huu';
+        T.post(url, { listData }, data => {
+            if (data.error && data.error.length) {
+                T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error('PUT: ' + url + '. ' + data.error.toString());
+            } else {
+                done && done(data.item);
+            }
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+    };
+}
