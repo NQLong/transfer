@@ -118,6 +118,7 @@ class CreateListYear extends AdminPage {
 
     componentDidMount() {
         T.hideSearchBox();
+        this.year.focus();
     }
     delete = (index, done) => {
         T.confirm('Xóa dữ liệu', 'Bạn có chắc bạn muốn xóa dữ liệu này?', 'warning', true, isConfirm => {
@@ -125,7 +126,7 @@ class CreateListYear extends AdminPage {
                 const listData = this.state.listData;
                 listData.splice(index, 1);
                 this.setState({ listData }
-                , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
+                    , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
                 done && done();
             }
         });
@@ -153,14 +154,14 @@ class CreateListYear extends AdminPage {
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' style={{ textAlign: 'right' }} content={ index + 1 } />
+                    <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell type='link' onClick={() => this.modal.show({ index, item })} style={{ whiteSpace: 'nowrap' }} content={(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.phai == '01' ? item.ngaySinh : ''} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.phai == '02' ? item.ngaySinh : ''} />
-                    <TableCell type='text' content={ item.tenChucDanh ? item.tenChucDanh.getFirstLetters().toUpperCase() + '.' : '' }/>
-                    <TableCell type='text' content={ item.tenHocVi ? item.tenHocVi.getFirstLetters().toUpperCase() : '' }/>
+                    <TableCell type='text' content={item.tenChucDanh ? item.tenChucDanh.getFirstLetters().toUpperCase() + '.' : ''} />
+                    <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters().toUpperCase() : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '').normalizedName() } />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '').normalizedName()} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''} />
@@ -191,7 +192,7 @@ class CreateListYear extends AdminPage {
         const updateValue = Object.assign({}, currentValue, changes);
         listData.splice(index, 1, updateValue);
         this.setState({ listData }
-        , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
+            , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
         done && done();
     };
 
@@ -220,7 +221,7 @@ class CreateListYear extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-hourglass-start',
             title: 'Tạo danh sách kéo dài công tác dự kiến',
-            header: <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} placeholder='Năm' onChange={this.handleTime} data={yearSelector} />,
+            header: <FormSelect style={{ width: '150px', marginBottom: '0' }} ref={e => this.year = e} allowClear={true} placeholder='Năm' onChange={this.handleTime} data={yearSelector} />,
             breadcrumb: [
                 <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài công tác</Link>, 'Import'
             ],
@@ -229,10 +230,10 @@ class CreateListYear extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update} />
             </>,
             onSave: (e) => this.save(e),
-            onExport: (e) => {
+            onExport: this.year && this.year.value() ? (e) => {
                 e.preventDefault();
                 xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), '[KHXH&NV] Bao cao thuc hien keo dai thoi gian cong tac nam ' + year + '.xlsx');
-            },
+            } : null,
             backRoute: '/user/tccb/qua-trinh/keo-dai-cong-tac',
         });
     }
