@@ -141,7 +141,7 @@ export function deleteDmNghiViec(ma, done) {
 export const SelectAdapter_DmNghiViec = {
     ajax: true,
     url: '/api/danh-muc/ly-do-ngung-cong-tac/all',
-    data: params => ({ condition: params.term, kichHoat: 1 }),
-    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.filter(item => item.kichHoat).map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmNghiViec(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };
