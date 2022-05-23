@@ -110,10 +110,10 @@ export class CanBoNhan extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: vaiTro[item.vaiTro]?.color || 'blue' }} content={vaiTro[item.vaiTro]?.text} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.hoNguoiTao + ' ' + item.tenNguoiTao).trim().normalizedName()} />
                     <TableCell type='buttons' permission={permissions} onDelete={() => this.onDelete(item)} >
-                        {item.vaiTro == vaiTro.PARTICIPANT.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyên quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
+                        {item.vaiTro == vaiTro.PARTICIPANT.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
                             <i className='fa fa-lg fa-user-plus' />
                         </a>}
-                        {item.vaiTro == vaiTro.MANAGER.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-warning' title='Xóa quyên quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.PARTICIPANT.id)}>
+                        {item.vaiTro == vaiTro.MANAGER.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-warning' title='Xóa quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.PARTICIPANT.id)}>
                             <i className='fa fa-lg fa-user-times' />
                         </a>}
                     </TableCell>

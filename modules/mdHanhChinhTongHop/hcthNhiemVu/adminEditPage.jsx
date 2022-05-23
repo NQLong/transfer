@@ -234,7 +234,7 @@ class AdminEditPage extends AdminPage {
         // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Giao nhiệm vụ',
+            title: 'Nhiệm vụ',
             breadcrumb: siteSetting.breadcrumb,
             content: <>
                 <div className='tile'>
