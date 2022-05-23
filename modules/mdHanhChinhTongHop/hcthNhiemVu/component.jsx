@@ -247,7 +247,8 @@ class CongVanDenSelector extends React.Component {
     itemRef = {}
     state = { ids: [] }
 
-    changeSearch = () => {
+    changeSearch = (e) => {
+        e?.preventDefault && e.preventDefault();
         const
             { pageNumber = 1, pageSize = 25 } = this.props.hcthNhiemVu?.cvdPage || {},
             searchTerm = this.search.value(),
@@ -347,7 +348,8 @@ class CongVanDiSelector extends React.Component {
     itemRef = {}
     state = { ids: [] }
 
-    changeSearch = () => {
+    changeSearch = (e) => {
+        e?.preventDefault && e.preventDefault();
         const
             { pageNumber = 1, pageSize = 25 } = this.props.hcthNhiemVu?.cvdPage || {},
             searchTerm = this.search.value(),
@@ -384,7 +386,8 @@ class CongVanDiSelector extends React.Component {
     getSelected = () => this.state.ids
 
 
-    resetSearch = () => {
+    resetSearch = (e) => {
+        e?.preventDefault && e.preventDefault();
         this.year.value('');
         this.search.value('');
         this.changeSearch();
@@ -420,7 +423,7 @@ class CongVanDiSelector extends React.Component {
         const TAB_ID = 'CongVanDiSelector';
         const tabs = [{ title: 'Danh sách' }, { title: 'Đã chọn' }];
         return (<div className='col-md-12' >
-            <div className='form-group row'>
+            <div className='form-group row' onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}>
                 <FormTextBox label='Tìm kiếm' ref={e => this.search = e} className='col-md-8' />
                 <FormTextBox label='Năm' ref={e => this.year = e} className='col-md-4' />
                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
