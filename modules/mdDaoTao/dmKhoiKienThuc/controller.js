@@ -31,7 +31,14 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/khoi-kien-thuc/all', app.permission.check('dmKhoiKienThuc:read'), (req, res) => {
-        app.model.dmKhoiKienThuc.getAll((error, items) => res.send({ error, items }));
+        let searchTerm = `%${req.query.condition || ''}%`,
+            khoiCha = req.query.khoiCha;
+        app.model.dmKhoiKienThuc.getAll({
+            statement: '(:khoiCha = 0 OR khoiCha = :khoiCha) AND lower(ten) LIKE :searchTerm',
+            parameter: {
+                searchTerm, khoiCha: khoiCha ? parseInt(khoiCha) : 0
+            }
+        }, (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/dao-tao/khoi-kien-thuc/item/:ma', app.permission.orCheck('dmKhoiKienThuc:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
