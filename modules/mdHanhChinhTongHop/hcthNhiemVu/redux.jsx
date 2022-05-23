@@ -440,3 +440,33 @@ export function completeNhiemVu(id, done) {
     };
 }
 
+export function closeNhiemVu(id, canBoNhan, nguoiTao, done) {
+    return () => {
+        const url = `/api/hcth/nhiem-vu/dong/${id}`;
+        T.post(url, { canBoNhan, nguoiTao }, res => {
+            if (res.error) {
+                T.notify('Đóng nhiệm vụ lỗi', 'danger');
+                console.error('GET: ' + url + '. ', res.error);
+            } else {
+                T.notify('Đóng nhiệm vụ thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Đóng nhiệm vụ lỗi', 'danger'));
+    };
+}
+
+export function reopenNhiemVu(id, canBoNhan, nguoiTao, done) {
+    return () => {
+        const url = `/api/hcth/nhiem-vu/mo-lai/${id}`;
+        T.post(url, { canBoNhan, nguoiTao }, res => {
+            if (res.error) {
+                T.notify('Mở nhiệm vụ lỗi', 'danger');
+                console.error('GET: ' + url + '. ', res.error);
+            } else {
+                T.notify('Mở nhiệm vụ thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Mở nhiệm vụ lỗi', 'danger'));
+    };
+}
+

@@ -22,6 +22,8 @@ module.exports = {
         REMOVE_EMPOYEE: 'REMOVE_EMPLOYEE',
         CHANGE_ROLE: 'CHANGE_ROLE',
         COMPLETE: 'COMPLETE',
+        CLOSE: 'CLOSE',
+        REOPEN: 'REOPEN'
     },
 
     CONG_VAN_TYPE: 'DEN',
@@ -76,11 +78,13 @@ module.exports = {
     },
 
     trangThaiNhiemVu: {
-        MOI: { id: 'MOI', text: 'Mới', value: 0, color: 'blue', next: ['MOI', 'DANG_XU_LY', 'DA_HUY', 'TAM_HOAN'] },
+        MOI: { id: 'MOI', text: 'Mới', value: 0, color: 'blue', next: ['MOI', 'DANG_XU_LY', 'DA_HUY', 'TAM_HOAN', 'DONG'] },
         DANG_XU_LY: { id: 'DANG_XU_LY', text: 'Đang xử lý', value: 1, color: 'blue', next: ['DANG_XU_LY', 'DA_XU_LY', 'DA_HUY', 'TAM_HOAN'] },
         DA_HUY: { id: 'DA_HUY', value: 2, text: 'Đã hủy', color: 'red', next: ['DA_HUY',] },
         DA_XU_LY: { id: 'DA_XU_LY', text: 'Đã xử lý', value: 2, color: '#149414', next: ['DA_XU_LY'] },
         TAM_HOAN: { id: 'TAM_HOAN', text: 'Tạm hoãn', value: 1, color: 'red', next: ['TAM_HOAN', 'DANG_XU_LY', 'DA_HUY'] },
+        DONG: { id: 'DONG', text: 'Đóng', value: 2, color: 'red' },
+        MO: { id: 'MO', text: 'Mở', value: 0, color: '#149414'}
     },
 
     nhiemVuSelector: {

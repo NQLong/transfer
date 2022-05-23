@@ -4,8 +4,9 @@ import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_FwCanBo, SelectAdapter_FwCanBoByDonVi } from 'modules/mdTccb/tccbCanBo/redux';
-const { vaiTro, loaiLienKet } = require('../constant');
+const { vaiTro, loaiLienKet, trangThaiNhiemVu } = require('../constant');
 const vaiTroSelector = Object.keys(vaiTro).map(key => ({ id: key, text: vaiTro[key].text }));
+
 
 export class CanBoNhan extends AdminPage {
 
@@ -28,9 +29,10 @@ export class CanBoNhan extends AdminPage {
     }
 
     canAdd = () => {
+        console.log(this.props.trangThai !== trangThaiNhiemVu.DONG.id);
         const userPermission = this.getCurrentPermissions();
 
-        if (this.props.isCreator || userPermission.some(item => ['hcth:manage', 'rectors:login'].includes(item)))
+        if (this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isCreator || userPermission.some(item => ['hcth:manage', 'rectors:login'].includes(item))))
             return true;
 
         const currentDonViNhan = this.props.hcthNhiemVu?.item?.donViNhan || [];
@@ -38,8 +40,7 @@ export class CanBoNhan extends AdminPage {
         const isRelatedDepartmentManager = userPermission.includes('manager:write')
             && donViQuanLy.some(item => currentDonViNhan.some(item2 => item2.donViNhan == item.maDonVi));
 
-        if (this.props.lienPhong && isRelatedDepartmentManager)
-            return true;
+        if (this.props.lienPhong && isRelatedDepartmentManager && this.props.trangThai !== trangThaiNhiemVu.DONG.id) return true;
         return false;
     }
 
@@ -100,7 +101,7 @@ export class CanBoNhan extends AdminPage {
         renderRow: (item, index) => {
             const isAdder = this.props.system?.user?.shcc == item.shccNguoiTao;
             const permissions = {
-                delete: this.props.isCreator || isAdder || this.props.isManager
+                delete: this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isCreator || isAdder || this.props.isManager)
             };
             return (
                 <tr key={index}>
@@ -110,10 +111,10 @@ export class CanBoNhan extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: vaiTro[item.vaiTro]?.color || 'blue' }} content={vaiTro[item.vaiTro]?.text} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.hoNguoiTao + ' ' + item.tenNguoiTao).trim().normalizedName()} />
                     <TableCell type='buttons' permission={permissions} onDelete={() => this.onDelete(item)} >
-                        {item.vaiTro == vaiTro.PARTICIPANT.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyên quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
+                        {item.vaiTro == vaiTro.PARTICIPANT.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyên quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
                             <i className='fa fa-lg fa-user-plus' />
                         </a>}
-                        {item.vaiTro == vaiTro.MANAGER.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-warning' title='Xóa quyên quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.PARTICIPANT.id)}>
+                        {item.vaiTro == vaiTro.MANAGER.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-warning' title='Xóa quyên quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.PARTICIPANT.id)}>
                             <i className='fa fa-lg fa-user-times' />
                         </a>}
                     </TableCell>
@@ -225,12 +226,17 @@ export class PhanHoi extends React.Component {
                                 this.renderPhanHoi(phanHoi)
                             }
                         </div>
-                        <FormRichTextBox type='text' className='col-md-12 mt-2' ref={e => this.phanHoi = e} placeholder='Thêm phản hồi' />
-                        <div className='col-md-12 d-flex justify-content-end'>
-                            <button type='submit' className='btn btn-primary' onClick={this.onCreatePhanHoi}>
-                                Gửi
-                            </button>
-                        </div>
+                        {
+                            this.props.trangThai !== trangThaiNhiemVu.DONG.id ?
+                            <>
+                                <FormRichTextBox type='text' className='col-md-12 mt-2' ref={e => this.phanHoi = e} placeholder='Thêm phản hồi' />
+                                <div className='col-md-12 d-flex justify-content-end'>
+                                    <button type='submit' className='btn btn-primary' onClick={this.onCreatePhanHoi}>
+                                        Gửi
+                                    </button>
+                                </div>
+                            </> : null
+                        }
                     </div>
                 </div>
             </div>
@@ -594,6 +600,8 @@ export class History extends React.Component {
         READ: 'đọc',
         UPDATE: 'cập nhật',
         COMPLETE: 'hoàn thành',
+        CLOSE: 'đóng',
+        REOPEN: 'mở lại'
     }
 
     canBoNhanAction = {
@@ -609,7 +617,9 @@ export class History extends React.Component {
         UPDATE: 'blue',
         ADD_EMPLOYEES: '#28a745',
         REMOVE_EMPLOYEE: 'red',
-        CHANGE_ROLE: '#007bff'
+        CHANGE_ROLE: '#007bff',
+        CLOSE: 'red',
+        REOPEN: '#149414'
     }
 
     roleName = {
