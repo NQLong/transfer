@@ -86,7 +86,6 @@ class AdminEditPage extends AdminPage {
         this.ngayKetThuc.value(ngayKetThuc || '');
         this.doUuTien.value(doUuTien || '');
         this.lienPhong.value(lienPhong);
-        this.trangThai.value(trangThai || '');
         if (!this.state.id) {
             this.props.clearHcthNhiemVu();
         }
@@ -94,6 +93,7 @@ class AdminEditPage extends AdminPage {
         const isCreator = this.state.id ? this.props.hcthNhiemVu?.item?.nguoiTao == this.props.system?.user?.shcc : true;
         const isManager = canBoNhan.some(item => item.vaiTro == vaiTro.MANAGER.id && item.shccCanBoNhan == this.props.system?.user?.shcc);
         this.setState({ phanHoi, listFile, lienKet, nguoiTao, lienPhong, donViNhan, doUuTien, isCreator, isManager, trangThai }, () => {
+            this.trangThai?.value(trangThai || '');
 
             if (donViNhan.length > 0) {
                 if (lienPhong)
@@ -221,7 +221,7 @@ class AdminEditPage extends AdminPage {
             sitePermission = this.getSitePermission(),
             siteSetting = this.getSiteSetting(),
             buttons = [];
-
+        console.log(this.state);
         const isShowCloseTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai !== trangThaiNhiemVu.DONG.id;
         const isShowReopenTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai === trangThaiNhiemVu.DONG.id;
         if (sitePermission.isParticipant && this.state.trangThai !== trangThaiNhiemVu.DONG.id)
