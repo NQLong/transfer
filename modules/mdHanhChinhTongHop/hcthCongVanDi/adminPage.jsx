@@ -44,10 +44,6 @@ const listTrangThai = {
         status: 'Đã gửi',
         color: 'green'
     },
-    '6': {
-        status: 'Đã đọc',
-        color: 'green'
-    },
     '7': {
         status: 'Đã duyệt',
         color: 'green'
