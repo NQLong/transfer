@@ -29,10 +29,6 @@ export class EditModal extends AdminModal {
         if (changes.ten == '') {
             T.notify('Tên đơn vị công văn bị trống!', 'danger');
             this.ten.focus();
-        } 
-        if (changes.tenVietTat == '') {
-            T.notify('Tên đơn vị công văn bị trống!', 'danger');
-            this.ten.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -50,7 +46,7 @@ export class EditModal extends AdminModal {
                     readOnly={readOnly} required />
 
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenVietTat = e} label='Tên viết tắt '
-                    readOnly={readOnly} required />
+                    readOnly={readOnly} />
 
                 <FormCheckbox className='col-md-12' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
@@ -89,7 +85,7 @@ class DmLoaiCongVanPage extends AdminPage {
 
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmLoaiCongVan && this.props.dmLoaiCongVan.page ?
             this.props.dmLoaiCongVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-            
+
         let table = 'Không có danh sách loại công văn!';
         if (list && list.length > 0) {
             table = renderTable({

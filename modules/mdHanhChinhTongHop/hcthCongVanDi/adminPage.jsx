@@ -230,7 +230,7 @@ class HcthCongVanDi extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn giữa các phòng',
+            title: 'Công văn các phòng',
             breadcrumb: breadcrumb,
             onCreate: (permission && permission.write) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
