@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createMultiDtCauTrucKhungDaoTao, createDtCauTrucKhungDaoTao, updateDtCauTrucKhungDaoTao, getDtCauTrucKhungDaoTao } from './redux';
 import { Link } from 'react-router-dom';
-import ComponentMTDT from './componentMTDT';
+// import ComponentMTDT from './componentMTDT';
 import ComponentCTDT from './componentCTDT';
 import { AdminPage, FormDatePicker, FormTextBox } from 'view/component/AdminPage';
 import Loading from 'view/component/Loading';
@@ -23,7 +23,9 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                     this.getData(id, true);
                     return;
                 }
-                [this.mucTieuDaoTao, this.chuongTrinhDaoTao].forEach(e => e.setVal({ parents: {}, childs: {} }));
+                [
+                    // this.mucTieuDaoTao,
+                    this.chuongTrinhDaoTao].forEach(e => e.setVal({ parents: {}, childs: {} }));
             }
         });
     }
@@ -39,9 +41,15 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
             this.namDaoTaoEnd.value(isClone ? (Number(namDaoTao[1]) + 1) : namDaoTao[1]);
             this.batDauDangKy.value(isClone ? new Date().getTime() : batDauDangKy);
             this.ketThucDangKy.value(isClone ? new Date().getTime() : ketThucDangKy);
-            const mucCha = T.parse(ctkdt.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
-            const mucCon = T.parse(ctkdt.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
-            this.mucTieuDaoTao.setVal({ parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao });
+            const mucCha = T.parse(ctkdt.mucCha, {
+                // mucTieuDaoTao: {},
+                chuongTrinhDaoTao: {}
+            });
+            const mucCon = T.parse(ctkdt.mucCon, {
+                // mucTieuDaoTao: {},
+                chuongTrinhDaoTao: {}
+            });
+            // this.mucTieuDaoTao.setVal({ parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao });
             this.chuongTrinhDaoTao.setVal({ parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao });
         });
     }
@@ -73,18 +81,24 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
     save = () => {
         const data = this.getValue();
         if (data) {
-            const mucTieuDaoTao = this.mucTieuDaoTao.getValue() || { parents: [], childrens: {} };
+            // const mucTieuDaoTao = this.mucTieuDaoTao.getValue() || { parents: [], childrens: {} };
             const chuongTrinhDaoTao = this.chuongTrinhDaoTao.getValue() || { parents: [], childrens: {} };
 
-            const mucCha = { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} };
-            const mucCon = { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} };
+            const mucCha = {
+                // mucTieuDaoTao: {},
+                chuongTrinhDaoTao: {}
+            };
+            const mucCon = {
+                // mucTieuDaoTao: {},
+                chuongTrinhDaoTao: {}
+            };
 
             //1 mucTieuDaoTao, 2 chuongTrinhDaoTao
-            mucTieuDaoTao.parents.forEach((mtDt) => {
-                const { id, value } = mtDt;
-                mucCha.mucTieuDaoTao[id] = value;
-                mucCon.mucTieuDaoTao[id] = mucTieuDaoTao.childrens[id];
-            });
+            // mucTieuDaoTao.parents.forEach((mtDt) => {
+            //     const { id, value } = mtDt;
+            //     mucCha.mucTieuDaoTao[id] = value;
+            //     mucCon.mucTieuDaoTao[id] = mucTieuDaoTao.childrens[id];
+            // });
 
             chuongTrinhDaoTao.parents.forEach((ctDt) => {
                 const { id, value } = ctDt;
@@ -133,12 +147,12 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                         </div>
                     </div>
                 </div>
-                <div className='tile'>
+                {/* <div className='tile'>
                     <h3 className='tile-title'>Mục tiêu đào tạo</h3>
                     <div className='tile-body'>
                         <ComponentMTDT ref={e => this.mucTieuDaoTao = e} />
                     </div>
-                </div>
+                </div> */}
                 <div className='tile'>
                     <h3 className='tile-title'>Chương trình đào tạo</h3>
                     <div className='tile-body'>

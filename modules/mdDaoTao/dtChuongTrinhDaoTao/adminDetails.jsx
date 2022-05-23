@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, deleteMultiDtChuongTrinhDaoTao } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormRichTextBox, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
 import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -14,7 +14,11 @@ import T from 'view/js/common';
 
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
-    state = { isLoading: true, mucTieuDaoTao: {}, chuongTrinhDaoTao: {} };
+    state = {
+        isLoading: true,
+        // mucTieuDaoTao: {},
+        chuongTrinhDaoTao: {}
+    };
     mucTieu = {};
     chuongTrinh = {};
 
@@ -122,9 +126,18 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     setNamDaoTao = (value, mucTieu, ctdt) => {
         const { data, id } = value;
         this.khoaDt = id;
-        const mucCha = T.parse(data.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
-        const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
-        this.setState({ mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao }, chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao } }, () => {
+        const mucCha = T.parse(data.mucCha, {
+            // mucTieuDaoTao: {},
+            chuongTrinhDaoTao: {}
+        });
+        const mucCon = T.parse(data.mucCon, {
+            // mucTieuDaoTao: {},
+            chuongTrinhDaoTao: {}
+        });
+        this.setState({
+            // mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao },
+            chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao }
+        }, () => {
             Object.keys(this.chuongTrinh).forEach(key => {
                 const childs = mucCon.chuongTrinhDaoTao[key] || null;
                 const data = ctdt?.filter(item => item.maKhoiKienThuc === parseInt(mucCha.chuongTrinhDaoTao[key].id));
@@ -140,7 +153,9 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         const readOnly = !(permission.write || permission.manage),
             isPhongDaoTao = permission.write;
-        const { mucTieuDaoTao, chuongTrinhDaoTao } = this.state;
+        const {
+            // mucTieuDaoTao,
+            chuongTrinhDaoTao } = this.state;
         return this.renderPage({
             icon: 'fa fa-university',
             title: this.ma !== 'new' ? 'Chỉnh sửa chương trình đào tạo' : 'Tạo mới chương trình đào tạo',
@@ -197,7 +212,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                     </div>
                 </div>
 
-                {mucTieuDaoTao && mucTieuDaoTao.parents &&
+                {/* {mucTieuDaoTao && mucTieuDaoTao.parents &&
                     <div className='tile'>
                         <h3 className='tile-title'>2. Mục tiêu đào tạo</h3>
                         <div className='tile-body'>
@@ -222,7 +237,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                             </div>
                         </div>
                     </div>
-                }
+                } */}
                 {
                     chuongTrinhDaoTao && chuongTrinhDaoTao.parents && Object.keys(chuongTrinhDaoTao.parents).map((key) => {
                         const childs = chuongTrinhDaoTao.childs;
