@@ -33,8 +33,8 @@ export class ComponentKienThuc extends AdminPage {
             this.rows[idx].soTietThucHanh.value(item ? (item.soTietThucHanh || 0).toString() : '0');
             this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
             this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
-            id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
-            // id == -1 ? this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '') : this.rows[idx].tenMonHoc.value(item ? item.tenMonHoc : '');
+            // id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
+            this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
             this.rows[idx].ma.value((item && item.maMonHoc) ? item.maMonHoc : '');
             this.rows[idx].khoa.value(item ? item.khoa : '');
             this.rows[idx].soTiet.value(item ? (item.tongSoTiet || 0).toString() : '0');
@@ -65,10 +65,6 @@ export class ComponentKienThuc extends AdminPage {
         idx = childId >= 0 ? `${childId}_${idx}` : idx;
         if (!this.rows[idx] || !this.rows[idx].maMonHoc.value()) {
             T.notify('Vui lòng chọn môn học!', 'danger');
-            return;
-        } else if (!this.rows[idx].hocKyDuKien.value()) {
-            T.notify('Vui lòng nhập học kỳ!', 'danger');
-            !this.rows[idx].hocKyDuKien.focus();
             return;
         }
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
@@ -136,7 +132,7 @@ export class ComponentKienThuc extends AdminPage {
     selectMh = (item, idx, childId, childText) => {
         return (
             <>
-                {item.id != -1 ? <FormTextBox ref={e => this.rows[idx].tenMonHoc = e} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal /> : <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll()} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value, childId, childText)} />}
+                <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll()} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value, childId, childText)} />
                 <FormSelect ref={e => this.rows[idx].khoa = e} data={SelectAdapter_DmDonViFaculty_V2} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal />
             </>
         );
