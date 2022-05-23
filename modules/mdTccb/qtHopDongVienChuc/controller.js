@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3020: { title: 'Hợp đồng viên chức', link: '/user/tccb/qua-trinh/hop-dong-vien-chuc', icon: 'fa-id-badge', backgroundColor: '#386b70', groupIndex: 2 },
+            3020: { title: 'Hợp đồng làm việc', link: '/user/tccb/qua-trinh/hop-dong-lam-viec', icon: 'fa-id-badge', backgroundColor: '#016699', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -10,14 +10,14 @@ module.exports = app => {
         { name: 'qtHopDongVienChuc:write' },
         { name: 'qtHopDongVienChuc:delete' },
     );
-    app.get('/user/tccb/qua-trinh/hop-dong-vien-chuc/:ma', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hop-dong-vien-chuc', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hop-dong-vien-chuc/group/:shcc', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hop-dong-lam-viec/:ma', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hop-dong-lam-viec', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hop-dong-lam-viec/group/:shcc', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -33,7 +33,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/group/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/group/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -49,7 +49,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/groupShcc/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/groupShcc/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -63,15 +63,15 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/all', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/all', checkGetStaffPermission, (req, res) => {
         app.model.qtHopDongVienChuc.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/item/:ma', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/item/:ma', checkGetStaffPermission, (req, res) => {
         app.model.qtHopDongVienChuc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/edit/item/:ma', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/edit/item/:ma', checkGetStaffPermission, (req, res) => {
         app.model.qtHopDongVienChuc.get({ ma: req.params.ma }, (error, qtHopDongVienChuc) => {
             if (error || qtHopDongVienChuc == null) {
                 res.send({ error });
@@ -93,27 +93,27 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/tccb/qua-trinh/hop-dong-vien-chuc', app.permission.check('qtHopDongVienChuc:write'), (req, res) => {
+    app.post('/api/tccb/qua-trinh/hop-dong-lam-viec', app.permission.check('qtHopDongVienChuc:write'), (req, res) => {
         app.model.qtHopDongVienChuc.create(req.body.item, (error, item) => {
-            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hợp đồng viên chức');
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hợp đồng làm việc');
             res.send({ error, item });
         });
     });
 
-    app.put('/api/tccb/qua-trinh/hop-dong-vien-chuc', app.permission.check('qtHopDongVienChuc:write'), (req, res) => {
+    app.put('/api/tccb/qua-trinh/hop-dong-lam-viec', app.permission.check('qtHopDongVienChuc:write'), (req, res) => {
         app.model.qtHopDongVienChuc.update({ ma: req.body.ma }, req.body.changes, (error, item) => {
-            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hợp đồng viên chức');
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hợp đồng làm việc');
             res.send({ error, item });
         });
     });
-    app.delete('/api/tccb/qua-trinh/hop-dong-vien-chuc', app.permission.check('qtHopDongVienChuc:delete'), (req, res) => {
+    app.delete('/api/tccb/qua-trinh/hop-dong-lam-viec', app.permission.check('qtHopDongVienChuc:delete'), (req, res) => {
         app.model.qtHopDongVienChuc.delete({ ma: req.body.ma }, (error) => {
-            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng viên chức');
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng làm việc');
             res.send({ error });
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/download-word/:ma', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/download-word/:ma', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         if (req.params && req.params.ma) {
             app.model.qtHopDongVienChuc.download(req.params.ma, (error, item) => {
                 if (error || !item) {
@@ -176,7 +176,7 @@ module.exports = app => {
         return fdate !== '' ? (fdate.getDate()) + '/' + (fdate.getMonth() + 1) + '/' + fdate.getFullYear() : '';
     };
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/download-excel', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/download-excel', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         const pageNumber = 0,
             pageSize = 1000000,
             searchTerm = '';
@@ -273,7 +273,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-vien-chuc/get-truong-phong-tccb', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/get-truong-phong-tccb', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         app.model.canBo.get({ maChucVu: '003', maDonVi: '30' }, 'shcc', 'shcc DESC', (error, truongPhongTccb) => {
             res.send({ error, truongPhongTccb });
         });

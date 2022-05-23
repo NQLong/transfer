@@ -5,14 +5,14 @@ import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import React from 'react';
-import { AdminModal, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
+import { AdminModal, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
 export class SupportModal extends AdminModal {
     onShow = (data) => {
         //For Staff: data = { item: {} }
         //For TCCB Staff: data = { data: {} }
         let item = data.item || data.data || null;
 
-        let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh } = item;
+        let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh, thongTinKhac } = item;
         data.data && this.setState({ item, qtId: data.qtId });
         data.item && this.setState({ shcc: item.shcc });
         this.ho.value(ho);
@@ -35,6 +35,7 @@ export class SupportModal extends AdminModal {
         this.soBhxh.value(soBhxh || '');
         this.ngayBatDauBhxh.value(Number(ngayBatDauBhxh) || '');
         this.ngayKetThucBhxh.value(Number(ngayKetThucBhxh) || '');
+        this.thongTinKhac.value(thongTinKhac || '');
     }
 
     onSubmit = (e) => {
@@ -61,6 +62,7 @@ export class SupportModal extends AdminModal {
             soBhxh: getValue(this.soBhxh),
             ngayBatDauBhxh: getValue(this.ngayBatDauBhxh) ? getValue(this.ngayBatDauBhxh).getTime() : '',
             ngayKetThucBhxh: getValue(this.ngayKetThucBhxh) ? getValue(this.ngayKetThucBhxh).getTime() : '',
+            thongTinKhac: getValue(this.thongTinKhac),
         };
         let dataSupport = {
             qt: 'canBo',
@@ -108,6 +110,8 @@ export class SupportModal extends AdminModal {
                 <FormTextBox ref={e => this.soBhxh = e} className='col-md-6' label='Mã số Bảo hiểm xã hội' readOnly={readOnly} />
                 <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-3' label='Tháng bắt đầu' type='month-mask' readOnly={readOnly} />
                 <FormDatePicker ref={e => this.ngayKetThucBhxh = e} className='col-md-3' label='Tháng kết thúc' type='month-mask' readOnly={readOnly} />
+
+                <FormRichTextBox ref={e => this.thongTinKhac = e} className='col-md-12' label='Yêu cầu hỗ trợ thông tin khác' placeholder='Ghi rõ vấn đề cán bộ gặp phải' readOnly={readOnly} />
 
             </div>
         });

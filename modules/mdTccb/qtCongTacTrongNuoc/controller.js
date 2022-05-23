@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3043: { title: 'Quá trình Công tác trong nước', link: '/user/tccb/qua-trinh/cong-tac-trong-nuoc', icon: 'fa fa-building', backgroundColor: '#a69a03', groupIndex: 1 },
+            3043: { title: 'Quá trình Công tác trong nước', link: '/user/tccb/qua-trinh/cong-tac-trong-nuoc', icon: 'fa fa-building', backgroundColor: '#5E8F85', groupIndex: 1 },
         },
     };
     const menuStaff = {

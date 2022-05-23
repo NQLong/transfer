@@ -8,8 +8,8 @@ import Pagination from 'view/component/Pagination';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { Tooltip } from '@mui/material';
 
-class EditModal extends AdminModal {
-    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [] }
+class TreeModal extends AdminModal {
+    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [], isSemesterMode: false }
     componentDidMount() {
 
     }
@@ -113,13 +113,13 @@ class EditModal extends AdminModal {
     initLevel2 = (itemCha, key, hasNextRow = false) => {
         const { chuongTrinhDaoTaoCon } = this.state;
         const mucChaLength = Object.keys(itemCha).length;
-        const left = (parseInt(key) - 1) > 0 ? 0 : 100 * (1 / (2 * mucChaLength));
-        const width = !hasNextRow ? (parseInt(key) - 1) > 0 ? 100 - 100 / (mucChaLength * 2) : 100 * (1 - 1 / mucChaLength) : 100 - left;
+        const left = (parseInt(key) - 1) > 0 ? 0 : (100 - 1 * (mucChaLength - 1)) / (2 * mucChaLength);
+        const width = !hasNextRow ? (parseInt(key) - 1) > 0 ? 100 - 100 / (mucChaLength * 2) + (mucChaLength - 1) / (2 * mucChaLength) : 100 - ((100 - 1 * (mucChaLength - 1)) / mucChaLength) : 100 - left;
         const styleLevel2Wrapper = {
             gridTemplateColumns: `repeat(${mucChaLength}, 1fr)`,
             '--level-2-wrapper-left': `${left}%`,
             '--level-2-wrapper-width': `${width}%`,
-            marginTop: `${(parseInt(key) - 1) * 50}px`,
+            marginTop: `${(parseInt(key) - 1) === 0 ? 0 : 50}px`,
         };
         return (
             <ol className="level-2-wrapper" style={styleLevel2Wrapper} key={key}>
@@ -136,7 +136,7 @@ class EditModal extends AdminModal {
         );
     }
 
-    init = () => {
+    initChuongTrinhDaoTao = () => {
         const { chuongTrinhDaoTaoCha } = this.state;
         let item = {};
         let row = 0;
@@ -154,6 +154,64 @@ class EditModal extends AdminModal {
         );
     }
 
+    initLevel2HocKy = (itemCha, key, hasNextRow = false) => {
+        const mucChaLength = Object.keys(itemCha).length;
+        const left = (parseInt(key) - 1) > 0 ? 0 : (100 - 1 * (mucChaLength - 1)) / (2 * mucChaLength);
+        const width = !hasNextRow ? (parseInt(key) - 1) > 0 ? 100 - 100 / (mucChaLength * 2) + (mucChaLength - 1) / (2 * mucChaLength) : 100 - ((100 - 1 * (mucChaLength - 1)) / mucChaLength) : 100 - left;
+        const styleLevel2Wrapper = {
+            gridTemplateColumns: `repeat(${mucChaLength}, 1fr)`,
+            '--level-2-wrapper-left': `${left}%`,
+            '--level-2-wrapper-width': `${width}%`,
+            marginTop: `${(parseInt(key) - 1) === 0 ? 0 : 50}px`,
+        };
+        const { monHoc } = this.state;
+        return (
+            <ol className="level-2-wrapper" style={styleLevel2Wrapper} key={key}>
+                {itemCha && Object.keys(itemCha).map((key) => {
+                    const { text: ctdt, id } = itemCha[key];
+                    const monHocByKey = monHoc.filter(mh => {
+                        return parseInt(mh.hocKyDuKien) === parseInt(id);
+                    }) || [];
+                    return (<React.Fragment key={id}>
+                        <li>
+                            <p className='level-2-no-level-3 rectangle'>{ctdt}</p>
+                            <ol className={`${monHocByKey.length > 0 ? 'level-4-wrapper-no-level-3' : null}`}>
+                                {monHocByKey.map((monHoc, idx) => {
+                                    const { tenMonHoc } = monHoc;
+                                    return (<React.Fragment key={idx}>
+                                        {this.initLevelMonHoc(tenMonHoc, false)}
+                                    </React.Fragment>);
+                                })
+                                }
+                            </ol>
+                        </li>
+                    </React.Fragment>
+                    );
+                })
+                }
+            </ol>
+        );
+    }
+
+    initHocKyDuKien = () => {
+        let item = {};
+        let row = 0;
+        // const { monHoc } = this.state;
+        const hocKyDuKien = [1, 2, 3, 4, 5, 6, 7, 8];
+        return (
+            hocKyDuKien.map((hk, idx) => {
+                item[hk] = { text: `Học kỳ ${hk}`, id: hk };
+                const isLast = idx === Object.keys(hocKyDuKien).length - 1;
+                if (Object.keys(item).length >= 3 || (Object.keys(item).length > 0 && isLast)) {
+                    const temp = { ...item };
+                    item = {};
+                    row++;
+                    return (this.initLevel2HocKy(temp, row, !isLast));
+                }
+            })
+        );
+    }
+
 
     render = () => {
         // const readOnly = this.props.readOnly;
@@ -161,12 +219,45 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: `Chương trình năm học - ${this.namDaoTao}`,
             size: 'elarge',
+            buttons:
+                <div style={{ textAlign: 'center' }} className='toggle'>
+                    <label style={{ marginRight: 10 }}>Xem theo học kỳ dự kiến</label>
+                    <label>
+                        <input type='checkbox' checked={this.state.isSemesterMode} onChange={() => { this.setState({ isSemesterMode: !this.state.isSemesterMode }); }} />
+                        <span className='button-indecator' />
+                    </label>
+                </div>,
             body: <div className='row'>
                 <div className="container organization-tree">
                     <p className="level-1 rectangle">{this.tenNganh}</p>
-                    {this.init()}
-
+                    {!this.state.isSemesterMode ? this.initChuongTrinhDaoTao() : this.initHocKyDuKien()}
                 </div>
+            </div>
+
+        });
+    }
+}
+
+class CloneModal extends AdminModal {
+
+    onShow = (item) => {
+        this.id = item.id;
+    };
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const id = this.id;
+        const khoaDt = this.namDaoTao.value();
+        this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/new?id=${id}&khoaDt=${khoaDt}`);
+    };
+
+
+    render = () => {
+        return this.renderModal({
+            title: 'Lựa chọn khoá đào tạo mới',
+            submitText: 'Xác nhận',
+            body: <div>
+                <FormSelect ref={e => this.namDaoTao = e} label='Khóa đào tạo' data={SelectAdapter_DtCauTrucKhungDaoTao} required />
             </div>
         });
     }
@@ -239,6 +330,11 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                         <Tooltip title='Xem cây chương trình' arrow placeholder='bottom' >
                             <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
                         </Tooltip>
+                        <Tooltip title='Sao chép' arrow>
+                            <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || this.cloneModal.show(item)}>
+                                <i className='fa fa-lg fa-clone ' />
+                            </a>
+                        </Tooltip>
                     </TableCell>
                 </tr>
             )
@@ -263,7 +359,8 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtChuongTrinhDaoTaoPage} />
-                <EditModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write} getDtChuongTrinhDaoTao={this.props.getDtChuongTrinhDaoTao} />
+                <TreeModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write} getDtChuongTrinhDaoTao={this.props.getDtChuongTrinhDaoTao} />
+                <CloneModal ref={e => this.cloneModal = e} permission={permissionDaoTao} readOnly={!permission.write} history={this.props.history} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/dao-tao/chuong-trinh-dao-tao/new') : null

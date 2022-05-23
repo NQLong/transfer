@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3004: { title: 'Quá trình chức vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-black-tie', backgroundColor: '#c77a2e', color: 'black', groupIndex: 0 },
+            3004: { title: 'Quá trình chức vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-black-tie', backgroundColor: '#F5D7B0', groupIndex: 0, color: '#000' },
         },
     };
     app.permission.add(
@@ -20,12 +20,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let filter = '{}';
-        try {
-            filter = JSON.stringify(req.query.filter || {});
-        } catch (error) {
-            console.log(error);
-        }
+        let filter = app.stringify(req.query.filter || {});
         app.model.qtChucVu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -41,12 +36,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let filter = '{}';
-        try {
-            filter = JSON.stringify(req.query.filter || {});
-        } catch (error) {
-            console.log(error);
-        }
+        let filter = app.stringify(req.query.filter || {});
         app.model.qtChucVu.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -74,7 +64,7 @@ module.exports = app => {
     app.put('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.changes.shcc);
         let changes = req.body.changes;
-        if (changes && changes.thoiChucVu == 1) changes.chucVuChinh = 0; 
+        if (changes && changes.thoiChucVu == 1) changes.chucVuChinh = 0;
         app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Chức vụ');
             app.session.refresh(targetEmail);
