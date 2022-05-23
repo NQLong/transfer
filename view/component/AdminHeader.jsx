@@ -156,16 +156,16 @@ class NotificationItem extends AdminPage {
             return (
                 <li key={index}>
                     <UrlItem link={item.targetLink} onClick={e => buttons.length == 0 ? this.readNotify(item.id) : e.preventDefault()}>
-                        <span className='app-notification__icon'>
-                            <span className='fa-stack fa-lg'>
+                        <span className='app-notification__icon' style={{ display: 'flex', alignItems: 'center' }}>
+                            <span className='fa-stack fa-2x'>
                                 <i className='fa fa-circle fa-stack-2x' style={{ color: item.iconColor }} />
                                 <i className={`fa ${item.icon} fa-stack-1x fa-inverse`} />
                             </span>
                         </span>
                         <div>
                             <p className='app-notification__message' style={{ fontWeight: 'bold' }}>{item.title}</p>
-                            <p className='app-notification__meta'>{new Date(item.sendTime).getText()}</p>
-                            <p className='app-notification__meta'>{item.subTitle}</p>
+                            <p className='app-notification__meta'>{T.dateToText(item.sendTime, 'dd/mm/yy HH:mm')}</p>
+                            <p className='app-notification__meta' style={{ color: !item.read ? 'blue' : 'black' }}>{item.subTitle}</p>
                             {buttons.length ? (
                                 <div className='row'>
                                     {buttons.map((button, index) => (
@@ -220,6 +220,10 @@ class AdminHeader extends AdminPage {
         };
         T.hideSearchBox = () => {
             this.searchBox && $(this.searchBox).parent().css('display', 'none');
+            this.advancedSearch && $(this.advancedSearch).css('display', 'none');
+        };
+
+        T.hideAdvancedSearch = () => {
             this.advancedSearch && $(this.advancedSearch).css('display', 'none');
         };
         T.clearSearchBox = () => {

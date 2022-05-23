@@ -58,7 +58,7 @@ class ComponentTrinhDo extends AdminPage {
             return false;
         }
     }
-    render() {
+    render = () => {
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin về trình độ</h3>

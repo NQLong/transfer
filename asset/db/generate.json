@@ -6712,22 +6712,36 @@
                     "nullable": true,
                     "size": 10
                 },
-                "LAY_SO": {
-                    "value": "laySo",
+                "LOAI_CONG_VAN": {
+                    "value": "loaiCongVan",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
-                "LOAI_CONG_VAN": {
-                    "value": "loaiCongVan",
+                "SO_DI": {
+                    "value": "soDi",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
                 },
-                "LOAI_CONG": {
-                    "value": "loaiCong",
+                "SO_CONG_VAN": {
+                    "value": "soCongVan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "NOI_BO": {
+                    "value": "noiBo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "LAY_SO": {
+                    "value": "laySo",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,

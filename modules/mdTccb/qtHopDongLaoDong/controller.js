@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3007: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-briefcase', backgroundColor: '#1a76b8', groupIndex: 2 },
+            3007: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-briefcase', backgroundColor: '#9B693B', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -331,9 +331,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.getMaxShccByDonVi(req.params.maDonVi, (error, item) => {
-            res.send({ error, preShcc: item && item.outBinds && item.outBinds.ret ? item.outBinds.ret + 1 : 1 });
-        });
+    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), async (req, res) => {
+        let result = await app.model.qtHopDongLaoDong.getShccAuto(req.params.maDonVi);
+        res.send(result);
     });
 };

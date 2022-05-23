@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox, AdminPage } from 'view/component/AdminPage';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
@@ -13,10 +13,12 @@ import ComponentToChucKhac from '../tccbToChucKhac/componentToChucKhac';
 import { getStaffEdit } from './redux';
 import { SelectAdapter_DmHangThuongBinh } from 'modules/mdDanhMuc/dmHangThuongBinh/redux';
 
-class ComponentCaNhan extends React.Component {
+class ComponentCaNhan extends AdminPage {
     state = { image: '', dangVien: 0, doanVien: 0, congDoan: 0 };
     // shcc = ''; email = '';
-
+    componentDidMount() {
+        this.props.shcc && this.props.getStaffEdit(this.props.shcc, item => this.value(item.item));
+    }
     handleHo = (e) => {
         this.ho.value(e.target.value.toUpperCase());
     }
@@ -25,8 +27,8 @@ class ComponentCaNhan extends React.Component {
         this.ten.value(e.target.value.toUpperCase());
     }
 
-    value = function (item) {
-        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan }, () => {
+    value = (item) => {
+        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan, emailTruong: item.email }, () => {
             this.shcc = item.shcc;
             this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
             this.donVi.value(item.maDonVi);
@@ -106,14 +108,28 @@ class ComponentCaNhan extends React.Component {
         return '';
     };
 
-    handleNewShcc = (value) => {
-        let curShcc = value.currentTarget.value;
+    handleNewShcc = () => {
+        let curShcc = this.maTheCanBo.value();
         if (curShcc && curShcc != '' && curShcc.length == 8 && curShcc != this.shcc) {
             this.props.getStaffEdit(curShcc, data => {
                 if (data.item && !data.error) {
                     T.confirm('Cảnh báo', `Mã số <b>${data.item.shcc}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
                         }. <br/><br/> Vui lòng nhập mã số khác!`, 'warning', true, isConfirm => {
                             isConfirm && this.shcc.value('');
+                        });
+                }
+            });
+        }
+    }
+
+    handleEmailHCMUSSH = () => {
+        let curEmail = this.emailTruong.value();
+        if (curEmail && curEmail != '' && T.validateEmail(curEmail) && curEmail != this.state.emailTruong) {
+            this.props.getStaffEdit({ email: curEmail }, data => {
+                if (data.item && !data.error) {
+                    T.confirm('Cảnh báo', `Email <b>${data.item.email}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
+                        }. <br/><br/> Vui lòng nhập email khác!`, 'warning', true, isConfirm => {
+                            isConfirm && this.emailTruong.value('');
                         });
                 }
             });
@@ -150,7 +166,7 @@ class ComponentCaNhan extends React.Component {
                     cmndNoiCap: this.getValue(this.cmndNoiCap),
                     dienThoaiCaNhan: this.getValue(this.soDienThoaiCaNhan),
                     dienThoaiBaoTin: this.getValue(this.soDienThoaiBaoTin),
-                    emailTruong,
+                    email: emailTruong,
                     emailCaNhan: this.getValue(this.emailCaNhan),
                     quocGia: this.getValue(this.quocTich),
                     danToc: this.getValue(this.danToc),
@@ -225,7 +241,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp' className='form-group col-md-4' />
                     <div className='form-group col-12' />
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân (khác email trường)' className='form-group col-md-6' />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={readOnly} onChange={this.handleEmailHCMUSSH} />
                     <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='SĐT cá nhân' className='col-md-6' maxLength={10} />
                     <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label={<span>SĐT báo tin (<a href='#' onClick={e => e.preventDefault() || (this.soDienThoaiCaNhan.value() ? this.soDienThoaiBaoTin.value(this.soDienThoaiCaNhan.value()) : T.notify('Điện thoại cá nhân trống', 'warning'))}>Nhấn vào đây nếu giống <b>SĐT cá nhân</b></a>)</span>} placeholder='SĐT báo tin' className='col-md-6' maxLength={10} />
 

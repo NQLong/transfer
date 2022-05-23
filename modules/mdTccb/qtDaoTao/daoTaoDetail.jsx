@@ -22,7 +22,7 @@ class DaoTaoDetail extends AdminPage {
             else if (chungChi == 'Ngoại ngữ') return i.loaiBangCap == 5;
             else if (chungChi != 'Hiện tại') return i.chuyenNganh === chungChi;
         }),
-            curPermission = this.getUserPermission('staff', ['login', 'delete']),
+            curPermission = this.getUserPermission('staff', ['login', 'write', 'delete']),
             permission = {
                 read: curPermission.login, write: curPermission.login, delete: curPermission.login
             };
@@ -83,20 +83,20 @@ class DaoTaoDetail extends AdminPage {
                 </div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <span style={{ display: this.state?.display || 'none' }}>
-                        <Tooltip title='Gửi yêu cầu cho phòng TCCB' arrow >
-                            <button className='btn btn-danger' onClick={e => {
+                        <Tooltip title={curPermission.write ? 'Thêm' : 'Gửi yêu cầu cho phòng TCCB'} arrow >
+                            <button className={curPermission.write ? 'btn btn-info' : 'btn btn-danger'} onClick={e => {
                                 e.preventDefault();
                                 this.modal.show({
                                     item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
                                 });
                             }}>
-                                <i className='fa fa-fw fa-lg fa-plus' />Gửi yêu cầu
+                                <i className='fa fa-fw fa-lg fa-plus' />{curPermission.write ? 'Thêm' : 'Gửi yêu cầu'}
                             </button>
                         </Tooltip>
                     </span>
                 </div>
-                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={true} shcc={this.props.shcc}
-                    create={this.props.createTccbSupport} />
+                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={!curPermission.write} shcc={this.props.shcc} update={curPermission ? this.props.updateQtDaoTaoStaff : null}
+                    create={curPermission.write ? this.props.createQtDaoTaoStaff : this.props.createTccbSupport} />
             </div >
         );
     }

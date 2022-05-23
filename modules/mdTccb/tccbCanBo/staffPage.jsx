@@ -20,12 +20,16 @@ class StaffUserPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user', () => {
+            T.hideSearchBox();
             if (this.props.system && this.props.system.user && this.props.system.user.staff) {
                 const staff = this.props.system.user.staff;
                 if (!staff.shcc) {
                     T.notify('Cán bộ chưa có mã thẻ', 'danger');
                     this.props.history.goBack();
-                } else this.shcc = staff.shcc;
+                } else {
+                    this.shcc = staff.shcc;
+                    this.email = staff.email;
+                }
                 this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
@@ -43,7 +47,7 @@ class StaffUserPage extends AdminPage {
     }
 
     setUp = (item) => {
-        this.componentCaNhan.value(item);
+        // this.componentCaNhan.value(item);
         this.componentTTCongTac.value(item);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
@@ -54,12 +58,12 @@ class StaffUserPage extends AdminPage {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
-        this.props.updateStaff(this.shcc, {
-            ...caNhanData
-        });
-        if (this.emailCanBo) {
+        // this.props.updateStaff(this.shcc, {
+        //     ...caNhanData
+        // });
+        if (this.shcc) {
             if (caNhanData && congTacData && trinhDoData) {
-                this.props.updateStaff(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
+                this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.email, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
             }
         }
     }
@@ -74,7 +78,6 @@ class StaffUserPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
             shcc = this.props.system.user.staff.shcc;
-        if (permission.login && permission.write) permission.write = false;
 
         return this.renderPage({
             icon: 'fa fa-address-card-o',
@@ -93,8 +96,10 @@ class StaffUserPage extends AdminPage {
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
 
                 <SupportModal ref={e => this.supportModal = e} create={this.props.createTccbSupport} system={this.props.system} />
-                <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '125px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />
+                {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '125px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}
+
                 <CirclePageButton type='custom' tooltip='Tải về lý lịch 2C (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={this.downloadWord} />
+
                 <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
             </>,
             backRoute: '/user',

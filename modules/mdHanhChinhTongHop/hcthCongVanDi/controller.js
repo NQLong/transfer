@@ -324,11 +324,25 @@ module.exports = app => {
 
     // Cần sửa lại
     const isRelated = async (congVan, donViNhan, req) => {
-        const permissions = req.session.user.permissions;
-        const maDonVi = req.session.user.staff.maDonVi;
-        if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
-            return true;
-        } else {
+        try {
+
+            const permissions = req.session.user.permissions;
+            const maDonVi = req.session.user.staff.maDonVi;
+            if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
+                return true;
+            }
+            if (req.query.nhiemVu) {
+                const count = (await app.model.hcthLienKet.asyncCount({
+                    keyA: req.query.nhiemVu,
+                    loaiA: 'NHIEM_VU',
+                    loaiB: 'CONG_VAN_DI',
+                    keyB: req.params.id
+                }));
+                if (await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
+                    && count && count.rows[0] && count.rows[0]['COUNT(*)'])
+                    return true;
+            }
+
             const canBoNhan = congVan.canBoNhan;
             const donViGui = congVan.donViGui;
             let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
@@ -341,7 +355,10 @@ module.exports = app => {
                 let maDonViNhan = donViNhan.map((item) => item.donViNhan);
                 return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDi:manage') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
             }
+        } catch {
+            return false;
         }
+
     };
 
 
@@ -598,7 +615,18 @@ module.exports = app => {
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const { ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
 
-        const data = { ids, excludeIds, hasIds, fromTime, toTime };
+        const donViCanBo = (req.session?.user?.staff?.donViQuanly || []).map(item => item.maDonVi);
+        const userPermissions = req.session.user?.permissions || [];
+        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
+        const hcthPermission = getUserPermission(req, 'hcth', ['login']);
+        const staffType = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
+
+        const data = { ids, excludeIds, hasIds, fromTime, toTime,
+            shccCanBo: req.session.user?.shcc,
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDi:manage') ? req.session.user?.staff?.maDonVi : '') || '',
+            staffType
+        };
+        // console.log(data);
         let filterParam;
         try {
             filterParam = JSON.stringify(data);
@@ -607,6 +635,7 @@ module.exports = app => {
             return;
         } finally {
             app.model.hcthCongVanDi.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+                // console.log(error);
                 if (error || !page) res.send({ error });
                 else {
                     const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;

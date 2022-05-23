@@ -119,7 +119,7 @@ module.exports = app => {
             }
         });
     });
-    app.post('/api/qua-trinh/di-nuoc-ngoai', app.permission.check('qtDiNuocNgoai:write'), (req, res) => {
+    app.post('/api/qua-trinh/di-nuoc-ngoai', app.permission.check('staff:login'), (req, res) => {
         app.model.qtDiNuocNgoai.create(req.body.data, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'C', 'Đi nước ngoài');
             res.send({ error, item });
