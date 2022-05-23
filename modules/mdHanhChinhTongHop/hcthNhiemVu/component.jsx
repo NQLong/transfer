@@ -29,7 +29,6 @@ export class CanBoNhan extends AdminPage {
     }
 
     canAdd = () => {
-        console.log(this.props.trangThai !== trangThaiNhiemVu.DONG.id);
         const userPermission = this.getCurrentPermissions();
 
         if (this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isCreator || userPermission.some(item => ['hcth:manage', 'rectors:login'].includes(item))))
@@ -65,10 +64,10 @@ export class CanBoNhan extends AdminPage {
     updatePermission = (e, item, vaiTroMoi) => {
         e.preventDefault();
         const updateData = {
-            id: item.id, 
+            id: item.id,
             nhiemVuId: this.props.target,
-            shccCanBoNhan: item.shccCanBoNhan, 
-            shccNguoiTao: this.props.system.user.staff.shcc, 
+            shccCanBoNhan: item.shccCanBoNhan,
+            shccNguoiTao: this.props.system.user.staff.shcc,
             hoCanBo: item.hoCanBoNhan,
             tenCanBo: item.tenCanBoNhan,
             vaiTroMoi
@@ -228,14 +227,14 @@ export class PhanHoi extends React.Component {
                         </div>
                         {
                             this.props.trangThai !== trangThaiNhiemVu.DONG.id ?
-                            <>
-                                <FormRichTextBox type='text' className='col-md-12 mt-2' ref={e => this.phanHoi = e} placeholder='Thêm phản hồi' />
-                                <div className='col-md-12 d-flex justify-content-end'>
-                                    <button type='submit' className='btn btn-primary' onClick={this.onCreatePhanHoi}>
-                                        Gửi
-                                    </button>
-                                </div>
-                            </> : null
+                                <>
+                                    <FormRichTextBox type='text' className='col-md-12 mt-2' ref={e => this.phanHoi = e} placeholder='Thêm phản hồi' />
+                                    <div className='col-md-12 d-flex justify-content-end'>
+                                        <button type='submit' className='btn btn-primary' onClick={this.onCreatePhanHoi}>
+                                            Gửi
+                                        </button>
+                                    </div>
+                                </> : null
                         }
                     </div>
                 </div>
@@ -634,16 +633,16 @@ export class History extends React.Component {
     }
 
     render = () => {
-        let historyData = this.props.data?.map(item => item.ghiChu ? ({...item, ghiChu: JSON.parse(item.ghiChu)}) : ({...item}));
+        let historyData = this.props.data?.map(item => item.ghiChu ? ({ ...item, ghiChu: JSON.parse(item.ghiChu) }) : ({ ...item }));
         const loginShcc = this.props.system?.user?.staff?.shcc;
         const renderChangeCanBoNhanContent = (action, item) => {
             switch (action) {
                 case 'ADD_EMPLOYEES':
-                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.roleName[item.ghiChu.role].color}}>thêm {item.ghiChu.quantity} {this.roleName[item.ghiChu.role].text}</b> vào nhiệm vụ này.</span>;
+                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.roleName[item.ghiChu.role].color }}>thêm {item.ghiChu.quantity} {this.roleName[item.ghiChu.role].text}</b> vào nhiệm vụ này.</span>;
                 case 'REMOVE_EMPLOYEE':
                     return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>xoá {item.ghiChu.name}</b> ra khỏi nhiệm vụ.</span>;
                 case 'CHANGE_ROLE':
-                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>thay đổi vai trò của {item.ghiChu.name}</b> thành <b style={{ color: this.roleName[item.ghiChu.role].color}}>{this.roleName[item.ghiChu.role].text}</b>.</span>;
+                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>thay đổi vai trò của {item.ghiChu.name}</b> thành <b style={{ color: this.roleName[item.ghiChu.role].color }}>{this.roleName[item.ghiChu.role].text}</b>.</span>;
                 default:
                     return null;
             }
@@ -659,9 +658,9 @@ export class History extends React.Component {
                             component: <>
                                 <span className='time'>{T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM')}</span>
                                 {
-                                    item.hanhDong !== this.canBoNhanAction.ADD_EMPLOYEES && item.hanhDong !== this.canBoNhanAction.REMOVE_EMPLOYEE && item.hanhDong !== this.canBoNhanAction.CHANGE_ROLE ? 
-                                    <p><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>{this.actionText[item.hanhDong]}</b> nhiệm vụ này.</p> :
-                                    <p>{renderChangeCanBoNhanContent(item.hanhDong, item)}</p>
+                                    item.hanhDong !== this.canBoNhanAction.ADD_EMPLOYEES && item.hanhDong !== this.canBoNhanAction.REMOVE_EMPLOYEE && item.hanhDong !== this.canBoNhanAction.CHANGE_ROLE ?
+                                        <p><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>{this.actionText[item.hanhDong]}</b> nhiệm vụ này.</p> :
+                                        <p>{renderChangeCanBoNhanContent(item.hanhDong, item)}</p>
                                 }
                             </>
                         })
@@ -745,7 +744,7 @@ export class ListFiles extends React.Component {
     });
     render() {
         const { id, sitePermission } = this.props;
-       
+
         return (
             <div className='tile'>
                 <div className='form-group'>
@@ -753,7 +752,7 @@ export class ListFiles extends React.Component {
                     <div className='tile-body row'>
                         <div className={'form-group ' + (!sitePermission.editGeneral ? 'col-md-12' : 'col-md-8')}>
                             {this.tableListFile(this.props.files, id, sitePermission)}
-                         </div>
+                        </div>
                         {sitePermission.editGeneral && <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin nhiệm vụ' postUrl='/user/upload' uploadType='hcthNhiemVuFile' userData='hcthNhiemVuFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
                     </div>
                 </div>

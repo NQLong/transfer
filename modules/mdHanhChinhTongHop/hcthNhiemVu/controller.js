@@ -244,7 +244,7 @@ module.exports = (app) => {
             resolve();
         }
     });
-    
+
 
     app.post('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'htch:manage', 'rectors:login'), async (req, res) => {
         try {
@@ -654,15 +654,15 @@ module.exports = (app) => {
         try {
             const id = req.params.id;
             const { canBoNhan, nguoiTao } = req.body;
-            app.model.hcthNhiemVu.update({ id }, { trangThai: trangThaiNhiemVu.DONG.id }, async (error, item ) => {
+            app.model.hcthNhiemVu.update({ id }, { trangThai: trangThaiNhiemVu.DONG.id }, async (error, item) => {
                 if (error) {
                     res.send({ error });
                 } else {
                     const _newHistory = {
                         loai: 'NHIEM_VU',
-                        key: id, 
-                        shcc: req.session.user?.shcc, 
-                        hanhDong: action.CLOSE 
+                        key: id,
+                        shcc: req.session.user?.shcc,
+                        hanhDong: action.CLOSE
                     };
                     await app.model.hcthHistory.asyncCreate(_newHistory).then(() => {
                         let listCanBoNhanShcc = [];
@@ -674,11 +674,11 @@ module.exports = (app) => {
                                 nguoiTaoShcc: req.session.user?.shcc,
                                 canBoNhan: listCanBoNhanShcc,
                                 hanhDong: action.CLOSE
-                             });
+                            });
                         }
                         res.send({ error: null, item });
                     })
-                    .catch(error => res.send({ error }));
+                        .catch(error => res.send({ error }));
                 }
             });
         } catch (error) {
@@ -690,31 +690,31 @@ module.exports = (app) => {
         try {
             const id = req.params.id;
             const { canBoNhan, nguoiTao } = req.body;
-            app.model.hcthNhiemVu.update({ id }, { trangThai: trangThaiNhiemVu.MO.id }, async (error, item ) => {
+            app.model.hcthNhiemVu.update({ id }, { trangThai: trangThaiNhiemVu.MO.id }, async (error, item) => {
                 if (error) {
                     res.send({ error });
                 } else {
                     const _newHistory = {
                         loai: 'NHIEM_VU',
-                        key: id, 
-                        shcc: req.session.user?.shcc, 
+                        key: id,
+                        shcc: req.session.user?.shcc,
                         hanhDong: action.REOPEN
                     };
                     await app.model.hcthHistory.asyncCreate(_newHistory).then(() => {
                         let listCanBoNhanShcc = [];
-                            if (nguoiTao !== req.session.user?.shcc) listCanBoNhanShcc.push(nguoiTao);
-                            if (canBoNhan.length > 0) listCanBoNhanShcc = listCanBoNhanShcc.concat([...canBoNhan.map(cb => cb.shccCanBoNhan)]);
-                            if (listCanBoNhanShcc.length > 0) {
-                                onCreateOpenAndCloseTaskNotification({
-                                    maNhiemVu: id,
-                                    nguoiTaoShcc: req.session.user?.shcc,
-                                    canBoNhan: listCanBoNhanShcc,
-                                    hanhDong: action.REOPEN
-                                });
-                            }
-                            res.send({ error: null, item });
+                        if (nguoiTao !== req.session.user?.shcc) listCanBoNhanShcc.push(nguoiTao);
+                        if (canBoNhan.length > 0) listCanBoNhanShcc = listCanBoNhanShcc.concat([...canBoNhan.map(cb => cb.shccCanBoNhan)]);
+                        if (listCanBoNhanShcc.length > 0) {
+                            onCreateOpenAndCloseTaskNotification({
+                                maNhiemVu: id,
+                                nguoiTaoShcc: req.session.user?.shcc,
+                                canBoNhan: listCanBoNhanShcc,
+                                hanhDong: action.REOPEN
+                            });
+                        }
+                        res.send({ error: null, item });
                     })
-                    .catch(error => res.send({ error }) );
+                        .catch(error => res.send({ error }));
                 }
             });
         } catch (error) {

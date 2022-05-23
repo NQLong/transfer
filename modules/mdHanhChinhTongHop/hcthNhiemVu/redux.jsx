@@ -274,7 +274,7 @@ export function deleteLienKet(id, done) {
 }
 
 // // History
-export function getListHistory(id , done) {
+export function getListHistory(id, done) {
     return dispatch => {
         const url = '/api/hcth/nhiem-vu/lich-su/list';
         T.post(url, { id }, res => {

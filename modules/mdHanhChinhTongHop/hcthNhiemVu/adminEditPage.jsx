@@ -205,13 +205,13 @@ class AdminEditPage extends AdminPage {
 
     onClose = () => {
         T.confirm('Đóng nhiệm vụ', 'Bạn có chắc chắn muốn đóng nhiệm vụ này lại không ?', true,
-            isConfirm => isConfirm && this.props.closeNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData )
+            isConfirm => isConfirm && this.props.closeNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData)
         );
     }
 
     onReopen = () => {
         T.confirm('Mở lại nhiệm vụ', 'Bạn có chắc chắn muốn mở lại nhiệm vụ này không ?', true,
-            isConfirm => isConfirm && this.props.reopenNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData )
+            isConfirm => isConfirm && this.props.reopenNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData)
         );
     }
 
@@ -227,9 +227,9 @@ class AdminEditPage extends AdminPage {
         if (sitePermission.isParticipant && this.state.trangThai !== trangThaiNhiemVu.DONG.id)
             buttons.push({ icon: 'fa-check', onClick: this.onComplete, className: 'btn-success' });
         if (isShowCloseTaskBtn)
-            buttons.push({ icon: 'fa-lock', onClick: this.onClose, className: 'btn-danger'});
+            buttons.push({ icon: 'fa-lock', onClick: this.onClose, className: 'btn-danger' });
         if (isShowReopenTaskBtn)
-            buttons.push({ icon: 'fa-unlock', onClick: this.onReopen, className: 'btn-success'});
+            buttons.push({ icon: 'fa-unlock', onClick: this.onReopen, className: 'btn-success' });
         // const nextTrangThai = trangThaiNhiemVu[this.state.trangThaix]?.next || [];
         // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
         return this.renderPage({
@@ -261,11 +261,11 @@ class AdminEditPage extends AdminPage {
                         } */}
                     </div>
                 </div>
-                <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} trangThai={this.state.trangThai}/>
+                <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} trangThai={this.state.trangThai} />
                 {this.state.id && <PhanHoi {...this.props} target={this.state.id} sitePermission={sitePermission} trangThai={this.state.trangThai} />}
                 {this.state.id && <LienKet {...this.props} sitePermission={sitePermission} target={this.state.id} data={this.props.hcthNhiemVu?.cvdPage?.list} />}
 
-                <ListFiles {...this.props} files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} updateListFile={(newList) => this.setState({ listFile: newList}) } />
+                <ListFiles {...this.props} files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} updateListFile={(newList) => this.setState({ listFile: newList })} />
 
                 {this.state.id && <History {...this.props} data={this.props.hcthNhiemVu?.item?.history} />}
             </>,
