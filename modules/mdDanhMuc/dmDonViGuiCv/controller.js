@@ -20,8 +20,10 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
-        const statement = ['ten']
+        let statement = ['ten']
             .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
+
+        statement += ' AND KICH_HOAT = 1';
         if (req.query.condition) {
             condition = {
                 statement,
