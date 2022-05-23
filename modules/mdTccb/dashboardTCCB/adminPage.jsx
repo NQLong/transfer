@@ -136,7 +136,7 @@ class Dashboard extends AdminPage {
                 listStaffGender: this.setUp(nhanSuCongTac, 'gioiTinh', [DefaultColors.green, DefaultColors.yellow]),
                 listDiNuocNgoai: this.setUp(qtDiNuocNgoai, 'tenMucDich', DefaultColors.navy),
                 listCongTacTrongNuoc: this.setUp(qtCongTacTrongNuoc, 'tenMucDich', DefaultColors.yellow),
-                listNgach: this.setUp(nhanSuCongTac, 'tenNgach', DefaultColors.maroon),
+                listNgach: this.setUp(nhanSuCongTac, 'tenNgach', DefaultColors.green),
                 listDonVi: listDonVi.groupBy('maPl'),
                 listHocHam: this.setUp(nhanSuCongTac, 'chucDanh', [DefaultColors.blue, DefaultColors.red], { '01': 'Giáo sư', '02': 'Phó giáo sư' }),
                 listNhanSuTuyenDung: this.setUp(nhanSuCongTac.map(item => {
@@ -202,22 +202,22 @@ class Dashboard extends AdminPage {
             subTitle: `${fromTime ? ('Từ ' + T.dateToText(Number(fromTime), 'dd/mm/yyyy') + ' đến') : ''} ${new Date().ddmmyyyy()}`,
             content: this.state.isLoading ? loadSpinner() : <div className='row'>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='info' icon='fa-users' title='Cán bộ' value={tongCB} link='/user/tccb/staff' />
+                    <DashboardIcon type='primary' icon='fa-users' title='Cán bộ' value={tongCB} link='/user/tccb/staff' />
                 </div>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='info' icon='fa-modx' title='Đơn vị' value={soLuongDonVi} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='primary' icon='fa-modx' title='Đơn vị' value={soLuongDonVi} link='/user/tccb/danh-sach-don-vi' />
                 </div>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='info' icon='fa-tags' title='Khoa - Bộ môn' value={listDonVi[1]?.length || 0} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='primary' icon='fa-tags' title='Khoa - Bộ môn' value={listDonVi[1]?.length || 0} link='/user/tccb/danh-sach-don-vi' />
                 </div>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='info' icon='fa-sticky-note' title='Phòng ban' value={listDonVi[2]?.length || 0} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='primary' icon='fa-sticky-note' title='Phòng ban' value={listDonVi[2]?.length || 0} link='/user/tccb/danh-sach-don-vi' />
                 </div>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='info' icon='fa-building' title='Trung tâm - công ty' value={listDonVi[3]?.length || 0} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='primary' icon='fa-building' title='Trung tâm - công ty' value={listDonVi[3]?.length || 0} link='/user/tccb/danh-sach-don-vi' />
                 </div>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='info' icon='fa-fire' title='Đoàn thể' value={listDonVi[4]?.length || 0} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='primary' icon='fa-fire' title='Đoàn thể' value={listDonVi[4]?.length || 0} link='/user/tccb/danh-sach-don-vi' />
                 </div>
 
                 {/* <ChartArea className='col-lg-6' title='Giới tính' chartType='doughnut' data={listStaffGender} aspectRatio={2} renderFilter={
@@ -239,14 +239,14 @@ class Dashboard extends AdminPage {
                 <ChartArea className='col-lg-6' title='Nhân sự trung tâm, công ty' chartType='bar' data={nhanSuTrungTam} aspectRatio={2} />
                 <ChartArea className='col-lg-6' title='Nhân sự đoàn thể' chartType='bar' data={nhanSuDoanThe} aspectRatio={2} />
 
-                <ChartArea className='col-lg-6' title='Số lượng các quá trình' chartType='doughnut' data={soLuongCacQuaTrinh} aspectRatio={1} />
+                <ChartArea className='col-lg-4' title='Các quá trình' chartType='doughnut' data={soLuongCacQuaTrinh} aspectRatio={1} />
                 {/* <ChartArea className='col-lg-6' title='Công tác trong nước' chartType='bar' data={listCongTacTrongNuoc} aspectRatio={2} />
 
                 <ChartArea className='col-lg-6' title='Đi nước ngoài' chartType='bar' data={listDiNuocNgoai} aspectRatio={2} /> */}
 
-                <ChartArea className='col-lg-6' title='Chức danh nghề nghiệp' chartType='bar' data={listNgach} aspectRatio={1}
+                <ChartArea className='col-lg-8' title='Chức danh nghề nghiệp' chartType='bar' data={listNgach} aspectRatio={2.22}
                     renderFilter={
-                        <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.ngachTheoDonVi = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '250px' }} allowClear placeholder='Chọn đơn vị' onChange={value => this.setState({
+                        <FormSelect data={SelectAdapter_DmDonVi} ref={e => this.ngachTheoDonVi = e} style={{ position: 'absolute', top: '20px', right: '100px', width: '150px' }} allowClear placeholder='Chọn đơn vị' onChange={value => this.setState({
                             listNgach: this.setUp(nhanSuCongTac.filter(item => value ? item.donVi == value.id : true), 'tenNgach', DefaultColors.maroon)
                         })} />
                     } />
