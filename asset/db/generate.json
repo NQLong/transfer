@@ -13544,10 +13544,10 @@
                 },
                 "PHAN_TRAM_HUONG": {
                     "value": "phanTramHuong",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "3,0"
+                    "size": 500
                 },
                 "SO_HOP_DONG": {
                     "value": "soHopDong",
@@ -13555,6 +13555,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "DIA_DIEM_LAM_VIEC": {
+                    "value": "diaDiemLamViec",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "CONG_VIEC_DUOC_GIAO": {
+                    "value": "congViecDuocGiao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
+                },
+                "CHIU_SU_PHAN_CONG": {
+                    "value": "chiuSuPhanCong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
                 }
             },
             "primaryKeys": [
