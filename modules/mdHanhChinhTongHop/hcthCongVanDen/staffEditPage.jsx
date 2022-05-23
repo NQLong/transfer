@@ -615,7 +615,14 @@ class StaffEditPage extends AdminPage {
         let { donViNhan, canBoNhan } = this.getItem() || {};
         let maDonViNhan = donViNhan?.split(',') || [];
         let maCanBoNhan = canBoNhan?.split(',') || [];
-        return currentPermission.includes('rectors:login') || currentPermission.includes('hcth:login') || this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) || maCanBoNhan.includes(this.state.shcc);
+        let maDonViCanBo = this.props.system?.user?.staff?.maDonVi;
+        return (
+            currentPermission.includes('rectors:login') ||
+            currentPermission.includes('hcth:login') ||
+            (currentPermission.includes('donViCongVanDen:read') && maDonViNhan.includes(maDonViCanBo) ) ||
+            this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) ||
+            maCanBoNhan.includes(this.state.shcc)
+        );
     }
 
     onCreatePhanHoi = (e) => {
