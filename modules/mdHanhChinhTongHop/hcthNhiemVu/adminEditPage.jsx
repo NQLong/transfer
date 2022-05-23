@@ -221,7 +221,6 @@ class AdminEditPage extends AdminPage {
             sitePermission = this.getSitePermission(),
             siteSetting = this.getSiteSetting(),
             buttons = [];
-        console.log(this.state);
         const isShowCloseTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai !== trangThaiNhiemVu.DONG.id;
         const isShowReopenTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai === trangThaiNhiemVu.DONG.id;
         if (sitePermission.isParticipant && this.state.trangThai !== trangThaiNhiemVu.DONG.id)
