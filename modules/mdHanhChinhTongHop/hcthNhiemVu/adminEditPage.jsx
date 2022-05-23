@@ -12,7 +12,7 @@ const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 
 class AdminEditPage extends AdminPage {
     listFileRefs = {};
-    state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.MOI.id }
+    state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.DONG.id }
 
     tableListFile = (data, id, sitePermission) => renderTable({
         getDataSource: () => data,
@@ -75,7 +75,7 @@ class AdminEditPage extends AdminPage {
 
     setData = (data = null) => {
 
-        let { tieuDe, noiDung, ngayTao, ngayBatDau, ngayKetThuc, donViNhan, doUuTien, phanHoi = [], listFile = [], lienKet = [], lienPhong = 0, canBoNhan = [], nguoiTao, trangThai = '' } = data ? data :
+        let { tieuDe, noiDung, ngayTao, ngayBatDau, ngayKetThuc, donViNhan, doUuTien, phanHoi = [], listFile = [], lienKet = [], lienPhong = 0, canBoNhan = [], nguoiTao, trangThai = trangThaiNhiemVu.MO.id } = data ? data :
             { tieuDe: '', noiDung: '', ngayTao: '', ngayBatDau: '', ngayKetThuc: '', donViNhan: [], doUuTien: doUuTienMapper.NORMAL.id, lienKet, lienPhong: 0, canBoNhanNhiemVu: {}, nguoiTao: '' };
 
         this.ngayTao?.value(ngayTao || '');
@@ -86,10 +86,10 @@ class AdminEditPage extends AdminPage {
         this.ngayKetThuc.value(ngayKetThuc || '');
         this.doUuTien.value(doUuTien || '');
         this.lienPhong.value(lienPhong);
+        this.trangThai.value(trangThai || '');
         if (!this.state.id) {
             this.props.clearHcthNhiemVu();
         }
-
 
         const isCreator = this.state.id ? this.props.hcthNhiemVu?.item?.nguoiTao == this.props.system?.user?.shcc : true;
         const isManager = canBoNhan.some(item => item.vaiTro == vaiTro.MANAGER.id && item.shccCanBoNhan == this.props.system?.user?.shcc);
@@ -230,8 +230,6 @@ class AdminEditPage extends AdminPage {
             buttons.push({ icon: 'fa-lock', onClick: this.onClose, className: 'btn-danger' });
         if (isShowReopenTaskBtn)
             buttons.push({ icon: 'fa-unlock', onClick: this.onReopen, className: 'btn-success' });
-        // const nextTrangThai = trangThaiNhiemVu[this.state.trangThaix]?.next || [];
-        // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Nhiệm vụ',
@@ -245,6 +243,7 @@ class AdminEditPage extends AdminPage {
                     <div className='tile-body row'>
                         <FormTextBox type='text' className='col-md-12' ref={e => this.tieuDe = e} label='Tiêu đề' required readOnly={!sitePermission.editGeneral} />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={!sitePermission.editGeneral} required />
+                        {this.state.id && <div className='form-group col-md-12'>Trạng thái nhiệm vụ: <span style={{ color: trangThaiNhiemVu[this.state.trangThai].color, fontWeight: 'bold' }}>{trangThaiNhiemVu[this.state.trangThai].text}</span></div>}
                         {this.state.id && <>
                             <FormSelect className='col-md-6' ref={(e => this.nguoiTao = e)} label='Người tạo' data={SelectAdapter_FwCanBo} readOnly={true} />
                             <FormDatePicker type='date-mask' className='col-md-6' ref={(e => this.ngayTao = e)} label='Người tạo' readOnly={true} />
@@ -255,10 +254,7 @@ class AdminEditPage extends AdminPage {
                         <FormSelect className='col-md-12' ref={e => this.doUuTien = e} label='Độ ưu tiên' data={Object.keys(doUuTienMapper).map(key => ({ id: key, text: doUuTienMapper[key].text }))} readOnly={!sitePermission.editGeneral} required />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' readOnly={!sitePermission.editGeneral} readOnlyEmptyText='Chưa có' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKetThuc = e} label='Ngày kết thúc' readOnly={!sitePermission.editGeneral} readOnlyEmptyText='Chưa có' />
-                        {/* {this.state.id && this.state.trangThai && (<>
-                            <FormSelect className={this.state.trangThai != trangThaiNhiemVu.MOI.id ? 'col-md-6' : 'col-md-12'} ref={e => this.trangThai = e} data={trangThaiAdapter} label='Tình trạng nhiêm vụ' readOnly={!sitePermission.editTrangThai} />
-                        </>)
-                        } */}
+
                     </div>
                 </div>
                 <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} trangThai={this.state.trangThai} />

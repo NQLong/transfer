@@ -249,7 +249,7 @@ module.exports = (app) => {
     app.post('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'htch:manage', 'rectors:login'), async (req, res) => {
         try {
             const { canBoNhan = [], fileList = [], donViNhan = [], ...data } = req.body;
-            const nhiemVu = await app.model.hcthNhiemVu.asyncCreate({ ...data, trangThai: trangThaiNhiemVu.MOI.id });
+            const nhiemVu = await app.model.hcthNhiemVu.asyncCreate({ ...data, trangThai: trangThaiNhiemVu.MO.id });
             await app.model.hcthDonViNhan.createFromList(donViNhan, nhiemVu.id, 'NHIEM_VU');
             await updateCanBoNhan(canBoNhan, nhiemVu.id);
             app.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
