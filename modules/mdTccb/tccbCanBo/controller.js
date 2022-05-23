@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3002: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 }
+            3002: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#28586F', groupIndex: 0 }
         }
     };
 
@@ -164,8 +164,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:login'), async (req, res) => {
-        app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
+    app.get('/api/staff/edit/item', app.permission.check('staff:login'), async (req, res) => {
+        app.model.canBo.get(req.query.condition, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
@@ -178,11 +178,20 @@ module.exports = app => {
         const newItem = req.body.canBo;
         app.model.canBo.get({ shcc: newItem.shcc }, (error, item) => {
             if (item) {
-                res.status(403).send({ error: { exist: true, message: 'Cán bộ ' + newItem.shcc.toString() + ' đã tồn tại' } });
+                res.send({ error: { exist: true, message: 'Cán bộ ' + newItem.shcc.toString() + ' đã tồn tại' } });
             } else if (error) {
-                res.status(500).send({ error });
+                res.send({ error });
             } else {
                 app.model.canBo.create(newItem, (error, item) => {
+                    app.tccbSaveCRUD(req.session.user.email, 'C', 'Hồ sơ cán bộ');
+                    app.model.fwUser.create({
+                        email: item.email,
+                        active: 1,
+                        isStaff: 1,
+                        firstName: item.ho,
+                        lastName: item.ten,
+                        shcc: item.shcc
+                    });
                     res.send({ error, item });
                 });
             }
@@ -192,6 +201,7 @@ module.exports = app => {
     app.put('/api/staff', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
         shcc ? app.model.canBo.update({ shcc }, req.body.changes, (error, item) => {
+            req.session.user.permissions.includes('staff:write') && app.tccbSaveCRUD(req.session.user.email, 'U', 'Hồ sơ cán bộ');
             // if (item && !error) app.notification.send({ toEmail: item.email, title: 'Lý lịch được cập nhật thành công', subTitle: `Bởi ${req.session.user.lastName} ${req.session.user.firstName}`, icon: 'fa-check-square-o', iconColor: 'success' });
             res.send({ error, item });
         }) : res.send({ error: 'No permission' });
@@ -201,6 +211,7 @@ module.exports = app => {
 
     app.delete('/api/staff', app.permission.check('staff:delete'), (req, res) => {
         app.model.canBo.delete({ shcc: req.body.shcc }, error => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hồ sơ cán bộ');
             new Promise(resolve => {
                 app.model.quanHeCanBo.delete({ shcc: req.body.shcc }, () => {
                     resolve();

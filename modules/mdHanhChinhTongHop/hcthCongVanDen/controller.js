@@ -342,22 +342,25 @@ module.exports = (app) => {
     });
 
     const isRelated = async (congVan, donViNhan, req) => {
-        const permissions = req.session.user.permissions;
-        if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
-            return true;
-        }
-        else if (req.query.nhiemVu) {
-            const count = (await app.model.hcthLienKet.asyncCount({
-                keyA: req.query.nhiemVu,
-                loaiA: 'NHIEM_VU',
-                loaiB: 'CONG_VAN_DEN',
-                keyB: req.params.id
-            }));
-            return await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
-                && count && count.rows[0] && count.rows[0]['COUNT(*)'];
-        }
-        else {
-            const canBoNhan = congVan.canBoNhan;
+        try {
+
+            const permissions = req.session.user.permissions;
+            if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
+                return true;
+            }
+            if (req.query.nhiemVu) {
+                const count = (await app.model.hcthLienKet.asyncCount({
+                    keyA: req.query.nhiemVu,
+                    loaiA: 'NHIEM_VU',
+                    loaiB: 'CONG_VAN_DEN',
+                    keyB: req.params.id
+                }));
+                if (await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
+                    && count && count.rows[0] && count.rows[0]['COUNT(*)'])
+                    return true;
+            }
+
+            const canBoNhan = congVan.canBoNhan || '';
             if (canBoNhan.split(',').includes(req.session.user.shcc))
                 return true;
             else {
@@ -365,6 +368,8 @@ module.exports = (app) => {
                 let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
                 return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDen:read') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
             }
+        } catch {
+            return false;
         }
     };
 

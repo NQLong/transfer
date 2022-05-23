@@ -9,7 +9,7 @@ module.exports = app => {
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3013: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
+            3013: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#1999C2', groupIndex: 5 },
         },
     };
 

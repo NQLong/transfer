@@ -56,7 +56,7 @@ export default function QtDaoTaoReducer(state = null, data) {
 
 //Admin Page ---------------------------------------------------------------------------------------------------------
 T.initPage('pageQtDaoTao');
-export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, ma, filter, done) {
+export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
@@ -64,27 +64,26 @@ export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, ma, filter,
     const page = T.updatePage('pageQtDaoTao', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/qua-trinh/dao-tao/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, ma: ma, filter: page.filter }, data => {
+        T.get(url, { condition: pageCondition, filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình đào tạo sản bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: QtDaoTaoGetPage, page: data.page });
+                if (done) done(data.page);
             }
         }, () => T.notify('Lấy danh sách quá trình đào tạo bị lỗi!', 'danger'));
     };
 }
 
-T.initPage('groupPageQtDaoTao', true);
 export function getQtDaoTaoGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageQtDaoTao', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageQtDaoTao', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/dao-tao/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -102,6 +101,8 @@ export function getQtDaoTaoGroupPage(pageNumber, pageSize, pageCondition, filter
 }
 
 export function createQtDaoTao(data, done) {
+    const route = T.routeMatcher('/user/tccb/qua-trinh/dao-tao/:shcc'),
+        shcc = route.parse(window.location.pathname)?.shcc || null;
     return dispatch => {
         const url = '/api/qua-trinh/dao-tao';
         T.post(url, { data }, res => {
@@ -110,15 +111,16 @@ export function createQtDaoTao(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm quá trình đào tạo thành công!', 'success');
+                dispatch(getQtDaoTaoPage(undefined, undefined, '', { listShcc: shcc }));
                 done(data);
-                dispatch(getQtDaoTaoPage());
-
             }
         }, () => T.notify('Thêm quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function updateQtDaoTao(id, changes, done) {
+    const route = T.routeMatcher('/user/tccb/qua-trinh/dao-tao/:shcc'),
+        shcc = route.parse(window.location.pathname)?.shcc || null;
     return dispatch => {
         const url = '/api/qua-trinh/dao-tao';
         T.put(url, { id, changes }, data => {
@@ -127,7 +129,7 @@ export function updateQtDaoTao(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật quá trình đào tạo thành công!', 'success');
-                dispatch(getQtDaoTaoPage());
+                dispatch(getQtDaoTaoPage(undefined, undefined, '', { listShcc: shcc }));
                 done && done(data.item);
             }
         }, () => T.notify('Cập nhật quá trình đào tạo bị lỗi', 'danger'));
@@ -135,6 +137,8 @@ export function updateQtDaoTao(id, changes, done) {
 }
 
 export function deleteQtDaoTao(id) {
+    const route = T.routeMatcher('/user/tccb/qua-trinh/dao-tao/:shcc'),
+        shcc = route.parse(window.location.pathname)?.shcc || null;
     return dispatch => {
         const url = '/api/qua-trinh/dao-tao';
         T.delete(url, { id }, data => {
@@ -143,7 +147,7 @@ export function deleteQtDaoTao(id) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'success', false, 800);
-                dispatch(getQtDaoTaoPage());
+                dispatch(getQtDaoTaoPage(undefined, undefined, '', { listShcc: shcc }));
             }
         }, () => T.notify('Xóa quá trình đào tạo bị lỗi', 'danger'));
     };

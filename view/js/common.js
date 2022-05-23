@@ -83,7 +83,7 @@ const T = {
 
     getCookiePage: (cookieName, key) => {
         const pageData = T.storage(cookieName);
-        return pageData && pageData[key] ? pageData[key] : '';
+        return (pageData && pageData[key]) ? pageData[key] : '';
     },
 
     cookie: (cname, cvalue, exdays) => {

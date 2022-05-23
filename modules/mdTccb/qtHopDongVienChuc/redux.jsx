@@ -56,7 +56,7 @@ export function getQtHopDongVienChucPage(pageNumber, pageSize, pageCondition, fi
     }
     const page = T.updatePage('pageQtHopDongVienChuc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/hop-dong-vien-chuc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-lam-viec/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -78,7 +78,7 @@ export function getQtHopDongVienChucGroupPage(pageNumber, pageSize, pageConditio
     }
     const page = T.updatePage('pageQtHopDongVienChuc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/hop-dong-vien-chuc/group/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-lam-viec/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -97,7 +97,7 @@ T.initPage('shccPageQtHopDongVienChuc', true);
 export function getQtHopDongVienChucShccPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('shccPageQtHopDongVienChuc', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/hop-dong-vien-chuc/groupShcc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-lam-viec/groupShcc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -113,7 +113,7 @@ export function getQtHopDongVienChucShccPage(pageNumber, pageSize, pageCondition
 
 export function getQtHopDongVienChucAll(done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hop-dong-vien-chuc/all';
+        const url = '/api/tccb/qua-trinh/hop-dong-lam-viec/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -128,7 +128,7 @@ export function getQtHopDongVienChucAll(done) {
 
 export function getQtHopDongVienChuc(ma, done) {
     return () => {
-        const url = `/api/tccb/qua-trinh/hop-dong-vien-chuc/item/${ma}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-lam-viec/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy hợp đồng bị lỗi!', 'danger');
@@ -142,7 +142,7 @@ export function getQtHopDongVienChuc(ma, done) {
 
 export function getQtHopDongVienChucEdit(ma, done) {
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/hop-dong-vien-chuc/edit/item/${ma}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-lam-viec/edit/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
@@ -157,7 +157,7 @@ export function getQtHopDongVienChucEdit(ma, done) {
 
 export function createQtHopDongVienChuc(item, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hop-dong-vien-chuc';
+        const url = '/api/tccb/qua-trinh/hop-dong-lam-viec';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hợp đồng bị lỗi!', 'danger');
@@ -173,7 +173,7 @@ export function createQtHopDongVienChuc(item, done) {
 
 export function deleteQtHopDongVienChuc(ma, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hop-dong-vien-chuc';
+        const url = '/api/tccb/qua-trinh/hop-dong-lam-viec';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa hợp đồng bị lỗi!', 'danger');
@@ -189,7 +189,7 @@ export function deleteQtHopDongVienChuc(ma, done) {
 
 export function updateQtHopDongVienChuc(ma, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hop-dong-vien-chuc';
+        const url = '/api/tccb/qua-trinh/hop-dong-lam-viec';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật hợp đồng bị lỗi!', 'danger');
@@ -205,7 +205,7 @@ export function updateQtHopDongVienChuc(ma, changes, done) {
 }
 
 export function downloadWord(ma, done) {
-    const url = `/api/tccb/qua-trinh/hop-dong-vien-chuc/download-word/${ma}`;
+    const url = `/api/tccb/qua-trinh/hop-dong-lam-viec/download-word/${ma}`;
     T.get(url, data => {
         if (data.error) {
             T.notify('Tải file world bị lỗi', 'danger');
@@ -219,7 +219,7 @@ export function downloadWord(ma, done) {
 
 export function getTruongPhongTccb(done) {
     return () => {
-        const url = '/api/tccb/qua-trinh/hop-dong-vien-chuc/get-truong-phong-tccb';
+        const url = '/api/tccb/qua-trinh/hop-dong-lam-viec/get-truong-phong-tccb';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin trưởng phòng TCCB bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');

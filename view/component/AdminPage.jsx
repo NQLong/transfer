@@ -606,7 +606,6 @@ export class FormSelect extends React.Component {
 
     value = function (value, done = null) {
         const dropdownParent = this.props.dropdownParent || $('.modal-body').has(this.input)[0] || $('.tile-body').has(this.input)[0];
-        if (!value) this.setState({ valueText: '' });
         if (arguments.length) {
             this.clear();
             let hasInit = this.hasInit;
@@ -985,6 +984,12 @@ export class AdminPage extends React.Component {
     }
 
     showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
+
+    hideAdvanceSearch = () => {
+        $(this.advanceSearchBox).removeClass('show');
+        $(this.advanceSearchBox).addClass('hide');
+    }
+
 
     renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
 

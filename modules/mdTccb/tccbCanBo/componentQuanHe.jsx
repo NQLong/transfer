@@ -68,7 +68,7 @@ class ComponentQuanHe extends AdminPage {
 
     createRelation = (e) => {
         e.preventDefault();
-        this.modal.show({ item: null, shcc: this.state.shcc });
+        this.modal.show({ item: null, shcc: this.props.shcc });
     }
 
     editQuanHe = (e, item) => {
@@ -120,19 +120,20 @@ class ComponentQuanHe extends AdminPage {
 
     render() {
         const dataQuanHe = this.props.staff?.dataStaff?.quanHeCanBo || [];
-        let isCanBo = this.getUserPermission('staff', ['login']).login, permission = { write: isCanBo, read: isCanBo, delete: isCanBo };
+        let isCanBo = this.getUserPermission('staff', ['login']).login, permission = { write: isCanBo, read: isCanBo, delete: isCanBo },
+            voChongText = this.props.phai == '01' ? 'vợ' : 'chồng';
         let familyTabs = [
             {
                 title: 'Về bản thân',
                 component: <div style={{ marginTop: 8 }}>
-                    <p>Gồm người thân ruột, huyết thống của mình, {this.state.voChongText} và các con</p>
+                    <p>Gồm người thân ruột, huyết thống của mình, {voChongText} và các con</p>
                     {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => !i.loai) : [], 0, permission)}
                 </div>
             },
             {
-                title: 'Về bên ' + this.state.voChongText,
+                title: 'Về bên ' + voChongText,
                 component: <div style={{ marginTop: 8 }}>
-                    <p>Gồm người thân ruột, huyết thống của {this.state.voChongText}</p>
+                    <p>Gồm người thân ruột, huyết thống của {voChongText}</p>
                     {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.loai) : [], 1, permission)}
                 </div>
             },

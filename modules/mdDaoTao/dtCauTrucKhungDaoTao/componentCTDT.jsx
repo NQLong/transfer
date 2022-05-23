@@ -144,7 +144,7 @@ export class ComponentCTDT extends AdminPage {
             (<>
                 <FormSelect
                     ref={e => ref.value = e} data={SelectAdapter_DmKhoiKienThucAll}
-                    style={{ marginBottom: 0 }} className='form-group col-9' placeholder={`Chọn khối kiến thức ${isParent ? 'cha' : 'con'}`}
+                    style={{ marginBottom: 0 }} className='form-group col-8' placeholder={`Chọn khối kiến thức ${isParent ? 'cha' : 'con'}`}
                     readOnly={readOnly}
                 />
                 <div className='form-group col-2'>
@@ -160,14 +160,17 @@ export class ComponentCTDT extends AdminPage {
                     }
                 </div>
                 {isParent && !this.childRows[parentId] &&
-                    <div className='form-group col-12'>
-                        <Tooltip title='Thêm khối kiến thức con' arrow placeholder='bottom' style={{ marginLeft: 70 }}>
-                            <button className='btn' onClick={e => e.preventDefault() || this.addChildRow(0, null, parentId)}>
-                                <i className='fa fa-lg fa-plus' /> Thêm khối kiến thức con
-                            </button>
-                            {/* <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.addChildRow(0, null, parentId)}><i className='fa fa-lg fa-plus' /></a> */}
-                        </Tooltip>
-                    </div>
+                    <React.Fragment>
+                        <div className='form-group col-2'></div>
+                        <div className='form-group col-10'>
+                            <Tooltip title='Thêm khối kiến thức con' arrow placeholder='bottom'>
+                                <button className='btn' onClick={e => e.preventDefault() || this.addChildRow(0, null, parentId)}>
+                                    <i className='fa fa-lg fa-plus' /> Thêm khối kiến thức con
+                                </button>
+                                {/* <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.addChildRow(0, null, parentId)}><i className='fa fa-lg fa-plus' /></a> */}
+                            </Tooltip>
+                        </div>
+                    </React.Fragment>
                 }
             </>)
         );
@@ -210,6 +213,66 @@ export class ComponentCTDT extends AdminPage {
         return Object.values(this.state.datas) || [];
     }
 
+    onChangePosition = (e, pIndex) => {
+        const parentStateTmp = { ...this.state.parentItems };
+        const childStateTmp = { ...this.state.childItems };
+        let pNext = pIndex;
+        if (pIndex === 0) {
+            pNext++;
+        } else {
+            pNext--;
+        }
+        [childStateTmp[pIndex], childStateTmp[pNext]] = [childStateTmp[pNext], childStateTmp[pIndex]];
+        if (!childStateTmp[pIndex]) {
+            delete childStateTmp[pIndex];
+        }
+        [parentStateTmp[pIndex], parentStateTmp[pNext]] = [parentStateTmp[pNext], parentStateTmp[pIndex]];
+        [this.parentRows[pIndex], this.parentRows[pNext]] = [this.parentRows[pNext], this.parentRows[pIndex]];
+        [this.childRows[pIndex], this.childRows[pNext]] = [this.childRows[pNext], this.childRows[pIndex]];
+
+        const tmpCNextData = {};
+        const tmpCIndexData = {};
+
+        if (!this.childRows[pIndex]) {
+            delete this.childRows[pIndex];
+        } else {
+            Object.keys(this.childRows[pIndex]).forEach(key => {
+                const value = this.childRows[pIndex][key].value?.data();
+                tmpCIndexData[key] = value;
+            });
+        }
+
+        if (!this.childRows[pNext]) {
+            delete this.childRows[pNext];
+        } else {
+            Object.keys(this.childRows[pNext]).forEach(key => {
+                const value = this.childRows[pNext][key].value?.data();
+                tmpCNextData[key] = value;
+            });
+        }
+
+        this.setState({ parentItems: parentStateTmp, childItems: childStateTmp }, () => {
+            const tmpPNextData = this.parentRows[pNext].value?.data();
+            const tmpPIndexData = this.parentRows[pIndex].value?.data();
+
+            this.parentRows[pIndex]?.value?.value(tmpPNextData);
+            this.parentRows[pNext]?.value?.value(tmpPIndexData);
+
+            if (this.childRows[pNext]) {
+                Object.keys(this.childRows[pNext]).forEach(key => {
+                    this.childRows[pNext][key].value?.value(tmpCNextData[key]);
+                });
+            }
+
+            if (this.childRows[pIndex]) {
+                Object.keys(this.childRows[pIndex]).forEach(key => {
+                    this.childRows[pIndex][key].value?.value(tmpCIndexData[key]);
+                });
+            }
+
+        });
+    }
+
 
     render() {
         const { parentItems: parents, childItems: childs } = this.state;
@@ -229,7 +292,14 @@ export class ComponentCTDT extends AdminPage {
                         return (
                             !pIsDeleted &&
                             <div key={key} className="row">
-                                <strong className='form-group col-1' style={{ textAlign: 'center', lineHeight: '35px' }}>{pIndex}</strong>
+                                <div className='form-group col-1'>
+                                    <button className='btn' onClick={e => e.preventDefault() || this.onChangePosition(e, pIdx)}>
+                                        <a href='#' ><i className={`fa fa-lg ${pIdx === 0 ? 'fa-level-down' : 'fa-level-up'}`} /></a>
+                                    </button>
+                                </div>
+                                <div className='form-group col-1'>
+                                    <strong style={{ textAlign: 'center', lineHeight: '35px', marginLeft: '10px' }}>{pIndex}</strong>
+                                </div>
                                 {this.insertTextBox(key, pIdx, 'parent')}
                                 {
                                     children.map((cItem, cIdx) => {
@@ -237,12 +307,15 @@ export class ComponentCTDT extends AdminPage {
                                         !cIsDeleted && cIndex++;
                                         return (
                                             !cIsDeleted &&
-                                            <div key={`${key}.${cIdx}`} style={{ marginLeft: '30px' }} className="col-12">
-                                                <div className='row'>
-                                                    <p className='form-group col-1' style={{ textAlign: 'center', lineHeight: '35px' }}>{pIndex}.{cIndex}</p>
-                                                    {this.insertTextBox(key, cIdx, 'child')}
+                                            <React.Fragment key={`${key}.${cIdx}`}>
+                                                <div className="col-2"></div>
+                                                <div className="col-10">
+                                                    <div className='row'>
+                                                        <p className='form-group col-1' style={{ textAlign: 'center', lineHeight: '35px' }}>{pIndex}.{cIndex}</p>
+                                                        {this.insertTextBox(key, cIdx, 'child')}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </React.Fragment>
                                         );
                                     })
                                 }
