@@ -74,6 +74,7 @@ export function createHcthCongVanDi(data, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
+                // console.log(data);
                 T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
@@ -94,6 +95,7 @@ export function updateHcthCongVanDi(id, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
+                // console.log(data);
                 T.notify('Cập nhật công văn giữa các phòng thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done();
@@ -127,7 +129,7 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
         const url = `/api/hcth/cong-van-cac-phong/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                console.log(data);
+                // console.log(data);
                 T.notify('Lấy danh sách công văn đi bị lỗi, s1' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {

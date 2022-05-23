@@ -55,8 +55,8 @@ const listTrangThai = {
 };
 
 const selectCongVan = [
-    { id: 1, text: 'Nội bộ' },
-    { id: 2, text: 'Ra ngoài' }
+    { id: 1, text: 'Công văn của đơn vị' },
+    { id: 2, text: 'Công văn của trường' }
 ];
 
 class HcthCongVanDi extends AdminPage {
@@ -67,8 +67,6 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                // this.congVanLaySo?.value('');
-                this.loaiCongVan?.value('');
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
                 this.maCanBoNhan?.value('');
@@ -110,17 +108,16 @@ class HcthCongVanDi extends AdminPage {
         let donViNhan = this.donViNhan?.value() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         let loaiCongVan = this.loaiCongVan?.value() || null;
-        // let congVanLaySo = this.congVanLaySo?.value() || null;
+        //let congVanLaySo = this.congVanLaySo?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
         let status = this.status?.value() || null;
 
         let permissions = this.props.system?.user?.permissions;
-        let hcthStaff = permissions.includes('hcth:login') ? {} : {};
+        let hcthStaff = permissions.includes('hcth:login') ? { loaiCongVan: 2 } : {};
 
         const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, status };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
-                // console.log(page.filter);
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -128,10 +125,9 @@ class HcthCongVanDi extends AdminPage {
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     this.loaiCongVan?.value(filter.loaiCongVan || '');
-                    // this.congVanLaySo?.value(filter.congVanLaySo || '');
                     this.status?.value(filter.status || '');
                     this.donViNhanNgoai?.value(filter.donViNhanNgoai || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.loaiCongVan || filter.donViNhanNgoai)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.donViNhanNgoai)) this.showAdvanceSearch();
                 }
             });
         });
@@ -242,8 +238,8 @@ class HcthCongVanDi extends AdminPage {
             breadcrumb: breadcrumb,
             onCreate: (permission && permission.write) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
-                {/* <FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '16px' }} ref={e => this.congVanLaySo = e} placeholder="Công văn" data={selectCongVanV2} allowClear={true} onChange={() => this.changeAdvancedSearch()} /> */}
-                <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Loại công văn" data={selectCongVan} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
+                <FormSelect style={{ width: '200px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
             </>,
             content: <>
                 <div className="tile">
@@ -258,8 +254,7 @@ class HcthCongVanDi extends AdminPage {
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanNgoai = e} label='Đơn vị nhận bên ngoài' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-6' ref={e => this.loaiCongVan = e} label='Loại công văn' data={selectCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-6' ref={e => this.status = e} label='Trạng thái' data={selectStatus} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.status = e} label='Trạng thái' data={selectStatus} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>
 
