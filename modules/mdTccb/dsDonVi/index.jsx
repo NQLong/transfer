@@ -1,21 +1,16 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import { tccbSupport, tccbSupportReply } from './redux';
-
+import danhSachDonVi from 'modules/mdDanhMuc/dmDonVi/redux';
 export default {
     redux: {
         parent: 'tccb',
-        reducers: { tccbSupport, tccbSupportReply }
+        reducers: { danhSachDonVi }
     },
     routes: [
         {
-            path: '/user/tccb/support',
+            path: '/user/tccb/danh-sach-don-vi',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-        {
-            path: '/user/support',
-            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };
