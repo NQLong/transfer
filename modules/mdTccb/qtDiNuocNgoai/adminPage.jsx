@@ -686,7 +686,7 @@ class QtDiNuocNgoai extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' style={{ color: 'blue' }} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />}

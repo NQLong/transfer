@@ -493,7 +493,7 @@ class QtNghiPhep extends AdminPage {
                         )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' content={(

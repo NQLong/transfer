@@ -427,7 +427,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                         )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         <TableCell type='text' content={(
