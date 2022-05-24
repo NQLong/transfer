@@ -274,27 +274,28 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (
-                 SELECT THTS.MA_TO_HOP AS                           "maToHop",
-                        DMMT_1.TEN     AS                           "tenMon1",
-                        DMMT_2.TEN     AS                           "tenMon2",
-                        DMMT_3.TEN     AS                           "tenMon3",
-                        THTS.GHI_CHU   AS                           "ghiChu",
-                        THTS.KICH_HOAT AS                           "kichHoat",
-                        ROW_NUMBER() OVER (ORDER BY THTS.MA_TO_HOP) R
-                 FROM DM_SV_TO_HOP_TS THTS
-                          LEFT JOIN DM_SV_MON_THI DMMT_1 ON DMMT_1.ID = THTS.MON_1
-                          LEFT JOIN DM_SV_MON_THI DMMT_2 ON DMMT_2.ID = THTS.MON_2
-                          LEFT JOIN DM_SV_MON_THI DMMT_3 ON DMMT_3.ID = THTS.MON_3
+        FROM (SELECT THTS.MA_TO_HOP AS                           "maToHop",
+                     DMMT_1.TEN     AS                           "tenMon1",
+                     DMMT_2.TEN     AS                           "tenMon2",
+                     DMMT_3.TEN     AS                           "tenMon3",
+                     THTS.MON_1     AS                           "mon1",
+                     THTS.MON_2     AS                           "mon2",
+                     THTS.MON_3     AS                           "mon3",
+                     THTS.GHI_CHU   AS                           "ghiChu",
+                     THTS.KICH_HOAT AS                           "kichHoat",
+                     ROW_NUMBER() OVER (ORDER BY THTS.MA_TO_HOP) R
+              FROM DM_SV_TO_HOP_TS THTS
+                       LEFT JOIN DM_SV_MON_THI DMMT_1 ON DMMT_1.ID = THTS.MON_1
+                       LEFT JOIN DM_SV_MON_THI DMMT_2 ON DMMT_2.ID = THTS.MON_2
+                       LEFT JOIN DM_SV_MON_THI DMMT_3 ON DMMT_3.ID = THTS.MON_3
 
-                 WHERE searchTerm = ''
-                    OR LOWER(TRIM(DMMT_1.TEN)) LIKE sT
-                    OR LOWER(TRIM(DMMT_2.TEN)) LIKE sT
-                    OR LOWER(TRIM(DMMT_3.TEN)) LIKE sT
-                    OR LOWER(TRIM(THTS.GHI_CHU)) LIKE sT
-                    OR LOWER(TRIM(THTS.MA_TO_HOP)) LIKE sT
-                 ORDER BY MA_TO_HOP
-             )
+              WHERE searchTerm = ''
+                 OR LOWER(TRIM(DMMT_1.TEN)) LIKE sT
+                 OR LOWER(TRIM(DMMT_2.TEN)) LIKE sT
+                 OR LOWER(TRIM(DMMT_3.TEN)) LIKE sT
+                 OR LOWER(TRIM(THTS.GHI_CHU)) LIKE sT
+                 OR LOWER(TRIM(THTS.MA_TO_HOP)) LIKE sT
+              ORDER BY MA_TO_HOP)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 END;
@@ -6206,7 +6207,7 @@ BEGIN
 
                         cdnn.MA AS "maChucDanhNgheNghiep",
                         cdnn.TEN AS "tenChucDanhNgheNghiep",
-                        ROW_NUMBER() OVER (ORDER BY NGAY_DI DESC) R
+                        ROW_NUMBER() OVER (ORDER BY cb.TEN, cb.HO, NGAY_DI DESC) R
                 FROM QT_DI_NUOC_NGOAI qtdnn
                          LEFT JOIN TCHC_CAN_BO cb on qtdnn.SHCC = cb.SHCC
                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
@@ -6251,7 +6252,7 @@ BEGIN
                     OR LOWER(qtdnn.NOI_DUNG) LIKE sT
                     OR LOWER(qtdnn.NOI_DUNG_TIEP_NHAN) LIKE sT
                     OR LOWER(DMDNN.MO_TA) LIKE sT)
-                 ORDER BY qtdnn.NGAY_DI DESC
+                 ORDER BY cb.TEN, cb.HO, NGAY_DI DESC
              );
     RETURN my_cursor;
 
@@ -6608,7 +6609,7 @@ BEGIN
 
                         cdnn.MA AS "maChucDanhNgheNghiep",
                         cdnn.TEN AS "tenChucDanhNgheNghiep",
-                        ROW_NUMBER() OVER (ORDER BY NGAY_DI DESC) R
+                        ROW_NUMBER() OVER (ORDER BY cb.TEN, cb.HO, NGAY_DI DESC) R
                 FROM (SELECT *
                       FROM QT_DI_NUOC_NGOAI
                       WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM QT_DI_NUOC_NGOAI ORDER BY SHCC DESC) GROUP BY SHCC)) qtdnn
@@ -6617,7 +6618,7 @@ BEGIN
                          LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
                          LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
                          LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
-                ORDER BY qtdnn.NGAY_DI DESC
+                ORDER BY cb.TEN, cb.HO, NGAY_DI DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -6755,7 +6756,7 @@ BEGIN
 
                         cdnn.MA AS "maChucDanhNgheNghiep",
                         cdnn.TEN AS "tenChucDanhNgheNghiep",
-                        ROW_NUMBER() OVER (ORDER BY NGAY_DI DESC) R
+                        ROW_NUMBER() OVER (ORDER BY cb.TEN, cb.HO, NGAY_DI DESC) R
                 FROM QT_DI_NUOC_NGOAI qtdnn
                          LEFT JOIN TCHC_CAN_BO cb on qtdnn.SHCC = cb.SHCC
                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
@@ -6800,7 +6801,7 @@ BEGIN
                     OR LOWER(qtdnn.NOI_DUNG) LIKE sT
                     OR LOWER(qtdnn.NOI_DUNG_TIEP_NHAN) LIKE sT
                     OR LOWER(DMDNN.MO_TA) LIKE sT)
-                 ORDER BY qtdnn.NGAY_DI DESC
+                 ORDER BY cb.TEN, cb.HO, NGAY_DI DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;

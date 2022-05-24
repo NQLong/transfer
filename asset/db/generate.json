@@ -7603,6 +7603,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 4
+                },
+                "SO_QUYET_DINH": {
+                    "value": "soQuyetDinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "NGAY_QUYET_DINH": {
+                    "value": "ngayQuyetDinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -9315,6 +9329,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "NGAY_DI_DUONG": {
+                    "value": "ngayDiDuong",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -9928,7 +9949,7 @@
                     "value": "tenVietTat",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 100
                 },
                 "KICH_HOAT": {
