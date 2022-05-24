@@ -10,7 +10,7 @@ import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmNghiViec } from 'modules/mdDanhMuc/dmNghiViec/redux';
 
-class EditModal extends AdminModal {
+export class NghiViecModal extends AdminModal {
     onShow = (item) => {
         let { ma, shcc, lyDoNghi, noiDung, ghiChu, ngayNghi, soQuyetDinh, hoCanBo, hoTen } = item ? item : {
             ma: '', shcc: '', lyDoNghi: null, noiDung: '', ngayNghi: null, soQuyetDinh: ''
@@ -55,13 +55,17 @@ class EditModal extends AdminModal {
                     T.notify('Không thể cập nhật cho nhiều cán bộ');
                     this.shcc.focus();
                 } else {
-                    console.log(changes);
-
                     changes.shcc = this.state.shcc ? changes.listShcc[0] : '';
-                    this.props.update(this.state.ma, changes, this.hide);
+                    this.props.update(this.state.ma, changes, () => {
+                        this.hide();
+                        this.props.getStaffPage && this.props.getStaffPage();
+                    });
                 }
             } else {
-                this.props.create(changes, this.hide);
+                this.props.create(changes, () => {
+                    this.hide();
+                    this.props.getStaffPage && this.props.getStaffPage();
+                });
             }
         }
     }
@@ -261,7 +265,7 @@ class QtNghiViec extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <NghiViecModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
                     create={this.props.createQtNghiViecStaff} update={this.props.updateQtNghiViecStaff}
                 />

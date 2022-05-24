@@ -13,7 +13,9 @@ import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import T from 'view/js/common';
-
+import { Tooltip } from '@mui/material';
+import { NghiViecModal } from '../qtNghiViec/adminPage';
+import { createQtNghiViecStaff, updateQtNghiViecStaff } from '../qtNghiViec/redux';
 class StaffPage extends AdminPage {
     state = { filter: {}, visibleCVDT: false, visibleHDTN: false };
     componentDidMount() {
@@ -166,12 +168,17 @@ class StaffPage extends AdminPage {
     export = (e, pageCondition) => {
         e.preventDefault();
         if (e.type == 'click') {
-            const filter = T.stringify(this.state.filter);
-            let pageC = pageCondition;
-            pageC = typeof pageC === 'string' ? pageC : '';
-            if (pageC.length == 0) pageC = null;
-            T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'DANH_SACH_CAN_BO.xlsx');
-            this.setState({ exported: true });
+            this.setState({ exported: true }, () => {
+                const filter = T.stringify(this.state.filter);
+                let pageC = pageCondition;
+                pageC = typeof pageC === 'string' ? pageC : '';
+                if (pageC.length == 0) pageC = null;
+                T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'DANH_SACH_CAN_BO.xlsx');
+                setTimeout(() => {
+                    this.setState({ exported: false });
+                }, 1000);
+            });
+
         }
     }
 
@@ -237,7 +244,13 @@ class StaffPage extends AdminPage {
                             <span>{item.loaiCanBo + (item.loaiCanBo == 'Hợp đồng' && item.isHdtn ? ' (Trách nhiệm)' : '')}<br /></span>
                             <small style={{ color: 'blue' }}>{(item.ngayBienChe && item.ngayBienChe != 1) ? T.dateToText(item.ngayBienChe, 'dd/mm/yyyy') : ''}</small>
                         </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}>
+                        <Tooltip title='Đánh dấu nghỉ việc' arrow>
+                            <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.nghiViec.show(item)}>
+                                <i className='fa fa-lg fa-user-times' />
+                            </button>
+                        </Tooltip>
+                    </TableCell>
                 </tr>)
         });
 
@@ -276,7 +289,6 @@ class StaffPage extends AdminPage {
                     <FormSelect className='col-md-3' ref={e => this.listTonGiao = e} data={SelectAdapter_DmTonGiaoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo tôn giáo' />
                     <FormTextBox className='col-md-3' type='number' ref={e => this.fromAge = e} label='Từ độ tuổi' />
                     <FormTextBox className='col-md-3' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
-
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -293,19 +305,43 @@ class StaffPage extends AdminPage {
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />
-                    <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tải xuống báo cáo hàng tháng' customIcon='fa-th-list' onClick={e => {
+                    <NghiViecModal ref={e => this.nghiViec = e} getStaffPage={this.props.getStaffPage}
+                        create={this.props.createQtNghiViecStaff} update={this.props.updateQtNghiViecStaff} />
+                    {!this.state.baoCaoThang ? <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tải xuống báo cáo hàng tháng' customIcon='fa-th-list' onClick={e => {
                         e.preventDefault();
+                        this.setState({ baoCaoThang: true });
                         T.download(T.url('/api/staff/download-monthly-report'), 'BAO_CAO_HANG_THANG.xlsx');
-                    }} />
+                        setTimeout(() => {
+                            this.setState({ baoCaoThang: false });
+                        }, 10000);
+                    }} /> : <button type='button' className='btn btn-circle btn-warning'
+                        style={{ position: 'fixed', right: '10px', bottom: '10px', zIndex: 500, marginRight: '120px' }} >
+                        <div style={{ width: '30px' }}>
+                            <svg className='m-circular' viewBox='25 25 50 50'>
+                                <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' style={{ stroke: 'white' }} />
+                            </svg>
+                        </div>
+                    </button>}
+                    {!this.state.exported ? <CirclePageButton type='export' className='btn-warning' style={{ marginRight: '60px' }} tooltip='Tải danh sách' customIcon='fa-file-excel-o' onClick={e => this.export(e, pageCondition)} /> :
+                        <button type='button' className='btn btn-circle btn-success'
+                            style={{ position: 'fixed', right: '10px', bottom: '10px', zIndex: 500, marginRight: '60px' }} >
+                            <div style={{ width: '30px' }}>
+                                <svg className='m-circular' viewBox='25 25 50 50'>
+                                    <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' style={{ stroke: 'white' }} />
+                                </svg>
+                            </div>
+                        </button>
+                    }
                 </div>
             </>,
             backRoute: '/user/tccb',
             onCreate: permission ? e => this.create(e) : null,
-            onExport: !this.state.exported ? e => this.export(e, pageCondition) : null
+            // onExport: !this.state.exported ? e => this.export(e, pageCondition) :
+
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
-const mapActionsToProps = { getStaffPage, deleteStaff, getDmDonViAll };
+const mapActionsToProps = { getStaffPage, deleteStaff, getDmDonViAll, createQtNghiViecStaff, updateQtNghiViecStaff };
 export default connect(mapStateToProps, mapActionsToProps)(StaffPage);
