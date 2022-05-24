@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox, FormDatePicker, CirclePageButton } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     createQtNghiViecStaff, updateQtNghiViecStaff, deleteQtNghiViecStaff, getQtNghiViecPage,
@@ -84,7 +84,6 @@ class EditModal extends AdminModal {
 }
 
 class QtNghiViec extends AdminPage {
-    checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
 
     componentDidMount() {
@@ -142,12 +141,6 @@ class QtNghiViec extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getQtNghiViecPage(pageN, pageS, pageC, this.state.filter, done);
-    }
-
-    groupPage = () => {
-        this.checked = !this.checked;
-        T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
-        this.getPage();
     }
 
     list = (text, i, j) => {
@@ -265,9 +258,12 @@ class QtNghiViec extends AdminPage {
                     permissions={currentPermissions}
                     create={this.props.createQtNghiViecStaff} update={this.props.updateQtNghiViecStaff}
                 />
+                <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tạo danh sách nghỉ hưu dự kiến' customIcon='fa-list-ol' onClick={e => {
+                    e.preventDefault();
+                    this.props.history.push('/user/tccb/qua-trinh/nghi-viec/create-list');
+                }} />
             </>,
             backRoute: '/user/tccb',
-            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/nghi-viec/create-list') : '',
             onCreate: (e) => this.showModal(e),
             onExport: (e) => {
                 e.preventDefault();

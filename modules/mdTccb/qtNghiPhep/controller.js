@@ -183,7 +183,7 @@ module.exports = app => {
                     if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
                         app.model.dmNghiPhep.get({ ma: items[idx].lyDo }, (error, itemNghiPhep) => {
                             let value = app.date.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, danhSachNgayLe);
-                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
+                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep - items[idx].ngayDiDuong, 0);
                             result -= value;
                             solve(idx + 1);
                         });
@@ -233,8 +233,9 @@ module.exports = app => {
                             { cell: 'I1', value: 'Kết thúc', bold: true, border: '1234' },
                             { cell: 'J1', value: 'Tổng ngày được nghỉ', bold: true, border: '1234' },
                             { cell: 'K1', value: 'Số ngày xin nghỉ', bold: true, border: '1234' },
-                            { cell: 'L1', value: 'Số ngày tính phép', bold: true, border: '1234' },
-                            { cell: 'M1', value: 'Thâm niên', bold: true, border: '1234' },
+                            { cell: 'L1', value: 'Ngày đi đường', bold: true, border: '1234' },
+                            { cell: 'M1', value: 'Số ngày tính phép', bold: true, border: '1234' },
+                            { cell: 'N1', value: 'Thâm niên', bold: true, border: '1234' },
                         ];
                         const solve = (index = 0) => {
                             if (index == result.rows.length) {
@@ -257,8 +258,9 @@ module.exports = app => {
                                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
                                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: soNgayPhepConLai + ' + ' + soNgayPhepConLai2 });
                                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, danhSachNgayLe) });
-                                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), danhSachNgayLe) - item.ngayNghiPhep, 0) + ' + ' + app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.ketThuc).getFullYear(), danhSachNgayLe) });
-                                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                        cells.push({ cell: 'L' + (index + 2), border: '1234', number: item.ngayDiDuong || 0 });
+                                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), danhSachNgayLe) - item.ngayNghiPhep, 0) + ' + ' + app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.ketThuc).getFullYear(), danhSachNgayLe) });
+                                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
                                         solve(index + 1);
                                     });
                                 } else {
@@ -273,8 +275,9 @@ module.exports = app => {
                                     cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
                                     cells.push({ cell: 'J' + (index + 2), border: '1234', value: soNgayPhepConLai });
                                     cells.push({ cell: 'K' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, danhSachNgayLe) });
-                                    cells.push({ cell: 'L' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), danhSachNgayLe) - item.ngayNghiPhep, 0) });
-                                    cells.push({ cell: 'M' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                    cells.push({ cell: 'L' + (index + 2), border: '1234', number: item.ngayDiDuong || 0 });
+                                    cells.push({ cell: 'M' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), danhSachNgayLe) - item.ngayNghiPhep, 0) });
+                                    cells.push({ cell: 'N' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
                                     solve(index + 1);
                                 }
                             });

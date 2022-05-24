@@ -17,8 +17,8 @@ class EditModal extends AdminModal {
     multiple = false;
 
     onShow = (item) => {
-        let { id, shcc, tenGiaiThuong, noiDung, noiCap, namCap } = item ? item : {
-            id: null, shcc: '', tenGiaiThuong: '', noiDung: null, noiCap: '', namCap: ''
+        let { id, shcc, tenGiaiThuong, noiDung, noiCap, namCap, soQuyetDinh } = item ? item : {
+            id: null, shcc: '', tenGiaiThuong: '', noiDung: null, noiCap: '', namCap: '', soQuyetDinh: ''
         };
 
         this.setState({ id: id });
@@ -29,6 +29,7 @@ class EditModal extends AdminModal {
             this.namCap.value(namCap ? namCap : '');
             this.noiDung.value(noiDung ? noiDung : '');
             this.noiCap.value(noiCap ? noiCap : '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
         }, 500);
     };
 
@@ -40,6 +41,7 @@ class EditModal extends AdminModal {
             noiDung: this.noiDung.value(),
             noiCap: this.noiCap.value(),
             namCap: this.namCap.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
@@ -62,6 +64,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+                <FormTextBox className='col-12' ref={e => this.soQuyetDinh = e} label={'Số quyết định'} type='text' readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' readOnly={readOnly} />
@@ -146,6 +149,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt giải</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp</th>
@@ -169,6 +173,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                                 {(item.tenDonVi || '')}
                             </>
                         )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soQuyetDinh}/>
                         <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenGiaiThuong}</b></span> <br />
