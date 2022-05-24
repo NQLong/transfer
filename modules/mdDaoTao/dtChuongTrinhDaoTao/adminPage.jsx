@@ -9,11 +9,8 @@ import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redu
 import { Tooltip } from '@mui/material';
 
 class TreeModal extends AdminModal {
-    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [], isSemesterMode: false }
-    componentDidMount() {
-
-    }
-
+    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [], isSemesterMode: false, mucConSwitch: {}, hocKySwitch: {} }
+    hocKyDuKien = [1, 2, 3, 4, 5, 6, 7, 8];
     onShow = (item) => {
         const { idNamDaoTao, tenNganh, id, namDaoTao } = item;
         this.namDaoTao = namDaoTao;
@@ -25,10 +22,33 @@ class TreeModal extends AdminModal {
                 const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
                 const { chuongTrinhDaoTao: chuongTrinhDaoTaoCha } = mucCha;
                 const { chuongTrinhDaoTao: chuongTrinhDaoTaoCon } = mucCon;
-                this.setState({ monHoc: ctdt, chuongTrinhDaoTaoCha: chuongTrinhDaoTaoCha, chuongTrinhDaoTaoCon: chuongTrinhDaoTaoCon });
+
+                const mucConSwitch = {};
+                Object.values(chuongTrinhDaoTaoCha).forEach(value => {
+                    const { id } = value;
+                    mucConSwitch[id] = false;
+                });
+
+                const hocKySwitch = {};
+                this.hocKyDuKien.map(index => {
+                    hocKySwitch[index] = false;
+                });
+                this.setState({ monHoc: ctdt, chuongTrinhDaoTaoCha: chuongTrinhDaoTaoCha, chuongTrinhDaoTaoCon: chuongTrinhDaoTaoCon, mucConSwitch: mucConSwitch, hocKySwitch: hocKySwitch });
             });
         });
     };
+
+    onChangeMucConSwitch = (id) => {
+        const mucConSwitchState = { ...this.state.mucConSwitch };
+        mucConSwitchState[id] = !mucConSwitchState[id];
+        this.setState({ mucConSwitch: mucConSwitchState });
+    }
+
+    onChangeHocKySwitch = (index) => {
+        const hocKySwitchState = { ...this.state.hocKySwitch };
+        hocKySwitchState[index] = !hocKySwitchState[index];
+        this.setState({ hocKySwitch: hocKySwitchState });
+    }
 
     initLevelMonHoc = (tenMonHoc, hasLevel3 = true) => {
         return (
@@ -62,6 +82,7 @@ class TreeModal extends AdminModal {
     }
 
     initLevelMucCha = (ctdt, idCha, mucCon = {}) => {
+        const { mucConSwitch } = this.state;
         const mucConLength = Object.keys(mucCon).length;
         const { monHoc } = this.state;
         const styleLevel3Wrapper = {
@@ -78,9 +99,9 @@ class TreeModal extends AdminModal {
 
         return (
             <li>
-                <p className={`${mucConLength > 0 ? 'level-2' : 'level-2-no-level-3'} rectangle`}>{ctdt}</p>
-                {
-                    mucConLength > 0 ?
+                <p style={{ cursor: 'pointer' }} className={`${mucConSwitch[idCha] && mucConLength > 0 ? 'level-2' : 'level-2-no-level-3'} rectangle`} onClick={() => this.onChangeMucConSwitch(idCha)}>{ctdt}</p>
+                {mucConSwitch[idCha] &&
+                    (mucConLength > 0 ?
                         (<ol className="level-3-wrapper" style={styleLevel3Wrapper}>
                             {
                                 mucCon && Object.keys(mucCon).map((key, idx) => {
@@ -102,7 +123,7 @@ class TreeModal extends AdminModal {
                                 })
                                 }
                             </ol>
-                        )
+                        ))
                 }
 
             </li>
@@ -155,6 +176,7 @@ class TreeModal extends AdminModal {
     }
 
     initLevel2HocKy = (itemCha, key, hasNextRow = false) => {
+        const { hocKySwitch } = this.state;
         const mucChaLength = Object.keys(itemCha).length;
         const left = (parseInt(key) - 1) > 0 ? 0 : (100 - 1 * (mucChaLength - 1)) / (2 * mucChaLength);
         const width = !hasNextRow ? (parseInt(key) - 1) > 0 ? 100 - 100 / (mucChaLength * 2) + (mucChaLength - 1) / (2 * mucChaLength) : 100 - ((100 - 1 * (mucChaLength - 1)) / mucChaLength) : 100 - left;
@@ -174,8 +196,8 @@ class TreeModal extends AdminModal {
                     }) || [];
                     return (<React.Fragment key={id}>
                         <li>
-                            <p className='level-2-no-level-3 rectangle'>{ctdt}</p>
-                            <ol className={`${monHocByKey.length > 0 ? 'level-4-wrapper-no-level-3' : null}`}>
+                            <p style={{ cursor: 'pointer' }} className='level-2-no-level-3 rectangle' onClick={() => this.onChangeHocKySwitch(id)}>{ctdt}</p>
+                            {hocKySwitch[id] && (<ol className={`${monHocByKey.length > 0 ? 'level-4-wrapper-no-level-3' : null}`}>
                                 {monHocByKey.map((monHoc, idx) => {
                                     const { tenMonHoc } = monHoc;
                                     return (<React.Fragment key={idx}>
@@ -183,7 +205,8 @@ class TreeModal extends AdminModal {
                                     </React.Fragment>);
                                 })
                                 }
-                            </ol>
+                            </ol>)
+                            }
                         </li>
                     </React.Fragment>
                     );
@@ -197,11 +220,11 @@ class TreeModal extends AdminModal {
         let item = {};
         let row = 0;
         // const { monHoc } = this.state;
-        const hocKyDuKien = [1, 2, 3, 4, 5, 6, 7, 8];
+
         return (
-            hocKyDuKien.map((hk, idx) => {
+            this.hocKyDuKien.map((hk, idx) => {
                 item[hk] = { text: `Học kỳ ${hk}`, id: hk };
-                const isLast = idx === Object.keys(hocKyDuKien).length - 1;
+                const isLast = idx === Object.keys(this.hocKyDuKien).length - 1;
                 if (Object.keys(item).length >= 3 || (Object.keys(item).length > 0 && isLast)) {
                     const temp = { ...item };
                     item = {};

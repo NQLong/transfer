@@ -8,6 +8,16 @@ module.exports = {
         DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối' },
     },
 
+    trangThaiCongVanDi: {
+        MOI: { id: '1', text: 'Mới'},
+        CHO_KIEM_TRA: { id: '2', text: 'Chờ kiểm tra' },
+        CHO_DUYET: { id: '3', text: 'Chờ duyệt' },
+        TRA_LAI: { id: '4', text: 'Trả lại' },
+        DA_GUI: { id: '5', text: 'Đã gửi' },
+        DA_DOC: { id: '6', text: 'Đã đọc' },
+        DA_DUYET: { id: '7', text: 'Đã duyệt' },
+    },
+
     action: {
         CREATE: 'CREATE',
         UPDATE: 'UPDATE',
@@ -27,6 +37,7 @@ module.exports = {
     },
 
     CONG_VAN_TYPE: 'DEN',
+    CONG_VAN_DI_TYPE: 'DI',
     MA_CHUC_VU_HIEU_TRUONG: '001',
     MA_BAN_GIAM_HIEU: '68',
     MA_HCTH: '29',
