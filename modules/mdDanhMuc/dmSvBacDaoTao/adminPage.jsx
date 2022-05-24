@@ -7,9 +7,9 @@ import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
   componentDidMount() {
-    $(document).ready(() => this.onShown(() => {
+    this.onShown(() => {
       !this.maBac.value() ? this.maBac.focus() : this.tenBac.focus();
-    }));
+    });
   }
 
   onShow = (item) => {
@@ -58,6 +58,9 @@ class EditModal extends AdminModal {
 
 class DmSvBacDaoTaoPage extends AdminPage {
   componentDidMount() {
+    let route = T.routeMatcher('/user/:menu/bac-dao-tao').parse(window.location.pathname);
+    this.menu = route.menu;
+    T.ready(`/user/${this.menu == 'dao-tao' ? 'dao-tao' : 'category'}`);
     T.onSearch = (searchText) => this.props.getDmSvBacDaoTaoPage(undefined, undefined, searchText || '');
     T.showSearchBox();
     this.props.getDmSvBacDaoTaoPage();
@@ -113,7 +116,7 @@ class DmSvBacDaoTaoPage extends AdminPage {
       icon: 'fa fa-list-alt',
       title: 'Bậc Đào tạo sinh viên',
       breadcrumb: [
-        <Link key={0} to='/user/category'>Danh mục</Link>,
+        <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'dao-tao' ? 'Đào tạo' : 'Danh mục'}</Link>,
         'Bậc Đào tạo sinh viên'
       ],
       content: <>
@@ -123,7 +126,7 @@ class DmSvBacDaoTaoPage extends AdminPage {
         <EditModal ref={e => this.modal = e} permission={permission}
           create={this.props.createDmSvBacDaoTao} update={this.props.updateDmSvBacDaoTao} permissions={currentPermissions} />
       </>,
-      backRoute: '/user/category',
+      backRoute: `/user/${this.menu}`,
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null
     });
   }

@@ -2,18 +2,26 @@ module.exports = app => {
   const menu = {
     parentMenu: app.parentMenu.category,
     menus: {
-      4087: { title: 'Bậc đào tạo', subTitle: 'Đào tạo', link: '/user/danh-muc/dao-tao/bac-dao-tao' },
+      4087: { title: 'Bậc đào tạo', subTitle: 'Đào tạo', link: '/user/danh-muc/bac-dao-tao' },
+    },
+  };
+  const menuDaoTao = {
+    parentMenu: app.parentMenu.daoTao,
+    menus: {
+      9009: { title: 'Bậc đào tạo ', link: '/user/dao-tao/bac-dao-tao', groupIndex: 2, icon: 'fa fa-list-alt' },
     },
   };
   app.permission.add(
     { name: 'dmSvBacDaoTao:read', menu },
+    { name: 'dtSvBacDaoTao:read', menu: menuDaoTao },
     { name: 'dmSvBacDaoTao:write' },
     { name: 'dmSvBacDaoTao:delete' },
   );
-  app.get('/user/danh-muc/dao-tao/bac-dao-tao', app.permission.check('dmSvBacDaoTao:read'), app.templates.admin);
+  app.get('/user/danh-muc/bac-dao-tao', app.permission.check('dmSvBacDaoTao:read'), app.templates.admin);
+  app.get('/user/dao-tao/bac-dao-tao', app.permission.check('dtSvBacDaoTao:read'), app.templates.admin);
 
   // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-  app.get('/api/danh-muc/dao-tao/bac-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/danh-muc/bac-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
     const pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize);
     let condition = { statement: null };
@@ -26,11 +34,11 @@ module.exports = app => {
     app.model.dmSvBacDaoTao.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
   });
 
-  app.get('/api/danh-muc/dao-tao/bac-dao-tao/item/:maBac', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/danh-muc/bac-dao-tao/item/:maBac', app.permission.check('user:login'), (req, res) => {
     app.model.dmSvBacDaoTao.get({ maBac: req.params.maBac }, (error, item) => res.send({ error, item }));
   });
 
-  app.post('/api/danh-muc/dao-tao/bac-dao-tao', app.permission.check('dmSvBacDaoTao:write'), (req, res) => {
+  app.post('/api/danh-muc/bac-dao-tao', app.permission.check('dmSvBacDaoTao:write'), (req, res) => {
     let data = req.body.data;
     app.model.dmSvBacDaoTao.get({ maBac: data.maBac }, (error, item) => {
       if (!error && item) {
@@ -41,11 +49,11 @@ module.exports = app => {
     });
   });
 
-  app.put('/api/danh-muc/dao-tao/bac-dao-tao', app.permission.check('dmSvBacDaoTao:write'), (req, res) => {
+  app.put('/api/danh-muc/bac-dao-tao', app.permission.check('dmSvBacDaoTao:write'), (req, res) => {
     app.model.dmSvBacDaoTao.update({ maBac: req.body.maBac }, req.body.changes, (error, item) => res.send({ error, item }));
   });
 
-  app.delete('/api/danh-muc/dao-tao/bac-dao-tao', app.permission.check('dmSvBacDaoTao:delete'), (req, res) => {
+  app.delete('/api/danh-muc/bac-dao-tao', app.permission.check('dmSvBacDaoTao:delete'), (req, res) => {
     app.model.dmSvBacDaoTao.delete({ maBac: req.body.maBac }, errors => res.send({ errors }));
   });
 };
