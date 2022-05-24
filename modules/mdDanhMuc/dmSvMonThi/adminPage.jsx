@@ -108,7 +108,7 @@ class DmSvMonThiPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Môn thi',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Môn thi'
             ],
             content: <>
@@ -118,7 +118,7 @@ class DmSvMonThiPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmSvMonThi} update={this.props.updateDmSvMonThi} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
+            backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

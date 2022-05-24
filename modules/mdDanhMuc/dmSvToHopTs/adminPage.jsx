@@ -10,8 +10,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { maToHop, mon1, mon2, mon3, ghiChu } = item ? item : { maToHop: '', mon1: '', mon2: '', mon3: '', ghiChu: '' };
-
-        this.setState({ item });
+        this.setState({ maToHop });
         this.maToHop.value(maToHop);
         this.mon1.value(mon1);
         this.mon2.value(mon2);
@@ -41,7 +40,7 @@ class EditModal extends AdminModal {
             T.notify('Môn 3 không được bị trống!', 'danger');
             this.mon3.focus();
         } else {
-            this.state.item ? this.props.update(changes.maToHop, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.maToHop ? this.props.update(changes.maToHop, changes, this.hide) : this.props.create(changes, this.hide);
         }
     };
 
@@ -50,7 +49,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Tạo mới tổ hợp thi' : 'Cập nhật tổ hợp thi',
+            title: !this.state.maToHop ? 'Tạo mới tổ hợp thi' : 'Cập nhật tổ hợp thi',
             size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-12' ref={e => this.maToHop = e} label='Mã tổ hợp' readOnly={readOnly} required />
@@ -117,7 +116,7 @@ class DmSvToHopTsPage extends AdminPage {
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenMon3} />
                         <TableCell content={item.ghiChu} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDmSvToHopTs(item.id, { kichHoat: Number(value) })} />
+                            onChanged={value => this.props.updateDmSvToHopTs(item.maToHop, { kichHoat: Number(value) })} />
                         <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
@@ -129,7 +128,7 @@ class DmSvToHopTsPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Ngành theo tổ hợp thi',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Ngành theo tổ hợp thi'
             ],
             content: <>
@@ -139,7 +138,7 @@ class DmSvToHopTsPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmSvToHopTs} update={this.props.updateDmSvToHopTs} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
+            backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

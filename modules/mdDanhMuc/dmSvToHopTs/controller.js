@@ -28,8 +28,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/dao-tao/to-hop-thi/item/:id', app.permission.check('user:login'), (req, res) => {
-        app.model.dmSvToHopTs.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+    app.get('/api/danh-muc/dao-tao/to-hop-thi/item/:maToHop', app.permission.check('user:login'), (req, res) => {
+        app.model.dmSvToHopTs.get({ maToHop: req.params.maToHop }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/dao-tao/to-hop-thi', app.permission.check('dmSvToHopTs:write'), (req, res) => {
@@ -38,10 +38,10 @@ module.exports = app => {
 
     app.put('/api/danh-muc/dao-tao/to-hop-thi', app.permission.check('dmSvToHopTs:write'), (req, res) => {
         const changes = req.body.changes || {};
-        app.model.dmSvToHopTs.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+        app.model.dmSvToHopTs.update({ maToHop: req.body.maToHop }, changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/dao-tao/to-hop-thi', app.permission.check('dmSvToHopTs:delete'), (req, res) => {
-        app.model.dmSvToHopTs.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.dmSvToHopTs.delete({ maToHop: req.body.maToHop }, errors => res.send({ errors }));
     });
 };

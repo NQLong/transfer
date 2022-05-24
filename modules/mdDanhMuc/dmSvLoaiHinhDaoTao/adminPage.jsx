@@ -116,7 +116,7 @@ class DmSvLoaiHinhDaoTaoPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Loại hình đào tạo',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Loại hình đào tạo'
             ],
             content: <>
@@ -126,7 +126,7 @@ class DmSvLoaiHinhDaoTaoPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmSvLoaiHinhDaoTao} update={this.props.updateDmSvLoaiHinhDaoTao} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
+            backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
