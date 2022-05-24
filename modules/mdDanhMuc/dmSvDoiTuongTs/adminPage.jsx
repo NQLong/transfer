@@ -2,19 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmSvDoiTuongTsPage, deleteDmSvDoiTuongTs, createDmSvDoiTuongTs, updateDmSvDoiTuongTs } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
+import { getValue,AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
   componentDidMount() {
     $(document).ready(() => this.onShown(() => {
-      !this.ma.value() ? this.ma.focus() : this.ten.focus();
+      !getValue(this.ma) ? this.ma.focus() : this.ten.focus();
     }));
   }
 
   onShow = (item) => {
     let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: true };
-
     this.setState({ ma, item });
     this.ma.value(ma);
     this.ten.value(ten);
@@ -24,19 +23,12 @@ class EditModal extends AdminModal {
   onSubmit = (e) => {
     e.preventDefault();
     const changes = {
-      ma: this.ma.value(),
-      ten: this.ten.value(),
-      kichHoat: Number(this.kichHoat.value())
+      ma: getValue(this.ma),
+      ten: getValue(this.ten),
+      kichHoat: Number(getValue(this.kichHoat))
     };
-    if (!this.state.ma && !this.ma.value()) {
-      T.notify('Mã không được trống!', 'danger');
-      this.ma.focus();
-    } else if (changes.ten == '') {
-      T.notify('Tên không được bị trống!', 'danger');
-      this.ten.focus();
-    } else {
-      this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-    }
+    this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
+    
   };
 
   changeKichHoat = value => this.kichHoat.value(value);
@@ -113,7 +105,7 @@ class DmSvDoiTuongTsPage extends AdminPage {
 
 
     return this.renderPage({
-      icon: 'fa fa-list-alt',
+      icon: this.menu == 'dao-tao' ? 'fa fa-user-circle-o' : 'fa fa-list-alt',
       title: ' Đối tượng tuyển sinh',
       subTitle: 'Sinh viên',
       breadcrumb: [

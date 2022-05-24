@@ -9,7 +9,7 @@ module.exports = app => {
   const menuDaoTao = {
     parentMenu: app.parentMenu.daoTao,
     menus: {
-      9013: { title: 'Đối tượng tuyển sinh', link: '/user/dao-tao/doi-tuong-tuyen-sinh', groupIndex: 2, icon: 'fa fa-list-alt' },
+      9013: { title: 'Đối tượng tuyển sinh', link: '/user/dao-tao/doi-tuong-tuyen-sinh', groupIndex: 2, icon: 'fa fa-user-circle-o' },
     },
   };
 
