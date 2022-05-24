@@ -15,7 +15,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1010: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/support', icon: 'fa-universal-access', backgroundColor: '#FE894F', pin: true, subTitle: 'Phòng Tổ chức cán bộ' },
+            1010: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/support', icon: 'fa-universal-access', backgroundColor: '#FE894F', pin: true, subTitle: 'Phòng Tổ chức - Cán bộ' },
         },
     };
 
