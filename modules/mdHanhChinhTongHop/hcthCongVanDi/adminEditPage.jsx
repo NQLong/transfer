@@ -13,7 +13,8 @@ import {
     // createHistory,
     getHistory,
     updateStatus,
-    getPhanHoi
+    getPhanHoi,
+    readCongVanDi
 } from './redux';
 import { Link } from 'react-router-dom';
 import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
@@ -436,9 +437,8 @@ class AdminEditPage extends AdminPage {
     onReadCvDi = () => {
         T.confirm('Thông báo', 'Bạn có muốn xác nhận là đã đọc công văn này không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
-                // this.onCreateHistory('6');
-                // this.setState({ trangThai: '6' }, () => this.save());
-                this.onChangeStatus(trangThaiCongVanDi.DA_DOC.id, () => this.getData());
+
+                this.props.readCongVanDi({ id: this.state.id, shcc: this.state.shcc }, () => this.props.getHistory(this.state.id, () => this.getData()));
             }
         });
     }
@@ -448,20 +448,15 @@ class AdminEditPage extends AdminPage {
         const data = this.getValidatedData();
         if (data) {
             let newTrangThai;
-            if (this.state.loaiCongVan == 'TRUONG') {
-                newTrangThai = trangThaiCongVanDi.CHO_KIEM_TRA.id;
-                // this.onCreateHistory(trangThaiCongVanDi.CHO_KIEM_TRA.id);
-                // this.setState({ trangThai: '2' }, () => this.save());
-            } else {
-                newTrangThai = trangThaiCongVanDi.DA_GUI.id;
-                // this.onCreateHistory(trangThaiCongVanDi.DA_GUI.id);
-                // this.setState({ trangThai: '5' }, () => this.save());
-            }
             T.confirm('Thông báo', 'Bạn có chắc chắn muốn gửi công văn này đi không ?', 'warning', true, isConfirm => {
                 if (isConfirm) {
-                    // this.setState({ trangThai: newTrangThai }, () => this.save());
-                    // this.onChangeStatus(newTrangThai);
-                    this.setState({ trangThai: newTrangThai }, () => this.save());
+                    if (this.state.loaiCongVan == 'TRUONG') {
+                        newTrangThai = trangThaiCongVanDi.CHO_KIEM_TRA.id;
+                        this.setState({ trangThai: newTrangThai }, () => this.save());
+                    } else {
+                        newTrangThai = trangThaiCongVanDi.DA_GUI.id;
+                        this.onChangeStatus(newTrangThai, () => this.getData());
+                    }
                 }
             });
         }
@@ -550,7 +545,7 @@ class AdminEditPage extends AdminPage {
     }
 
     canSeeNumber = () => {
-        return this.state.id && [trangThaiCongVanDi.DA_DOC.id, trangThaiCongVanDi.DA_DUYET.id].includes(this.state.trangThai);
+        return this.state.id && [trangThaiCongVanDi.DA_DUYET.id, trangThaiCongVanDi.DA_GUI.id].includes(this.state.trangThai);
     }
 
     canReadOnly = () => {
@@ -626,7 +621,7 @@ class AdminEditPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
-            title: 'Công văn giữa các phòng',
+            title: 'Công văn các phòng',
             breadcrumb,
             content: this.state.isLoading ? loading : (<>
                 <div className='tile'>
@@ -650,7 +645,8 @@ class AdminEditPage extends AdminPage {
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngày gửi' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngày ký' />
                         <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi' readOnly={this.canReadOnly()} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} placeholder="Chọn đơn vị gửi" required readOnlyEmptyText='Chưa có đơn vị gửi' />
-                        <FormSelect className='col-md-12' label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={loaiCongVanArr} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại công văn' onChange={value => this.setState({ loaiCongVan: value.id })} required />
+                        <FormSelect className='col-md-6' label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={loaiCongVanArr} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại công văn' onChange={value => this.setState({ loaiCongVan: value.id })} required />
+                        <FormSelect className='col-md-6' allowClear={true} label='Loại văn bản' placeholder='Chọn loại văn bản' ref={e => this.loaiVanBan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại văn bản' />
                         <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Chọn đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có đơn vị nhận' />
                         <FormSelect multiple={true} className='col-md-12' label={(<span onClick={(e) => e.stopPropagation()}>
                             <span style={{ marginRight: '2px' }}>Đơn vị nhận bên ngoài</span>
@@ -661,7 +657,6 @@ class AdminEditPage extends AdminPage {
                             }
                         </span>)} placeholder='Chọn đơn vị nhận bên ngoài' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có đơn vị nhận' />
                         <FormSelect multiple={true} className='col-md-12' label='Cán bộ nhận' placeholder='Cán bộ nhận' ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có cán bộ nhận' />
-                        <FormSelect className='col-md-12' allowClear={true} label='Loại văn bản' placeholder='Chọn loại văn bản' ref={e => this.loaiVanBan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại văn bản' />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={this.canReadOnly()} required readOnlyEmptyText=': Chưa có trích yếu' />
                     </div>
                 </div>
@@ -740,7 +735,8 @@ const mapActionsToProps = {
     updateStatus,
     getPhanHoi,
     // createHistory,
-    createDmDonViGuiCv
+    createDmDonViGuiCv,
+    readCongVanDi
     // getHistory
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

@@ -703,7 +703,7 @@ module.exports = app => {
             if (congVan.trangThai == trangThai || !trangThai) {
                 res.send({ error: null, item: congVan });
             } else {
-                if (trangThai == trangThaiCongVanDi.DA_DOC.id) {
+                if (trangThai == trangThaiCongVanDi.DA_GUI.id) {
                     await createSoCongVan(id, donViGui);
                 }
                 const newCongVan = await updateCongVanDi(id, { trangThai });
@@ -720,6 +720,35 @@ module.exports = app => {
             }
         } catch (error) {
             res.send({ error });
+        }
+    });
+
+    app.put('/api/hcth/cong-van-cac-phong/read/:id', app.permission.check('staff:login'), async (req, res) => {
+        const { id, shcc } = req.body.data;
+        // check permission
+        const check = await app.model.hcthHistory.asyncGet({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
+
+        // console.log(check);
+        // console.log(shcc);
+        try {
+            if (check) {
+                throw 400;
+            }
+            // console.log(id);
+            await app.model.hcthHistory.asyncCreate({
+                key: id,
+                loai: CONG_VAN_DI_TYPE,
+                thoiGian: new Date().getTime(),
+                shcc: req.session?.user?.shcc,
+                hanhDong: action.READ,
+            });
+            res.send({ error: null });
+        } catch (error) {
+            if (res.error == 400) {
+                res.send({ error: 400 });
+            } else {
+                res.send({ error });
+            }
         }
     });
 

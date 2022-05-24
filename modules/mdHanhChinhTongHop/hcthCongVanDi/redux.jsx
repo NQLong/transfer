@@ -264,3 +264,24 @@ export function getHistory(id, done) {
         }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
     };
 }
+
+export function readCongVanDi(data, done) {
+    return () => {
+        const url = `/api/hcth/cong-van-cac-phong/read/${data.id}`;
+        T.put(url, { data }, res => {
+            if (res.error) {
+                // console.log(res.error);
+                if (res.error == 400) {
+                    T.notify('Bạn đã đọc công văn này rồi', 'danger');
+                }
+                else {
+                    T.notify('Đọc công văn lỗi', 'danger');
+                    console.error('PUT: ' + url + '. ' + res.error);
+                }
+            } else {
+                T.notify('Bạn đã đọc công văn này', 'success');
+                done && done();
+            }
+        }, () => T.notify('Đọc công văn lỗi', 'danger'));
+    };
+}
