@@ -1,47 +1,44 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createQtNghiViecStaff, updateQtNghiViecStaff, deleteQtNghiViecStaff,
-    getQtNghiViecGroupPage, getQtNghiViecPage,
+    createQtNghiViecStaff, updateQtNghiViecStaff, deleteQtNghiViecStaff, getQtNghiViecPage,
 } from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DmNghiViec } from 'modules/mdDanhMuc/dmNghiViec/redux';
 
 class EditModal extends AdminModal {
-    state = {
-        ma: null,
-    }
-
-    componentDidMount() {
-    }
-    multiple = false;
-    onShow = (item, multiple = true) => {
-        this.multiple = multiple;
-        let { ma, shcc, dienNghi, noiDung, ghiChu, ngayNghi, soQuyetDinh } = item ? item : {
-            ma: '', shcc: '', dienNghi: null, noiDung: '', ngayNghi: null, soQuyetDinh: ''
+    onShow = (item) => {
+        let { ma, shcc, lyDoNghi, noiDung, ghiChu, ngayNghi, soQuyetDinh, hoCanBo, hoTen } = item ? item : {
+            ma: '', shcc: '', lyDoNghi: null, noiDung: '', ngayNghi: null, soQuyetDinh: ''
         };
-        this.setState({ ma, item });
-        setTimeout(() => {
-            this.shcc.value(shcc);
-            this.dienNghi.value(dienNghi);
+        this.setState({ ma, item, shcc, hoCanBo }, () => {
+            this.state.ma && (!this.state.shcc || !this.state.hoCanBo) ? this.hoTen.value(hoTen) : this.shcc.value(shcc);
+            this.lyDoNghi.value(lyDoNghi);
             this.noiDung.value(noiDung ? noiDung : '');
             this.ghiChu.value(ghiChu ? ghiChu : '');
             this.ngayNghi.value(ngayNghi ? ngayNghi : '');
             this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-        }, 500);
+        });
     }
 
     onSubmit = (e) => {
         e.preventDefault();
-        let listMa = this.shcc.value();
-        if (!Array.isArray(listMa)) {
-            listMa = [listMa];
-        }
-        if (listMa.length == 0) {
-            T.notify('Danh sách cán bộ trống', 'danger');
+        let listShcc = this.state.ma && (!this.state.shcc || !this.state.hoCanBo) ? null : this.shcc.value();
+        const changes = {
+            listShcc,
+            hoTen: this.state.ma && (!this.state.shcc || !this.state.hoCanBo) ? this.hoTen.value() : this.shcc.data().text,
+            lyDoNghi: this.lyDoNghi.value(),
+            noiDung: this.noiDung.value(),
+            ngayNghi: Number(this.ngayNghi.value()),
+            ghiChu: this.ghiChu.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
+        };
+        if (this.state.shcc && listShcc.length == 0) {
+            T.notify('Cán bộ trống', 'danger');
             this.shcc.focus();
         } else if (!this.soQuyetDinh.value()) {
             T.notify('Số quyết định bị trống', 'danger');
@@ -49,30 +46,23 @@ class EditModal extends AdminModal {
         } else if (!this.ngayNghi.value()) {
             T.notify('Ngày nghỉ bị trống', 'danger');
             this.ngayNghi.focus();
-        } else if (!this.dienNghi.value()) {
-            T.notify('Chưa chọn diện nghỉ', 'danger');
-            this.dienNghi.focus();
+        } else if (!this.lyDoNghi.value()) {
+            T.notify('Chưa chọn lý do nghỉ', 'danger');
+            this.lyDoNghi.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    dienNghi: this.dienNghi.value(),
-                    noiDung: this.noiDung.value(),
-                    ngayNghi: Number(this.ngayNghi.value()),
-                    ghiChu: this.ghiChu.value(),
-                    soQuyetDinh: this.soQuyetDinh.value(),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.ma ? this.props.update(this.state.ma, changes, this.hide, false) : this.props.create(changes, this.hide, false);
-                    this.setState({
-                        ma: ''
-                    });
-                    this.shcc.reset();
+            if (this.state.ma) {
+                if (Array.isArray(listShcc) && listShcc.length > 1) {
+                    T.notify('Không thể cập nhật cho nhiều cán bộ');
+                    this.shcc.focus();
+                } else {
+                    console.log(changes);
+
+                    changes.shcc = this.state.shcc ? changes.listShcc[0] : '';
+                    this.props.update(this.state.ma, changes, this.hide);
                 }
-                else {
-                    this.state.ma ? this.props.update(this.state.ma, changes, null, false) : this.props.create(changes, null, false);
-                }
-            });
+            } else {
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -82,10 +72,10 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật thông tin nghỉ việc' : 'Tạo mới thông tin nghỉ việc',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
+                {readOnly && (!this.state.shcc || !this.state.hoCanBo) ? <FormTextBox className='col-md-12' ref={e => this.hoTen = e} label='Cán bộ' required /> : <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} required multiple allowClear />}
                 <FormTextBox className='col-md-12' ref={e => this.soQuyetDinh = e} label='Số quyết định' type='text' required />
                 <FormDatePicker className='col-md-6' ref={e => this.ngayNghi = e} label='Ngày nghỉ' type='date-mask' required />
-                <FormSelect className='col-md-6' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} required />
+                <FormSelect className='col-md-6' ref={e => this.lyDoNghi = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiViec} required />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} label={'Nội dung'} />
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} label={'Ghi chú'} />
             </div>,
@@ -96,7 +86,9 @@ class EditModal extends AdminModal {
 class QtNghiViec extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
+
     componentDidMount() {
+        T.clearSearchBox();
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -104,14 +96,7 @@ class QtNghiViec extends AdminPage {
                 this.toYear?.value('');
                 this.maDonVi?.value('');
                 this.mulCanBo?.value('');
-                setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            if (this.checked) {
-                this.hienThiTheoCanBo.value(true);
-                this.props.getQtNghiViecGroupPage();
-            } else {
-                this.props.getQtNghiViecPage();
-            }
             this.changeAdvancedSearch(true);
         });
     }
@@ -121,33 +106,42 @@ class QtNghiViec extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtNghiViec && this.props.qtNghiViec.page ? this.props.qtNghiViec.page : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const listDv = this.maDonVi?.value().toString() || '';
+        const listDonVi = this.maDonVi?.value().toString() || '';
         const listShcc = this.mulCanBo?.value().toString() || '';
-        const dienNghi = this.dienNghi.value();
-        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, dienNghi };
-        this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+        const listLyDo = this.lyDoNghi.value();
+        const filterCookie = T.storage('pageQtNghiViec').F;
+        const pageFilter = isInitial ? filterCookie : { listDonVi, fromYear, toYear, listShcc, listLyDo };
+        this.setState({ filter: isReset ? {} : pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', () => {
                 if (isInitial) {
-                    const filter = page.filter || {};
+                    const filter = this.state.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.listDv);
+                    this.maDonVi?.value(filter.listDonVi);
                     this.mulCanBo?.value(filter.listShcc);
-                    this.dienNghi?.value(filter.dienNghi);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.dienNghi)) this.showAdvanceSearch();
+                    this.lyDoNghi?.value(filter.listLyDo);
+                    Object.values(filterCookie).some(item => !item.includes('%') && item && item != '' && item != 0) && this.showAdvanceSearch();
+                } else {
+                    this.hideAdvanceSearch();
+                    if (isReset) {
+                        this.fromYear?.value('');
+                        this.toYear?.value('');
+                        this.maDonVi?.value('');
+                        this.mulCanBo?.value('');
+                        this.lyDoNghi?.value('');
+                    }
                 }
             });
         });
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        if (this.checked) this.props.getQtNghiViecGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtNghiViecPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtNghiViecPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -175,79 +169,63 @@ class QtNghiViec extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtNghiViec', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-            this.props.qtNghiViec && this.props.qtNghiViec.pageGr ?
-                this.props.qtNghiViec.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
-            : (this.props.qtNghiViec && this.props.qtNghiViec.page ? this.props.qtNghiViec.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
-        let table = 'Không có danh sách!';
-        if (list && list.length > 0) {
-            table = renderTable({
-                getDataSource: () => list, stickyHead: true,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định nghỉ</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghỉ</th>}
-                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>}
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lần nghỉ</th>}
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách nội dung nghỉ</th>}
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
-                    </tr>
-                ),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc}
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
-                            </>
-                        )} />
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span><i>{item.soQuyetDinh}</i></span><br />
-                                <span>Diện nghỉ: <span style={{ color: 'blue' }}>{item.dienNghi == 1 ? 'Biên chế' : 'Hợp đồng'}</span></span>
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(<span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>)} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span><i>{item.noiDung}</i></span><br />
-                                {item.ghiChu ? '(' + item.ghiChu + ')' : null}
-                            </>
-                        )}
-                        />}
-                        {this.checked && <TableCell type='text' content={item.soLanNghi} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNghiViec, item.soLanNghi, item.soLanNghi)} />}
-                        {
-                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                            </TableCell>
-                        }
-                        {
-                            this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/nghi-viec/group/${item.shcc}`} >
-                                    <i className='fa fa-lg fa-compress' />
-                                </Link>
-                            </TableCell>
-                        }
-                    </tr>
-                )
-            });
-        }
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiViec && this.props.qtNghiViec.page ? this.props.qtNghiViec.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: null };
+        let table = renderTable({
+            emptyTable: 'Chưa có dữ liệu',
+            getDataSource: () => list, stickyHead: true,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Học vị</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Quyết định nghỉ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghỉ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nội dung</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span>{item.hoCanBo ? (item.hoCanBo + ' ' + item.tenCanBo)?.normalizedName() : (item.hoTen?.normalizedName() || '')}</span><br />
+                            {item.shcc}
+                        </>
+                    )} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span> {item.tenChucVu ? item.tenChucVu + <br /> : ''}</span>
+                            {(item.tenDonVi || '')}
+                        </>
+                    )} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span><i>{item.soQuyetDinh}</i></span><br />
+                            <span>Lý do: <span style={{ color: 'blue' }}>{item.tenLyDo || ''}</span></span>
+                        </>
+                    )}
+                    />
+                    <TableCell type='text' content={(<span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>)} />
+                    <TableCell type='text' contentClassName='multiple-lines-4' content={(
+                        <>
+                            <span><i>{item.noiDung}</i></span><br />
+                            {item.ghiChu ? '(' + item.ghiChu + ')' : null}
+                        </>
+                    )}
+                    />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                    </TableCell>
+
+
+                </tr>
+            )
+        });
 
         return this.renderPage({
             icon: 'fa fa-user-times',
@@ -258,16 +236,27 @@ class QtNghiViec extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-6' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-6' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-md-6' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-6' label='Từ thời gian' />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-6' label='Đến thời gian' />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-6' ref={e => this.lyDoNghi = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiViec} allowClear={true} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
+                    <div className='col-12'>
+                        <div className='row justify-content-between'>
+                            <div className='form-group col-md-12' style={{ textAlign: 'right' }}>
+                                <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                                    <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                                </button>
+                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                                    <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
@@ -278,14 +267,21 @@ class QtNghiViec extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/nghi-viec/create-list') : '',
+            onCreate: (e) => this.showModal(e),
+            onExport: (e) => {
+                e.preventDefault();
+                let filter = T.stringify(this.state.filter);
+                if (filter.includes('%')) filter = '{}';
+
+                T.download(T.url(`/api/qua-trinh/nghi-viec/download-excel/${filter}`), 'NGHIVIEC.xlsx');
+            }
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtNghiViec: state.tccb.qtNghiViec });
 const mapActionsToProps = {
-    createQtNghiViecStaff, updateQtNghiViecStaff, deleteQtNghiViecStaff,
-    getQtNghiViecGroupPage, getQtNghiViecPage,
+    createQtNghiViecStaff, updateQtNghiViecStaff, deleteQtNghiViecStaff, getQtNghiViecPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghiViec);

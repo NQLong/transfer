@@ -18,6 +18,7 @@ module.exports = app => {
         { name: 'qtKeoDaiCongTac:write' },
         { name: 'qtKeoDaiCongTac:delete' },
     );
+    app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/create-list', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/:shcc', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/keo-dai-cong-tac', app.permission.check('staff:login'), app.templates.admin);
@@ -228,51 +229,53 @@ module.exports = app => {
                 }
                 const item = data[index];
                 app.model.dmNghiHuu.getTuoiNghiHuu({ phai: item.phai, ngaySinh: new Date(item.ngaySinh) }, (error, data) => {
-                    let canExtend = item.chucDanh == '01' ? 10 : item.chucDanh == '02' ? 7 : (item.hocVi == '01' || item.hocVi == '02') ? 5 : 0;
-                    let start = new Date(data.resultDate);
-                    let end = new Date(data.prevResultDate);
-                    end.setFullYear(end.getFullYear() + canExtend);
-                    if (start.getFullYear() < yearCalc) start = firstYear;
+                    if (data) {
+                        let canExtend = item.chucDanh == '01' ? 10 : item.chucDanh == '02' ? 7 : (item.hocVi == '01' || item.hocVi == '02') ? 5 : 0;
+                        let start = new Date(data.resultDate);
+                        let end = new Date(data.prevResultDate);
+                        end.setFullYear(end.getFullYear() + canExtend);
+                        if (start.getFullYear() < yearCalc) start = firstYear;
 
-                    if (data && (data.resultDate.getFullYear() <= yearCalc) && end.getFullYear() >= yearCalc) {
-                        if (end.getFullYear() > yearCalc) end = endYear;
+                        if (data.resultDate.getFullYear() <= yearCalc && end.getFullYear() >= yearCalc) {
+                            if (end.getFullYear() > yearCalc) end = endYear;
 
-                        let tenChucDanh = '', tenHocVi = '', tenChucDanhNgheNghiep = '', tenChucVu = '', tenDonVi = '';
-                        app.model.dmChucDanhKhoaHoc.get({ ma: item.chucDanh }, (error, itemCD) => {
-                            app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, itemHV) => {
-                                app.model.dmNgachCdnn.get({ ma: item.ngach }, (error, itemCDNN) => {
-                                    app.model.dmChucVu.get({ ma: item.maChucVu }, (error, itemCV) => {
-                                        app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDV) => {
-                                            if (itemCD) tenChucDanh = itemCD.ten;
-                                            if (itemHV) tenHocVi = itemHV.ten;
-                                            if (itemCDNN) tenChucDanhNgheNghiep = itemCDNN.ten;
-                                            if (itemCV) tenChucVu = itemCV.ten;
-                                            if (itemDV) tenDonVi = itemDV.ten;
+                            let tenChucDanh = '', tenHocVi = '', tenChucDanhNgheNghiep = '', tenChucVu = '', tenDonVi = '';
+                            app.model.dmChucDanhKhoaHoc.get({ ma: item.chucDanh }, (error, itemCD) => {
+                                app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, itemHV) => {
+                                    app.model.dmNgachCdnn.get({ ma: item.ngach }, (error, itemCDNN) => {
+                                        app.model.dmChucVu.get({ ma: item.maChucVu }, (error, itemCV) => {
+                                            app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDV) => {
+                                                if (itemCD) tenChucDanh = itemCD.ten;
+                                                if (itemHV) tenHocVi = itemHV.ten;
+                                                if (itemCDNN) tenChucDanhNgheNghiep = itemCDNN.ten;
+                                                if (itemCV) tenChucVu = itemCV.ten;
+                                                if (itemDV) tenDonVi = itemDV.ten;
 
-                                            let dataAdd = {
-                                                shcc: item.shcc,
-                                                hoCanBo: item.ho,
-                                                tenCanBo: item.ten,
-                                                tenChucDanh,
-                                                tenHocVi,
-                                                tenChucVu,
-                                                tenDonVi,
-                                                tenChucDanhNgheNghiep,
-                                                batDau: start.getTime(),
-                                                ketThuc: end.getTime(),
-                                                batDauType: 'dd/mm/yyyy',
-                                                ketThucType: 'dd/mm/yyyy',
-                                                ngayNghiHuu: data.resultDate,
-                                                ngaySinh: item.ngaySinh,
-                                                phai: item.phai,
-                                            };
-                                            items.push(dataAdd);
-                                            solve(index + 1);
+                                                let dataAdd = {
+                                                    shcc: item.shcc,
+                                                    hoCanBo: item.ho,
+                                                    tenCanBo: item.ten,
+                                                    tenChucDanh,
+                                                    tenHocVi,
+                                                    tenChucVu,
+                                                    tenDonVi,
+                                                    tenChucDanhNgheNghiep,
+                                                    batDau: start.getTime(),
+                                                    ketThuc: end.getTime(),
+                                                    batDauType: 'dd/mm/yyyy',
+                                                    ketThucType: 'dd/mm/yyyy',
+                                                    ngayNghiHuu: data.resultDate,
+                                                    ngaySinh: item.ngaySinh,
+                                                    phai: item.phai,
+                                                };
+                                                items.push(dataAdd);
+                                                solve(index + 1);
+                                            });
                                         });
                                     });
                                 });
                             });
-                        });
+                        } else solve(index + 1);
                     } else solve(index + 1);
                 });
             };

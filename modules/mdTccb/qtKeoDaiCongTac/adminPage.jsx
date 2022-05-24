@@ -29,7 +29,7 @@ const timeList = [
 ];
 
 const
-    start = new Date().getFullYear() - 10 ,
+    start = new Date().getFullYear() - 10,
     end = new Date().getFullYear() + 2,
     yearSelector = [...Array(end - start + 1).keys()].map(i => ({
         id: end - i,
@@ -164,14 +164,14 @@ class UpdateQuyetDinhModal extends AdminModal {
             stickyHead: true,
             renderHead: () => (
                 <tr>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
                 </tr>
             ),
             renderRow: (item, index) => {
@@ -194,7 +194,7 @@ class UpdateQuyetDinhModal extends AdminModal {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         <TableCell type='text' content={(
@@ -261,7 +261,7 @@ class UpdateQuyetDinhModal extends AdminModal {
                 <FormDatePicker className='col-md-4' ref={e => this.ngayQuyetDinh = e} style={{ display: this.state.data.length ? 'block' : 'none' }} type='date-mask' label='Ngày quyết định' required />
                 <FormTextBox className='col-md-12' style={{ display: this.state.data.length ? 'block' : 'none' }} type='text' label={<b>{'Có ' + this.state.data.length + ' kết quả'}</b>} readOnly={true} />
                 <div className='form-group col-md-12'>{this.tableData(this.state.data)}</div>
-                </div>
+            </div>
         });
     }
 }
@@ -313,7 +313,7 @@ class QtKeoDaiCongTac extends AdminPage {
             toYear = this.toYear.value();
             toYear.setHours(23, 59, 59, 999);
             toYear = toYear.getTime();
-        }    
+        }
         const timeType = this.timeType.value() == '' ? null : this.timeType.value();
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
@@ -413,11 +413,11 @@ class QtKeoDaiCongTac extends AdminPage {
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày đủ tuổi nghỉ hưu</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thời gian</th>}
-                        {this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Số quá trình<br/>kéo dài công tác</th>}
-                        {this.checked && <th style={{ width: '50%', textAlign: 'center' }}>Danh sách thời gian<br/>kéo dài công tác</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thời gian được kéo dài</th>}
+                        {this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Số quá trình<br />kéo dài công tác</th>}
+                        {this.checked && <th style={{ width: '50%', textAlign: 'center' }}>Danh sách thời gian<br />kéo dài công tác</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
-                    </tr>
+                    </tr >
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -438,16 +438,16 @@ class QtKeoDaiCongTac extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
                         {!this.checked && <TableCell type='text' style={{ color: 'blue' }} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />}
-                        {!this.checked && <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} /> }
+                        {!this.checked && <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />}
@@ -482,8 +482,8 @@ class QtKeoDaiCongTac extends AdminPage {
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={this.handleTime} />
                     {this.state.visibleTime &&
                         <>
-                            <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian'  />
-                            <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian'  />
+                            <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' />
+                            <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' />
                         </>}
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />

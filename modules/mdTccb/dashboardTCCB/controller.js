@@ -21,11 +21,12 @@ module.exports = app => {
             if (error) res.send({ error });
             else {
                 let soLieu = item.rows[0],
-                    { nhanSuDonVi = [], nhanSuCongTac = [], qtDiNuocNgoai = [], qtCongTacTrongNuoc = [] } = item;
+                    { nhanSuDonVi = [], nhanSuCongTac = [], qtDiNuocNgoai = [], qtCongTacTrongNuoc = [], qtNghiPhep = [], qtNghiThaiSan = [] } = item;
+                console.log(qtNghiPhep, qtNghiThaiSan);
                 app.model.dmDonVi.getAll({ kichHoat: 1 }, 'ma,maPl', 'maPl', (error, listDonVi) => {
                     if (error) res.send({ error });
                     else {
-                        res.send({ data: { soLieu, nhanSuDonVi, nhanSuCongTac, qtDiNuocNgoai, qtCongTacTrongNuoc, listDonVi } });
+                        res.send({ data: { soLieu, nhanSuDonVi, nhanSuCongTac, qtDiNuocNgoai, qtCongTacTrongNuoc, listDonVi, qtNghiPhep, qtNghiThaiSan } });
                     }
                 });
             }

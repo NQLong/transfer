@@ -319,7 +319,7 @@ class StaffEditPage extends AdminPage {
         this.chiDao?.value('');
 
         this.setState({ listFile, chiDao: danhSachChiDao, trangThai, history, needConduct }, () => {
-            listFile.map((item, index) => this.listFileRefs[index]?.value(item.viTri || ''));
+            listFile.map((item) => this.listFileRefs[item.id]?.value(item.viTri || ''));
             //fetch list banGiamHieu to render quyen chi dao
             this.props.getStaffPage(1, 100, '', { listDonVi: MA_BAN_GIAM_HIEU }, (page) => {
                 const presiendents = page.list.filter(item => item.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG).map(item => item.shcc);
@@ -348,14 +348,6 @@ class StaffEditPage extends AdminPage {
         else if (response.item) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.item);
-            let linkCongVan = '[]';
-            try {
-                linkCongVan = JSON.stringify(listFile);
-            } catch (exception) {
-                T.notify(exception, 'danger');
-                return;
-            }
-            this.state.id && this.props.updateHcthCongVanDen(this.state.id, { linkCongVan });
             this.setState({ listFile });
         }
     }
@@ -371,9 +363,9 @@ class StaffEditPage extends AdminPage {
             }));
     }
 
-    onViTriChange = (e, index) => {
+    onViTriChange = (e, id, index) => {
         let listFile = [...this.state.listFile];
-        listFile[index].viTri = this.listFileRefs[index].value() || '';
+        listFile[index].viTri = this.listFileRefs[id].value() || '';
         setTimeout(() => this.setState({ listFile }), 500);
     }
 
@@ -396,14 +388,14 @@ class StaffEditPage extends AdminPage {
                 originalName = item.ten,
                 linkFile = `/api/hcth/cong-van-den/download/${id || 'new'}/${originalName}`;
             return (
-                <tr key={index}>
+                <tr key={item.id}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
                         <a href={linkFile} download>{originalName}</a>
                     </>
                     } />
                     <TableCell content={(
-                        permission.write && !readOnly ? <FormTextBox type='text' placeholder='Nhập vị trí' style={{ marginBottom: 0 }} ref={e => this.listFileRefs[index] = e} onChange={e => this.onViTriChange(e, index)} /> : item.viTri
+                        permission.write && !readOnly ? <FormTextBox type='text' placeholder='Nhập vị trí' style={{ marginBottom: 0 }} ref={e => this.listFileRefs[item.id] = e} onChange={e => this.onViTriChange(e, item.id, index)} /> : item.viTri
                     )} />
                     <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={readOnly ? null : e => this.deleteFile(e, index, item)}>
@@ -615,7 +607,14 @@ class StaffEditPage extends AdminPage {
         let { donViNhan, canBoNhan } = this.getItem() || {};
         let maDonViNhan = donViNhan?.split(',') || [];
         let maCanBoNhan = canBoNhan?.split(',') || [];
-        return currentPermission.includes('rectors:login') || currentPermission.includes('hcth:login') || this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) || maCanBoNhan.includes(this.state.shcc);
+        let maDonViCanBo = this.props.system?.user?.staff?.maDonVi;
+        return (
+            currentPermission.includes('rectors:login') ||
+            currentPermission.includes('hcth:login') ||
+            (currentPermission.includes('donViCongVanDen:read') && maDonViNhan.includes(maDonViCanBo)) ||
+            this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) ||
+            maCanBoNhan.includes(this.state.shcc)
+        );
     }
 
     onCreatePhanHoi = (e) => {

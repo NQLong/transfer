@@ -10,8 +10,8 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/nghi-viec/group/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+            path: '/user/tccb/qua-trinh/nghi-viec/create-list',
+            component: Loadable({ loading: Loading, loader: () => import('./adminCreatePage') })
         },
         {
             path: '/user/tccb/qua-trinh/nghi-viec',
