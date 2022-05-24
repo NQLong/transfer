@@ -369,6 +369,7 @@ class AdminEditPage extends AdminPage {
                 // }
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
+                changes.ngayTao = new Date().getTime();
                 this.props.createHcthCongVanDi(changes, () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong') : this.props.history.push('/user/cong-van-cac-phong')));
             }
         }
