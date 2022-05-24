@@ -24,8 +24,8 @@ class TreeModal extends AdminModal {
                 const { chuongTrinhDaoTao: chuongTrinhDaoTaoCon } = mucCon;
 
                 const mucConSwitch = {};
-                Object.keys(chuongTrinhDaoTaoCha).map(key => {
-                    const { id } = chuongTrinhDaoTaoCha[key];
+                Object.values(chuongTrinhDaoTaoCha).forEach(value => {
+                    const { id } = value;
                     mucConSwitch[id] = false;
                 });
 
