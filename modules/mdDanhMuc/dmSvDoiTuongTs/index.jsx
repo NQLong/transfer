@@ -10,7 +10,11 @@ export default {
   },
   routes: [
     {
-      path: '/user/danh-muc/dao-tao/doi-tuong-tuyen-sinh',
+      path: '/user/danh-muc/doi-tuong-tuyen-sinh',
+      component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+    },
+    {
+      path: '/user/dao-tao/doi-tuong-tuyen-sinh',
       component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
     },
   ],

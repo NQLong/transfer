@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
   render = () => {
     const readOnly = this.props.readOnly;
     return this.renderModal({
-      title: this.state.ma ? 'Tạo mới đối tượng tuyển sinh (sinh viên)' : 'Cập nhật đối tượng tuyển sinh (sinh viên)',
+      title: !this.state.ma ? 'Tạo mới đối tượng tuyển sinh (sinh viên)' : 'Cập nhật đối tượng tuyển sinh (sinh viên)',
       size: 'large',
       body: <div className='row'>
         <FormTextBox className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} placeholder='Mã' required />
@@ -59,6 +59,9 @@ class EditModal extends AdminModal {
 
 class DmSvDoiTuongTsPage extends AdminPage {
   componentDidMount() {
+    let route = T.routeMatcher('/user/:menu/doi-tuong-tuyen-sinh').parse(window.location.pathname);
+    this.menu = route.menu == 'danh-muc' ? 'category' : 'dao-tao';
+    T.ready(`/user/${this.menu}`);
     T.onSearch = (searchText) => this.props.getDmSvDoiTuongTsPage(undefined, undefined, searchText || '');
     T.showSearchBox();
     this.props.getDmSvDoiTuongTsPage();
@@ -70,6 +73,7 @@ class DmSvDoiTuongTsPage extends AdminPage {
   }
 
   delete = (e, item) => {
+    
     T.confirm('Xóa đối tượng tuyển sinh (sinh viên)', `Bạn có chắc bạn muốn xóa đối tượng tuyển sinh (sinh viên) ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
       isConfirm && this.props.deleteDmSvDoiTuongTs(item.ma, error => {
         if (error) T.notify(error.message ? error.message : `Xoá đối tượng tuyển sinh (sinh viên) ${item.ten} bị lỗi!`, 'danger');
@@ -113,7 +117,7 @@ class DmSvDoiTuongTsPage extends AdminPage {
       title: ' Đối tượng tuyển sinh',
       subTitle: 'Sinh viên',
       breadcrumb: [
-        <Link key={0} to='/user/category'>Danh mục</Link>,
+        <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'dao-tao' ? 'Đào tạo' : 'Danh mục'}</Link>,
         'Đối tượng tuyển sinh (sinh viên)'
       ],
       content: <>
@@ -123,7 +127,7 @@ class DmSvDoiTuongTsPage extends AdminPage {
         <EditModal ref={e => this.modal = e} permission={permission}
           create={this.props.createDmSvDoiTuongTs} update={this.props.updateDmSvDoiTuongTs} permissions={currentPermissions} />
       </>,
-      backRoute: '/user/category',
+      backRoute: `/user/${this.menu}`,
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null
     });
   }
