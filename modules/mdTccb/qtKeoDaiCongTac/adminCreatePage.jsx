@@ -158,8 +158,8 @@ class CreateListYear extends AdminPage {
                     <TableCell type='link' onClick={() => this.modal.show({ index, item })} style={{ whiteSpace: 'nowrap' }} content={(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.phai == '01' ? item.ngaySinh : ''} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.phai == '02' ? item.ngaySinh : ''} />
-                    <TableCell type='text' content={item.tenChucDanh ? item.tenChucDanh.getFirstLetters().toUpperCase() + '.' : ''} />
-                    <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters().toUpperCase() : ''} />
+                    <TableCell type='text' content={item.tenChucDanh ? item.tenChucDanh.getFirstLetters() + '.' : ''} />
+                    <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters() : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '')} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />

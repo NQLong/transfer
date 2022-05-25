@@ -352,8 +352,8 @@ module.exports = app => {
                         let hoTenCb = (item.hoCanBo ? item.hoCanBo.normalizedName() : '') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : '');
                         let gioiTinhNam = item.phai == '01' && item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '';
                         let gioiTinhNu = item.phai == '02' && item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '';
-                        let chucDanh = item.tenChucDanh ? item.tenChucDanh.getFirstLetters().toUpperCase() + '.' : '';
-                        let hocVi = item.tenHocVi ? item.tenHocVi.getFirstLetters().toUpperCase() : '';
+                        let chucDanh = item.tenChucDanh ? item.tenChucDanh.getFirstLetters() + '.' : '';
+                        let hocVi = item.tenHocVi ? item.tenHocVi.getFirstLetters() : '';
 
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.soQuyetDinh });
