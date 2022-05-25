@@ -198,7 +198,7 @@ class Dashboard extends AdminPage {
             listHocHam = {}, dataLevelByGender = {}, nhanSuKhoaBM = {}, nhanSuPhongBan = {}, nhanSuTrungTam = {}, nhanSuDoanThe = {}, listNgach = {}, listNhanSuTuyenDung = {}, fromTime = null, soLuongCacQuaTrinh = {} } = this.state;
         return this.renderPage({
             icon: 'fa fa-bar-chart',
-            title: 'Dashboard Phòng Tổ chức cán bộ',
+            title: 'Dashboard Phòng Tổ chức - Cán bộ',
             subTitle: `${fromTime ? ('Từ ' + T.dateToText(Number(fromTime), 'dd/mm/yyyy') + ' đến') : ''} ${new Date().ddmmyyyy()}`,
             content: this.state.isLoading ? loadSpinner() : <div className='row'>
                 <div className='col-md-6 col-lg-4'>

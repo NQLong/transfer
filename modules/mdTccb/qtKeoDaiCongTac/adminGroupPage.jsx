@@ -37,8 +37,8 @@ class EditModal extends AdminModal {
 
 
     onShow = (item) => {
-        let { id, shcc, batDau, batDauType, ketThuc, ketThucType, phai, ngaySinh } = item ? item : {
-            id: '', shcc: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', phai: '', ngaySinh: '',
+        let { id, shcc, batDau, batDauType, ketThuc, ketThucType, phai, ngaySinh, soQuyetDinh, ngayQuyetDinh } = item ? item : {
+            id: '', shcc: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', phai: '', ngaySinh: '', soQuyetDinh: '', ngayQuyetDinh: '',
         };
         if (!shcc) {
             shcc = this.props.canBo.shcc;
@@ -63,7 +63,9 @@ class EditModal extends AdminModal {
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
             this.batDau.setVal(batDau ? batDau : '');
-            this.state.ketThuc != -1 && this.ketThuc.setVal(ketThuc ? ketThuc : '');
+            this.ketThuc.setVal(ketThuc ? ketThuc : '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
+            this.ngayQuyetDinh.value(ngayQuyetDinh || '');
         });
     }
 
@@ -75,6 +77,8 @@ class EditModal extends AdminModal {
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
             ketThuc: this.ketThuc.getVal(),
+            soQuyetDinh: this.soQuyetDinh.value(),
+            ngayQuyetDinh: Number(this.ngayQuyetDinh.value()),
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
@@ -100,9 +104,11 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={true} required />
-                <FormTextBox className='col-md-4' ref={e => this.phai = e} type='text' label='Giới tính' readOnly={true} required />
-                <FormDatePicker className='col-md-8' ref={e => this.ngaySinh = e} type='date-mask' label='Ngày sinh' readOnly={true} required />
-                <FormDatePicker className='col-md-12' ref={e => this.ngayNghiHuu = e} type='date-mask' label='Ngày nghỉ hưu' readOnly={true} required />
+                <FormTextBox className='col-md-4' ref={e => this.phai = e} type='text' label='Giới tính' readOnly={true} />
+                <FormDatePicker className='col-md-8' ref={e => this.ngaySinh = e} type='date-mask' label='Ngày sinh' readOnly={true} />
+                <FormDatePicker className='col-md-12' ref={e => this.ngayNghiHuu = e} type='date-mask' label='Ngày đủ tuổi nghỉ hưu' readOnly={true} />
+                <FormTextBox className='col-md-8' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormDatePicker className='col-md-4' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -229,7 +235,9 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày nghỉ hưu</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày đủ tuổi nghỉ hưu</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -253,9 +261,11 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
+                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
+                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
                         <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
                         <TableCell type='text' content={(
                             <>

@@ -42,6 +42,7 @@ class EditModal extends AdminModal {
         diffYear: false,
         soNgayPhep2: 0,
         soNgayNghiPhepConLai2: 0,
+        ngayDiDuong: 0,
     };
     calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, currentId, dateCalc, done) => {
         new Promise(resolve => {
@@ -60,7 +61,7 @@ class EditModal extends AdminModal {
                     if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
                         this.props.getNghiPhep(items[idx].lyDo, itemNghiPhep => {
                             let value = T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, this.props.danhSachNgayLe);
-                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
+                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep - (items[idx].ngayDiDuong ? items[idx].ngayDiDuong : 0), 0);
                             if (currentId != items[idx].id) result -= value;
                             solve(idx + 1);
                         });
@@ -75,8 +76,8 @@ class EditModal extends AdminModal {
         });
     };
     onShow = (item) => {
-        let { id, shcc, lyDo, batDau, batDauType, ketThuc, ketThucType, noiDen, ghiChu, lyDoKhac, ngayNghiPhep, ngayBatDauCongTac } = item ? item : {
-            id: '', shcc: '', lyDo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDen: '', ghiChu: '', lyDoKhac: '', ngayNghiPhep: 0, ngayBatDauCongTac: null
+        let { id, shcc, lyDo, batDau, batDauType, ketThuc, ketThucType, noiDen, ghiChu, lyDoKhac, ngayNghiPhep, ngayBatDauCongTac, ngayDiDuong } = item ? item : {
+            id: '', shcc: '', lyDo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDen: '', ghiChu: '', lyDoKhac: '', ngayNghiPhep: 0, ngayBatDauCongTac: null, ngayDiDuong: 0
         };
         if (shcc) {
             this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, id, new Date(batDau), soNgayNghiPhepConLai => {
@@ -103,6 +104,7 @@ class EditModal extends AdminModal {
             batDau, ketThuc, lyDoKhac: lyDo == '99' ? true : false,
             ngayPhepLyDo: ngayNghiPhep, shcc: shcc,
             ngayBatDauCongTac: ngayBatDauCongTac,
+            ngayDiDuong: ngayDiDuong || 0,
         }, () => {
             this.maCanBo.value(shcc);
             this.lyDo.value(lyDo || '');
@@ -114,6 +116,7 @@ class EditModal extends AdminModal {
             this.lyDoKhac.value(lyDoKhac || '');
             this.ghiChu.value(ghiChu || '');
             this.state.lyDoKhac ? $('#lyDoKhac').show() : $('#lyDoKhac').hide();
+            this.ngayDiDuong.value(ngayDiDuong || '');
         });
     };
 
@@ -129,6 +132,7 @@ class EditModal extends AdminModal {
             lyDo: this.lyDo.value(),
             ghiChu: this.ghiChu.value(),
             lyDoKhac: this.lyDoKhac.value(),
+            ngayDiDuong: this.ngayDiDuong.value(),
         };
         if (!this.lyDo.value()) {
             T.notify('Lý do nghỉ phép trống', 'danger');
@@ -145,8 +149,8 @@ class EditModal extends AdminModal {
         } else if (this.state.soNgayXinNghi == -1) {
             T.notify('Số ngày xin nghỉ là rất lớn', 'danger');
             this.batDau.focus();
-        } else if (this.state.soNgayNghiPhepConLai < this.state.soNgayPhep) {
-            T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.batDau).getFullYear()} là ${this.state.soNgayNghiPhepConLai} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep}`, 'danger');
+        } else if (this.state.soNgayNghiPhepConLai < this.state.soNgayPhep - this.state.ngayDiDuong) {
+            T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.batDau).getFullYear()} là ${this.state.soNgayNghiPhepConLai} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep - this.state.ngayDiDuong}`, 'danger');
             this.batDau.focus();
         } else if (this.state.diffYear && this.state.soNgayNghiPhepConLai2 < this.state.soNgayPhep2) {
             T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.ketThuc).getFullYear()} là ${this.state.soNgayNghiPhepConLai2} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep2}`, 'danger');
@@ -257,6 +261,12 @@ class EditModal extends AdminModal {
             });
         }
     }
+
+    handleNgayDiDuong = (value) => {
+        this.setState({ ngayDiDuong: value || 0 });
+        if (!value) this.ngayDiDuong.value('');
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
@@ -266,7 +276,8 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} required readOnly />
                 {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
                 {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
-                <FormSelect className='col-md-6' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
+                <FormSelect className='col-md-8' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
+                <FormTextBox className='col-md-4' type='number' ref={e => this.ngayDiDuong = e} label='Ngày đi đường' readOnly={readOnly} onChange={this.handleNgayDiDuong} />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
             
@@ -363,7 +374,6 @@ class QtNghiPhepGroupPage extends AdminPage {
                     this.toYear.value(filter.toYear || filterCookie.toYear || '');
                     this.tinhTrang.value(filter.tinhTrang || filterCookie.tinhTrang || '');
                     this.lyDo.value(filter.lyDo || filterCookie.lyDo || '');
-                    if (this.fromYear.value() || this.toYear.value() || this.tinhTrang.value() || this.lyDo.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.fromYear.value('');
                     this.toYear.value('');
@@ -406,10 +416,11 @@ class QtNghiPhepGroupPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị công tác</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do nghỉ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br/>xin nghỉ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đi<br/>đường</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br/>tính phép</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
@@ -427,9 +438,11 @@ class QtNghiPhepGroupPage extends AdminPage {
                         )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
+                        <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />
+                        <TableCell type='text' content={item.noiDen} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -437,9 +450,8 @@ class QtNghiPhepGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />
-                        <TableCell type='text' content={item.noiDen} />
                         <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, this.state.danhSachNgayLe)} />
+                        <TableCell type='number' content={item.ngayDiDuong || 0} />
                         <TableCell type='number' content={(
                             <>
                                 {Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), this.state.danhSachNgayLe) - item.ngayNghiPhep, 0)}
@@ -490,12 +502,7 @@ class QtNghiPhepGroupPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>
-                <div className='tile'>
+                    <div style={{ marginBottom: '10px' }}>Tìm thấy: <b>{totalItem}</b> kết quả.</div>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
@@ -507,6 +514,12 @@ class QtNghiPhepGroupPage extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/nghi-phep',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const filter = T.stringify(this.state.filter);
+
+                T.download(T.url(`/api/qua-trinh/nghi-phep/download-excel/${filter}`), 'nghiphep.xlsx');
+            }
         });
     }
 }

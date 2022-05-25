@@ -19,8 +19,8 @@ class EditModal extends AdminModal {
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
 
-        let { id, shcc, tenGiaiThuong, noiDung, noiCap, namCap } = item ? item : {
-            id: null, shcc: '', tenGiaiThuong: '', noiDung: null, noiCap: '', namCap: ''
+        let { id, shcc, tenGiaiThuong, noiDung, noiCap, namCap, soQuyetDinh } = item ? item : {
+            id: null, shcc: '', tenGiaiThuong: '', noiDung: null, noiCap: '', namCap: '', soQuyetDinh: '',
         };
 
         this.setState({ id: id });
@@ -31,6 +31,7 @@ class EditModal extends AdminModal {
             this.namCap.value(namCap ? namCap : '');
             this.noiDung.value(noiDung ? noiDung : '');
             this.noiCap.value(noiCap ? noiCap : '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
         }, 500);
     };
 
@@ -57,6 +58,7 @@ class EditModal extends AdminModal {
                     noiDung: this.noiDung.value(),
                     noiCap: this.noiCap.value(),
                     namCap: this.namCap.value(),
+                    soQuyetDinh: this.soQuyetDinh.value(),
                 };
                 if (index == listMa.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -79,6 +81,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormTextBox className='col-12' ref={e => this.soQuyetDinh = e} label={'Số quyết định'} type='text' readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' readOnly={readOnly} />
@@ -156,16 +159,16 @@ class QtGiaiThuong extends AdminPage {
         let results = [];
         let choose = i > 5 ? 5 : i;
         for (let k = 0; k < choose; k++) {
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
         if (i > 5) {
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 .........................................
             </span></div>);
             let k = i - 1;
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
@@ -205,6 +208,7 @@ class QtGiaiThuong extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt giải</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp</th>}
@@ -227,9 +231,10 @@ class QtGiaiThuong extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soQuyetDinh} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenGiaiThuong}</b></span> <br />

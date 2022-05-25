@@ -8,10 +8,11 @@ import {
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import xlsx from 'xlsx';
 
 const
     start = new Date().getFullYear(),
-    end = start + 50,
+    end = start + 5,
     yearSelector = [...Array(end - start + 1).keys()].map(i => ({
         id: i + start,
         text: i + start
@@ -88,7 +89,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={true} required />
                 <FormTextBox className='col-md-4' ref={e => this.phai = e} type='text' label='Giới tính' readOnly={true} required />
                 <FormDatePicker className='col-md-8' ref={e => this.ngaySinh = e} type='date-mask' label='Ngày sinh' readOnly={true} required />
-                <FormDatePicker className='col-md-12' ref={e => this.ngayNghiHuu = e} type='date-mask' label='Ngày nghỉ hưu' readOnly={true} required />
+                <FormDatePicker className='col-md-12' ref={e => this.ngayNghiHuu = e} type='date-mask' label='Ngày đủ tuổi nghỉ hưu' readOnly={true} required />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -111,15 +112,21 @@ class EditModal extends AdminModal {
 class CreateListYear extends AdminPage {
     state = {
         listData: [],
+        year: null,
+        loading: null,
     }
 
+    componentDidMount() {
+        T.hideSearchBox();
+        this.year.focus();
+    }
     delete = (index, done) => {
         T.confirm('Xóa dữ liệu', 'Bạn có chắc bạn muốn xóa dữ liệu này?', 'warning', true, isConfirm => {
             if (isConfirm) {
                 const listData = this.state.listData;
                 listData.splice(index, 1);
                 this.setState({ listData }
-                , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
+                    , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
                 done && done();
             }
         });
@@ -132,38 +139,32 @@ class CreateListYear extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
-                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày nghỉ hưu</th>
-                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thời gian</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ và tên</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nam</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nữ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh GS, PGS</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trình độ chuyên môn</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ, đơn vị công tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đủ tuổi nghỉ hưu</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Từ ngày</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đến ngày</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' style={{ textAlign: 'right' }} content={ index + 1 } />
-                    <TableCell type='link' onClick={() => this.modal.show({ index, item })} style={{ whiteSpace: 'nowrap' }} content={(
-                        <>
-                            <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                            {item.shcc}
-                        </>
-                    )} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.phai == '01' ? 'Nam' : 'Nữ'} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.ngaySinh} />
-                    <TableCell type='text' content={<>
-                        {item.tenChucDanh && <span> {item.tenChucDanh}<br /></span>}
-                        {item.tenHocVi}
-                    </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell type='link' onClick={() => this.modal.show({ index, item })} style={{ whiteSpace: 'nowrap' }} content={(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')} />
+                    <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.phai == '01' ? item.ngaySinh : ''} />
+                    <TableCell type='date' style={{ whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' content={item.phai == '02' ? item.ngaySinh : ''} />
+                    <TableCell type='text' content={item.tenChucDanh ? item.tenChucDanh.getFirstLetters() + '.' : ''} />
+                    <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters() : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '')} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
-                    <TableCell type='text' content={(
-                        <>
-                            {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                            {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                        </>
-                    )}
-                    />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''} />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ index, item })} onDelete={() => this.delete(index)} >
@@ -176,12 +177,13 @@ class CreateListYear extends AdminPage {
 
     handleTime = (value) => {
         if (value) {
+            this.setState({ loading: true });
             let year = parseInt(value.id);
             this.props.getListInYear(year, (listData) => {
-                this.setState({ listData });
+                this.setState({ year, listData, loading: false });
             });
         } else {
-            this.setState({ listData: [] });
+            this.setState({ listData: [], year: null, loading: null });
         }
     }
 
@@ -190,7 +192,7 @@ class CreateListYear extends AdminPage {
         const updateValue = Object.assign({}, currentValue, changes);
         listData.splice(index, 1, updateValue);
         this.setState({ listData }
-        , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
+            , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
         done && done();
     };
 
@@ -200,7 +202,7 @@ class CreateListYear extends AdminPage {
             this.props.createMultiQtKeoDaiCongTac(data, (error, data) => {
                 if (error) T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
                 else {
-                    this.setState({ listData: [] });
+                    this.setState({ listData: [], year: null });
                     T.notify(`Cập nhật ${data && data.items ? data.items.length + ' ' : ''} kéo dài công tác thành công!`, 'success');
                     this.props.history.push('/user/tccb/qua-trinh/keo-dai-cong-tac');
                 }
@@ -213,20 +215,25 @@ class CreateListYear extends AdminPage {
     };
 
     render() {
-        const { listData } = this.state,
+        const { listData, year } = this.state,
             permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete']);
+        const table = this.tableList(listData, permission);
         return this.renderPage({
             icon: 'fa fa-hourglass-start',
-            title: 'Tạo danh sách kéo dài công tác',
-            header: <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} placeholder='Năm' onChange={this.handleTime} data={yearSelector} />,
+            title: 'Tạo danh sách kéo dài công tác dự kiến',
+            header: <FormSelect style={{ width: '150px', marginBottom: '0' }} ref={e => this.year = e} allowClear={true} placeholder='Năm' onChange={this.handleTime} data={yearSelector} />,
             breadcrumb: [
                 <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài công tác</Link>, 'Import'
             ],
             content: <>
-                <div className='tile'>{this.tableList(listData, permission)}</div>
+                <div className='tile'> {(this.state.loading == null || this.state.loading == false) ? table : this.tableList()} </div>
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update} />
             </>,
             onSave: (e) => this.save(e),
+            onExport: this.year && this.year.value() ? (e) => {
+                e.preventDefault();
+                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), '[KHXH&NV] Bao cao thuc hien keo dai thoi gian cong tac nam ' + year + '.xlsx');
+            } : null,
             backRoute: '/user/tccb/qua-trinh/keo-dai-cong-tac',
         });
     }
