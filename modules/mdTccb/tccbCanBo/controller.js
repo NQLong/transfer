@@ -61,8 +61,8 @@ module.exports = app => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = JSON.stringify(req.query.filter || {});
-
+        let time = req.query.timeCondition || new Date().getTime();
+        const filter = JSON.stringify({ ...req.query.filter, time });
         app.model.canBo.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

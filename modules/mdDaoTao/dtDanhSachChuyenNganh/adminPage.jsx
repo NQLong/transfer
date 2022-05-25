@@ -6,7 +6,7 @@ import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell 
 import Pagination from 'view/component/Pagination';
 import { SelectAdapter_DtNganhDaoTao } from '../dtNganhDaoTao/redux';
 import { getDtDanhSachChuyenNganhPage, updateDtDanhSachChuyenNganh, createDtDanhSachChuyenNganh, deleteDtDanhSachChuyenNganh } from './redux';
-
+import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 class EditModal extends AdminModal {
     onShow = (item) => {
         let { ten = '', namHoc = '', khoa = null, id = null, nganh = '' } = item ? item : {};
@@ -41,16 +41,16 @@ class EditModal extends AdminModal {
         }
     }
     render = () => {
-        let readOnly = this.props.readOnly;
+        let readOnly = this.props.readOnly, readOnlyKhoa = this.props.readOnlyKhoa;
         return this.renderModal({
             readOnly: readOnly,
             title: 'Thông tin chuyên ngành',
             size: 'large',
             body: <div className='row'>
                 <FormTextBox ref={e => this.ten = e} className='col-12' required label='Tên chuyên ngành' readOnly={readOnly} />
-                <FormTextBox type='year' ref={e => this.namHoc = e} className='col-12' required label='Năm' readOnly={readOnly} />
-                <FormSelect ref={e => this.khoa = e} className='col-12' required label='Khoa/Bộ môn' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnly || this.props.khoa != 'all'} />
-                <FormSelect ref={e => this.nganh = e} className='col-12' required label='Ngành' data={SelectAdapter_DtNganhDaoTao} readOnly={readOnly || this.props.khoa != 'all'} />
+                <FormSelect type='year' ref={e => this.namHoc = e} className='col-12' required label='Năm' readOnly={readOnly} data={SelectAdapter_DtCauTrucKhungDaoTao} />
+                <FormSelect ref={e => this.khoa = e} className='col-12' required label='Khoa/Bộ môn' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnlyKhoa} />
+                <FormSelect ref={e => this.nganh = e} className='col-12' required label='Ngành' data={SelectAdapter_DtNganhDaoTao} readOnly={readOnly} />
             </div>
         });
     }
@@ -62,7 +62,7 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             let permission = this.getUserPermission('dtDanhSachChuyenNganh', ['read']);
-            this.setState({ donVi: permission.read ? 'all' : this.props.system.user.staff.maDonVi }, () => {
+            this.setState({ donVi: permission.read ? '' : this.props.system.user.staff.maDonVi }, () => {
                 this.getData(this.state.donVi);
             });
         });
@@ -93,8 +93,8 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtDanhSachChuyenNganh && this.props.dtDanhSachChuyenNganh.page ?
             this.props.dtDanhSachChuyenNganh.page : {
                 pageNumber: 1, pageSize: 200, pageTotal: 1, pageCondition: {
-                    searchTerm: '', donVi: this.state.donVi, nam: this.state.nam
-                }, totalItem: 0, list: []
+                    searchTerm: '',
+                }, totalItem: 0, list: null
             };
 
         let table = renderTable({
@@ -105,16 +105,20 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>#</th>
                     <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên chuyên ngành</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm học</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoa, bộ môn</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm đào tạo</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             </>),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right', whiteSpace: 'nowrap' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell content={item.ten} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.namHoc} />
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ten} />
+                    <TableCell content={`${item.nganh} - ${item.tenNganh}`} style={{ whiteSpace: 'nowrap' }} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa} />
+                    <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namDaoTao} />
+                    <TableCell type='buttons' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                 </tr>)
         });
         return this.renderPage({
@@ -130,14 +134,14 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'><h3>Tra cứu</h3></div>
                         <div className='row'>
-                            <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ donVi: value ? value.id : 'all' })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
-                            <FormTextBox type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ nam: value })} />
+                            <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ donVi: value ? value.id : '' })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
+                            <FormSelect type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ nam: value?.id || '' })} data={SelectAdapter_DtCauTrucKhungDaoTao} />
                             <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                                 <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => {
                                     e.preventDefault();
                                     this.donVi.value('');
                                     this.nam.value('');
-                                    this.getData('all');
+                                    this.getData();
                                     T.notify('Đã xóa bộ lọc', 'info');
                                 }}>
                                     <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -150,7 +154,7 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
                     </div>}
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDtDanhSachChuyenNganhPage} />
-                <EditModal ref={e => this.modal = e} readOnly={!permission.write} update={this.props.updateDtDanhSachChuyenNganh} create={this.props.createDtDanhSachChuyenNganh} khoa={this.state.donVi} />
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} readOnlyKhoa={!permissionDaoTao.write} update={this.props.updateDtDanhSachChuyenNganh} create={this.props.createDtDanhSachChuyenNganh} khoa={this.state.donVi} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => e.preventDefault() || this.modal.show() : null

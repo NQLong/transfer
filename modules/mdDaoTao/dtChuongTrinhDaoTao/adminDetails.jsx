@@ -11,6 +11,7 @@ import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinh
 import Loading from 'view/component/Loading';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import T from 'view/js/common';
+import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
 
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
@@ -47,6 +48,8 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
             this.maNganh.value(data.maNganh);
+            this.chuyenNganh.value(data.chuyenNganh);
+            this.setState({ maNganh: data.maNganh });
             this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
             this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
             this.trinhDoDaoTao.value(data.trinhDoDaoTao);
@@ -93,8 +96,8 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 tenVanBangEn: this.validation(this.tenVanBangEn),
                 tenVanBang: T.stringify({ vi: this.tenVanBangVi.value(), en: this.tenVanBangEn.value() }),
                 maKhoa: this.validation(this.khoa),
-                mucTieu: T.stringify(mucTieu)
-
+                mucTieu: T.stringify(mucTieu),
+                chuyenNganh: this.validation(this.chuyenNganh)
             };
             return data;
         } catch (selector) {
@@ -102,6 +105,15 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             T.notify('<b>' + (selector.props.placeholder || selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
             return false;
         }
+    }
+
+    handleNganh = (value) => {
+        this.tenNganhVi.value(value.name);
+        this.tenVanBangVi.value('Cử nhân ' + value.name);
+        this.setState({ tenNganhVi: value.name, maNganh: value?.id || null }, () => {
+            this.chuyenNganh.value('');
+            this.chuyenNganh.focus();
+        });
     }
 
     save = () => {
@@ -135,9 +147,12 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             chuongTrinhDaoTao: {}
         });
         this.setState({
+            namHoc: value.id,
             // mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao },
             chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao }
         }, () => {
+            !ctdt && this.chuyenNganh.value('');
+            !ctdt && this.maNganh.focus();
             Object.keys(this.chuongTrinh).forEach(key => {
                 const childs = mucCon.chuongTrinhDaoTao[key] || null;
                 const data = ctdt?.filter(item => item.maKhoiKienThuc === parseInt(mucCha.chuongTrinhDaoTao[key].id));
@@ -172,37 +187,37 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                     <div className='tile-body'>
                         <div className='row'>
                             <div className='row col-12' style={{ display: 'flex', alignItems: 'end' }}>
-                                <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={value => {
-                                    this.tenNganhVi.value(value.name);
-                                    this.setState({ tenNganhVi: value.name });
-                                }} required />
-                                <div style={{ marginBottom: '0' }} className='form-group col-md-8'>
+                                <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
+
+                                <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
+                                <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' required />
+                                <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
                                     <FormTabs tabs={[
                                         {
                                             title: <>Tên ngành tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
                                             component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên ngành (tiếng Việt)' required />
                                         },
                                         {
-                                            title: <>Tên ngành tiếng Anh  <span style={{ color: 'red' }}>*</span></>,
-                                            component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' required />
+                                            title: <>Tên ngành tiếng Anh</>,
+                                            component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' />
                                         }
                                     ]} />
                                 </div>
                             </div>
 
-                            <FormSelect ref={e => this.namDaoTao = e} label='Khóa' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-3' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
-                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-3' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-3' required readOnly={readOnly} />
-                            <FormTextBox type='number' suffix=' năm' step={0.5} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-3' required readOnly={readOnly} />
+
+                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormTextBox type='number' suffix=' năm' step={0.5} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
                             <div className='form-group col-md-12'>
                                 <label>Tên văn bằng sau khi tốt nghiệp: </label>
                                 <FormTabs tabs={[
                                     {
                                         title: <>Tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
-                                        component: <FormTextBox ref={e => this.tenVanBangVi = e} placeholder='Tên văn bằng (tiếng Việt)' />
+                                        component: <FormTextBox ref={e => this.tenVanBangVi = e} placeholder='Tên văn bằng (tiếng Việt)' required />
                                     },
                                     {
-                                        title: <>Tiếng Anh  <span style={{ color: 'red' }}>*</span></>,
+                                        title: <>Tiếng Anh</>,
                                         component: <FormTextBox ref={e => this.tenVanBangEn = e} placeholder='Tên văn bằng (tiếng Anh)' />
                                     }
                                 ]} />
