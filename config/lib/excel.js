@@ -27,8 +27,7 @@ module.exports = app => {
             for (let i = 0; i < items.length; i++) {
                 let item = items[i],
                     cell = worksheet.getCell(item.cell);
-
-                if (item.number) {
+                if ('number' in item) {
                     item.number = parseInt(item.number);
                     if (item.number !== 0) {
                         cell.value = item.number;

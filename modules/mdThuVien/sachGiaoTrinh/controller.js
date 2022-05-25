@@ -149,6 +149,26 @@ module.exports = app => {
         }
     });
 
+    app.post('/api/staff/sach-giao-trinh/create-multiple', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        const { listShcc, ten, theLoai, namSanXuat, nhaSanXuat, chuBien, sanPham, butDanh, quocTe } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Sách giáo trình');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, ten, theLoai, namSanXuat, nhaSanXuat, chuBien, sanPham, butDanh, quocTe
+            };
+            app.model.sachGiaoTrinh.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/user/staff/sach-giao-trinh', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
             app.model.sachGiaoTrinh.get({ id: req.body.id }, (error, item) => {

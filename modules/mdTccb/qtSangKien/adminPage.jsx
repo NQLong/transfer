@@ -181,7 +181,7 @@ class QtSangKien extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>  
                             <span> {item.tenChucVu || ''}<br /> </span>
-                            {(item.tenDonVi || '').normalizedName()}
+                            {(item.tenDonVi || '')}
                         </>
                     )} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />

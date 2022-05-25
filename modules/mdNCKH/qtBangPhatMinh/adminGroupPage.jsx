@@ -187,7 +187,7 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
