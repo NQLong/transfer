@@ -469,6 +469,7 @@ module.exports = app => {
                         item.ketThuc = item.ketThuc ? (item.ketThuc == -1 ? ' - nay' : ' - ' + app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType)) : '';
                         item.tenTrinhDo = item.tenTrinhDo || item.trinhDo || '';
                         item.tenHinhThuc = item.tenHinhThuc || '';
+                        item.coSo = item.coSo || '';
                         return item;
                     });
 
@@ -546,9 +547,9 @@ module.exports = app => {
                         ngayHuongLuong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
                         danToc: canBo.danToc || '',
                         tonGiao: canBo.tonGiao || '',
-                        phuCapChucVu: qtChucVu[0]?.phuCapChucVu,
-                        chucVu: qtChucVu[0]?.chucVu,
-                        donVi: qtChucVu[0]?.donVi,
+                        phuCapChucVu: qtChucVu[0]?.phuCapChucVu || '',
+                        chucVu: qtChucVu[0]?.chucVu || '',
+                        donVi: qtChucVu[0]?.donVi || '',
                         phoThong: canBo.phoThong || '',
                         hocVi: canBo.hocVi || '',
                         ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
@@ -570,7 +571,7 @@ module.exports = app => {
                         tinHoc: tinHoc.tenTrinhDo || '',
                         qlnn: qlnn.tenTrinhDo || '',
                         qtHocTapCongTac,
-                        ngoaiNgu: canBo.ngoaiNgu,
+                        ngoaiNgu: canBo.ngoaiNgu || '',
                         quanHe: quanHeGiaDinh.filter(i => i.loai == 0),
                         quanHeInLaw: quanHeGiaDinh.filter(i => i.loai == 1),
                         danhHieu: ''

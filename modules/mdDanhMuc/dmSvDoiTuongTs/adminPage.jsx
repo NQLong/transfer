@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmSvDoiTuongTsPage, deleteDmSvDoiTuongTs, createDmSvDoiTuongTs, updateDmSvDoiTuongTs } from './redux';
 import { Link } from 'react-router-dom';
-import { getValue,AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
+import { getValue, AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -28,7 +28,7 @@ class EditModal extends AdminModal {
       kichHoat: Number(getValue(this.kichHoat))
     };
     this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-    
+
   };
 
   changeKichHoat = value => this.kichHoat.value(value);
@@ -44,8 +44,7 @@ class EditModal extends AdminModal {
         <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
           onChange={value => this.changeKichHoat(value ? 1 : 0)} />
       </div>
-    }
-    );
+    });
   }
 }
 
@@ -65,7 +64,7 @@ class DmSvDoiTuongTsPage extends AdminPage {
   }
 
   delete = (e, item) => {
-    
+
     T.confirm('Xóa đối tượng tuyển sinh (sinh viên)', `Bạn có chắc bạn muốn xóa đối tượng tuyển sinh (sinh viên) ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
       isConfirm && this.props.deleteDmSvDoiTuongTs(item.ma, error => {
         if (error) T.notify(error.message ? error.message : `Xoá đối tượng tuyển sinh (sinh viên) ${item.ten} bị lỗi!`, 'danger');

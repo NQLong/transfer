@@ -46,8 +46,7 @@ class EditModal extends AdminModal {
         <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
           onChange={value => this.changeKichHoat(value)} required />
       </div>
-    }
-    );
+    });
   }
 }
 

@@ -21,7 +21,7 @@ module.exports = app => {
   app.get('/user/dao-tao/bac-dao-tao', app.permission.check('dtSvBacDaoTao:read'), app.templates.admin);
 
   // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-  app.get('/api/danh-muc/bac-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/danh-muc/bac-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dmSvBacDaoTao:read','dtSvBacDaoTao:read'), (req, res) => {
     const pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize);
     let condition = { statement: null };
@@ -34,7 +34,7 @@ module.exports = app => {
     app.model.dmSvBacDaoTao.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
   });
 
-  app.get('/api/danh-muc/bac-dao-tao/item/:maBac', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/danh-muc/bac-dao-tao/item/:maBac', app.permission.orCheck('dmSvBacDaoTao:read','dtSvBacDaoTao:read'), (req, res) => {
     app.model.dmSvBacDaoTao.get({ maBac: req.params.maBac }, (error, item) => res.send({ error, item }));
   });
 

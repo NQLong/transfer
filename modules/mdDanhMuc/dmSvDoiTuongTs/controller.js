@@ -3,7 +3,7 @@ module.exports = app => {
     parentMenu: app.parentMenu.category,
     menus: {
       4088: { title: 'Đối tượng tuyển sinh', subTitle: 'Đào tạo', link: '/user/danh-muc/doi-tuong-tuyen-sinh' },
-      
+
     },
   };
   const menuDaoTao = {

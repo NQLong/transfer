@@ -255,7 +255,7 @@ class Dashboard extends AdminPage {
             </div>,
             backRoute: '/user/tccb',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/tccb'>Tổ chức - Cán bộ</Link>,
                 'Dashboard'
             ],
             header: <FormSelect data={listThoiGian} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '300px', marginBottom: '0' }} onChange={value => this.initData(value?.id || null)} allowClear />
