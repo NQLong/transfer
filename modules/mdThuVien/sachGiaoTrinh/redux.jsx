@@ -258,11 +258,25 @@ export function createSachGTStaff(data, done) {
                 T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                if (done) {
-                    T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
-                    done(data);
-                    dispatch(getSachGiaoTrinhPage());
-                }
+                T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
+                dispatch(getSachGiaoTrinhPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger'));
+    };
+}
+
+export function createSachGiaoTrinhMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/staff/sach-giao-trinh/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
+                dispatch(getSachGiaoTrinhPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger'));
     };
