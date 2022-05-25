@@ -197,10 +197,24 @@ export function createQtNckhStaff(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin nghiên cứu khoa học thành công!', 'success');
-                if (done) {
-                    done(data);
-                    dispatch(getQtNghienCuuKhoaHocPage());
-                }
+                dispatch(getQtNghienCuuKhoaHocPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
+    };
+}
+
+export function createQtNckhMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nckh/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin nghiên cứu khoa học thành công!', 'success');
+                dispatch(getQtNghienCuuKhoaHocPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };

@@ -92,6 +92,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/qua-trinh/hdlv/create-multiple', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        const { listShcc, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Hướng dẫn luận văn');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao
+            };
+            app.model.qtHuongDanLuanVan.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
         app.model.qtHuongDanLuanVan.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Hướng dẫn luận văn');

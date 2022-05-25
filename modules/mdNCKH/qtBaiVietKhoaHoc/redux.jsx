@@ -254,11 +254,25 @@ export function createQtBaiVietKhoaHocStaff(data, done) {
                 T.notify('Thêm thông tin quá trình bài viết khoa học bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                if (done) {
-                    T.notify('Thêm thông tin quá trình bài viết khoa học thành công!', 'info');
-                    done(data);
-                    dispatch(getQtBaiVietKhoaHocPage());
-                }
+                T.notify('Thêm thông tin quá trình bài viết khoa học thành công!', 'info');
+                dispatch(getQtBaiVietKhoaHocPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
+    };
+}
+
+export function createQtBaiVietKhoaHocMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/bai-viet-khoa-hoc/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin quá trình bài viết khoa học bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình bài viết khoa học thành công!', 'info');
+                dispatch(getQtBaiVietKhoaHocPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
     };
