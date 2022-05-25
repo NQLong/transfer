@@ -2,20 +2,20 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmSvBacDaoTaoPage, deleteDmSvBacDaoTao, createDmSvBacDaoTao, updateDmSvBacDaoTao } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, getValue } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
+        this.onShown(() => {
             !this.maBac.value() ? this.maBac.focus() : this.tenBac.focus();
-        }));
+        });
     }
 
     onShow = (item) => {
         let { maBac, tenBac, kichHoat } = item ? item : { maBac: '', tenBac: '', kichHoat: true };
 
-        this.setState({ maBac, item });
+        this.setState({ maBac });
         this.maBac.value(maBac);
         this.tenBac.value(tenBac);
         this.kichHoat.value(kichHoat);
@@ -24,19 +24,11 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-            maBac: this.maBac.value(),
-            tenBac: this.tenBac.value(),
-            kichHoat: Number(this.kichHoat.value())
+            maBac: getValue(this.maBac),
+            tenBac: getValue(this.tenBac),
+            kichHoat: Number(getValue(this.kichHoat)),
         };
-        if (!this.state.maBac && !this.maBac.value()) {
-            T.notify('Mã không được trống!', 'danger');
-            this.maBac.focus();
-        } else if (changes.tenBac == '') {
-            T.notify('Tên không được bị trống!', 'danger');
-            this.tenBac.focus();
-        } else {
-            this.state.maBac ? this.props.update(this.state.maBac, changes, this.hide) : this.props.create(changes, this.hide);
-        }
+        this.state.maBac ? this.props.update(this.state.maBac, changes, this.hide) : this.props.create(changes, this.hide);
     };
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
@@ -44,26 +36,25 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.maBac ? 'Tạo mới bậc đào tạo sinh viên' : 'Cập nhật bậc đào tạo sinh viên',
+            title: this.state.maBac ? 'Cập nhật bậc đào tạo sinh viên' : 'Tạo mới bậc đào tạo sinh viên',
             body: <div className='row'>
                 <FormTextBox className='col-12' ref={e => this.maBac = e} label='Mã' readOnly={this.state.maBac ? true : readOnly} placeholder='Mã' required />
                 <FormTextBox className='col-12' ref={e => this.tenBac = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                    onChange={value => this.changeKichHoat(value)} required />
             </div>
-        }
-        );
+        });
     }
 }
 
 class DmSvBacDaoTaoPage extends AdminPage {
     componentDidMount() {
-        T.ready('/user/dao-tao', () => {
-            T.onSearch = (searchText) => this.props.getDmSvBacDaoTaoPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getDmSvBacDaoTaoPage();
-        });
-
+        let route = T.routeMatcher('/user/:menu/bac-dao-tao').parse(window.location.pathname);
+        this.menu = route.menu;
+        T.ready(`/user/${this.menu == 'dao-tao' ? 'dao-tao' : 'category'}`);
+        T.onSearch = (searchText) => this.props.getDmSvBacDaoTaoPage(undefined, undefined, searchText || '');
+        T.showSearchBox();
+        this.props.getDmSvBacDaoTaoPage();
     }
 
     showModal = (e) => {
@@ -73,17 +64,14 @@ class DmSvBacDaoTaoPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa bậc đào tạo sinh viên', `Bạn có chắc bạn muốn xóa bậc đào tạo sinh viên ${item.tenBac ? `<b>${item.tenBac}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteDmSvBacDaoTao(item.maBac, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá bậc đào tạo sinh viên ${item.tenBac} bị lỗi!`, 'danger');
-                else T.alert(`Xoá bậc đào tạo sinh viên ${item.tenBac} thành công!`, 'success', false, 800);
-            });
+            isConfirm && this.props.deleteDmSvBacDaoTao(item.maBac);
         });
         e.preventDefault();
     }
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dmSvBacDaoTao', ['read', 'write', 'delete']);
+            permission = this.getUserPermission('dmSvBacDaoTao');
 
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmSvBacDaoTao && this.props.dmSvBacDaoTao.page ?
             this.props.dmSvBacDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
@@ -116,7 +104,7 @@ class DmSvBacDaoTaoPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Bậc Đào tạo sinh viên',
             breadcrumb: [
-                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
+                <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'dao-tao' ? 'Đào tạo' : 'Danh mục'}</Link>,
                 'Bậc Đào tạo sinh viên'
             ],
             content: <>
@@ -126,7 +114,7 @@ class DmSvBacDaoTaoPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmSvBacDaoTao} update={this.props.updateDmSvBacDaoTao} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/dao-tao',
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
