@@ -6621,6 +6621,13 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -6725,6 +6732,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 10
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -12528,6 +12542,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "TINH_CHAT_MON": {
+                    "value": "tinhChatMon",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -12691,6 +12712,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 4000
+                },
+                "CHUYEN_NGANH": {
+                    "value": "chuyenNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [

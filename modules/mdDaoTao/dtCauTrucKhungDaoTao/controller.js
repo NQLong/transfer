@@ -18,7 +18,7 @@ module.exports = app => {
     app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.check('dtCauTrucKhungDaoTao:read'), (req, res) => {
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
@@ -35,7 +35,7 @@ module.exports = app => {
         app.model.dtCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:read'), (req, res) => {
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dtCauTrucKhungDaoTao.get(condition, '*', 'id ASC', (error, item) => res.send({ error, item }));
