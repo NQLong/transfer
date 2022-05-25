@@ -13563,12 +13563,12 @@
                     "nullable": true,
                     "size": "22,0"
                 },
-                "CHUC_DANH": {
-                    "value": "chucDanh",
-                    "dataType": "NUMBER",
+                "CHUC_DANH_NGHE_NGHIEP": {
+                    "value": "chucDanhNgheNghiep",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 20
                 },
                 "NGACH": {
                     "value": "ngach",
