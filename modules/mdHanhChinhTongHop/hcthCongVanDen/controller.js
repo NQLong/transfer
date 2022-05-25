@@ -53,7 +53,7 @@ module.exports = (app) => {
         const { fileList, chiDao, quyenChiDao, donViNhan, ...data } = req.body.data;
         const dsCanBoChiDao = quyenChiDao.split(',');
 
-        app.model.hcthCongVanDen.create({ ...data, quyenChiDao: dsCanBoChiDao.toString() }, (error, item) => {
+        app.model.hcthCongVanDen.create({ ...data, quyenChiDao: dsCanBoChiDao.toString(), nguoiTao: req.session.user?.staff?.shcc }, (error, item) => {
             if (error)
                 res.send({ error, item });
             else {
@@ -596,16 +596,19 @@ module.exports = (app) => {
     });
 
     const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
-        app.model.hcthCongVanDen.getAuthorizedStaff((error, staffs) => {
-            if (error) reject(error);
-            else {
-                const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/hcth/cong-van-den/${item.id}` }, error => {
-                    if (error) reject(error);
-                    else resolve();
-                });
-            }
-        });
+        if (item.nguoiTao)
+            app.model.fwUser.get({ shcc: item.nguoiTao }, 'email', 'email', (error, staff) => {
+                if (error) reject(error);
+                else if (staff && staff.email) {
+                    const emails = [staff.email];
+                    createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/hcth/cong-van-den/${item.id}` }, error => {
+                        if (error) reject(error);
+                        else resolve();
+                    });
+                }
+                else resolve();
+            });
+        else resolve();
     });
 
     const createRelatedStaffNotification = (item, status) => new Promise((resolve, reject) => {
