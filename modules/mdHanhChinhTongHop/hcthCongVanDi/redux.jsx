@@ -42,7 +42,7 @@ export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, filter
         const url = `/api/hcth/cong-van-cac-phong/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách sách công văn giữa các phòng bị lỗi!, 1', 'danger');
+                T.notify('Lấy danh sách sách công văn các phòng bị lỗi!, 1', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -50,7 +50,7 @@ export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, filter
                 dispatch({ type: hcthCongVanDiGetPage, page: data.page });
                 done && done(data.page);
             }
-        }, () => T.notify('Lấy danh sách sách công văn giữa các phòng bị lỗi!, 2', 'danger'));
+        }, () => T.notify('Lấy danh sách sách công văn các phòng bị lỗi!, 2', 'danger'));
     };
 }
 
@@ -59,13 +59,13 @@ export function getHcthCongVanDiAll(done) {
         const url = '/api/hcth/cong-van-cac-phong/all';
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách công văn giữa các phòng bị lỗi, 3' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách công văn các phòng bị lỗi, 3' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 done && done(data.items);
                 dispatch({ type: hcthCongVanDiGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách công văn giữa các phòng bị lỗi, 4' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách công văn các phòng bị lỗi, 4' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -75,14 +75,14 @@ export function createHcthCongVanDi(data, done) {
         T.post(url, { data }, res => {
             if (res.error) {
                 // console.log(data);
-                T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger');
+                T.notify('Thêm công văn các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm công văn giữa các phòng thành công!', 'success');
+                T.notify('Thêm công văn các phòng thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done(data);
             }
-        }, () => T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger'));
+        }, () => T.notify('Thêm công văn các phòng bị lỗi', 'danger'));
     };
 }
 
@@ -91,16 +91,16 @@ export function updateHcthCongVanDi(id, changes, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật công văn giữa các phòng bị lỗi!', 'danger');
+                T.notify('Cập nhật công văn các phòng bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
                 // console.log(data);
-                T.notify('Cập nhật công văn giữa các phòng thành công!', 'success');
+                T.notify('Cập nhật công văn các phòng thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done();
             }
-        }, () => T.notify('Cập nhật công văn giữa các phòng bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật công văn các phòng bị lỗi!', 'danger'));
     };
 }
 
@@ -109,13 +109,13 @@ export function deleteHcthCongVanDi(id) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa công văn giữa các phòng bị lỗi!, lỗi 1', 'danger');
+                T.notify('Xóa công văn các phòng bị lỗi!, lỗi 1', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.notify('Xóa công văn giữa các phòng thành công!', 'success');
+                T.notify('Xóa công văn các phòng thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
             }
-        }, () => T.notify('Xóa công văn giữa các phòng bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa công văn các phòng bị lỗi!', 'danger'));
     };
 }
 
@@ -173,7 +173,7 @@ export function getCongVanDi(id, context, done) {
                     dispatch({ type: hcthCongVanDiGetError, error: 401 });
                 }
                 console.error('GET: ' + url + '.', data.error);
-                T.notify('Lấy công văn giữa các phòng bị lỗi!', 'danger');
+                T.notify('Lấy công văn các phòng bị lỗi!', 'danger');
             } else {
                 dispatch({ type: hcthCongVanDiGet, item: data.item });
                 done && done(data.item);

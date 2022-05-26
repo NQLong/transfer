@@ -43,7 +43,8 @@ module.exports = app => {
             canBoXem = '';
 
         const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-        const hcthPermission = getUserPermission(req, 'hcth', ['login']);
+        const hcthPermission = getUserPermission(req, 'hcth', ['manage']),
+            hcthManagePermission = getUserPermission(req, 'hcthCongVanDi', ['manage']);
         const user = req.session.user;
         const permissions = user.permissions;
 
@@ -51,9 +52,9 @@ module.exports = app => {
         donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes('donViCongVanDi:manage') && req.session?.user?.staff?.maDonVi || '';
         canBoXem = req.session?.user?.shcc || '';
 
-        let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
+        let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.manage ? 2 : 0;
 
-        if (rectorsPermission.login || hcthPermission.login || (!user.isStaff && !user.isStudent)) {
+        if (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent) || hcthManagePermission.manage) {
             donViXem = '';
             canBoXem = '';
         }

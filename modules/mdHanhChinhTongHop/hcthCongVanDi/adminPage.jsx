@@ -142,6 +142,8 @@ class HcthCongVanDi extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
+            hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
+            unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
             { baseUrl, breadcrumb, backRoute } = this.getSiteSetting();
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
@@ -237,7 +239,7 @@ class HcthCongVanDi extends AdminPage {
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn các phòng',
             breadcrumb: breadcrumb,
-            onCreate: (permission && permission.write) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
+            onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
                 <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Loại công văn" data={selectCongVan} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
                 <FormSelect style={{ width: '200px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
