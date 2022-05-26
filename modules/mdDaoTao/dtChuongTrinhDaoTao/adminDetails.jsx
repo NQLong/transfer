@@ -208,7 +208,10 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 
                             <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' required readOnly={readOnly} />
-                            <FormTextBox type='number' suffix=' năm' step={0.5} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect data={[
+                                { id: 4, text: '4 năm' },
+                                { id: 3.5, text: '3,5 năm' }
+                            ]} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
                             <div className='form-group col-md-12'>
                                 <label>Tên văn bằng sau khi tốt nghiệp: </label>
                                 <FormTabs tabs={[
