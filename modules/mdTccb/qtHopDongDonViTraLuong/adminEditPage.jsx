@@ -97,26 +97,7 @@ class QtHopDongDvtlEditPage extends AdminPage {
 
     setVal = (data = {}) => {
         const {
-            shcc = '',
-            // maChucVu='',
-            cmnd = '', cmndNgayCap = '', cmndNoiCap = '',
-            hienTaiMaHuyen = '', hienTaiMaTinh = '', hienTaiMaXa = '', hienTaiSoNha = '',
-            thuongTruMaHuyen = '', thuongTruMaTinh = '', thuongTruMaXa = '', thuongTruSoNha = '',
-            // nguyenQuanMaTinh = '', 
-            noiSinhMaTinh = '',
-            danToc = '', quocGia = '',
-            dienThoai = '',
-            email = '',
-            gioiTinh = '', ngaySinh = '',
-            hocVi = '',
-            chucDanh = '',
-            chuyenNganh = '',
-            chuyenNganhChucDanh = '',
-            tonGiao = '',
-        } = data ? data : {};
-
-        const {
-            bac = '', batDauLamViec = '', chiuSuPhanCong = '', chucDanhNgheNghiep = '',
+            shcc = '', bac = '', batDauLamViec = '', chiuSuPhanCong = '', chucDanhNgheNghiep = '',
             congViecDuocGiao = '', diaDiemLamViec = '', donViTraLuong = '', heSo = '',
             ketThucHopDong = null, loaiHopDong = '',
             ngayKyHopDong = '', ngayTaiKy = '', nguoiKy = '',
@@ -126,31 +107,12 @@ class QtHopDongDvtlEditPage extends AdminPage {
         this.handleChucVu(data.nguoiKy);
 
         this.urlMa && this.selectedShcc.value(shcc);
-        this.email.value(email ? email : '');
-        this.gioiTinh.value(gioiTinh ? gioiTinh : '');
-        this.quocGia.value(quocGia ? quocGia : '');
-        this.danToc.value(danToc ? danToc : '');
-        this.tonGiao.value(tonGiao ? tonGiao : '');
-        this.ngaySinh.value(ngaySinh ? ngaySinh : '');
-
         !this.urlMa && this.typeFilter.setText(EnumLoaiCanBo[1]);
-
-        this.noiSinh.value(noiSinhMaTinh);
-        this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
-        this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
-
-        this.hocVanTrinhDo.value(hocVi ? hocVi : '');
-        this.hocVanChuyenNganh.value(chuyenNganh ? chuyenNganh : '');
-        this.khoaHocChucDanh.value(chucDanh ? chucDanh : '');
-        this.khoaHocChuyenNganh.value(chuyenNganhChucDanh ? chuyenNganhChucDanh : '');
-        this.cmnd.value(cmnd ? cmnd : '');
-        this.cmndNgayCap.value(cmndNgayCap ? cmndNgayCap : '');
-        this.cmndNoiCap.value(cmndNoiCap ? cmndNoiCap : '');
-        this.dienThoai.value(dienThoai ? dienThoai : '');
         this.soHopDong.value(soHopDong ? soHopDong : this.state.suggestSoHopDong);
 
         this.loaiHopDong.value(loaiHopDong ? loaiHopDong : '');
         this.nguoiKy.value(nguoiKy ? nguoiKy : '');
+        this.hieuLucHopDong.value(batDauLamViec ? batDauLamViec : '');
         this.batDauLamViec.value(batDauLamViec ? batDauLamViec : '');
         this.ketThucHopDong.value(ketThucHopDong);
         this.ngayKyHopDongTiepTheo.value(ngayTaiKy ? ngayTaiKy : '');
@@ -185,14 +147,14 @@ class QtHopDongDvtlEditPage extends AdminPage {
                 quocGia: this.validate(this.quocGia),
                 danToc: this.validate(this.danToc),
                 tonGiao: this.validate(this.tonGiao),
-                ngaySinh: this.validate(this.ngaySinh).getTime(),
+                ngaySinh: this.validate(this.ngaySinh)?.getTime(),
                 phai: this.validate(this.gioiTinh),
                 hocVanTrinhDo: this.validate(this.hocVanTrinhDo),
                 hocVanChuyenNganh: this.validate(this.hocVanChuyenNganh),
                 khoaHocChucDanh: this.validate(this.khoaHocChucDanh),
                 khoaHocChuyenNganh: this.validate(this.khoaHocChuyenNganh),
                 cmnd: this.validate(this.cmnd),
-                cmndNgayCap: this.validate(this.cmndNgayCap).getTime(),
+                cmndNgayCap: this.validate(this.cmndNgayCap)?.getTime(),
                 cmndNoiCap: this.validate(this.cmndNoiCap),
                 dienThoaiCaNhan: this.validate(this.dienThoai),
                 maTinhNoiSinh: this.validate(this.noiSinh.dmTinhThanhPho),
@@ -212,10 +174,11 @@ class QtHopDongDvtlEditPage extends AdminPage {
                 chuyenNganhChucDanh: this.validate(this.khoaHocChuyenNganh),
 
                 soHopDong: this.validate(this.soHopDong),
+                nguoiKy: this.validate(this.nguoiKy),
                 loaiHopDong: this.validate(this.loaiHopDong),
-                batDauLamViec: this.validate(this.batDauLamViec).getTime(),
-                ketThucHopDong: this.validate(this.ketThucHopDong).getTime(),
-                ngayTaiKy: this.validate(this.ngayKyHopDongTiepTheo).getTime(),
+                batDauLamViec: this.validate(this.batDauLamViec)?.getTime(),
+                ketThucHopDong: this.validate(this.ketThucHopDong)?.getTime(),
+                ngayTaiKy: this.validate(this.ngayKyHopDongTiepTheo)?.getTime(),
                 diaDiemLamViec: this.validate(this.diaDiemLamViec),
                 chucDanhNgheNghiep: this.validate(this.chucDanhNgheNghiep),
                 congViecDuocGiao: this.validate(this.congViecDuocGiao),
@@ -224,7 +187,7 @@ class QtHopDongDvtlEditPage extends AdminPage {
                 ngach: this.validate(this.chucDanhNgheNghiep),
                 bac: parseFloat(this.validate(this.bac)),
                 heSo: this.validate(this.heSo),
-                ngayKyHopDong: this.validate(this.ngayKyHopDong).getTime(),
+                ngayKyHopDong: this.validate(this.ngayKyHopDong)?.getTime(),
                 phanTramHuong: this.validate(this.phanTramHuong),
             };
             return data;
@@ -373,8 +336,8 @@ class QtHopDongDvtlEditPage extends AdminPage {
     }
 
     handleTuNgay = () => {
-        if (this.ngayKyHopDong.current.getVal() && !this.state.hdkxdtg && this.state.thoiGianHd) {
-            const newDate = moment(this.ngayKyHopDong.current.getVal()).add(parseInt(this.state.thoiGianHd), 'M');
+        if (this.ngayKyHopDong.value() && !this.state.hdkxdtg && this.state.thoiGianHd) {
+            const newDate = moment(this.ngayKyHopDong.value()).add(parseInt(this.state.thoiGianHd), 'M');
             this.ketThucHopDong.value(newDate.valueOf() - 24 * 3600000);
         }
     }
@@ -393,6 +356,10 @@ class QtHopDongDvtlEditPage extends AdminPage {
             });
         });
     };
+
+    handleNgayBatDau = (value) => {
+        this.batDauLamViec.value(value);
+    }
 
     render() {
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
@@ -464,7 +431,8 @@ class QtHopDongDvtlEditPage extends AdminPage {
                     <div className='tile-body row'>
                         <div className='form-group col-xl-6 col-md-6'><FormSelect data={SelectAdapter_DmLoaiHopDongV2} ref={e => this.loaiHopDong = e} label='Loại hợp đồng' onChange={this.handleLoaiHd} required /></div>
                         <div className='form-group col-xl-6 col-md-6'><FormDatePicker type='date-mask' ref={e => this.ngayKyHopDong = e} label='Ngày ký hợp đồng' onChange={this.handleTuNgay} required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><FormDatePicker type='date-mask' ref={e => this.batDauLamViec = e} label='Ngày bắt đầu làm việc' required /></div>
+                        <div className='form-group col-xl-3 col-md-6'><FormDatePicker type='date-mask' ref={e => this.hieuLucHopDong = e} label='Ngày hiệu lực hợp đồng' required onChange={this.handleNgayBatDau} /></div>
+                        <div className='form-group col-xl-3 col-md-6'><FormDatePicker type='date-mask' ref={e => this.batDauLamViec = e} label='Ngày bắt đầu làm việc' required readOnly/></div>
                         <div className='form-group col-xl-3 col-md-6' id='ketThucHd'><FormDatePicker type='date-mask' ref={e => this.ketThucHopDong = e} label='Ngày kết thúc hợp đồng' required /></div>
                         <div className='form-group col-xl-3 col-md-6' id='kyTiepTheo'><FormDatePicker type='date-mask' ref={e => this.ngayKyHopDongTiepTheo = e} label='Ngày ký hợp đồng tiếp theo' /></div>
                         <div className='form-group col-xl-12 col-md-12'><FormSelect data={SelectAdapter_DmDonVi} ref={e => this.diaDiemLamViec = e} label='Địa điểm làm việc' onChange={this.genNewShcc}/></div>

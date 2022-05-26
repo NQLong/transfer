@@ -32,18 +32,7 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-trach-nhiem/edit/:ma', app.permission.check('qtHopDongTrachNhiem:read'), (req, res) => {
-        const ma = req.params.ma;
-        app.model.qtHopDongTrachNhiem.get({ ma }, (error, hopDong) => {
-            if (error || hopDong == null) {
-                res.send({ error });
-            } else {
-                app.model.canBo.get({ shcc: hopDong.nguoiKy }, (error, nguoiKy) => {
-                    app.model.canBo.get({ shcc: hopDong.nguoiDuocThue }, (error, nguoiDuocThue) => {
-                        res.send({ error, item: { nguoiDuocThue, nguoiKy, hopDong } });
-                    });
-                });
-            }
-        });
+        app.model.qtHopDongTrachNhiem.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-trach-nhiem/handle-so-hop-dong', app.permission.check('qtHopDongTrachNhiem:read'), (req, res) => {
@@ -63,4 +52,27 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/tccb/qua-trinh/hop-dong-trach-nhiem/edit/item/:ma', app.permission.check('qtHopDongTrachNhiem:read'), (req, res) => {
+        app.model.qtHopDongTrachNhiem.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    });
+
+    app.post('/api/tccb/qua-trinh/hop-dong-trach-nhiem', app.permission.check('qtHopDongTrachNhiem:write'), (req, res) => {
+        app.model.qtHopDongTrachNhiem.create(req.body.item, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hợp đồng trách nhiệm');
+            res.send({ error, item });
+        });
+    });
+
+    app.put('/api/tccb/qua-trinh/hop-dong-trach-nhiem', app.permission.check('qtHopDongTrachNhiem:write'), (req, res) => {
+        app.model.qtHopDongTrachNhiem.update({ ma: req.body.ma }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hợp đồng trách nhiệm');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/tccb/qua-trinh/hop-dong-trach-nhiem', app.permission.check('qtHopDongTrachNhiem:write'), (req, res) => {
+        app.model.qtHopDongTrachNhiem.delete({ ma: req.body.ma }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng trách nhiệm');
+            res.send({ error });
+        });
+    });
 };

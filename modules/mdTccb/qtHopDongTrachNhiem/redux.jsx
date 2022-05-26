@@ -57,3 +57,52 @@ export function handleSoHopDongTrachNhiem(done) {
         });
     };
 }
+
+export function createQtHopDongTrachNhiem(item, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/hop-dong-trach-nhiem';
+        T.post(url, { item }, data => {
+            if (data.error) {
+                T.notify('Tạo hợp đồng bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, data.error);
+            } else {
+                T.notify('Tạo hợp đồng thành công!', 'success');
+                dispatch(getQtHopDongTrachNhiemPage());
+                if (done) done(data);
+            }
+        }, () => T.notify('Tạo hợp đồng bị lỗi!', 'danger'));
+    };
+}
+
+export function deleteQtHopDongTrachNhiem(ma, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/hop-dong-trach-nhiem';
+        T.delete(url, { ma }, data => {
+            if (data.error) {
+                T.notify('Xóa hợp đồng bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('hợp đồng đã xóa thành công!', 'success', false, 800);
+                dispatch(getQtHopDongTrachNhiemPage());
+            }
+            done && done();
+        }, () => T.notify('Xóa hợp đồng bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtHopDongTrachNhiem(ma, changes, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/hop-dong-trach-nhiem';
+        T.put(url, { ma, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật hợp đồng bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật hợp đồng thành công!', 'success');
+                done && done(data.item);
+                dispatch(getHopDongTrachNhiem(ma));
+            }
+        }, () => T.notify('Cập nhật hợp đồng bị lỗi!', 'danger'));
+    };
+}
