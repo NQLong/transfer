@@ -238,7 +238,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Ngày đủ tuổi nghỉ hưu</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian được kéo dài</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),

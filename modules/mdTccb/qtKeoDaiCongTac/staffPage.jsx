@@ -167,7 +167,7 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian được kéo dài</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
