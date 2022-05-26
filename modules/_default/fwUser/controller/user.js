@@ -209,7 +209,7 @@ module.exports = app => {
                             if (error) {
                                 reject(error);
                             } else if (roles) {
-                                app.model.fwUserRole.delete({ email: 'buihaphuong81@hcmussh.edu.vn' }, error => {
+                                app.model.fwUserRole.delete({ email: req.body.email }, error => {
                                     if (error) {
                                         reject(error);
                                     } else {
