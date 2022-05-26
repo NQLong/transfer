@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
-    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
+    updateSachGTStaff, deleteSachGTStaff,
+    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage, createSachGiaoTrinhMultiple
 } from './redux';
 
 import { DateInput } from 'view/component/Input';
@@ -47,6 +47,16 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            ten: this.ten.value(),
+            theLoai: this.theLoai.value(),
+            namSanXuat: this.namSanXuat.getVal() ? new Date(this.namSanXuat.getVal()).getFullYear() : null,
+            nhaSanXuat: this.nhaSanXuat.value(),
+            chuBien: this.chuBien.value(),
+            sanPham: this.sanPham.value(),
+            butDanh: this.butDanh.value(),
+            quocTe: this.quocTe.value()
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
@@ -60,29 +70,13 @@ class EditModal extends AdminModal {
             T.notify('Nhà xuất bản trống', 'danger');
             this.nhaSanXuat.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    ten: this.ten.value(),
-                    theLoai: this.theLoai.value(),
-                    namSanXuat: this.namSanXuat.getVal() ? new Date(this.namSanXuat.getVal()).getFullYear() : null,
-                    nhaSanXuat: this.nhaSanXuat.value(),
-                    chuBien: this.chuBien.value(),
-                    sanPham: this.sanPham.value(),
-                    butDanh: this.butDanh.value(),
-                    quocTe: this.quocTe.value()
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -222,7 +216,7 @@ class SachGiaoTrinh extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' content={(
@@ -292,7 +286,7 @@ class SachGiaoTrinh extends AdminPage {
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createSachGTStaff} update={this.props.updateSachGTStaff}
+                    create={this.props.createSachGiaoTrinhMultiple} update={this.props.updateSachGTStaff}
                 />
             </>,
             backRoute: '/user/library',
@@ -303,7 +297,7 @@ class SachGiaoTrinh extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.library.sachGiaoTrinh });
 const mapActionsToProps = {
-    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
-    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
+    updateSachGTStaff, deleteSachGTStaff,
+    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage, createSachGiaoTrinhMultiple
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinh);

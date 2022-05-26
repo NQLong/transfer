@@ -204,10 +204,52 @@ module.exports = (app) => {
         }
     });
 
+    const onCreateOpenAndCloseTaskNotification = ({ maNhiemVu, nguoiTaoShcc, canBoNhan, hanhDong }) => new Promise((resolve, reject) => {
+        try {
+            let listEmployees = [];
+            listEmployees.push(nguoiTaoShcc);
+            listEmployees = listEmployees.concat(canBoNhan);
+            app.model.canBo.getAll({
+                statement: 'shcc IN (:dsCanBo)',
+                parameter: {
+                    dsCanBo: [...listEmployees]
+                }
+            }, 'email, ho, ten, shcc', 'email', (error, canBos) => {
+                if (error) reject(error);
+                else {
+                    const nguoiTao = canBos.find(canBo => canBo.shcc === nguoiTaoShcc);
+                    const dsNguoiNhan = canBos.filter(canBo => canBo.shcc !== nguoiTaoShcc);
+                    const hoTenNguoiTao = nguoiTao?.ho + ' ' + nguoiTao?.ten;
+                    let subTitle = '';
+                    let icon = '';
+                    let iconColor = '';
+                    if (hanhDong === action.CLOSE) {
+                        subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã đóng nhiệm vụ #${maNhiemVu}.`;
+                        icon = 'fa-lock';
+                        iconColor = 'danger';
+                    }
+                    else {
+                        subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã mở lại nhiệm vụ #${maNhiemVu}.`;
+                        icon = 'fa-unlock';
+                        iconColor = 'success';
+                    }
+                    createNotification(dsNguoiNhan.map(item => item.email), { title: 'Nhiệm vụ', icon, iconColor, subTitle, link: `/user/nhiem-vu/${maNhiemVu}` }, (error) => {
+                        if (error) reject(error);
+                        else resolve();
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('fail to send close task to employees notification', error);
+            resolve();
+        }
+    });
+
+
     app.post('/api/hcth/nhiem-vu', app.permission.orCheck('manager:write', 'htch:manage', 'rectors:login'), async (req, res) => {
         try {
             const { canBoNhan = [], fileList = [], donViNhan = [], ...data } = req.body;
-            const nhiemVu = await app.model.hcthNhiemVu.asyncCreate({ ...data, trangThai: trangThaiNhiemVu.MOI.id });
+            const nhiemVu = await app.model.hcthNhiemVu.asyncCreate({ ...data, trangThai: trangThaiNhiemVu.MO.id });
             await app.model.hcthDonViNhan.createFromList(donViNhan, nhiemVu.id, 'NHIEM_VU');
             await updateCanBoNhan(canBoNhan, nhiemVu.id);
             app.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
@@ -603,6 +645,78 @@ module.exports = (app) => {
                 await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: id, shcc: req.session.user?.shcc, hanhDong: action.COMPLETE });
                 res.send({ error: null });
             }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/hcth/nhiem-vu/dong/:id', app.permission.check('staff:login'), (req, res) => {
+        try {
+            const id = req.params.id;
+            const { canBoNhan, nguoiTao } = req.body;
+            app.model.hcthNhiemVu.update({ id }, { trangThai: trangThaiNhiemVu.DONG.id }, async (error, item) => {
+                if (error) {
+                    res.send({ error });
+                } else {
+                    const _newHistory = {
+                        loai: 'NHIEM_VU',
+                        key: id,
+                        shcc: req.session.user?.shcc,
+                        hanhDong: action.CLOSE
+                    };
+                    await app.model.hcthHistory.asyncCreate(_newHistory).then(() => {
+                        let listCanBoNhanShcc = [];
+                        if (nguoiTao !== req.session.user?.shcc) listCanBoNhanShcc.push(nguoiTao);
+                        if (canBoNhan.length > 0) listCanBoNhanShcc = listCanBoNhanShcc.concat([...canBoNhan.map(cb => cb.shccCanBoNhan)]);
+                        if (listCanBoNhanShcc.length > 0) {
+                            onCreateOpenAndCloseTaskNotification({
+                                maNhiemVu: id,
+                                nguoiTaoShcc: req.session.user?.shcc,
+                                canBoNhan: listCanBoNhanShcc,
+                                hanhDong: action.CLOSE
+                            });
+                        }
+                        res.send({ error: null, item });
+                    })
+                        .catch(error => res.send({ error }));
+                }
+            });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/hcth/nhiem-vu/mo-lai/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const { canBoNhan, nguoiTao } = req.body;
+            app.model.hcthNhiemVu.update({ id }, { trangThai: trangThaiNhiemVu.MO.id }, async (error, item) => {
+                if (error) {
+                    res.send({ error });
+                } else {
+                    const _newHistory = {
+                        loai: 'NHIEM_VU',
+                        key: id,
+                        shcc: req.session.user?.shcc,
+                        hanhDong: action.REOPEN
+                    };
+                    await app.model.hcthHistory.asyncCreate(_newHistory).then(() => {
+                        let listCanBoNhanShcc = [];
+                        if (nguoiTao !== req.session.user?.shcc) listCanBoNhanShcc.push(nguoiTao);
+                        if (canBoNhan.length > 0) listCanBoNhanShcc = listCanBoNhanShcc.concat([...canBoNhan.map(cb => cb.shccCanBoNhan)]);
+                        if (listCanBoNhanShcc.length > 0) {
+                            onCreateOpenAndCloseTaskNotification({
+                                maNhiemVu: id,
+                                nguoiTaoShcc: req.session.user?.shcc,
+                                canBoNhan: listCanBoNhanShcc,
+                                hanhDong: action.REOPEN
+                            });
+                        }
+                        res.send({ error: null, item });
+                    })
+                        .catch(error => res.send({ error }));
+                }
+            });
         } catch (error) {
             res.send({ error });
         }

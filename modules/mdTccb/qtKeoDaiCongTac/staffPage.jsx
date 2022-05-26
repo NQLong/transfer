@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     updateQtKeoDaiCongTacUserPage, deleteQtKeoDaiCongTacUserPage,
@@ -34,8 +34,8 @@ class EditModal extends AdminModal {
 
 
     onShow = (item) => {
-        let { id, batDau, batDauType, ketThuc, ketThucType } = item && item.item ? item.item : {
-            id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: ''
+        let { id, batDau, batDauType, ketThuc, ketThucType, soQuyetDinh, ngayQuyetDinh } = item && item.item ? item.item : {
+            id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', soQuyetDinh: '', ngayQuyetDinh: '',
         };
         this.setState({
             id, batDauType: 'dd/mm/yyyy',
@@ -46,7 +46,9 @@ class EditModal extends AdminModal {
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
             this.batDau.setVal(batDau ? batDau : '');
-            this.state.ketThuc != -1 && this.ketThuc.setVal(ketThuc ? ketThuc : '');
+            this.ketThuc.setVal(ketThuc ? ketThuc : '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
+            this.ngayQuyetDinh.value(ngayQuyetDinh || '');
         });
     }
 
@@ -58,6 +60,8 @@ class EditModal extends AdminModal {
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
             ketThuc: this.ketThuc.getVal(),
+            soQuyetDinh: this.soQuyetDinh.value(),
+            ngayQuyetDinh: Number(this.ngayQuyetDinh.value()),
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
@@ -82,6 +86,8 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật thông tin kéo dài công tác' : 'Tạo mới thông tin kéo dài công tác',
             size: 'large',
             body: <div className='row'>
+                <FormTextBox className='col-md-8' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormDatePicker className='col-md-4' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -150,7 +156,7 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
         const textGioiTinh = isStaff ? `Giới tính: ${phai}` : '';
         const textNgaySinh = isStaff ? `Ngày sinh: ${ngaySinh}` : '';
-        const textNgayNghiHuu = isStaff && this.state.ngayNghiHuu ? `Ngày nghỉ hưu: ${T.dateToText(this.state.ngayNghiHuu, 'dd/mm/yyyy')}` : '';
+        const textNgayNghiHuu = isStaff && this.state.ngayNghiHuu ? `Ngày đủ tuổi nghỉ hưu: ${T.dateToText(this.state.ngayNghiHuu, 'dd/mm/yyyy')}` : '';
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.userPage ? this.props.qtKeoDaiCongTac.userPage : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -159,6 +165,8 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -166,6 +174,8 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
+                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}

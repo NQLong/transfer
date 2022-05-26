@@ -43,8 +43,9 @@ T.initPage('pageDmSvMonThi');
 export function getDmSvMonThiPage(pageNumber, pageSize, pageCondition, done) {
   const page = T.updatePage('pageDmSvMonThi', pageNumber, pageSize, pageCondition);
   return dispatch => {
-    const url = `/api/danh-muc/dao-tao/mon-thi/page/${page.pageNumber}/${page.pageSize}`;
+    const url = `/api/danh-muc/mon-thi/page/${page.pageNumber}/${page.pageSize}`;
     T.get(url, { condition: pageCondition }, data => {
+      console.log(pageCondition);
       if (data.error) {
         T.notify('Lấy danh sách môn thi bị lỗi!', 'danger');
         console.error(`GET: ${url}.`, data.error);
@@ -59,7 +60,7 @@ export function getDmSvMonThiPage(pageNumber, pageSize, pageCondition, done) {
 
 export function getDmSvMonThi(id, done) {
   return () => {
-    const url = `/api/danh-muc/dao-tao/mon-thi/item/${id}`;
+    const url = `/api/danh-muc/mon-thi/item/${id}`;
     T.get(url, data => {
       if (data.error) {
         T.notify('Lấy thông tin môn thi bị lỗi!', 'danger');
@@ -73,7 +74,7 @@ export function getDmSvMonThi(id, done) {
 
 export function createDmSvMonThi(item, done) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/mon-thi';
+    const url = '/api/danh-muc/mon-thi';
     T.post(url, { data: item }, data => {
       if (data.error) {
         T.notify(data.error.message || 'Tạo môn thi bị lỗi', 'danger');
@@ -90,7 +91,7 @@ export function createDmSvMonThi(item, done) {
 
 export function deleteDmSvMonThi(id) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/mon-thi';
+    const url = '/api/danh-muc/mon-thi';
     T.delete(url, { id: id }, data => {
       if (data.error) {
         T.notify('Xóa danh mục môn thi bị lỗi!', 'danger');
@@ -105,7 +106,7 @@ export function deleteDmSvMonThi(id) {
 
 export function updateDmSvMonThi(id, changes, done) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/mon-thi';
+    const url = '/api/danh-muc/mon-thi';
     T.put(url, { id, changes }, data => {
       if (data.error || changes == null) {
         T.notify(data.error.message || 'Cập nhật thông tin môn thi bị lỗi', 'danger');
@@ -120,15 +121,13 @@ export function updateDmSvMonThi(id, changes, done) {
   };
 }
 
-export function changeDmSvMonThi(item) {
-  return { type: DmSvMonThiUpdate, item };
-}
-
 export const SelectAdapter_DmSvMonThi = {
   ajax: true,
-  url: '/api/danh-muc/dao-tao/mon-thi/page/1/20',
-  data: params => ({ condition: params.term }),
+  url: '/api/danh-muc/mon-thi/page/1/20',
+  data: params => ({ condition: params.term, kichHoat: 1 }),
   processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
   getOne: getDmSvMonThi,
+  fetchOne: (id, done) => (getDmSvMonThi(id, item => done && done({ id: item.id, text: item.ten })))(),
   processResultOne: response => response && ({ value: response.id, text: response.id + ': ' + response.ten }),
+  // fetchOne: (id, done) => (getDmSvMonThi(id, item => done && done({ id: item.id, text: item.ten })))(),
 };

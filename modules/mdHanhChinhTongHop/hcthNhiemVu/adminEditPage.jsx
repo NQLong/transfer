@@ -5,14 +5,14 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { CanBoNhan, History, LienKet, ListFiles, PhanHoi } from './component';
-import { clearHcthNhiemVu, completeNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getHistory, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu } from './redux';
+import { clearHcthNhiemVu, completeNhiemVu, closeNhiemVu, reopenNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getHistory, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu } from './redux';
 const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 
 // const tienDoSelector = [...Array(11).keys()].map(i => ({ id: i * 10, text: `${i * 10}%` }));
 
 class AdminEditPage extends AdminPage {
     listFileRefs = {};
-    state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.MOI.id }
+    state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.DONG.id }
 
     tableListFile = (data, id, sitePermission) => renderTable({
         getDataSource: () => data,
@@ -75,7 +75,7 @@ class AdminEditPage extends AdminPage {
 
     setData = (data = null) => {
 
-        let { tieuDe, noiDung, ngayTao, ngayBatDau, ngayKetThuc, donViNhan, doUuTien, phanHoi = [], listFile = [], lienKet = [], lienPhong = 0, canBoNhan = [], nguoiTao, trangThai = '' } = data ? data :
+        let { tieuDe, noiDung, ngayTao, ngayBatDau, ngayKetThuc, donViNhan, doUuTien, phanHoi = [], listFile = [], lienKet = [], lienPhong = 0, canBoNhan = [], nguoiTao, trangThai = trangThaiNhiemVu.MO.id } = data ? data :
             { tieuDe: '', noiDung: '', ngayTao: '', ngayBatDau: '', ngayKetThuc: '', donViNhan: [], doUuTien: doUuTienMapper.NORMAL.id, lienKet, lienPhong: 0, canBoNhanNhiemVu: {}, nguoiTao: '' };
 
         this.ngayTao?.value(ngayTao || '');
@@ -90,10 +90,10 @@ class AdminEditPage extends AdminPage {
             this.props.clearHcthNhiemVu();
         }
 
-
         const isCreator = this.state.id ? this.props.hcthNhiemVu?.item?.nguoiTao == this.props.system?.user?.shcc : true;
         const isManager = canBoNhan.some(item => item.vaiTro == vaiTro.MANAGER.id && item.shccCanBoNhan == this.props.system?.user?.shcc);
         this.setState({ phanHoi, listFile, lienKet, nguoiTao, lienPhong, donViNhan, doUuTien, isCreator, isManager, trangThai }, () => {
+            this.trangThai?.value(trangThai || '');
 
             if (donViNhan.length > 0) {
                 if (lienPhong)
@@ -191,9 +191,9 @@ class AdminEditPage extends AdminPage {
         return {
             primePermission,
             isParticipant: this.state.id && canBoNhan.some(item => item.shccCanBoNhan === shcc),
-            editGeneral: this.state.isCreator || this.state.isManager,
+            editGeneral: (this.state.trangThai !== trangThaiNhiemVu.DONG.id) && (this.state.isCreator || this.state.isManage),
             editTrangThai: primePermission || this.state.isCreator || this.state.isManager,
-            delete: this.state.isCreator || this.state.isManager,
+            delete: (this.state.trangThai !== trangThaiNhiemVu.DONG.id) && (this.state.isCreator || this.state.isManager),
         };
     }
 
@@ -203,20 +203,35 @@ class AdminEditPage extends AdminPage {
         );
     }
 
+    onClose = () => {
+        T.confirm('Đóng nhiệm vụ', 'Bạn có chắc chắn muốn đóng nhiệm vụ này lại không ?', true,
+            isConfirm => isConfirm && this.props.closeNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData)
+        );
+    }
+
+    onReopen = () => {
+        T.confirm('Mở lại nhiệm vụ', 'Bạn có chắc chắn muốn mở lại nhiệm vụ này không ?', true,
+            isConfirm => isConfirm && this.props.reopenNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData)
+        );
+    }
+
     render() {
         const
             isNew = !this.state.id,
             sitePermission = this.getSitePermission(),
             siteSetting = this.getSiteSetting(),
             buttons = [];
-
-        if (sitePermission.isParticipant)
+        const isShowCloseTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai !== trangThaiNhiemVu.DONG.id;
+        const isShowReopenTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai === trangThaiNhiemVu.DONG.id;
+        if (sitePermission.isParticipant && this.state.trangThai !== trangThaiNhiemVu.DONG.id)
             buttons.push({ icon: 'fa-check', onClick: this.onComplete, className: 'btn-success' });
-        // const nextTrangThai = trangThaiNhiemVu[this.state.trangThai]?.next || [];
-        // const trangThaiAdapter = this.state.trangThai ? nextTrangThai.map(key => ({ id: trangThaiNhiemVu[key].id, text: trangThaiNhiemVu[key].text })) : [];
+        if (isShowCloseTaskBtn)
+            buttons.push({ icon: 'fa-lock', onClick: this.onClose, className: 'btn-danger' });
+        if (isShowReopenTaskBtn)
+            buttons.push({ icon: 'fa-unlock', onClick: this.onReopen, className: 'btn-success' });
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Giao nhiệm vụ',
+            title: 'Nhiệm vụ',
             breadcrumb: siteSetting.breadcrumb,
             content: <>
                 <div className='tile'>
@@ -227,6 +242,7 @@ class AdminEditPage extends AdminPage {
                     <div className='tile-body row'>
                         <FormTextBox type='text' className='col-md-12' ref={e => this.tieuDe = e} label='Tiêu đề' required readOnly={!sitePermission.editGeneral} />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={!sitePermission.editGeneral} required />
+                        {this.state.id && <div className='form-group col-md-12'>Trạng thái nhiệm vụ: <span style={{ color: trangThaiNhiemVu[this.state.trangThai].color, fontWeight: 'bold' }}>{trangThaiNhiemVu[this.state.trangThai].text}</span></div>}
                         {this.state.id && <>
                             <FormSelect className='col-md-6' ref={(e => this.nguoiTao = e)} label='Người tạo' data={SelectAdapter_FwCanBo} readOnly={true} />
                             <FormDatePicker type='date-mask' className='col-md-6' ref={(e => this.ngayTao = e)} label='Người tạo' readOnly={true} />
@@ -237,27 +253,24 @@ class AdminEditPage extends AdminPage {
                         <FormSelect className='col-md-12' ref={e => this.doUuTien = e} label='Độ ưu tiên' data={Object.keys(doUuTienMapper).map(key => ({ id: key, text: doUuTienMapper[key].text }))} readOnly={!sitePermission.editGeneral} required />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' readOnly={!sitePermission.editGeneral} readOnlyEmptyText='Chưa có' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKetThuc = e} label='Ngày kết thúc' readOnly={!sitePermission.editGeneral} readOnlyEmptyText='Chưa có' />
-                        {/* {this.state.id && this.state.trangThai && (<>
-                            <FormSelect className={this.state.trangThai != trangThaiNhiemVu.MOI.id ? 'col-md-6' : 'col-md-12'} ref={e => this.trangThai = e} data={trangThaiAdapter} label='Tình trạng nhiêm vụ' readOnly={!sitePermission.editTrangThai} />
-                        </>)
-                        } */}
+
                     </div>
                 </div>
-                <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} />
-                {this.state.id && <PhanHoi {...this.props} target={this.state.id} sitePermission={sitePermission} />}
+                <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} trangThai={this.state.trangThai} />
+                {this.state.id && <PhanHoi {...this.props} target={this.state.id} sitePermission={sitePermission} trangThai={this.state.trangThai} />}
                 {this.state.id && <LienKet {...this.props} sitePermission={sitePermission} target={this.state.id} data={this.props.hcthNhiemVu?.cvdPage?.list} />}
 
-                <ListFiles {...this.props} files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} updateListFile={(newList) => this.setState({ listFile: newList}) }/>
+                <ListFiles {...this.props} files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} updateListFile={(newList) => this.setState({ listFile: newList })} />
 
                 {this.state.id && <History {...this.props} data={this.props.hcthNhiemVu?.item?.history} />}
             </>,
             backRoute: siteSetting.backRoute,
-            onSave: this.save,
+            onSave: sitePermission.editGeneral && this.save,
             buttons
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthNhiemVu: state.hcth.hcthNhiemVu });
-const mapActionsToProps = { completeNhiemVu, getHistory, clearHcthNhiemVu, updateCanBoNhanNhiemVu, deleteFile, deleteLienKet, getCongVanCacPhongSelector, createNhiemVu, updateNhiemVu, deleteNhiemVu, searchNhiemVu, getNhiemVu, createPhanHoi, getPhanHoi, createLienKet, updateLienKet, getLienKet, createCanBoNhanNhiemVu, getListCanBoNhanNhiemVu, removeCanBoNhanNhiemVu, getCongVanDenSelector };
+const mapActionsToProps = { completeNhiemVu, reopenNhiemVu, closeNhiemVu, getHistory, clearHcthNhiemVu, updateCanBoNhanNhiemVu, deleteFile, deleteLienKet, getCongVanCacPhongSelector, createNhiemVu, updateNhiemVu, deleteNhiemVu, searchNhiemVu, getNhiemVu, createPhanHoi, getPhanHoi, createLienKet, updateLienKet, getLienKet, createCanBoNhanNhiemVu, getListCanBoNhanNhiemVu, removeCanBoNhanNhiemVu, getCongVanDenSelector };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

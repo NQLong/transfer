@@ -9,9 +9,9 @@ class EditModal extends AdminModal {
     state = { kichHoat: 1 };
 
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
+        this.onShown(() => {
             this.ten.focus();
-        }));
+        });
     }
 
     onShow = (item) => {
@@ -67,7 +67,7 @@ class DmPhongPage extends AdminPage {
     componentDidMount() {
         let route = T.routeMatcher('/user/:menu/phong').parse(window.location.pathname);
         this.menu = route.menu;
-        T.ready(`/user/${this.menu}`);
+        T.ready(`/user/${this.menu == 'dao-tao' ? 'dao-tao' : 'category'}`);
         T.showSearchBox();
         this.props.getDmPhongAll();
         this.props.getDmToaNhaAll();

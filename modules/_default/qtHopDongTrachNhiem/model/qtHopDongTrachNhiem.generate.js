@@ -1,6 +1,6 @@
-// Table name: QT_HOP_DONG_TRACH_NHIEM { soHopDong, kieuHopDong, nguoiKy, chucVu, loaiHopDong, batDauLamViec, ketThucHopDong, ngayKyHdTiepTheo, diaDiemLamViec, chucDanhChuyenMon, congViecDuocGiao, chiuSuPhanCong, donViChiTra, ngach, bac, heSo, hieuLucHopDong, ngayKyHopDong, phanTramHuong, tienLuong, nguoiDuocThue, ma }
+// Table name: QT_HOP_DONG_TRACH_NHIEM { soHopDong, nguoiKy, ketThucHopDong, ngayKyHdTiepTheo, diaDiemLamViec, congViecDuocGiao, chiuSuPhanCong, ngach, hieuLucHopDong, tienLuong, nguoiDuocThue, ma, ngayKyHopDong, hocVi, chuyenNganh, chucDanh, chuyenNganhChucDanh }
 const keys = ['MA'];
-const obj2Db = { 'soHopDong': 'SO_HOP_DONG', 'kieuHopDong': 'KIEU_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'chucVu': 'CHUC_VU', 'loaiHopDong': 'LOAI_HOP_DONG', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayKyHdTiepTheo': 'NGAY_KY_HD_TIEP_THEO', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'chucDanhChuyenMon': 'CHUC_DANH_CHUYEN_MON', 'congViecDuocGiao': 'CONG_VIEC_DUOC_GIAO', 'chiuSuPhanCong': 'CHIU_SU_PHAN_CONG', 'donViChiTra': 'DON_VI_CHI_TRA', 'ngach': 'NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'hieuLucHopDong': 'HIEU_LUC_HOP_DONG', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'phanTramHuong': 'PHAN_TRAM_HUONG', 'tienLuong': 'TIEN_LUONG', 'nguoiDuocThue': 'NGUOI_DUOC_THUE', 'ma': 'MA' };
+const obj2Db = { 'soHopDong': 'SO_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayKyHdTiepTheo': 'NGAY_KY_HD_TIEP_THEO', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'congViecDuocGiao': 'CONG_VIEC_DUOC_GIAO', 'chiuSuPhanCong': 'CHIU_SU_PHAN_CONG', 'ngach': 'NGACH', 'hieuLucHopDong': 'HIEU_LUC_HOP_DONG', 'tienLuong': 'TIEN_LUONG', 'nguoiDuocThue': 'NGUOI_DUOC_THUE', 'ma': 'MA', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'hocVi': 'HOC_VI', 'chuyenNganh': 'CHUYEN_NGANH', 'chucDanh': 'CHUC_DANH', 'chuyenNganhChucDanh': 'CHUYEN_NGANH_CHUC_DANH' };
 
 module.exports = app => {
     app.model.qtHopDongTrachNhiem = {
@@ -76,8 +76,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM QT_HOP_DONG_TRACH_NHIEM' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+            const sqlCount = 'SELECT COUNT(*) FROM QT_HOP_DONG_TRACH_NHIEM' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done(error);
                 } else {

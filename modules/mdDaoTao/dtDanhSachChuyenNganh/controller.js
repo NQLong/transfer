@@ -24,24 +24,18 @@ module.exports = app => {
     //APIs -------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/page/:pageNumber/:pageSize', checkDaoTaoPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            donVi = req.query.donVi || 'all',
-            namHoc = req.query.namHoc ? parseInt(req.query.namHoc) : null,
-            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
-            statement = 'lower(ten) LIKE :searchTerm',
-            parameter = { searchTerm };
-        if (donVi != 'all') {
-            parameter.donVi = parseInt(donVi);
-            parameter.namHoc = namHoc;
-            statement = 'khoa = :donVi AND (:namHoc IS NULL OR (namHoc = :namHoc)) AND lower(ten) LIKE :searchTerm';
-        }
-        let condition = { statement, parameter };
-        app.model.dtDanhSachChuyenNganh.getPage(pageNumber, pageSize, condition, '*', 'khoa', (error, page) => {
-            page.pageCondition = {
-                searchTerm, donVi, nam: namHoc
-            };
-            res.send({ error, page });
+            pageSize = parseInt(req.params.pageSize);
+        let filter = app.stringify({ ...req.query.filter, maNganh: req.query.maNganh, nam: req.query.namHoc }),
+            searchTerm = req.query.searchTerm || '';
+        app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            const pageCondition = searchTerm;
+            res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
         });
+    });
+
+    app.get('/api/dao-tao/danh-sach-chuyen-nganh/item/:id', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        app.model.dtDanhSachChuyenNganh.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/dao-tao/danh-sach-chuyen-nganh', app.permission.orCheck('dtNganhDaoTao:write', 'manager:write'), (req, res) => {

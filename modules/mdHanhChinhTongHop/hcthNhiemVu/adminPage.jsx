@@ -8,7 +8,7 @@ import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/Ad
 import Pagination from 'view/component/Pagination';
 import { createNhiemVu, deleteNhiemVu, getHcthNhiemVuPage, searchNhiemVu, updateNhiemVu } from './redux';
 
-const { doUuTienMapper, nhiemVuSelector } = require('../constant');
+const { doUuTienMapper, nhiemVuSelector, trangThaiNhiemVu } = require('../constant');
 
 class hcthNhiemVuPage extends AdminPage {
     state = { searching: false, loaiDonVi: [] };
@@ -133,9 +133,9 @@ class hcthNhiemVuPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Độ ưu tiên</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Người tạo</th>
-                    {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th> */}
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày kết thúc</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trạng thái</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
@@ -176,6 +176,9 @@ class hcthNhiemVuPage extends AdminPage {
                             item.ngayKetThuc ? (<>
                                 <span style={{ color: 'red' }}> {T.dateToText(item.ngayKetThuc, 'dd/mm/yyyy')}</span>
                             </>) : null
+                        } />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center', color: trangThaiNhiemVu[item.trangThai].color }} content={
+                            trangThaiNhiemVu[item.trangThai].text
                         } />
 
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{}}

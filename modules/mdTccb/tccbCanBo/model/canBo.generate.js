@@ -76,8 +76,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM TCHC_CAN_BO' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+            const sqlCount = 'SELECT COUNT(*) FROM TCHC_CAN_BO' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done(error);
                 } else {
@@ -156,8 +156,8 @@ module.exports = app => {
         },
 
         getDashboardData: (time, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_data(:time, :nhanSuDonVi, :qtDiNuocNgoai, :qtCongTacTrongNuoc, :nhanSuCongTac); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, time, nhanSuDonVi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtDiNuocNgoai: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtCongTacTrongNuoc: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhanSuCongTac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_data(:time, :nhanSuDonVi, :qtDiNuocNgoai, :qtCongTacTrongNuoc, :qtNghiPhep, :qtNghiThaiSan, :nhanSuCongTac); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, time, nhanSuDonVi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtDiNuocNgoai: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtCongTacTrongNuoc: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtNghiPhep: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtNghiThaiSan: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhanSuCongTac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

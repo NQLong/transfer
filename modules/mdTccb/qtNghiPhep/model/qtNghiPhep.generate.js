@@ -1,6 +1,6 @@
-// Table name: QT_NGHI_PHEP { shcc, lyDo, noiDen, batDau, batDauType, ketThuc, ketThucType, ghiChu, id, lyDoKhac }
+// Table name: QT_NGHI_PHEP { shcc, lyDo, noiDen, batDau, batDauType, ketThuc, ketThucType, ghiChu, id, lyDoKhac, ngayDiDuong }
 const keys = ['ID'];
-const obj2Db = { 'shcc': 'SHCC', 'lyDo': 'LY_DO', 'noiDen': 'NOI_DEN', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'ghiChu': 'GHI_CHU', 'id': 'ID', 'lyDoKhac': 'LY_DO_KHAC' };
+const obj2Db = { 'shcc': 'SHCC', 'lyDo': 'LY_DO', 'noiDen': 'NOI_DEN', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'ghiChu': 'GHI_CHU', 'id': 'ID', 'lyDoKhac': 'LY_DO_KHAC', 'ngayDiDuong': 'NGAY_DI_DUONG' };
 
 module.exports = app => {
     app.model.qtNghiPhep = {
@@ -76,8 +76,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+            const sqlCount = 'SELECT COUNT(*) FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done(error);
                 } else {

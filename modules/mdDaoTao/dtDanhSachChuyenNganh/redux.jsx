@@ -74,7 +74,13 @@ export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition
     const page = T.updatePage('pageDtDanhSachChuyenNganh', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dao-tao/danh-sach-chuyen-nganh/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition.searchTerm, donVi: pageCondition.donVi, namHoc: pageCondition.nam }, data => {
+        T.get(url, {
+            searchTerm: pageCondition.searchTerm,
+            filter: {
+                donVi: pageCondition.donVi,
+                namHoc: pageCondition.nam
+            }
+        }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chuyên ngành bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -152,10 +158,12 @@ export function changeDtDanhSachChuyenNganh(item) {
     return { type: DtDanhSachChuyenNganhUpdate, item };
 }
 
-export const SelectAdapter_DtDanhSachChuyenNganh = {
-    ajax: true,
-    url: '/api/dao-tao/danh-sach-chuyen-nganh/page/1/20',
-    data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
-    fetchOne: (id, done) => (getDtDanhSachChuyenNganh(id, item => done && done({ id: item.id, text: item.tenNganh })))(),
+export const SelectAdapter_DtDanhSachChuyenNganh = (maNganh = '', namHoc = '') => {
+    return {
+        ajax: true,
+        url: '/api/dao-tao/danh-sach-chuyen-nganh/page/1/20',
+        data: params => ({ searchTerm: params.term, maNganh, namHoc }),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
+        fetchOne: (id, done) => (getDtDanhSachChuyenNganh(id, item => done && done({ id: item.id, text: item.ten })))(),
+    };
 };

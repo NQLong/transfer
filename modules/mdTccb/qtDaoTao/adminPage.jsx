@@ -139,7 +139,7 @@ class QtDaoTao extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
                             {item.tenChucVu ? <>{item.tenChucVu} <br /></> : ''}
-                            {(item.tenDonVi || '').normalizedName()}
+                            {(item.tenDonVi || '')}
                         </>
                     )} />
                     <TableCell type='text' style={{}} content={item.chuyenNganh} />
@@ -191,7 +191,7 @@ class QtDaoTao extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
                             {item.tenChucVu ? <>{item.tenChucVu} <br /></> : ''}
-                            {(item.tenDonVi || '').normalizedName()}
+                            {(item.tenDonVi || '')}
                         </>
                     )} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={this.list(item.danhSachChuyenNganh, item.soQuaTrinh, item.soQuaTrinh)} />

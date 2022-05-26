@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DEN { id, ngayNhan, donViGui, soCongVan, ngayCongVan, trichYeu, canBoNhan, ngayHetHan, quyenChiDao, chiDao, trangThai, soDen, nhacNho }
+// Table name: HCTH_CONG_VAN_DEN { id, ngayNhan, donViGui, soCongVan, ngayCongVan, trichYeu, canBoNhan, ngayHetHan, quyenChiDao, chiDao, trangThai, soDen, nhacNho, nguoiTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 'soCongVan': 'SO_CONG_VAN', 'ngayCongVan': 'NGAY_CONG_VAN', 'trichYeu': 'TRICH_YEU', 'canBoNhan': 'CAN_BO_NHAN', 'ngayHetHan': 'NGAY_HET_HAN', 'quyenChiDao': 'QUYEN_CHI_DAO', 'chiDao': 'CHI_DAO', 'trangThai': 'TRANG_THAI', 'soDen': 'SO_DEN', 'nhacNho': 'NHAC_NHO' };
+const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 'soCongVan': 'SO_CONG_VAN', 'ngayCongVan': 'NGAY_CONG_VAN', 'trichYeu': 'TRICH_YEU', 'canBoNhan': 'CAN_BO_NHAN', 'ngayHetHan': 'NGAY_HET_HAN', 'quyenChiDao': 'QUYEN_CHI_DAO', 'chiDao': 'CHI_DAO', 'trangThai': 'TRANG_THAI', 'soDen': 'SO_DEN', 'nhacNho': 'NHAC_NHO', 'nguoiTao': 'NGUOI_TAO' };
 
 module.exports = app => {
     app.model.hcthCongVanDen = {
@@ -76,8 +76,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DEN' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+            const sqlCount = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DEN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done(error);
                 } else {

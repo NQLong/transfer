@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, donViNhanNgoai, trangThai, loaiCongVan, soDi, soCongVan, noiBo, laySo }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'donViNhanNgoai': 'DON_VI_NHAN_NGOAI', 'trangThai': 'TRANG_THAI', 'loaiCongVan': 'LOAI_CONG_VAN', 'soDi': 'SO_DI', 'soCongVan': 'SO_CONG_VAN', 'noiBo': 'NOI_BO', 'laySo': 'LAY_SO' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
@@ -76,8 +76,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+            const sqlCount = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done(error);
                 } else {

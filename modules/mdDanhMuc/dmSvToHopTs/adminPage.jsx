@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmSvToHopTsPage, deleteDmSvToHopTs, createDmSvToHopTs, updateDmSvToHopTs } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox, getValue } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { SelectAdapter_DmSvMonThi } from '../dmSvMonThi/redux';
 
@@ -11,7 +11,7 @@ class EditModal extends AdminModal {
   onShow = (item) => {
     let { maToHop, mon1, mon2, mon3, ghiChu } = item ? item : { maToHop: '', mon1: '', mon2: '', mon3: '', ghiChu: '' };
 
-    this.setState({ item });
+    this.setState({ maToHop });
     this.maToHop.value(maToHop);
     this.mon1.value(mon1);
     this.mon2.value(mon2);
@@ -23,26 +23,13 @@ class EditModal extends AdminModal {
     e.preventDefault();
     const changes = {
       maToHop: this.maToHop.value().trim(),
-      mon1: Number(this.mon1.value()),
-      mon2: Number(this.mon2.value()),
-      mon3: Number(this.mon3.value()),
+      mon1: Number(getValue(this.mon1)),
+      mon2: Number(getValue(this.mon2)),
+      mon3: Number(getValue(this.mon3)),
       ghiChu: this.ghiChu.value()
     };
-    if (changes.maToHop == '') {
-      T.notify('Tên không được bị trống!', 'danger');
-      this.maToHop.focus();
-    } else if (!changes.mon1) {
-      T.notify('Môn 1 không được bị trống!', 'danger');
-      this.mon1.focus();
-    } else if (!changes.mon2) {
-      T.notify('Môn 2 không được bị trống!', 'danger');
-      this.mon2.focus();
-    } else if (!changes.mon3) {
-      T.notify('Môn 3 không được bị trống!', 'danger');
-      this.mon3.focus();
-    } else {
-      this.state.item ? this.props.update(changes.maToHop, changes, this.hide) : this.props.create(changes, this.hide);
-    }
+    this.state.maToHop ? this.props.update(changes.maToHop, changes, this.hide) : this.props.create(changes, this.hide);
+
   };
 
   changeKichHoat = value => this.kichHoat.value(value);
@@ -50,7 +37,7 @@ class EditModal extends AdminModal {
   render = () => {
     const readOnly = this.props.readOnly;
     return this.renderModal({
-      title: this.state.id ? 'Tạo mới tổ hợp thi' : 'Cập nhật tổ hợp thi',
+      title: this.state.maToHop ? 'Cập nhật tổ hợp thi' : 'Tạo mới tổ hợp thi',
       size: 'large',
       body: <div className='row'>
         <FormTextBox type='text' className='col-12' ref={e => this.maToHop = e} label='Mã tổ hợp' readOnly={readOnly} required />
@@ -59,13 +46,15 @@ class EditModal extends AdminModal {
         <FormSelect className='col-4' ref={e => this.mon3 = e} label='Môn 3' readOnly={readOnly} data={SelectAdapter_DmSvMonThi} required />
         <FormRichTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
       </div>
-    }
-    );
+    });
   }
 }
 
 class DmSvToHopTsPage extends AdminPage {
   componentDidMount() {
+    let route = T.routeMatcher('/user/:menu/to-hop-thi').parse(window.location.pathname);
+    this.menu = route.menu == 'dao-tao' ? 'dao-tao' : 'category';
+    T.ready(`/user/${this.menu}`);
     T.onSearch = (searchText) => this.props.getDmSvToHopTsPage(undefined, undefined, searchText || '');
     T.showSearchBox();
     this.props.getDmSvToHopTsPage();
@@ -78,17 +67,14 @@ class DmSvToHopTsPage extends AdminPage {
 
   delete = (e, item) => {
     T.confirm('Xóa tổ hợp thi', `Bạn có chắc bạn muốn xóa tổ hợp thi ${item.maToHop ? `<b>${item.maToHop}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-      isConfirm && this.props.deleteDmSvToHopTs(item.maNganh, error => {
-        if (error) T.notify(error.message ? error.message : `Xoá tổ hợp thi ${item.maToHop} bị lỗi!`, 'danger');
-        else T.alert(`Xoá tổ hợp thi ${item.maToHop} thành công!`, 'success', false, 800);
-      });
+      isConfirm && this.props.deleteDmSvToHopTs(item.maToHop);
     });
     e.preventDefault();
   }
 
   render() {
     const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permission = this.getUserPermission('dmSvToHopTs', ['read', 'write', 'delete']);
+      permission = this.getUserPermission('dmSvToHopTs');
 
     const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmSvToHopTs && this.props.dmSvToHopTs.page ?
       this.props.dmSvToHopTs.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
@@ -115,7 +101,7 @@ class DmSvToHopTsPage extends AdminPage {
             <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenMon3} />
             <TableCell content={item.ghiChu} />
             <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-              onChanged={value => this.props.updateDmSvToHopTs(item.id, { kichHoat: Number(value) })} />
+              onChanged={value => this.props.updateDmSvToHopTs(item.maToHop, { kichHoat: Number(value) })} />
             <TableCell type='buttons' content={item} permission={permission}
               onEdit={() => this.modal.show(item)} onDelete={this.delete} />
           </tr>
@@ -124,10 +110,10 @@ class DmSvToHopTsPage extends AdminPage {
 
 
     return this.renderPage({
-      icon: 'fa fa-list-alt',
+      icon: this.menu == 'category' ? 'fa fa-list-alt' : 'fa fa-object-group',
       title: 'Ngành theo tổ hợp thi',
       breadcrumb: [
-        <Link key={0} to='/user/category'>Danh mục</Link>,
+        <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'dao-tao' ? 'Đào tạo' : 'Danh mục'}</Link>,
         'Ngành theo tổ hợp thi'
       ],
       content: <>
@@ -137,7 +123,7 @@ class DmSvToHopTsPage extends AdminPage {
         <EditModal ref={e => this.modal = e} permission={permission}
           create={this.props.createDmSvToHopTs} update={this.props.updateDmSvToHopTs} permissions={currentPermissions} />
       </>,
-      backRoute: '/user/category',
+      backRoute: `/user/${this.menu}`,
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null
     });
   }
