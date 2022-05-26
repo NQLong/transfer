@@ -56,13 +56,13 @@ module.exports = app => {
         app.model.dtKhungDaoTao.getAll({ namDaoTao: nam, maNganh }, (error, items) => {
             if (error) res.send({ error });
             else {
-                let listPromise = [];
-                items.forEach(item => listPromise.push(new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, 'maMonHoc,tenMonHoc,tinhChatMon', null, (error, listMonHocCtdt) => {
-                    listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
-                    resolve(listMonHocCtdt || []);
-                }))));
+                let listPromise = items.map(item => {
+                    return new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, 'maMonHoc,tenMonHoc,tinhChatMon', null, (error, listMonHocCtdt) => {
+                        listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
+                        resolve(listMonHocCtdt || []);
+                    }));
+                });
                 Promise.all(listPromise).then(listMonHocCtdt => {
-                    // console.log(listMonHocCtdt);
                     let listMonHoc = listMonHocCtdt.flat();
                     let listMonHocChung = listMonHoc.filter((value, index, self) =>
                         index === self.findIndex((t) => (
