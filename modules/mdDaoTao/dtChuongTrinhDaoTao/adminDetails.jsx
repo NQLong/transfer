@@ -109,6 +109,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 
     handleNganh = (value) => {
         this.tenNganhVi.value(value.name);
+        this.khoa.value(value.khoa);
         this.tenVanBangVi.value('Cử nhân ' + value.name);
         this.setState({ tenNganhVi: value.name, maNganh: value?.id || null }, () => {
             this.chuyenNganh.value('');
@@ -186,29 +187,30 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                     <h3 className='tile-title'>1. Thông tin chung về chương trình đào tạo</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <div className='row col-12' style={{ display: 'flex', alignItems: 'end' }}>
-                                <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
+                            <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
 
-                                <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
-                                <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' required />
-                                <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
-                                    <FormTabs tabs={[
-                                        {
-                                            title: <>Tên ngành tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
-                                            component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên ngành (tiếng Việt)' required />
-                                        },
-                                        {
-                                            title: <>Tên ngành tiếng Anh</>,
-                                            component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' />
-                                        }
-                                    ]} />
-                                </div>
+                            <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
+                            <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' />
+                            <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
+                                <FormTabs tabs={[
+                                    {
+                                        title: <>Tên ngành tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
+                                        component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên ngành (tiếng Việt)' required />
+                                    },
+                                    {
+                                        title: <>Tên ngành tiếng Anh</>,
+                                        component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' />
+                                    }
+                                ]} />
                             </div>
 
 
                             <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' required readOnly={readOnly} />
-                            <FormTextBox type='number' suffix=' năm' step={0.5} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect data={[
+                                { id: 4, text: '4 năm' },
+                                { id: 3.5, text: '3,5 năm' }
+                            ]} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
                             <div className='form-group col-md-12'>
                                 <label>Tên văn bằng sau khi tốt nghiệp: </label>
                                 <FormTabs tabs={[

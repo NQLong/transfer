@@ -340,7 +340,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namDaoTao} />
                     <TableCell style={{ textAlign: 'center' }} content={item.maNganh} />
-                    <TableCell content={item.tenNganh} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenNganh} />
                     <TableCell style={{ textAlign: 'center' }} content={item.trinhDoDaoTao} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.loaiHinhDaoTao} />
                     <TableCell style={{ textAlign: 'center' }} content={item.thoiGianDaoTao + ' năm'} />

@@ -2,67 +2,11 @@ import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const DtDanhSachChuyenNganhGetPage = 'DtDanhSachChuyenNganh:GetPage';
-const DtDanhSachChuyenNganhUpdate = 'DtDanhSachChuyenNganh:Update';
-const DtDanhSachChuyenNganhDelete = 'DtDanhSachChuyenNganh:Delete';
-const DtDanhSachChuyenNganhCreate = 'DtDanhSachChuyenNganh:Create';
 
 export default function DtDanhSachChuyenNganhReducer(state = null, data) {
     switch (data.type) {
         case DtDanhSachChuyenNganhGetPage:
             return Object.assign({}, state, { page: data.page });
-        case DtDanhSachChuyenNganhUpdate:
-            if (state) {
-                let updatedItems = Object.assign({}, state.items),
-                    updatedPage = Object.assign({}, state.page),
-                    updatedItem = data.item;
-                if (updatedItems) {
-                    for (let i = 0, n = updatedItems.length; i < n; i++) {
-                        if (updatedItems[i].id == updatedItem.id) {
-                            updatedItems.splice(i, 1, updatedItem);
-                            break;
-                        }
-                    }
-                }
-                if (updatedPage) {
-                    for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].id == updatedItem.id) {
-                            updatedPage.list.splice(i, 1, updatedItem);
-                            break;
-                        }
-                    }
-                }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
-            } else {
-                return null;
-            }
-        case DtDanhSachChuyenNganhDelete:
-            if (state) {
-                let
-                    updatedPage = Object.assign({}, state.page),
-                    deletedItem = data.item;
-                if (updatedPage) {
-                    for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].id == deletedItem.id) {
-                            updatedPage.list.splice(i, 1);
-                            break;
-                        }
-                    }
-                }
-                return Object.assign({}, state, { page: updatedPage });
-            } else {
-                return null;
-            }
-        case DtDanhSachChuyenNganhCreate:
-            if (state) {
-                let updatedPage = Object.assign({}, state.page),
-                    createdItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list.unshift(createdItem);
-                }
-                return Object.assign({}, state, { page: updatedPage });
-            } else {
-                return null;
-            }
         default:
             return state;
     }
@@ -70,16 +14,13 @@ export default function DtDanhSachChuyenNganhReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDtDanhSachChuyenNganh');
-export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition) {
-    const page = T.updatePage('pageDtDanhSachChuyenNganh', pageNumber, pageSize, pageCondition);
+export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition, filter) {
+    const page = T.updatePage('pageDtDanhSachChuyenNganh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/dao-tao/danh-sach-chuyen-nganh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, {
-            searchTerm: pageCondition.searchTerm,
-            filter: {
-                donVi: pageCondition.donVi,
-                namHoc: pageCondition.nam
-            }
+            searchTerm: pageCondition,
+            filter
         }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chuyên ngành bị lỗi!', 'danger');
@@ -115,7 +56,7 @@ export function createDtDanhSachChuyenNganh(item, done) {
                 if (done) done(data.error);
             } else {
                 T.notify('Tạo mới thông tin chuyên ngành thành công!', 'success');
-                dispatch({ type: DtDanhSachChuyenNganhCreate, item: data.item });
+                dispatch(getDtDanhSachChuyenNganhPage());
                 if (done) done(data.item);
             }
         }, () => T.notify('Tạo chuyên ngành bị lỗi!', 'danger'));
@@ -131,7 +72,7 @@ export function deleteDtDanhSachChuyenNganh(id) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa chuyên ngành thành công!', 'success', false, 800);
-                dispatch({ type: DtDanhSachChuyenNganhDelete, item: { id } });
+                dispatch(getDtDanhSachChuyenNganhPage());
             }
         }, () => T.notify('Xóa chuyên chuyên ngành bị lỗi!', 'danger'));
     };
@@ -147,15 +88,11 @@ export function updateDtDanhSachChuyenNganh(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin chuyên ngành thành công!', 'success');
-                dispatch({ type: DtDanhSachChuyenNganhUpdate, item: data.item });
+                dispatch(getDtDanhSachChuyenNganhPage());
                 if (done) done();
             }
         }, () => T.notify('Cập nhật thông tin chuyên ngành bị lỗi!', 'danger'));
     };
-}
-
-export function changeDtDanhSachChuyenNganh(item) {
-    return { type: DtDanhSachChuyenNganhUpdate, item };
 }
 
 export const SelectAdapter_DtDanhSachChuyenNganh = (maNganh = '', namHoc = '') => {
