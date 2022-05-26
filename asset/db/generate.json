@@ -13694,10 +13694,10 @@
                 },
                 "NGACH": {
                     "value": "ngach",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": 10
                 },
                 "HIEU_LUC_HOP_DONG": {
                     "value": "hieuLucHopDong",

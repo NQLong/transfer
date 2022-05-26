@@ -2395,6 +2395,9 @@ CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_SEARCH_PAGE(
     canBoXem IN STRING,
     loaiCanBo IN NUMBER,
     status IN STRING,
+    timeType IN NUMBER,
+    fromTime IN NUMBER,
+    toTime IN NUMBER,
     searchTerm IN STRING,
     totalItem OUT NUMBER,
     pageTotal OUT NUMBER)
@@ -2538,6 +2541,46 @@ BEGIN
                       status IS NULL OR hcthCVD.TRANG_THAI = status
                       )
                   AND (
+                              timeType IS NULL
+                          OR (
+                                          fromTime IS NULL
+                                      AND toTime IS NULL
+                                  )
+                          OR (
+                                          timeType IS NOT NULL
+                                      AND (
+                                                      fromTime IS NULL
+                                                  OR (
+                                                              (
+                                                                          timeType = 1
+                                                                      AND hcthCVD.NGAY_GUI IS NOT NULL
+                                                                      AND hcthCVD.NGAY_GUI >= fromTime
+                                                                  )
+                                                              OR (
+                                                                          timeType = 2
+                                                                      AND hcthCVD.NGAY_KY IS NOT NULL
+                                                                      AND hcthCVD.NGAY_KY >= fromTime
+                                                                  )
+                                                          )
+                                              )
+                                      AND (
+                                                      toTime IS NULL
+                                                  OR (
+                                                              (
+                                                                          timeType = 1
+                                                                      AND hcthCVD.NGAY_GUI IS NOT NULL
+                                                                      AND hcthCVD.NGAY_GUI <= toTime
+                                                                  )
+                                                              OR (
+                                                                          timeType = 2
+                                                                      AND hcthCVD.NGAY_KY IS NOT NULL
+                                                                      AND hcthCVD.NGAY_KY <= toTime
+                                                                  )
+                                                          )
+                                              )
+                                  )
+                      )
+                  AND (
                               ST = ''
                           OR LOWER(hcthCVD.TRICH_YEU) LIKE ST
                           OR LOWER(dvg.TEN) LIKE ST
@@ -2633,7 +2676,8 @@ BEGIN
                         ROW_NUMBER() OVER (ORDER BY hcthCVD.ID DESC) R
                  FROM HCTH_CONG_VAN_DI hcthCVD
                           LEFT JOIN DM_DON_VI dvg on (hcthCVD.DON_VI_GUI = dvg.MA)
-                          LEFT JOIN DM_LOAI_CONG_VAN lvb on hcthCVD.LOAI_VAN_BAN is not null and lvb.ID = hcthCVD.LOAI_VAN_BAN
+                          LEFT JOIN DM_LOAI_CONG_VAN lvb
+                                    on hcthCVD.LOAI_VAN_BAN is not null and lvb.ID = hcthCVD.LOAI_VAN_BAN
                  WHERE (
                                ((
                                             donViGui IS NULL
@@ -2763,6 +2807,46 @@ BEGIN
                                    )
                                AND (
                                    status IS NULL OR hcthCVD.TRANG_THAI = status
+                                   )
+                               AND (
+                                           timeType IS NULL
+                                       OR (
+                                                       fromTime IS NULL
+                                                   AND toTime IS NULL
+                                               )
+                                       OR (
+                                                       timeType IS NOT NULL
+                                                   AND (
+                                                                   fromTime IS NULL
+                                                               OR (
+                                                                           (
+                                                                                       timeType = 1
+                                                                                   AND hcthCVD.NGAY_GUI IS NOT NULL
+                                                                                   AND hcthCVD.NGAY_GUI >= fromTime
+                                                                               )
+                                                                           OR (
+                                                                                       timeType = 2
+                                                                                   AND hcthCVD.NGAY_KY IS NOT NULL
+                                                                                   AND hcthCVD.NGAY_KY >= fromTime
+                                                                               )
+                                                                       )
+                                                           )
+                                                   AND (
+                                                                   toTime IS NULL
+                                                               OR (
+                                                                           (
+                                                                                       timeType = 1
+                                                                                   AND hcthCVD.NGAY_GUI IS NOT NULL
+                                                                                   AND hcthCVD.NGAY_GUI <= toTime
+                                                                               )
+                                                                           OR (
+                                                                                       timeType = 2
+                                                                                   AND hcthCVD.NGAY_KY IS NOT NULL
+                                                                                   AND hcthCVD.NGAY_KY <= toTime
+                                                                               )
+                                                                       )
+                                                           )
+                                               )
                                    )
                                AND (
                                            ST = ''
