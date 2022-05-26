@@ -76,8 +76,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sqlCount = 'SELECT COUNT(*) FROM QT_HOP_DONG_TRACH_NHIEM' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+            const sql_count = 'SELECT COUNT(*) FROM QT_HOP_DONG_TRACH_NHIEM' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
                 if (error) {
                     done(error);
                 } else {
@@ -133,6 +133,11 @@ module.exports = app => {
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM QT_HOP_DONG_TRACH_NHIEM' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
+        },
+
+        searchPage: (pagenumber, pagesize, filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_hop_dong_trach_nhiem_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

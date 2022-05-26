@@ -101,7 +101,6 @@ class QtDaoTao extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete']);
-        let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtDaoTao && this.props.qtDaoTao.pageGr ?
                 this.props.qtDaoTao.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -240,7 +239,7 @@ class QtDaoTao extends AdminPage {
                     </div>
                     {this.checked ? groupTable : table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.checked ? this.props.getQtDaoTaoGroupPage : this.props.getQtDaoTaoPage} />
                 <DaoTaoModal ref={e => this.modal = e} isCanBo={false}
                     create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao}
