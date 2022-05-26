@@ -43,11 +43,39 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        const condition = req.query.condition || {};
-        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
-        app.model.dtChuongTrinhDaoTao.getAll(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
+    app.get('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        app.model.dtChuongTrinhDaoTao.getAll(req.query.condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
     });
+
+    app.get('/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/:nam/:maNganh', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {
+        // let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        // let nam = thoiGianMoMon.nam, maNganh = req.query.maNganh;
+        let { nam, maNganh } = req.params;
+
+        //Lấy tất cả CTDT của ngành đó trong năm (e.g, Ngành Báo chí có 2 chuyên ngành vào năm 2022: Báo điện tử, Báo chính thống --> Lấy hết)
+        app.model.dtKhungDaoTao.getAll({ namDaoTao: nam, maNganh }, (error, items) => {
+            if (error) res.send({ error });
+            else {
+                let listPromise = items.map(item => {
+                    return new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, 'maMonHoc,tenMonHoc,tinhChatMon', null, (error, listMonHocCtdt) => {
+                        listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
+                        resolve(listMonHocCtdt || []);
+                    }));
+                });
+                Promise.all(listPromise).then(listMonHocCtdt => {
+                    let listMonHoc = listMonHocCtdt.flat();
+                    let listMonHocChung = listMonHoc.filter((value, index, self) =>
+                        index === self.findIndex((t) => (
+                            t.maMonHoc === value.maMonHoc && t.tinhChatMon === 0
+                        ))
+                    );
+                    let listMonHocChuyenNganh = listMonHoc.filter(item => item.tinhChatMon == 1);
+                    res.send({ listMonHocChung, listMonHocChuyenNganh });
+                });
+            }
+        });
+    });
+
 
     app.get('/api/dao-tao/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const condition = req.query.condition || {};
