@@ -197,49 +197,44 @@ module.exports = app => {
         if (changes.isStaff) changes.isStaff = Number(changes.isStaff);
         if (changes.isStudent) changes.isStudent = Number(changes.isStudent);
         if (changes.active) changes.active = Number(changes.active);
-
         if (req.body.email == req.session.user.email && changes.active == 0) {
             res.send({ error: 'Cannot deactive your account!' });
         } else {
             new Promise((resolve, reject) => {
-                if (changes.roles && Array.isArray(changes.roles)) {
-                    app.model.fwUser.get({ email: req.body.email }, (error, user) => {
-                        if (error) {
-                            reject(error);
-                        } else if (user) {
-                            app.model.fwRole.getAll({}, (error, roles) => {
-                                if (error) {
-                                    reject(error);
-                                } else if (roles) {
-                                    app.model.fwUserRole.delete({ email: req.body.email }, error => {
-                                        if (error) {
-                                            reject(error);
-                                        } else {
-                                            const roleIds = roles.map(role => role.id);
+                app.model.fwUser.get({ email: req.body.email }, (error, user) => {
+                    if (error) {
+                        reject(error);
+                    } else if (user) {
+                        app.model.fwRole.getAll({}, (error, roles) => {
+                            if (error) {
+                                reject(error);
+                            } else if (roles) {
+                                app.model.fwUserRole.delete({ email: 'buihaphuong81@hcmussh.edu.vn' }, error => {
+                                    if (error) {
+                                        reject(error);
+                                    } else {
+                                        const roleIds = roles.map(role => role.id);
+                                        if (changes.roles && changes.roles.length) {
                                             changes.roles.forEach(roleId => {
                                                 roleId = Number(roleId);
                                                 if (roleIds.indexOf(roleId) != -1) {
                                                     app.model.fwUserRole.create({ email: req.body.email, roleId }, () => { });
                                                 }
                                             });
-
-                                            if (req.body.email == req.session.user.email) {
-                                                //TODO: update session user
-                                            }
+                                            resolve();
+                                        } else {
                                             resolve();
                                         }
-                                    });
-                                } else {
-                                    reject('System has errors!');
-                                }
-                            });
-                        } else {
-                            reject('Invalid email!');
-                        }
-                    });
-                } else {
-                    resolve();
-                }
+                                    }
+                                });
+                            } else {
+                                reject('System has errors!');
+                            }
+                        });
+                    } else {
+                        reject('Invalid email!');
+                    }
+                });
             }).then(() => {
                 delete changes.roles;
                 if (Object.keys(changes).length > 0) {
