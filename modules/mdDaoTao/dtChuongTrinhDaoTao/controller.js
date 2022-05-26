@@ -51,11 +51,14 @@ module.exports = app => {
         // let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         // let nam = thoiGianMoMon.nam, maNganh = req.query.maNganh;
         let { nam, maNganh } = req.params;
+
+        //Lấy tất cả CTDT của ngành đó trong năm (e.g, Ngành Báo chí có 2 chuyên ngành vào năm 2022: Báo điện tử, Báo chính thống --> Lấy hết)
         app.model.dtKhungDaoTao.getAll({ namDaoTao: nam, maNganh }, (error, items) => {
             if (error) res.send({ error });
             else {
                 let listPromise = [];
                 items.forEach(item => listPromise.push(new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, 'maMonHoc,tenMonHoc,tinhChatMon', null, (error, listMonHocCtdt) => {
+                    listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
                     resolve(listMonHocCtdt || []);
                 }))));
                 Promise.all(listPromise).then(listMonHocCtdt => {

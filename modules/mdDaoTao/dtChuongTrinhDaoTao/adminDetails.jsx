@@ -190,7 +190,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                 <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
 
                                 <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
-                                <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' required />
+                                <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' />
                                 <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
                                     <FormTabs tabs={[
                                         {

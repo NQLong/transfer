@@ -87,8 +87,8 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
             permissionManager = this.getUserPermission('manager');
         let permission = {
             read: permissionDaoTao.read || permissionManager.read,
-            write: permissionManager.write,
-            delete: permissionManager.write
+            write: permissionDaoTao.write,
+            delete: permissionDaoTao.delete
         };
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtDanhSachChuyenNganh && this.props.dtDanhSachChuyenNganh.page ?
             this.props.dtDanhSachChuyenNganh.page : {
