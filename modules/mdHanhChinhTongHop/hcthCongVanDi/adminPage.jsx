@@ -21,7 +21,7 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import {
     SelectAdapter_DmDonViGuiCongVan
 } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-
+const { loaiCongVan } = require('../constant');
 
 const listTrangThai = {
     '1': {
@@ -51,8 +51,8 @@ const listTrangThai = {
 };
 
 const selectCongVan = [
-    { id: 1, text: 'Công văn của đơn vị' },
-    { id: 2, text: 'Công văn của trường' }
+    { id: 1, text: 'Công văn đơn vị' },
+    { id: 2, text: 'Công văn trường' }
 ];
 
 class HcthCongVanDi extends AdminPage {
@@ -161,6 +161,8 @@ class HcthCongVanDi extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Số công văn</th>
+                    <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Loại công văn</th>
+                    <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Loại văn bản</th>
                     <th style={{ width: '100%', verticalAlign: 'middle' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời gian</th>
                     <th style={{ width: 'auto', verticalAlign: 'middle' }}>Đơn vị gửi</th>
@@ -169,14 +171,17 @@ class HcthCongVanDi extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
-                let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
-                let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
-                let danhSachDonViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';');
+                let danhSachDonViNhan = item.danhSachDonViNhan?.split(';'),
+                    danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';'),
+                    danhSachDonViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';'),
+                    loaiCongVanItem = item.loaiCongVan && loaiCongVan[item.loaiCongVan];
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`${baseUrl}/${item.id}`)} content={item.soCongVan ? item.soCongVan : 'Chưa có số công văn'} />
-                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.trichYeu || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: loaiCongVanItem ? loaiCongVanItem.color : 'blue' }} content={loaiCongVanItem?.text} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.tenLoaiVanBan} />
+                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%', minWidth: '250px' }} content={item.trichYeu || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
@@ -238,7 +243,7 @@ class HcthCongVanDi extends AdminPage {
                 <FormSelect style={{ width: '200px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
             </>,
             content: <>
-                <div className="tile">
+                <div className="tile" style={{ overflowX: 'auto' }}>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}

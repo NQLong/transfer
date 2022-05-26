@@ -9,7 +9,7 @@ module.exports = {
     },
 
     trangThaiCongVanDi: {
-        MOI: { id: '1', text: 'Mới'},
+        MOI: { id: '1', text: 'Mới' },
         CHO_KIEM_TRA: { id: '2', text: 'Chờ kiểm tra' },
         CHO_DUYET: { id: '3', text: 'Chờ duyệt' },
         TRA_LAI: { id: '4', text: 'Trả lại' },
@@ -90,7 +90,7 @@ module.exports = {
 
     trangThaiNhiemVu: {
         DONG: { id: 'DONG', text: 'Đóng', value: 2, color: 'red' },
-        MO: { id: 'MO', text: 'Mở', value: 0, color: '#149414'}
+        MO: { id: 'MO', text: 'Mở', value: 0, color: '#149414' }
     },
 
     nhiemVuSelector: {
@@ -98,5 +98,18 @@ module.exports = {
         NHIEM_VU_DON_VI: { id: 'NHIEM_VU_DON_VI', text: 'Nhiệm vụ của đơn vị' },
         NHIEM_VU_CUA_BAN: { id: 'NHIEM_VU_CUA_BAN', text: 'Nhiệm vụ của bạn' },
         NHIEM_VU_THAM_GIA: { id: 'NHIEM_VU_THAM_GIA', text: 'Nhiệm vụ đang tham gia' },
+    },
+
+    loaiCongVan: {
+        DON_VI: {
+            id: 'DON_VI',
+            text: 'Công văn đơn vị',
+            color: 'blue',
+        },
+        TRUONG: {
+            id: 'TRUONG',
+            text: 'Công văn trường',
+            color: 'red',
+        }
     }
 };
