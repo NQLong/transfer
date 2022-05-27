@@ -744,11 +744,7 @@ module.exports = app => {
             });
             res.send({ error: null });
         } catch (error) {
-            if (res.error == 400) {
-                res.send({ error: 400 });
-            } else {
-                res.send({ error });
-            }
+            res.send({ error });
         }
     });
 

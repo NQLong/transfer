@@ -43,7 +43,7 @@ T.initPage('pageDmSvDoiTuongTs');
 export function getDmSvDoiTuongTsPage(pageNumber, pageSize, pageCondition, done) {
   const page = T.updatePage('pageDmSvDoiTuongTs', pageNumber, pageSize);
   return dispatch => {
-    const url = `/api/danh-muc/dao-tao/doi-tuong-tuyen-sinh/page/${page.pageNumber}/${page.pageSize}`;
+    const url = `/api/danh-muc/doi-tuong-tuyen-sinh/page/${page.pageNumber}/${page.pageSize}`;
     T.get(url, { condition: pageCondition }, data => {
       if (data.error) {
         T.notify('Lấy danh sách đối tượng bị lỗi!', 'danger');
@@ -58,7 +58,7 @@ export function getDmSvDoiTuongTsPage(pageNumber, pageSize, pageCondition, done)
 
 export function getDmSvDoiTuongTs(ma, done) {
   return () => {
-    const url = `/api/danh-muc/dao-tao/doi-tuong-tuyen-sinh/item/${ma}`;
+    const url = `/api/danh-muc/doi-tuong-tuyen-sinh/item/${ma}`;
     T.get(url, data => {
       if (data.error) {
         T.notify('Lấy thông tin đối tượng bị lỗi!', 'danger');
@@ -72,7 +72,7 @@ export function getDmSvDoiTuongTs(ma, done) {
 
 export function createDmSvDoiTuongTs(item, done) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/doi-tuong-tuyen-sinh';
+    const url = '/api/danh-muc/doi-tuong-tuyen-sinh';
     T.post(url, { data: item }, data => {
       if (data.error) {
         T.notify(data.error.message || 'Tạo đối tượng bị lỗi', 'danger');
@@ -89,7 +89,7 @@ export function createDmSvDoiTuongTs(item, done) {
 
 export function deleteDmSvDoiTuongTs(ma) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/doi-tuong-tuyen-sinh';
+    const url = '/api/danh-muc/doi-tuong-tuyen-sinh';
     T.delete(url, { ma: ma }, data => {
       if (data.error) {
         T.notify('Xóa danh mục đối tượng bị lỗi!', 'danger');
@@ -104,7 +104,7 @@ export function deleteDmSvDoiTuongTs(ma) {
 
 export function updateDmSvDoiTuongTs(ma, changes, done) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/doi-tuong-tuyen-sinh';
+    const url = '/api/danh-muc/doi-tuong-tuyen-sinh';
     T.put(url, { ma, changes }, data => {
       if (data.error || changes == null) {
         T.notify(data.error.message || 'Cập nhật thông tin đối tượng bị lỗi', 'danger');
@@ -125,7 +125,7 @@ export function changeDmSvDoiTuongTs(item) {
 
 export const SelectAdapter_DmSvDoiTuongTs = {
   ajax: true,
-  url: '/api/danh-muc/dao-tao/doi-tuong-tuyen-sinh/page/1/20',
+  url: '/api/danh-muc/doi-tuong-tuyen-sinh/page/1/20',
   data: params => ({ condition: params.term }),
   processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
   getOne: getDmSvDoiTuongTs,

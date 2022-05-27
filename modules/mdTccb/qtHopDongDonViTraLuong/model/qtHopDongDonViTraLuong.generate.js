@@ -1,6 +1,6 @@
-// Table name: QT_HOP_DONG_DON_VI_TRA_LUONG { id, shcc, loaiHopDong, nguoiKy, ngayKyHopDong, batDauLamViec, ketThucHopDong, ngayTaiKy, donViTraLuong, chucDanh, ngach, bac, heSo, phanTramHuong, soHopDong, diaDiemLamViec, congViecDuocGiao, chiuSuPhanCong }
+// Table name: QT_HOP_DONG_DON_VI_TRA_LUONG { id, shcc, loaiHopDong, nguoiKy, ngayKyHopDong, batDauLamViec, ketThucHopDong, ngayTaiKy, donViTraLuong, chucDanhNgheNghiep, ngach, bac, heSo, phanTramHuong, soHopDong, diaDiemLamViec, congViecDuocGiao, chiuSuPhanCong }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'loaiHopDong': 'LOAI_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayTaiKy': 'NGAY_TAI_KY', 'donViTraLuong': 'DON_VI_TRA_LUONG', 'chucDanh': 'CHUC_DANH', 'ngach': 'NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'phanTramHuong': 'PHAN_TRAM_HUONG', 'soHopDong': 'SO_HOP_DONG', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'congViecDuocGiao': 'CONG_VIEC_DUOC_GIAO', 'chiuSuPhanCong': 'CHIU_SU_PHAN_CONG' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'loaiHopDong': 'LOAI_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayTaiKy': 'NGAY_TAI_KY', 'donViTraLuong': 'DON_VI_TRA_LUONG', 'chucDanhNgheNghiep': 'CHUC_DANH_NGHE_NGHIEP', 'ngach': 'NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'phanTramHuong': 'PHAN_TRAM_HUONG', 'soHopDong': 'SO_HOP_DONG', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'congViecDuocGiao': 'CONG_VIEC_DUOC_GIAO', 'chiuSuPhanCong': 'CHIU_SU_PHAN_CONG' };
 
 module.exports = app => {
     app.model.qtHopDongDonViTraLuong = {
@@ -138,6 +138,16 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, filter, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=qt_hop_dong_don_vi_tra_luong_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        groupPage: (pagenumber, pagesize, filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_hop_dong_don_vi_tra_luong_group_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        getShccByDonVi: (madonvi, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_hop_dong_don_vi_tra_luong_shcc_by_don_vi(:madonvi); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, madonvi }, done);
         },
     };
 };
