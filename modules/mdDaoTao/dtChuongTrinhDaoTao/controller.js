@@ -47,33 +47,57 @@ module.exports = app => {
         app.model.dtChuongTrinhDaoTao.getAll(req.query.condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/:nam/:maNganh', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {
-        // let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        // let nam = thoiGianMoMon.nam, maNganh = req.query.maNganh;
-        let { nam, maNganh } = req.params;
+    app.get('/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/:khoa/:maNganh', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {
+        let { khoa, maNganh } = req.params;
 
         //Lấy tất cả CTDT của ngành đó trong năm (e.g, Ngành Báo chí có 2 chuyên ngành vào năm 2022: Báo điện tử, Báo chính thống --> Lấy hết)
-        app.model.dtKhungDaoTao.getAll({ namDaoTao: nam, maNganh }, (error, items) => {
-            if (error) res.send({ error });
-            else {
-                let listPromise = items.map(item => {
-                    return new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, 'maMonHoc,tenMonHoc,tinhChatMon', null, (error, listMonHocCtdt) => {
-                        listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
-                        resolve(listMonHocCtdt || []);
-                    }));
-                });
-                Promise.all(listPromise).then(listMonHocCtdt => {
-                    let listMonHoc = listMonHocCtdt.flat();
-                    let listMonHocChung = listMonHoc.filter((value, index, self) =>
-                        index === self.findIndex((t) => (
-                            t.maMonHoc === value.maMonHoc && t.tinhChatMon === 0
-                        ))
-                    );
-                    let listMonHocChuyenNganh = listMonHoc.filter(item => item.tinhChatMon == 1);
-                    res.send({ listMonHocChung, listMonHocChuyenNganh });
-                });
-            }
+        app.model.dtCauTrucKhungDaoTao.get({ khoa }, (error, item) => {
+            app.model.dtKhungDaoTao.getAll({ namDaoTao: item.id, maNganh }, (error, items) => {
+                if (error) res.send({ error });
+                else {
+                    let listPromise = items.map(item => {
+                        return new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, 'maMonHoc,tenMonHoc,tinhChatMon,soTietLyThuyet,soTietThucHanh,loaiMonHoc', null, (error, listMonHocCtdt) => {
+                            listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
+                            resolve(listMonHocCtdt || []);
+                        }));
+                    });
+                    app.model.dtDanhSachChuyenNganh.getAll({ namHoc: item.id }, (error, danhSachChuyenNganh) => {
+                        if (error) res.send({ error });
+                        else {
+                            let chuyenNganhMapper = {};
+                            danhSachChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
+                            Promise.all(listPromise).then(listMonHocCtdt => {
+                                let listMonHoc = listMonHocCtdt.flat().map(item => {
+                                    item.isMo = 0;
+                                    return item;
+                                });
+                                let listMonHocChung = listMonHoc.filter((value, index, self) =>
+                                    index === self.findIndex((t) => (
+                                        t.maMonHoc === value.maMonHoc && t.tinhChatMon === 0
+                                    ))
+                                ).map(item => {
+                                    item.chuyenNganh = '';
+                                    return item;
+                                });
+                                let monTheoChuyenNganh = listMonHoc
+                                    .filter(item => item.tinhChatMon == 1)
+                                    .map(item => {
+                                        item.tenChuyenNganh = chuyenNganhMapper[item.chuyenNganh];
+                                        return item;
+                                    })
+                                    .groupBy('tenChuyenNganh');
+                                let listMonHocChuyenNganh = Object.keys(monTheoChuyenNganh).map(item => {
+                                    return { tenChuyenNganh: item, danhSachMonChuyenNganh: monTheoChuyenNganh[item] };
+                                });
+                                res.send({ listMonHocChung, listMonHocChuyenNganh });
+                            });
+                        }
+                    });
+
+                }
+            });
         });
+
     });
 
 

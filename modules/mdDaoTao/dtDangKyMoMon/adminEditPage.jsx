@@ -8,6 +8,7 @@ import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { createDtThoiKhoaBieu } from '../dtThoiKhoaBieu/redux';
 import Loading from 'view/component/Loading';
+import MonHocCtdtModal from './DangKyModal';
 class SubjectModal extends AdminModal {
     state = { item: {} }
     onShow = (khoaSinhVien) => {
@@ -62,6 +63,7 @@ class DtDsMonMoEditPage extends AdminPage {
         this.id = route.id;
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
+                console.log(data);
                 let { danhSachMonMo } = data,
                     danhSachTheoKhoaSV = danhSachMonMo.groupBy('khoaSinhVien');
                 [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach(khoaSV => {
@@ -202,7 +204,7 @@ class DtDsMonMoEditPage extends AdminPage {
                 <div className='tile-footer' />
                 {(!this.state.expired && !this.state.isDuyet) ? <div style={{ textAlign: 'right' }}>
                     <Tooltip title='Thêm môn học' arrow>
-                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.addMonHoc.show(khoaSV)}>
+                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.monHocCtdt.show({ khoaSV, maNganh: this.props.dtDanhSachMonMo.thongTinKhoaNganh.maNganh })}>
                             <i className='fa fa-lg fa-plus' /> Bổ sung môn học
                         </button>
                     </Tooltip>
@@ -241,7 +243,7 @@ class DtDsMonMoEditPage extends AdminPage {
                 }
                 />}
                 <SubjectModal ref={e => this.addMonHoc = e} create={this.props.createDtDanhSachMonMo} maDangKy={this.id} />
-
+                <MonHocCtdtModal ref={e => this.monHocCtdt = e} />
                 {(permission.write && !this.state.isDuyet) ? <CirclePageButton type='custom' tooltip='Phòng Đào Tạo xác nhận' customIcon='fa-check-square-o' style={{ marginRight: '65px' }} onClick={e => this.duyetDangKy(e)} /> : null}
             </>,
             backRoute: '/user/dao-tao/dang-ky-mo-mon',

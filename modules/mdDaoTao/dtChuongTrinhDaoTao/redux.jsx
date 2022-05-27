@@ -203,3 +203,17 @@ export const SelectAdapter_ChuongTrinhDaoTaoFilter = (maNganh = null) => {
 export function changeDtChuongTrinhDaoTao(item) {
     return { type: DtChuongTrinhDaoTaoUpdate, item };
 }
+
+
+export function getDanhSachMonChuongTrinhDaoTao(khoa, maNganh, done) {
+    return () => {
+        T.get(`/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/${khoa}/${maNganh}`, result => {
+            if (result.error) {
+                T.notify('Lấy danh sách môn CTDT lỗi', 'danger');
+                console.error(result.error);
+            } else {
+                done(result);
+            }
+        });
+    };
+}
