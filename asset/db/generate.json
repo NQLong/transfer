@@ -13497,7 +13497,9 @@
             "moduleName": "qtHopDongDonViTraLuong",
             "modelName": "qtHopDongDonViTraLuong",
             "methods": {
-                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage"
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage",
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_GROUP_PAGE": "groupPage",
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SHCC_BY_DON_VI": "getShccByDonVi"
             },
             "columns": {
                 "ID": {
@@ -13637,6 +13639,9 @@
             "active": true,
             "moduleName": "qtHopDongTrachNhiem",
             "modelName": "qtHopDongTrachNhiem",
+            "methods": {
+                "QT_HOP_DONG_TRACH_NHIEM_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "SO_HOP_DONG": {
                     "value": "soHopDong",

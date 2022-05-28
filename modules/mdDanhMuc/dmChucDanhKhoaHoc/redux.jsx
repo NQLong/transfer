@@ -146,3 +146,13 @@ export const SelectAdapter_DmChucDanhKhoaHoc = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmChucDanhKhoaHoc(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };
+
+export const SelectAdapter_DmChucDanhKhoaHocV2 = {
+    ajax: true,
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    url: '/api/danh-muc/chuc-danh-khoa-hoc/page/1/20',
+    getOne: getDmChucDanhKhoaHoc,
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmChucDanhKhoaHoc(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+    processResultOne: response => response && ({ value: response.ma, text: response.ten }),
+};

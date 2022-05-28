@@ -28,9 +28,10 @@ module.exports = app => {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
+
         app.model.dtNganhDaoTao.getPage(pageNumber, pageSize, {
-            statement: '(:donVi) IS NULL OR khoa = (: donVi)',
-            parameter: { donVi }
+            statement: '((:donVi) IS NULL OR khoa = (: donVi)) AND (lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText)',
+            parameter: { donVi, searchText: `%${req.query.condition || ''}%` }
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
