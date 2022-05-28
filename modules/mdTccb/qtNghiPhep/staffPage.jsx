@@ -58,7 +58,7 @@ class EditModal extends AdminModal {
                     if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
                         this.props.getNghiPhep(items[idx].lyDo, itemNghiPhep => {
                             let value = T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, this.props.danhSachNgayLe);
-                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
+                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep - (items[idx].ngayDiDuong ? items[idx].ngayDiDuong : 0), 0);
                             if (currentId != items[idx].id) result -= value;
                             solve(idx + 1);
                         });
