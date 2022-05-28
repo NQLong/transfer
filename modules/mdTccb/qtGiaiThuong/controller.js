@@ -46,14 +46,46 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/qua-trinh/giai-thuong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtGiaiThuong.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/giai-thuong', app.permission.check('qtGiaiThuong:write'), (req, res) => {
+        app.model.qtGiaiThuong.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Giải thưởng');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/giai-thuong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtGiaiThuong.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/giai-thuong/create-multiple', app.permission.check('qtGiaiThuong:write'), (req, res) => {
+        const { listShcc, tenGiaiThuong, noiDung, noiCap, namCap, soQuyetDinh } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Giải thưởng');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, tenGiaiThuong, noiDung, noiCap, namCap, soQuyetDinh
+            };
+            app.model.qtGiaiThuong.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
 
-    app.delete('/api/qua-trinh/giai-thuong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtGiaiThuong.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/giai-thuong', app.permission.check('qtGiaiThuong:write'), (req, res) => {
+        app.model.qtGiaiThuong.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Giải thưởng');
+            res.send({ error, item });
+        });
+    });
+
+    app.delete('/api/qua-trinh/giai-thuong', app.permission.check('qtGiaiThuong:write'), (req, res) => {
+        app.model.qtGiaiThuong.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Giải thưởng');
+            res.send({ error });
+        });
+    });
 
     app.post('/api/user/qua-trinh/giai-thuong', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {

@@ -7,7 +7,7 @@ import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
-    getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuoc,
+    getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuocMultiple,
     updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage
 }
     from './redux';
@@ -76,6 +76,20 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            noiDen: this.noiDen.value().toString(),
+            vietTat: this.vietTat.value(),
+            lyDo: this.lyDo.value(),
+            kinhPhi: this.kinhPhi.value(),
+            ghiChu: this.ghiChu.value(),
+            soCv: this.soCv.value(),
+            ngayQuyetDinh: this.ngayQuyetDinh.value() ? Number(this.ngayQuyetDinh.value()) : '',
+
+            batDauType: this.state.batDauType,
+            batDau: this.batDau.getVal(),
+            ketThucType: this.state.ketThucType,
+            ketThuc: this.ketThuc.getVal(),
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.shcc.focus();
@@ -95,34 +109,13 @@ class EditModal extends AdminModal {
             T.notify('Ngày đi lớn hơn ngày về', 'danger');
             this.batDau.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    noiDen: this.noiDen.value().toString(),
-                    vietTat: this.vietTat.value(),
-                    lyDo: this.lyDo.value(),
-                    kinhPhi: this.kinhPhi.value(),
-                    ghiChu: this.ghiChu.value(),
-                    soCv: this.soCv.value(),
-                    ngayQuyetDinh: this.ngayQuyetDinh.value() ? Number(this.ngayQuyetDinh.value()) : '',
-
-                    batDauType: this.state.batDauType,
-                    batDau: this.batDau.getVal(),
-                    ketThucType: this.state.ketThucType,
-                    ketThuc: this.ketThuc.getVal(),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.shcc.reset();
-                    this.noiDen.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -407,7 +400,7 @@ class QtCongTacTrongNuoc extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtCongTacTrongNuoc} update={this.props.updateQtCongTacTrongNuoc}
+                    create={this.props.createQtCongTacTrongNuocMultiple} update={this.props.updateQtCongTacTrongNuoc}
                     permissions={currentPermissions}
                 />
             </>,
@@ -425,7 +418,7 @@ class QtCongTacTrongNuoc extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtCongTacTrongNuoc: state.tccb.qtCongTacTrongNuoc });
 const mapActionsToProps = {
-    getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuoc,
+    getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuocMultiple,
     updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtCongTacTrongNuoc);

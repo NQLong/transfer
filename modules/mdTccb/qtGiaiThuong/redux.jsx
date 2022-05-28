@@ -104,11 +104,25 @@ export function createQtGiaiThuongStaff(data, done) {
                 T.notify('Tạo giải thưởng bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
-                if (done) {
-                    T.notify('Tạo giải thưởng thành công!', 'success');
-                    done(data);
-                    dispatch(getQtGiaiThuongPage());
-                }
+                T.notify('Tạo giải thưởng thành công!', 'success');
+                dispatch(getQtGiaiThuongPage());
+                done && done(data);
+            }
+        }, () => T.notify('Tạo giải thưởng bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtGiaiThuongMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/giai-thuong/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Tạo giải thưởng bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                T.notify('Tạo giải thưởng thành công!', 'success');
+                dispatch(getQtGiaiThuongPage());
+                done && done(data);
             }
         }, () => T.notify('Tạo giải thưởng bị lỗi!', 'danger'));
     };
