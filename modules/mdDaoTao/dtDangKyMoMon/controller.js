@@ -60,8 +60,7 @@ module.exports = app => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             hocKy = thoiGianMoMon.hocKy,
             nam = thoiGianMoMon.nam;
-        let { data, id } = req.body,
-            isDuyet = data.isDuyet || 0,
+        let { data, id, isDuyet } = req.body,
             thoiGian = new Date().getTime(),
             changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
             isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
@@ -78,7 +77,7 @@ module.exports = app => {
                     } else {
                         let monHoc = list[index];
                         delete monHoc.id;
-                        app.model.dtDanhSachMonMo.create({ ...monHoc, nam, hocKy }, (error, item) => {
+                        app.model.dtDanhSachMonMo.create(monHoc, (error, item) => {
                             if (error || !item) reject(error);
                             else {
                                 newDanhSach.push(item);

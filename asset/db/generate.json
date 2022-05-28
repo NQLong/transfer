@@ -10073,6 +10073,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "10,0"
+                },
+                "nguoiTao": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TEN_FILE": {
+                    "value": "tenFile",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "KICH_THUOC": {
+                    "value": "kichThuoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -11843,8 +11864,8 @@
                     "nullable": true,
                     "size": "2,0"
                 },
-                "SO_TIET": {
-                    "value": "soTiet",
+                "SO_TIET_BUOI": {
+                    "value": "soTietBuoi",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12854,8 +12875,8 @@
                 "DT_DANH_SACH_MON_MO_GET_CURRENT": "getCurrent"
             },
             "columns": {
-                "MON_HOC_KHOA": {
-                    "value": "monHocKhoa",
+                "KHOA": {
+                    "value": "khoa",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12917,8 +12938,8 @@
                     "nullable": true,
                     "size": 15
                 },
-                "MA_CTDT": {
-                    "value": "maCtdt",
+                "CHUYEN_NGANH": {
+                    "value": "chuyenNganh",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12952,8 +12973,8 @@
                     "nullable": true,
                     "size": "22,0"
                 },
-                "SO_NHOM": {
-                    "value": "soNhom",
+                "SO_LOP": {
+                    "value": "soLop",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12966,8 +12987,8 @@
                     "nullable": true,
                     "size": "5,0"
                 },
-                "KHOA_SINH_VIEN": {
-                    "value": "khoaSinhVien",
+                "KHOA_SV": {
+                    "value": "khoaSv",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
