@@ -126,6 +126,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/qua-trinh/ho-tro-hoc-phi/create-multiple', app.permission.check('qtHoTroHocPhi:write'), (req, res) => {
+        const { listShcc, ngayLamDon, noiDung, coSoDaoTao, hocKyHoTro, soTien, hoSo, ghiChu, batDauType, batDau, ketThucType, ketThuc } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Hỗ trợ học phí');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, ngayLamDon, noiDung, coSoDaoTao, hocKyHoTro, soTien, hoSo, ghiChu, batDauType, batDau, ketThucType, ketThuc
+            };
+            app.model.qtHoTroHocPhi.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('qtHoTroHocPhi:write'), (req, res) => {
         app.model.qtHoTroHocPhi.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Hỗ trợ học phí');
