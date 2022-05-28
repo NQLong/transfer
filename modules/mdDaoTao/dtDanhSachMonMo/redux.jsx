@@ -1,4 +1,4 @@
-import { saveDangKyMoMon } from '../dtDangKyMoMon/redux';
+// import { saveDangKyMoMon } from '../dtDangKyMoMon/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const dtDanhSachMonMoGetCurrent = 'dtDanhSachMoMon:GetCurrent';
@@ -41,26 +41,28 @@ export function getDtDanhSachMonMoCurrent(id, done) {
                 console.error(data.error.message);
             }
             else {
-                data.chuongTrinhDaoTao = data.chuongTrinhDaoTao.map(item => {
-                    item.tenMonHoc = T.parse(item.tenMonHoc).vi;
-                    item.maDangKy = id;
-                    return item;
-                });
-                if (!data.danhSachMonMo.length) {
-                    data.danhSachMonMo = data.chuongTrinhDaoTao;
-                    saveDangKyMoMon(id, data.chuongTrinhDaoTao.map(item => {
-                        item.maDangKy = id;
-                        return item;
-                    }), () => {
-                        T.notify('Lấy danh sách dự kiến từ CTĐT các khóa', 'info');
-                        dispatch({ type: dtDanhSachMonMoGetCurrent, data });
-                        done && done(data);
-                    });
-                }
-                else {
-                    dispatch({ type: dtDanhSachMonMoGetCurrent, data });
-                    done && done(data);
-                }
+                dispatch({ type: dtDanhSachMonMoGetCurrent, data });
+                done && done(data);
+                // data.chuongTrinhDaoTao = data.chuongTrinhDaoTao.map(item => {
+                //     item.tenMonHoc = T.parse(item.tenMonHoc).vi;
+                //     item.maDangKy = id;
+                //     return item;
+                // });
+                // if (!data.danhSachMonMo.length) {
+                //     data.danhSachMonMo = data.chuongTrinhDaoTao;
+                //     saveDangKyMoMon(id, data.chuongTrinhDaoTao.map(item => {
+                //         item.maDangKy = id;
+                //         return item;
+                //     }), () => {
+                //         T.notify('Lấy danh sách dự kiến từ CTĐT các khóa', 'info');
+                //         dispatch({ type: dtDanhSachMonMoGetCurrent, data });
+                //         done && done(data);
+                //     });
+                // }
+                // else {
+                //     dispatch({ type: dtDanhSachMonMoGetCurrent, data });
+                //     done && done(data);
+                // }
 
             }
         });
