@@ -5,7 +5,7 @@ import { AdminModal, AdminPage, FormDatePicker, FormSelect, FormTextBox, renderT
 import Pagination from 'view/component/Pagination';
 import { SelectAdapter_FwCanBo } from '../../mdTccb/tccbCanBo/redux';
 import {
-    getQtBangPhatMinhPage, deleteQtBangPhatMinhStaff, createQtBangPhatMinhStaff,
+    getQtBangPhatMinhPage, deleteQtBangPhatMinhStaff, createQtBangPhatMinhMultiple,
     updateQtBangPhatMinhStaff, getQtBangPhatMinhGroupPage
 }
     from './redux';
@@ -44,6 +44,15 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            tenBang: this.tenBang.value(),
+            soHieu: this.soHieu.value(),
+            namCap: this.namCap.value().getYear() + 1900,
+            noiCap: this.noiCap.value(),
+            tacGia: this.tacGia.value(),
+            sanPham: this.sanPham.value(),
+            loaiBang: this.loaiBang.value(),
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
@@ -57,28 +66,13 @@ class EditModal extends AdminModal {
             T.notify('Năm cấp bằng phát minh trống', 'danger');
             this.namCap.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    tenBang: this.tenBang.value(),
-                    soHieu: this.soHieu.value(),
-                    namCap: this.namCap.value().getYear() + 1900,
-                    noiCap: this.noiCap.value(),
-                    tacGia: this.tacGia.value(),
-                    sanPham: this.sanPham.value(),
-                    loaiBang: this.loaiBang.value(),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -89,9 +83,9 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
-                <FormTextBox className='col-md-12' ref={e => this.tenBang = e} label='Tên bằng phát minh' readOnly={readOnly}/>
-                <FormTextBox className='col-md-6' ref={e => this.soHieu = e} label='Số hiệu bằng phát minh' readOnly={readOnly}/>
-                <FormDatePicker className='col-md-6' type='year-mask' ref={e => this.namCap = e} label='Năm cấp bằng phát minh' placeholder='Năm cấp' readOnly={readOnly}/>
+                <FormTextBox className='col-md-12' ref={e => this.tenBang = e} label='Tên bằng phát minh' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.soHieu = e} label='Số hiệu bằng phát minh' readOnly={readOnly} required />
+                <FormDatePicker className='col-md-6' type='year-mask' ref={e => this.namCap = e} label='Năm cấp bằng phát minh' placeholder='Năm cấp' readOnly={readOnly} required/>
                 <FormTextBox className='col-md-6' ref={e => this.noiCap = e} label='Nơi cấp bằng phát minh' readOnly={readOnly}/>
                 <FormTextBox className='col-md-6' ref={e => this.tacGia = e} label='Tác giả bằng phát minh' readOnly={readOnly}/>
                 <FormTextBox className='col-md-6' ref={e => this.sanPham = e} label='Sản phẩm' readOnly={readOnly}/>
@@ -271,7 +265,7 @@ class QtBangPhatMinh extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write}
-                    create={this.props.createQtBangPhatMinhStaff} update={this.props.updateQtBangPhatMinhStaff}
+                    create={this.props.createQtBangPhatMinhMultiple} update={this.props.updateQtBangPhatMinhStaff}
                 />
             </>,
             backRoute: '/user/' + this.menu,
@@ -282,7 +276,7 @@ class QtBangPhatMinh extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtBangPhatMinh: state.khcn.qtBangPhatMinh });
 const mapActionsToProps = {
-    getQtBangPhatMinhPage, deleteQtBangPhatMinhStaff, createQtBangPhatMinhStaff,
+    getQtBangPhatMinhPage, deleteQtBangPhatMinhStaff, createQtBangPhatMinhMultiple,
     updateQtBangPhatMinhStaff, getQtBangPhatMinhGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtBangPhatMinh);

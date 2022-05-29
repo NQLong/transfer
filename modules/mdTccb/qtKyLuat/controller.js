@@ -141,6 +141,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/tccb/qua-trinh/ky-luat/create-multiple', app.permission.check('qtKyLuat:write'), (req, res) => { 
+        const { listShcc, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Kỷ luật');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh
+            };
+            app.model.qtKyLuat.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
         app.model.qtKyLuat.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Kỷ luật');

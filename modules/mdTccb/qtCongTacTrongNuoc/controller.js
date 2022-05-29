@@ -126,6 +126,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/qua-trinh/cong-tac-trong-nuoc/create-multiple', app.permission.check('qtCongTacTrongNuoc:write'), (req, res) => {
+        const { listShcc, noiDen, vietTat, lyDo, kinhPhi, ghiChu, soCv, ngayQuyetDinh, batDauType, batDau, ketThucType, ketThuc } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Công tác trong nước');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, noiDen, vietTat, lyDo, kinhPhi, ghiChu, soCv, ngayQuyetDinh, batDauType, batDau, ketThucType, ketThuc
+            };
+            app.model.qtCongTacTrongNuoc.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('qtCongTacTrongNuoc:write'), (req, res) => {
         app.model.qtCongTacTrongNuoc.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Công tác trong nước');

@@ -171,7 +171,7 @@ class UpdateQuyetDinhModal extends AdminModal {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức danh khoa học<br />Trình độ chuyên môn</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
-                    <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian được kéo dài</th>
                 </tr>
             ),
             renderRow: (item, index) => {
