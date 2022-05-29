@@ -47,7 +47,6 @@ class FileModal extends React.Component {
                 delete body.id;
                 this.props.updateStorage(this.state.id, body);
             } else {
-                console.log('body',this.fileBox.current);
                 this.fileBox.current.onUploadFile(body);
             }
             $(this.modal.current).modal('hide');
