@@ -13443,7 +13443,7 @@ BEGIN
                  LEFT JOIN DM_BANG_DAO_TAO bdt on qtdt.LOAI_BANG_CAP = bdt.MA
                  LEFT JOIN DM_HINH_THUC_DAO_TAO htdt on qtdt.HINH_THUC = htdt.MA
                  LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TDDT.MA = qtdt.TRINH_DO
-        where qtdt.SHCC = mtcb;
+        where qtdt.SHCC = mtcb AND qtdt.KET_THUC != -1;
 
     return CAN_BO;
 END;
