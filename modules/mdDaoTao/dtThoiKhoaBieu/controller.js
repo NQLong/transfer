@@ -120,7 +120,6 @@ module.exports = app => {
 
     app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), (req, res) => {
         let { condition, changes } = req.body;
-        console.log(condition, changes);
         if (typeof condition == 'number') app.model.dtThoiKhoaBieu.update(condition, changes, (error, item) => res.send({ error, item }));
         else if (typeof condition == 'object') {
             let { nam, hocKy, maMonHoc, maNganh } = condition;
@@ -142,10 +141,7 @@ module.exports = app => {
         let phong = req.query.phong;
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         let listNgayLe = await app.model.dmNgayLe.getAllNgayLeTrongNam(thoiGianMoMon.khoa);
-        console.log('##Thời gian mở môn:', thoiGianMoMon);
         app.model.dtThoiKhoaBieu.getCalendar(phong, thoiGianMoMon.nam, thoiGianMoMon.hocKy, (error, items) => {
-            console.log('##get calendar error:', error);
-            console.log('##items calendar:', items);
             res.send({ error, items: items?.rows || [], listNgayLe });
         });
     });

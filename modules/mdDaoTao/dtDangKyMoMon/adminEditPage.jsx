@@ -105,7 +105,6 @@ class DtDsMonMoEditPage extends AdminPage {
     onSave = () => {
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        console.log(data);
         this.props.saveDangKyMoMon(this.id, data);
     }
 

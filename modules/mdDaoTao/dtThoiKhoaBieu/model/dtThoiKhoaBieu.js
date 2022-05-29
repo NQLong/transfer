@@ -240,7 +240,6 @@ module.exports = app => {
                 let { soTietLyThuyet, soTietThucHanh, soBuoiTuan, soTietBuoi } = item,
                     tongTiet = soTietLyThuyet + soTietThucHanh,
                     soTuan = Math.ceil(tongTiet / (soTietBuoi * soBuoiTuan));
-                console.log(monHoc.ngayBatDau, soTietLyThuyet, soTietThucHanh, tongTiet, soTuan, monHoc.ngayBatDau + soTuan * 7 * DATE_UNIX);
                 let ngayKetThuc = monHoc.ngayBatDau + soTuan * 7 * DATE_UNIX;
                 for (let ngayLe of listNgayLe) {
                     if (ngayLe.ngay > monHoc.ngayBatDau && ngayLe.ngay <= ngayKetThuc && new Date(ngayLe.ngay).getDay() == monHoc.thu - 1) ngayKetThuc += 7 * DATE_UNIX;

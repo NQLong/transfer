@@ -7,7 +7,6 @@ import { createDtDanhSachMonMo } from '../dtDanhSachMonMo/redux';
 class MonHocCtdtModal extends AdminModal {
     state = { listMonHocChonChung: [], listMonHocChonChuyenNganh: [] }
     onShow = (item) => {
-        // console.log('#####item', item);
         let { khoaSv, thongTinKhoaNganh, maDangKy } = item;
         let { maNganh, khoaDangKy } = thongTinKhoaNganh;
 
@@ -160,7 +159,6 @@ class MonHocCtdtModal extends AdminModal {
 
     getData = () => {
         let { listMonHocChonChung, listMonHocChonChuyenNganh } = this.state;
-        console.log(listMonHocChonChung, listMonHocChonChuyenNganh);
         try {
             listMonHocChonChung.forEach(monHoc => {
                 ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
@@ -207,7 +205,6 @@ class MonHocCtdtModal extends AdminModal {
 
     render = () => {
         let { listMonHocChung, listMonHocChuyenNganh } = this.state;
-        // console.log(this.state.listMonHocChonChung, this.state.listMonHocChonChuyenNganh);
         return this.renderModal({
             title: 'Chọn môn học từ Chương trình đào tạo',
             size: 'elarge',

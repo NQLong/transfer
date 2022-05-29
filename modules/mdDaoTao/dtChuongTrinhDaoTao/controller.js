@@ -86,7 +86,6 @@ module.exports = app => {
                                         item.chuyenNganh = '';
                                         return item;
                                     });
-                                    console.log(danhSachMonMoChuyenNganh.map(item => ({ maMonHoc: item.maMonHoc, chuyenNganh: item.chuyenNganh })));
                                     let monTheoChuyenNganh = listMonHoc
                                         .filter(item => item.tinhChatMon == 1)
                                         .map(item => {

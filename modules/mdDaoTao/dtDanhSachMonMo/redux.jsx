@@ -73,8 +73,6 @@ export function getDtDanhSachMonMoCurrent(id, done) {
 export function createDtDanhSachMonMo(maNganh, data, done) {
     return () => {
         const url = '/api/dao-tao/danh-sach-mon-mo';
-        console.log('Data###', data);
-        console.log('MaNganh###', maNganh);
         T.post(url, { data, maNganh }, result => {
             if (result.error) {
                 T.notify(`Lỗi: ${result.error.message}`, 'danger');
