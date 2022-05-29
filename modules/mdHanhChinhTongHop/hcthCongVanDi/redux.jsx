@@ -74,7 +74,6 @@ export function createHcthCongVanDi(data, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
-                // console.log(data);
                 T.notify('Thêm công văn các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
@@ -95,7 +94,6 @@ export function updateHcthCongVanDi(id, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                // console.log(data);
                 T.notify('Cập nhật công văn các phòng thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done();
@@ -129,7 +127,6 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
         const url = `/api/hcth/cong-van-cac-phong/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                // console.log(data);
                 T.notify('Lấy danh sách công văn đi bị lỗi, s1' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
@@ -238,7 +235,6 @@ export function updateStatus(data, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/status';
         T.put(url, { data }, res => {
-            console.log(data);
             if (res.error) {
                 T.notify('Cập nhật trạng thái công văn bị lỗi,1', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
@@ -270,7 +266,6 @@ export function readCongVanDi(data, done) {
         const url = `/api/hcth/cong-van-cac-phong/read/${data.id}`;
         T.put(url, { data }, res => {
             if (res.error) {
-                // console.log(res.error);
                 if (res.error == 400) {
                     T.notify('Bạn đã đọc công văn này rồi', 'danger');
                 }

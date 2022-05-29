@@ -15,12 +15,16 @@ import {
     renderTable,
     FormSelect,
     TableCell,
+    FormDatePicker,
 } from 'view/component/AdminPage';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import {
     SelectAdapter_DmDonViGuiCongVan
 } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
+import {
+    SelectAdapter_DmLoaiCongVan
+} from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 const { loaiCongVan } = require('../constant');
 
 const listTrangThai = {
@@ -50,10 +54,22 @@ const listTrangThai = {
     }
 };
 
+const timeList = [
+    { id: 1, text: 'Theo ngày gửi' },
+    { id: 2, text: 'Theo ngày ký' }
+];
+
 const selectCongVan = [
     { id: 1, text: 'Công văn đơn vị' },
     { id: 2, text: 'Công văn trường' }
 ];
+
+const start = new Date().getFullYear(),
+    end = 1900,
+    yearSelector = [...Array(start - end + 1).keys()].map(i => ({
+        id: start - i,
+        text: start - i
+    }));
 
 class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
@@ -63,11 +79,16 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.congVanYear?.value(0);
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
                 this.maCanBoNhan?.value('');
                 this.donViNhanNgoai?.value('');
                 this.status?.value('');
+                this.timeType?.value('');
+                this.fromTime?.value('');
+                this.toTime?.value('');
+                this.loaiVanBan?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
@@ -104,14 +125,18 @@ class HcthCongVanDi extends AdminPage {
         let donViNhan = this.donViNhan?.value() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         let loaiCongVan = this.loaiCongVan?.value() || null;
-        //let congVanLaySo = this.congVanLaySo?.value() || null;
+        let loaiVanBan = this.loaiVanBan?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
         let status = this.status?.value() || null;
+        let timeType = this.timeType?.value() || null;
+        let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
+        let toTime = this.toTime?.value() ? Number(this.toTime.value()) : null;
+        let congVanYear = this.congVanYear?.value() || null;
 
         let permissions = this.props.system?.user?.permissions;
         let hcthStaff = permissions.includes('hcth:login') ? { loaiCongVan: 2 } : {};
 
-        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, status };
+        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -121,9 +146,14 @@ class HcthCongVanDi extends AdminPage {
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     this.loaiCongVan?.value(filter.loaiCongVan || '');
+                    this.loaiVanBan?.value(filter.loaiVanBan || '');
                     this.status?.value(filter.status || '');
                     this.donViNhanNgoai?.value(filter.donViNhanNgoai || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.donViNhanNgoai)) this.showAdvanceSearch();
+                    this.timeType?.value(filter.timeType || '');
+                    this.fromTime?.value(filter.fromTime || '');
+                    this.toTime?.value(filter.toTime || '');
+                    this.congVanYear?.value(filter.congVanYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.donViNhanNgoai || filter.timeType || filter.fromTime || filter.toTime || filter.loaiVanBan)) this.showAdvanceSearch();
                 }
             });
         });
@@ -158,7 +188,6 @@ class HcthCongVanDi extends AdminPage {
             emptyTable: 'Chưa có dữ liệu công văn các phòng',
             getDataSource: () => list,
             stickyHead: false,
-            header: 'thead-light',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>
@@ -241,8 +270,8 @@ class HcthCongVanDi extends AdminPage {
             breadcrumb: breadcrumb,
             onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
+                <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.congVanYear = e} placeholder="Năm" data={yearSelector} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
                 <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Loại công văn" data={selectCongVan} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
-                <FormSelect style={{ width: '200px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
             </>,
             content: <>
                 <div className="tile" style={{ overflowX: 'auto' }}>
@@ -254,10 +283,17 @@ class HcthCongVanDi extends AdminPage {
             backRoute: backRoute,
             advanceSearch: <>
                 <div className="row">
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGui = e} label='Đơn vị gửi' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanNgoai = e} label='Đơn vị nhận bên ngoài' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.loaiVanBan = e} label='Loại văn bản' data={SelectAdapter_DmLoaiCongVan} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.status = e} label='Trạng thái' data={selectStatus} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType?.value() && (<>
+                        <FormDatePicker type='date' className='col-md-4' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
+                        <FormDatePicker type='date' className='col-md-4' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
+                    </>)}
                 </div>
             </>
 
