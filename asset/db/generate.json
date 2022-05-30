@@ -13397,10 +13397,10 @@
                 },
                 "QT_ID": {
                     "value": "qtId",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 50
                 },
                 "APPROVED": {
                     "value": "approved",
