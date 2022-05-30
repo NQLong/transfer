@@ -710,20 +710,24 @@ AS
 BEGIN
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT TKB.MA_MON_HOC          AS "maMonHoc",
-                     TKB.TIET_BAT_DAU        AS "tietBatDau",
-                     TKB.NGAY_BAT_DAU        AS "ngayBatDau",
-                     TKB.NGAY_KET_THUC       AS "ngayKetThuc",
-                     TKB.SO_TIET             AS "soTiet",
-                     TKB.GIANG_VIEN          AS "giangVien",
-                     TKB.NHOM                AS "nhom",
-                     TKB.THU                 AS "thu",
+        FROM (SELECT TKB.MA_MON_HOC            AS "maMonHoc",
+                     TKB.TIET_BAT_DAU          AS "tietBatDau",
+                     TKB.NGAY_BAT_DAU          AS "ngayBatDau",
+                     TKB.NGAY_KET_THUC         AS "ngayKetThuc",
+                     TKB.SO_TIET_BUOI          AS "soTiet",
+                     TKB.GIANG_VIEN            AS "giangVien",
+                     TKB.NHOM                  AS "nhom",
+                     TKB.THU                   AS "thu",
                      TIETBD.THOI_GIAN_BAT_DAU  AS "thoiGianBatDau",
                      TIETKT.THOI_GIAN_KET_THUC AS "thoiGianKetThuc"
               FROM DT_THOI_KHOA_BIEU TKB
                        LEFT JOIN DM_CA_HOC TIETBD on TIETBD.TEN = TKB.TIET_BAT_DAU AND TIETBD.MA_CO_SO = 2
-              LEFT JOIN DM_CA_HOC TIETKT on TO_NUMBER(TIETKT.TEN) = TO_NUMBER(TKB.TIET_BAT_DAU) + TO_NUMBER(TKB.SO_TIET) AND TIETKT.MA_CO_SO = 2
-              WHERE room = TKB.PHONG AND idNam = TKB.NAM AND hocKy = TKB.HOC_KY);
+                       LEFT JOIN DM_CA_HOC TIETKT
+                                 on TO_NUMBER(TIETKT.TEN) = TO_NUMBER(TKB.TIET_BAT_DAU) + TO_NUMBER(TKB.SO_TIET) AND
+                                    TIETKT.MA_CO_SO = 2
+              WHERE room = TKB.PHONG
+                AND idNam = TKB.NAM
+                AND hocKy = TKB.HOC_KY);
     RETURN my_cursor;
 
 end;
@@ -897,7 +901,8 @@ BEGIN
         SELECT DKMM.KHOA     AS "khoaDangKy",
                DKMM.MA_NGANH AS "maNganh",
                NDT.TEN_NGANH AS "tenNganh",
-               DV.TEN        AS "tenKhoaDangKy"
+               DV.TEN        AS "tenKhoaDangKy",
+               DKMM.IS_DUYET AS "isDuyet"
         FROM DT_DANG_KY_MO_MON DKMM
                  LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = DKMM.MA_NGANH
                  LEFT JOIN DM_DON_VI DV ON DV.MA = DKMM.KHOA
@@ -940,14 +945,19 @@ BEGIN
                DS.NAM               AS "nam",
                DS.HOC_KY            AS "hocKy",
                DS.MA_NGANH          AS "maNganh",
+               DS.CHUYEN_NGANH      AS "chuyenNganh",
                DS.ID                AS "id",
-               DS.SO_NHOM           AS "soNhom",
+               DS.SO_LOP            AS "soLop",
                DS.SO_BUOI_TUAN      AS "soBuoiTuan",
                DS.SO_TIET_BUOI      AS "soTietBuoi",
                DS.SO_LUONG_DU_KIEN  AS "soLuongDuKien",
-               DS.MON_HOC_KHOA      AS "monHocKhoa",
-               DS.KHOA_SINH_VIEN    AS "khoaSinhVien"
-        FROM DT_DANH_SACH_MON_MO DS;
+               DS.KHOA              AS "monHocKhoa",
+               DS.KHOA_SV           AS "khoaSv",
+               CN.TEN               AS "tenChuyenNganh",
+               DS.MA_DANG_KY        AS "maDangKy"
+        FROM DT_DANH_SACH_MON_MO DS
+                 LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CN ON CN.ID = DS.CHUYEN_NGANH
+    WHERE DS.MA_DANG_KY = ID_DANG_KY_MO_MON;
 
     return DANH_SACH_MON_MO;
 END;
@@ -965,9 +975,10 @@ BEGIN
     SELECT COUNT(*)
     INTO totalItem
     FROM DT_KHUNG_DAO_TAO KDT
+             LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CN ON CN.ID = KDT.CHUYEN_NGANH
              LEFT JOIN DM_DON_VI DV ON DV.MA = KDT.MA_KHOA
              LEFT JOIN DT_NGANH_DAO_TAO DNDT on KDT.MA_NGANH = DNDT.MA_NGANH
-            LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO KHUNG ON KHUNG.ID = KDT.NAM_DAO_TAO
+             LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO KHUNG ON KHUNG.ID = KDT.NAM_DAO_TAO
 
     WHERE (donVi IS NULL OR donVi = '' OR TO_NUMBER(donVi) = KDT.MA_KHOA)
       AND (searchTerm = ''
@@ -983,34 +994,33 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (
-                 SELECT KDT.MA_KHOA           AS                     "maKhoa",
-                        KDT.NAM_DAO_TAO       AS                     "idNamDaoTao",
-                        KHUNG.NAM_DAO_TAO       AS                     "namDaoTao",
-                        KDT.ID                AS                     "id",
-                        KDT.MA_NGANH          AS                     "maNganh",
-                        DNDT.TEN_NGANH        AS                     "tenNganh",
-                        BDT.TEN_BAC           AS                     "trinhDoDaoTao",
-                        LHDT.TEN              AS                     "loaiHinhDaoTao",
-                        KDT.THOI_GIAN_DAO_TAO AS                     "thoiGianDaoTao",
-                        DV.TEN                AS                     "tenKhoaBoMon",
+        FROM (SELECT KDT.MA_KHOA           AS                          "maKhoa",
+                     KDT.NAM_DAO_TAO       AS                          "idNamDaoTao",
+                     KHUNG.NAM_DAO_TAO     AS                          "namDaoTao",
+                     KDT.ID                AS                          "id",
+                     KDT.MA_NGANH          AS                          "maNganh",
+                     DNDT.TEN_NGANH        AS                          "tenNganh",
+                     BDT.TEN_BAC           AS                          "trinhDoDaoTao",
+                     LHDT.TEN              AS                          "loaiHinhDaoTao",
+                     KDT.THOI_GIAN_DAO_TAO AS                          "thoiGianDaoTao",
+                     DV.TEN                AS                          "tenKhoaBoMon",
+                     CN.TEN                AS                          "tenChuyenNganh",
+                     ROW_NUMBER() OVER (ORDER BY KDT.NAM_DAO_TAO DESC) R
+              FROM DT_KHUNG_DAO_TAO KDT
+                       LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CN ON CN.ID = KDT.CHUYEN_NGANH
+                       LEFT JOIN DM_DON_VI DV ON DV.MA = KDT.MA_KHOA
+                       LEFT JOIN DT_NGANH_DAO_TAO DNDT on KDT.MA_NGANH = DNDT.MA_NGANH
+                       LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO KHUNG ON KHUNG.ID = KDT.NAM_DAO_TAO
 
-                        ROW_NUMBER() OVER (ORDER BY KDT.NAM_DAO_TAO DESC) R
-                 FROM DT_KHUNG_DAO_TAO KDT
-                          LEFT JOIN DM_DON_VI DV ON DV.MA = KDT.MA_KHOA
-                          LEFT JOIN DT_NGANH_DAO_TAO DNDT on KDT.MA_NGANH = DNDT.MA_NGANH
-                            LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO KHUNG ON KHUNG.ID = KDT.NAM_DAO_TAO
-
-                          LEFT JOIN DM_SV_BAC_DAO_TAO BDT ON BDT.MA_BAC = KDT.TRINH_DO_DAO_TAO
-                          LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = KDT.LOAI_HINH_DAO_TAO
-                 WHERE (donVi IS NULL OR donVi = '' OR TO_NUMBER(donVi) = KDT.MA_KHOA)
-                   AND (searchTerm = ''
-                     OR LOWER(TRIM(DNDT.MA_NGANH)) LIKE sT
-                     OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
-                     OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
-                     OR LOWER(TRIM(DV.TEN)) LIKE sT)
-                 ORDER BY KDT.NAM_DAO_TAO DESC
-             )
+                       LEFT JOIN DM_SV_BAC_DAO_TAO BDT ON BDT.MA_BAC = KDT.TRINH_DO_DAO_TAO
+                       LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = KDT.LOAI_HINH_DAO_TAO
+              WHERE (donVi IS NULL OR donVi = '' OR TO_NUMBER(donVi) = KDT.MA_KHOA)
+                AND (searchTerm = ''
+                  OR LOWER(TRIM(DNDT.MA_NGANH)) LIKE sT
+                  OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
+                  OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
+                  OR LOWER(TRIM(DV.TEN)) LIKE sT)
+              ORDER BY KDT.NAM_DAO_TAO DESC)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 END;
@@ -1155,7 +1165,7 @@ BEGIN
                      TKB.PHONG            AS              "phong",
                      TKB.THU              AS              "thu",
                      TKB.TIET_BAT_DAU     AS              "tietBatDau",
-                     TKB.SO_TIET          AS              "soTiet",
+                     TKB.SO_TIET_BUOI     AS              "soTiet",
                      TKB.HOC_KY           AS              "hocKy",
                      TKB.NAM              AS              "nam",
                      TKB.MA_MON_HOC       AS              "maMonHoc",
@@ -2390,6 +2400,7 @@ CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_SEARCH_PAGE(
     donViGui IN NUMBER,
     donVi IN NUMBER,
     loaiCongVan IN NUMBER,
+    loaiVanBan IN STRING,
     donViNhanNgoai IN NUMBER,
     donViXem IN STRING,
     canBoXem IN STRING,
@@ -2539,6 +2550,9 @@ BEGIN
                       )
                   AND (
                       status IS NULL OR hcthCVD.TRANG_THAI = status
+                      )
+                  AND (
+                      loaiVanBan IS NULL OR hcthCVD.LOAI_VAN_BAN = loaiVanBan
                       )
                   AND (
                               timeType IS NULL
@@ -2807,6 +2821,9 @@ BEGIN
                                    )
                                AND (
                                    status IS NULL OR hcthCVD.TRANG_THAI = status
+                                   )
+                               AND (
+                                   loaiVanBan IS NULL OR hcthCVD.LOAI_VAN_BAN = loaiVanBan
                                    )
                                AND (
                                            timeType IS NULL
