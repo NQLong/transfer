@@ -222,15 +222,15 @@ module.exports = app => {
                             user.isStaff = 1;
                             item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
-                            user.firstName = item.ten || user.firstName;
-                            user.lastName = item.ho || user.lastName;
+                            user.firstName = item.ten;
+                            user.lastName = item.ho;
                             user.maDonVi = item.maDonVi;
                             user.staff = {
                                 shcc: item.shcc,
                                 listChucVu: [],
                                 maDonVi: item.maDonVi,
                             };
-                            if (item.tienSi) app.permissionHooks.pushUserPermission(user, 'doctor:login');
+                            if (item.tienSi || item.chucDanh || item.hocVi == '02' || item.hocVi == '01') app.permissionHooks.pushUserPermission(user, 'doctor:login'); //Tiến sĩ trở lên
                             const condition = {
                                 statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
                                 parameter: {
