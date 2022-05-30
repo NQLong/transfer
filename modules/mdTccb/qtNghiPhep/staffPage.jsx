@@ -269,22 +269,22 @@ class EditModal extends AdminModal {
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
 
-                <div className='form-group col-md-5'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu: &nbsp; <Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <div className='form-group col-md-7'><DateInput ref={e => this.ketThuc = e} onChange={this.handleKetThuc} placeholder='Thời gian kết thúc'
+                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} onChange={this.handleKetThuc} placeholder='Thời gian kết thúc'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc: &nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <span className='form-group col-md-5' style={{ color: 'blue' }}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>}</span>
-                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-7' style={{ color: 'blue' }}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep} ngày </b></>}</span>}
+                <span className='form-group col-md-6' style={{ color: 'blue' }}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>}</span>
+                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-6' style={{ color: 'blue' }}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep} ngày </b></>}</span>}
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Ghi chú (tối đa 200 ký tự)' />
             </div>
         });
@@ -365,7 +365,7 @@ class QtNghiPhepUserPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br />xin nghỉ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đi<br/>đường</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đi<br />đường</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br />tính phép</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>

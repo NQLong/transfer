@@ -222,8 +222,8 @@ module.exports = app => {
                             user.isStaff = 1;
                             item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
-                            user.firstName = item.ten;
-                            user.lastName = item.ho;
+                            user.firstName = item.ten || user.firstName;
+                            user.lastName = item.ho || user.lastName;
                             user.maDonVi = item.maDonVi;
                             user.staff = {
                                 shcc: item.shcc,
