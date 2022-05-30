@@ -33,7 +33,8 @@ module.exports = {
         CHANGE_ROLE: 'CHANGE_ROLE',
         COMPLETE: 'COMPLETE',
         CLOSE: 'CLOSE',
-        REOPEN: 'REOPEN'
+        REOPEN: 'REOPEN',
+        VIEW: 'VIEW'
     },
 
     CONG_VAN_TYPE: 'DEN',

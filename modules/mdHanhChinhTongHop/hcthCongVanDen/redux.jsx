@@ -276,3 +276,18 @@ export function getChiDao(id, done) {
     };
 }
 
+export function updateQuyenChiDao(id, shcc, status, done) {
+    return () => {
+            const url = '/api/hcth/cong-van-den/quyen-chi-dao';
+            T.post(url, { id, shcc, status }, res => {
+                if (res.error) {
+                    T.notify('Thêm cán bộ chỉ đạo lỗi', 'danger');
+                    console.error('POST: ' + url + '. ' + res.error);
+                } else {
+                    if (status) T.notify('Thêm cán bộ chỉ đạo thành công', 'success');
+                    else T.notify('Xoá cán bộ chỉ đạo thành công', 'success');
+                    done && done();
+                }
+            }, () => T.notify('Thêm cán bộ chỉ đạo lỗi', 'danger'));
+    };
+}
