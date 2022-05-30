@@ -518,7 +518,7 @@ class AdminEditPage extends AdminPage {
 
     canSend = () => {
         let canEditTrangThai = [trangThaiCongVanDi.MOI.id, trangThaiCongVanDi.TRA_LAI.id].includes(this.state.trangThai);
-        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage && this.state.listDonViQuanLy.length != 0);
+        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage);
 
         return this.state.id && canEditTrangThai && permission && !this.checkNotDonVi();
     }
