@@ -42,7 +42,6 @@ class CanBoPage extends AdminPage {
     }
 
     downloadWord = (e) => {
-        console.log(this.shcc);
         e.preventDefault();
         this.shcc && this.props.downloadWord(this.shcc, data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_2c.docx');
