@@ -27,47 +27,51 @@ module.exports = app => {
                             if (error) {
                                 return error;
                             } else {
-                                let data = await getDataGenerateSchedule(lisSubjectsOfSemester.filter(item => item.isMo), listDays, listPeriods, listRooms);
-                                if (data.error) done(data);
-                                else {
-                                    app.model.dmNgayLe.getAll({
-                                        statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
-                                        parameter: {
-                                            startDateOfYear: new Date(nam, 0, 1).setHours(0, 0, 0, 1),
-                                            endDateOfYear: new Date(nam, 11, 31).setHours(23, 59, 59, 999)
-                                        }
-                                    }, (error, listNgayLe) => {
-                                        if (!error) {
-                                            listNgayLe = listNgayLe.map(item => {
-                                                item.ngay = new Date(item.ngay).setHours(0, 0, 0);
-                                                return item;
-                                            });
-                                            let dataArray = Object.keys(data.data);
-                                            const update = async (index = 0) => {
-                                                if (index == dataArray.length) {
-                                                    done({ success: 'Tạo thời khóa biểu thành công' });
-                                                } else {
-                                                    let id = dataArray[index],
-                                                        changes = data.data[id];
-                                                    let startDate = new Date(ngayBatDau),
-                                                        currentDay = startDate.getDay() + 1,
-                                                        distance = changes.thu - currentDay;
-                                                    if (distance < 0) distance += 7;
-                                                    changes.ngayBatDau = new Date(startDate.getTime() + distance * DATE_UNIX).setHours(0, 0, 0);
-                                                    if (listNgayLe.some(item => item.ngay == changes.ngayBatDau)) {
-                                                        changes.ngayBatDau = changes.ngayBatDau + 7 * DATE_UNIX;
+                                try {
+                                    let data = await getDataGenerateSchedule(lisSubjectsOfSemester.filter(item => item.isMo), listDays, listPeriods, listRooms);
+                                    if (data.error) done(data);
+                                    else {
+                                        app.model.dmNgayLe.getAll({
+                                            statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
+                                            parameter: {
+                                                startDateOfYear: new Date(nam, 0, 1).setHours(0, 0, 0, 1),
+                                                endDateOfYear: new Date(nam, 11, 31).setHours(23, 59, 59, 999)
+                                            }
+                                        }, (error, listNgayLe) => {
+                                            if (!error) {
+                                                listNgayLe = listNgayLe.map(item => {
+                                                    item.ngay = new Date(item.ngay).setHours(0, 0, 0);
+                                                    return item;
+                                                });
+                                                let dataArray = Object.keys(data.data);
+                                                const update = async (index = 0) => {
+                                                    if (index == dataArray.length) {
+                                                        done({ success: 'Tạo thời khóa biểu thành công' });
+                                                    } else {
+                                                        let id = dataArray[index],
+                                                            changes = data.data[id];
+                                                        let startDate = new Date(ngayBatDau),
+                                                            currentDay = startDate.getDay() + 1,
+                                                            distance = changes.thu - currentDay;
+                                                        if (distance < 0) distance += 7;
+                                                        changes.ngayBatDau = new Date(startDate.getTime() + distance * DATE_UNIX).setHours(0, 0, 0);
+                                                        if (listNgayLe.some(item => item.ngay == changes.ngayBatDau)) {
+                                                            changes.ngayBatDau = changes.ngayBatDau + 7 * DATE_UNIX;
+                                                        }
+                                                        changes.ngayKetThuc = await app.model.dtThoiKhoaBieu.calculateEndDate(changes, listNgayLe);
+                                                        app.model.dtThoiKhoaBieu.update({ id }, changes, (error, item) => {
+                                                            if (error || !item) done({ error: 'Lỗi khi tạo thời khóa biểu' });
+                                                            else update(index + 1);
+                                                        });
                                                     }
-                                                    changes.ngayKetThuc = await app.model.dtThoiKhoaBieu.calculateEndDate(changes, listNgayLe);
-                                                    app.model.dtThoiKhoaBieu.update({ id }, changes, (error, item) => {
-                                                        if (error || !item) done({ error: 'Lỗi khi tạo thời khóa biểu' });
-                                                        else update(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            update();
-                                        }
-                                    });
+                                                };
+                                                update();
+                                            }
+                                        });
 
+                                    }
+                                } catch (error) {
+                                    done({ error });
                                 }
                             }
                         });
@@ -79,6 +83,8 @@ module.exports = app => {
 
     const getDataGenerateSchedule = (lisSubjectsOfSemester, listDays, listPeriods, listRooms) => new Promise(resolve => {
         let data = {}, dataNganh = {};
+        // Tạo ra một object với key là mã ngành, value là 1 object nữa (key là mã môn, value là danh sách lịch của môn đó)
+        // để kiểm tra nguyên tắc: số môn bắt buộc trong cùng 1 ngành có số lịch trùng nhau là ít nhất.
         Object.keys(lisSubjectsOfSemester.groupBy('maNganh')).forEach(maNganh => {
             dataNganh[maNganh] = {};
             lisSubjectsOfSemester.groupBy('maNganh')[maNganh]
@@ -94,19 +100,20 @@ module.exports = app => {
                 Object.keys(data).length ? resolve({ data, dataNganh }) : resolve({ error: 'Các môn học đều đã có thời khóa biểu!' });
             }
             let subject = danhSachKhongPhong[index],
-                nganhBox = dataNganh[subject.maNganh];
+                nganhBox = dataNganh[subject.maNganh];      //nganhBox = { abc: [ { tietBatDau, thu, phong } ], xyz: ... }
             lessonLoop: for (let period of listPeriods) {
                 let startedPeriod = parseInt(period.ten),
                     isValid = isValidPeriod(startedPeriod, parseInt(subject.soTiet));
-                if (isValid == undefined) {
+
+                if (isValid == undefined) {     // Nếu như số tiết không hợp lệ -> môn tiếp theo
                     setRoomForSubject(index + 1, list);
-                } else if (isValid == false) {
+
+                } else if (isValid == false) {      // Nếu như số tiết không phù hợp -> tiết tiếp theo
                     continue;
                 }
                 else {
-                    let day = parseInt(listDays.sample());
-                    //Nếu môn học là bắt buộc
-                    if (subject.loaiMonHoc == 0) {
+                    let day = parseInt(listDays.sample());      // Lấy 1 ngày bất kỳ
+                    if (subject.loaiMonHoc == 0) {      // Nếu môn học là bắt buộc
                         /**
                          * Check lịch cho sinh viên có thể đăng ký được tất cả các môn bắt buộc
                          *    - Nếu ngành mở hơn 1 môn bắt buộc:
@@ -125,11 +132,12 @@ module.exports = app => {
                             };
 
                             if (nganhBox[subject.maMonHoc].length) {
-                                //Cùng môn, cùng buổi, khác nhóm mà cùng giờ thì continue
-                                if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi == currentTime.buoi && item.nhom != currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
+                                // Cùng môn, khác buổi, cùng nhóm mà cùng ngày thì continue
+                                if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi != currentTime.buoi && item.nhom == currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
 
-                                //Cùng môn, khác buổi, cùng nhóm mà cùng ngày thì continue
-                                else if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi != currentTime.buoi && item.nhom == currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
+                                // Cùng môn, cùng buổi, khác nhóm mà cùng giờ thì continue
+                                //To-do: Nếu như hết xếp được thì quay lại từ đầu.
+                                else if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi == currentTime.buoi && item.nhom != currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
                             }
                             let nganhBoxExceptCurrentSubject = Object.keys(nganhBox).filter(maMonHoc => maMonHoc != subject.maMonHoc);
                             for (let maMonHoc of nganhBoxExceptCurrentSubject) {
@@ -224,19 +232,19 @@ module.exports = app => {
         return roomResult;
     };
 
-    app.model.dtThoiKhoaBieu.calculateEndDate = (monHoc, listNgayLe) => new Promise(resolve => {
+    app.model.dtThoiKhoaBieu.calculateEndDate = (monHoc, listNgayLe) => new Promise((resolve, reject) => {
         app.model.dtDanhSachMonMo.get({ maMonHoc: monHoc.maMonHoc }, (error, item) => {
             if (error) {
-                resolve({ error: 'Invalid Subject' });
+                reject('Invalid Subject');
             } else {
-                let { soTietLyThuyet, soTietThucHanh, soBuoiTuan } = item,
+                let { soTietLyThuyet, soTietThucHanh, soBuoiTuan, soTietBuoi } = item,
                     tongTiet = soTietLyThuyet + soTietThucHanh,
-                    soTuan = Math.ceil(tongTiet / (monHoc.soTiet * soBuoiTuan));
-
+                    soTuan = Math.ceil(tongTiet / (soTietBuoi * soBuoiTuan));
                 let ngayKetThuc = monHoc.ngayBatDau + soTuan * 7 * DATE_UNIX;
                 for (let ngayLe of listNgayLe) {
                     if (ngayLe.ngay > monHoc.ngayBatDau && ngayLe.ngay <= ngayKetThuc && new Date(ngayLe.ngay).getDay() == monHoc.thu - 1) ngayKetThuc += 7 * DATE_UNIX;
                 }
+                if (!ngayKetThuc || ngayKetThuc == '' || isNaN(ngayKetThuc)) reject('Không tính được ngày kết thúc');
                 resolve(ngayKetThuc);
             }
         });

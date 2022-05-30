@@ -13,8 +13,8 @@ export class SupportModal extends AdminModal {
         let item = data.item || data.data || null;
 
         let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh, thongTinKhac } = item;
-        data.data && this.setState({ item, qtId: data.qtId });
-        data.item && this.setState({ shcc: item.shcc });
+        data.data && this.setState({ item, qtId: data.qtId, type: data.type });
+        data.item && this.setState({ shcc: item.shcc, dataBanDau: item });
         this.ho.value(ho);
         this.ten.value(ten);
         this.phai.value(phai);
@@ -40,36 +40,44 @@ export class SupportModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const { maTinhThanhPho: maTinhNguyenQuan, maQuanHuyen: maHuyenNguyenQuan, maPhuongXa: maXaNguyenQuan } = this.nguyenQuan.value();
-        const { maTinhThanhPho: maTinhNoiSinh, maQuanHuyen: maHuyenNoiSinh, maPhuongXa: maXaNoiSinh } = this.noiSinh.value();
-        let data = {
-            ho: getValue(this.ho).toUpperCase(),
-            ten: getValue(this.ten).toUpperCase(),
-            biDanh: getValue(this.biDanh),
-            maDonVi: getValue(this.maDonVi),
-            ngaySinh: getValue(this.ngaySinh).getTime(),
-            phai: getValue(this.phai),
-            quocGia: getValue(this.quocTich),
-            danToc: getValue(this.danToc),
-            tonGiao: getValue(this.tonGiao),
-            email: getValue(this.emailTruong),
-            maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan,
-            maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh,
-            ngheNghiepCu: getValue(this.ngheNghiepCu),
-            ngayBatDauCongTac: getValue(this.ngayBatDauCongTac) ? getValue(this.ngayBatDauCongTac).getTime() : '',
-            ngayBienChe: getValue(this.ngayBienChe) ? getValue(this.ngayBienChe).getTime() : '',
-            donViTuyenDung: getValue(this.donViTuyenDung),
-            soBhxh: getValue(this.soBhxh),
-            ngayBatDauBhxh: getValue(this.ngayBatDauBhxh) ? getValue(this.ngayBatDauBhxh).getTime() : '',
-            ngayKetThucBhxh: getValue(this.ngayKetThucBhxh) ? getValue(this.ngayKetThucBhxh).getTime() : '',
-            thongTinKhac: getValue(this.thongTinKhac),
-        };
-        let dataSupport = {
-            qt: 'canBo',
-            qtId: this.state.shcc,
-            type: 'update'
-        };
-        this.props.create(data, dataSupport, this.hide);
+        try {
+            const { maTinhThanhPho: maTinhNguyenQuan, maQuanHuyen: maHuyenNguyenQuan, maPhuongXa: maXaNguyenQuan } = this.nguyenQuan.value();
+            const { maTinhThanhPho: maTinhNoiSinh, maQuanHuyen: maHuyenNoiSinh, maPhuongXa: maXaNoiSinh } = this.noiSinh.value();
+            let data = {
+                ho: getValue(this.ho).toUpperCase(),
+                ten: getValue(this.ten).toUpperCase(),
+                biDanh: getValue(this.biDanh),
+                maDonVi: getValue(this.maDonVi),
+                ngaySinh: getValue(this.ngaySinh).getTime(),
+                phai: getValue(this.phai),
+                quocGia: getValue(this.quocTich),
+                danToc: getValue(this.danToc),
+                tonGiao: getValue(this.tonGiao),
+                email: getValue(this.emailTruong),
+                maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan,
+                maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh,
+                ngheNghiepCu: getValue(this.ngheNghiepCu),
+                ngayBatDauCongTac: getValue(this.ngayBatDauCongTac) ? getValue(this.ngayBatDauCongTac).getTime() : '',
+                ngayBienChe: getValue(this.ngayBienChe) ? getValue(this.ngayBienChe).getTime() : '',
+                donViTuyenDung: getValue(this.donViTuyenDung),
+                soBhxh: getValue(this.soBhxh),
+                ngayBatDauBhxh: getValue(this.ngayBatDauBhxh) ? getValue(this.ngayBatDauBhxh).getTime() : '',
+                ngayKetThucBhxh: getValue(this.ngayKetThucBhxh) ? getValue(this.ngayKetThucBhxh).getTime() : '',
+                thongTinKhac: getValue(this.thongTinKhac),
+            };
+            if (Object.keys(data).every(key =>
+                (this.state.dataBanDau[key] || '').toString() == (data[key] || '').toString()
+            )) throw ('Không có thay đổi nào');
+            let dataSupport = {
+                qt: 'canBo',
+                qtId: this.state.shcc,
+                type: 'update'
+            };
+            this.props.create(data, dataSupport, this.hide);
+        } catch (error) {
+            T.notify(error, 'warning');
+        }
+
     }
 
     onChangeViewMode = (value) => {
@@ -84,7 +92,7 @@ export class SupportModal extends AdminModal {
         let readOnly = this.props.readOnly || this.props.isSupport;
         return this.renderModal({
             title: 'Chỉnh sửa thông tin',
-            buttons: this.props.isSupport && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
+            buttons: this.props.isSupport && this.state.type == 'update' && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
             size: 'elarge',
             submitText: 'Gửi yêu cầu chỉnh sửa',
             body: <div className='row'>

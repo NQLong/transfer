@@ -181,11 +181,25 @@ export function createQtKyLuatStaff(data, done) {
                 T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
-                if (done) {
-                    T.notify('Tạo quá trình kỷ luật thành công!', 'success');
-                    dispatch(getQtKyLuatPage());
-                    done(data);
-                }
+                T.notify('Tạo quá trình kỷ luật thành công!', 'success');
+                dispatch(getQtKyLuatPage());
+                done && done(data);
+            }
+        }, () => T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtKyLuatMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/ky-luat/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                T.notify('Tạo quá trình kỷ luật thành công!', 'success');
+                dispatch(getQtKyLuatPage());
+                done && done(data);
             }
         }, () => T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger'));
     };

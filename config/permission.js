@@ -230,7 +230,7 @@ module.exports = app => {
                                 listChucVu: [],
                                 maDonVi: item.maDonVi,
                             };
-                            if (item.tienSi) app.permissionHooks.pushUserPermission(user, 'doctor:login');
+                            if (item.tienSi || item.chucDanh || item.hocVi == '02' || item.hocVi == '01') app.permissionHooks.pushUserPermission(user, 'doctor:login'); //Tiến sĩ trở lên
                             const condition = {
                                 statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
                                 parameter: {

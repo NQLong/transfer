@@ -84,7 +84,7 @@ export function createDtThoiKhoaBieu(item, done) {
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo thời khoá biểu bị lỗi!', 'danger');
-                console.error(`POST ${url}. ${data.error}`);
+                console.error(`POST ${url}. ${data.error.message}`);
             } else {
                 T.notify('Tạo thời khoá biểu thành công!', 'success');
                 if (done) done();

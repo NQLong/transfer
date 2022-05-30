@@ -12,19 +12,19 @@ import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
 class CanBoPage extends AdminPage {
-    urlSHCC = null
+    shcc = null
     state = { item: null, create: false, load: true }
     componentDidMount() {
         T.hideSearchBox();
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/staff/:shcc'),
                 shcc = route.parse(window.location.pathname).shcc;
-            this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
-            if (this.urlSHCC) {
+            this.shcc = shcc && shcc != 'new' ? shcc : null;
+            if (this.shcc) {
                 this.setState({
-                    shcc: this.urlSHCC
+                    shcc: this.shcc
                 });
-                this.props.getStaffEdit(this.urlSHCC, data => {
+                this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                     }
@@ -59,8 +59,8 @@ class CanBoPage extends AdminPage {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = !this.state.create ? this.componentTrinhDo.getAndValidate() : {};
-        if (this.urlSHCC) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
+        if (this.shcc) {
+            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
         } else {
             caNhanData && congTacData && trinhDoData && this.props.createStaff({ ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.props.history.push('/user/tccb/staff'));
         }

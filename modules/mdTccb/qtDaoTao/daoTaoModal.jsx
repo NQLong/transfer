@@ -43,7 +43,7 @@ export class DaoTaoModal extends AdminModal {
             tenTruong: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: '', minhChung: '[]', shcc: ''
         };
         let listFile = T.parse(minhChung || '[]');
-        data?.data && this.setState({ item, qtId: data.qtId });
+        data?.data && this.setState({ item, qtId: data.qtId, type: data.type });
         this.setState({
             batDauType: batDauType || 'dd/mm/yyyy',
             ketThucType: ketThucType || 'dd/mm/yyyy',
@@ -205,7 +205,7 @@ export class DaoTaoModal extends AdminModal {
         return this.renderModal({
             title: <>Thông tin quá trình đào tạo {this.props.title || ''}</>,
             size: 'large',
-            buttons: this.props.isSupport && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
+            buttons: this.props.isSupport && this.state.type == 'update' && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
             submitText: this.props.isCanBo ? 'Gửi yêu cầu' : 'Lưu',
             body: <div className='row'>
 
@@ -258,7 +258,5 @@ export class DaoTaoModal extends AdminModal {
 }
 
 const mapStateToProps = () => ({});
-const mapActionsToProps = {
-
-};
+const mapActionsToProps = {};
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(DaoTaoModal);

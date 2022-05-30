@@ -126,6 +126,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/qua-trinh/htct/create-multiple', app.permission.check('qtHocTapCongTac:write'), (req, res) => {
+        const { listShcc, batDauType, batDau, ketThucType, ketThuc, noiDung } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Học tập công tác');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, batDauType, batDau, ketThucType, ketThuc, noiDung
+            };
+            app.model.qtHocTapCongTac.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/qua-trinh/htct', app.permission.check('qtHocTapCongTac:write'), (req, res) => {
         app.model.qtHocTapCongTac.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Học tập công tác');

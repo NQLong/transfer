@@ -158,11 +158,25 @@ export function createQtCongTacTrongNuoc(data, done) {
                 T.notify('Thêm thông tin quá trình công tác trong nước bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                if (done) {
-                    T.notify('Thêm thông tin quá trình công tác trong nước thành công!', 'info');
-                    dispatch(getQtCongTacTrongNuocPage());
-                    done && done(data);
-                }
+                T.notify('Thêm thông tin quá trình công tác trong nước thành công!', 'info');
+                dispatch(getQtCongTacTrongNuocPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin quá trình công tác trong nước bị lỗi', 'danger'));
+    };
+}
+
+export function createQtCongTacTrongNuocMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/cong-tac-trong-nuoc/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin quá trình công tác trong nước bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình công tác trong nước thành công!', 'info');
+                dispatch(getQtCongTacTrongNuocPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm thông tin quá trình công tác trong nước bị lỗi', 'danger'));
     };

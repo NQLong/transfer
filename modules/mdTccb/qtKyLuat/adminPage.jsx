@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtKyLuatPage, updateQtKyLuatStaff,
-    deleteQtKyLuatStaff, createQtKyLuatStaff, getQtKyLuatGroupPage,
+    deleteQtKyLuatStaff, createQtKyLuatMultiple, getQtKyLuatGroupPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -42,6 +42,13 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            lyDoHinhThuc: this.hinhThucKyLuat.value(),
+            diemThiDua: this.diemThiDua.value(),
+            noiDung: this.noiDung.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
+            ngayRaQuyetDinh: Number(this.ngayRaQuyetDinh.value()),
+        };
         if (listMa.length == 0) {
             T.notify('Cán bộ bị trống', 'danger');
             this.maCanBo.focus();
@@ -55,26 +62,13 @@ class EditModal extends AdminModal {
             T.notify('Hình thức kỷ luật trống', 'danger');
             this.hinhThucKyLuat.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    lyDoHinhThuc: this.hinhThucKyLuat.value(),
-                    diemThiDua: this.diemThiDua.value(),
-                    noiDung: this.noiDung.value(),
-                    soQuyetDinh: this.soQuyetDinh.value(),
-                    ngayRaQuyetDinh: Number(this.ngayRaQuyetDinh.value()),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -308,21 +302,18 @@ class QtKyLuat extends AdminPage {
                 </div>
             </>,
             content: <>
-                {!this.checked && <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>}
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                        <div style={{ marginBottom: '10px' }}>Tìm thấy: <b>{totalItem}</b> kết quả.</div>
+                    </div>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createQtKyLuatStaff} update={this.props.updateQtKyLuatStaff}
+                    create={this.props.createQtKyLuatMultiple} update={this.props.updateQtKyLuatStaff}
                 />
             </>,
             backRoute: '/user/tccb',
@@ -340,6 +331,6 @@ class QtKyLuat extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.tccb.qtKyLuat });
 const mapActionsToProps = {
     getQtKyLuatPage, updateQtKyLuatStaff,
-    deleteQtKyLuatStaff, createQtKyLuatStaff, getQtKyLuatGroupPage,
+    deleteQtKyLuatStaff, createQtKyLuatMultiple, getQtKyLuatGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuat);

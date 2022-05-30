@@ -32,6 +32,7 @@ export default function dashboardTccbReducer(state = null, data) {
             return state;
     }
 }
+
 export function getDtDanhSachMonMoCurrent(id, done) {
     return dispatch => {
         const url = '/api/dao-tao/danh-sach-mon-mo/current';
@@ -69,17 +70,17 @@ export function getDtDanhSachMonMoCurrent(id, done) {
     };
 }
 
-export function createDtDanhSachMonMo(data, done) {
-    return dispatch => {
-        const url = '/api/dao-tao/danh-sach-mon-mo/current';
-        T.post(url, { data }, result => {
+export function createDtDanhSachMonMo(maNganh, data, done) {
+    return () => {
+        const url = '/api/dao-tao/danh-sach-mon-mo';
+        T.post(url, { data, maNganh }, result => {
             if (result.error) {
                 T.notify(`Lỗi: ${result.error.message}`, 'danger');
                 console.error(result.error.message);
             } else {
                 T.notify('Bổ sung thành công', 'success');
-                dispatch({ type: dtDanhSachMonMoCreate, item: result.item });
-                done && done(result.item);
+                // dispatch(getDtDanhSachMonMoCurrent(maDangKy));
+                done && done();
             }
         });
     };

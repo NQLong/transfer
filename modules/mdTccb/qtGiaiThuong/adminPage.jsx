@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtGiaiThuongPage, updateQtGiaiThuongStaff,
-    deleteQtGiaiThuongStaff, createQtGiaiThuongStaff, getQtGiaiThuongGroupPage,
+    deleteQtGiaiThuongStaff, createQtGiaiThuongMultiple, getQtGiaiThuongGroupPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -41,6 +41,13 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            tenGiaiThuong: this.tenGiaiThuong.value(),
+            noiDung: this.noiDung.value(),
+            noiCap: this.noiCap.value(),
+            namCap: this.namCap.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
@@ -51,26 +58,13 @@ class EditModal extends AdminModal {
             T.notify('Năm đạt giải trống', 'danger');
             this.namCap.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    tenGiaiThuong: this.tenGiaiThuong.value(),
-                    noiDung: this.noiDung.value(),
-                    noiCap: this.noiCap.value(),
-                    namCap: this.namCap.value(),
-                    soQuyetDinh: this.soQuyetDinh.value(),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -287,7 +281,7 @@ class QtGiaiThuong extends AdminPage {
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createQtGiaiThuongStaff} update={this.props.updateQtGiaiThuongStaff}
+                    create={this.props.createQtGiaiThuongMultiple} update={this.props.updateQtGiaiThuongStaff}
                 />
             </>,
             backRoute: '/user/tccb',
@@ -298,7 +292,7 @@ class QtGiaiThuong extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.tccb.qtGiaiThuong });
 const mapActionsToProps = {
-    getQtGiaiThuongPage, deleteQtGiaiThuongStaff, createQtGiaiThuongStaff,
+    getQtGiaiThuongPage, deleteQtGiaiThuongStaff, createQtGiaiThuongMultiple,
     updateQtGiaiThuongStaff, getQtGiaiThuongGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtGiaiThuong);
