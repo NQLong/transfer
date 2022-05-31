@@ -160,7 +160,7 @@ module.exports = (app) => {
         Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
     };
 
-    app.put('/api/hcth/cong-van-den', app.permission.orCheck('hcthCongVanDen:read', 'rectors:login'), (req, res) => {
+    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
             app.model.hcthCongVanDen.get({ id: req.body.id }, (error, congVan) => {
