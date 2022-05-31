@@ -1,0 +1,41 @@
+.form-file-text-box {
+    height: fit-content;
+
+    .rich-text-box {
+
+        border: none;
+        background: transparent;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -ms-appearance: none;
+        -o-appearance: none;
+        appearance: none;
+        outline: none;
+        padding: 0px;
+        resize: none;
+        width: 100%;
+        overflow: hidden;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        -ms-box-shadow: none;
+        -o-box-shadow: none;
+        box-shadow: none;
+        border: none;
+    }
+
+    &:focus-within {
+        color: $input-focus-color;
+        background-color: $input-focus-bg;
+        border-color: $input-focus-border-color;
+        outline: 0;
+
+        // Avoid using mixin so we can pass custom focus shadow properly
+        @if $enable-shadows {
+            box-shadow: $input-box-shadow, $input-focus-box-shadow;
+        }
+
+        @else {
+            box-shadow: $input-focus-box-shadow;
+        }
+    }
+}

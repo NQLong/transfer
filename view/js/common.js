@@ -568,6 +568,61 @@ T.ftcoAnimate = () => {
     }, { offset: '95%' });
 };
 
+T.postWithFile = (postUrl, data, file, success) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (data)
+        try {
+            formData.append('data', JSON.stringify(data));
+        }
+        catch (error) {
+            console.error(error);
+            T.notify('Dữ liệu lỗi', 'danger');
+            return;
+        }
+
+    $.ajax({
+        method: 'POST',
+        url: T.url(postUrl),
+        dataType: 'json',
+        data: formData,
+        body: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: response => {
+            if (response.error) {
+                if (typeof response.error === 'string') response.error = {
+                    message: response.error
+                };
+                else if (response.error.constructor === ({}).constructor) {
+                    if (response.error.errorNum) response.error.message = getOracleErrorMessage(response.error.errorNum);
+                }
+            }
+            success && success(response);
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+            const data = {
+                error: {}
+            };
+            if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                if (typeof jqXHR.responseJSON.error === 'string') data.error.message = jqXHR.responseJSON.error;
+                else if (jqXHR.responseJSON.error.errorNum) data.error.message = getOracleErrorMessage(jqXHR.responseJSON.error.errorNum);
+            } else if (jqXHR.responseText) data.error.message = jqXHR.responseText;
+            else if (jqXHR.readyState == 4) {
+                if (jqXHR.status === 401) data.error.message = 'Không thể truy cập tài nguyên, vui lòng đăng nhập lại.';
+                if (jqXHR.status === 403) data.error.message = 'Không thể truy cập tài nguyên.';
+                if (jqXHR.status === 404) data.error.message = 'Không tìm thấy tài nguyên.';
+                if (jqXHR.status < 500) data.error.message = 'Yêu cầu bị lỗi!';
+                data.error.message = 'Server gặp lỗi. Hãy liên hệ logngười quản trị trang web.';
+            } else if (jqXHR.readyState == 0) data.error.message = 'Mạng có vấn đề, xin hãy kiểm tra lại đường truyền.';
+            else data.error.message = errorThrown;
+            console.error('Ajax (' + method + ' => ' + url + ') has error. Error:', data.error.message || jqXHR);
+            error && error(data);
+        }
+    });
+}
+
 export default T;
 
 String.prototype.getText = function () {

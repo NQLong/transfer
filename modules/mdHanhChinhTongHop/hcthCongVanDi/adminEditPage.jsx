@@ -43,7 +43,8 @@ import {
     SelectAdapter_DmLoaiCongVan
 } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE } = require('../constant.js');
+import { FormFileTextBox, FileComponent } from './component';
+const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
 
 const listTrangThai = {
     '1': {
@@ -76,16 +77,6 @@ const listTrangThai = {
     }
 };
 
-const listLoaiCongVan = {
-    CONG_VAN_DON_VI: {
-        id: 'DON_VI',
-        text: 'Công văn đơn vị'
-    },
-    CONG_VAN_TRUONG: {
-        id: 'TRUONG',
-        text: 'Công văn trường'
-    }
-};
 
 const actionToText = (value) => {
     switch (value) {
@@ -187,40 +178,33 @@ class AdminEditPage extends AdminPage {
             renderAvatar: (item) => <img src={item.image || '/img/avatar.png'} style={{ width: '48px', height: '48px', paddingTop: '5px', borderRadius: '50%' }} />,
             renderName: (item) => <><span style={{ color: 'blue' }}>{item.ho?.normalizedName()} {item.ten?.normalizedName()}</span></>,
             renderTime: (item) => T.dateToText(item.ngayTao, 'dd/mm/yyyy HH:MM'),
-            renderContent: (item) => item.noiDung
+            renderContent: (item) => (<div style={{ display: 'flex', flexDirection: 'column' }} >
+                <div>{item.noiDung}</div>
+                {item.fileId && <a href={`/api/hcth/cong-van-cac-phong/phan-hoi/file/${item.fileId}`} download><FileComponent file={{ name: item.tenFile }} style={{ width: 'fit-content' }} /></a>}
+            </div>)
+
+
         });
     }
 
     onCreatePhanHoi = (e) => {
         e.preventDefault();
-        if (this.phanHoi.value()) {
+        const data = this.phanHoi.value();
+        if (data.text || data.file) {
             const { shcc } = this.state;
             const newPhanHoi = {
                 canBoGui: shcc,
-                noiDung: this.phanHoi.value(),
+                noiDung: data.text,
                 ngayTao: new Date().getTime(),
                 key: parseInt(this.props.match.params.id),
                 loai: CONG_VAN_DI_TYPE
             };
-            this.props.createPhanHoi(newPhanHoi, () => this.getData());
+            this.props.createPhanHoi(newPhanHoi, data.file, () => this.getData());
         } else {
             T.notify('Nội dung phản hồi bị trống', 'danger');
             this.phanHoi.focus();
         }
     }
-
-    // onCreateHistory = (value) => {
-    //     const { shcc } = this.state;
-    //     const newHistory = {
-    //         loai: 'DI',
-    //         key: this.state.id ? this.state.id : null,
-    //         shcc: shcc,
-    //         hanhDong: statusToAction(this.state.trangThai ? this.state.trangThai : '', value),
-    //         thoiGian: new Date().getTime(),
-    //         trangThai: value ? value : ''
-    //     };
-    //     this.props.createHistory(newHistory);
-    // }
 
     renderHistory = (history) => renderTimeline({
         getDataSource: () => history,
@@ -528,7 +512,7 @@ class AdminEditPage extends AdminPage {
 
     canSend = () => {
         let canEditTrangThai = [trangThaiCongVanDi.MOI.id, trangThaiCongVanDi.TRA_LAI.id].includes(this.state.trangThai);
-        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage && this.state.listDonViQuanLy.length != 0);
+        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage);
 
         return this.state.id && canEditTrangThai && permission && !this.checkNotDonVi();
     }
@@ -597,7 +581,7 @@ class AdminEditPage extends AdminPage {
         const lengthDv = this.state.listDonViQuanLy.length;
 
         const soCongVan = this.props.hcthCongVanDi?.item?.soCongVan;
-        const loaiCongVanArr = Object.values(listLoaiCongVan);
+        const loaiCongVanArr = Object.values(loaiCongVan);
 
         const loading = (
             <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -674,7 +658,7 @@ class AdminEditPage extends AdminPage {
                                 </div>
                                 {this.canAddComment() &&
                                     <>
-                                        <FormRichTextBox type='text' className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
+                                        <FormFileTextBox className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
                                         <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                             <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
                                                 Thêm

@@ -379,6 +379,8 @@ module.exports = (app) => {
             if (isNaN(id))
                 throw { status: 400, message: 'Invalid id' };
             const congVan = await app.model.hcthCongVanDen.getCVD({ id });
+            if (!congVan)
+                throw { status: 404, message: 'Không tìm thấy công văn đến' };
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
