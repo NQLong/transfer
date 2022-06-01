@@ -10074,7 +10074,7 @@
                     "nullable": true,
                     "size": "10,0"
                 },
-                "nguoiTao": {
+                "NGUOI_TAO": {
                     "value": "nguoiTao",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
