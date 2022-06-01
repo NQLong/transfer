@@ -15,13 +15,17 @@ import {
     renderTable,
     FormSelect,
     TableCell,
+    FormDatePicker,
 } from 'view/component/AdminPage';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import {
     SelectAdapter_DmDonViGuiCongVan
 } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-
+import {
+    SelectAdapter_DmLoaiCongVan
+} from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
+const { loaiCongVan } = require('../constant');
 
 const listTrangThai = {
     '1': {
@@ -50,10 +54,22 @@ const listTrangThai = {
     }
 };
 
-const selectCongVan = [
-    { id: 1, text: 'Công văn của đơn vị' },
-    { id: 2, text: 'Công văn của trường' }
+const timeList = [
+    { id: 1, text: 'Theo ngày gửi' },
+    { id: 2, text: 'Theo ngày ký' }
 ];
+
+const selectCongVan = [
+    { id: 1, text: 'Công văn đơn vị' },
+    { id: 2, text: 'Công văn trường' }
+];
+
+const start = new Date().getFullYear(),
+    end = 1900,
+    yearSelector = [...Array(start - end + 1).keys()].map(i => ({
+        id: start - i,
+        text: start - i
+    }));
 
 class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
@@ -63,11 +79,16 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.congVanYear?.value(0);
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
                 this.maCanBoNhan?.value('');
                 this.donViNhanNgoai?.value('');
                 this.status?.value('');
+                this.timeType?.value('');
+                this.fromTime?.value('');
+                this.toTime?.value('');
+                this.loaiVanBan?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
@@ -104,14 +125,18 @@ class HcthCongVanDi extends AdminPage {
         let donViNhan = this.donViNhan?.value() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         let loaiCongVan = this.loaiCongVan?.value() || null;
-        //let congVanLaySo = this.congVanLaySo?.value() || null;
+        let loaiVanBan = this.loaiVanBan?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
         let status = this.status?.value() || null;
+        let timeType = this.timeType?.value() || null;
+        let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
+        let toTime = this.toTime?.value() ? Number(this.toTime.value()) : null;
+        let congVanYear = this.congVanYear?.value() || null;
 
         let permissions = this.props.system?.user?.permissions;
         let hcthStaff = permissions.includes('hcth:login') ? { loaiCongVan: 2 } : {};
 
-        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, status };
+        const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -121,9 +146,14 @@ class HcthCongVanDi extends AdminPage {
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     this.loaiCongVan?.value(filter.loaiCongVan || '');
+                    this.loaiVanBan?.value(filter.loaiVanBan || '');
                     this.status?.value(filter.status || '');
                     this.donViNhanNgoai?.value(filter.donViNhanNgoai || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.donViNhanNgoai)) this.showAdvanceSearch();
+                    this.timeType?.value(filter.timeType || '');
+                    this.fromTime?.value(filter.fromTime || '');
+                    this.toTime?.value(filter.toTime || '');
+                    this.congVanYear?.value(filter.congVanYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.donViNhanNgoai || filter.timeType || filter.fromTime || filter.toTime || filter.loaiVanBan)) this.showAdvanceSearch();
                 }
             });
         });
@@ -142,6 +172,8 @@ class HcthCongVanDi extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
+            hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
+            unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
             { baseUrl, breadcrumb, backRoute } = this.getSiteSetting();
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
@@ -156,11 +188,12 @@ class HcthCongVanDi extends AdminPage {
             emptyTable: 'Chưa có dữ liệu công văn các phòng',
             getDataSource: () => list,
             stickyHead: false,
-            header: 'thead-light',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Số công văn</th>
+                    <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Loại công văn</th>
+                    <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Loại văn bản</th>
                     <th style={{ width: '100%', verticalAlign: 'middle' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời gian</th>
                     <th style={{ width: 'auto', verticalAlign: 'middle' }}>Đơn vị gửi</th>
@@ -169,14 +202,17 @@ class HcthCongVanDi extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
-                let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
-                let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
-                let danhSachDonViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';');
+                let danhSachDonViNhan = item.danhSachDonViNhan?.split(';'),
+                    danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';'),
+                    danhSachDonViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';'),
+                    loaiCongVanItem = item.loaiCongVan && loaiCongVan[item.loaiCongVan];
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`${baseUrl}/${item.id}`)} content={item.soCongVan ? item.soCongVan : 'Chưa có số công văn'} />
-                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.trichYeu || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: loaiCongVanItem ? loaiCongVanItem.color : 'blue' }} content={loaiCongVanItem?.text} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.tenLoaiVanBan} />
+                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%', minWidth: '250px' }} content={item.trichYeu || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
@@ -232,13 +268,13 @@ class HcthCongVanDi extends AdminPage {
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn các phòng',
             breadcrumb: breadcrumb,
-            onCreate: (permission && permission.write) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
+            onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
+                <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.congVanYear = e} placeholder="Năm" data={yearSelector} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
                 <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Loại công văn" data={selectCongVan} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
-                <FormSelect style={{ width: '200px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
             </>,
             content: <>
-                <div className="tile">
+                <div className="tile" style={{ overflowX: 'auto' }}>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
@@ -247,10 +283,17 @@ class HcthCongVanDi extends AdminPage {
             backRoute: backRoute,
             advanceSearch: <>
                 <div className="row">
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGui = e} label='Đơn vị gửi' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanNgoai = e} label='Đơn vị nhận bên ngoài' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.loaiVanBan = e} label='Loại văn bản' data={SelectAdapter_DmLoaiCongVan} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.status = e} label='Trạng thái' data={selectStatus} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType?.value() && (<>
+                        <FormDatePicker type='date' className='col-md-4' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
+                        <FormDatePicker type='date' className='col-md-4' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
+                    </>)}
                 </div>
             </>
 
