@@ -120,7 +120,13 @@ module.exports = app => {
 
     app.post('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         let dataKhung = req.body.item.data, dataMon = req.body.item.items || [];
-        app.model.dtKhungDaoTao.get({ namDaoTao: dataKhung.namDaoTao, maNganh: dataKhung.maNganh }, (error, createdCTDT) => {
+        const condition = {
+            statement: 'namDaoTao = :namDaoTao AND maNganh = :maNganh AND (chuyenNganh is NULL OR chuyenNganh = \'\' OR chuyenNganh = :chuyenNganh)',
+            parameter: {
+                namDaoTao: dataKhung.namDaoTao, maNganh: dataKhung.maNganh, chuyenNganh: dataKhung.chuyenNganh
+            }
+        };
+        app.model.dtKhungDaoTao.get(condition, (error, createdCTDT) => {
             if (!error && !createdCTDT) {
                 app.model.dtKhungDaoTao.create(dataKhung, (error, item) => {
                     if (!error) {
@@ -139,7 +145,7 @@ module.exports = app => {
                         create();
                     } else res.send({ error });
                 });
-            } else res.send({ error: `Mã ngành ${dataKhung.maNganh} năm ${dataKhung.namDaoTao} đã tồn tại!` });
+            } else res.send({ error: 'Chuyên ngành/Ngành đã tồn tại!' });
         });
 
     });

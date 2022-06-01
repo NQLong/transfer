@@ -31,7 +31,7 @@ module.exports = app => {
 
         app.model.dtNganhDaoTao.getPage(pageNumber, pageSize, {
             statement: '((:donVi) IS NULL OR khoa = (: donVi)) AND (lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText)',
-            parameter: { donVi, searchText: `%${req.query.condition || ''}%` }
+            parameter: { donVi, searchText: `%${(req.query.condition || '').toLowerCase()}%` }
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
