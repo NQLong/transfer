@@ -723,7 +723,7 @@ BEGIN
               FROM DT_THOI_KHOA_BIEU TKB
                        LEFT JOIN DM_CA_HOC TIETBD on TIETBD.TEN = TKB.TIET_BAT_DAU AND TIETBD.MA_CO_SO = 2
                        LEFT JOIN DM_CA_HOC TIETKT
-                                 on TO_NUMBER(TIETKT.TEN) = TO_NUMBER(TKB.TIET_BAT_DAU) + TO_NUMBER(TKB.SO_TIET) AND
+                                 on TO_NUMBER(TIETKT.TEN) = TO_NUMBER(TKB.TIET_BAT_DAU) + TO_NUMBER(TKB.SO_TIET_BUOI) AND
                                     TIETKT.MA_CO_SO = 2
               WHERE room = TKB.PHONG
                 AND idNam = TKB.NAM
@@ -3532,7 +3532,7 @@ END;
 
 CREATE OR REPLACE FUNCTION HCTH_PHAN_HOI_GET_ALL_FROM(
     target IN NUMBER,
-    type in STRING
+    targetType in STRING
 ) RETURN SYS_REFCURSOR AS
     my_cursor SYS_REFCURSOR;
 BEGIN
@@ -3545,7 +3545,9 @@ BEGIN
                cb.HO         as "ho",
                cb.TEN        as "ten",
                DMCV.TEN      as "chucVu",
-               usr.IMAGE     AS "image"
+               usr.IMAGE     AS "image",
+               fi.ID         AS "fileId",
+               fi.TEN        AS "tenFile"
 
 
         FROM HCTH_PHAN_HOI ph
@@ -3553,10 +3555,11 @@ BEGIN
                  LEFT JOIN QT_CHUC_VU qtcv ON cb.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
                  LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
                  LEFT JOIN FW_USER usr on usr.SHCC = cb.shcc
+                 LEFT JOIN HCTH_FILE fi on fi.LOAI = 'PHAN_HOI' and fi.MA = ph.id
 
 
-        WHERE (target is not null and ph.KEY = target and loai is not null and type = ph.loai)
-        ORDER BY NGAY_TAO ASC;
+        WHERE (target is not null and ph.KEY = target and ph.loai is not null and targetType = ph.loai)
+        ORDER BY NGAY_TAO;
     RETURN my_cursor;
 END;
 

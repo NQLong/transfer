@@ -139,5 +139,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_search_page(:pagenumber, :pagesize, :donvi, :searchterm, :totalitem, :pagetotal, :thoigianphancong); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, donvi, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, thoigianphancong: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getCalendar: (room, idnam, hocky, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_calendar(:room, :idnam, :hocky); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, room, idnam, hocky }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
