@@ -138,7 +138,7 @@ export function getSachGiaoTrinhPage(pageNumber, pageSize, pageCondition, filter
     }
     const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/library/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger');
@@ -160,7 +160,7 @@ export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, pageCondition, f
     }
     const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/library/qua-trinh/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -183,7 +183,7 @@ export function getSachGiaoTrinhGroupPageMa(pageNumber, pageSize, pageCondition,
     }
     const page = T.updatePage('groupPageMaSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/library/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger');
