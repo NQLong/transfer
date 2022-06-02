@@ -2339,6 +2339,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "PRIORITY": {
+                    "value": "priority",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
