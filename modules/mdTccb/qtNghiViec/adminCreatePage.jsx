@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/Ad
 import {
     getListNghiHuuInYear, createMultiQtNghiViecFromNghiHuu
 } from './redux';
-import xlsx from 'xlsx';
+
 
 const
     start = new Date().getFullYear(),
@@ -108,7 +108,7 @@ class CreateListYear extends AdminPage {
             </>,
             onExport: this.year && this.year.value() ? (e) => {
                 e.preventDefault();
-                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), 'Nghi huu du kien nam ' + year + '.xlsx');
+                T.download(`/api/tccb/qua-trinh/download-nghi-huu-du-kien?year=${year}`, 'Nghỉ hưu dự kiến năm ' + year + '.xlsx');
             } : null,
             backRoute: '/user/tccb/qua-trinh/nghi-viec',
         });
