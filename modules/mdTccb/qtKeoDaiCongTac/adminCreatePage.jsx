@@ -162,7 +162,7 @@ class CreateListYear extends AdminPage {
                     <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters() : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '')} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'red' }} content={T.dateToText(item.ngayNghiHuu, 'dd/mm/yyyy')} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''} />
                     {
