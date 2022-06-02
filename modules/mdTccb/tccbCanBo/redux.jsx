@@ -254,10 +254,10 @@ export function createMultiCanBo(canBoList, done) {
     };
 }
 
-export function downloadWord(shcc, done) {
+export function downloadWord(shcc, type, done) {
     return () => {
         const url = `/api/staff/get-ly-lich/${shcc}`;
-        T.get(url, data => {
+        T.get(url, { type }, data => {
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);

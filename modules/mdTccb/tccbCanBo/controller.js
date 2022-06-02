@@ -512,8 +512,8 @@ module.exports = app => {
                     } else toChucKhac.map(item => {
                         item.ngayThamGia = item.ngayThamGia ? app.date.dateTimeFormat(new Date(item.ngayThamGia), 'dd/mm/yyyy') : '';
                     });
-
-                    const source = app.path.join(__dirname, 'resource', 'Mau-2C-BNV-2008.docx');
+                    const type = req.query.type;
+                    const source = app.path.join(__dirname, 'resource', type == 'cc' ? 'Mau-2C-BNV-2008.docx' : 'HSVC.docx');
                     const data = {
                         HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
                         otherName: '',
