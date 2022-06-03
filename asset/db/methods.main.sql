@@ -7343,23 +7343,13 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION QT_HOP_DONG_DON_VI_TRA_LUONG_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                filter IN STRING, searchTerm IN STRING,
+                                                list_shcc IN STRING, list_dv IN STRING,
+                                                fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
                                                 totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(500) := '%' || lower(searchTerm) || '%';
-    listShcc STRING (100);
-    listDv STRING (100);
-    fromYear NUMBER;
-    toYear NUMBER;
-    timeType NUMBER;
 BEGIN
-    SELECT JSON_VALUE(filter, '$.listShcc') INTO listShcc FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.listDv') INTO listDv FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.fromYear') INTO fromYear FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.toYear') INTO toYear FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.timeType') INTO timeType FROM DUAL;
-
     SELECT COUNT(*)
     INTO totalItem
     FROM (SELECT *
@@ -7387,13 +7377,12 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO benA ON hd_temp.SHCC = benA.SHCC
                                  LEFT JOIN DM_DON_VI dv on hd_temp.DON_VI_TRA_LUONG = dv.MA
                                  LEFT JOIN DM_NGACH_CDNN ncdnn ON hd_temp.NGACH = ncdnn.ID
-                                 LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd_temp.CHUC_DANH = cdcm.MA
                         WHERE (hd_temp.SHCC = hd.SHCC)
-                            AND (((listShcc IS NULL) AND (listDv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
-                            OR (((listShcc IS NOT NULL AND
-                                  ((INSTR(listShcc, ',') != 0 AND INSTR(listShcc, benA.SHCC) != 0) OR (listShcc = benA.SHCC)))
-                                OR (listDv IS NOT NULL AND INSTR(listDv, benA.MA_DON_VI) != 0)
-                                OR (listShcc IS NULL AND listDv IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND
+                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benA.SHCC) != 0) OR (list_shcc = benA.SHCC)))
+                                OR (list_dv IS NOT NULL AND INSTR(list_dv, benA.MA_DON_VI) != 0)
+                                OR (list_shcc IS NULL AND list_dv IS NULL))
                                 AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (fromYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG >= fromYear))
                                 AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (toYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG <= (toYear + 86399999)))))
                           AND (searchTerm = ''
@@ -7413,13 +7402,12 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO benA ON hd_temp.SHCC = benA.SHCC
                                  LEFT JOIN DM_DON_VI dv on hd_temp.DON_VI_TRA_LUONG = dv.MA
                                  LEFT JOIN DM_NGACH_CDNN ncdnn ON hd_temp.NGACH = ncdnn.ID
-                                 LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd_temp.CHUC_DANH = cdcm.MA
                         WHERE (hd_temp.SHCC = hd.SHCC)
-                            AND (((listShcc IS NULL) AND (listDv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
-                            OR (((listShcc IS NOT NULL AND
-                                  ((INSTR(listShcc, ',') != 0 AND INSTR(listShcc, benA.SHCC) != 0) OR (listShcc = benA.SHCC)))
-                                OR (listDv IS NOT NULL AND INSTR(listDv, benA.MA_DON_VI) != 0)
-                                OR (listShcc IS NULL AND listDv IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND
+                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benA.SHCC) != 0) OR (list_shcc = benA.SHCC)))
+                                OR (list_dv IS NOT NULL AND INSTR(list_dv, benA.MA_DON_VI) != 0)
+                                OR (list_shcc IS NULL AND list_dv IS NULL))
                                 AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (fromYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG >= fromYear))
                                 AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (toYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG <= (toYear + 86399999)))))
                           AND (searchTerm = ''
@@ -13497,6 +13485,22 @@ BEGIN
     RETURN my_cursor;
 
 end;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE PROCEDURE TC_HOC_PHI_TRANSACTION_ADD_BILL(NAM_HOC IN STRING, HOC_KY IN STRING, TRANS_ID IN STRING, TRANS_DATE IN STRING, CUSTOMER_ID IN STRING, BILL_ID IN STRING, SERVICE_ID IN STRING, AMOUNT IN NUMBER, CHECKSUM IN STRING)
+AS
+    DA_DONG NUMBER;
+BEGIN
+    INSERT INTO TC_HOC_PHI_TRANSACTION (TRANS_ID, TRANS_DATE, CUSTOMER_ID, BILL_ID, SERVICE_ID, AMOUNT, CHECKSUM)
+        VALUES (TRANS_ID, TRANS_DATE, CUSTOMER_ID, BILL_ID, SERVICE_ID, AMOUNT, CHECKSUM);
+
+    SELECT SUM(T.AMOUNT) INTO DA_DONG FROM TC_HOC_PHI_TRANSACTION T WHERE T.NAM_HOC=NAM_HOC AND T.HOC_KY=HOC_KY AND T.CUSTOMER_ID=CUSTOMER_ID;
+
+    UPDATE TC_HOC_PHI T SET T.CONG_NO=T.HOC_PHI-DA_DONG WHERE T.NAM_HOC=NAM_HOC AND T.HOC_KY=HOC_KY AND T.MSSV=CUSTOMER_ID;
+    COMMIT;
+END;
 
 /
 --EndMethod--

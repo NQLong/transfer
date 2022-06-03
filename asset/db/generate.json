@@ -13796,6 +13796,133 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "TC_HOC_PHI": {
+            "active": true,
+            "moduleName": "tcHocPhi",
+            "modelName": "tcHocPhi",
+            "columns": {
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "1,0"
+                },
+                "HOC_PHI": {
+                    "value": "hocPhi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CONG_NO": {
+                    "value": "congNo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "HOC_KY",
+                "MSSV",
+                "NAM_HOC"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_TRANSACTION": {
+            "active": true,
+            "moduleName": "tcHocPhi",
+            "modelName": "tcHocPhiTransaction",
+            "methods": {
+                "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill"
+            },
+            "columns": {
+                "TRANS_ID": {
+                    "value": "transId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "TRANS_DATE": {
+                    "value": "transDate",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "CUSTOMER_ID": {
+                    "value": "customerId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BILL_ID": {
+                    "value": "billId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "SERVICE_ID": {
+                    "value": "serviceId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "AMOUNT": {
+                    "value": "amount",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CHECKSUM": {
+                    "value": "checksum",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "TRANS_ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
