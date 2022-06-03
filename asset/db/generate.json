@@ -13923,6 +13923,32 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "TC_SETTING": {
+            "active": true,
+            "moduleName": "tcSetting",
+            "modelName": "tcSetting",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
