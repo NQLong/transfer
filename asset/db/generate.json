@@ -13823,8 +13823,8 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "CON_NO": {
-                    "value": "conNo",
+                "CONG_NO": {
+                    "value": "congNo",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
