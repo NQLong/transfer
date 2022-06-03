@@ -74,7 +74,6 @@ module.exports = app => {
         });
     });
 
-
     app.get('/api/qua-trinh/nghi-viec/download-excel/:filter', app.permission.check('qtNghiViec:read'), (req, res) => {
         app.model.qtNghiViec.downloadExcel(req.params.filter, (error, result) => {
             if (error || !result) {
@@ -219,4 +218,118 @@ module.exports = app => {
         solve();
     });
 
+    app.get('/api/tccb/qua-trinh/download-nghi-huu-du-kien', app.permission.check('qtNghiViec:read'), (req, res) => {
+        const yearCalc = req.query.year;
+        console.log(yearCalc);
+        const endYear = new Date(yearCalc, 11, 31, 23, 59, 59, 999);
+        // 1419120000000 = 45 * 365 * 24 * 3600 * 10000 (45 năm)
+        app.model.canBo.getAll({
+            statement: 'ngayNghi IS NULL AND (ngaySinh IS NULL OR ngaySinh + 1419120000000 <= :year)',
+            parameter: { year: endYear.getTime() }
+        }, 'shcc,ho,ten,phai,ngach,hocVi,chucDanh,maDonVi,ngaySinh,trinhDoPhoThong,ngayBienChe', 'chucDanh', async (error, data) => {
+            if (error) {
+                res.send({ error, items: null });
+                return;
+            }
+            let items = [];
+            let getDataNghiHuu = () => new Promise(resolve => {
+                const init = (index = 0) => {
+                    if (index == data.length) {
+                        resolve(items);
+                    }
+                    else {
+                        const item = data[index];
+                        app.model.dmNghiHuu.getTuoiNghiHuu({ phai: item.phai, ngaySinh: new Date(item.ngaySinh) }, (error, data) => {
+                            if (data) {
+                                let canExtend = item.chucDanh == '01' ? 10 : item.chucDanh == '02' ? 7 : (item.hocVi == '01' || item.hocVi == '02') ? 5 : 0;
+                                let end = new Date(data.resultDate);
+                                end.setFullYear(end.getFullYear() + canExtend);
+                                let tenChucDanh = '', tenHocVi = '', tenChucDanhNgheNghiep = '', tenChucVu = '', tenDonVi = '';
+
+                                if (end.getFullYear() == yearCalc) {
+                                    app.model.dmChucDanhKhoaHoc.get({ ma: item.chucDanh }, (error, itemCD) => {
+                                        app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, itemHV) => {
+                                            app.model.dmNgachCdnn.get({ ma: item.ngach }, (error, itemCDNN) => {
+                                                app.model.dmChucVu.get({ ma: item.maChucVu }, (error, itemCV) => {
+                                                    app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDV) => {
+                                                        if (itemCD) tenChucDanh = itemCD.ten;
+                                                        if (itemHV) tenHocVi = itemHV.ten;
+                                                        if (itemCDNN) tenChucDanhNgheNghiep = itemCDNN.ten;
+                                                        if (itemCV) tenChucVu = itemCV.ten;
+                                                        if (itemDV) tenDonVi = itemDV.ten;
+
+                                                        let dataAdd = {
+                                                            shcc: item.shcc,
+                                                            hoCanBo: item.ho,
+                                                            tenCanBo: item.ten,
+                                                            tenChucDanh,
+                                                            tenHocVi,
+                                                            tenChucVu,
+                                                            tenDonVi,
+                                                            tenChucDanhNgheNghiep,
+                                                            thoiDiemNghiHuuSauKeoDai: end.getTime(),
+                                                            ngayNghiHuu: data.resultDate,
+                                                            ngaySinh: item.ngaySinh,
+                                                            phai: item.phai,
+                                                            dienNghi: item.ngayBienChe ? 1 : 2,
+                                                            trinhDoPhoThong: item.trinhDoPhoThong,
+                                                        };
+                                                        items.push(dataAdd);
+                                                        init(index + 1);
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                } else init(index + 1);
+                            } else init(index + 1);
+                        });
+                    }
+                };
+                init();
+            });
+            try {
+                let dataNghiHuu = await getDataNghiHuu();
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('Danh sách nghỉ hưu dự kiến');
+                new Promise(solve => {
+                    let cells = [
+                        { cell: 'A1', value: 'STT', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'Họ và tên', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'Nam', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'Nữ', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'Chức danh GS, PGS', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'Trình độ chuyên môn', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'Chức danh nghề nghiệp', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Chức vụ', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Đơn vị công tác', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'Ngày đủ tuổi nghỉ hưu', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Nghỉ hưu từ', bold: true, border: '1234' },
+                    ];
+                    dataNghiHuu.forEach((item, index) => {
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.hoCanBo + ' ' + item.tenCanBo });
+                        cells.push({ cell: 'C' + (index + 2), alignment: 'center', border: '1234', value: item.phai == '01' && item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.phai == '02' && item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenChucDanh || '' });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenHocVi || item.trinhDoPhoThong || '' });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep || '' });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenChucVu || '' });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenDonVi || '' });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: app.date.dateTimeFormat(new Date(item.ngayNghiHuu), 'dd/mm/yyyy') });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: app.date.dateTimeFormat(new Date(item.thoiDiemNghiHuuSauKeoDai), 'dd/mm/yyyy') });
+                    });
+                    solve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'Danh sách nghỉ hưu dự kiến.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            } catch (error) {
+                res.send({ error });
+            }
+        });
+
+    });
 };
