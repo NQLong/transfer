@@ -34,7 +34,7 @@ module.exports = app => {
                                 data: {
                                     service_id,
                                     customer_id, customer_name: (sinhVien.ho + ' ' + sinhVien.ten).toUpperCase(), customer_addr: '',
-                                    type: 0, matchAmoun: hocPhi.congNo,
+                                    type: 0, matchAmount: hocPhi.congNo,
                                 },
                             });
                         }
