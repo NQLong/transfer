@@ -1,21 +1,24 @@
 module.exports = app => {
     const crypto = require('crypto');
+    const namHoc = 2021, hocKy = 3; //TODO: lấy từ cấu hình
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // BIDV
     const urlBidv = '/api/bidv';
+    const transBidvId = 'bidv-';
     const secretCode = 'BIDV-XHNV';
     const serviceId = 'HocPhi';
 
     app.post(urlBidv + '/getbill', (req, res) => {
         const { customer_id, service_id, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
+        console.log('getbill', { customer_id, service_id, checksum });
         if (service_id != serviceId) {
             res.send({ result_code: '020' });
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
         } else {
-            app.model.tcHocPhi.get({ mssv: customer_id }, (error, hocPhi) => {
+            app.model.tcHocPhi.get({ namHoc, hocKy, mssv: customer_id }, (error, hocPhi) => {
                 if (error) {
                     res.send({ result_code: '096' });
                 } else if (!hocPhi || hocPhi.congNo <= 0) {
@@ -45,25 +48,23 @@ module.exports = app => {
     app.post(urlBidv + '/paybill', (req, res) => {
         const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
+        console.log('paybill', { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
         if (service_id != serviceId) {
             res.send({ result_code: '020' });
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
         } else {
-            app.model.tcHocPhi.get({ mssv: customer_id }, (error, hocPhi) => {
+            app.model.tcHocPhi.get({ namHoc, hocKy, mssv: customer_id }, (error, hocPhi) => {
                 if (error) {
                     res.send({ result_code: '096' });
-                } else if (!hocPhi || hocPhi.congNo <= 0) {
+                } else if (!hocPhi) {
                     res.send({ result_code: '025' });
                 } else {
-                    app.model.fwStudents.get({ mssv: customer_id }, (error, sinhVien) => {
+                    app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, transBidvId + trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum, (error) => {
                         if (error) {
                             res.send({ result_code: '096' });
-                        } else if (!sinhVien) {
-                            res.send({ result_code: '017' });
                         } else {
-                            // TODO
-                            res.send({ trans_date, result_code: '000', result_desc: 'success' });
+                            res.send({ result_code: '000', result_desc: 'success' });
                         }
                     });
                 }
