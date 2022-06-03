@@ -21,11 +21,9 @@ module.exports = app => {
                 result_code: '001',
                 result_desc: 'success',
                 data: {
-                    service_id,
-                    customer_id,
+                    service_id, customer_id, type: 0,
                     customer_name: customerName,
                     customer_addr: '',
-                    type: 0,
                     matchAmount,
                 }
             });
