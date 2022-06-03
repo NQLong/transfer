@@ -8,7 +8,7 @@ module.exports = app => {
     const serviceId = 'HocPhi';
 
     app.post(urlBidv + '/getbill', async (req, res) => {
-        const { namHoc, hocKy } = await app.model.tcThoiGianHocPhi.getActive();
+        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
         const { customer_id, service_id, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
         console.log('getbill', { customer_id, service_id, checksum });
@@ -45,7 +45,7 @@ module.exports = app => {
     });
 
     app.post(urlBidv + '/paybill', async (req, res) => {
-        const { namHoc, hocKy } = await app.model.tcThoiGianHocPhi.getActive();
+        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
         const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
         console.log('paybill', { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
