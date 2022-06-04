@@ -6,6 +6,7 @@ module.exports = app => {
     };
     const serviceId = 'HocPhi';
     const crypto = require('crypto');
+    // console.log(crypto.createHash('md5').update(`${bankPartners.bidv}|${serviceId}|2156031059`).digest('hex'));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/:bank/getbill', async (req, res) => {
