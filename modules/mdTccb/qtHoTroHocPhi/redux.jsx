@@ -161,11 +161,25 @@ export function createQtHoTroHocPhi(data, done) {
                 T.notify('Thêm thông tin quá trình hỗ trợ học phí bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                if (done) {
-                    T.notify('Thêm thông tin quá trình hỗ trợ học phí thành công!', 'info');
-                    dispatch(getQtHoTroHocPhiPage());
-                    done && done(data);
-                }
+                T.notify('Thêm thông tin quá trình hỗ trợ học phí thành công!', 'info');
+                dispatch(getQtHoTroHocPhiPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin quá trình hỗ trợ học phí bị lỗi', 'danger'));
+    };
+}
+
+export function createQtHoTroHocPhiMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/ho-tro-hoc-phi/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin quá trình hỗ trợ học phí bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình hỗ trợ học phí thành công!', 'info');
+                dispatch(getQtHoTroHocPhiPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm thông tin quá trình hỗ trợ học phí bị lỗi', 'danger'));
     };

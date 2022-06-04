@@ -177,6 +177,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/tccb/qua-trinh/khen-thuong-all/create-multiple', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
+        const { listMa, loaiDoiTuong, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh } = req.body.items, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listMa.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Khen thưởng');
+                res.send({ error: errorList });
+                return;
+            }
+            const ma = listMa[index];
+            const dataAdd = {
+                ma, loaiDoiTuong, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh 
+            };
+            app.model.qtKhenThuongAll.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.post('/api/tccb/qua-trinh/khen-thuong-all/multiple', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
         const qtKhenThuongAll = req.body.qtKhenThuongAll, errorList = [];
         for (let i = 0; i <= qtKhenThuongAll.length; i++) {

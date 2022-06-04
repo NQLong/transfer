@@ -6,7 +6,7 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import { getQtHoTroHocPhiPage, deleteQtHoTroHocPhi, createQtHoTroHocPhi, updateQtHoTroHocPhi, getQtHoTroHocPhiGroupPage } from './redux';
+import { getQtHoTroHocPhiPage, deleteQtHoTroHocPhi, createQtHoTroHocPhiMultiple, updateQtHoTroHocPhi, getQtHoTroHocPhiGroupPage } from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmHoTroHocPhiCoSo } from 'modules/mdDanhMuc/dmHoTroHocPhiCoSo/redux';
 
@@ -77,6 +77,20 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            ngayLamDon: this.ngayLamDon.value() ? Number(this.ngayLamDon.value()) : '',
+            noiDung: this.noiDung.value(),
+            coSoDaoTao: this.coSoDaoTao.value(),
+            hocKyHoTro: this.hocKyHoTro.value(),
+            soTien: this.soTien.value(),
+            hoSo: this.hoSo.value(),
+            ghiChu: this.ghiChu.value(),
+
+            batDauType: this.state.batDauType,
+            batDau: this.batDau.getVal(),
+            ketThucType: !this.state.denNay ? this.state.ketThucType : '',
+            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.shcc.focus();
@@ -96,33 +110,13 @@ class EditModal extends AdminModal {
             T.notify('Bắt đầu lớn hơn kết thúc', 'danger');
             this.batDau.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    ngayLamDon: this.ngayLamDon.value() ? Number(this.ngayLamDon.value()) : '',
-                    noiDung: this.noiDung.value(),
-                    coSoDaoTao: this.coSoDaoTao.value(),
-                    hocKyHoTro: this.hocKyHoTro.value(),
-                    soTien: this.soTien.value(),
-                    hoSo: this.hoSo.value(),
-                    ghiChu: this.ghiChu.value(),
-
-                    batDauType: this.state.batDauType,
-                    batDau: this.batDau.getVal(),
-                    ketThucType: !this.state.denNay ? this.state.ketThucType : '',
-                    ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.shcc.reset();
-                    this.noiDen.reset();
-                } else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -390,7 +384,7 @@ class QtHoTroHocPhi extends AdminPage {
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} create={this.props.createQtHoTroHocPhi} update={this.props.updateQtHoTroHocPhi} permissions={currentPermissions} />
+                <EditModal ref={e => this.modal = e} permission={permission} create={this.props.createQtHoTroHocPhiMultiple} update={this.props.updateQtHoTroHocPhi} permissions={currentPermissions} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
@@ -404,5 +398,5 @@ class QtHoTroHocPhi extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, qtHoTroHocPhi: state.tccb.qtHoTroHocPhi });
-const mapActionsToProps = { getQtHoTroHocPhiPage, deleteQtHoTroHocPhi, createQtHoTroHocPhi, updateQtHoTroHocPhi, getQtHoTroHocPhiGroupPage };
+const mapActionsToProps = { getQtHoTroHocPhiPage, deleteQtHoTroHocPhi, createQtHoTroHocPhiMultiple, updateQtHoTroHocPhi, getQtHoTroHocPhiGroupPage };
 export default connect(mapStateToProps, mapActionsToProps)(QtHoTroHocPhi);

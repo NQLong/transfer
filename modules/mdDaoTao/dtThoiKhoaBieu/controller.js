@@ -54,17 +54,21 @@ module.exports = app => {
         let item = req.body.item || [];
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
-        const onCreate = (index, monHoc) => new Promise(resolve => {
+        const onCreate = (index, monHoc) => new Promise((resolve, reject) => {
             const save = (i, m) => {
-                if (i > parseInt(m.soNhom)) {
+                if (i > parseInt(m.soLop)) {
                     resolve(m);
                     return;
                 }
                 app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet }, (error, tkb) => {
-                    if (!error && !tkb) {
+                    if (error) reject(error);
+                    else if (!tkb) {
                         m.nhom = i;
+                        delete m.id;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i }, () => { });
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i }, (error, item) => {
+                                if (error || !item) reject(error);
+                            });
                         }
                     }
                     save(i + 1, m);
@@ -75,7 +79,7 @@ module.exports = app => {
         let listPromise = item.map(monHoc => item = onCreate(1, monHoc));
         Promise.all(listPromise).then((values) => {
             res.send({ item: values });
-        });
+        }).catch(error => res.send({ error }));
     });
 
     app.put('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
@@ -116,10 +120,10 @@ module.exports = app => {
 
     app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), (req, res) => {
         let { condition, changes } = req.body;
-        if (condition.id) app.model.dtThoiKhoaBieu.update(condition, changes);
-        if (typeof condition == 'object') {
-            let { nam, hocKy, maMonHoc, khoaDangKy, maNganh } = condition;
-            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, khoaDangKy, maNganh }, changes, (error, item) => res.send({ error, item }));
+        if (typeof condition == 'number') app.model.dtThoiKhoaBieu.update(condition, changes, (error, item) => res.send({ error, item }));
+        else if (typeof condition == 'object') {
+            let { nam, hocKy, maMonHoc, maNganh } = condition;
+            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, maNganh }, changes, (error, item) => res.send({ error, item }));
         }
         else app.model.dtThoiKhoaBieu.update({ id: condition }, changes, (error, item) => res.send({ error, item }));
     });
@@ -137,10 +141,7 @@ module.exports = app => {
         let phong = req.query.phong;
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
         let listNgayLe = await app.model.dmNgayLe.getAllNgayLeTrongNam(thoiGianMoMon.khoa);
-        console.log('##Thời gian mở môn:', thoiGianMoMon);
         app.model.dtThoiKhoaBieu.getCalendar(phong, thoiGianMoMon.nam, thoiGianMoMon.hocKy, (error, items) => {
-            console.log('##get calendar error:', error);
-            console.log('##items calendar:', items);
             res.send({ error, items: items?.rows || [], listNgayLe });
         });
     });

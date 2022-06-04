@@ -104,7 +104,7 @@ class SachGiaoTrinh extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/library', () => {
+        T.ready('/user/tccb', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -215,19 +215,19 @@ class SachGiaoTrinh extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {item.tenChucVu && <span> {item.tenChucVu || ''}<br /> </span>}
                                 {(item.tenDonVi || '')}
                             </>
                         )} />
-                        {!this.checked && <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(
                             <>
-                                <span><i style={{ color: 'blue' }}>{item.ten}</i><br /><br /></span>
+                                <span><i style={{ color: 'blue' }}>{item.ten}</i><br /></span>
                                 {item.theLoai ? <span><b>Thể loại: </b><span style={{ whiteSpace: 'nowrap' }}>{item.theLoai}<br /></span></span> : null}
                                 {item.butDanh ? <span><b>Bút danh: </b><i>{item.butDanh}</i></span> : null}
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(
                             <>
                                 <span><b>Nhà XB: </b><span style={{ color: 'blue' }}>{item.nhaSanXuat}</span></span><br />
                                 <span><b>Năm XB:</b> <span >{item.namSanXuat}</span></span> <br />
@@ -252,7 +252,7 @@ class SachGiaoTrinh extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/library/sach-giao-trinh/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/sach-giao-trinh/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -266,7 +266,7 @@ class SachGiaoTrinh extends AdminPage {
             icon: 'fa fa-book',
             title: 'Sách, giáo trình cán bộ',
             breadcrumb: [
-                <Link key={0} to='/user/library'>Thư viện</Link>,
+                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Sách, giáo trình cán bộ'
             ],
             advanceSearch: <>
@@ -289,13 +289,13 @@ class SachGiaoTrinh extends AdminPage {
                     create={this.props.createSachGiaoTrinhMultiple} update={this.props.updateSachGTStaff}
                 />
             </>,
-            backRoute: '/user/library',
+            backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.library.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
     updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage, createSachGiaoTrinhMultiple

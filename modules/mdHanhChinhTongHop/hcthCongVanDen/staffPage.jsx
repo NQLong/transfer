@@ -150,7 +150,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             { permissions: currentPermissions, staff } = user,
             donViQuanLy = staff && staff.donViQuanLy ? staff.donViQuanLy : [],
             permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']),
-            {baseUrl, backRoute, breadcrumb} = this.getSiteSetting();
+            { baseUrl, backRoute, breadcrumb } = this.getSiteSetting();
         const hcthStaff = currentPermissions.includes('hcth:login');
 
         const statusSelector = Object.keys(trangThaiSwitcher).filter(key => hcthStaff || trangThaiSwitcher[key].id != trangThaiSwitcher.MOI.id).map(key => trangThaiSwitcher[key]);
@@ -198,7 +198,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                             </>) : null
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.tenDonViGuiCV} />
-                        <TableCell type='text' contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.trichYeu} />
+                        <TableCell type='text' contentClassName='multiple-lines-3' contentStyle={{ width: '100%', minWidth: '300px' }} content={item.trichYeu} />
                         <TableCell type='text' contentClassName='multiple-lines' style={{}} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (

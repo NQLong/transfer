@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/Ad
 import {
     getListNghiHuuInYear, createMultiQtNghiViecFromNghiHuu
 } from './redux';
-import xlsx from 'xlsx';
+
 
 const
     start = new Date().getFullYear(),
@@ -68,8 +68,8 @@ class CreateListYear extends AdminPage {
                     <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters() : item.trinhDoPhoThong} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '')} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.thoiDiemNghiHuuSauKeoDai} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'red' }} content={T.dateToText(item.ngayNghiHuu, 'dd/mm/yyyy')} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={T.dateToText(item.thoiDiemNghiHuuSauKeoDai, 'dd/mm/yyyy')} />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onDelete={() => this.delete(index)} >
@@ -108,7 +108,7 @@ class CreateListYear extends AdminPage {
             </>,
             onExport: this.year && this.year.value() ? (e) => {
                 e.preventDefault();
-                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), 'Nghi huu du kien nam ' + year + '.xlsx');
+                T.download(`/api/tccb/qua-trinh/download-nghi-huu-du-kien?year=${year}`, 'Nghỉ hưu dự kiến năm ' + year + '.xlsx');
             } : null,
             backRoute: '/user/tccb/qua-trinh/nghi-viec',
         });

@@ -68,10 +68,10 @@ class StaffUserPage extends AdminPage {
         }
     }
 
-    downloadWord = (e) => {
+    downloadWord = (e, type) => {
         e.preventDefault();
-        this.shcc && this.props.downloadWord(this.shcc, data => {
-            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_2c.docx');
+        this.shcc && this.props.downloadWord(this.shcc, type, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_' + type + '.docx');
         });
     }
 
@@ -96,9 +96,11 @@ class StaffUserPage extends AdminPage {
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
 
                 <SupportModal ref={e => this.supportModal = e} create={this.props.createTccbSupport} system={this.props.system} />
-                {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '125px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}
+                {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '185px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}
 
-                <CirclePageButton type='custom' tooltip='Tải về lý lịch 2C (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={this.downloadWord} />
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch viên chức (2019)' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '125px' }} onClick={e => this.downloadWord(e, 'vc')} />
+
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch công chức (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={e => this.downloadWord(e, 'cc')} />
 
                 <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
             </>,

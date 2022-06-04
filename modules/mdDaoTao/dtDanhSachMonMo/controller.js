@@ -4,7 +4,7 @@ module.exports = app => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             { hocKy, nam, batDau, ketThuc } = thoiGianMoMon,
             now = new Date().getTime();
-        let data = req.body.data;
+        let { data, maNganh } = req.body;
         if (now < batDau || now > ketThuc) {
             res.send({ error: 'Không thuộc thời gian cho phép thao tác' });
             return;
@@ -22,7 +22,12 @@ module.exports = app => {
                 });
             }
         };
-        create();
+        app.model.dtDanhSachMonMo.delete({ maNganh, nam, hocKy }, (error) => {
+            if (error) res.send({ error });
+            else {
+                create();
+            }
+        });
     });
 
     app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
@@ -44,7 +49,7 @@ module.exports = app => {
             res.send({ error: 'Không thuộc thời gian cho phép thao tác' });
         }
         else app.model.dtDanhSachMonMo.create({ ...data, hocKy, nam }, (error, item) => {
-            res.send({ error, item: { ...item, khoaSinhVien: data.khoaSinhVien } });
+            res.send({ error, item });
         });
     });
 

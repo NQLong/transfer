@@ -276,11 +276,25 @@ export function createQtHuongDanLuanVanStaff(data, done) {
                 T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
-                if (done) {
-                    T.notify('Tạo hướng dẫn luận văn thành công!', 'success');
-                    done(data);
-                    dispatch(getQtHuongDanLuanVanPage());
-                }
+                T.notify('Tạo hướng dẫn luận văn thành công!', 'success');
+                dispatch(getQtHuongDanLuanVanPage());
+                done && done(data);
+            }
+        }, () => T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtHuongDanLuanVanMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/hdlv/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                T.notify('Tạo hướng dẫn luận văn thành công!', 'success');
+                dispatch(getQtHuongDanLuanVanPage());
+                done && done(data);
             }
         }, () => T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger'));
     };

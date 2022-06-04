@@ -293,6 +293,22 @@ export function createQtBangPhatMinhStaff(data, done) {
     };
 }
 
+export function createQtBangPhatMinhMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/bang-phat-minh/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin quá trình bằng phát minh bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình bằng phát minh thành công!', 'info');
+                dispatch(getQtBangPhatMinhPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin quá trình bằng phát minh bị lỗi', 'danger'));
+    };
+}
+
 export function updateQtBangPhatMinhStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/bang-phat-minh';
