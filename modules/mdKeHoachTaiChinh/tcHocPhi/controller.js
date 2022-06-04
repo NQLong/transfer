@@ -18,7 +18,7 @@ module.exports = app => {
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.check('tcHocPhi:read'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
-        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
+        const { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
         let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
         app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), searchTerm, filter, (error, page) => {
             if (error || !page) {
@@ -34,7 +34,7 @@ module.exports = app => {
     });
 
     app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.check('tcHocPhi:read'), async (req, res) => {
-        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']),
+        const { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy'),
             mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             if (error) res.send({ error });

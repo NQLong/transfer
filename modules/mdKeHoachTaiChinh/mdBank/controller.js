@@ -7,10 +7,11 @@ module.exports = app => {
     const serviceId = 'HocPhi';
     const crypto = require('crypto');
     // console.log(crypto.createHash('md5').update(`${bankPartners.bidv}|${serviceId}|2156031059`).digest('hex'));
+    // console.log(crypto.createHash('md5').update(`${bankPartners.bidv}|${1000}|20221000|1500000`).digest('hex'));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/:bank/getbill', async (req, res) => {
-        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
+        const { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
         const { bank } = req.params,
             { customer_id, service_id, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${bankPartners[bank]}|${service_id}|${customer_id}`).digest('hex');
@@ -51,7 +52,7 @@ module.exports = app => {
     });
 
     app.post('/api/:bank/paybill', async (req, res) => {
-        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
+        const { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
         const { bank } = req.params,
             { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${bankPartners[bank]}|${trans_id}|${bill_id}|${amount}`).digest('hex');

@@ -1,22 +1,27 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
-    // app.model.tcSetting.foo = () => { };
-
-    app.model.tcSetting.getValue = (keys, done) => new Promise(resolve => {
-        let result = {};
-        const solveAnItem = (index) => {
-            if (index < keys.length) {
-                let key = keys[index];
-                app.model.tcSetting.get({ key }, (error, item) => {
-                    result[key] = (error == null && item) ? item.value : null;
-                    solveAnItem(index + 1);
-                });
-            } else if (done) {
-                done(result);
-            } else resolve(result);
-        };
-        solveAnItem(0);
-    });
+    app.model.tcSetting.getValue = function () {
+        return new Promise(resolve => {
+            const result = {};
+            const solveAnItem = (index) => {
+                if (index < arguments.length) {
+                    const key = arguments[index];
+                    if (typeof key == 'function') {
+                        key(result);
+                        resolve(result);
+                    } else {
+                        app.model.tcSetting.get({ key }, (error, item) => {
+                            result[key] = (error == null && item) ? item.value : null;
+                            solveAnItem(index + 1);
+                        });
+                    }
+                } else {
+                    resolve(result);
+                }
+            };
+            solveAnItem(0);
+        });
+    };
 
     app.model.tcSetting.setValue = (data, done) => {
         let keys = Object.keys(data),
