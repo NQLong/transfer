@@ -55,7 +55,8 @@ module.exports = (cluster, isDebug) => {
     app.get('/download/:name', (req, res) => {
         const fileName = req.params.name, path = app.path.join(app.documentPath, fileName);
         if (app.fs.existsSync(path)) {
-            res.download(path, fileName);
+            let displayName = req.query.displayName ? `${req.query.displayName}${app.path.extname(fileName)}` : fileName;
+            res.download(path, displayName);
         } else {
             // res.redirect('/404.html');
         }

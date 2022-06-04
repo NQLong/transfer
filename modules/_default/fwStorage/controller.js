@@ -20,27 +20,76 @@ module.exports = app => {
             res.send({ error: 'Thông tin bạn gửi không hợp lệ!' });
         }
     });
+    
+    app.uploadHooks.add('fwStorageFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => fwStorageFile(req, fields, files, params, done), done, 'staff:login'));
 
-    app.post('/user/upload-file', app.permission.check('storage:write'), (req, res) => {
-        app.getUploadForm().parse(req, (error, fields, files) => {
-            const body = JSON.parse(fields.data);
-            body.path = files.assets[0].originalFilename;
-            body.userUpload = req.session.user.lastName + ' ' + req.session.user.firstName;
-            body.maDonVi = req.session.user.maDonVi;
-            app.fs.rename(files.assets[0].path, app.path.join(app.documentPath, body.path), error => {
-                if (error) {
-                    return res.send({ error, x1: files.assets[0].path, x2: app.path.join(app.documentPath, body.path) });
-                } else
-                    app.model.fwStorage.get({ path: body.path }, (error, itemCheck) => {
-                        if (itemCheck) {
-                            res.send({ error: 'Đã tồn tại tệp tin trùng tên trong hệ thống.' });
+    const fwStorageFile = (req, fields, files, params, done) => {
+        
+        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('fwStorageFile') && files.fwStorageFile && files.fwStorageFile.length > 0) {
+            const
+                srcPath = files.fwStorageFile[0].path,
+                body = JSON.parse(fields.data),
+                id = fields.userData[0].substring(14),
+                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
+                baseNamePath = app.path.extname(srcPath);
+                if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done && done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                const newData = {
+                    nameDisplay: body.nameDisplay,
+                    note: body.note,
+                    active: Number(body.active),
+                    userUpload: req.session.user.lastName + ' ' + req.session.user.firstName,
+                    maDonVi: req.session.user.maDonVi
+                    
+                };
+                if (id == 'new') {
+                    app.model.fwStorage.create(newData, (error, item) => {
+                        if (error || !item) {
+                            done && done({ error });
+                            app.deleteFile(srcPath);
                         } else {
-                            app.model.fwStorage.create(body, (error, item) => {
-                                res.send({ error, item });
+                            const path = item.id + app.path.extname(srcPath);
+                            app.fs.rename(srcPath, app.path.join(app.assetPath, 'document', path), error => {
+                                if (error) {
+                                    done && done({ error });
+                                } else {
+                                    app.model.fwStorage.update({ id: item.id }, { path: path}, (error, item) => {
+                                        done && done({ error, item });
+                                    });
+                                } 
                             });
                         }
                     });
-            });
+                } else {
+
+                        app.model.fwStorage.get({id:id},(error, item) => {
+                        app.deleteFile(app.path.join(app.assetPath, 'document', item.path));
+                        
+                        const path = id + app.path.extname(srcPath);
+                        app.fs.rename(srcPath, app.path.join(app.assetPath, 'document', path), error => {
+                            
+                            if (error) {
+                                done && done({ error });
+                            } else {
+                                app.model.fwStorage.update({ id: id }, {...newData,path:path}, (error, item) => {
+                                    done && done({ error, item });
+                                });
+                            } 
+                        });
+                    });
+                    }
+                    // TODO: getItem => Xoa file cu => fs.rename => update Path
+                    
+                }
+            }
+        };
+    
+    app.get('/api/storage/all', app.permission.check('storage:read'), (req, res) => {
+        app.model.fwStorage.getAll({}, '*', 'nameDisplay asc', (error, items) => {
+            res.send({error, items});
         });
     });
     app.get('/api/storage/page/:pageNumber/:pageSize', app.permission.check('storage:read'), (req, res) => {
@@ -73,7 +122,23 @@ module.exports = app => {
         });
     });
 
+    
+
     app.delete('/api/storage', app.permission.check('storage:delete'), (req, res) =>
-        app.model.fwStorage.delete2({ id: req.body.id }, error => res.send({ error })));
+    {
+        let pathDeleteFile= app.assetPath + '/document/';
+        
+        app.model.fwStorage.get({id:req.body.id},(error,itemCheck)=>{
+
+            pathDeleteFile+=itemCheck.path;
+        });
+        app.model.fwStorage.delete({ id: req.body.id }, error => {
+            if (app.fs.existsSync(pathDeleteFile))
+                    app.deleteFile(pathDeleteFile);
+            res.send({ error });
+        });
+        });
+    
+   
 
 };
