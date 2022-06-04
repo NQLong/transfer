@@ -13839,6 +13839,13 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [

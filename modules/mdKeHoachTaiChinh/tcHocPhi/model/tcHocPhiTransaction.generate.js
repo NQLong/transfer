@@ -136,8 +136,8 @@ module.exports = app => {
         },
 
         addBill: (namHoc, hocKy, transId, transDate, customerId, billId, serviceId, amount, checksum, done) => {
-            app.database.oracle.connection.main.execute('BEGIN tc_hoc_phi_transaction_add_bill(:namHoc, :hocKy, :transId, :transDate, :customerId, :billId, :serviceId, :amount, :checksum); END;',
-                { namHoc, hocKy, transId, transDate, customerId, billId, serviceId, amount, checksum }, done);
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_transaction_add_bill(:namHoc, :hocKy, :transId, :transDate, :customerId, :billId, :serviceId, :amount, :checksum); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, namHoc, hocKy, transId, transDate, customerId, billId, serviceId, amount, checksum }, done);
         },
     };
 };
