@@ -1,18 +1,23 @@
 module.exports = app => {
-    const crypto = require('crypto');
-    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    // BIDV
-    const urlBidv = '/api/bidv';
-    const transBidvId = 'bidv-';
-    const secretCode = 'BIDV-XHNV';
+    const bankPartners = {
+        bidv: 'BIDV-XHNV',
+        vcb: 'VCB-XHNV',
+        agri: 'AGRI-XHNV',
+    };
     const serviceId = 'HocPhi';
+    const crypto = require('crypto');
 
-    app.post(urlBidv + '/getbill', async (req, res) => {
+    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+    app.post('/api/:bank/getbill', async (req, res) => {
         const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
-        const { customer_id, service_id, checksum } = req.body,
-            myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
+        const { bank } = req.params,
+            { customer_id, service_id, checksum } = req.body,
+            myChecksum = crypto.createHash('md5').update(`${bankPartners[bank]}|${service_id}|${customer_id}`).digest('hex');
         console.log('getbill', { customer_id, service_id, checksum });
-        if (service_id != serviceId) {
+
+        if (!bankPartners[bank]) {
+            res.send({ result_code: '096' });
+        } else if (service_id != serviceId) {
             res.send({ result_code: '020' });
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
@@ -44,12 +49,16 @@ module.exports = app => {
         }
     });
 
-    app.post(urlBidv + '/paybill', async (req, res) => {
+    app.post('/api/:bank/paybill', async (req, res) => {
         const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
-        const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
-            myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
+        const { bank } = req.params,
+            { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
+            myChecksum = crypto.createHash('md5').update(`${bankPartners[bank]}|${trans_id}|${bill_id}|${amount}`).digest('hex');
         console.log('paybill', { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
-        if (service_id != serviceId) {
+
+        if (!bankPartners[bank]) {
+            res.send({ result_code: '096' });
+        } else if (service_id != serviceId) {
             res.send({ result_code: '020' });
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
@@ -60,7 +69,7 @@ module.exports = app => {
                 } else if (!hocPhi) {
                     res.send({ result_code: '025' });
                 } else {
-                    app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, transBidvId + trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum, (error) => {
+                    app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `${bank}-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error) => {
                         if (error) {
                             res.send({ result_code: '096' });
                         } else {
