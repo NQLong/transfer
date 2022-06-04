@@ -18,7 +18,7 @@ module.exports = app => {
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.check('tcHocPhi:read'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
-        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
+        const { namHoc, hocKy } = await getTerm();
         let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
         app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), searchTerm, filter, (error, page) => {
             if (error || !page) {
@@ -34,7 +34,7 @@ module.exports = app => {
     });
 
     app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.check('tcHocPhi:read'), async (req, res) => {
-        const { namHoc, hocKy } = await app.model.tcSetting.getValue(['namHoc', 'hocKy']),
+        const { namHoc, hocKy } = await getTerm(),
             mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             if (error) res.send({ error });
@@ -49,10 +49,16 @@ module.exports = app => {
 
 
     //Hook upload -----------------------------------------------------------------------------------------
-    app.uploadHooks.add('TcHocPhiImportData', (req, fields, files, params, done) =>
-        app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write'));
+    app.uploadHooks.add('TcHocPhiData', (req, fields, files, params, done) =>
+        app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
+    );
 
-    const tcHocPhiImportData = (fields, files, done) => {
+    const getTerm = async () =>
+        await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
+
+
+    const tcHocPhiImportData = async (fields, files, done) => {
+        const { namHoc, hocKy } = await getTerm();
         let worksheet = null;
         console.log(done);
         new Promise((resolve, reject) => {
@@ -66,17 +72,44 @@ module.exports = app => {
                 });
             }
         }).then(() => {
-            // let data = [];
-            // const init = (index = 2) => {
-            //     if (!worksheet.getCell('A' + index).value) return;
-            //     else {
-            //         let row = {
-            //             mssv: worksheet.getCell('A' + index).value?.toString().trim() || '',
-            //             hocPhi: worksheet.getCell('B' + index).value?.toString(),
-            //             congNo: worksheet.getCell('C' + index).value,
-            //         };
-            //     }
-            // };  
+            const items = [];
+            const init = (index = 2) => {
+                if (!worksheet.getCell('A' + index).value) {
+                    done({ items, term: { namHoc, hocKy } });
+                    return;
+                } else {
+                    const mssv = worksheet.getCell('A' + index).value?.toString().trim() || '';
+                    //TODO: check mssv
+                    // const profile = await app.model.dmKhenThuongLoaiDoiTuong.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
+                    if (!mssv) {
+                        init(index + 1);
+                        return;
+                    }
+                    const hocPhi = worksheet.getCell('B' + index).value;
+                    const congNo = worksheet.getCell('C' + index).value;
+                    const row = {
+                        mssv: mssv,
+                        hocPhi: hocPhi,
+                        congNo: congNo,
+                    };
+                    items.push(row);
+                    init(index + 1);
+                }
+            };
+            init();
         });
     };
+
+    app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:write'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Hoc_phi_Template');
+        const defaultColumns = [
+            { header: 'MSSV', key: 'maSoSinhVien', width: 20 },
+            { header: 'HỌC PHÍ', key: 'hocPhi', width: 25, style: { numFmt: '###,###' } },
+            { header: 'CÔNG NỢ', key: 'congNo', width: 25, style: { numFmt: '###,###' } },
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
+    });
 };
