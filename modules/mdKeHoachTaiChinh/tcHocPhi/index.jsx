@@ -11,6 +11,10 @@ export default {
     },
     routes: [
         {
+            path: '/user/finance/import-hoc-phi',
+            component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
+        },
+        {
             path: '/user/finance/hoc-phi/:mssv',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         },

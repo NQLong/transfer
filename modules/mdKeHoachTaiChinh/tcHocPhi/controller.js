@@ -13,7 +13,7 @@ module.exports = app => {
 
     app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
-
+    app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     //APIs----------------------------------------------------------------------------------
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.check('tcHocPhi:read'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
@@ -46,4 +46,37 @@ module.exports = app => {
             }
         });
     });
+
+
+    //Hook upload -----------------------------------------------------------------------------------------
+    app.uploadHooks.add('TcHocPhiImportData', (req, fields, files, params, done) =>
+        app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write'));
+
+    const tcHocPhiImportData = (fields, files, done) => {
+        let worksheet = null;
+        console.log(done);
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'TcHocPhiData' && files.TcHocPhiData && files.TcHocPhiData.length) {
+                const srcPath = files.TcHocPhiData[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
+                    app.deleteFile(srcPath);
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('Invalid excel file!');
+                });
+            }
+        }).then(() => {
+            // let data = [];
+            // const init = (index = 2) => {
+            //     if (!worksheet.getCell('A' + index).value) return;
+            //     else {
+            //         let row = {
+            //             mssv: worksheet.getCell('A' + index).value?.toString().trim() || '',
+            //             hocPhi: worksheet.getCell('B' + index).value?.toString(),
+            //             congNo: worksheet.getCell('C' + index).value,
+            //         };
+            //     }
+            // };  
+        });
+    };
 };

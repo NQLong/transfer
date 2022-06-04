@@ -48,7 +48,8 @@ class TcHocPhiAdminPage extends AdminPage {
                 {table}
                 <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getTcHocPhiPage} />
-            </div>
+            </div>,
+            onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null
         });
     }
 }
