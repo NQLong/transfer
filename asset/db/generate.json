@@ -13801,6 +13801,9 @@
             "active": true,
             "moduleName": "tcHocPhi",
             "modelName": "tcHocPhi",
+            "methods": {
+                "TC_HOC_PHI_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "MSSV": {
                     "value": "mssv",
