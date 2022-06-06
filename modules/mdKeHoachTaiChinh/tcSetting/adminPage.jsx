@@ -141,6 +141,7 @@ class TcSettingAdminPage extends AdminPage {
 
                         <div className='tab-pane fade' id='smsHocPhi'>
                             <div className='tile-body'>
+                                <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
                                 <FormRichTextBox ref={e => this.hocPhiSms = e} />
                             </div>
                         </div>
