@@ -1,27 +1,20 @@
 module.exports = app => {
-    const bankPartners = {
-        bidv: 'BIDV-XHNV',
-        vcb: 'VCB-XHNV',
-        agri: 'AGRI-XHNV',
-    };
+    const SecretCode = 'AGRI-XHNV';
     const serviceId = 'HocPhi';
     const crypto = require('crypto');
-    // console.log(crypto.createHash('md5').update(`${bankPartners.bidv}|${serviceId}|2156031059`).digest('hex'));
-    // console.log(crypto.createHash('md5').update(`${bankPartners.bidv}|${1000}|20221000|1500000`).digest('hex'));
+    // console.log(crypto.createHash('md5').update(`${SecretCode}|${serviceId}|2156031059`).digest('hex'));
+    // console.log(crypto.createHash('md5').update(`${SecretCode}|${1000}|20221000|1500000`).digest('hex'));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.post('/api/:bank/getbill', async (req, res) => {
+    app.post('/api/agri/getbill', async (req, res) => {
         let { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
-        const { bank } = req.params,
-            { customer_id, service_id, checksum } = req.body,
-            myChecksum = crypto.createHash('md5').update(`${bankPartners[bank]}|${service_id}|${customer_id}`).digest('hex');
+        const { customer_id, service_id, checksum } = req.body,
+            myChecksum = crypto.createHash('md5').update(`${SecretCode}|${service_id}|${customer_id}`).digest('hex');
         console.log('getbill', { customer_id, service_id, checksum });
 
-        if (!bankPartners[bank]) {
-            res.send({ result_code: '096' });
-        } else if (service_id != serviceId) {
+        if (service_id != serviceId) {
             res.send({ result_code: '020' });
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
@@ -53,19 +46,16 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/:bank/paybill', async (req, res) => {
+    app.post('/api/agri/paybill', async (req, res) => {
         try {
             let { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
             namHoc = Number(namHoc);
             hocKy = Number(hocKy);
-            const { bank } = req.params,
-                { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
-                myChecksum = crypto.createHash('md5').update(`${bankPartners[bank]}|${trans_id}|${bill_id}|${amount}`).digest('hex');
+            const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
+                myChecksum = crypto.createHash('md5').update(`${SecretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
             console.log('paybill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
 
-            if (!bankPartners[bank]) {
-                res.send({ result_code: '096' });
-            } else if (service_id != serviceId) {
+            if (service_id != serviceId) {
                 res.send({ result_code: '020' });
             } else if (checksum != myChecksum) {
                 res.send({ result_code: '007' });
@@ -76,7 +66,7 @@ module.exports = app => {
                     } else if (!hocPhi) {
                         res.send({ result_code: '025' });
                     } else {
-                        app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `${bank}-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
+                        app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `AGRI-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
                             if (error || !result || !result.outBinds || !result.outBinds.ret) {
                                 res.send({ result_code: '096' });
                             } else {
