@@ -13846,6 +13846,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "BILL_DATE": {
+                    "value": "billDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BILL_DUE_DATE": {
+                    "value": "billDueDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -13922,6 +13936,13 @@
                 },
                 "HOC_KY": {
                     "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "IS_SUCCESS": {
+                    "value": "isSuccess",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
