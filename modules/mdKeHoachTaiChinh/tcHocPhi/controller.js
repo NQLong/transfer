@@ -5,14 +5,20 @@ module.exports = app => {
             5002: { title: 'Học phí', link: '/user/finance/hoc-phi' },
         },
     };
-    app.permission.add({ name: 'tcHocPhi:read', menu }, 'tcHocPhi:write', 'tcHocPhi:delete');
+    const menuStudent = {
+        parentMenu: app.parentMenu.students,
+        menus: {
+            6102: { title: 'Học phí', link: '/user/finance/hoc-phi' },
+        },
+    };
+    app.permission.add({ name: 'tcHocPhi:read', menu }, { name: 'student:login', menu: menuStudent }, 'tcHocPhi:write', 'tcHocPhi:delete');
 
-    app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/finance/hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
 
     //APIs ------------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.check('tcHocPhi:read'), async (req, res) => {
+    app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
         let namHoc = req.query?.settings?.namHoc;
@@ -23,7 +29,9 @@ module.exports = app => {
             if (!hocKy) hocKy = settings.hocKy;
         }
         let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
-        app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), searchTerm, filter, (error, page) => {
+        let mssv = '';
+        if (!req.session.user.permissions.includes('tcHocPhi:read')) mssv = req.session.user.data.mssv;
+        app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), mssv, searchTerm, filter, (error, page) => {
             if (error || !page) {
                 res.send({ error });
             } else {
