@@ -6,7 +6,7 @@ module.exports = app => {
 
     // VCB --------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/VCBPayment/Inquiry', async (req, res) => {
-        let { namHoc, hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('namHoc', 'hocKy', 'secretCodeVcb');
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
         let { context, payload, signature } = req.body,
@@ -78,7 +78,7 @@ module.exports = app => {
     });
 
     // app.post('/api/VCBPayment/Payment', async (req, res) => {
-    //     let { namHoc, hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('namHoc', 'hocKy', 'secretCodeVcb');
+    //     let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb');
     //     namHoc = Number(namHoc);
     //     hocKy = Number(hocKy);
     //     let { context, payload, signature } = req.body,
