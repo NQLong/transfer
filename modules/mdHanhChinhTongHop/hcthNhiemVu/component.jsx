@@ -4,13 +4,78 @@ import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_FwCanBo, SelectAdapter_FwCanBoByDonVi } from 'modules/mdTccb/tccbCanBo/redux';
-const { vaiTro, loaiLienKet, trangThaiNhiemVu } = require('../constant');
+const { vaiTro, loaiLienKet, trangThaiNhiemVu} = require('../constant');
 const vaiTroSelector = Object.keys(vaiTro).map(key => ({ id: key, text: vaiTro[key].text }));
 
+export class RefreshStatusModal extends AdminModal {
+
+    componentDidMount() {
+        T.ready(() => this.onShown(() => this.phanHoi.focus()));
+    }
+
+    onShow = (item) => {
+        console.log(item);
+        this.setState({ item});
+        this.phanHoi.value('');
+    }
+
+    onSubmit = (e) => {
+        console.log(this.phanHoi.value());
+        if (this.phanHoi.value() !== '') {
+            console.log(this.state.item);
+            const { shccCanBoNhan, tenCanBoNhan, hoCanBoNhan } = this.state.item;
+            this.props.onSave({
+                id: this.props.nhiemVuId,
+                phanHoi: this.phanHoi.value(),
+                shccCanBoNhan,
+                tenCanBoNhan,
+                hoCanBoNhan
+            }, () => {
+                this.modal.hide();
+                this.phanHoi.value('');
+            });
+        } else {
+            T.notify('Vui lòng nhập lý do !', 'danger');
+            this.ten.focus();
+        }
+        // const changes = {
+        //     ten: this.ten.value(),
+        //     tenVietTat: this.tenVietTat.value(),
+        //     kichHoat: this.kichHoat.value() ? 1 : 0,
+        // };
+        // if (changes.ten == '') {
+        //     T.notify('Tên đơn vị công văn bị trống!', 'danger');
+        //     this.ten.focus();
+        // } else {
+        //     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        // }
+        e.preventDefault();
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Nhập phản hồi',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-md-12' ref={e => this.phanHoi = e} label='Nhập phản hồi'
+                />
+            </div>
+        });
+    }
+}
 
 export class CanBoNhan extends AdminPage {
+    tinhTrangText = {
+        READ: 'Đã đọc',
+        COMPLETE: 'Đã hoàn thành',
+    }
+
+    tinhTrangColor = {
+        READ: 'blue',
+        COMPLETE: '#149414'
+    }
 
     state = { ids: [], canBoNhan: [] };
+
     componentDidMount() {
         this.vaiTro?.value(vaiTro.PARTICIPANT.id);
     }
@@ -80,8 +145,35 @@ export class CanBoNhan extends AdminPage {
             }));
     }
 
+    refreshTrangThai = (e) => {
+        // T.confirm('', `Bạn có chắc bạn muốn thay đổi quyền cán bộ ${(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()} thành ${vaiTro[vaiTroMoi].text}?`, true,
+        //     isConfirm => isConfirm && this.props.updateCanBoNhanNhiemVu(updateData, () => {
+        //         const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
+        //         const currentId = currentCanBoNhan.map(item => item.id);
+        //         this.props.getList({ ma: this.props.target, ids: currentId });
+        //     }));
+        this.showModal(e);
+    }
+
+    canBoNhanData = () => {
+        let listCanBoNhan = this.props.target && this.props.hcthNhiemVu?.item?.canBoNhan ? this.props.hcthNhiemVu?.item?.canBoNhan : [];
+        let listHistory = this.props.hcthNhiemVu?.item?.history || [];
+        console.log('list : ',listCanBoNhan);
+        console.log(listHistory);
+        let listCanBoNhanWithStatus = listCanBoNhan.map(canBo => {
+            let lastHistory = listHistory.find(history => history.shcc == canBo.shccCanBoNhan);
+            console.log(lastHistory);
+            return ({
+                ...canBo,
+                trangThai: lastHistory?.hanhDong || ''
+            });
+        });
+        console.log('trang thai :', listCanBoNhanWithStatus);
+        return listCanBoNhanWithStatus;
+    }
+
     tableCanBoNhan = () => renderTable({
-        getDataSource: () => this.props.hcthNhiemVu?.item?.canBoNhan || (!this.props.target && []),
+        getDataSource: this.canBoNhanData,
         stickyHead: false,
         emptyTable: 'Chưa có cán bộ tham gia!',
         loadingOverlay: false,
@@ -92,7 +184,8 @@ export class CanBoNhan extends AdminPage {
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SHCC</th>
                 <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Cán bộ</th>
                 <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Vai trò</th>
-                <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Người tạo</th>
+                <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Người tạo</th>
+                <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Trạng thái</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>
         ),
@@ -109,7 +202,11 @@ export class CanBoNhan extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold', color: 'blue' }} content={(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: vaiTro[item.vaiTro]?.color || 'blue' }} content={vaiTro[item.vaiTro]?.text} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.hoNguoiTao + ' ' + item.tenNguoiTao).trim().normalizedName()} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: this.tinhTrangColor[item.trangThai], fontWeight: 'bold' }} content={this.tinhTrangText[item.trangThai]} />
                     <TableCell type='buttons' permission={permissions} onDelete={() => this.onDelete(item)} >
+                        {(this.props.isManager || this.props.isCreator) && <a className='btn btn-primary' title='Phản hồi' onClick={() => this.modal.show(item)}>
+                            <i className='fa fa-lg fa-refresh' />
+                        </a>}
                         {item.vaiTro == vaiTro.PARTICIPANT.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
                             <i className='fa fa-lg fa-user-plus' />
                         </a>}
@@ -152,6 +249,7 @@ export class CanBoNhan extends AdminPage {
         return (this.props.isCreator || !this.props.target) ? vaiTroSelector : [{ id: vaiTro.PARTICIPANT.id, text: vaiTro.PARTICIPANT.text }];
     }
 
+
     render() {
         return (
             <div className='tile'>
@@ -171,7 +269,8 @@ export class CanBoNhan extends AdminPage {
                         </div>
                     </div>
                 </div>
-            </div >
+                <RefreshStatusModal ref={e => this.modal = e} onSave={this.props.refreshCanBoNhanStatus} nhiemVuId={this.props.target}/>
+            </div>
         );
     }
 }
@@ -337,7 +436,7 @@ class CongVanDenSelector extends React.Component {
                 <div className='col-md-12' style={{ maxHeight: '40vh', overflowY: 'scroll', padding: '10px 10px 10px 10px' }}>
                     {table}
                 </div>
-                < Pagination style={{ marginLeft: '50px', position: 'static', marginTop: '10px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                <Pagination style={{ marginLeft: '50px', position: 'static', marginTop: '10px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </div>
         </div>);

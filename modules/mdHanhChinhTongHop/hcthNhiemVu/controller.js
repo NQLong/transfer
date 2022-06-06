@@ -721,5 +721,64 @@ module.exports = (app) => {
             res.send({ error });
         }
     });
+
+    const onCreateResetCanBoNhanStatusNotification = ({ maNhiemVu, phanHoi, nguoiTaoShcc, canBoNhan = []}) => new Promise((resolve, reject) => {
+        try {
+            console.log(maNhiemVu, phanHoi, nguoiTaoShcc, canBoNhan);
+            let listEmployees = [];
+            listEmployees.push(nguoiTaoShcc);
+            listEmployees = listEmployees.concat(canBoNhan);
+            app.model.canBo.getAll({
+                statement: 'shcc IN (:dsCanBo)',
+                parameter: {
+                    dsCanBo: [...listEmployees]
+                }
+            }, 'email, ho, ten, shcc', 'email', (error, canBos) => {
+                if (error) reject(error);
+                else {
+                    const nguoiTao = canBos.find(canBo => canBo.shcc === nguoiTaoShcc);
+                    const dsNguoiNhan = canBos.filter(canBo => canBo.shcc !== nguoiTaoShcc);
+                    const hoTenNguoiTao = nguoiTao?.ho + ' ' + nguoiTao?.ten;
+                    
+                    const subTitle = `${hoTenNguoiTao} đã phản hồi nhiệm vụ ${maNhiemVu}: ${phanHoi}`;
+                    createNotification(dsNguoiNhan.map(item => item.email), { title: 'Nhiệm vụ', icon: 'fa-list-alt', iconColor: 'primary', subTitle, link: `/user/nhiem-vu/${maNhiemVu}` }, (error) => {
+                        if (error) reject(error);
+                        else resolve();
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('fail to send notification', error);
+            resolve();
+        }
+    });
+
+    app.post('/api/hcth/nhiem-vu/reset-trang-thai/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            console.log(req.body);
+            const { phanHoi, shccCanBoNhan, hoCanBoNhan, tenCanBoNhan } = req.body;
+            const nhiemVuId = req.params.id;
+            const shccNguoiTao = req.session?.user?.staff?.shcc;
+            await app.model.hcthHistory.asyncCreate({
+                loai: 'NHIEM_VU',
+                key: nhiemVuId,
+                shcc: shccNguoiTao,
+                ghiChu: JSON.stringify({
+                    name: (hoCanBoNhan + ' ' + tenCanBoNhan).normalizedName()
+                }),
+                hanhDong: 'RESET'
+            }).then(async () => {
+                    await onCreateResetCanBoNhanStatusNotification({
+                        maNhiemVu: nhiemVuId,
+                        phanHoi,
+                        nguoiTaoShcc: req.session?.user?.staff?.shcc,
+                        canBoNhan: [shccCanBoNhan]
+                    }).then(() => res.send({ error: null }));
+            });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };
+
 

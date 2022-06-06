@@ -264,7 +264,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                     </div>
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} onChange={() => this.changeA$ƠdvancedSearch()} />
                 </div>
             </>,
             content: <div className='tile'>
@@ -275,6 +275,13 @@ class HcthCongVanDenStaffPage extends AdminPage {
             </div>,
 
             onCreate: permission && permission.write ? () => this.props.history.push(`${baseUrl}/new`) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                console.log(this.state.filter);
+                const { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status } = 
+                (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null };
+                T.download(T.url(`/api/hcth/cong-van-den/download-excel/${donViGuiCongVan ? donViGuiCongVan : null}/${donViNhanCongVan ? donViNhanCongVan : null}/${canBoNhanCongVan ? canBoNhanCongVan : null}/${timeType ? timeType : null}/${fromTime ? fromTime : null}/${toTime ? toTime : null}/${congVanYear ? congVanYear : null}/${tab}/${status ? status : null}/${this.state.sortBy !== '' ? this.state.sortBy : null}/${this.state.sortType !== '' ? this.state.sortType : null}`), 'CONG_VAN_DEN.xlsx');
+            },
             backRoute,
         });
     }
