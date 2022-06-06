@@ -232,7 +232,7 @@ class CreateListYear extends AdminPage {
             onSave: (e) => this.save(e),
             onExport: this.year && this.year.value() ? (e) => {
                 e.preventDefault();
-                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), '[KHXH&NV] Bao cao thuc hien keo dai thoi gian cong tac nam ' + year + '.xlsx');
+                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table'), { dateNF: 'mm/dd/yyyy;@', cellDates: true }), '[KHXH&NV] Bao cao thuc hien keo dai thoi gian cong tac nam ' + year + '.xlsx');
             } : null,
             backRoute: '/user/tccb/qua-trinh/keo-dai-cong-tac',
         });

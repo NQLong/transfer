@@ -5,8 +5,6 @@ module.exports = app => {
     // VCB --------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/PayLoad/Inquiry', async (req, res) => {
         try {
-            // console.log('Get in success');
-
             let { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
             namHoc = Number(namHoc);
             hocKy = Number(hocKy);
@@ -14,7 +12,6 @@ module.exports = app => {
             const secretCode = '8FC824A5A94877219ABC9B1B83DA5'; //TODO: Lấy từ settings
             const providerId = 'VCB_XHNV';
 
-            // console.log('body:', req.body);
             let { context, payload } = req.body,
                 { channelId, channelRefNumber } = context,
                 { customerCode, fields, signature } = payload;
@@ -66,17 +63,7 @@ module.exports = app => {
                                 }
                             ], customerName = (sinhVien.ho + ' ' + sinhVien.ten).trim().toUpperCase();
                             context.status = 'Success';
-                            data = `${channelId}
-                        |${channelRefNumber}
-                        |${context.status}
-                        |${context.errorCode}
-                        |${context.billerDivisionKey || ''}
-                        |${customerCode}
-                        |${customerName}
-                        |${''}
-                        |${''}
-                        |${JSON.stringify(bills)}
-                        |${secretCode}`;
+                            data = `${channelId}|${channelRefNumber}|${context.status}|${context.errorCode}|${context.billerDivisionKey || ''}|${customerCode}|${customerName}|${''}|${''}|${JSON.stringify(bills)}|${secretCode}`;
                             signature = crypto.createHash('md5').update(data).digest('hex');
                             res.send({
                                 context,
@@ -107,17 +94,7 @@ module.exports = app => {
                 { channelId, channelRefNumber, requestDateTime } = context,
                 { customerCode, fields, signature, totalPaymentAmount, paymentMode, internalTransactionRefNo, bills } = payload;
 
-            let data = `${channelId}
-            |${channelRefNumber}
-            |${providerId}
-            |${serviceId}
-            |${customerCode}
-            |${totalPaymentAmount}
-            |${paymentMode}
-            |${internalTransactionRefNo}
-            |${JSON.stringify(fields)}
-            |${JSON.stringify(bills)}
-            |${secretCode}`;
+            let data = `${channelId}|${channelRefNumber}|${providerId}|${serviceId}|${customerCode}|${totalPaymentAmount}|${paymentMode}|${internalTransactionRefNo}|${JSON.stringify(fields)}|${JSON.stringify(bills)}${secretCode}`;
 
             let mySignature = crypto.createHash('md5').update(data).digest('hex');
 
@@ -144,32 +121,12 @@ module.exports = app => {
                     const billResult = [];
                     const solve = (index = 0) => {
                         if (index == bills.length) {
-                            data = `${channelId}
-                                |${channelRefNumber}
-                                |${'Success'}
-                                |${'0'}
-                                |${customerCode}
-                                |${totalPaymentAmount}
-                                |${paymentMode}
-                                |${internalTransactionRefNo}
-                                |${JSON.stringify(fields)}
-                                |${JSON.stringify(billResult)}
-                                |${secretCode}`;
+                            data = `${channelId}|${channelRefNumber}|${'Success'}|${'0'}|${customerCode}|${totalPaymentAmount}|${paymentMode}|${internalTransactionRefNo}|${JSON.stringify(fields)}|${JSON.stringify(billResult)}|${secretCode}`;
                             signature = crypto.createHash('md5').update(data).digest('hex');
                             app.model.tcHocPhiTransaction.update({ transId: `VCB-${internalTransactionRefNo}` }, { checksum: signature }, (error, item) => {
                                 if (error || !item) {
                                     context.status = 'Failure';
-                                    data = `${channelId}
-                                        |${channelRefNumber}
-                                        |${'Failure'}
-                                        |${'22'}
-                                        |${customerCode}
-                                        |${totalPaymentAmount}
-                                        |${paymentMode}
-                                        |${internalTransactionRefNo}
-                                        |${JSON.stringify(fields)}
-                                        |${JSON.stringify(billResult)}
-                                        |${secretCode}`;
+                                    data = `${channelId}|${channelRefNumber}|${'Failure'}|${'22'}|${customerCode}|${totalPaymentAmount}|${paymentMode}|${internalTransactionRefNo}|${JSON.stringify(fields)}|${JSON.stringify(billResult)}|${secretCode}`;
                                     signature = crypto.createHash('md5').update(data).digest('hex');
                                     app.model.tcHocPhiTransaction.update({ transId: `VCB-${internalTransactionRefNo}` }, { checksum: signature, isSuccess: 0 }, () => {
                                         res.send({
@@ -203,7 +160,7 @@ module.exports = app => {
                 }
             });
         } catch (error) {
-            res.send({ result_code: '096' });
+            res.sendStatus(400);
         }
     });
 };
