@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_LOG { email, ngay, quaTrinh, thaoTac }
+// Table name: TC_HOC_PHI_LOG { email, ngay, thaoTac, mssv, hocKy, namHoc, duLieuCu, duLieuMoi }
 const keys = [''];
-const obj2Db = { 'email': 'EMAIL', 'ngay': 'NGAY', 'quaTrinh': 'QUA_TRINH', 'thaoTac': 'THAO_TAC' };
+const obj2Db = { 'email': 'EMAIL', 'ngay': 'NGAY', 'thaoTac': 'THAO_TAC', 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'duLieuCu': 'DU_LIEU_CU', 'duLieuMoi': 'DU_LIEU_MOI' };
 
 module.exports = app => {
     app.model.tcHocPhiLog = {

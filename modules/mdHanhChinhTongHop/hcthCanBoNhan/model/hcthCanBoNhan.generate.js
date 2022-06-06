@@ -1,6 +1,6 @@
-// Table name: HCTH_CAN_BO_NHAN { id, canBoNhan, loai, ma, vaiTro, nguoiTao }
+// Table name: HCTH_CAN_BO_NHAN { id, canBoNhan, loai, ma, vaiTro, nguoiTao, trangThai }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'canBoNhan': 'CAN_BO_NHAN', 'loai': 'LOAI', 'ma': 'MA', 'vaiTro': 'VAI_TRO', 'nguoiTao': 'NGUOI_TAO' };
+const obj2Db = { 'id': 'ID', 'canBoNhan': 'CAN_BO_NHAN', 'loai': 'LOAI', 'ma': 'MA', 'vaiTro': 'VAI_TRO', 'nguoiTao': 'NGUOI_TAO', 'trangThai': 'TRANG_THAI' };
 
 module.exports = app => {
     app.model.hcthCanBoNhan = {

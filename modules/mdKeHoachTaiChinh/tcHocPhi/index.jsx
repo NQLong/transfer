@@ -22,5 +22,9 @@ export default {
             path: '/user/finance/hoc-phi',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/hoc-phi',
+            component: Loadable({ loading: Loading, loader: () => import('./userPage') })
+        },
     ],
 };
