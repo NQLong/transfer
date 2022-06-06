@@ -18,7 +18,13 @@ module.exports = app => {
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.check('tcHocPhi:read'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
-        const { namHoc, hocKy } = await getTerm();
+        let namHoc = req.query?.settings?.namHoc;
+        let hocKy = req.query?.settings?.hocKy;
+        if (!namHoc || !hocKy) {
+            const settings = await getSettings();
+            if (!namHoc) namHoc = settings.namHoc;
+            if (!hocKy) hocKy = settings.hocKy;
+        }
         let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
         app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), searchTerm, filter, (error, page) => {
             if (error || !page) {
@@ -27,14 +33,14 @@ module.exports = app => {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
                 const pageCondition = searchTerm;
                 res.send({
-                    page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list }
+                    page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, settings: { namHoc, hocKy } }
                 });
             }
         });
     });
 
     app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.check('tcHocPhi:read'), async (req, res) => {
-        const { namHoc, hocKy } = await getTerm(),
+        const { namHoc, hocKy } = await getSettings(),
             mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             if (error) res.send({ error });
@@ -47,18 +53,84 @@ module.exports = app => {
         });
     });
 
+    app.put('/api/finance/hoc-phi', app.permission.check('tcHocPhi:write'), (req, res) => {
+        const { item: {mssv, namHoc, hocKy}, changes } = req.body;
+        delete changes['congNo'];
+        app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, (error, item) => {
+            if (!error && item) {
+                item.hocPhi = changes['hocPhi'];
+                getCongNo(item, ({ congNo }) => {
+                    changes['congNo'] = congNo;
+                    app.model.tcHocPhi.update({ mssv }, changes, (error, item) => {
+                        app.tcHocPhiSaveLog(req.session.user.email, 'U', `Cập nhật học phí của ${mssv} thành ${item.hocPhi}`);
+                        res.send({ error, item });
+                    });
+                });
+            }
+        });
+    });
+
+    app.post('/api/finance/hoc-phi/upload', app.permission.check('tcHocPhi:write'), async (req, res) => {
+        const data = req.body.upload;
+        const tmpData = data.map(obj => {
+            delete obj['congNo'];
+            delete obj['hoTenSinhVien'];
+            delete obj['curFee'];
+            obj['ngayTao'] = Date.now();
+            return obj;
+        });
+        if (tmpData && tmpData.length > 0) {
+            let idx = 0;
+            const setCongNo = (index) => {
+                const item = data[index];
+                if (!item) {
+                    app.model.tcHocPhi.insertAndUpdate(tmpData, (err, result) => {
+                        if (err) {
+                            res.send({ error: err });
+                        } else {
+                            tmpData.forEach(item => {
+                                app.tcHocPhiSaveLog(req.session.user.email, 'U', `Cập nhật học phí của ${item.mssv} thành ${item.hocPhi}`);
+                            });
+                            res.send({ result });
+                        }
+                    });
+                    return;
+                }
+                getCongNo(item, ({ congNo }) => {
+                    item['congNo'] = congNo;
+                    idx++;
+                    setCongNo(idx);
+                });
+            };
+            setCongNo(idx);
+        } else {
+            res.send({});
+        }
+    });
+
+    const getCongNo = (item, done) => {
+        const { mssv, hocKy, namHoc, hocPhi } = item;
+        app.model.tcHocPhiTransaction.getAll({
+            customerId: mssv, hocKy, namHoc
+        }, (error, items) => {
+            if (!error) {
+                //calculate cong no
+                const congNo = hocPhi - items.reduce((partialSum, item) => partialSum + parseInt(item.amount), 0);
+                done({ congNo });
+            }
+        });
+    };
 
     //Hook upload -----------------------------------------------------------------------------------------
     app.uploadHooks.add('TcHocPhiData', (req, fields, files, params, done) =>
         app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
     );
 
-    const getTerm = async () =>
-        await app.model.tcSetting.getValue(['namHoc', 'hocKy']);
+    const getSettings = async () =>
+        await app.model.tcSetting.getValue('namHoc', 'hocKy');
 
 
     const tcHocPhiImportData = async (fields, files, done) => {
-        const { namHoc, hocKy } = await getTerm();
         let worksheet = null;
         console.log(done);
         new Promise((resolve, reject) => {
@@ -73,43 +145,71 @@ module.exports = app => {
             }
         }).then(() => {
             const items = [];
+            const duplicateDatas = [];
             const init = (index = 2) => {
                 if (!worksheet.getCell('A' + index).value) {
-                    done({ items, term: { namHoc, hocKy } });
+                    done({ items, duplicateDatas });
                     return;
                 } else {
-                    const mssv = worksheet.getCell('A' + index).value?.toString().trim() || '';
-                    //TODO: check mssv
-                    // const profile = await app.model.dmKhenThuongLoaiDoiTuong.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
+                    const namHoc = worksheet.getCell('A' + index).value;
+                    const hocKy = (worksheet.getCell('B' + index).value || 'HK').replace('HK', '');
+                    const hocPhi = worksheet.getCell('D' + index).value;
+                    const mssv = worksheet.getCell('C' + index).value?.toString().trim() || '';
+                    const row = { namHoc, hocKy, mssv, hocPhi };
                     if (!mssv) {
                         init(index + 1);
                         return;
                     }
-                    const hocPhi = worksheet.getCell('B' + index).value;
-                    const congNo = worksheet.getCell('C' + index).value;
-                    const row = {
-                        mssv: mssv,
-                        hocPhi: hocPhi,
-                        congNo: congNo,
-                    };
-                    items.push(row);
-                    init(index + 1);
+                    let hoTenSinhVien = '';
+                    //check MSSV
+                    app.model.fwStudents.get({ mssv }, (error, item) => {
+                        if (error || !item) {
+                            items.push(row);
+                            init(index + 1);
+                        } else {
+                            hoTenSinhVien = `${item.ho} ${item.ten}`;
+                            let tmpRow = { ...row, hoTenSinhVien };
+                            app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, (error, item) => {
+                                if (!error && item) {
+                                    const { hocPhi: curFee } = item;
+                                    tmpRow = { ...tmpRow, curFee };
+                                    duplicateDatas.push(mssv);
+                                }
+                                items.push(tmpRow);
+                                init(index + 1);
+                            });
+
+                        }
+                    });
                 }
             };
             init();
         });
     };
 
+    const yearDatas = () => {
+        return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
+    };
+
+    const termDatas = ['HK1', 'HK2', 'HK3'];
+
     app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:write'), (req, res) => {
         const workBook = app.excel.create();
         const ws = workBook.addWorksheet('Hoc_phi_Template');
         const defaultColumns = [
+            { header: 'NĂM HỌC', key: 'namHoc', width: 20 },
+            { header: 'HỌC KỲ', key: 'hocKy', width: 20 },
             { header: 'MSSV', key: 'maSoSinhVien', width: 20 },
             { header: 'HỌC PHÍ', key: 'hocPhi', width: 25, style: { numFmt: '###,###' } },
-            { header: 'CÔNG NỢ', key: 'congNo', width: 25, style: { numFmt: '###,###' } },
         ];
         ws.columns = defaultColumns;
-        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        const { dataRange: years } = workBook.createRefSheet('NAM_HOC', yearDatas());
+        const { dataRange: terms } = workBook.createRefSheet('HOC_KY', termDatas);
+        const rows = ws.getRows(2, 1000);
+        rows.forEach((row) => {
+            row.getCell('namHoc').dataValidation = { type: 'list', allowBlank: true, formulae: [years] };
+            row.getCell('hocKy').dataValidation = { type: 'list', allowBlank: true, formulae: [terms] };
+        });
         app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
     });
 };
