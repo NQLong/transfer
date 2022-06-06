@@ -11529,7 +11529,7 @@
                     "value": "noiDung",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 255
                 },
                 "CAN_BO_GUI": {
@@ -13846,6 +13846,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "BILL_DATE": {
+                    "value": "billDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BILL_DUE_DATE": {
+                    "value": "billDueDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -13926,6 +13940,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "IS_SUCCESS": {
+                    "value": "isSuccess",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -13957,6 +13978,44 @@
             "primaryKeys": [
                 "KEY"
             ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_LOG": {
+            "active": true,
+            "moduleName": "tcHocPhiLog",
+            "modelName": "tcHocPhiLog",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NGAY": {
+                    "value": "ngay",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "QUA_TRINH": {
+                    "value": "quaTrinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "THAO_TAC": {
+                    "value": "thaoTac",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                }
+            },
+            "primaryKeys": [],
             "foreignKeys": [],
             "type": "table"
         }
