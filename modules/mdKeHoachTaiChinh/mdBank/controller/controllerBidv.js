@@ -1,17 +1,16 @@
 module.exports = app => {
-    const SecretCode = 'BIDV-XHNV';
     const serviceId = '347002';
     const crypto = require('crypto');
-    // console.log(crypto.createHash('md5').update(`${SecretCode}|${serviceId}|2156031059`).digest('hex'));
-    // console.log(crypto.createHash('md5').update(`${SecretCode}|${1000}|20221000|1500000`).digest('hex'));
+    // console.log(crypto.createHash('md5').update(`${secretCode}|${serviceId}|2156031059`).digest('hex'));
+    // console.log(crypto.createHash('md5').update(`${secretCode}|${1000}|20221000|1500000`).digest('hex'));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/bidv-nvxhhcm/getbill', async (req, res) => {
-        let { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
+        let { namHoc, hocKy, secretCodeBidv: secretCode } = await app.model.tcSetting.getValue('namHoc', 'hocKy', 'secretCodeBidv');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
         const { customer_id, service_id, checksum } = req.body,
-            myChecksum = crypto.createHash('md5').update(`${SecretCode}|${service_id}|${customer_id}`).digest('hex');
+            myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
         console.log('getbill', { customer_id, service_id, checksum });
 
         if (service_id != serviceId) {
@@ -48,11 +47,11 @@ module.exports = app => {
 
     app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
         try {
-            let { namHoc, hocKy } = await app.model.tcSetting.getValue('namHoc', 'hocKy');
+            let { namHoc, hocKy, secretCodeBidv: secretCode } = await app.model.tcSetting.getValue('namHoc', 'hocKy', 'secretCodeBidv');
             namHoc = Number(namHoc);
             hocKy = Number(hocKy);
             const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
-                myChecksum = crypto.createHash('md5').update(`${SecretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
+                myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
             console.log('paybill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
 
             if (service_id != serviceId) {
@@ -68,6 +67,7 @@ module.exports = app => {
                     } else {
                         app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `BIDV-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
                             if (error || !result || !result.outBinds || !result.outBinds.ret) {
+                                //TODO: error thì sao Tùng?
                                 res.send({ result_code: '096' });
                             } else {
                                 res.send({ result_code: '000', result_desc: 'success' });
