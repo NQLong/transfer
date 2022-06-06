@@ -1048,3 +1048,78 @@ export class AdminPage extends React.Component {
 
     render() { return null; }
 }
+
+export class FileComponent extends React.Component {
+    render() {
+        const { file, className = '', style = {}, onRemove, onClick } = this.props;
+
+        return (
+            <div className={'btn btn-primary d-flex justify-content-between align-items-center ' + className} onClick={onClick} style={{ border: '1px solid #ced4da', gap: '10px', paddingRight: '5px', ...style }}>
+                <i className='fa fa-file' />
+                <span >{file.name}</span>
+                {onRemove && <i className='btn btn-danger fa fa-times' onClick={onRemove} />}
+            </div>
+        );
+    }
+}
+
+export class FormFileTextBox extends React.Component {
+    state = { text: '', file: null };
+
+    value = (data) => {
+        if (data) {
+            this.setState({ text: data.text, file: data.file });
+        } else {
+            return {
+                text: this.state.text,
+                file: this.state.file
+            };
+        }
+    }
+
+    focus = () => this.textInput.focus();
+
+    clear = () => {
+        this.setState({ file: null, text: '' });
+    };
+
+    clearFile = (e) => {
+        e.preventDefault();
+        this.setState({ file: null });
+    }
+
+    onUpload = (data, done) => {
+        this.fileInput.onUploadFile(data, (ret) => {
+            done(ret);
+            this.clear();
+        }, false);
+    }
+
+    currentFile = () => this.fileInput?.file;
+
+    render() {
+        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, onError, onSuccess, uploadType, userData, postUrl = '/user/upload' } = this.props;
+        let displayElement = '';
+        if (label) {
+            displayElement = <><label onClick={() => this.textInput?.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label></>;
+        } else {
+            displayElement = readOnly ? <b>{this.state.value}</b> : '';
+        }
+        return (
+            <div className={'form-group ' + (className ? className : '')} style={style} >
+                {displayElement}
+                <div className='form-control form-file-text-box' ref={e => this.box = e}>
+                    <textarea ref={e => this.textInput = e} className='rich-text-box' style={{ display: readOnly ? 'none' : 'block', position: 'relative' }} placeholder={placeholder ? placeholder : label} value={this.state.text} rows={rows} onChange={e => this.setState({ text: e.target.value }, () => onChange && onChange(e))} onFocus={e => { e.preventDefault(); this.box?.focus(); }} />
+                    <FileBox onChange={(file) => this.setState({ file })} style={{ display: 'none' }} ref={e => this.fileInput = e} pending={true} postUrl={postUrl} uploadType={uploadType} userData={userData} success={onSuccess} error={onError} />
+                    <div className='d-flex justify-content-between' style={{ gap: '10px' }}>
+                        <div>
+                            {this.state.file && <FileComponent file={this.state.file} onRemove={this.clearFile} />}
+                        </div>
+                        <div className='d-flex align-items-center'>
+                            <i className='btn fa fa-file' onClick={e => { e.preventDefault(); this.fileInput?.onClick(e) || this.setState({}); }} />
+                        </div>
+                    </div>
+                </div>
+            </div>);
+    }
+}

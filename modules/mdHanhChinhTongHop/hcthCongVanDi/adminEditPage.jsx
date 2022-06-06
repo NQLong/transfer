@@ -1,49 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-    getHcthCongVanDiPage,
-    getHcthCongVanDiAll,
-    createHcthCongVanDi,
-    updateHcthCongVanDi,
-    deleteHcthCongVanDi,
-    getHcthCongVanDiSearchPage,
-    deleteFile,
-    getCongVanDi,
-    createPhanHoi,
-    // createHistory,
-    getHistory,
-    updateStatus,
-    getPhanHoi,
-    readCongVanDi
-} from './redux';
+import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, readCongVanDi } from './redux';
 import { Link } from 'react-router-dom';
 import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
-import {
-    AdminPage,
-    FormDatePicker,
-    renderTable,
-    FormRichTextBox,
-    FormSelect,
-    TableCell,
-    // FormCheckbox,
-    FormFileBox,
-    FormTextBox,
-    renderComment,
-    renderTimeline
-} from 'view/component/AdminPage';
-import {
-    SelectAdapter_DmDonVi,
-    SelectAdapter_DmDonViFilter,
-} from 'modules/mdDanhMuc/dmDonVi/redux';
-import {
-    SelectAdapter_DmDonViGuiCongVan,
-    createDmDonViGuiCv
-} from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
-import {
-    SelectAdapter_DmLoaiCongVan
-} from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
+import { AdminPage, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormFileBox, FormTextBox, renderComment, renderTimeline, FormFileTextBox, FileComponent } from 'view/component/AdminPage';
+import { SelectAdapter_DmDonVi, SelectAdapter_DmDonViFilter } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmDonViGuiCongVan, createDmDonViGuiCv } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
+import { SelectAdapter_DmLoaiCongVan } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { FormFileTextBox, FileComponent } from './component';
+import T from 'view/js/common';
 const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
 
 const listTrangThai = {
@@ -182,8 +147,6 @@ class AdminEditPage extends AdminPage {
                 <div>{item.noiDung}</div>
                 {item.fileId && <a href={`/api/hcth/cong-van-cac-phong/phan-hoi/file/${item.fileId}`} download><FileComponent file={{ name: item.tenFile }} style={{ width: 'fit-content' }} /></a>}
             </div>)
-
-
         });
     }
 
@@ -199,7 +162,7 @@ class AdminEditPage extends AdminPage {
                 key: parseInt(this.props.match.params.id),
                 loai: CONG_VAN_DI_TYPE
             };
-            this.props.createPhanHoi(newPhanHoi, data.file, () => this.getData());
+            this.phanHoi.onUpload(newPhanHoi, () => this.getData());
         } else {
             T.notify('Nội dung phản hồi bị trống', 'danger');
             this.phanHoi.focus();
@@ -239,7 +202,6 @@ class AdminEditPage extends AdminPage {
         this.donViGui.value(donViGui);
 
         this.loaiVanBan.value(loaiVanBan);
-        this.phanHoi?.value('');
 
         this.setState({
             soDi,
@@ -400,17 +362,18 @@ class AdminEditPage extends AdminPage {
         e.preventDefault();
         T.confirm('Thông báo', 'Bạn có chắc chắn muốn trả lại công văn này không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
-                if (this.phanHoi.value()) {
+                const data = this.phanHoi.value();
+                if (data.text || data.file) {
                     const { shcc } = this.state;
                     const newPhanHoi = {
                         canBoGui: shcc,
-                        noiDung: this.phanHoi.value(),
+                        noiDung: data.text,
                         ngayTao: new Date().getTime(),
                         key: parseInt(this.props.match.params.id),
                         loai: CONG_VAN_DI_TYPE
                     };
                     // this.onCreateHistory('4');
-                    this.props.createPhanHoi(newPhanHoi, () => this.props.getPhanHoi(this.state.id, () => this.onChangeStatus(trangThaiCongVanDi.TRA_LAI.id, () => this.getData())));
+                    this.phanHoi.onUpload(newPhanHoi, () => this.props.getPhanHoi(this.state.id, () => this.onChangeStatus(trangThaiCongVanDi.TRA_LAI.id, () => this.getData())));
                 } else {
                     T.notify('Bạn cần thêm lý do trả lại', 'danger');
                     this.phanHoi.focus();
@@ -658,7 +621,7 @@ class AdminEditPage extends AdminPage {
                                 </div>
                                 {this.canAddComment() &&
                                     <>
-                                        <FormFileTextBox className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
+                                        <FormFileTextBox uploadType='hcthCongVanDiPhanHoi' userData='hcthCongVanDiPhanHoi' className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' onError={() => T.notify('Thêm phản hồi lỗi', 'danger')} />
                                         <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                             <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
                                                 Thêm

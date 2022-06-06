@@ -84,12 +84,13 @@ export default class FileBox extends React.Component {
                 // }
                 this.file = event.target.files[0];
                 this.box.style.backgroundImage = 'url(/img/received.png)';
+                this.onChange(this.file);
             }
             event.target.value = '';
         }
     };
 
-    onUploadFile = (data) => {
+    onUploadFile = (data, done, fileRequired = true) => {
         const pending = !!this.props.pending;
         let file, body;
         if (pending) {
@@ -100,7 +101,7 @@ export default class FileBox extends React.Component {
             body = null;
         }
 
-        if (!file) {
+        if (!file && fileRequired) {
             T.alert('Bạn chưa đính kèm tệp tin', 'warning', false, 2000);
             return;
         } else if (!body && pending) {
@@ -157,6 +158,7 @@ export default class FileBox extends React.Component {
             success: data => {
                 this.setState({ isUploading: false });
                 if (this.props.success) this.props.success(data);
+                if (done) done(data);
             },
             error: error => {
                 this.setState({ isUploading: false });
@@ -220,6 +222,10 @@ export default class FileBox extends React.Component {
         });
     }
 
+    onClick = (e) => e.preventDefault() || this.uploadInput.click();
+
+    onChange = (file) => this.props.onChange && this.props.onChange(file);
+
     render() {
         const fileAttrs = { type: 'file' };
         if (this.props.accept) fileAttrs.accept = this.props.accept;
@@ -227,7 +233,7 @@ export default class FileBox extends React.Component {
         return (
             <div style={this.props.style} className={this.props.className}>
                 <div ref={e => this.box = e} id={this.props.uploadType} style={UploadBoxStyle}
-                    onDrop={this.onDrop} onClick={e => e.preventDefault() || this.uploadInput.click()}
+                    onDrop={this.onDrop} onClick={this.onClick}
                     onDragOver={this.onDragOver} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} />
                 <small className='form-text text-primary' style={{ textAlign: 'center' }}>
                     {this.props.description ? this.props.description : 'Nhấp hoặc kéo tập tin thả vào ô phía trên!'}

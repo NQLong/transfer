@@ -1,7 +1,7 @@
 module.exports = app => {
     const FILE_TYPE = 'DI';
 
-    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, } = require('../constant');
+    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, CONG_VAN_TYPE, } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -460,59 +460,64 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/hcth/cong-van-cac-phong/phan-hoi', app.permission.check('staff:login'), (req, res) => {
-        app.getUploadForm().parse(req, async (error, fields, files) => {
-            if (error) {
-                res.send({ error });
-            } else {
+    app.uploadHooks.add('hcthCongVanDiPhanHoi', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthCongVanDiPhanHoiHook(req, fields, files, params, done), done, 'staff:login'));
+
+    const hcthCongVanDiPhanHoiHook = async (req, fields, files, params, done) => {
+        let
+            [userData] = fields.userData || [],
+            [data] = fields.data || [];
+        if (userData == 'hcthCongVanDiPhanHoi') {
+            try {
+                data = JSON.parse(data);
+            } catch (error) {
+                done({ error: 'Không đọc được dữ liệu phản hồi' });
+                return;
+            }
+            const { key: congVanId } = data;
+            const congVan = await app.model.hcthCongVanDi.getCVD({ id: congVanId });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: congVanId, loai: CONG_VAN_TYPE });
+            if (!isRelated(congVan, donViNhan, req)) {
+                done({ error: 'Không có quyền phản hồi' });
+                return;
+            }
+            const phanHoi = await app.model.hcthPhanHoi.asyncCreate(data);
+            if (files.hcthCongVanDiPhanHoi && files.hcthCongVanDiPhanHoi.length) {
                 try {
-                    let data = fields.data[0];
-                    try {
-                        data = JSON.parse(data);
-                    } catch (error) {
-                        res.status(401).send({ error: 'Không đọc được dữ liệu phản hồi' });
-                        return;
-                    }
-                    const phanHoi = await app.model.hcthPhanHoi.asyncCreate(data);
-                    if (files.file && files.file.length) {
-                        const fileList = files.file;
-                        const promises = fileList.map(file => new Promise((resolve, reject) => {
-                            const destPath = app.path.join(app.assetPath, '/phanHoi', `${phanHoi.id}`);
-                            let fileName = file.path.replace(/^.*[\\\/]/, '');
-                            app.model.hcthFile.create({ ten: file.originalFilename, thoiGian: new Date().getTime(), loai: 'PHAN_HOI', ma: phanHoi.id, tenFile: fileName, kichThuoc: file.size, nguoiTao: req.session.user.staff?.shcc }, (error) => {
-                                if (error) reject(error);
-                                else
-                                    app.fs.rename(file.path, destPath + '/' + fileName, error => {
-                                        if (error) {
-                                            reject({ error });
-                                        } else {
-                                            resolve();
-                                        }
-                                    });
-                            });
-                        }));
-                        await Promise.all(promises);
-                    }
-                    res.send({ error: null });
+                    const file = files.hcthCongVanDiPhanHoi && files.hcthCongVanDiPhanHoi.length && files.hcthCongVanDiPhanHoi[0];
+                    let fileName = file.path.replace(/^.*[\\\/]/, '');
+                    const destPath = app.path.join(app.assetPath, '/phanHoi', `${phanHoi.id}`);
+                    await app.model.hcthFile.asyncCreate({ ten: file.originalFilename, thoiGian: new Date().getTime(), loai: 'PHAN_HOI', ma: phanHoi.id, tenFile: fileName, kichThuoc: file.size, nguoiTao: req.session.user.staff?.shcc });
+                    app.fs.rename(file.path, destPath + '/' + fileName, error => {
+                        if (error) {
+                            throw error;
+                        }
+                    });
                 }
                 catch (error) {
-                    res.send({ error });
+                    done({ error });
                 }
             }
-        });
-    });
+            done({});
+        }
+    };
+
 
     app.get('/api/hcth/cong-van-cac-phong/phan-hoi/file/:id', (req, res) => {
         const fileId = parseInt(req.params.id);
         app.model.hcthFile.get({ id: fileId }, (error, file) => {
             if (error) res.send({ error });
             else if (file) {
-                const filePath = app.path.join(app.assetPath, '/phanHoi', `${file.ma}`, file.tenFile);
-                res.setHeader('Content-Disposition', `filename="${file.ten}"`);
-                res.sendFile(filePath);
-            } else {
-                res.status(404).send('file not found');
+                const dir = app.path.join(app.assetPath, '/phanHoi', `${file.ma}`,);
+                if (app.fs.existsSync(dir)) {
+                    const filePath = app.path.join(dir, file.tenFile);
+                    if (app.fs.lstatSync(filePath).isFile()) {
+                        res.setHeader('Content-Disposition', `filename="${file.ten}"`);
+                        return res.sendFile(filePath);
+                    }
+                }
             }
+            res.status(404).send('file not found');
         });
     });
 
