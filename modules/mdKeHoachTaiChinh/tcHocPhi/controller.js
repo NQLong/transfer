@@ -5,16 +5,13 @@ module.exports = app => {
             5002: { title: 'Học phí', link: '/user/finance/hoc-phi' },
         },
     };
-    app.permission.add(
-        { name: 'tcHocPhi:read', menu },
-        { name: 'tcHocPhi:write' },
-        { name: 'tcHocPhi:delete' },
-    );
+    app.permission.add({ name: 'tcHocPhi:read', menu }, 'tcHocPhi:write', 'tcHocPhi:delete');
 
     app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
-    //APIs----------------------------------------------------------------------------------
+
+    //APIs ------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.check('tcHocPhi:read'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
@@ -54,7 +51,7 @@ module.exports = app => {
     });
 
     app.put('/api/finance/hoc-phi', app.permission.check('tcHocPhi:write'), (req, res) => {
-        const { item: {mssv, namHoc, hocKy}, changes } = req.body;
+        const { item: { mssv, namHoc, hocKy }, changes } = req.body;
         delete changes['congNo'];
         app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, (error, item) => {
             if (!error && item) {
@@ -121,7 +118,7 @@ module.exports = app => {
         });
     };
 
-    //Hook upload -----------------------------------------------------------------------------------------
+    //Hook upload -----------------------------------------------------------------------------------------------------------------------------------
     app.uploadHooks.add('TcHocPhiData', (req, fields, files, params, done) =>
         app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
     );

@@ -13944,7 +13944,7 @@
                 "IS_SUCCESS": {
                     "value": "isSuccess",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
                 }
@@ -13983,7 +13983,7 @@
         },
         "TC_HOC_PHI_LOG": {
             "active": true,
-            "moduleName": "tcHocPhiLog",
+            "moduleName": "tcHocPhi",
             "modelName": "tcHocPhiLog",
             "columns": {
                 "EMAIL": {
