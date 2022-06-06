@@ -52,7 +52,7 @@ module.exports = (app) => {
     const createCanBoNhanChiDao = (danhSachCanBo, nguoiTao, id) => {
         const promises = danhSachCanBo.map(canBo => new Promise((resolve, reject) => {
             app.model.hcthCanBoNhan.create({ canBoNhan: canBo, nguoiTao, ma: id, loai: 'DEN', vaiTro: 'DIRECT' }, (error, item) => {
-                if (error) reject(error); 
+                if (error) reject(error);
                 else resolve(item);
             });
         }));
@@ -774,15 +774,14 @@ module.exports = (app) => {
             app.model.hcthCanBoNhan.delete({ canBoNhan: canBoShcc, loai: 'DEN', ma: id, vaiTro: 'DIRECT' }, async (error) => {
                 if (error) reject(error);
                 else {
-                    if (canBoShcc !== nguoiTao) {
-                        await createChiDaoNotification({
-                            id,
-                            quyenChiDao: canBoShcc,
-                        }, false)
-                            .then(() => resolve())
-                            .catch(error => reject(error));
+                    try {
+                        if (canBoShcc !== nguoiTao) {
+                            await createChiDaoNotification({id,quyenChiDao: canBoShcc,}, false);
+                        }
+                        resolve();
+                    } catch (error) {
+                        reject(error);
                     }
-                    else resolve();
                 }
             });
         }));
@@ -790,28 +789,27 @@ module.exports = (app) => {
     };
 
     app.post('/api/hcth/cong-van-den/quyen-chi-dao', app.permission.check('rectors:login'), async (req, res) => {
-        const { id, shcc, status } = req.body;
-        let quyenChiDaoStatus = JSON.parse(status);
-        if (quyenChiDaoStatus) {
-            let listCanBo = [];
-            listCanBo.push(shcc);
-            await createCanBoNhanChiDao(listCanBo, req.session.user?.staff?.shcc, req.body.id)
-                .then(async () => {
-                    if (shcc !== req.session?.user?.staff.shcc) {
-                        await createChiDaoNotification({
-                            id,
-                            quyenChiDao: shcc,
-                        }).then(() => res.send({ error: null }))
-                        .catch(error => res.send({ error }));
-                    } else {
-                        res.send({ error: null });
-                    }
-                })
-                .catch((error) => res.send({ error}));
-        } else {
-            await deleteCanBoNhanChiDao(shcc, id, req.session?.user?.staff.shcc)
-                .then(() => res.send({ error: null }))
-                .catch((error) => res.send({ error }));
+        try {
+            const { id, shcc, status } = req.body;
+            let quyenChiDaoStatus = JSON.parse(status);
+            if (quyenChiDaoStatus) {
+                let listCanBo = [];
+                listCanBo.push(shcc);
+                await createCanBoNhanChiDao(listCanBo, req.session.user?.staff?.shcc, req.body.id);
+                if (shcc !== req.session?.user?.staff.shcc) {
+                    await createChiDaoNotification({
+                        id,
+                        quyenChiDao: shcc,
+                    });
+                }
+                res.send({ error: null });
+            } else {
+                await deleteCanBoNhanChiDao(shcc, id, req.session?.user?.staff.shcc);
+                res.send({ error: null });
+            }
+        }
+        catch (error) {
+            res.send({ error });
         }
     });
 };
