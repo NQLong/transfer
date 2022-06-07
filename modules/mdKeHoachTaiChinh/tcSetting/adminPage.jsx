@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
-import { AdminPage, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 import Editor from 'view/component/CkEditor4';
 
 class EmailItem extends React.Component {
@@ -25,19 +25,16 @@ class EmailItem extends React.Component {
     }
 
     render() {
-        const className = this.props.active ? 'tab-pane fade active show' : 'tab-pane fade';
         return (
-            <div className={className} id={this.props.id}>
-                <div className='tile-body'>
-                    <div className='form-group'>
-                        <label className='control-label'>Tiêu đề</label>
-                        <input className='form-control' type='text' defaultValue='' ref={this.title} placeholder='Tiêu đề email' />
-                    </div>
-                    <div className='form-group'>
-                        <label className='control-label'>HTML</label>
-                        <small className='form-text text-muted'>Tham số: {this.props.params}</small>
-                        <Editor ref={this.editor} placeholder='Nội dung email' height={600} />
-                    </div>
+            <div className='tile-body'>
+                <div className='form-group'>
+                    <label className='control-label'>Tiêu đề</label>
+                    <input className='form-control' type='text' defaultValue='' ref={this.title} placeholder='Tiêu đề email' />
+                </div>
+                <div className='form-group'>
+                    <label className='control-label'>HTML</label>
+                    <small className='form-text text-muted'>Tham số: {this.props.params}</small>
+                    <Editor ref={this.editor} placeholder='Nội dung email' height={600} />
                 </div>
             </div>
         );
@@ -99,23 +96,7 @@ class TcSettingAdminPage extends AdminPage {
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <div className='col-md-6'>
-                    <div className='tile'>
-                        <h3 className='tile-header'>Ngân hàng: Chuỗi bí mật</h3>
-                        <FormTextBox ref={e => this.secretCodeBidv = e} label='BIDV' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.secretCodeVcb = e} label='VCB' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.secretCodeAgri = e} label='Agribank' readOnly={readOnly} />
-                        <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('secretCodeBidv', 'secretCodeVcb', 'secretCodeAgri')}>
-                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className='col-md-6'>
                     <div className='tile'>
                         <h3 className='tile-header'>Email</h3>
                         <FormTextBox ref={e => this.email = e} label='Email' type='email' readOnly={readOnly} />
@@ -136,30 +117,114 @@ class TcSettingAdminPage extends AdminPage {
                     </div>
                 </div>
 
+                <div className='col-md-6'>
+                    <div className='tile'>
+                        <h3 className='tile-header'>Ngân hàng: Chuỗi bí mật</h3>
+                        <FormTextBox ref={e => this.secretCodeBidv = e} label='BIDV' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.secretCodeVcb = e} label='VCB' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.secretCodeAgri = e} label='Agribank' readOnly={readOnly} />
+                        <div style={{ textAlign: 'right' }}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('secretCodeBidv', 'secretCodeVcb', 'secretCodeAgri')}>
+                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className='tile'>
+                        <h3 className='tile-header'>Hướng dẫn đóng học phí</h3>
+                        <FormEditor ref={e => this.hocPhiHuongDan = e} readOnly={readOnly} />
+                        <div style={{ textAlign: 'right' }}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiHuongDan')}>
+                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div className='col-md-12'>
                     <ul className='nav nav-tabs'>
                         <li className='nav-item'>
-                            <a className='nav-link active show' data-toggle='tab' href='#emailHocPhi'>Học phí: Email</a>
+                            <a className='nav-link active show' data-toggle='tab' href='#hocPhiEmailDong'>Email đóng học phí</a>
                         </li>
                         <li className='nav-item'>
-                            <a className='nav-link' data-toggle='tab' href='#smsHocPhi'>Học phí: SMS</a>
+                            <a className='nav-link' data-toggle='tab' href='#hocPhiEmailPhatSinh'>Email phát sinh học phí</a>
+                        </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' data-toggle='tab' href='#hocPhiEmailHoanTra'>Email hoàn trả học phí</a>
+                        </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' data-toggle='tab' href='#hocPhiSmsDong'>SMS đóng học phí</a>
+                        </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' data-toggle='tab' href='#hocPhiSmsPhatSinh'>SMS phát sinh học phí</a>
+                        </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' data-toggle='tab' href='#hocPhiSmsHoanTra'>SMS hoàn trả học phí</a>
                         </li>
                     </ul>
 
                     <div className='tab-content tile'>
-                        <EmailItem ref={e => this.emailHocPhi = e} id='emailHocPhi' active={true} params='{name}, {subject}, {message}' />
-
-                        <div className='tab-pane fade' id='smsHocPhi'>
-                            <div className='tile-body'>
-                                <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
-                                <FormRichTextBox ref={e => this.hocPhiSms = e} />
+                        <div className='tab-pane fade active show' id='hocPhiEmailDong'>
+                            <EmailItem ref={e => this.hocPhiEmailDong = e} params='{name}, {subject}, {message}' />
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('TODO')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
                             </div>
                         </div>
 
-                        <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiSms')}>
-                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
-                            </button>
+                        <div className='tab-pane fade' id='hocPhiEmailPhatSinh'>
+                            <EmailItem ref={e => this.hocPhiEmailPhatSinh = e} params='{name}, {subject}, {message}' />
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('TODO')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className='tab-pane fade' id='hocPhiEmailHoanTra'>
+                            <EmailItem ref={e => this.hocPhiEmailHoanTra = e} params='{name}, {subject}, {message}' />
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('TODO')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className='tab-pane fade' id='hocPhiSmsDong'>
+                            <div className='tile-body'>
+                                <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
+                                <FormRichTextBox ref={e => this.hocPhiSmsDong = e} />
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiSmsDong')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className='tab-pane fade' id='hocPhiSmsPhatSinh'>
+                            <div className='tile-body'>
+                                <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
+                                <FormRichTextBox ref={e => this.hocPhiSmsPhatSinh = e} />
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiSmsPhatSinh')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className='tab-pane fade' id='hocPhiSmsHoanTra'>
+                            <div className='tile-body'>
+                                <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
+                                <FormRichTextBox ref={e => this.hocPhiSmsHoanTra = e} />
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiSmsHoanTra')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
