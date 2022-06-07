@@ -339,18 +339,18 @@ module.exports = app => {
         new Promise(resolve => {
             app.model.fwUser.get({ email: canBo.email }, (error, user) => {
                 result = app.clone(canBo, { image: user?.image || '' });
-                resolve();
+                resolve(result);
             });
-        }).then(() => new Promise(resolve => {
+        }).then((result) => new Promise(resolve => {
             app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, quanHeCanBo) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin quan hệ gia đình cán bộ !' });
                 } else {
                     result = app.clone(result, { quanHeCanBo: quanHeCanBo?.rows || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.dmDonVi.get({ ma: canBo.maDonVi, kichHoat: 1 }, (error, item) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đơn vị cán bộ !' });
@@ -359,18 +359,18 @@ module.exports = app => {
                 } else {
                     result = app.clone(result, { tenDonVi: item.ten });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
                 } else {
                     result = app.clone(result, { toChucKhac: toChucKhac || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.qtDaoTao.getCurrentOfStaff(canBo.shcc, curTime, (error, daoTaoCurrent) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đào tạo hiện tại!' });
@@ -379,18 +379,18 @@ module.exports = app => {
                 } else {
                     result = app.clone(result, { daoTaoCurrent: daoTaoCurrent.rows });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.qtDaoTao.getHV(canBo.shcc, (error, daoTaoBoiDuong) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đào tạo, bồi dưỡng!' });
                 } else {
                     result = app.clone(result, { daoTaoBoiDuong: daoTaoBoiDuong.rows || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
@@ -398,9 +398,9 @@ module.exports = app => {
                 else {
                     result = app.clone(result, { trinhDoNN: trinhDoNN || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             let chucVuChinhQuyen = [], chucVuDoanThe = [];
             app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                 if (error) {
@@ -410,31 +410,55 @@ module.exports = app => {
                     chucVuDoanThe = chucVu.rows.filter(i => i.loaiChucVu != 1);
                     result = app.clone(result, { chucVuChinhQuyen, chucVuDoanThe });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            app.model.qtHopDongLaoDong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, canBoLD) => {
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongDonViTraLuong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, dvtl) => {
+                if (error) {
+                    res.send({ error: 'Lỗi khi lấy thông tin hợp đồng đơn vị!' });
+                } else if (dvtl) {
+                    result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: new Date(dvtl.ngayKyHopDong).setHours(0, 0, 0), loaiHopDongCanBo: dvtl.loaiHopDong });
+                    resolve(result);
+                } else
+                    resolve(result);
+            });
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongTrachNhiem.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong', 'NGAY_KY_HOP_DONG DESC', (error, tn) => {
+                if (error) {
+                    res.send({ error: 'Lỗi khi lấy thông tin hợp đồng trách nhiệm!' });
+                } else if (tn) {
+                    let ngayKyHopDong = new Date(tn.ngayKyHopDong).setHours(0, 0, 0);
+                    if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
+                        result = app.clone(result, { hopDongCanBo: 'TN', hopDongCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: '' });
+                    } resolve(result);
+                } else
+                    resolve(result);
+            });
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongLaoDong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hdld) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng lao động !' });
-                } else if (!canBoLD) {
-                    result = app.clone(result, { canBoCanBo: 'VC' });
-                } else {
-                    result = app.clone(result, { canBoCanBo: 'LĐ', canBoCanBoNgay: canBoLD.ngayKyHopDong, loaiHopDongCanBo: canBoLD.loaiHopDong });
-                }
-                resolve();
+                } else if (hdld) {
+                    let ngayKyHopDong = new Date(hdld.ngayKyHopDong).setHours(0, 0, 0);
+                    if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
+                        result = app.clone(result, { hopDongCanBo: 'LĐ', canBoCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdld.loaiHopDong });
+                    } resolve(result);
+                } else
+                    resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, canBoVC) => {
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hdvc) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng làm việc !' });
-                } else if (!canBoVC)
-                    result = app.clone(result, { canBoCanBo: 'LĐ' });
-                else {
-                    result = app.clone(result, { canBoCanBo: 'VC', canBoCanBoNgay: canBoVC.ngayKyHopDong, loaiHopDongCanBo: canBoVC.loaiHopDong });
-                }
-                resolve();
+                } else if (hdvc) {
+                    let ngayKyHopDong = new Date(hdvc.ngayKyHopDong).setHours(0, 0, 0);
+                    if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
+                        result = app.clone(result, { canBoCanBo: 'VC', canBoCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdvc.loaiHopDong });
+                    } resolve(result);
+                } else
+                    resolve(result);
             });
-        })).then(() => {
+        })).then((result) => {
             res.send({ item: result });
         });
     };
