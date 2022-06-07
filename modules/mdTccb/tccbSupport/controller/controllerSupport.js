@@ -52,7 +52,8 @@ module.exports = app => {
         let data = req.body.data,
             dataTccbSupport = req.body.dataTccbSupport,
             sentDate = new Date().getTime(),
-            shcc = req.session.user.shcc;
+            { firstName, lastName, shcc } = req.session.user;
+        let fullName = `${lastName || ''} ${firstName || ''}`;
         data = app.stringify(data);
         shcc ? app.model.tccbSupport.create({ data, ...dataTccbSupport, shcc, sentDate }, (error, item) => {
             {
@@ -64,7 +65,7 @@ module.exports = app => {
                     else {
                         app.notification.send({
                             toEmail: EMAIL_OF_SUPPORTERS[index],
-                            title: 'Yêu cầu hỗ trợ',
+                            title: `Cán bộ ${fullName} yêu cầu hỗ trợ`,
                             subTitle: `${ACTIONS[dataTccbSupport.type].text} ${QT_MAPPER[dataTccbSupport.qt]}`,
                             icon: 'fa-universal-access',
                             iconColor: ACTIONS[dataTccbSupport.type].background,
@@ -88,7 +89,9 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/support/assign', app.permission.check('tccbSupport:write'), (req, res) => {
-        let changes = req.query.data, shcc = req.session.user?.shcc || '';
+        let changes = req.query.data,
+            { firstName, lastName, shcc = '' } = req.session.user;
+        let fullName = `${lastName || ''} ${firstName || ''}`;
         let data = app.parse(changes.data);
         let { qt, type, qtId, id } = changes;
         const updateApproved = () => {
@@ -96,7 +99,18 @@ module.exports = app => {
                 shccAssign: shcc,
                 modifiedDate: new Date().getTime(),
                 approved: 1
-            }, (error, item) => {
+            }, async (error, item) => {
+                if (!error) {
+                    let emailCanBoYeuCau = await app.getEmailByShcc(changes.shcc);
+                    app.notification.send({
+                        toEmail: emailCanBoYeuCau,
+                        title: 'Yêu cầu đã được duyệt',
+                        subTitle: `Bởi ${fullName}`,
+                        icon: 'fa-universal-access',
+                        iconColor: 'success',
+                        link: '/user/support',
+                    });
+                }
                 res.send({ error, item });
             });
         };

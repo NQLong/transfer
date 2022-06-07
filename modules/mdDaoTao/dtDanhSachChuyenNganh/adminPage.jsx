@@ -57,23 +57,19 @@ class EditModal extends AdminModal {
 }
 
 class DtDanhSachChuyenNganhPage extends AdminPage {
-    state = { donVi: '', nam: '' }
+    state = { filter: {} }
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
-            let permission = this.getUserPermission('dtDanhSachChuyenNganh', ['read']);
-            this.setState({ donVi: permission.read ? '' : this.props.system.user.staff.maDonVi }, () => {
-                this.getData(this.state.donVi);
-            });
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+
+            this.getPage();
         });
     }
 
-    getData = (donVi, nam) => {
-        this.props.getDtDanhSachChuyenNganhPage(undefined, undefined, {
-            searchTerm: '',
-            donVi, nam
-        });
-        this.setState({ donVi });
+    getPage = (pageS, pageN, pageC) => {
+        this.props.getDtDanhSachChuyenNganhPage(pageS, pageN, pageC, this.state.filter);
     }
 
     delete = (e, item) => {
@@ -83,18 +79,16 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
     }
 
     render() {
-        let permissionDaoTao = this.getUserPermission('dtDanhSachChuyenNganh'),
-            permissionManager = this.getUserPermission('manager');
+        let permissionDaoTao = this.getUserPermission('dtDanhSachChuyenNganh', ['read', 'write', 'delete']);
+        let permissionCTDT = this.getUserPermission('dtChuongTrinhDaoTao', ['manage']);
         let permission = {
-            read: permissionDaoTao.read || permissionManager.read,
-            write: permissionManager.write,
-            delete: permissionManager.write
+            read: permissionDaoTao.read || permissionCTDT.manage,
+            write: permissionDaoTao.write || permissionCTDT.manage,
+            delete: permissionDaoTao.delete || permissionCTDT.manage
         };
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtDanhSachChuyenNganh && this.props.dtDanhSachChuyenNganh.page ?
             this.props.dtDanhSachChuyenNganh.page : {
-                pageNumber: 1, pageSize: 200, pageTotal: 1, pageCondition: {
-                    searchTerm: '',
-                }, totalItem: 0, list: null
+                pageNumber: 1, pageSize: 200, pageTotal: 1, pageCondition: '', totalItem: 0, list: null
             };
 
         let table = renderTable({
@@ -134,19 +128,17 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'><h3>Tra cứu</h3></div>
                         <div className='row'>
-                            <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ donVi: value ? value.id : '' })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
-                            <FormSelect type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ nam: value?.id || '' })} data={SelectAdapter_DtCauTrucKhungDaoTao} />
+                            <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id || '' } })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
+                            <FormSelect type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value?.id || '' } })} data={SelectAdapter_DtCauTrucKhungDaoTao} />
                             <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                                 <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => {
                                     e.preventDefault();
-                                    this.donVi.value('');
-                                    this.nam.value('');
-                                    this.getData();
+                                    this.getPage();
                                     T.notify('Đã xóa bộ lọc', 'info');
                                 }}>
                                     <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                                 </button>
-                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.getData(this.state.donVi, this.state.nam)}>
+                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.getPage()}>
                                     <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
                                 </button>
                             </div>

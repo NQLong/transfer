@@ -82,7 +82,7 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
 
 export function getDtChuongTrinhDaoTao(maKhungDaoTao, done) {
     return dispatch => {
-        const url = `/api/dao-tao/chuong-trinh-dao-tao/${maKhungDaoTao}`;
+        const url = '/api/dao-tao/chuong-trinh-dao-tao';
         T.get(url, { condition: { maKhungDaoTao } }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
@@ -189,7 +189,31 @@ export function updateDtChuongTrinhDaoTao(id, changes, done) {
 }
 
 
+export const SelectAdapter_ChuongTrinhDaoTaoFilter = (maNganh = null) => {
+    return {
+        ajax: true,
+        url: '/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc',
+        data: params => ({ searchText: params.term, maNganh }),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })) : [] }),
+        fetchOne: (ma, done) => (getDtChuongTrinhDaoTao(ma, item => done && done({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })))()
+    };
+};
+
 
 export function changeDtChuongTrinhDaoTao(item) {
     return { type: DtChuongTrinhDaoTaoUpdate, item };
+}
+
+
+export function getDanhSachMonChuongTrinhDaoTao(khoa, maNganh, done) {
+    return () => {
+        T.get(`/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/${khoa}/${maNganh}`, result => {
+            if (result.error) {
+                T.notify('Lấy danh sách môn CTDT lỗi', 'danger');
+                console.error(result.error);
+            } else {
+                done(result);
+            }
+        });
+    };
 }

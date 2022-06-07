@@ -162,7 +162,7 @@ class CreateListYear extends AdminPage {
                     <TableCell type='text' content={item.tenHocVi ? item.tenHocVi.getFirstLetters() : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu + ' ' + (item.tenDonVi || '')} />
-                    <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'red' }} content={T.dateToText(item.ngayNghiHuu, 'dd/mm/yyyy')} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''} />
                     {
@@ -232,7 +232,7 @@ class CreateListYear extends AdminPage {
             onSave: (e) => this.save(e),
             onExport: this.year && this.year.value() ? (e) => {
                 e.preventDefault();
-                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), '[KHXH&NV] Bao cao thuc hien keo dai thoi gian cong tac nam ' + year + '.xlsx');
+                xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table'), { dateNF: 'mm/dd/yyyy;@', cellDates: true }), '[KHXH&NV] Bao cao thuc hien keo dai thoi gian cong tac nam ' + year + '.xlsx');
             } : null,
             backRoute: '/user/tccb/qua-trinh/keo-dai-cong-tac',
         });

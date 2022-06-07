@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, updateQtKhenThuongAll,
-    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage
+    deleteQtKhenThuongAll, createQtKhenThuongAllMultiple, getQtKhenThuongAllGroupPage
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
@@ -61,6 +61,15 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+
+        let changes = {
+            loaiDoiTuong: this.loaiDoiTuong.value(),
+            namDatDuoc: this.namDatDuoc.value(),
+            thanhTich: this.thanhTich.value(),
+            chuThich: this.chuThich.value(),
+            diemThiDua: this.diemThiDua.value(),
+            soQuyetDinh: this.soQuyetDinh.value()
+        };
         if (!this.loaiDoiTuong.value()) {
             T.notify('Loại đối tượng trống', 'danger');
             this.loaiDoiTuong.focus();
@@ -73,28 +82,13 @@ class EditModal extends AdminModal {
             T.notify('Thành tích trống', 'danger');
             this.thanhTich.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    loaiDoiTuong: this.loaiDoiTuong.value(),
-                    ma: ma,
-                    namDatDuoc: this.namDatDuoc.value(),
-                    thanhTich: this.thanhTich.value(),
-                    chuThich: this.chuThich.value(),
-                    diemThiDua: this.diemThiDua.value(),
-                    soQuyetDinh: this.soQuyetDinh.value()
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: '', doiTuong: ''
-                    });
-                    this.maCanBo.reset();
-                    this.maDonVi.reset();
-                    this.maBoMon.reset();
-                } else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.ma = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listMa = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -345,19 +339,16 @@ class QtKhenThuongAll extends AdminPage {
                 </div>
             </>,
             content: <>
-                {!this.checked && <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>}
                 <div className='tile'>
-                    <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} />
-                    <FormCheckbox label='Hiển thị theo đối tượng' style={{ position: 'absolute', right: '70px', top: '70px' }} ref={e => this.hienThiTheoDoiTuong = e} onChange={this.groupPage} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} />
+                        <FormCheckbox label='Hiển thị theo đối tượng' ref={e => this.hienThiTheoDoiTuong = e} onChange={this.groupPage} />
+                        <div style={{ marginBottom: '10px' }}>Tìm thấy: <b>{totalItem}</b> kết quả.</div>
+                    </div>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll} permissions={currentPermissions} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
+                <EditModal ref={e => this.modal = e} permission={permission} create={this.props.createQtKhenThuongAllMultiple} update={this.props.updateQtKhenThuongAll} permissions={currentPermissions} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
@@ -374,7 +365,7 @@ class QtKhenThuongAll extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.tccb.qtKhenThuongAll });
 const mapActionsToProps = {
-    getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
+    getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAllMultiple,
     updateQtKhenThuongAll, getDmKhenThuongLoaiDoiTuongAll, getQtKhenThuongAllGroupPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAll);

@@ -43,7 +43,7 @@ import {
     SelectAdapter_DmLoaiCongVan
 } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE } = require('../constant.js');
+const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
 
 const listTrangThai = {
     '1': {
@@ -76,16 +76,6 @@ const listTrangThai = {
     }
 };
 
-const listLoaiCongVan = {
-    CONG_VAN_DON_VI: {
-        id: 'DON_VI',
-        text: 'Công văn đơn vị'
-    },
-    CONG_VAN_TRUONG: {
-        id: 'TRUONG',
-        text: 'Công văn trường'
-    }
-};
 
 const actionToText = (value) => {
     switch (value) {
@@ -528,7 +518,7 @@ class AdminEditPage extends AdminPage {
 
     canSend = () => {
         let canEditTrangThai = [trangThaiCongVanDi.MOI.id, trangThaiCongVanDi.TRA_LAI.id].includes(this.state.trangThai);
-        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage && this.state.listDonViQuanLy.length != 0);
+        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage);
 
         return this.state.id && canEditTrangThai && permission && !this.checkNotDonVi();
     }
@@ -597,7 +587,7 @@ class AdminEditPage extends AdminPage {
         const lengthDv = this.state.listDonViQuanLy.length;
 
         const soCongVan = this.props.hcthCongVanDi?.item?.soCongVan;
-        const loaiCongVanArr = Object.values(listLoaiCongVan);
+        const loaiCongVanArr = Object.values(loaiCongVan);
 
         const loading = (
             <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

@@ -181,11 +181,25 @@ export function createQtHocTapCongTacStaff(data, done) {
                 T.notify('Tạo học tập, công tác bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
-                if (done) {
-                    T.notify('Tạo học tập, công tác thành công!', 'success');
-                    done(data);
-                    dispatch(getQtHocTapCongTacPage());
-                }
+                T.notify('Tạo học tập, công tác thành công!', 'success');
+                dispatch(getQtHocTapCongTacPage());
+                done && done(data);
+            }
+        }, () => T.notify('Tạo học tập, công tác bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtHocTapCongTacMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/htct/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Tạo học tập, công tác bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                T.notify('Tạo học tập, công tác thành công!', 'success');
+                dispatch(getQtHocTapCongTacPage());
+                done && done(data);
             }
         }, () => T.notify('Tạo học tập, công tác bị lỗi!', 'danger'));
     };

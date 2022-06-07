@@ -12,19 +12,19 @@ import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
 class CanBoPage extends AdminPage {
-    urlSHCC = null
+    shcc = null
     state = { item: null, create: false, load: true }
     componentDidMount() {
         T.hideSearchBox();
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/staff/:shcc'),
                 shcc = route.parse(window.location.pathname).shcc;
-            this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
-            if (this.urlSHCC) {
+            this.shcc = shcc && shcc != 'new' ? shcc : null;
+            if (this.shcc) {
                 this.setState({
-                    shcc: this.urlSHCC
+                    shcc: this.shcc
                 });
-                this.props.getStaffEdit(this.urlSHCC, data => {
+                this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                     }
@@ -41,10 +41,10 @@ class CanBoPage extends AdminPage {
         });
     }
 
-    downloadWord = (e) => {
+    downloadWord = (e, type) => {
         e.preventDefault();
-        this.shcc && this.props.downloadWord(this.shcc, data => {
-            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_2c.docx');
+        this.shcc && this.props.downloadWord(this.shcc, type, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_' + type + '.docx');
         });
     }
 
@@ -59,8 +59,8 @@ class CanBoPage extends AdminPage {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = !this.state.create ? this.componentTrinhDo.getAndValidate() : {};
-        if (this.urlSHCC) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
+        if (this.shcc) {
+            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
         } else {
             caNhanData && congTacData && trinhDoData && this.props.createStaff({ ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.props.history.push('/user/tccb/staff'));
         }
@@ -82,7 +82,11 @@ class CanBoPage extends AdminPage {
                 {!this.state.create && <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} phai={this.state.phai} />}
                 {!this.state.create && <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />}
                 {!this.state.create && <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />}
-                <CirclePageButton type='custom' tooltip='Tải về lý lịch 2C (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={this.downloadWord} />
+
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch viên chức (2019)' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '125px' }} onClick={e => this.downloadWord(e, 'vc')} />
+
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch công chức (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={e => this.downloadWord(e, 'cc')} />
+
                 <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
             </>,
             backRoute: '/user/tccb/staff',

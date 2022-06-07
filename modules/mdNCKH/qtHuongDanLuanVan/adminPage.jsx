@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
+    getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanMultiple,
     updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -39,6 +39,13 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            hoTen: this.hoTen.value(),
+            tenLuanVan: this.tenLuanVan.value(),
+            namTotNghiep: this.namTotNghiep.value(),
+            sanPham: this.sanPham.value(),
+            bacDaoTao: this.bacDaoTao.value(),
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.shcc.focus();
@@ -49,26 +56,13 @@ class EditModal extends AdminModal {
             T.notify('Năm tốt nghiệp trống', 'danger');
             this.namTotNghiep.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    hoTen: this.hoTen.value(),
-                    tenLuanVan: this.tenLuanVan.value(),
-                    namTotNghiep: this.namTotNghiep.value(),
-                    sanPham: this.sanPham.value(),
-                    bacDaoTao: this.bacDaoTao.value(),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.shcc.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -282,7 +276,7 @@ class QtHuongDanLuanVan extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write}
-                    create={this.props.createQtHuongDanLuanVanStaff} update={this.props.updateQtHuongDanLuanVanStaff}
+                    create={this.props.createQtHuongDanLuanVanMultiple} update={this.props.updateQtHuongDanLuanVanStaff}
                 />
             </>,
             backRoute: '/user/' + this.menu,
@@ -293,7 +287,7 @@ class QtHuongDanLuanVan extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.khcn.qtHuongDanLuanVan });
 const mapActionsToProps = {
-    getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
+    getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanMultiple,
     updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHuongDanLuanVan);

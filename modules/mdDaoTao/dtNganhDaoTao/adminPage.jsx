@@ -45,14 +45,14 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-                title: this.state.maNganh ? 'Cập nhât ngành đào tạo' : 'Tạo mới ngành đào tạo',
-                size: 'large',
-                body: <div className='row'>
-                    <FormTextBox type='text' className='col-12' ref={e => this.maNganh = e} label='Mã' readOnly={this.state.maNganh ? true : readOnly} placeholder='Mã' required />
-                    <FormTextBox type='text' className='col-12' ref={e => this.tenNganh = e} label='Tên ngành' readOnly={readOnly} placeholder='Tên' required />
-                    <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                </div>
-            }
+            title: this.state.maNganh ? 'Cập nhât ngành đào tạo' : 'Tạo mới ngành đào tạo',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-12' ref={e => this.maNganh = e} label='Mã' readOnly={this.state.maNganh ? true : readOnly} placeholder='Mã' required />
+                <FormTextBox type='text' className='col-12' ref={e => this.tenNganh = e} label='Tên ngành' readOnly={readOnly} placeholder='Tên' required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+            </div>
+        }
         );
     }
 }

@@ -97,6 +97,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/qua-trinh/nckh/create-multiple', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
+        const { listShcc, batDau, ketThuc, batDauType, ketThucType, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ketQua, ngayNghiemThu, ngayNghiemThuType } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghiên cứu khoa học');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, batDau, ketThuc, batDauType, ketThucType, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ketQua, ngayNghiemThu, ngayNghiemThuType
+            };
+            app.model.qtNghienCuuKhoaHoc.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.put('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) => {
         app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghiên cứu khoa học');

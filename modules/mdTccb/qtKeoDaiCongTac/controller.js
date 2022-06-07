@@ -13,19 +13,20 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'doctor:login', menu: menuStaff },
         { name: 'qtKeoDaiCongTac:read', menu },
         { name: 'qtKeoDaiCongTac:write' },
         { name: 'qtKeoDaiCongTac:delete' },
     );
+
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/create-list', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/:shcc', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
-    app.get('/user/keo-dai-cong-tac', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/keo-dai-cong-tac', app.permission.check('doctor:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
-    app.post('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('doctor:login'), (req, res) => {
         if (req.body.data && req.session.user) {
             const data = req.body.data;
             app.model.qtKeoDaiCongTac.create(data, (error, item) => res.send({ error, item }));
@@ -34,7 +35,7 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('doctor:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
             app.model.qtKeoDaiCongTac.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
@@ -53,7 +54,7 @@ module.exports = app => {
         }
     });
 
-    app.delete('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:login'), (req, res) => {
+    app.delete('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('doctor:login'), (req, res) => {
         if (req.session.user) {
             app.model.qtKeoDaiCongTac.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
@@ -71,7 +72,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/user/qua-trinh/keo-dai-cong-tac/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/user/qua-trinh/keo-dai-cong-tac/page/:pageNumber/:pageSize', app.permission.check('doctor:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';

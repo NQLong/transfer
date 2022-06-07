@@ -35,7 +35,7 @@ module.exports = app => {
                 };
             }
         }
-        app.model.dmNgachCdnn.getPage(pageNumber, pageSize, condition, '*', 'nhom,ten', (error, page) => res.send({ error, page }));
+        app.model.dmNgachCdnn.getPage(pageNumber, pageSize, condition, '*', 'nhom,priority,ten', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/ngach-cdnn/all', app.permission.check('user:login'), (req, res) => {

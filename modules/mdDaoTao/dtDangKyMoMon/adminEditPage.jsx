@@ -8,10 +8,11 @@ import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { createDtThoiKhoaBieu } from '../dtThoiKhoaBieu/redux';
 import Loading from 'view/component/Loading';
+import MonHocCtdtModal from './DangKyModal';
 class SubjectModal extends AdminModal {
     state = { item: {} }
-    onShow = (khoaSinhVien) => {
-        this.setState({ khoaSinhVien });
+    onShow = (khoaSv) => {
+        this.setState({ khoaSv });
     }
     onSubmit = (e) => {
         e && e.preventDefault();
@@ -20,7 +21,7 @@ class SubjectModal extends AdminModal {
             maDangKy: this.props.maDangKy,
             maMonHoc: this.monHoc.value(),
             monHocKhoa: item.khoa,
-            khoaSinhVien: this.state.khoaSinhVien,
+            khoaSv: this.state.khoaSv,
             tenMonHoc: T.parse(item.ten).vi,
             loaiMonHoc: Number(this.tuChon.value()),
             soTietLyThuyet: Number(item.tinChiLt) * 15,
@@ -53,29 +54,35 @@ class DtDsMonMoEditPage extends AdminPage {
     state = { isDaoTao: false, data: {}, isLoading: true }
     soTiet = {}
     soBuoi = {}
-    soNhom = {}
+    soLop = {}
     soLuongDuKien = []
     id = null
+    isDuyet = 1
     cookieTab = 0
     componentDidMount() {
+        this.init();
+    }
+
+    init = () => {
         const route = T.routeMatcher('/user/dao-tao/dang-ky-mo-mon/:id').parse(window.location.pathname);
         this.id = route.id;
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
                 let { danhSachMonMo } = data,
-                    danhSachTheoKhoaSV = danhSachMonMo.groupBy('khoaSinhVien');
-                [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach(khoaSV => {
-                    let list = danhSachTheoKhoaSV[khoaSV];
+                    danhSachTheoKhoaSV = danhSachMonMo.groupBy('khoaSv');
+                [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach(khoaSv => {
+                    let list = danhSachTheoKhoaSV[khoaSv];
                     list?.forEach((item, index) => {
-                        let { soNhom, soTietBuoi, soBuoiTuan, soLuongDuKien } = item;
-                        this.soNhom[khoaSV][index].value(soNhom || 1);
-                        this.soTiet[khoaSV][index].value(soTietBuoi || 5);
-                        this.soBuoi[khoaSV][index].value(soBuoiTuan || 1);
-                        this.soLuongDuKien[khoaSV][index].value(soLuongDuKien || 50);
+                        let { soLop, soTietBuoi, soBuoiTuan, soLuongDuKien } = item;
+                        this.soLop[khoaSv][index].value(soLop || 1);
+                        this.soTiet[khoaSv][index].value(soTietBuoi || 5);
+                        this.soBuoi[khoaSv][index].value(soBuoiTuan || 1);
+                        this.soLuongDuKien[khoaSv][index].value(soLuongDuKien || 50);
                     });
                 });
             });
         });
+
     }
 
     addRow = (item, index, done) => {
@@ -97,19 +104,17 @@ class DtDsMonMoEditPage extends AdminPage {
 
     onSave = () => {
         let data = [];
-        [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSV) => data = [...data, this.create(khoaSV)].flat());
+        [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
         this.props.saveDangKyMoMon(this.id, data);
     }
 
-    create = (khoaSV) => {
-        let currentDanhSachCuaKhoa = this.props.dtDanhSachMonMo.danhSachMonMo.groupBy('khoaSinhVien')[khoaSV];
+    create = (khoaSv) => {
+        let currentDanhSachCuaKhoa = this.props.dtDanhSachMonMo.danhSachMonMo.groupBy('khoaSv')[khoaSv];
         currentDanhSachCuaKhoa?.map((item, index) => {
-            item.soNhom = this.soNhom[khoaSV][index].value() || 0;
-            item.soBuoiTuan = this.soBuoi[khoaSV][index].value() || 0;
-            item.soTietBuoi = this.soTiet[khoaSV][index].value() || 0;
-            item.soLuongDuKien = this.soLuongDuKien[khoaSV][index].value() || 0;
-            item.khoaSinhVien = khoaSV;
-            item.maDangKy = this.id;
+            item.soLop = this.soLop[khoaSv][index].value() || 0;
+            item.soBuoiTuan = this.soBuoi[khoaSv][index].value() || 0;
+            item.soTietBuoi = this.soTiet[khoaSv][index].value() || 0;
+            item.soLuongDuKien = this.soLuongDuKien[khoaSv][index].value() || 0;
         });
         return currentDanhSachCuaKhoa || [];
     }
@@ -117,14 +122,8 @@ class DtDsMonMoEditPage extends AdminPage {
     duyetDangKy = (e) => {
         e.preventDefault();
         let data = [];
-        [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSV) => data = [...data, this.create(khoaSV)].flat().map(item => {
-            let { khoaDangKy, maNganh } = this.props.dtDanhSachMonMo.thongTinKhoaNganh;
-            delete item.id;
-            item.khoaDangKy = khoaDangKy;
-            item.maNganh = maNganh;
-            return item;
-        }));
-        this.props.saveDangKyMoMon(this.id, { isDuyet: 1 }, () => {
+        [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
+        this.props.saveDangKyMoMon(this.id, { isDuyet: 1, data }, () => {
             this.props.createDtThoiKhoaBieu(data, () => {
                 // location.reload();
             });
@@ -132,7 +131,7 @@ class DtDsMonMoEditPage extends AdminPage {
     }
 
     renderMonHocTable = (yearth, data) => {
-        this.soNhom[yearth] = [];
+        this.soLop[yearth] = [];
         this.soBuoi[yearth] = [];
         this.soTiet[yearth] = [];
         this.soLuongDuKien[yearth] = [];
@@ -150,7 +149,7 @@ class DtDsMonMoEditPage extends AdminPage {
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Tự chọn</th>
                         <th rowSpan='1' colSpan='5' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời lượng</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }}>Số lượng SV dự kiến / lớp</th>
-                        {!(this.state.expired || this.state.isDuyet) && <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>}
+                        {!(this.state.expired || this.isDuyet) && <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>}
                     </tr>
                     <tr>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết LT</th>
@@ -162,7 +161,7 @@ class DtDsMonMoEditPage extends AdminPage {
                 </>
             ),
             renderRow: (item, index) => {
-                this.soNhom[yearth][index] = '';
+                this.soLop[yearth][index] = '';
                 this.soTiet[yearth][index] = '';
                 this.soBuoi[yearth][index] = '';
                 this.soLuongDuKien[yearth][index] = '';
@@ -170,39 +169,39 @@ class DtDsMonMoEditPage extends AdminPage {
                     <tr key={index}>
                         <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
-                        <TableCell style={{ width: 'auto' }} content={item.tenMonHoc} />
+                        <TableCell style={{ width: 'auto' }} content={<>{item.tenMonHoc} <br /><i className='text-primary'>{item.tenChuyenNganh || ''}</i></>} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.loaiMonHoc ? 'x' : ''} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTietLyThuyet} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTietThucHanh} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soNhom[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.state.expired || this.state.isDuyet} />
+                            <FormTextBox type='number' ref={e => this.soLop[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.state.expired || this.state.isDuyet} />
+                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soBuoi[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.state.expired || this.state.isDuyet} />
+                            <FormTextBox type='number' ref={e => this.soBuoi[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soLuongDuKien[yearth][index] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={this.state.expired || this.state.isDuyet} />
+                            <FormTextBox type='number' ref={e => this.soLuongDuKien[yearth][index] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={this.isDuyet} />
                         } />
-                        {!(this.state.expired || this.state.isDuyet) && <TableCell type='buttons' style={{ textAlign: 'center' }} permission={{ delete: true }} onDelete={e => e.preventDefault() || this.deleteRow(item, index)} />}
+                        {!(this.state.expired || this.isDuyet) && <TableCell type='buttons' style={{ textAlign: 'center' }} permission={{ delete: true }} onDelete={e => e.preventDefault() || this.deleteRow(item, index)} />}
                     </tr>
                 );
             }
         });
     }
 
-    tabsKhoaSinhVien = (khoaSV, item) => ({
-        title: `Khóa ${khoaSV}`,
+    tabsKhoaSinhVien = (khoaSv, item) => ({
+        title: `Khóa ${khoaSv}`,
         component: <>
             <div className='tile'>
                 <h5 className='tile-title'>{'Danh sách gửi Phòng Đào tạo'}</h5>
-                {this.renderMonHocTable(khoaSV, item)}
+                {this.renderMonHocTable(khoaSv, item)}
                 <div className='tile-footer' />
-                {(!this.state.expired && !this.state.isDuyet) ? <div style={{ textAlign: 'right' }}>
+                {(!this.state.expired && !this.isDuyet) ? <div style={{ textAlign: 'right' }}>
                     <Tooltip title='Thêm môn học' arrow>
-                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.addMonHoc.show(khoaSV)}>
+                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.monHocCtdt.show({ khoaSv, thongTinKhoaNganh: this.props.dtDanhSachMonMo.thongTinKhoaNganh, maDangKy: this.id })}>
                             <i className='fa fa-lg fa-plus' /> Bổ sung môn học
                         </button>
                     </Tooltip>
@@ -214,16 +213,16 @@ class DtDsMonMoEditPage extends AdminPage {
     render() {
         let { danhSachMonMo, thoiGianMoMon, thongTinKhoaNganh } = this.props.dtDanhSachMonMo || {},
             { khoa, hocKy, namDaoTao, batDau, ketThuc } = thoiGianMoMon || {}, //khoa: Khóa sinh viên (e.g 2021)
-            { tenKhoaDangKy, tenNganh, maNganh } = thongTinKhoaNganh || {};
+            { tenKhoaDangKy, tenNganh, maNganh, isDuyet } = thongTinKhoaNganh || {};
         this.khoa = khoa;
+        this.isDuyet = isDuyet;
         let permission = this.getUserPermission('dtDangKyMoMon', ['read', 'write', 'delete', 'manage']);
         return this.renderPage({
             title: <>Mở môn học</>,
             icon: 'fa fa-paper-plane-o',
             subTitle: <>
                 Năm: {namDaoTao || ''}. Học kỳ: {hocKy || ''} <br />
-                Đơn vị: {tenKhoaDangKy || ''} <br />
-                Ngành: {tenNganh || ''} - {maNganh || ''}
+                Ngành: {tenNganh || ''} ({maNganh || ''}) - {tenKhoaDangKy || ''}
             </>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
@@ -237,15 +236,15 @@ class DtDsMonMoEditPage extends AdminPage {
             content: <>
                 {!this.khoa && <Loading />}
                 {thoiGianMoMon && <FormTabs ref={e => this.tabs = e} tabs={
-                    [khoa, khoa - 1, khoa - 2, khoa - 3].map(khoaSV => this.tabsKhoaSinhVien(khoaSV, danhSachMonMo?.groupBy('khoaSinhVien')[khoaSV] || []))
+                    [khoa, khoa - 1, khoa - 2, khoa - 3].map(khoaSv => this.tabsKhoaSinhVien(khoaSv, danhSachMonMo?.groupBy('khoaSv')[khoaSv] || []))
                 }
                 />}
                 <SubjectModal ref={e => this.addMonHoc = e} create={this.props.createDtDanhSachMonMo} maDangKy={this.id} />
-
+                <MonHocCtdtModal ref={e => this.monHocCtdt = e} reinit={this.init} />
                 {(permission.write && !this.state.isDuyet) ? <CirclePageButton type='custom' tooltip='Phòng Đào Tạo xác nhận' customIcon='fa-check-square-o' style={{ marginRight: '65px' }} onClick={e => this.duyetDangKy(e)} /> : null}
             </>,
             backRoute: '/user/dao-tao/dang-ky-mo-mon',
-            onSave: (this.state.expired || this.state.isDuyet) ? null : ((e) => e.preventDefault() || this.onSave())
+            onSave: (this.state.expired || this.isDuyet) ? null : ((e) => e.preventDefault() || this.onSave())
         });
     }
 }

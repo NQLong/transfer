@@ -2339,6 +2339,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "PRIORITY": {
+                    "value": "priority",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -10073,6 +10080,27 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "10,0"
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TEN_FILE": {
+                    "value": "tenFile",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "KICH_THUOC": {
+                    "value": "kichThuoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -11501,7 +11529,7 @@
                     "value": "noiDung",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 255
                 },
                 "CAN_BO_GUI": {
@@ -11843,8 +11871,8 @@
                     "nullable": true,
                     "size": "2,0"
                 },
-                "SO_TIET": {
-                    "value": "soTiet",
+                "SO_TIET_BUOI": {
+                    "value": "soTietBuoi",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12854,8 +12882,8 @@
                 "DT_DANH_SACH_MON_MO_GET_CURRENT": "getCurrent"
             },
             "columns": {
-                "MON_HOC_KHOA": {
-                    "value": "monHocKhoa",
+                "KHOA": {
+                    "value": "khoa",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12917,8 +12945,8 @@
                     "nullable": true,
                     "size": 15
                 },
-                "MA_CTDT": {
-                    "value": "maCtdt",
+                "CHUYEN_NGANH": {
+                    "value": "chuyenNganh",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12952,8 +12980,8 @@
                     "nullable": true,
                     "size": "22,0"
                 },
-                "SO_NHOM": {
-                    "value": "soNhom",
+                "SO_LOP": {
+                    "value": "soLop",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -12966,8 +12994,8 @@
                     "nullable": true,
                     "size": "5,0"
                 },
-                "KHOA_SINH_VIEN": {
-                    "value": "khoaSinhVien",
+                "KHOA_SV": {
+                    "value": "khoaSv",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -13376,10 +13404,10 @@
                 },
                 "QT_ID": {
                     "value": "qtId",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 50
                 },
                 "APPROVED": {
                     "value": "approved",
@@ -13497,7 +13525,9 @@
             "moduleName": "qtHopDongDonViTraLuong",
             "modelName": "qtHopDongDonViTraLuong",
             "methods": {
-                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage"
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SEARCH_PAGE": "searchPage",
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_GROUP_PAGE": "groupPage",
+                "QT_HOP_DONG_DON_VI_TRA_LUONG_SHCC_BY_DON_VI": "getShccByDonVi"
             },
             "columns": {
                 "ID": {
@@ -13637,6 +13667,9 @@
             "active": true,
             "moduleName": "qtHopDongTrachNhiem",
             "modelName": "qtHopDongTrachNhiem",
+            "methods": {
+                "QT_HOP_DONG_TRACH_NHIEM_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "SO_HOP_DONG": {
                     "value": "soHopDong",
@@ -13689,10 +13722,10 @@
                 },
                 "NGACH": {
                     "value": "ngach",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": 10
                 },
                 "HIEU_LUC_HOP_DONG": {
                     "value": "hieuLucHopDong",
@@ -13761,6 +13794,228 @@
             "primaryKeys": [
                 "MA"
             ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI": {
+            "active": true,
+            "moduleName": "tcHocPhi",
+            "modelName": "tcHocPhi",
+            "methods": {
+                "TC_HOC_PHI_SEARCH_PAGE": "searchPage"
+            },
+            "columns": {
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "1,0"
+                },
+                "HOC_PHI": {
+                    "value": "hocPhi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CONG_NO": {
+                    "value": "congNo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BILL_DATE": {
+                    "value": "billDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BILL_DUE_DATE": {
+                    "value": "billDueDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "HOC_KY",
+                "MSSV",
+                "NAM_HOC"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_TRANSACTION": {
+            "active": true,
+            "moduleName": "tcHocPhi",
+            "modelName": "tcHocPhiTransaction",
+            "methods": {
+                "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill"
+            },
+            "columns": {
+                "TRANS_ID": {
+                    "value": "transId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "TRANS_DATE": {
+                    "value": "transDate",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "CUSTOMER_ID": {
+                    "value": "customerId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BILL_ID": {
+                    "value": "billId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "SERVICE_ID": {
+                    "value": "serviceId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "AMOUNT": {
+                    "value": "amount",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CHECKSUM": {
+                    "value": "checksum",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "IS_SUCCESS": {
+                    "value": "isSuccess",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "TRANS_ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_SETTING": {
+            "active": true,
+            "moduleName": "tcSetting",
+            "modelName": "tcSetting",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_LOG": {
+            "active": true,
+            "moduleName": "tcHocPhi",
+            "modelName": "tcHocPhiLog",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NGAY": {
+                    "value": "ngay",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "QUA_TRINH": {
+                    "value": "quaTrinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "THAO_TAC": {
+                    "value": "thaoTac",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                }
+            },
+            "primaryKeys": [],
             "foreignKeys": [],
             "type": "table"
         }

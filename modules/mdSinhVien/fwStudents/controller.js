@@ -68,7 +68,7 @@ module.exports = app => {
     });
 
     app.delete('/api/students/:mssv', app.permission.check('student:delete'), (req, res) => {
-        app.model.sinhVien.delete({ mssv: req.params.mssv }, (error) => res.send({ error }));
+        app.model.fwStudents.delete({ mssv: req.params.mssv }, (error) => res.send({ error }));
     });
 
     app.put('/api/user/student', app.permission.check('student:login'), (req, res) => {
