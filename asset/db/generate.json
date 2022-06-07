@@ -8470,6 +8470,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 16
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 16
                 }
             },
             "primaryKeys": [
@@ -14000,19 +14007,47 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "QUA_TRINH": {
-                    "value": "quaTrinh",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 1000
-                },
                 "THAO_TAC": {
                     "value": "thaoTac",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "DU_LIEU_CU": {
+                    "value": "duLieuCu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "DU_LIEU_MOI": {
+                    "value": "duLieuMoi",
+                    "dataType": "VARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
                 }
             },
             "primaryKeys": [],

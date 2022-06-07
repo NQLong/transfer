@@ -8,12 +8,13 @@ module.exports = app => {
     const menuStudent = {
         parentMenu: app.parentMenu.students,
         menus: {
-            6102: { title: 'Học phí', link: '/user/finance/hoc-phi' },
+            6102: { title: 'Học phí', link: '/user/hoc-phi' },
         },
     };
     app.permission.add({ name: 'tcHocPhi:read', menu }, { name: 'student:login', menu: menuStudent }, 'tcHocPhi:write', 'tcHocPhi:delete');
 
-    app.get('/user/finance/hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), app.templates.admin);
+    app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
 
@@ -63,11 +64,19 @@ module.exports = app => {
         delete changes['congNo'];
         app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, (error, item) => {
             if (!error && item) {
+                const hocPhiCu = item.hocPhi;
                 item.hocPhi = changes['hocPhi'];
                 getCongNo(item, ({ congNo }) => {
                     changes['congNo'] = congNo;
                     app.model.tcHocPhi.update({ mssv }, changes, (error, item) => {
-                        app.tcHocPhiSaveLog(req.session.user.email, 'U', `Cập nhật học phí của ${mssv} thành ${item.hocPhi}`);
+                        const logItem = {
+                            mssv: mssv,
+                            hocKy: hocKy,
+                            namHoc: namHoc,
+                            duLieuCu: JSON.stringify({hocPhi: hocPhiCu}),
+                            duLieuMoi: JSON.stringify({hocPhi: item.hocPhi})
+                        };
+                        app.tcHocPhiSaveLog(req.session.user.email, 'U', logItem);
                         res.send({ error, item });
                     });
                 });
@@ -77,6 +86,7 @@ module.exports = app => {
 
     app.post('/api/finance/hoc-phi/upload', app.permission.check('tcHocPhi:write'), async (req, res) => {
         const data = req.body.upload;
+        const curFees = data.map(obj => obj.curFee);
         const tmpData = data.map(obj => {
             delete obj['congNo'];
             delete obj['hoTenSinhVien'];
@@ -93,8 +103,16 @@ module.exports = app => {
                         if (err) {
                             res.send({ error: err });
                         } else {
-                            tmpData.forEach(item => {
-                                app.tcHocPhiSaveLog(req.session.user.email, 'U', `Cập nhật học phí của ${item.mssv} thành ${item.hocPhi}`);
+                            tmpData.forEach((item,idx) => {
+                                const logItem = {
+                                    mssv: item.mssv,
+                                    hocKy: item.hocKy,
+                                    namHoc: item.namHoc,
+                                    duLieuCu: JSON.stringify({hocPhi: curFees[idx]}),
+                                    duLieuMoi: JSON.stringify({hocPhi: item.hocPhi})
+                                };
+                                const cud = curFees[idx] >= 0 ? 'U' : 'C';
+                                app.tcHocPhiSaveLog(req.session.user.email, cud, logItem);
                             });
                             res.send({ result });
                         }
