@@ -120,7 +120,6 @@ module.exports = app => {
                     } else {
                         const dataRequest = `${channelId}|${channelRefNumber}|${secretCode}`,
                             mySignatureRequest = crypto.createHash('md5').update(dataRequest).digest('hex');
-                        console.log(' - Data = ', dataRequest, '\n - Signature = ', mySignatureRequest);
 
                         if (mySignatureRequest != signature) {
                             context.status = 'FAILURE';
@@ -167,8 +166,6 @@ module.exports = app => {
                                                 return;
                                             } else {
                                                 app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VCB', `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, parseInt(billInfo.amount), signature, (error, result) => {
-                                                    console.log('Error: ', error);
-                                                    console.log('Result: ', result);
                                                     if (error || !result || !result.outBinds || !result.outBinds.ret) {
                                                         billResult.push({
                                                             billId: billInfo.billId,
