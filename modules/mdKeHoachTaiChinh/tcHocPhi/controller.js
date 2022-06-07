@@ -25,8 +25,8 @@ module.exports = app => {
         let hocKy = req.query?.settings?.hocKy;
         if (!namHoc || !hocKy) {
             const settings = await getSettings();
-            if (!namHoc) namHoc = settings.namHoc;
-            if (!hocKy) hocKy = settings.hocKy;
+            if (!namHoc) namHoc = settings.hocPhiNamHoc;
+            if (!hocKy) hocKy = settings.hocPhiHocKy;
         }
         let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
         let mssv = '';
@@ -45,7 +45,7 @@ module.exports = app => {
     });
 
     app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.check('tcHocPhi:read'), async (req, res) => {
-        const { namHoc, hocKy } = await getSettings(),
+        const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings(),
             mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             if (error) res.send({ error });
@@ -131,8 +131,7 @@ module.exports = app => {
         app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
     );
 
-    const getSettings = async () =>
-        await app.model.tcSetting.getValue('namHoc', 'hocKy');
+    const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
 
 
     const tcHocPhiImportData = async (fields, files, done) => {

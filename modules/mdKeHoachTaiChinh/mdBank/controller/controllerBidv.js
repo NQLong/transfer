@@ -6,7 +6,7 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/bidv-nvxhhcm/getbill', async (req, res) => {
-        let { namHoc, hocKy, secretCodeBidv: secretCode } = await app.model.tcSetting.getValue('namHoc', 'hocKy', 'secretCodeBidv');
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeBidv: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeBidv');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
         const { customer_id, service_id, checksum } = req.body,
@@ -47,7 +47,7 @@ module.exports = app => {
 
     app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
         try {
-            let { namHoc, hocKy, secretCodeBidv: secretCode } = await app.model.tcSetting.getValue('namHoc', 'hocKy', 'secretCodeBidv');
+            let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeBidv: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeBidv');
             namHoc = Number(namHoc);
             hocKy = Number(hocKy);
             const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
