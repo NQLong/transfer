@@ -13947,6 +13947,13 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "BANK": {
+                    "value": "bank",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -14041,6 +14048,30 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 1000
+                }
+            },
+            "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_SETTING": {
+            "active": true,
+            "moduleName": "hcthSetting",
+            "modelName": "hcthSetting",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
                 }
             },
             "primaryKeys": [],

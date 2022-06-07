@@ -130,7 +130,7 @@ module.exports = app => {
                                 });
                             }
                             let billInfo = bills[index];
-                            app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, billInfo.amount, signature, (error, result) => {
+                            app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VCB', `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, billInfo.amount, signature, (error, result) => {
                                 if (error || !result || !result.outBinds || !result.outBinds.ret) {
                                     billResult.push({
                                         billId: billInfo.billId,
