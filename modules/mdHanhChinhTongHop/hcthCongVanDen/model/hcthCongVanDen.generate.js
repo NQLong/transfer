@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DEN { id, ngayNhan, donViGui, soCongVan, ngayCongVan, trichYeu, canBoNhan, ngayHetHan, quyenChiDao, chiDao, trangThai, soDen, nhacNho, nguoiTao }
+// Table name: HCTH_CONG_VAN_DEN { id, ngayNhan, donViGui, soCongVan, ngayCongVan, trichYeu, canBoNhan, ngayHetHan, quyenChiDao, chiDao, trangThai, soDen, nhacNho, nguoiTao, capNhatLuc }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 'soCongVan': 'SO_CONG_VAN', 'ngayCongVan': 'NGAY_CONG_VAN', 'trichYeu': 'TRICH_YEU', 'canBoNhan': 'CAN_BO_NHAN', 'ngayHetHan': 'NGAY_HET_HAN', 'quyenChiDao': 'QUYEN_CHI_DAO', 'chiDao': 'CHI_DAO', 'trangThai': 'TRANG_THAI', 'soDen': 'SO_DEN', 'nhacNho': 'NHAC_NHO', 'nguoiTao': 'NGUOI_TAO' };
+const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 'soCongVan': 'SO_CONG_VAN', 'ngayCongVan': 'NGAY_CONG_VAN', 'trichYeu': 'TRICH_YEU', 'canBoNhan': 'CAN_BO_NHAN', 'ngayHetHan': 'NGAY_HET_HAN', 'quyenChiDao': 'QUYEN_CHI_DAO', 'chiDao': 'CHI_DAO', 'trangThai': 'TRANG_THAI', 'soDen': 'SO_DEN', 'nhacNho': 'NHAC_NHO', 'nguoiTao': 'NGUOI_TAO', 'capNhatLuc': 'CAP_NHAT_LUC' };
 
 module.exports = app => {
     app.model.hcthCongVanDen = {
@@ -159,11 +159,5 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_search_selector(:pagenumber, :pagesize, :filterparam, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filterparam, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
-        
-        download: (donviguicv, listdonvi, macanbo, timetype, fromtime, totime, sortby, sorttype, shcccanbo, donvicanbo, stafftype, status, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_download(:donviguicv, :listdonvi, :macanbo, :timetype, :fromtime, :totime, :sortby, :sorttype, :shcccanbo, :donvicanbo, :stafftype, :status, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, donviguicv, listdonvi, macanbo, timetype, fromtime, totime, sortby, sorttype, shcccanbo, donvicanbo, stafftype, status, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
     };
 };
