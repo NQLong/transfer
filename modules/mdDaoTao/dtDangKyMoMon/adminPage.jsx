@@ -109,7 +109,7 @@ class DtDangKyMoMonPage extends AdminPage {
                     <TableCell contentClassName='multiple-lines-2' content={item.tenKhoaBoMon} />
                     <TableCell contentClassName='multiple-lines-4' content={`${item.maNganh}: ${item.tenNganh}`} />
                     <TableCell content={'HK' + item.hocKy} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.namHoc} />
+                    <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namHoc} />
                     <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.thoiGian} />
                     <TableCell contentClassName='multiple-lines-4' content={item.isDuyet ? 'Phòng Đào tạo đã xác nhận' : 'Phòng Đào tạo chưa xác nhận'} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`)} />

@@ -127,8 +127,8 @@ class ComponentTTCongTac extends AdminPage {
                     <FormDatePicker type='date-mask' className='col-6' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={readOnly} />
                     <FormTextBox className='col-12' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={readOnly} />
                     <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-12' ref={e => this.ngach = e} label='Chức danh nghề nghiệp' readOnly={readOnly} />
-                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={readOnly} />
-                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-8' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={readOnly} />
+                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly />
+                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-8' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly />
                     <div className='col-md-12 form-group' style={{ display: create ? 'none' : 'block' }}>
                         <ComponentChucVu label='Chức vụ chính quyền:' shcc={shcc} type='CQ' />
                         <ComponentChucVu label='Chức vụ đoàn thể:' shcc={shcc} type='DT' />

@@ -47,11 +47,10 @@ class StaffUserPage extends AdminPage {
     }
 
     setUp = (item) => {
-        // this.componentCaNhan.value(item);
-        this.componentTTCongTac.value(item);
-        this.componentQuanHe.value(item.email, item.phai, item.shcc);
-        this.componentTrinhDo.value(item);
-        this.setState({ item });
+        this.componentCaNhan?.value(item);
+        this.componentTTCongTac?.value(item);
+        this.componentTrinhDo?.value(item);
+        this.setState({ item, phai: item.phai });
     }
 
     save = () => {
@@ -90,7 +89,7 @@ class StaffUserPage extends AdminPage {
             content: <>
                 {!this.state.item && <Loading />}
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={shcc} />
-                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} />
+                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} phai={this.state.phai} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={shcc} readOnly={!permission.write} />
                 <ComponentHTCT />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
