@@ -134,13 +134,13 @@ module.exports = (app) => {
     };
 
 
-    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async(req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
-            app.model.hcthCongVanDen.get({ id: req.body.id }, (error, congVan) => {
+            app.model.hcthCongVanDen.get({ id: req.body.id }, async (error, congVan) => {
                 if (error) throw error;
                 else {
-                    app.model.hcthCongVanDen.update({ id: req.body.id }, changes, (errors, item) => {
+                    app.model.hcthCongVanDen.update({ id: req.body.id }, changes, async (errors, item) => {
                         if (errors)
                             res.send({ errors, item });
                         else
@@ -623,12 +623,37 @@ module.exports = (app) => {
         });
     });
 
+    const sendChiDaoCongVanDenMailToRectors = (item) => {
+        const canBoChiDao = item.quyenChiDao?.split(',') || [];
+        app.model.canBo.getAll({
+            statement: 'shcc IN (:dsCanBo)',
+            parameter: {
+                dsCanBo: [...canBoChiDao, ''],
+            }
+        }, 'email', 'email', async (error, canBos) => {
+            if (error) throw(error);
+            else {
+                const { email: fromMail, emailPassword: fromMailPassword, emailChiDaoCongVanDenTitle, emailChiDaoCongVanDenText, emailChiDaoCongVanDenHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'emailChiDaoCongVanDenTitle', 'emailChiDaoCongVanDenText', 'emailChiDaoCongVanDenHtml');
+                let mailTitle = emailChiDaoCongVanDenTitle,
+                mailText = emailChiDaoCongVanDenText.replaceAll('{id}', item.id),
+                mailHtml = emailChiDaoCongVanDenHtml.replaceAll('{id}', item.id).replaceAll('{link}', `http://localhost:7012/user/cong-van-den/${item.id}`);
+                
+                canBos.map(canBoEmail => new Promise(() => {
+                    app.email.sendMail(fromMail, fromMailPassword, canBoEmail, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                        if (error) throw(error);
+                    });
+                }));
+            }
+        });
+    };
+
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
         try {
             if (before == after)
                 resolve();
             if (after == trangThaiSwitcher.CHO_DUYET.id) {
                 createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
+                sendChiDaoCongVanDenMailToRectors(item);
             }
             else if ([trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(after)) {
                 createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });

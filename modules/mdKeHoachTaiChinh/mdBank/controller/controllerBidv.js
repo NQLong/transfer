@@ -65,9 +65,8 @@ module.exports = app => {
                     } else if (!hocPhi) {
                         res.send({ result_code: '025' });
                     } else {
-                        app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `BIDV-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
+                        app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
                             if (error || !result || !result.outBinds || !result.outBinds.ret) {
-                                //TODO: error thì sao Tùng?
                                 res.send({ result_code: '096' });
                             } else {
                                 res.send({ result_code: '000', result_desc: 'success' });

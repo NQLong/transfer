@@ -64,7 +64,5 @@ class TcHocPhiTransactionEditPage extends AdminPage {
     }
 }
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = {
-    getTcHocPhiTransactionByMssv
-};
+const mapActionsToProps = { getTcHocPhiTransactionByMssv };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiTransactionEditPage);

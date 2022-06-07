@@ -3,7 +3,9 @@ module.exports = app => {
     app.model.tcSetting.getValue = function () {
         return new Promise(resolve => {
             const result = {};
+
             const solveAnItem = (index) => {
+                console.log(arguments);
                 if (index < arguments.length) {
                     const key = arguments[index];
                     if (typeof key == 'function') {

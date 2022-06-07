@@ -4,6 +4,7 @@ import { AdminPage, FormCheckbox, FormSelect, FormTextBox } from 'view/component
 import { getStaffEdit, userGetStaff } from './redux';
 import DaoTaoDetail from '../qtDaoTao/daoTaoDetail';
 import { createQtDaoTaoStaff, updateQtDaoTaoStaff, deleteQtDaoTaoStaff } from '../qtDaoTao/redux.jsx';
+import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 class ComponentTrinhDo extends AdminPage {
     state = { shcc: '', email: '' };
 
@@ -24,7 +25,9 @@ class ComponentTrinhDo extends AdminPage {
             this.chucDanh.value(item.chucDanh ? item.chucDanh : '');
             this.namChucDanh.value(item.namChucDanh ? item.namChucDanh : '');
             this.coSoChucDanh.value(item.coSoChucDanh ? item.coSoChucDanh : '');
-            this.chuyenNganh.value(item.chuyenNganhChucDanh ? item.chuyenNganhChucDanh : '');
+            this.chuyenNganhChucDanh.value(item.chuyenNganhChucDanh ? item.chuyenNganhChucDanh : '');
+            this.chuyenNganh.value(item.chuyenNganh ? item.chuyenNganh : '');
+            this.hocViNoiTotNghiep.value(item.hocViNoiTotNghiep || '');
         });
     }
 
@@ -65,17 +68,21 @@ class ComponentTrinhDo extends AdminPage {
                 <div className='tile-body row'>
                     <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' placeholder='Nhập trình độ phổ thông (Ví dụ: 12/12)' className='form-group col-md-4' />
 
-                    <FormCheckbox ref={e => this.cuNhan = e} label='Là Cử nhân' onChange={value => this.setState({ cuNhan: Number(value) })} className='form-group col-md-12' />
+                    <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành (Học vị)' className='form-group col-md-4' />
+                    <FormSelect ref={e => this.hocViNoiTotNghiep = e} label='Quốc gia tốt nghiệp (Học vị)' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
+
+
+                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: Number(value) })} className='form-group col-md-12' />
                     <DaoTaoDetail hocVi='Cử nhân' shcc={this.props.shcc} style={{ display: this.state.cuNhan ? 'block' : 'none' }} />
 
-                    <FormCheckbox ref={e => this.thacSi = e} label='Là Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-12' />
+                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-12' />
                     <DaoTaoDetail hocVi='Thạc sĩ' shcc={this.props.shcc} style={{ display: this.state.thacSi ? 'block' : 'none' }} />
 
-                    <FormCheckbox ref={e => this.tienSi = e} label='Là Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' />
+                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' />
                     <DaoTaoDetail hocVi='Tiến sĩ' shcc={this.props.shcc} style={{ display: this.state.tienSi ? 'block' : 'none' }} />
 
                     <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '02', text: 'Phó giáo sư' }, { id: '01', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear />
-                    <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />
+                    <FormTextBox ref={e => this.chuyenNganhChucDanh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />
                     <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận chức danh' className='form-group col-md-3' />
                     <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' />
                     <div className='form-group col-md-12' />
