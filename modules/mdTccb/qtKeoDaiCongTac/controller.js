@@ -244,34 +244,37 @@ module.exports = app => {
                             app.model.dmChucDanhKhoaHoc.get({ ma: item.chucDanh }, (error, itemCD) => {
                                 app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, itemHV) => {
                                     app.model.dmNgachCdnn.get({ ma: item.ngach }, (error, itemCDNN) => {
-                                        app.model.dmChucVu.get({ ma: item.maChucVu }, (error, itemCV) => {
-                                            app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDV) => {
-                                                if (itemCD) tenChucDanh = itemCD.ten;
-                                                if (itemHV) tenHocVi = itemHV.ten;
-                                                if (itemCDNN) tenChucDanhNgheNghiep = itemCDNN.ten;
-                                                if (itemCV) tenChucVu = itemCV.ten;
-                                                if (itemDV) tenDonVi = itemDV.ten;
+                                        app.model.qtChucVu.get({ shcc: item.shcc, chucVuChinh: 1 }, (error, itemCV) => {
+                                            app.model.dmChucVu.get({ ma: itemCV?.maChucVu || '' }, (error, chucVu) => {
+                                                app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDV) => {
+                                                    if (itemCD) tenChucDanh = itemCD.ten;
+                                                    if (itemHV) tenHocVi = itemHV.ten;
+                                                    if (itemCDNN) tenChucDanhNgheNghiep = itemCDNN.ten;
+                                                    if (chucVu) tenChucVu = chucVu.ten;
+                                                    if (itemDV) tenDonVi = itemDV.ten;
 
-                                                let dataAdd = {
-                                                    shcc: item.shcc,
-                                                    hoCanBo: item.ho,
-                                                    tenCanBo: item.ten,
-                                                    tenChucDanh,
-                                                    tenHocVi,
-                                                    tenChucVu,
-                                                    tenDonVi,
-                                                    tenChucDanhNgheNghiep,
-                                                    batDau: start.getTime(),
-                                                    ketThuc: end.getTime(),
-                                                    batDauType: 'dd/mm/yyyy',
-                                                    ketThucType: 'dd/mm/yyyy',
-                                                    ngayNghiHuu: data.resultDate,
-                                                    ngaySinh: item.ngaySinh,
-                                                    phai: item.phai,
-                                                };
-                                                items.push(dataAdd);
-                                                solve(index + 1);
+                                                    let dataAdd = {
+                                                        shcc: item.shcc,
+                                                        hoCanBo: item.ho,
+                                                        tenCanBo: item.ten,
+                                                        tenChucDanh,
+                                                        tenHocVi,
+                                                        tenChucVu,
+                                                        tenDonVi,
+                                                        tenChucDanhNgheNghiep,
+                                                        batDau: start.getTime(),
+                                                        ketThuc: end.getTime(),
+                                                        batDauType: 'dd/mm/yyyy',
+                                                        ketThucType: 'dd/mm/yyyy',
+                                                        ngayNghiHuu: data.resultDate,
+                                                        ngaySinh: item.ngaySinh,
+                                                        phai: item.phai,
+                                                    };
+                                                    items.push(dataAdd);
+                                                    solve(index + 1);
+                                                });
                                             });
+
                                         });
                                     });
                                 });
