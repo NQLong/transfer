@@ -60,6 +60,7 @@ class EditModal extends AdminModal {
         });
     }
 }
+
 class TcHocPhiAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/hoc-phi', () => {
@@ -84,10 +85,10 @@ class TcHocPhiAdminPage extends AdminPage {
             renderHead: () => (<tr>
                 <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Học kỳ</th>
-                <th style={{ width: '20%', whiteSpace: 'nowrap' }}>MSSV</th>
-                <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Họ và tên</th>
-                <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
-                <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Công nợ (vnđ)</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>MSSV</th>
+                <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Họ và tên</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Công nợ (vnđ)</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (

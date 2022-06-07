@@ -5,7 +5,7 @@ import { AdminPage, FormSelect, FormTextBox, FormRichTextBox } from 'view/compon
 import Editor from 'view/component/CkEditor4';
 
 class EmailItem extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.title = React.createRef();
         this.editor = React.createRef();
@@ -65,6 +65,20 @@ class TcSettingAdminPage extends AdminPage {
         arguments.length && this.props.updateTcSetting(changes);
     }
 
+    changePassword = () => {
+        const password1 = this.emailPassword1.value();
+        const password2 = this.emailPassword2.value();
+        if (!password1) {
+            T.notify('Mật khẩu không được trống!', 'danger');
+        } else if (!password2) {
+            T.notify('Cần phải nhập lại mật khẩu!', 'danger');
+        } else if (password1 != password2) {
+            T.notify('Mật khẩu không trùng nhau!', 'danger');
+        } else {
+            this.props.updateTcSetting({ emailPassword: password1 }, () => this.emailPassword1.value('') || this.emailPassword2.value(''));
+        }
+    }
+
     render() {
         const permission = this.getUserPermission('TcSetting'),
             readOnly = !permission.write;
@@ -107,19 +121,15 @@ class TcSettingAdminPage extends AdminPage {
                         <FormTextBox ref={e => this.email = e} label='Email' type='email' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-success' type='button' onClick={() => this.save('email')}>
-                                <i className='fa fa-fw fa-lg fa-save'></i>Đổi Email
+                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>
-                    </div>
-                </div>
 
-                <div className='col-md-6'>
-                    <div className='tile'>
                         <h3 className='tile-header'>Mật khẩu email</h3>
                         <FormTextBox ref={e => this.emailPassword1 = e} label='Mật khẩu email' type='password' readOnly={readOnly} />
                         <FormTextBox ref={e => this.emailPassword2 = e} label='Nhập lại mật khẩu email' type='password' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('emailPassword')}>
+                            <button className='btn btn-success' type='button' onClick={this.changePassword}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Đổi mật khẩu
                             </button>
                         </div>

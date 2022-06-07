@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { uploadDsHocPhi } from './redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import FileBox from 'view/component/FileBox';
+
 class EditModal extends AdminModal {
     state = { index: '' };
 
@@ -11,9 +12,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { mssv, hocPhi, namHoc, hocKy, hoTenSinhVien } = item ? item.item : {
-            mssv: '', hocPhi: '', congNo: ''
-        };
+        const { mssv, hocPhi, namHoc, hocKy, hoTenSinhVien } = item ? item.item : { mssv: '', hocPhi: '', congNo: '' };
         const index = item?.index;
 
         this.setState({ index }, () => {
@@ -47,8 +46,8 @@ class EditModal extends AdminModal {
         });
     }
 }
-class TcHocPhiImportPage extends AdminPage {
 
+class TcHocPhiImportPage extends AdminPage {
     state = { hocPhiAll: [], duplicateDatas: [], message: '', displayState: 'import', isDisplay: true };
 
     componentDidMount() {
@@ -56,8 +55,9 @@ class TcHocPhiImportPage extends AdminPage {
     }
 
     onSuccess = (response) => {
-        if (response.error) T.notify(response.error, 'danger');
-        else if (response.items) {
+        if (response.error) {
+            T.notify(response.error, 'danger');
+        } else if (response.items) {
             this.setState({
                 hocPhiAll: response.items,
                 duplicateDatas: response.duplicateDatas,
@@ -82,8 +82,7 @@ class TcHocPhiImportPage extends AdminPage {
         const tmpHocPhi = [...hocPhiAll];
         const currentValue = tmpHocPhi[index];
         currentValue['hocPhi'] = nHocPhi;
-        this.setState({ hocPhiAll: tmpHocPhi }
-            , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
+        this.setState({ hocPhiAll: tmpHocPhi }, () => T.notify('Cập nhật dữ liệu thành công', 'success'));
         done && done();
     };
 
@@ -93,8 +92,7 @@ class TcHocPhiImportPage extends AdminPage {
             if (isConfirm) {
                 const hocPhiAll = this.state.hocPhiAll;
                 hocPhiAll.splice(index, 1);
-                this.setState({ hocPhiAll },
-                    () => T.notify('Xóa dữ liệu thành công', 'success'));
+                this.setState({ hocPhiAll }, () => T.notify('Xóa dữ liệu thành công', 'success'));
             }
         });
     };
@@ -103,8 +101,9 @@ class TcHocPhiImportPage extends AdminPage {
         const doSave = () => {
             const data = this.state.hocPhiAll;
             this.props.uploadDsHocPhi(data, (error, data) => {
-                if (error) T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
-                else {
+                if (error) {
+                    T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
+                } else {
                     this.setState({ displayState: 'import', hocPhiAll: [] });
                     T.notify(`Cập nhật ${data && data.items ? data.items.length + ' ' : ''} học phí thành công!`, 'success');
                     this.props.history.push('/user/finance/hoc-phi');
@@ -172,7 +171,7 @@ class TcHocPhiImportPage extends AdminPage {
                     <p>MSSV trùng dữ liệu: {duplicateDatas.join(', ')}</p>
                     {table}
                 </div>
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update}/>
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update} />
             </>,
             onSave: displayState == 'data' ? (e) => this.save(e) : null,
         });
@@ -180,7 +179,5 @@ class TcHocPhiImportPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = {
-    uploadDsHocPhi
-};
+const mapActionsToProps = { uploadDsHocPhi };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiImportPage);
