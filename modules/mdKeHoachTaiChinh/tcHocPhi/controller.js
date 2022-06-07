@@ -6,9 +6,9 @@ module.exports = app => {
         },
     };
     const menuStudent = {
-        parentMenu: app.parentMenu.students,
+        parentMenu: app.parentMenu.user,
         menus: {
-            6102: { title: 'Học phí', link: '/user/hoc-phi' },
+            1098: { title: 'Học phí', link: '/user/hoc-phi' },
         },
     };
     app.permission.add({ name: 'tcHocPhi:read', menu }, { name: 'student:login', menu: menuStudent }, 'tcHocPhi:write', 'tcHocPhi:delete');
@@ -32,6 +32,7 @@ module.exports = app => {
         let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
         let mssv = '';
         if (!req.session.user.permissions.includes('tcHocPhi:read')) mssv = req.session.user.data.mssv;
+
         app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), mssv, searchTerm, filter, (error, page) => {
             if (error || !page) {
                 res.send({ error });
@@ -73,8 +74,8 @@ module.exports = app => {
                             mssv: mssv,
                             hocKy: hocKy,
                             namHoc: namHoc,
-                            duLieuCu: JSON.stringify({hocPhi: hocPhiCu}),
-                            duLieuMoi: JSON.stringify({hocPhi: item.hocPhi})
+                            duLieuCu: JSON.stringify({ hocPhi: hocPhiCu }),
+                            duLieuMoi: JSON.stringify({ hocPhi: item.hocPhi })
                         };
                         app.tcHocPhiSaveLog(req.session.user.email, 'U', logItem);
                         res.send({ error, item });
@@ -103,13 +104,13 @@ module.exports = app => {
                         if (err) {
                             res.send({ error: err });
                         } else {
-                            tmpData.forEach((item,idx) => {
+                            tmpData.forEach((item, idx) => {
                                 const logItem = {
                                     mssv: item.mssv,
                                     hocKy: item.hocKy,
                                     namHoc: item.namHoc,
-                                    duLieuCu: JSON.stringify({hocPhi: curFees[idx]}),
-                                    duLieuMoi: JSON.stringify({hocPhi: item.hocPhi})
+                                    duLieuCu: JSON.stringify({ hocPhi: curFees[idx] }),
+                                    duLieuMoi: JSON.stringify({ hocPhi: item.hocPhi })
                                 };
                                 const cud = curFees[idx] >= 0 ? 'U' : 'C';
                                 app.tcHocPhiSaveLog(req.session.user.email, cud, logItem);

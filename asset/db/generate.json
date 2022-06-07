@@ -6635,6 +6635,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "CAP_NHAT_LUC": {
+                    "value": "capNhatLuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -13849,20 +13856,6 @@
                 },
                 "NGAY_TAO": {
                     "value": "ngayTao",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "BILL_DATE": {
-                    "value": "billDate",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "BILL_DUE_DATE": {
-                    "value": "billDueDate",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,

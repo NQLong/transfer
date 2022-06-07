@@ -5,7 +5,7 @@ import { AdminPage, FormSelect, FormTextBox, FormRichTextBox } from 'view/compon
 import Editor from 'view/component/CkEditor4';
 
 class EmailItem extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.title = React.createRef();
         this.editor = React.createRef();
@@ -80,7 +80,7 @@ class TcSettingAdminPage extends AdminPage {
                         <FormTextBox ref={e => this.hocPhiNamHoc = e} label='Học phí: Năm học' type='year' readOnly={readOnly} />
                         <FormSelect ref={e => this.hocPhiHocKy = e} label='Học phí: Học kỳ' data={[1, 2, 3]} readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('namHoc', 'hocKy')}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiNamHoc', 'hocPhiHocKy')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>

@@ -16,21 +16,20 @@ class UserPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user', () => {
-            this.props.getTcHocPhiPage();
+            this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
+                const { settings: { namHoc, hocKy } } = data;
+                this.year.value(namHoc);
+                this.term.value(hocKy);
+            });
         });
     }
 
-    duyetYeuCau = (item) => {
-        T.confirm('Duyệt yêu cầu hỗ trợ thông tin', 'Bạn có chắc muốn duyệt yêu cầu này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.assignTccbSupport(item);
-        });
-    }
     render() {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
         let table = renderTable({
-            emptyTable: 'Không có dữ liệu yêu cầu hỗ trợ',
+            emptyTable: 'Không có dữ liệu học phí',
             stickyHead: true,
             header: 'thead-light',
             getDataSource: () => list,
@@ -46,10 +45,10 @@ class UserPage extends AdminPage {
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                       <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK${item.hocKy}`} />
-                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
-                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
                 </tr>
@@ -79,7 +78,7 @@ class UserPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.tccb.tcHocPhi });
+const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
     getTcHocPhiPage
 };
