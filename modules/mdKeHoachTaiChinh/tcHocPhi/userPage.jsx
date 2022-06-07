@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getTcHocPhiPage } from './redux';
+import { getTcHocPhiPage, getTcHocPhiHuongDan } from './redux';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -11,8 +11,29 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
+class Modal extends AdminModal {
+    state = { hocPhiHuongDan: null }
 
+    componentDidMount() {
+    }
+
+    onShow = (hocPhiHuongDan) => {
+        this.setState({ hocPhiHuongDan });
+    };
+
+    render = () => {
+        const { hocPhiHuongDan } = this.state;
+        return this.renderModal({
+            title: 'Hướng dẫn đóng học phí',
+            size: 'large',
+            body: <div className='row'>
+                <span style={{margin: 16}} dangerouslySetInnerHTML={{__html: hocPhiHuongDan}} />
+            </div>
+        });
+    }
+}
 class UserPage extends AdminPage {
+    state = { hocPhiHuongDan: null }
 
     componentDidMount() {
         T.ready('/user', () => {
@@ -21,6 +42,7 @@ class UserPage extends AdminPage {
                 this.year.value(namHoc);
                 this.term.value(hocKy);
             });
+            this.props.getTcHocPhiHuongDan();
         });
     }
 
@@ -28,10 +50,12 @@ class UserPage extends AdminPage {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
+        const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
         let table = renderTable({
             emptyTable: 'Không có dữ liệu học phí',
             stickyHead: true,
             header: 'thead-light',
+            style: {marginTop: 16},
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
@@ -71,8 +95,10 @@ class UserPage extends AdminPage {
             breadcrumb: ['Học phí'],
             backRoute: '/user',
             content: <div className='tile'>
+                <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a><br/>
                 {table}
                 <Pagination getPage={this.props.getTcHocPhiPage} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} style={{ marginLeft: '70px' }} />
+                <Modal ref={e => this.modal = e} />
             </div>
         });
     }
@@ -80,6 +106,6 @@ class UserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage
+    getTcHocPhiPage, getTcHocPhiHuongDan
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);
