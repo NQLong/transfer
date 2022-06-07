@@ -14064,14 +14064,14 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 100
                 },
                 "VALUE": {
                     "value": "value",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 1000
                 }
             },
             "primaryKeys": [],
