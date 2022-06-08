@@ -776,7 +776,7 @@ module.exports = (app) => {
                 else {
                     try {
                         if (canBoShcc !== nguoiTao) {
-                            await createChiDaoNotification({id,quyenChiDao: canBoShcc,}, false);
+                            await createChiDaoNotification({ id, quyenChiDao: canBoShcc, }, false);
                         }
                         resolve();
                     } catch (error) {
@@ -790,7 +790,7 @@ module.exports = (app) => {
 
     app.post('/api/hcth/cong-van-den/quyen-chi-dao', app.permission.check('rectors:login'), async (req, res) => {
         try {
-            const { id, shcc, status } = req.body;
+            const { id, shcc, trangThaiCv, status } = req.body;
             let quyenChiDaoStatus = JSON.parse(status);
             if (quyenChiDaoStatus) {
                 let listCanBo = [];
@@ -804,8 +804,13 @@ module.exports = (app) => {
                 }
                 res.send({ error: null });
             } else {
-                await deleteCanBoNhanChiDao(shcc, id, req.session?.user?.staff.shcc);
-                res.send({ error: null });
+                app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiCv }, async (error) => {
+                    if (error) throw error;
+                    else {
+                        await deleteCanBoNhanChiDao(shcc, id, req.session?.user?.staff.shcc);
+                        res.send({ error: null });
+                    }
+                });
             }
         }
         catch (error) {

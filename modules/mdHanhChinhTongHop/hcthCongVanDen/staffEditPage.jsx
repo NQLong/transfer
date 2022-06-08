@@ -345,7 +345,9 @@ class StaffEditPage extends AdminPage {
             this.quyenChiDaoRef[shcc].value(!value);
             T.notify('Chọn ít nhất 1 cán bộ chỉ đạo đối với công văn cần chỉ đạo!', 'danger');
         }
-        else this.setState({ quyenChiDao: newQuyenChiDao }, () => this.state.id && permissions.includes('rectors:login') && this.props.updateQuyenChiDao(this.state.id, shcc, value));
+        else this.setState({ quyenChiDao: newQuyenChiDao }, () => this.state.id && permissions.includes('rectors:login') && this.props.updateQuyenChiDao(this.state.id, shcc, this.state.trangThai,value, (res) => {
+            T.notify(`${value ? 'Thêm' : 'Xoá'} cán bộ chỉ đạo ${res.error ? 'lỗi' : ' thành công'}`, `${res.error ? 'danger' : 'success'}`);
+        }));
     }
 
     onSuccess = (response) => {
@@ -655,14 +657,22 @@ class StaffEditPage extends AdminPage {
                         const presiendents = page.list.filter(item => item.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG).map(item => item.shcc);
                         this.setState({ quyenChiDao: presiendents }, () => {
                             this.setQuyenChiDao();
-                            this.props.updateQuyenChiDao(this.state.id, this.state.quyenChiDao.join(','), true);
+                            this.props.updateQuyenChiDao(this.state.id, this.state.quyenChiDao.join(','), this.state.trangThai, true, (res) => {
+                                if (res.error) T.notify('Thêm quyền chỉ đạo lỗi', 'danger');
+                                else T.notify('Thêm quyền chỉ đạo thành công', 'success');
+                            
+                            });
                         });
                     });
                 } else {
-                    this.props.updateQuyenChiDao(this.state.id, this.state.quyenChiDao.join(',') , false, () => {
-                        this.setState({
-                            quyenChiDao: []
-                        }, this.setQuyenChiDao);
+                    let newTrangThai = this.state.trangThai;
+                    if (newTrangThai == trangThaiSwitcher.CHO_DUYET.id) newTrangThai = trangThaiSwitcher.CHO_PHAN_PHOI.id;
+                    this.props.updateQuyenChiDao(this.state.id, this.state.quyenChiDao.join(','), newTrangThai, false, (res) => {
+                        if (res.error) T.notify('Xoá quyền chỉ đạo lỗi', 'danger');
+                        else {
+                            T.notify('Xoá quyền chỉ đạo thành công', 'success');
+                            this.getData();
+                        }
                     });
                 }
             } else {
@@ -734,7 +744,7 @@ class StaffEditPage extends AdminPage {
 
                     </div>
                 </div>
-                {this.state.id && this.state.needConduct && this.state.quyenChiDao?.includes(this.props.system?.user?.staff?.shcc) && this.renderChiDao(readOnly)}
+                {this.state.id && this.renderChiDao(readOnly)}
                 {this.state.id && <PhanHoi {...this.props} canPhanHoi={this.isRelated()} congVan={this.state.id} />}
                 <div className='tile'>
                     <div className='form-group'>
