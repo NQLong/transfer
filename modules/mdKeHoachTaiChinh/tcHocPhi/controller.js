@@ -150,7 +150,12 @@ module.exports = app => {
         app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
     );
 
-    const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+    const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
+
+    app.get('/api/finance/huong-dan-dong-hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
+        const { hocPhiHuongDan } = await getSettings();
+        res.send({ hocPhiHuongDan });
+    });
 
 
     const tcHocPhiImportData = async (fields, files, done) => {

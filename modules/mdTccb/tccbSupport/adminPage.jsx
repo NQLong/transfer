@@ -64,7 +64,7 @@ class AdminSupportPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell style={{ textAlign: 'right' }} content={item.id} />
-                    <TableCell type='link' content={<>{item.canBoYeuCau?.normalizedName() || ''}<br />{item.shcc}</>} onClick={e => e.preventDefault() || this[item.qt].show({ data: T.parse(item.data), qtId: item.qtId, type: item.type })} />
+                    <TableCell type='link' content={<>{item.canBoYeuCau?.normalizedName() || ''}<br />{item.shcc}</>} onClick={e => e.preventDefault() || this[item.qt].show({ data: T.parse(item.data), qtId: item.qtId, type: item.type, oldData: T.parse(item.oldData) })} />
                     <TableCell content={<>{item.sentDate ?
                         <>
                             {T.dateToText(item.sentDate, 'dd/mm/yyyy')}

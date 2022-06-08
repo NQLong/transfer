@@ -56,10 +56,14 @@ module.exports = app => {
                 if (error) res.send({ error });
                 else {
                     let listPromise = items.map(item => {
-                        return new Promise(resolve => app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: item.id }, (error, listMonHocCtdt) => {
-                            listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
-                            resolve(listMonHocCtdt || []);
-                        }));
+                        return new Promise(resolve =>
+                            app.model.dtChuongTrinhDaoTao.getAll({
+                                statement: 'maKhungDaoTao = :maKhungDaoTao AND khoa != 33 AND khoa != 32',
+                                parameter: { maKhungDaoTao: item.id }
+                            }, (error, listMonHocCtdt) => {
+                                listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
+                                resolve(listMonHocCtdt || []);
+                            }));
                     });
                     app.model.dtDanhSachMonMo.getAll({ nam: item.id, maNganh, hocKy: thoiGianMoMon.hocKy }, (error, danhSachMonMo) => {
                         let danhSachMonMoChung = danhSachMonMo.filter(item => !item.chuyenNganh || item.chuyenNganh == ''),
@@ -177,16 +181,12 @@ module.exports = app => {
                 }
             });
         });
-        app.model.dtKhungDaoTao.get({ namDaoTao: changes.data.namDaoTao, maNganh: changes.data.maNganh }, async (error, createdCTDT) => {
-            if ((!error && !createdCTDT) || createdCTDT.id == id) {
-                try {
-                    let listMonHocCTDT = await updateCTDT(changes.items || []);
-                    app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
-                } catch (error) {
-                    res.send({ error });
-                }
-            } else res.send({ error: `Mã ngành ${changes.data.maNganh} năm ${changes.data.namDaoTao} đã tồn tại!` });
-        });
+        try {
+            let listMonHocCTDT = await updateCTDT(changes.items || []);
+            app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'dtChuongTrinhDaoTao:manage'), (req, res) => {

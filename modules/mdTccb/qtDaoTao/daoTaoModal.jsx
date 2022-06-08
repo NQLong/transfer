@@ -38,12 +38,13 @@ export class DaoTaoModal extends AdminModal {
         //data for adminPage, daoTaoDetail: data: { item: }
         //data for support: data: { data: {}, qtId }
         let item = data?.item || data?.data || null;
+        // console.log(item.hinhThuc);
         let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenTruong, hinhThuc, loaiBangCap, minhChung, shcc } = item || {
             id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
             tenTruong: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: '', minhChung: '[]', shcc: ''
         };
         let listFile = T.parse(minhChung || '[]');
-        data?.data && this.setState({ item, qtId: data.qtId, type: data.type });
+        data?.data && this.setState({ item, qtId: data.qtId, type: data.type, oldData: data.oldData });
         this.setState({
             batDauType: batDauType || 'dd/mm/yyyy',
             ketThucType: ketThucType || 'dd/mm/yyyy',
@@ -54,7 +55,7 @@ export class DaoTaoModal extends AdminModal {
             this.trinhDo?.value(trinhDo || '');
             this.chuyenNganh?.value(chuyenNganh || (this.state.loaiBangCap ? chuyenNganhSupportText[this.state.loaiBangCap] : ''));
             this.tenTruong?.value(tenTruong || '');
-            this.hinhThuc?.value(hinhThuc || '');
+            this.hinhThuc?.value(hinhThuc);
             this.batDauType?.setText({ text: this.state.batDauType });
             this.ketThucType?.setText({ text: this.state.ketThucType });
             this.batDau?.value(this.state.batDau || '');
@@ -97,7 +98,7 @@ export class DaoTaoModal extends AdminModal {
         }
         else {
             if (!this.props.readOnly && this.props.isCanBo) {
-                this.props.create(changes, tccbSupport, this.hide);
+                this.props.create(this.state.oldData, changes, tccbSupport, this.hide);
             }
             else {
                 this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -157,11 +158,10 @@ export class DaoTaoModal extends AdminModal {
     };
 
     onChangeViewMode = (value) => {
+        // console.log(this.state.item);
         if (value) {
-            this.props.getItemQtDaoTao(this.state.qtId, data => {
-                this.onShow({ item: data });
-            });
-        } else this.onShow({ data: this.state.item, qtId: this.state.qtId });
+            this.onShow({ item: this.state.oldData });
+        } else this.onShow({ data: this.state.item, qtId: this.state.qtId, type: this.state.type, oldData: this.state.oldData });
     }
 
     tableListFile = (data, permission) => {
@@ -200,6 +200,7 @@ export class DaoTaoModal extends AdminModal {
     }
 
     render = () => {
+        console.log(this.props.isSupport, this.state.type);
         let readOnly = this.props.readOnly || this.props.isSupport;
         const displayElement = this.state.loaiBangCap ? 'block' : 'none';
         return this.renderModal({
