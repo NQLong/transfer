@@ -13979,7 +13979,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 1000
+                    "size": 2000
                 }
             },
             "primaryKeys": [
@@ -14063,7 +14063,7 @@
                     "value": "key",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": true,
+                    "nullable": false,
                     "size": 100
                 },
                 "VALUE": {
@@ -14074,7 +14074,9 @@
                     "size": 1000
                 }
             },
-            "primaryKeys": [],
+            "primaryKeys": [
+                "KEY"
+            ],
             "foreignKeys": [],
             "type": "table"
         }
