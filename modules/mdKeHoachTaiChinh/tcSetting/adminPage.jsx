@@ -2,52 +2,22 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
-import Editor from 'view/component/CkEditor4';
-
-class EmailItem extends React.Component {
-    constructor(props) {
-        super(props);
-        this.title = React.createRef();
-        this.editor = React.createRef();
-    }
-
-    set(title, text, html) {
-        this.title.current.value = title;
-        this.editor.current.html(html);
-    }
-
-    get() {
-        return {
-            title: this.title.current.value,
-            text: this.editor.current.text(),
-            html: this.editor.current.html(),
-        };
-    }
-
-    render() {
-        return (
-            <div className='tile-body'>
-                <div className='form-group'>
-                    <label className='control-label'>Tiêu đề</label>
-                    <input className='form-control' type='text' defaultValue='' ref={this.title} placeholder='Tiêu đề email' />
-                </div>
-                <div className='form-group'>
-                    <label className='control-label'>HTML</label>
-                    <small className='form-text text-muted'>Tham số: {this.props.params}</small>
-                    <Editor ref={this.editor} placeholder='Nội dung email' height={600} />
-                </div>
-            </div>
-        );
-    }
-}
 
 class TcSettingAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/setting', () => {
             this.props.getTcSettingAll(items => {
                 (items || []).forEach(item => {
-                    const component = this[item.key];
-                    component && component.value && component.value(item.value);
+                    if (item.key == 'hocPhiEmailDongEditorHtml') {
+                        this.hocPhiEmailDongEditor.html(item.value);
+                    } else if (item.key == 'hocPhiEmailPhatSinhEditorHtml') {
+                        this.hocPhiEmailPhatSinhEditor.html(item.value);
+                    } else if (item.key == 'hocPhiEmailHoanTraEditorHtml') {
+                        this.hocPhiEmailHoanTraEditor.html(item.value);
+                    } else {
+                        const component = this[item.key];
+                        component && component.value && component.value(item.value);
+                    }
                 });
             });
         });
@@ -74,6 +44,14 @@ class TcSettingAdminPage extends AdminPage {
         } else {
             this.props.updateTcSetting({ emailPassword: password1 }, () => this.emailPassword1.value('') || this.emailPassword2.value(''));
         }
+    }
+
+    saveEmailTempate = (titleKey, editorKey) => {
+        const changes = {};
+        changes[titleKey] = this[titleKey].value();
+        changes[editorKey + 'Text'] = this[editorKey].text();
+        changes[editorKey + 'Html'] = this[editorKey].html();
+        this.props.updateTcSetting(changes);
     }
 
     render() {
@@ -132,7 +110,7 @@ class TcSettingAdminPage extends AdminPage {
 
                     <div className='tile'>
                         <h3 className='tile-header'>Hướng dẫn đóng học phí</h3>
-                        <FormEditor ref={e => this.hocPhiHuongDan = e} readOnly={readOnly} />
+                        <FormEditor ref={e => this.hocPhiHuongDan = e} height={400} readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiHuongDan')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
@@ -165,27 +143,36 @@ class TcSettingAdminPage extends AdminPage {
 
                     <div className='tab-content tile'>
                         <div className='tab-pane fade active show' id='hocPhiEmailDong'>
-                            <EmailItem ref={e => this.hocPhiEmailDong = e} params='{name}, {subject}, {message}' />
+                            <div className='tile-body'>
+                                <FormTextBox ref={e => this.hocPhiEmailDongTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                <FormEditor ref={e => this.hocPhiEmailDongEditor = e} label='Nội dung email' smallText='Tham số: {name}, {subject}, {message}' height={400} />
+                            </div>
                             <div style={{ textAlign: 'right' }}>
-                                <button className='btn btn-success' type='button' onClick={() => this.save('TODO')}>
+                                <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailDongTitle', 'hocPhiEmailDongEditor')}>
                                     <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                 </button>
                             </div>
                         </div>
 
                         <div className='tab-pane fade' id='hocPhiEmailPhatSinh'>
-                            <EmailItem ref={e => this.hocPhiEmailPhatSinh = e} params='{name}, {subject}, {message}' />
+                            <div className='tile-body'>
+                                <FormTextBox ref={e => this.hocPhiEmailPhatSinhTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                <FormEditor ref={e => this.hocPhiEmailPhatSinhEditor = e} label='Nội dung email' smallText='Tham số: {name}, {subject}, {message}' height={400} />
+                            </div>
                             <div style={{ textAlign: 'right' }}>
-                                <button className='btn btn-success' type='button' onClick={() => this.save('TODO')}>
+                                <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditor')}>
                                     <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                 </button>
                             </div>
                         </div>
 
                         <div className='tab-pane fade' id='hocPhiEmailHoanTra'>
-                            <EmailItem ref={e => this.hocPhiEmailHoanTra = e} params='{name}, {subject}, {message}' />
+                            <div className='tile-body'>
+                                <FormTextBox ref={e => this.hocPhiEmailHoanTraTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                <FormEditor ref={e => this.hocPhiEmailHoanTraEditor = e} label='Nội dung email' smallText='Tham số: {name}, {subject}, {message}' height={400} />
+                            </div>
                             <div style={{ textAlign: 'right' }}>
-                                <button className='btn btn-success' type='button' onClick={() => this.save('TODO')}>
+                                <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditor')}>
                                     <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                 </button>
                             </div>
