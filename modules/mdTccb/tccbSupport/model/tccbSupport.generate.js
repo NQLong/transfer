@@ -1,6 +1,6 @@
-// Table name: TCCB_SUPPORT { id, data, shcc, shccAssign, modifiedDate, type, deleted, qtId, approved, qt, sentDate }
+// Table name: TCCB_SUPPORT { id, shcc, shccAssign, modifiedDate, type, deleted, qtId, approved, qt, sentDate, oldData, data }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'data': 'DATA', 'shcc': 'SHCC', 'shccAssign': 'SHCC_ASSIGN', 'modifiedDate': 'MODIFIED_DATE', 'type': 'TYPE', 'deleted': 'DELETED', 'qtId': 'QT_ID', 'approved': 'APPROVED', 'qt': 'QT', 'sentDate': 'SENT_DATE' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'shccAssign': 'SHCC_ASSIGN', 'modifiedDate': 'MODIFIED_DATE', 'type': 'TYPE', 'deleted': 'DELETED', 'qtId': 'QT_ID', 'approved': 'APPROVED', 'qt': 'QT', 'sentDate': 'SENT_DATE', 'oldData': 'OLD_DATA', 'data': 'DATA' };
 
 module.exports = app => {
     app.model.tccbSupport = {
