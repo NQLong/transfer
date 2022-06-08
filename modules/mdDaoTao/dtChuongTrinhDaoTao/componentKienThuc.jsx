@@ -4,7 +4,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { deleteDtChuongTrinhDaoTao } from './redux';
-export class ComponentKienThuc extends AdminPage {
+class ComponentKienThuc extends AdminPage {
     maKhoa = null;
     rows = {};
     state = { datas: {} };
@@ -37,6 +37,7 @@ export class ComponentKienThuc extends AdminPage {
             this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
             // id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
             this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
+            item && item.maMonHoc && this.props.pushMonHocChosen(item.maMonHoc);
             this.rows[idx].ma.value((item && item.maMonHoc) ? item.maMonHoc : '');
             this.rows[idx].khoa.value(item ? item.khoa : '');
             this.rows[idx].soTiet.value(item ? (item.tongSoTiet || 0).toString() : '0');
@@ -69,17 +70,24 @@ export class ComponentKienThuc extends AdminPage {
             T.notify('Vui lòng chọn môn học!', 'danger');
             return;
         }
+        let oldData = this.rows[idx].maMonHoc.value();
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
         if (permission.write || permission.manage) {
-            const curEdit = this.state.datas[idx].edit;
-            const id = this.state.datas[idx].id;
-            const isDeleted = this.state.datas[idx].isDeleted;
-            const childText = this.state.datas[idx].childText;
-            const childId = this.state.datas[idx].childId;
-            this.setEditState(idx, childId, childText, !curEdit, id, isDeleted, () => {
-                this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
-                this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
-            });
+            let curData = this.rows[idx].maMonHoc.value();
+            this.props.removeMonHoc(oldData);
+            if (this.props.pushMonHocChosen(curData)) {
+                const curEdit = this.state.datas[idx].edit;
+                const id = this.state.datas[idx].id;
+                const isDeleted = this.state.datas[idx].isDeleted;
+                const childText = this.state.datas[idx].childText;
+                const childId = this.state.datas[idx].childId;
+                this.setEditState(idx, childId, childText, !curEdit, id, isDeleted, () => {
+                    this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
+                    this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
+                });
+            } else {
+                this.rows[idx].maMonHoc.focus();
+            }
         }
     }
 
@@ -89,6 +97,7 @@ export class ComponentKienThuc extends AdminPage {
         T.confirm('Xóa môn học', 'Bạn có chắc bạn muốn xóa môn học này?', 'warning', true, isConfirm => {
             if (isConfirm) {
                 T.alert('Xóa môn học thành công!', 'success', false, 800);
+                this.props.removeMonHoc(this.rows[idx].maMonHoc.value());
                 const childId = this.state.datas[idx].childId;
                 const childText = this.state.datas[idx].childText;
                 this.setEditState(idx, childId, childText, false, id, true);
@@ -99,11 +108,12 @@ export class ComponentKienThuc extends AdminPage {
     undoRow = (e, idx, childId) => {
         e.preventDefault();
         idx = childId >= 0 ? `${childId}_${idx}` : idx;
-        const id = this.state.datas[idx].id;
-        const childText = this.state.datas[idx].childText;
-        this.setEditState(idx, childId, childText, false, id, false);
+        if (this.props.pushMonHocChosen(this.rows[idx].maMonHoc.value())) {
+            const id = this.state.datas[idx].id;
+            const childText = this.state.datas[idx].childText;
+            this.setEditState(idx, childId, childText, false, id, false);
+        }
     }
-
 
     setMonHoc = (idx, value, childId, childText) => {
         const id = value.id,
@@ -121,14 +131,19 @@ export class ComponentKienThuc extends AdminPage {
         if (this.rows[statePreIdx] && this.state.datas[statePreIdx]?.edit) {
             this.editRow(null, preIdx, childId);
         }
-        this.rows[idx].ten = T.parse(ten, { vi: '' }).vi;
-        this.rows[idx].soTinChi.value(tongTinChi);
-        this.rows[idx].soTietLyThuyet.value(tietLt.toString() || '0');
-        this.rows[idx].soTietThucHanh.value(tietTh.toString() || '0');
-        this.rows[idx].soTiet.value(tongTiet);
-        this.rows[idx].khoa.value(khoa);
-        this.rows[idx].ma.value(id);
-        this.addRow(nextIdx, null, childId, childText);
+        if (this.props.pushMonHocChosen(id)) {
+            this.rows[idx].ten = T.parse(ten, { vi: '' }).vi;
+            this.rows[idx].soTinChi.value(tongTinChi);
+            this.rows[idx].soTietLyThuyet.value(tietLt.toString() || '0');
+            this.rows[idx].soTietThucHanh.value(tietTh.toString() || '0');
+            this.rows[idx].soTiet.value(tongTiet);
+            this.rows[idx].khoa.value(khoa);
+            this.rows[idx].ma.value(id);
+            this.addRow(nextIdx, null, childId, childText);
+        } else {
+            this.rows[idx].maMonHoc.focus();
+        }
+
     }
 
     selectMh = (item, idx, childId, childText) => {

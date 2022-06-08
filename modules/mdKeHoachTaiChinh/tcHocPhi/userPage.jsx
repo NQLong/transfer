@@ -27,7 +27,7 @@ class Modal extends AdminModal {
             title: 'Hướng dẫn đóng học phí',
             size: 'large',
             body: <div className='row'>
-                <span style={{margin: 16}} dangerouslySetInnerHTML={{__html: hocPhiHuongDan}} />
+                <span style={{ margin: 16 }} dangerouslySetInnerHTML={{ __html: hocPhiHuongDan }} />
             </div>
         });
     }
@@ -55,7 +55,7 @@ class UserPage extends AdminPage {
             emptyTable: 'Không có dữ liệu học phí',
             stickyHead: true,
             header: 'thead-light',
-            style: {marginTop: 16},
+            style: { marginTop: 16 },
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
@@ -95,7 +95,7 @@ class UserPage extends AdminPage {
             breadcrumb: ['Học phí'],
             backRoute: '/user',
             content: <div className='tile'>
-                <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a><br/>
+                <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a><br />
                 {table}
                 <Pagination getPage={this.props.getTcHocPhiPage} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} style={{ marginLeft: '70px' }} />
                 <Modal ref={e => this.modal = e} />
