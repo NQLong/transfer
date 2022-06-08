@@ -36,7 +36,7 @@ class TcHocPhiTransactionEditPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'right' }} content={item.billId} />
-                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'right' }} content={item.transDate} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'right' }} content={parseInt(item.transDate)} />
                     <TableCell style={{ textAlign: 'right' }} content={(item.amount?.toString() || '').numberWithCommas()} />
                 </tr>
             )
