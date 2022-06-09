@@ -220,7 +220,7 @@ module.exports = app => {
                             resolve();
                         } else {
                             user.isStaff = 1;
-                            item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
+                            if (item.phai == '02') app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
                             user.firstName = item.ten;
                             user.lastName = item.ho;
@@ -301,17 +301,15 @@ module.exports = app => {
                         });
                     } else resolve();
                 })).then(() => new Promise(resolve => {
-                    if (!user.isStaff && user.studentId) {
-                        app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
-                            if (student) {
-                                app.permissionHooks.pushUserPermission(user, 'student:login');
-                                user.isStudent = 1;
-                                user.active = 1;
-                                user.data = student;
-                                resolve();
-                            } else resolve();
-                        });
-                    } else resolve();
+                    app.model.fwStudents.get({ emailTruong: user.email }, (error, student) => {
+                        if (student) {
+                            app.permissionHooks.pushUserPermission(user, 'student:login');
+                            user.isStudent = 1;
+                            user.active = 1;
+                            user.data = student;
+                            resolve();
+                        } else resolve();
+                    });
                 })).then(() => {
                     user.menu = app.permission.tree();
                     Object.keys(user.menu).forEach(parentMenuIndex => {

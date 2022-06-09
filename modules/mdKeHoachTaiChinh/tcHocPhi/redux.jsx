@@ -3,11 +3,14 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TcHocPhiGetPage = 'TcHocPhi:GetPage';
 const TcHocPhiUpdate = 'TcHocPhi:Update';
+const TcHocPhiGetHuongDan = 'TcHocPhi:GetHuongDan';
 
 export default function dtThoiKhoaBieuReducer(state = null, data) {
     switch (data.type) {
         case TcHocPhiGetPage:
             return Object.assign({}, state, { page: data.page });
+        case TcHocPhiGetHuongDan:
+            return Object.assign({}, state, { hocPhiHuongDan: data.result });
         case TcHocPhiUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -100,5 +103,21 @@ export function updateHocPhi(item, changes, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật thông tin học phí bị lỗi!', 'danger'));
+    };
+}
+
+export function getTcHocPhiHuongDan(done) {
+    return dispatch => {
+        const url = '/api/finance/huong-dan-dong-hoc-phi';
+        T.get(url, result => {
+            if (result.error) {
+                T.notify('Lấy các hướng dẫn đóng học phí bị lỗi', 'danger');
+                console.error(result.error);
+            }
+            else {
+                dispatch({ type: TcHocPhiGetHuongDan, result: result?.hocPhiHuongDan });
+                done && done(result);
+            }
+        });
     };
 }

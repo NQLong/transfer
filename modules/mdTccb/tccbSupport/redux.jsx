@@ -72,10 +72,10 @@ export function getPageTccbSupport(pageNumber, pageSize, pageCondition, done) {
     };
 }
 
-export function createTccbSupport(data, dataTccbSupport, done) {
+export function createTccbSupport(oldData, data, dataTccbSupport, done) {
     return dispatch => {
         const url = '/api/tccb/support';
-        T.post(url, { data, dataTccbSupport }, result => {
+        T.post(url, { oldData, data, dataTccbSupport }, result => {
             if (result.error) {
                 T.notify(`Lỗi: ${result.error.message}`, 'danger');
                 console.error(result.error);

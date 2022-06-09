@@ -34,7 +34,8 @@ module.exports = {
         COMPLETE: 'COMPLETE',
         CLOSE: 'CLOSE',
         REOPEN: 'REOPEN',
-        RESET: 'RESET'
+        RESET: 'RESET',
+        VIEW: 'VIEW'
     },
 
     CONG_VAN_TYPE: 'DEN',

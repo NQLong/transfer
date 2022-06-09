@@ -6635,6 +6635,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "CAP_NHAT_LUC": {
+                    "value": "capNhatLuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -8466,6 +8473,13 @@
                 },
                 "NGUOI_TAO": {
                     "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 16
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
@@ -13360,13 +13374,6 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "DATA": {
-                    "value": "data",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 2000
-                },
                 "SHCC": {
                     "value": "shcc",
                     "dataType": "NVARCHAR2",
@@ -13429,6 +13436,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "OLD_DATA": {
+                    "value": "oldData",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "DATA": {
+                    "value": "data",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
                 }
             },
             "primaryKeys": [
@@ -13736,10 +13757,10 @@
                 },
                 "TIEN_LUONG": {
                     "value": "tienLuong",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "10,0"
+                    "size": 10
                 },
                 "NGUOI_DUOC_THUE": {
                     "value": "nguoiDuocThue",
@@ -13846,20 +13867,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
-                },
-                "BILL_DATE": {
-                    "value": "billDate",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "BILL_DUE_DATE": {
-                    "value": "billDueDate",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -13947,6 +13954,13 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "BANK": {
+                    "value": "bank",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -13972,7 +13986,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 1000
+                    "size": 2000
                 }
             },
             "primaryKeys": [
@@ -14000,22 +14014,76 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "QUA_TRINH": {
-                    "value": "quaTrinh",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 1000
-                },
                 "THAO_TAC": {
                     "value": "thaoTac",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "DU_LIEU_CU": {
+                    "value": "duLieuCu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "DU_LIEU_MOI": {
+                    "value": "duLieuMoi",
+                    "dataType": "VARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
                 }
             },
             "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_SETTING": {
+            "active": true,
+            "moduleName": "hcthSetting",
+            "modelName": "hcthSetting",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
+            ],
             "foreignKeys": [],
             "type": "table"
         }

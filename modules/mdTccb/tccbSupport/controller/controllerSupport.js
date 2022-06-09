@@ -50,12 +50,14 @@ module.exports = app => {
 
     app.post('/api/tccb/support', app.permission.check('staff:login'), (req, res) => {
         let data = req.body.data,
+            oldData = req.body.oldData,
             dataTccbSupport = req.body.dataTccbSupport,
             sentDate = new Date().getTime(),
             { firstName, lastName, shcc } = req.session.user;
         let fullName = `${lastName || ''} ${firstName || ''}`;
         data = app.stringify(data);
-        shcc ? app.model.tccbSupport.create({ data, ...dataTccbSupport, shcc, sentDate }, (error, item) => {
+        oldData = app.stringify(oldData);
+        shcc ? app.model.tccbSupport.create({ data, ...dataTccbSupport, shcc, sentDate, oldData }, (error, item) => {
             {
                 const sendNotification = (index = 0) => {
                     if (index > EMAIL_OF_SUPPORTERS.length - 1) {
