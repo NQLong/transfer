@@ -4,7 +4,7 @@ import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_FwCanBo, SelectAdapter_FwCanBoByDonVi } from 'modules/mdTccb/tccbCanBo/redux';
-const { vaiTro, loaiLienKet, trangThaiNhiemVu} = require('../constant');
+const { vaiTro, loaiLienKet, trangThaiNhiemVu } = require('../constant');
 const vaiTroSelector = Object.keys(vaiTro).map(key => ({ id: key, text: vaiTro[key].text }));
 
 export class RefreshStatusModal extends AdminModal {
@@ -14,64 +14,46 @@ export class RefreshStatusModal extends AdminModal {
     }
 
     onShow = (item) => {
-        console.log(item);
-        this.setState({ item});
+        this.setState({ item });
         this.phanHoi.value('');
     }
 
     onSubmit = (e) => {
-        console.log(this.phanHoi.value());
         if (this.phanHoi.value() !== '') {
-            console.log(this.state.item);
             const { shccCanBoNhan, tenCanBoNhan, hoCanBoNhan } = this.state.item;
             this.props.onSave({
                 id: this.props.nhiemVuId,
-                phanHoi: this.phanHoi.value(),
+                content: this.phanHoi.value(),
                 shccCanBoNhan,
                 tenCanBoNhan,
                 hoCanBoNhan
-            }, () => {
-                this.modal.hide();
-                this.phanHoi.value('');
-            });
+            }, this.hide);
         } else {
-            T.notify('Vui lòng nhập lý do !', 'danger');
-            this.ten.focus();
+            T.notify('Vui lòng nhập lý do thay đổi !', 'danger');
+            this.phanHoi.focus();
         }
-        // const changes = {
-        //     ten: this.ten.value(),
-        //     tenVietTat: this.tenVietTat.value(),
-        //     kichHoat: this.kichHoat.value() ? 1 : 0,
-        // };
-        // if (changes.ten == '') {
-        //     T.notify('Tên đơn vị công văn bị trống!', 'danger');
-        //     this.ten.focus();
-        // } else {
-        //     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-        // }
         e.preventDefault();
     }
 
     render = () => {
         return this.renderModal({
-            title: 'Nhập phản hồi',
+            title: 'Nhập lý do thay đổi',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.phanHoi = e} label='Nhập phản hồi'
-                />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.phanHoi = e} />
             </div>
         });
     }
 }
 
 export class CanBoNhan extends AdminPage {
-    tinhTrangText = {
+    trangThaiText = {
         READ: 'Đã đọc',
-        COMPLETE: 'Đã hoàn thành',
+        COMPLETED: 'Đã hoàn thành',
     }
 
-    tinhTrangColor = {
+    trangThaiColor = {
         READ: 'blue',
-        COMPLETE: '#149414'
+        COMPLETED: '#149414'
     }
 
     state = { ids: [], canBoNhan: [] };
@@ -146,34 +128,12 @@ export class CanBoNhan extends AdminPage {
     }
 
     refreshTrangThai = (e) => {
-        // T.confirm('', `Bạn có chắc bạn muốn thay đổi quyền cán bộ ${(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()} thành ${vaiTro[vaiTroMoi].text}?`, true,
-        //     isConfirm => isConfirm && this.props.updateCanBoNhanNhiemVu(updateData, () => {
-        //         const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
-        //         const currentId = currentCanBoNhan.map(item => item.id);
-        //         this.props.getList({ ma: this.props.target, ids: currentId });
-        //     }));
         this.showModal(e);
-    }
-
-    canBoNhanData = () => {
-        let listCanBoNhan = this.props.target && this.props.hcthNhiemVu?.item?.canBoNhan ? this.props.hcthNhiemVu?.item?.canBoNhan : [];
-        let listHistory = this.props.hcthNhiemVu?.item?.history || [];
-        console.log('list : ',listCanBoNhan);
-        console.log(listHistory);
-        let listCanBoNhanWithStatus = listCanBoNhan.map(canBo => {
-            let lastHistory = listHistory.find(history => history.shcc == canBo.shccCanBoNhan);
-            console.log(lastHistory);
-            return ({
-                ...canBo,
-                trangThai: lastHistory?.hanhDong || ''
-            });
-        });
-        console.log('trang thai :', listCanBoNhanWithStatus);
-        return listCanBoNhanWithStatus;
+        e.preventDefault();
     }
 
     tableCanBoNhan = () => renderTable({
-        getDataSource: this.canBoNhanData,
+        getDataSource: () => this.props.hcthNhiemVu?.item?.canBoNhan || (!this.props.target && []),
         stickyHead: false,
         emptyTable: 'Chưa có cán bộ tham gia!',
         loadingOverlay: false,
@@ -192,9 +152,9 @@ export class CanBoNhan extends AdminPage {
 
         renderRow: (item, index) => {
             const isAdder = this.props.system?.user?.shcc == item.shccNguoiTao;
-            const permissions = {
-                delete: this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isCreator || isAdder || this.props.isManager)
-            };
+            const permissions = (item) => ({
+                delete: this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isCreator || isAdder || (this.props.isManager && item.vaiTro == vaiTro.PARTICIPANT.id))
+            });
             return (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
@@ -202,15 +162,15 @@ export class CanBoNhan extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold', color: 'blue' }} content={(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: vaiTro[item.vaiTro]?.color || 'blue' }} content={vaiTro[item.vaiTro]?.text} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.hoNguoiTao + ' ' + item.tenNguoiTao).trim().normalizedName()} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: this.tinhTrangColor[item.trangThai], fontWeight: 'bold' }} content={this.tinhTrangText[item.trangThai]} />
-                    <TableCell type='buttons' permission={permissions} onDelete={() => this.onDelete(item)} >
-                        {(this.props.isManager || this.props.isCreator) && <a className='btn btn-primary' title='Phản hồi' onClick={() => this.modal.show(item)}>
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai && this.trangThaiColor[item.trangThai], fontWeight: 'bold' }} content={item.trangThai && this.trangThaiText[item.trangThai]} />
+                    <TableCell type='buttons' permission={permissions(item)} onDelete={() => this.onDelete(item)} style={{ textAlign: 'center' }}>
+                        {this.props.trangThai !== trangThaiNhiemVu.DONG.id && ((this.props.isManager && item.vaiTro == vaiTro.PARTICIPANT.id) || this.props.isCreator) && (item.trangThai && item.trangThai == 'COMPLETED') && <a className='btn btn-primary' title='Đặt lại trạng thái' onClick={() => this.modal.show(item)}>
                             <i className='fa fa-lg fa-refresh' />
                         </a>}
-                        {item.vaiTro == vaiTro.PARTICIPANT.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
+                        {item.vaiTro == vaiTro.PARTICIPANT.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && ((this.props.isManager && item.vaiTro == vaiTro.PARTICIPANT.id) || this.props.isCreator) && <a className='btn btn-info' title='Cấp quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.MANAGER.id)}>
                             <i className='fa fa-lg fa-user-plus' />
                         </a>}
-                        {item.vaiTro == vaiTro.MANAGER.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && (this.props.isManager || this.props.isCreator) && <a className='btn btn-warning' title='Xóa quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.PARTICIPANT.id)}>
+                        {item.vaiTro == vaiTro.MANAGER.id && this.props.trangThai !== trangThaiNhiemVu.DONG.id && ((this.props.isManager && item.vaiTro == vaiTro.PARTICIPANT.id) || this.props.isCreator) && <a className='btn btn-warning' title='Xóa quyền quản trị viên' onClick={(e) => this.updatePermission(e, item, vaiTro.PARTICIPANT.id)}>
                             <i className='fa fa-lg fa-user-times' />
                         </a>}
                     </TableCell>
@@ -269,7 +229,7 @@ export class CanBoNhan extends AdminPage {
                         </div>
                     </div>
                 </div>
-                <RefreshStatusModal ref={e => this.modal = e} onSave={this.props.refreshCanBoNhanStatus} nhiemVuId={this.props.target}/>
+                <RefreshStatusModal ref={e => this.modal = e} onSave={this.props.refreshCanBoNhanStatus} nhiemVuId={this.props.target} />
             </div>
         );
     }
@@ -702,13 +662,15 @@ export class History extends React.Component {
         UPDATE: 'cập nhật',
         COMPLETE: 'hoàn thành',
         CLOSE: 'đóng',
-        REOPEN: 'mở lại'
+        REOPEN: 'mở lại',
+        RESET: 'thay đổi trạng thái'
     }
 
     canBoNhanAction = {
         ADD_EMPLOYEES: 'ADD_EMPLOYEES',
         REMOVE_EMPLOYEE: 'REMOVE_EMPLOYEE',
-        CHANGE_ROLE: 'CHANGE_ROLE'
+        CHANGE_ROLE: 'CHANGE_ROLE',
+        RESET: 'RESET'
     }
 
     actionColor = {
@@ -720,7 +682,8 @@ export class History extends React.Component {
         REMOVE_EMPLOYEE: 'red',
         CHANGE_ROLE: '#007bff',
         CLOSE: 'red',
-        REOPEN: '#149414'
+        REOPEN: '#149414',
+        RESET: 'blue',
     }
 
     roleName = {
@@ -734,17 +697,31 @@ export class History extends React.Component {
         }
     }
 
+    trangThaiCanBoNhan = {
+        READ: {
+            text: 'Đã đọc',
+            color: 'blue'
+        },
+        COMPLETED: {
+            text: 'Đã hoàn thành',
+            color: '#149414'
+        }
+    }
+
     render = () => {
         let historyData = this.props.data?.map(item => item.ghiChu ? ({ ...item, ghiChu: JSON.parse(item.ghiChu) }) : ({ ...item }));
         const loginShcc = this.props.system?.user?.staff?.shcc;
+        const { ADD_EMPLOYEES, REMOVE_EMPLOYEE, CHANGE_ROLE, RESET } = this.canBoNhanAction;
         const renderChangeCanBoNhanContent = (action, item) => {
             switch (action) {
-                case 'ADD_EMPLOYEES':
+                case ADD_EMPLOYEES:
                     return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.roleName[item.ghiChu.role].color }}>thêm {item.ghiChu.quantity} {this.roleName[item.ghiChu.role].text}</b> vào nhiệm vụ này.</span>;
-                case 'REMOVE_EMPLOYEE':
+                case REMOVE_EMPLOYEE:
                     return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>xoá {item.ghiChu.name}</b> ra khỏi nhiệm vụ.</span>;
-                case 'CHANGE_ROLE':
+                case CHANGE_ROLE:
                     return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>thay đổi vai trò của {item.ghiChu.name}</b> thành <b style={{ color: this.roleName[item.ghiChu.role].color }}>{this.roleName[item.ghiChu.role].text}</b>.</span>;
+                case RESET:
+                    return <span><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>thay đổi trạng thái của {item.ghiChu.name}</b> thành <b style={{ color: this.trangThaiCanBoNhan[item.ghiChu.status].color }}>{this.trangThaiCanBoNhan[item.ghiChu.status].text}</b> .</span>;
                 default:
                     return null;
             }
@@ -760,7 +737,7 @@ export class History extends React.Component {
                             component: <>
                                 <span className='time'>{T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM')}</span>
                                 {
-                                    item.hanhDong !== this.canBoNhanAction.ADD_EMPLOYEES && item.hanhDong !== this.canBoNhanAction.REMOVE_EMPLOYEE && item.hanhDong !== this.canBoNhanAction.CHANGE_ROLE ?
+                                    !Object.values(this.canBoNhanAction).includes(item.hanhDong) ?
                                         <p><b style={{ color: 'blue' }}>{item.shcc !== loginShcc ? (item.ho?.normalizedName() || '') + ' ' + (item.ten?.normalizedName() || '') : 'Bạn'}</b> đã <b style={{ color: this.actionColor[item.hanhDong] }}>{this.actionText[item.hanhDong]}</b> nhiệm vụ này.</p> :
                                         <p>{renderChangeCanBoNhanContent(item.hanhDong, item)}</p>
                                 }
