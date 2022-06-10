@@ -159,5 +159,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_search_selector(:pagenumber, :pagesize, :filterparam, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filterparam, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        download: (donviguicv, listdonvi, macanbo, timetype, fromtime, totime, sortby, sorttype, shcccanbo, donvicanbo, stafftype, status, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_download(:donviguicv, :listdonvi, :macanbo, :timetype, :fromtime, :totime, :sortby, :sorttype, :shcccanbo, :donvicanbo, :stafftype, :status, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, donviguicv, listdonvi, macanbo, timetype, fromtime, totime, sortby, sorttype, shcccanbo, donvicanbo, stafftype, status, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
