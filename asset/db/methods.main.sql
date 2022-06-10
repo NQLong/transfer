@@ -1649,7 +1649,8 @@ BEGIN
                cbn.HO              as "hoCanBoNhan",
                cbn.TEN             as "tenCanBoNhan",
                nt.HO               as "hoNguoiTao",
-               nt.TEN              as "tenNguoiTao"
+               nt.TEN              as "tenNguoiTao",
+               hcthcbn.TRANG_THAI  as "trangThai"
         from HCTH_CAN_BO_NHAN hcthcbn
                  LEFT JOIN TCHC_CAN_BO cbn on hcthcbn.CAN_BO_NHAN = cbn.SHCC
                  LEFT JOIN TCHC_CAN_BO nt on nt.SHCC = hcthcbn.NGUOI_TAO
@@ -2214,8 +2215,8 @@ BEGIN
             OR (
                         maCanBo is NOT NULL
                     AND maCanBo in (SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
-                                      from dual
-                                      connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
+                                    from dual
+                                    connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
                 )
             OR (
                         listDonVi IS NOT NULL
@@ -2344,6 +2345,7 @@ BEGIN
                         hcthcvd.TRANG_THAI    AS "trangThai",
                         dvgcv.ID              AS "maDonViGuiCV",
                         dvgcv.TEN             AS "tenDonViGuiCV",
+                        hcthcvd.CAP_NHAT_LUC  AS "capNhatLuc",
 
 
                         (SELECT LISTAGG(hcthdvn.DON_VI_NHAN, ',') WITHIN GROUP (
