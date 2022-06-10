@@ -26,18 +26,20 @@ module.exports = app => {
         };
 
         http.request(option, (res) => {
-            if (res.statusCode == 1) {
+            if (res.statusCode == 200) {
                 res.on('data', (data) => {
-                    app.model.fwSms.create({
-                        email: req.session.user.email,
-                        sentDate: new Date().getTime(),
-                        total: currentTotal - data.total
-                    }, (error, item) => {
-                        if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total }, () => res.send({ item }));
-                        else res.send({ error });
-                    });
+                    if (data.code == 1) {
+                        app.model.fwSms.create({
+                            email: req.session.user.email,
+                            sentDate: new Date().getTime(),
+                            total: currentTotal - data.total
+                        }, (error, item) => {
+                            if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total }, () => res.send({ item }));
+                            else res.send({ error });
+                        });
+                    } else res.send({ error: 'Unsuccessful request' });
                 });
-            } else res.send({ error: 'Fail to send SMS' });
+            } else res.send({ error: 'Requesting to Viettel has been failed' });
 
         });
 
