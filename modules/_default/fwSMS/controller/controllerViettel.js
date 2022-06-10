@@ -33,7 +33,7 @@ module.exports = app => {
                         sentDate: new Date().getTime(),
                         total: currentTotal - data.total
                     }, (error, item) => {
-                        if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total });
+                        if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total }, res.send({ error, item }));
                     });
                 });
             }
