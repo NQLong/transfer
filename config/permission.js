@@ -307,6 +307,8 @@ module.exports = app => {
                             user.isStudent = 1;
                             user.active = 1;
                             user.data = student;
+                            user.lastName = student.ho;
+                            user.firstName = student.ten;
                             resolve();
                         } else resolve();
                     });

@@ -580,7 +580,7 @@ export class LienKet extends React.Component {
 
     render() {
         return (<div className='tile'>
-            <h3 className='tile-header'>Liên kết</h3>
+            <h3 className='tile-title'>Liên kết</h3>
             <div className='tile-body row'>
                 <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto', marginBottom: '10px' }}>
                     {this.tableLienKet(this.props.hcthNhiemVu?.item?.lienKet)}
@@ -651,7 +651,7 @@ export class History extends React.Component {
             }
         };
         return (<div className='tile'>
-            <h3 className='tile-header'>Lịch sử</h3>
+            <h3 className='tile-title'>Lịch sử</h3>
             <div className='tile-body row'>
                 <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                     {renderTimeline({

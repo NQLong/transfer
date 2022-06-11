@@ -92,14 +92,22 @@ class NotificationItem extends AdminPage {
             if (this.props.system && this.props.system.user) {
                 // const contactRead = this.getUserPermission('contact', ['read']).read;
                 // if (contactRead) this.props.getUnreadContacts();
-                this.props.getUnreadNotification(1, 10);
+                this.props.getUnreadNotification(1, 10, page => {
+                    if (page && page.list && page.list.length) {
+                        document.notification = `(${page.list.length})`;
+                    }
+                });
             } else setTimeout(handleGetNotification, 250);
         };
         handleGetNotification();
     }
 
     readNotify = (id, action) => {
-        this.props.readNotification(id, action, () => this.props.getUnreadNotification(1, 10));
+        this.props.readNotification(id, action, () => this.props.getUnreadNotification(1, 10, page => {
+            if (page && page.list && page.list.length) {
+                document.notification = `(${page.list.length})`;
+            }
+        }));
     }
 
     handleClickButton = (e, button, notiId) => {
