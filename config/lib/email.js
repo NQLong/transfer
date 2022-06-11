@@ -58,7 +58,7 @@ module.exports = app => {
     //Nodemailer
     const nodemailer = require('nodemailer');
 
-    app.email.sendMail = (mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, successCallback, errorCallback) => {
+    app.email.normalSendEmail = (mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, successCallback, errorCallback) => {
         let transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
