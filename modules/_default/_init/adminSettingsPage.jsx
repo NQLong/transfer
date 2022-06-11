@@ -4,7 +4,7 @@ import { saveSystemState, createFooterItem, updateFooterItem, swapFooterItem, ge
 import ImageBox from 'view/component/ImageBox';
 import { FormTextBox } from 'view/component/AdminPage';
 
-const lisKeyViettel = ['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel'];
+const listKeysViettel = ['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel'];
 class EditFooterModal extends React.Component {
     modal = React.createRef();
     state = {
@@ -123,8 +123,8 @@ class SettingsPage extends React.Component {
     componentDidMount() {
         this.getFooterSystem();
         T.ready('/user/truyen-thong', () => {
-            this.props.getValueFwSetting(lisKeyViettel, (data) => {
-                lisKeyViettel.forEach(ref => this[ref].value(data[ref] || ''));
+            this.props.getValueFwSetting(listKeysViettel, (data) => {
+                listKeysViettel.forEach(ref => this[ref].value(data[ref] || ''));
             });
             $('.menuList').sortable({
                 start: (e, ui) => {
@@ -290,7 +290,7 @@ class SettingsPage extends React.Component {
                             </div>
                         </div>
                         <div className='tile'>
-                            <h3 className='tile-header'>Viettel SMS</h3>
+                            <h3 className='tile-title'>Viettel SMS</h3>
                             <FormTextBox ref={e => this.brandName = e} label='Tên thương hiệu (cấp cho Viettel)' />
                             <FormTextBox ref={e => this.usernameViettel = e} label='Username' />
                             <FormTextBox ref={e => this.passViettel = e} label='Password' />
