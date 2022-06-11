@@ -52,15 +52,6 @@ module.exports = (cluster, isDebug) => {
     app.createTemplate('home', 'admin', 'unit');
     app.loadModules();
     app.get('/user', app.permission.check(), app.templates.admin);
-    app.get('/download/:name', app.permission.check('storage:read'), (req, res) => {
-        const fileName = req.params.name, path = app.path.join(app.documentPath, fileName);
-        if (app.fs.existsSync(path)) {
-            let displayName = req.query.displayName ? `${req.query.displayName}${app.path.extname(fileName)}` : fileName;
-            res.download(path, displayName);
-        } else {
-            // res.redirect('/404.html');
-        }
-    });
 
     let hasUpdate = new Set(); //Mỗi lần nodemon restart nó chỉ updateSessionUser 1 lần
     app.get('*', (req, res, next) => {
