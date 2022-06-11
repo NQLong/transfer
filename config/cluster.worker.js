@@ -52,7 +52,7 @@ module.exports = (cluster, isDebug) => {
     app.createTemplate('home', 'admin', 'unit');
     app.loadModules();
     app.get('/user', app.permission.check(), app.templates.admin);
-    app.get('/download/:name', (req, res) => {
+    app.get('/download/:name', app.permission.check('storage:read'), (req, res) => {
         const fileName = req.params.name, path = app.path.join(app.documentPath, fileName);
         if (app.fs.existsSync(path)) {
             let displayName = req.query.displayName ? `${req.query.displayName}${app.path.extname(fileName)}` : fileName;
