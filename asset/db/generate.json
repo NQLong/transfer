@@ -13818,34 +13818,13 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "HCTH_SETTING": {
-            "active": true,
-            "moduleName": "hcthSetting",
-            "modelName": "hcthSetting",
-            "columns": {
-                "KEY": {
-                    "value": "key",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 50
-                },
-                "VALUE": {
-                    "value": "value",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 50
-                }
-            },
-            "primaryKeys": [],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "TC_HOC_PHI": {
             "active": true,
             "moduleName": "tcHocPhi",
             "modelName": "tcHocPhi",
+            "methods": {
+                "TC_HOC_PHI_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "MSSV": {
                     "value": "mssv",
@@ -13898,76 +13877,13 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "TC_HOC_PHI_LOG": {
-            "active": true,
-            "moduleName": "tcHocPhiLog",
-            "modelName": "tcHocPhiLog",
-            "columns": {
-                "EMAIL": {
-                    "value": "email",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                },
-                "NGAY": {
-                    "value": "ngay",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "THAO_TAC": {
-                    "value": "thaoTac",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                },
-                "MSSV": {
-                    "value": "mssv",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 10
-                },
-                "HOC_KY": {
-                    "value": "hocKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "NAM_HOC": {
-                    "value": "namHoc",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "DU_LIEU_CU": {
-                    "value": "duLieuCu",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 1000
-                },
-                "DU_LIEU_MOI": {
-                    "value": "duLieuMoi",
-                    "dataType": "VARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 1000
-                }
-            },
-            "primaryKeys": [],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "TC_HOC_PHI_TRANSACTION": {
             "active": true,
-            "moduleName": "tcHocPhiTransaction",
+            "moduleName": "tcHocPhi",
             "modelName": "tcHocPhiTransaction",
+            "methods": {
+                "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill"
+            },
             "columns": {
                 "TRANS_ID": {
                     "value": "transId",
@@ -14075,6 +13991,132 @@
             },
             "primaryKeys": [
                 "KEY"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_LOG": {
+            "active": true,
+            "moduleName": "tcHocPhi",
+            "modelName": "tcHocPhiLog",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NGAY": {
+                    "value": "ngay",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "THAO_TAC": {
+                    "value": "thaoTac",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "DU_LIEU_CU": {
+                    "value": "duLieuCu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "DU_LIEU_MOI": {
+                    "value": "duLieuMoi",
+                    "dataType": "VARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_SETTING": {
+            "active": true,
+            "moduleName": "hcthSetting",
+            "modelName": "hcthSetting",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_SMS": {
+            "active": true,
+            "moduleName": "fwSms",
+            "modelName": "fwSms",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "SENT_DATE": {
+                    "value": "sentDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                },
+                "TOTAL": {
+                    "value": "total",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "EMAIL",
+                "SENT_DATE"
             ],
             "foreignKeys": [],
             "type": "table"
