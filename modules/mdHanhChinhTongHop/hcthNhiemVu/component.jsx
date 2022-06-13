@@ -56,7 +56,7 @@ export class CanBoNhan extends AdminPage {
             isConfirm => isConfirm && this.props.removeCanBoNhanNhiemVu(deleteData, () => {
                 const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
                 const currentId = currentCanBoNhan.map(item => item.id);
-                this.props.getList({ ma: this.props.target, ids: currentId });
+                this.props.getList({ ma: this.props.target, ids: currentId }, this.props.getHistory);
             })
         );
     }
@@ -76,7 +76,7 @@ export class CanBoNhan extends AdminPage {
             isConfirm => isConfirm && this.props.updateCanBoNhanNhiemVu(updateData, () => {
                 const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
                 const currentId = currentCanBoNhan.map(item => item.id);
-                this.props.getList({ ma: this.props.target, ids: currentId });
+                this.props.getList({ ma: this.props.target, ids: currentId }, this.props.getHistory);
             }));
     }
 
@@ -143,7 +143,7 @@ export class CanBoNhan extends AdminPage {
         else {
             this.props.create(this.props.target, nguoiTao, shccs, vaiTro, (items) => {
                 this.canBoNhan.clear();
-                this.props.getList({ ma: this.props.target, ids: [...currentId, ...items.map(item => item.id)] });
+                this.props.getList({ ma: this.props.target, ids: [...currentId, ...items.map(item => item.id)] }, this.props.getHistory);
             });
         }
     }
@@ -651,7 +651,7 @@ export class History extends React.Component {
             }
         };
         return (<div className='tile'>
-            <h3 className='tile-title'>Lịch sử</h3>
+            <h3 className='tile-title'><i className={`fa fa-sort-amount-${this.props.sortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.props.onChangeSort} /> Lịch sử</h3>
             <div className='tile-body row'>
                 <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                     {renderTimeline({

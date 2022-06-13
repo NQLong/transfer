@@ -12,7 +12,7 @@ const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 
 class AdminEditPage extends AdminPage {
     listFileRefs = {};
-    state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.DONG.id }
+    state = { id: null, listFile: [], newPhanHoi: [], phanHoi: [], listCanBo: [], listLienKet: [], lienPhong: 0, donViNhan: [], trangThaiAdapter: [], trangThai: trangThaiNhiemVu.DONG.id, historySortType: 'DESC' }
 
     tableListFile = (data, id, sitePermission) => renderTable({
         getDataSource: () => data,
@@ -199,7 +199,7 @@ class AdminEditPage extends AdminPage {
 
     onComplete = () => {
         T.confirm('Hoàn thành nhiệm vụ', 'Hệ thống sẽ ghi nhận bạn đã hoàn thành phần nhiệm vụ.', true,
-            isConfirm => isConfirm && this.props.completeNhiemVu(this.state.id)
+            isConfirm => isConfirm && this.props.completeNhiemVu(this.state.id, this.getHistory)
         );
     }
 
@@ -213,6 +213,18 @@ class AdminEditPage extends AdminPage {
         T.confirm('Mở lại nhiệm vụ', 'Bạn có chắc chắn muốn mở lại nhiệm vụ này không ?', true,
             isConfirm => isConfirm && this.props.reopenNhiemVu(this.state.id, this.props.hcthNhiemVu?.item?.canBoNhan || [], this.state.nguoiTao, this.getData)
         );
+    }
+
+    onChangeHistorySort = (e) => {
+        e.preventDefault();
+        const current = this.state.historySortType,
+            next = current == 'DESC' ? 'ASC' : 'DESC';
+        this.setState({ historySortType: next }, this.getHistory);
+    }
+
+    getHistory = () => {
+        if (this.state.id)
+            this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });
     }
 
     render() {
@@ -256,13 +268,13 @@ class AdminEditPage extends AdminPage {
 
                     </div>
                 </div>
-                <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} trangThai={this.state.trangThai} />
+                <CanBoNhan {...this.props} sitePermission={sitePermission} isManager={this.state.isManager} isCreator={this.state.isCreator} lienPhong={this.state.lienPhong} target={this.state.id} create={this.props.createCanBoNhanNhiemVu} getList={this.props.getListCanBoNhanNhiemVu} trangThai={this.state.trangThai} getHistory={this.getHistory} />
                 {this.state.id && <PhanHoi {...this.props} target={this.state.id} sitePermission={sitePermission} trangThai={this.state.trangThai} />}
                 {this.state.id && <LienKet {...this.props} sitePermission={sitePermission} target={this.state.id} data={this.props.hcthNhiemVu?.cvdPage?.list} />}
 
                 <ListFiles {...this.props} files={this.state.listFile} id={this.state.id} sitePermission={sitePermission} updateListFile={(newList) => this.setState({ listFile: newList })} />
 
-                {this.state.id && <History {...this.props} data={this.props.hcthNhiemVu?.item?.history} />}
+                {this.state.id && <History {...this.props} data={this.props.hcthNhiemVu?.item?.history} sortType={this.state.historySortType} onChangeSort={this.onChangeHistorySort} />}
             </>,
             backRoute: siteSetting.backRoute,
             onSave: sitePermission.editGeneral && this.save,

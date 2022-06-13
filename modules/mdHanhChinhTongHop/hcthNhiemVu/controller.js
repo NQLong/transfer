@@ -449,7 +449,7 @@ module.exports = (app) => {
                 await readNhiemVu(nhiemVu.id, req.session.user.shcc, nhiemVu.nguoiTao);
             }
 
-            const history = await app.model.hcthHistory.getAllHistoryFrom(nhiemVu.id, 'NHIEM_VU');
+            const history = await app.model.hcthHistory.getAllHistoryFrom(nhiemVu.id, 'NHIEM_VU', req.query.historySortType);
             nhiemVu.history = history?.rows || [];
             res.send({ error: null, item: nhiemVu });
         } catch (error) {
@@ -623,13 +623,13 @@ module.exports = (app) => {
     // history
     app.post('/api/hcth/nhiem-vu/lich-su/list', app.permission.check('staff:login'), async (req, res) => {
         const { id } = req.body;
-        app.model.hcthHistory.getAllFrom(id, 'NHIEM_VU', (error, result) => {
+        app.model.hcthHistory.getAllFrom(id, 'NHIEM_VU', req.query.historySortType, (error, result) => {
             res.send({ error: error, items: result?.rows });
         });
     });
 
     app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'NHIEM_VU', (error, items) => res.send({ error, items: items?.rows || [] }));
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'NHIEM_VU', req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
     app.get('/api/hcth/nhiem-vu/hoan-thanh/:id', app.permission.check('staff:login'), async (req, res) => {

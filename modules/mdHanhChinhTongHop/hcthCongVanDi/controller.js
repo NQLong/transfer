@@ -444,7 +444,7 @@ module.exports = app => {
             }
             const files = await app.model.hcthFile.getAllFile({ ma: id, loai: 'DI' }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, 'DI');
-            const history = await app.model.hcthHistory.getAllHistoryFrom(id, 'DI');
+            const history = await app.model.hcthHistory.getAllHistoryFrom(id, 'DI', req.query.historySortType);
 
             res.send({
                 item: {
@@ -502,7 +502,7 @@ module.exports = app => {
 
 
     app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
     const createNotification = (emails, notification, done) => {

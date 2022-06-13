@@ -121,7 +121,8 @@ class AdminEditPage extends AdminPage {
         phanHoi: [],
         listDonViQuanLy: [],
         maDonVi: [],
-        isLoading: true
+        isLoading: true,
+        historySortType: 'DESC',
     };
 
     componentDidMount() {
@@ -227,7 +228,7 @@ class AdminEditPage extends AdminPage {
         if (this.state.id) {
             const queryParams = new URLSearchParams(window.location.search);
             const nhiemVu = queryParams.get('nhiemVu');
-            const context = {};
+            const context = {historySortType: this.state.historySortType};
             if (nhiemVu) context.nhiemVu = nhiemVu;
             this.setState({ isLoading: false });
             this.props.getCongVanDi(Number(this.state.id), context, (item) => this.setData(item));
@@ -566,6 +567,13 @@ class AdminEditPage extends AdminPage {
         return ((this.state.trangThai == trangThaiCongVanDi.CHO_KIEM_TRA.id) && this.getUserPermission('hcthCongVanDi', ['manage']).manage) || ((this.state.trangThai == trangThaiCongVanDi.CHO_DUYET.id) && this.getUserPermission('rectors', ['login']).login);
     }
 
+    onChangeHistorySort = (e) => {
+        e.preventDefault();
+        const current = this.state.historySortType,
+            next = current == 'DESC' ? 'ASC' : 'DESC';
+        this.setState({ historySortType: next }, () => this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }));
+    }
+
     render = () => {
         const permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
             isNew = !this.state.id,
@@ -693,7 +701,7 @@ class AdminEditPage extends AdminPage {
 
                 {!isNew &&
                     <div className="tile">
-                        <h3 className="tile-title">Lịch sử</h3>
+                        <h3 className='tile-title'><i className={`fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
                     </div>
                 }
