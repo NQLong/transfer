@@ -14,15 +14,12 @@ export class RefreshStatusModal extends AdminModal {
     }
 
     onShow = (item) => {
-        console.log(item);
         this.setState({ item});
         this.phanHoi.value('');
     }
 
     onSubmit = (e) => {
-        console.log(this.phanHoi.value());
         if (this.phanHoi.value() !== '') {
-            console.log(this.state.item);
             const { shccCanBoNhan, tenCanBoNhan, hoCanBoNhan } = this.state.item;
             this.props.onSave({
                 id: this.props.nhiemVuId,
@@ -158,17 +155,13 @@ export class CanBoNhan extends AdminPage {
     canBoNhanData = () => {
         let listCanBoNhan = this.props.target && this.props.hcthNhiemVu?.item?.canBoNhan ? this.props.hcthNhiemVu?.item?.canBoNhan : [];
         let listHistory = this.props.hcthNhiemVu?.item?.history || [];
-        console.log('list : ',listCanBoNhan);
-        console.log(listHistory);
         let listCanBoNhanWithStatus = listCanBoNhan.map(canBo => {
             let lastHistory = listHistory.find(history => history.shcc == canBo.shccCanBoNhan);
-            console.log(lastHistory);
             return ({
                 ...canBo,
                 trangThai: lastHistory?.hanhDong || ''
             });
         });
-        console.log('trang thai :', listCanBoNhanWithStatus);
         return listCanBoNhanWithStatus;
     }
 
@@ -679,7 +672,7 @@ export class LienKet extends React.Component {
 
     render() {
         return (<div className='tile'>
-            <h3 className='tile-header'>Liên kết</h3>
+            <h3 className='tile-title'>Liên kết</h3>
             <div className='tile-body row'>
                 <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto', marginBottom: '10px' }}>
                     {this.tableLienKet(this.props.hcthNhiemVu?.item?.lienKet)}
@@ -750,7 +743,7 @@ export class History extends React.Component {
             }
         };
         return (<div className='tile'>
-            <h3 className='tile-header'>Lịch sử</h3>
+            <h3 className='tile-title'>Lịch sử</h3>
             <div className='tile-body row'>
                 <div className='col-md-12' style={{ maxHeight: '50vh', overflowY: 'auto' }}>
                     {renderTimeline({

@@ -1649,7 +1649,8 @@ BEGIN
                cbn.HO              as "hoCanBoNhan",
                cbn.TEN             as "tenCanBoNhan",
                nt.HO               as "hoNguoiTao",
-               nt.TEN              as "tenNguoiTao"
+               nt.TEN              as "tenNguoiTao",
+               hcthcbn.TRANG_THAI  as "trangThai"
         from HCTH_CAN_BO_NHAN hcthcbn
                  LEFT JOIN TCHC_CAN_BO cbn on hcthcbn.CAN_BO_NHAN = cbn.SHCC
                  LEFT JOIN TCHC_CAN_BO nt on nt.SHCC = hcthcbn.NGUOI_TAO
@@ -2214,8 +2215,8 @@ BEGIN
             OR (
                         maCanBo is NOT NULL
                     AND maCanBo in (SELECT regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level)
-                                      from dual
-                                      connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
+                                    from dual
+                                    connect by regexp_substr(hcthcvd.CAN_BO_NHAN, '[^,]+', 1, level) is not null)
                 )
             OR (
                         listDonVi IS NOT NULL
@@ -2344,6 +2345,7 @@ BEGIN
                         hcthcvd.TRANG_THAI    AS "trangThai",
                         dvgcv.ID              AS "maDonViGuiCV",
                         dvgcv.TEN             AS "tenDonViGuiCV",
+                        hcthcvd.CAP_NHAT_LUC  AS "capNhatLuc",
 
 
                         (SELECT LISTAGG(hcthdvn.DON_VI_NHAN, ',') WITHIN GROUP (
@@ -14827,8 +14829,8 @@ BEGIN
              LEFT JOIN TCHC_CAN_BO CB_YEUCAU ON CB_YEUCAU.SHCC = SP.SHCC
              LEFT JOIN TCHC_CAN_BO CB_XULY ON CB_XULY.SHCC = SP.SHCC_ASSIGN
 
-    WHERE (SHCC_QUERY IS NULL OR SHCC_QUERY = '' OR SHCC_QUERY = CB_YEUCAU.SHCC) AND
-          (TYPE_QUERY IS NULL OR
+    WHERE (SHCC_QUERY IS NULL OR SHCC_QUERY = '' OR SHCC_QUERY = CB_YEUCAU.SHCC)
+      AND (TYPE_QUERY IS NULL OR
            TYPE_QUERY IS NOT NULL AND SP.TYPE IN (SELECT regexp_substr(TYPE_QUERY, '[^,]+', 1, level)
                                                   from dual
                                                   connect by regexp_substr(TYPE_QUERY, '[^,]+', 1, level) is not null))
@@ -14843,26 +14845,27 @@ BEGIN
 
     OPEN TCCB_SP FOR
         SELECT *
-        FROM (SELECT SP.ID                                AS                    "id",
-                     SP.TYPE                              AS                    "type",
-                     SP.SHCC                              AS                    "shcc",
-                     SP.SHCC_ASSIGN                       AS                    "shccAssign",
-                     SP.DATA                              AS                    "data",
-                     SP.APPROVED                          AS                    "approved",
-                     SP.MODIFIED_DATE                     as                    "modifiedDate",
-                     SP.QT                                as                    "qt",
-                     SP.QT_ID                             AS                    "qtId",
-                     SP.SENT_DATE                         AS                    "sentDate",
-                     CB_XULY.HO || ' ' || CB_XULY.TEN     as                    "canBoXuLy",
-                     CB_YEUCAU.HO || ' ' || CB_YEUCAU.TEN as                    "canBoYeuCau",
+        FROM (SELECT SP.ID                                AS        "id",
+                     SP.TYPE                              AS        "type",
+                     SP.SHCC                              AS        "shcc",
+                     SP.SHCC_ASSIGN                       AS        "shccAssign",
+                     SP.DATA                              AS        "data",
+                     SP.APPROVED                          AS        "approved",
+                     SP.MODIFIED_DATE                     as        "modifiedDate",
+                     SP.QT                                as        "qt",
+                     SP.QT_ID                             AS        "qtId",
+                     SP.SENT_DATE                         AS        "sentDate",
+                     SP.OLD_DATA                          AS        "oldData",
+                     CB_XULY.HO || ' ' || CB_XULY.TEN     as        "canBoXuLy",
+                     CB_YEUCAU.HO || ' ' || CB_YEUCAU.TEN as        "canBoYeuCau",
 
                      ROW_NUMBER() OVER (ORDER BY SP.SENT_DATE DESC) R
               FROM TCCB_SUPPORT SP
                        LEFT JOIN TCHC_CAN_BO CB_YEUCAU ON CB_YEUCAU.SHCC = SP.SHCC
                        LEFT JOIN TCHC_CAN_BO CB_XULY ON CB_XULY.SHCC = SP.SHCC_ASSIGN
 
-              WHERE (SHCC_QUERY IS NULL OR SHCC_QUERY = '' OR SHCC_QUERY = CB_YEUCAU.SHCC) AND
-                    (TYPE_QUERY IS NULL OR
+              WHERE (SHCC_QUERY IS NULL OR SHCC_QUERY = '' OR SHCC_QUERY = CB_YEUCAU.SHCC)
+                AND (TYPE_QUERY IS NULL OR
                      TYPE_QUERY IS NOT NULL AND SP.TYPE IN (SELECT regexp_substr(TYPE_QUERY, '[^,]+', 1, level)
                                                             from dual
                                                             connect by regexp_substr(TYPE_QUERY, '[^,]+', 1, level) is not null))

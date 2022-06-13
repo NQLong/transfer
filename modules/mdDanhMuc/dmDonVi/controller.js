@@ -48,7 +48,7 @@ module.exports = app => {
         }, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/don-vi/item/:ma', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/item/:ma', app.permission.orCheck('staff:login', 'student:login'), (req, res) => {
         if (req.params.ma == 0) res.send({
             item: {
                 ma: 0, ten: 'Trường ĐH Khoa học Xã hội và Nhân văn - TPHCM'

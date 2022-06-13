@@ -220,7 +220,7 @@ module.exports = app => {
                             resolve();
                         } else {
                             user.isStaff = 1;
-                            item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
+                            if (item.phai == '02') app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
                             user.firstName = item.ten;
                             user.lastName = item.ho;
@@ -307,6 +307,8 @@ module.exports = app => {
                             user.isStudent = 1;
                             user.active = 1;
                             user.data = student;
+                            user.lastName = student.ho;
+                            user.firstName = student.ten;
                             resolve();
                         } else resolve();
                     });

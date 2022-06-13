@@ -47,6 +47,18 @@ module.exports = app => {
         }
     });
 
+    app.put('/api/fw-setting', app.permission.check('system:settings'), (req, res) => {
+        let changes = req.body.changes;
+        app.model.setting.setValue(changes, (error) => res.send({ error }));
+    });
+
+    app.get('/api/fw-setting', app.permission.check('system:settings'), async (req, res) => {
+        let keys = req.query.keys || [];
+        app.model.setting.getValue(keys, (items) => {
+            res.send(items);
+        });
+    });
+
     app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => { next(); }, (req, res) => {
         app.state.get((error, data) => {
             if (error || data == null) {

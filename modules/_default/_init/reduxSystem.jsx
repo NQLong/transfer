@@ -77,6 +77,7 @@ export function getFooterSystem(done) {
         });
     };
 }
+
 export function updateFooterItem(id, changes) {
     return (dispatch,) => {
         const url = '/api/system/footer';
@@ -207,6 +208,34 @@ export function updateProfile(changes) {
                 dispatch(getSystemState());
             }
         }, () => T.notify('Cập nhật thông tin cá nhân của bạn bị lỗi!', 'danger'));
+    };
+}
+
+export function getValueFwSetting(keys, done) {
+    return () => {
+        const url = '/api/fw-setting';
+        T.get(url, { keys }, result => {
+            if (result.error) {
+                T.notify('Lỗi lấy dữ liệu cấu hình', 'danger');
+                console.error(`GET VALUE fwSetting: ${result.error}`);
+            } else {
+                done && done(result);
+            }
+        });
+    };
+}
+export function updateFwSetting(changes, done) {
+    return () => {
+        const url = '/api/fw-setting';
+        T.put(url, { changes }, result => {
+            if (result.error) {
+                T.notify('Lỗi cập nhật cấu hình', 'danger');
+                console.error(`PUT fwSetting: ${result.error}`);
+            } else {
+                T.notify('Cập nhật cấu hình thành công', 'success');
+                done && done();
+            }
+        });
     };
 }
 

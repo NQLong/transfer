@@ -1,9 +1,9 @@
-// Table name: TCCB_SUPPORT { id, shcc, shccAssign, modifiedDate, type, deleted, qtId, approved, qt, sentDate, oldData, data }
-const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'shccAssign': 'SHCC_ASSIGN', 'modifiedDate': 'MODIFIED_DATE', 'type': 'TYPE', 'deleted': 'DELETED', 'qtId': 'QT_ID', 'approved': 'APPROVED', 'qt': 'QT', 'sentDate': 'SENT_DATE', 'oldData': 'OLD_DATA', 'data': 'DATA' };
+// Table name: FW_SMS { email, sentDate, total }
+const keys = ['EMAIL', 'SENT_DATE'];
+const obj2Db = { 'email': 'EMAIL', 'sentDate': 'SENT_DATE', 'total': 'TOTAL' };
 
 module.exports = app => {
-    app.model.tccbSupport = {
+    app.model.fwSms = {
         create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -17,10 +17,10 @@ module.exports = app => {
             if (statement.length == 0) {
                 done('Data is empty!');
             } else {
-                const sql = 'INSERT INTO TCCB_SUPPORT (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                const sql = 'INSERT INTO FW_SMS (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.tccbSupport.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.fwSms.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
@@ -41,7 +41,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM TCCB_SUPPORT' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM FW_SMS' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
 
@@ -58,7 +58,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TCCB_SUPPORT' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM FW_SMS' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
         },
 
@@ -76,7 +76,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sqlCount = 'SELECT COUNT(*) FROM TCCB_SUPPORT' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sqlCount = 'SELECT COUNT(*) FROM FW_SMS' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done(error);
@@ -86,7 +86,7 @@ module.exports = app => {
                     result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT TCCB_SUPPORT.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM TCCB_SUPPORT' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT FW_SMS.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM FW_SMS' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                     app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                         result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                         done(error, result);
@@ -100,10 +100,10 @@ module.exports = app => {
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
-                const sql = 'UPDATE TCCB_SUPPORT SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                const sql = 'UPDATE FW_SMS SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.tccbSupport.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.fwSms.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error);
                     }
@@ -120,7 +120,7 @@ module.exports = app => {
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'DELETE FROM TCCB_SUPPORT' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'DELETE FROM FW_SMS' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, error => done(error));
         },
 
@@ -131,13 +131,8 @@ module.exports = app => {
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT COUNT(*) FROM TCCB_SUPPORT' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'SELECT COUNT(*) FROM FW_SMS' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
-        },
-
-        searchPage: (pagenumber, pagesize, filter, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_support_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

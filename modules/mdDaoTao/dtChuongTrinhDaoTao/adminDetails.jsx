@@ -22,6 +22,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     };
     mucTieu = {};
     chuongTrinh = {};
+    listMonHocChosen = []
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
@@ -42,6 +43,23 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 this.khoa.value(this.maKhoa == 33 ? '' : this.maKhoa);
             }
         });
+    }
+
+    pushMonHocChosen = (maMonHoc) => {
+        if (maMonHoc) {
+            if (this.listMonHocChosen.includes(maMonHoc)) {
+                T.notify(`Trùng môn học <b>${maMonHoc}<b/>, vui lòng chọn môn học khác`, 'danger');
+                return false;
+            } else {
+                this.listMonHocChosen.push(maMonHoc);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    removeMonHoc = (maMonHoc) => {
+        if (maMonHoc) this.listMonHocChosen = this.listMonHocChosen.filter(item => item != maMonHoc);
     }
 
     getData = (id, isClone = false, khoaDt) => {
@@ -169,6 +187,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         const readOnly = !(permission.write || permission.manage),
             isPhongDaoTao = permission.write;
+
         const {
             // mucTieuDaoTao,
             chuongTrinhDaoTao } = this.state;
@@ -261,7 +280,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                         const pIdx = `${this.khoaDt}_${key}`;
                         const { id, text } = chuongTrinhDaoTao.parents[key];
                         return (
-                            <ComponentKienThuc key={pIdx} title={text} khoiKienThucId={id} childs={childs[key]} ref={e => this.chuongTrinh[key] = e} />
+                            <ComponentKienThuc key={pIdx} title={text} khoiKienThucId={id} childs={childs[key]} ref={e => this.chuongTrinh[key] = e} pushMonHocChosen={this.pushMonHocChosen} removeMonHoc={this.removeMonHoc} />
                         );
                     })
                 }

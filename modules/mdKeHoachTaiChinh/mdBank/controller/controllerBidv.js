@@ -13,7 +13,10 @@ module.exports = app => {
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
         console.log('getbill', { customer_id, service_id, checksum });
 
-        if (service_id != serviceId) {
+        if (!(customer_id && service_id && checksum)) {
+            res.send({ result_code: '145' });
+        }
+        else if (service_id != serviceId) {
             res.send({ result_code: '020' });
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
@@ -54,7 +57,9 @@ module.exports = app => {
                 myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
             console.log('paybill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
 
-            if (service_id != serviceId) {
+            if (!(trans_id && trans_date && customer_id && bill_id && service_id && amount)) {
+                res.send({ result_code: '145' });
+            } else if (service_id != serviceId) {
                 res.send({ result_code: '020' });
             } else if (checksum != myChecksum) {
                 res.send({ result_code: '007' });
@@ -65,7 +70,14 @@ module.exports = app => {
                     } else if (!hocPhi) {
                         res.send({ result_code: '025' });
                     } else {
-                        app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, trans_date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
+                        let year = trans_date.substring(0, 4);
+                        let month = trans_date.substring(4, 6);
+                        let day = trans_date.substring(6, 8);
+                        let hour = trans_date.substring(8, 10);
+                        let minute = trans_date.substring(10, 12);
+                        let second = trans_date.substring(12, 14);
+                        let date = new Date(year, month - 1, day, hour, minute, second).getTime();
+                        app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, date, customer_id, bill_id, service_id, amount, checksum, (error, result) => {
                             if (error || !result || !result.outBinds || !result.outBinds.ret) {
                                 res.send({ result_code: '096' });
                             } else {

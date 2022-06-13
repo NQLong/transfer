@@ -13,7 +13,7 @@ export class SupportModal extends AdminModal {
         let item = data.item || data.data || null;
 
         let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh, thongTinKhac } = item;
-        data.data && this.setState({ item, qtId: data.qtId, type: data.type });
+        data.data && this.setState({ item, qtId: data.qtId, type: data.type, oldData: data.oldData });
         data.item && this.setState({ shcc: item.shcc, dataBanDau: item });
         this.ho.value(ho);
         this.ten.value(ten);
@@ -73,7 +73,7 @@ export class SupportModal extends AdminModal {
                 qtId: this.state.shcc,
                 type: 'update'
             };
-            this.props.create(data, dataSupport, this.hide);
+            this.props.create(this.state.dataBanDau, data, dataSupport, this.hide);
         } catch (error) {
             T.notify(error, 'warning');
         }
@@ -82,10 +82,11 @@ export class SupportModal extends AdminModal {
 
     onChangeViewMode = (value) => {
         if (value) {
-            this.props.getStaffEdit(this.state.qtId, data => {
-                this.onShow({ item: data.item });
-            });
-        } else this.onShow({ data: this.state.item, qtId: this.state.qtId });
+            this.onShow({ item: this.state.oldData });
+            // this.props.getStaffEdit(this.state.qtId, data => {
+            //     this.onShow({ item: data.item });
+            // });
+        } else this.onShow({ data: this.state.item, qtId: this.state.qtId, oldData: this.state.oldData });
     }
 
     render = () => {
