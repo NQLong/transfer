@@ -820,17 +820,8 @@ module.exports = (app) => {
 
     // Download Template ---------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/hcth/cong-van-den/download-excel/:donViGuiCongVan/:donViNhanCongVan/:canBoNhanCongVan/:timeType/:fromTime/:toTime/:congVanYear/:tab/:status/:sortBy/:sortType', app.permission.check('staff:login'), (req, res) => {
-        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status, sortBy, sortType } = req.params ? req.params : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null, sortBy: '', sortType: '' };
-
-        if (donViGuiCongVan == 'null') donViGuiCongVan = null;
-        if (donViNhanCongVan == 'null') donViNhanCongVan = null;
-        if (canBoNhanCongVan == 'null') canBoNhanCongVan = null;
-        if (timeType == 'null') timeType = null;
-        if (fromTime == 'null') fromTime = null;
-        if (toTime == 'null') toTime = null;
-        if (congVanYear == 'null') congVanYear = null;
-        if (status == 'null') status = null;
+    app.get('/api/hcth/cong-van-den/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status, sortBy, sortType } = req.params.filter ? JSON.parse(req.params.filter) : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null, sortBy: '', sortType: '' };
 
         const obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' };
 
