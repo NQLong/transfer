@@ -275,13 +275,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             </div>,
 
             onCreate: permission && permission.write ? () => this.props.history.push(`${baseUrl}/new`) : null,
-            onExport: (e) => {
-                e.preventDefault();
-                const { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status } = 
-                (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null };
-                T.download(T.url(`/api/hcth/cong-van-den/download-excel/${donViGuiCongVan ? donViGuiCongVan : null}/${donViNhanCongVan ? donViNhanCongVan : null}/${canBoNhanCongVan ? canBoNhanCongVan : null}/${timeType ? timeType : null}/${fromTime ? fromTime : null}/${toTime ? toTime : null}/${congVanYear ? congVanYear : null}/${tab}/${status ? status : null}/${this.state.sortBy !== '' ? this.state.sortBy : null}/${this.state.sortType !== '' ? this.state.sortType : null}`), 'CONG_VAN_DEN.xlsx');
-            },
-            backRoute,
+            backRoute
         });
     }
 }

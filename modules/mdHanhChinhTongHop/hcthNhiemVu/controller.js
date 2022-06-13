@@ -483,7 +483,6 @@ module.exports = (app) => {
             nhiemVu.history = history?.rows || [];
             res.send({ error: null, item: nhiemVu });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
