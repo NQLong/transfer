@@ -160,10 +160,15 @@ export function deleteFile(id, fileId, file, done) {
 }
 
 
-export function getCongVanDen(id, done) {
+export function getCongVanDen(id, context, done) {
+
+    if (typeof context === 'function') {
+        done = context;
+        context = {};
+    }
     return dispatch => {
         const url = `/api/hcth/cong-van-den/${id}`;
-        T.get(url, data => {
+        T.get(url, context || {}, data => {
             if (data.error) {
                 if (data.error.status == 401) {
                     dispatch({ type: HcthCongVanDenGetError, error: 401 });
@@ -232,7 +237,7 @@ export function getPhanHoi(id, done) {
         T.get(url, res => {
             if (res.error) {
                 T.notify('Lấy danh sách phản hồi lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('GET: ' + url + '. ', res.error);
             } else {
                 dispatch({ type: HcthCongVanDenGetPhanHoi, phanHoi: res.items });
                 done && done(res.items);
@@ -268,5 +273,14 @@ export function getChiDao(id, done) {
                 done && done(res.items);
             }
         }, () => T.notify('Lấy công văn chỉ đạo lỗi', 'danger'));
+    };
+}
+
+export function updateQuyenChiDao(id, shcc, trangThaiCv, status, done) {
+    return () => {
+            const url = '/api/hcth/cong-van-den/quyen-chi-dao';
+            T.post(url, { id, shcc, trangThaiCv, status }, res => {
+                done && done(res);
+            }, () => T.notify('Thêm cán bộ chỉ đạo lỗi', 'danger'));
     };
 }

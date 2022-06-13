@@ -7,7 +7,7 @@ import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
     getQtHocTapCongTacPage, updateQtHocTapCongTacStaff,
-    deleteQtHocTapCongTacStaff, createQtHocTapCongTacStaff, getQtHocTapCongTacGroupPage,
+    deleteQtHocTapCongTacStaff, createQtHocTapCongTacMultiple, getQtHocTapCongTacGroupPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -73,6 +73,13 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            batDauType: this.state.batDauType,
+            batDau: this.batDau.getVal(),
+            ketThucType: !this.state.denNay ? this.state.ketThucType : '',
+            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
+            noiDung: this.noiDung.value()
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
@@ -89,26 +96,13 @@ class EditModal extends AdminModal {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
             this.batDau.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    batDauType: this.state.batDauType,
-                    batDau: this.batDau.getVal(),
-                    ketThucType: !this.state.denNay ? this.state.ketThucType : '',
-                    ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
-                    noiDung: this.noiDung.value()
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -280,7 +274,7 @@ class QtHocTapCongTac extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' content={(<i>{item.noiDung || ''}</i>)} />}
@@ -346,7 +340,7 @@ class QtHocTapCongTac extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtHocTapCongTacStaff} update={this.props.updateQtHocTapCongTacStaff}
+                    create={this.props.createQtHocTapCongTacMultiple} update={this.props.updateQtHocTapCongTacStaff}
                     permissions={currentPermissions}
                 />
             </>,
@@ -358,7 +352,7 @@ class QtHocTapCongTac extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtHocTapCongTac: state.tccb.qtHocTapCongTac });
 const mapActionsToProps = {
-    getQtHocTapCongTacPage, deleteQtHocTapCongTacStaff, createQtHocTapCongTacStaff,
+    getQtHocTapCongTacPage, deleteQtHocTapCongTacStaff, createQtHocTapCongTacMultiple,
     updateQtHocTapCongTacStaff, getQtHocTapCongTacGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHocTapCongTac);

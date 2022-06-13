@@ -62,15 +62,23 @@ module.exports = app => {
     });
 
     app.post('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.create(req.body.data, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ thai sản');
+            res.send({ error, item });
+        });
     });
 
     app.put('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghỉ thai sản');
+            res.send({ error, item });
+        });
     });
-
     app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
-        app.model.qtNghiThaiSan.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.qtNghiThaiSan.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ thai sản');
+            res.send({ error });
+        });
     });
 
     // //User Actions:
@@ -137,15 +145,16 @@ module.exports = app => {
     });
     ///END USER ACTIONS
     app.get('/api/qua-trinh/nghi-thai-san/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtNghiThaiSan:read'), (req, res) => {
-        let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: 0, tinhTrang: null };
+        let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: null, tinhTrang: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
-        app.model.qtNghiThaiSan.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        if (timeType == 'null') timeType = null;
+        app.model.qtNghiThaiSan.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('nghithaisan');
@@ -161,8 +170,6 @@ module.exports = app => {
                         { cell: 'G1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
                         { cell: 'H1', value: 'TỪ NGÀY', bold: true, border: '1234' },
                         { cell: 'I1', value: 'ĐẾN NGÀY', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'NỘI DUNG', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'NGÀY TRỞ LẠI CÔNG TÁC', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -174,8 +181,6 @@ module.exports = app => {
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
                         cells.push({ cell: 'H' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'I' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.noiDung });
-                        cells.push({ cell: 'K' + (index + 2), alignment: 'center', border: '1234', value: item.troLaiCongTac ? app.date.dateTimeFormat(new Date(item.troLaiCongTac), 'dd/mm/yyyy') : '' });
                     });
                     resolve(cells);
                 }).then((cells) => {
@@ -186,6 +191,5 @@ module.exports = app => {
                 });
             }
         });
-
     });
 };

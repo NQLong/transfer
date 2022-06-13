@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
+import { withRouter } from 'react-router-dom';
 import { getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDvWebsite, updateDvWebsite } from './redux';
 import { Link } from 'react-router-dom';
@@ -14,8 +14,10 @@ class AdminEditPage extends React.Component {
         T.ready('/user/website', () => {
             const route = T.routeMatcher('/user/website/edit/:ma'),
                 shortname = route.parse(window.location.pathname).ma;
+            // console.log('Pos1', shortname);
             if (shortname) {
                 this.props.getDvWebsite(shortname, data => {
+                    // console.log('Pos2', data);
                     if (data) {
                         $('#dvWebsiteShortname').val(data.shortname);
                         $('#dvWebsiteWebsite').val(data.website);
@@ -25,6 +27,7 @@ class AdminEditPage extends React.Component {
                         $('#otherWebAddress').val(data.otherWebAddress);
 
                         this.props.getDmDonVi(data.maDonVi, donVi => {
+                            // console.log('Pos3', donVi);
                             this.setState({
                                 shortname, donVi,
                                 kichHoat: data.kichHoat,
@@ -83,9 +86,10 @@ class AdminEditPage extends React.Component {
             { title: 'Bài viết chờ duyệt', link: '/user/news/draft' },
 
         ];
+        // console.log('Pos4', this.state.shortname, this.state.donVi);
         menus.forEach((item, index) => {
             groupMenus.push(
-                <div key={index} href='#' className='col-md-6 col-lg-4' style={{ cursor: 'pointer' }}
+                <div key={index} className='col-md-6 col-lg-4' style={{ cursor: 'pointer' }}
                     onClick={e => this.state.shortname && this.menuClick(e, item)} >
                     <div className='widget-small coloured-icon'>
                         <i style={{ backgroundColor: '#00b0ff' }} className={'icon fa fa-3x ' + (item.icon || 'fa-tasks')} />
@@ -175,4 +179,4 @@ class AdminEditPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dvWebsite: state.dvWebsite });
 const mapActionsToProps = { getDmDonVi, getDvWebsite, updateDvWebsite };
-export default connect(mapStateToProps, mapActionsToProps)(withRouter(AdminEditPage));
+export default withRouter(connect(mapStateToProps, mapActionsToProps)(AdminEditPage));

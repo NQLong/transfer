@@ -2,39 +2,40 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
-    userGetStaff, updateStaffUser
+    getStaffEdit, updateStaff, downloadWord
 } from './redux';
+import { createTccbSupport } from '../tccbSupport/redux';
 // import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import ComponentCaNhan from './componentCaNhan';
-import { AdminPage } from 'view/component/AdminPage';
+import { AdminPage, CirclePageButton } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
-// import ComponentKhenThuong from '../qtKhenThuongAll/componentKhenThuong';
-// import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
-// import ComponentKyLuat from '../qtKyLuat/componentKyLuat';
-// import ComponentNuocNgoai from '../qtNuocNgoai/componentNuocNgoai';
-// import ComponentHDLV from '../qtHuongDanLuanVan/componentHDLV';
-// import ComponentSGT from '../sachGiaoTrinh/componentSGT';
-// import ComponentDaoTao from '../qtDaoTao/componentDaoTao';
-// import ComponentLuong from '../qtLuong/componentLuong';
-// import ComponentCongTac from '../qtHocTapCongTac/componentCongTac';
-// import ComponentBaoHiemXaHoi from '../qtBaoHiemXaHoi/componentBaoHiemXaHoi';
+import { SupportModal } from './supportModal';
+import ComponentHTCT from './componentHTCT';
 
 class StaffUserPage extends AdminPage {
     state = { item: null, lastModified: null }
 
     componentDidMount() {
         T.ready('/user', () => {
-            if (this.props.system && this.props.system.user) {
-                const user = this.props.system.user;
-                this.emailCanBo = user.email ? user.email : null;
-                this.props.userGetStaff(user.email, data => {
+            T.hideSearchBox();
+            if (this.props.system && this.props.system.user && this.props.system.user.staff) {
+                const staff = this.props.system.user.staff;
+                if (!staff.shcc) {
+                    T.notify('Cán bộ chưa có mã thẻ', 'danger');
+                    this.props.history.goBack();
+                } else {
+                    this.shcc = staff.shcc;
+                    this.email = staff.email;
+                }
+                this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
+                        return;
                     } else if (data.item) {
-                        this.setState({ lastModified: data.item.lastModified });
+                        this.setState({ lastModified: data.item.lastModified, staff: data.item });
                         this.setUp(data.item);
                     }
                     else {
@@ -46,45 +47,63 @@ class StaffUserPage extends AdminPage {
     }
 
     setUp = (item) => {
-        this.componentCaNhan.value(item);
-        this.componentTTCongTac.value(item);
-        this.componentQuanHe.value(item.email, item.phai, item.shcc);
-        this.componentTrinhDo.value(item);
-        this.setState({ item });
+        this.componentCaNhan?.value(item);
+        this.componentTTCongTac?.value(item);
+        this.componentTrinhDo?.value(item);
+        this.setState({ item, phai: item.phai });
     }
 
     save = () => {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
-        if (this.emailCanBo) {
+        // this.props.updateStaff(this.shcc, {
+        //     ...caNhanData
+        // });
+        if (this.shcc) {
             if (caNhanData && congTacData && trinhDoData) {
-                this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
+                this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.email, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
             }
         }
     }
 
+    downloadWord = (e, type) => {
+        e.preventDefault();
+        this.shcc && this.props.downloadWord(this.shcc, type, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.shcc + '_' + type + '.docx');
+        });
+    }
 
     render() {
-        const { staff } = this.props.system && this.props.system.user ? this.props.system.user : { staff: null },
-            permission = this.getUserPermission('staff');
+        const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
+            shcc = this.props.system.user.staff.shcc;
+
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',
-            subTitle: staff ? <span>Chỉnh sửa lần cuối lúc <span style={{ color: 'blue' }}>{T.dateToText(this.state.lastModified ? this.state.lastModified : staff.lastModified)}</span></span> : '',
+            subTitle: <span>Chỉnh sửa lần cuối lúc <span style={{ color: 'blue' }}>{T.dateToText(this.state.lastModified) || ''}</span></span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Hồ sơ',
             ],
             content: <>
                 {!this.state.item && <Loading />}
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} />
-                <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false} />
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={shcc} />
+                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} phai={this.state.phai} />
+                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={shcc} readOnly={!permission.write} />
+                <ComponentHTCT />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
+
+                <SupportModal ref={e => this.supportModal = e} create={this.props.createTccbSupport} system={this.props.system} />
+                {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '185px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}
+
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch viên chức (2019)' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '125px' }} onClick={e => this.downloadWord(e, 'vc')} />
+
+                <CirclePageButton type='custom' tooltip='Tải về lý lịch công chức (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={e => this.downloadWord(e, 'cc')} />
+
+                <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
             </>,
             backRoute: '/user',
-            onSave: this.save,
         });
     }
 
@@ -92,6 +111,6 @@ class StaffUserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
-    userGetStaff, updateStaffUser
+    getStaffEdit, updateStaff, downloadWord, createTccbSupport
 };
 export default connect(mapStateToProps, mapActionsToProps)(StaffUserPage);

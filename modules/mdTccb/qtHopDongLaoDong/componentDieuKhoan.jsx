@@ -37,7 +37,7 @@ export class ComponentDieuKhoan extends React.Component {
 
     setVal = (data = null) => {
         if (data) {
-            let { ma, loaiHopDong, ngayKyHopDong, batDauLamViec, ketThucHopDong, diaDiemLamViec,
+            let { ma, loaiHopDong, batDauLamViec, ketThucHopDong, diaDiemLamViec,
                 congViecDuocGiao, maNgach, heSo, bac, phanTramHuong, chiuSuPhanCong, ngayKyHdTiepTheo, thoiGianLamViec, 
                 dungCuDuocCapPhat, phuongTienDiLaiLamViec, hinhThucTraLuong, cheDoNghiNgoi, boiThuongVatChat, isCvdt } = data;
             this.setState({ ma, maNgach });
@@ -52,8 +52,8 @@ export class ComponentDieuKhoan extends React.Component {
 
                         }
                     });
-                    this.tuNgay.value(ngayKyHopDong ? ngayKyHopDong : batDauLamViec);
-                    this.batDauLamViec.value(batDauLamViec ? batDauLamViec : ngayKyHopDong);
+                    this.tuNgay.value(batDauLamViec ? batDauLamViec : batDauLamViec);
+                    this.batDauLamViec.value(batDauLamViec ? batDauLamViec : batDauLamViec);
                     this.denNgay.value(ketThucHopDong);
                     this.donVi.value(diaDiemLamViec);
                     this.congViecDuocGiao.value(congViecDuocGiao ? congViecDuocGiao : defaultValue.congViecDuocGiao);
@@ -146,6 +146,7 @@ export class ComponentDieuKhoan extends React.Component {
                 ma: this.state.ma,
                 loaiHopDong: this.validate(this.loaiHopDong),
                 batDauLamViec: this.validate(this.batDauLamViec).getTime(),
+                ngayKyHopDong: this.validate(this.tuNgay).getTime(),
                 ketThucHopDong: this.validate(this.denNgay).getTime(),
                 diaDiemLamViec: this.validate(this.donVi),
                 maNgach: this.validate(this.chucDanh),
@@ -193,11 +194,18 @@ export class ComponentDieuKhoan extends React.Component {
                     <FormDatePicker ref={e => this.batDauLamViec = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày bắt đầu làm việc' required readOnly={true} />
                     <FormDatePicker ref={e => this.ngayKyTiepTheo = e} type='date-mask' className={this.state.isXacDinhTg ? 'col-xl-3 col-md-6' : 'd-none'} label='Ngày tái ký' required readOnly={readOnly} />
                     <FormSelect ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} className='col-xl-4 col-md-6' label='Địa điểm làm việc' readOnly={readOnly} onChange={value => { 
-                        this.setState({ maDv: value.id }, () => this.maBoMon.value(null)); 
-                        this.handleDonVi(); 
-                        this.props.genNewShcc(value.id, value.preShcc); }} required />
+                        this.setState({ maDv: value.id, preShcc: value.preShcc }, () => {
+                            this.maBoMon.value(null); 
+                            this.props.genNewShcc(this.state.maDv, this.state.preShcc, this.state.nhomNgach);
+                        }); 
+                        this.handleDonVi(); }} required />
                     <FormSelect ref={e => this.maBoMon = e} data={SelectAdapter_DmBoMonTheoDonVi(this.state.maDv)} label='Bộ môn' readOnly={readOnly} className={!this.state.maDv || !this.state.listMaKhoa.includes(this.state.maDv) ? 'd-none' : 'col-xl-4 col-md-6'} />
-                    <FormSelect ref={e => this.chucDanh = e} data={SelectAdapter_DmNgachCdnnV2} onChange={this.handleNgach} className='col-md-4' label='Chức danh chuyên môn' required />
+                    <FormSelect ref={e => this.chucDanh = e} data={SelectAdapter_DmNgachCdnnV2} onChange={(value) => {
+                        this.setState({ nhomNgach: value.nhom }, () => {
+                            this.props.genNewShcc(this.state.maDv, this.state.preShcc, this.state.nhomNgach);
+                        });
+                        this.handleNgach(value);
+                    }} className='col-md-4' label='Chức danh chuyên môn' required />
                     <FormCheckbox ref={e => this.isCVDT = e} className={this.state.maNgach == '01.003' ? 'col-md-12' : 'd-none'} label='Chuyên viên phục vụ đào tạo' />
                     <FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' readOnly={readOnly} className='col-12' maxLength={200} />
                     <div className='col-12 form-group' />
@@ -223,7 +231,7 @@ export class ComponentDieuKhoan extends React.Component {
                     <div className='col-12 form-group'>
                         <h5 className='control-label' style={{ fontWeight: 'bold' }}>2. Nghĩa vụ: </h5>
                     </div>
-                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' className='col-xl-6 col-md-6' />
+                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' readOnly={readOnly} className='col-xl-6 col-md-6' maxLength={200} />
                     <FormTextBox ref={e => this.boiThuong = e} label='Bồi thường vi phạm và vật chất' className='col-xl-6 col-md-6' />
                 </div>
             </div>

@@ -10,7 +10,11 @@ export default {
   },
   routes: [
     {
-      path: '/user/danh-muc/dao-tao/to-hop-thi',
+      path: '/user/danh-muc/to-hop-thi',
+      component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+    },
+    {
+      path: '/user/dao-tao/to-hop-thi',
       component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
     },
   ],

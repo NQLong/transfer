@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtBaiVietKhoaHocPage, updateQtBaiVietKhoaHocStaff,
-    deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage,
+    deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocMultiple, getQtBaiVietKhoaHocGroupPage,
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -53,6 +53,16 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            tenTacGia: this.tenTacGia.value(),
+            namXuatBan: this.namXuatBan.getVal() ? new Date(this.namXuatBan.getVal()).getFullYear() : null,
+            tenBaiViet: this.tenBaiViet.value(),
+            tenTapChi: this.tenTapChi.value(),
+            soHieuIssn: this.soHieuIssn.value(),
+            sanPham: this.sanPham.value(),
+            diemIf: this.diemIf.value(),
+            quocTe: this.quocTe.value(),
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
@@ -69,29 +79,13 @@ class EditModal extends AdminModal {
             T.notify('Năm xuất bản trống', 'danger');
             this.namXuatBan.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    tenTacGia: this.tenTacGia.value(),
-                    namXuatBan: this.namXuatBan.getVal() ? new Date(this.namXuatBan.getVal()).getFullYear() : null,
-                    tenBaiViet: this.tenBaiViet.value(),
-                    tenTapChi: this.tenTapChi.value(),
-                    soHieuIssn: this.soHieuIssn.value(),
-                    sanPham: this.sanPham.value(),
-                    diemIf: this.diemIf.value(),
-                    quocTe: this.quocTe.value(),
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -299,7 +293,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {
@@ -343,7 +337,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write}
-                    create={this.props.createQtBaiVietKhoaHocStaff} update={this.props.updateQtBaiVietKhoaHocStaff}
+                    create={this.props.createQtBaiVietKhoaHocMultiple} update={this.props.updateQtBaiVietKhoaHocStaff}
                 />
             </>,
             backRoute: '/user/' + this.menu,
@@ -360,7 +354,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.khcn.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
-    getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocStaff,
+    getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocMultiple,
     updateQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtBaiVietKhoaHoc);

@@ -2,14 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmSvLoaiHinhDaoTaoPage, deleteDmSvLoaiHinhDaoTao, createDmSvLoaiHinhDaoTao, updateDmSvLoaiHinhDaoTao } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, getValue } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
   componentDidMount() {
-    $(document).ready(() => this.onShown(() => {
+    this.onShown(() => {
       !this.maLoaiHinh.value() ? this.maLoaiHinh.focus() : this.ten.focus();
-    }));
+    });
   }
 
   onShow = (item) => {
@@ -24,41 +24,37 @@ class EditModal extends AdminModal {
   onSubmit = (e) => {
     e.preventDefault();
     const changes = {
-      ma: this.maLoaiHinh.value(),
-      ten: this.ten.value(),
-      kichHoat: Number(this.kichHoat.value())
+      ma: getValue(this.maLoaiHinh),
+      ten: getValue(this.ten),
+      kichHoat: Number(getValue(this.kichHoat))
     };
-    if (!this.state.ma && !this.maLoaiHinh.value()) {
-      T.notify('Mã không được trống!', 'danger');
-      this.maLoaiHinh.focus();
-    } else if (changes.ten == '') {
-      T.notify('Tên không được bị trống!', 'danger');
-      this.ten.focus();
-    } else {
-      this.state.item ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-    }
+
+    this.state.item ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
+
   };
 
-  changeKichHoat = value => this.kichHoat.value(value);
+  changeKichHoat = value => this.kichHoat.value(value ? 1 : 0);
 
   render = () => {
     const readOnly = this.props.readOnly;
     return this.renderModal({
-      title: this.state.maLoaiHinh ? 'Tạo mới loại hình đào tạo' : 'Cập nhật loại hình đào tạo',
+      title: this.state.ma ? 'Cập nhật loại hình đào tạo' : 'Tạo mới loại hình đào tạo',
       size: 'large',
       body: <div className='row'>
-        <FormTextBox className='col-12' ref={e => this.maLoaiHinh = e} label='Mã' readOnly={this.state.maLoaiHinh ? true : readOnly} placeholder='Mã' required />
+        <FormTextBox className='col-12' ref={e => this.maLoaiHinh = e} label='Mã' readOnly={this.state.ma ? true : readOnly} placeholder='Mã' required />
         <FormTextBox className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
         <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
-          onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+          onChange={value => this.changeKichHoat(value)} required />
       </div>
-    }
-    );
+    });
   }
 }
 
 class DmSvLoaiHinhDaoTaoPage extends AdminPage {
   componentDidMount() {
+    let route = T.routeMatcher('/user/:menu/loai-hinh-dao-tao').parse(window.location.pathname);
+    this.menu = route.menu == 'dao-tao' ? 'dao-tao' : 'category';
+    T.ready(`/user/${this.menu}`);
     T.onSearch = (searchText) => this.props.getDmSvLoaiHinhDaoTaoPage(undefined, undefined, searchText || '');
     T.showSearchBox();
     this.props.getDmSvLoaiHinhDaoTaoPage();
@@ -71,10 +67,7 @@ class DmSvLoaiHinhDaoTaoPage extends AdminPage {
 
   delete = (e, item) => {
     T.confirm('Xóa loại hình đào tạo', `Bạn có chắc bạn muốn xóa loại hình đào tạo ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-      isConfirm && this.props.deleteDmSvLoaiHinhDaoTao(item.maLoaiHinh, error => {
-        if (error) T.notify(error.message ? error.message : `Xoá loại hình đào tạo ${item.ten} bị lỗi!`, 'danger');
-        else T.alert(`Xoá loại hình đào tạo ${item.ten} thành công!`, 'success', false, 800);
-      });
+      isConfirm && this.props.deleteDmSvLoaiHinhDaoTao(item.ma);
     });
     e.preventDefault();
   }
@@ -102,7 +95,7 @@ class DmSvLoaiHinhDaoTaoPage extends AdminPage {
             <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
             <TableCell content={item.ten} />
             <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-              onChanged={value => this.props.updateDmSvLoaiHinhDaoTao(item.maLoaiHinh, { kichHoat: Number(value) })} />
+              onChanged={value => this.props.updateDmSvLoaiHinhDaoTao(item.ma, { kichHoat: Number(value) })} />
             <TableCell type='buttons' content={item} permission={permission}
               onEdit={() => this.modal.show(item)} onDelete={this.delete} />
           </tr>
@@ -111,10 +104,10 @@ class DmSvLoaiHinhDaoTaoPage extends AdminPage {
 
 
     return this.renderPage({
-      icon: 'fa fa-list-alt',
+      icon: this.menu == 'dao-tao' ? 'fa fa-tasks' : 'fa fa-list-alt',
       title: 'Loại hình đào tạo',
       breadcrumb: [
-        <Link key={0} to='/user/category'>Danh mục</Link>,
+        <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'dao-tao' ? 'Đào tạo' : 'Danh mục'}</Link>,
         'Loại hình đào tạo'
       ],
       content: <>
@@ -124,7 +117,7 @@ class DmSvLoaiHinhDaoTaoPage extends AdminPage {
         <EditModal ref={e => this.modal = e} permission={permission}
           create={this.props.createDmSvLoaiHinhDaoTao} update={this.props.updateDmSvLoaiHinhDaoTao} permissions={currentPermissions} />
       </>,
-      backRoute: '/user/category',
+      backRoute: `/user/${this.menu}`,
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null
     });
   }

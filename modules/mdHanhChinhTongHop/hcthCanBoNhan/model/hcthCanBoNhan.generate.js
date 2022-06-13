@@ -1,6 +1,6 @@
-// Table name: HCTH_CAN_BO_NHAN { id, canBoNhan, loai, key, nguoiTao }
+// Table name: HCTH_CAN_BO_NHAN { id, canBoNhan, loai, ma, vaiTro, nguoiTao, trangThai }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'canBoNhan': 'CAN_BO_NHAN', 'loai': 'LOAI', 'key': 'KEY', 'nguoiTao': 'NGUOI_TAO' };
+const obj2Db = { 'id': 'ID', 'canBoNhan': 'CAN_BO_NHAN', 'loai': 'LOAI', 'ma': 'MA', 'vaiTro': 'VAI_TRO', 'nguoiTao': 'NGUOI_TAO', 'trangThai': 'TRANG_THAI' };
 
 module.exports = app => {
     app.model.hcthCanBoNhan = {
@@ -76,18 +76,22 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM HCTH_CAN_BO_NHAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT HCTH_CAN_BO_NHAN.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM HCTH_CAN_BO_NHAN' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            const sqlCount = 'SELECT COUNT(*) FROM HCTH_CAN_BO_NHAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT HCTH_CAN_BO_NHAN.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM HCTH_CAN_BO_NHAN' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 
@@ -134,6 +138,11 @@ module.exports = app => {
         getAllCanBoNhan: (nhiemvuid, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_get_all_can_bo_nhan(:nhiemvuid); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhiemvuid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        getAllFrom: (target, targettype, ids, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_can_bo_nhan_get_all_from(:target, :targettype, :ids); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, target, targettype, ids }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

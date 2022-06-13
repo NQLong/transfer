@@ -292,6 +292,22 @@ export function createQtLamViecNgoaiStaff(data, done) {
     };
 }
 
+export function createQtLamViecNgoaiMultiple(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/lam-viec-ngoai/create-multiple';
+        T.post(url, { data }, res => {
+            if (res.error.length) {
+                T.notify('Thêm thông tin quá trình làm việc ngoài bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình làm việc ngoài thành công!', 'info');
+                dispatch(getQtLamViecNgoaiPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin quá trình làm việc ngoài bị lỗi', 'danger'));
+    };
+}
+
 export function updateQtLamViecNgoaiStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/lam-viec-ngoai';

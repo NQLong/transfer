@@ -48,7 +48,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
     state = { filter: {}, sortBy: '', sortType: '', tab: 0 };
 
     componentDidMount() {
-        T.ready(window.location.pathname.startsWith('/user/hcth') ? '/user/hcth' : '/user', () => {
+        T.ready(this.getSiteSetting().readyUrl, () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -62,6 +62,31 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
         });
+    }
+
+
+    getSiteSetting = () => {
+        const pathName = window.location.pathname;
+        if (pathName.startsWith('/user/hcth'))
+            return {
+                readyUrl: '/user/hcth',
+                breadcrumb: [
+                    <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
+                    'Danh sách công văn đến',
+                ],
+                backRoute: '/user/hcth',
+                baseUrl: '/user/hcth/cong-van-den',
+            };
+        else
+            return {
+                readyUrl: '/user',
+                breadcrumb: [
+                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    'Danh sách công văn đến',
+                ],
+                backRoute: '/user',
+                baseUrl: '/user/cong-van-den',
+            };
     }
 
     changeAdvancedSearch = (isInitial = false) => {
@@ -81,6 +106,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
+                this.setState({ loading: false });
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -123,7 +149,8 @@ class HcthCongVanDenStaffPage extends AdminPage {
         const user = this.props.system && this.props.system.user ? this.props.system.user : {},
             { permissions: currentPermissions, staff } = user,
             donViQuanLy = staff && staff.donViQuanLy ? staff.donViQuanLy : [],
-            permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
+            permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']),
+            { baseUrl, backRoute, breadcrumb } = this.getSiteSetting();
         const hcthStaff = currentPermissions.includes('hcth:login');
 
         const statusSelector = Object.keys(trangThaiSwitcher).filter(key => hcthStaff || trangThaiSwitcher[key].id != trangThaiSwitcher.MOI.id).map(key => trangThaiSwitcher[key]);
@@ -131,7 +158,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
             style: { marginTop: '5px' },
-            getDataSource: () => list,
+            getDataSource: () => this.state.loading ? null : list,
             emptyTable: 'Không có dữ liệu công văn đến',
             stickyHead: false,
             renderHead: () => (
@@ -155,7 +182,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={
                             <>
-                                <Link to={`${window.location.pathname}/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
+                                <Link to={`${baseUrl}/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
                                 {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
@@ -171,7 +198,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                             </>) : null
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.tenDonViGuiCV} />
-                        <TableCell type='text' contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.trichYeu} />
+                        <TableCell type='text' contentClassName='multiple-lines-3' contentStyle={{ width: '100%', minWidth: '300px' }} content={item.trichYeu} />
                         <TableCell type='text' contentClassName='multiple-lines' style={{}} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
@@ -194,7 +221,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <span style={{ color: [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id].includes(item.trangThai) ? 'red' : 'blue' }}>{getTrangThaiText(item.trangThai)}</span>
                         } />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ ...permission, delete: permission.delete && item.trangThai == trangThaiSwitcher.MOI.id }} onEdit={() => this.props.history.push(`${window.location.pathname}/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ ...permission, delete: permission.delete && item.trangThai == trangThaiSwitcher.MOI.id }} onEdit={`${baseUrl}/${item.id}`} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>);
             }
         });
@@ -202,15 +229,12 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let tabList = {
             all: {
                 title: 'Tất cả',
-                // component: table
             },
             donVi: {
                 title: 'Đơn vị quản lý',
-                // component: table
             },
             self: {
                 title: 'Cá nhân',
-                // component: table
             }
         };
 
@@ -222,10 +246,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn đến',
-            breadcrumb: [
-                <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
-                'Công văn đến'
-            ],
+            breadcrumb,
             header: <>
                 <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />
                 {(currentPermissions.includes('rectors:login') || currentPermissions.includes('hcth:login')) && <FormSelect style={{ width: '150px', marginBottom: '0', marginLeft: '5px' }} allowClear={true} ref={e => this.status = e} placeholder='Tình trạng' onChange={() => this.changeAdvancedSearch()} data={statusSelector} />}
@@ -247,14 +268,14 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 </div>
             </>,
             content: <div className='tile'>
-                <FormTabs style={tabs.length == 1 ? { display: 'none' } : {}} ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />
+                <FormTabs style={tabs.length == 1 ? { display: 'none' } : {}} ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.setState({ loading: true }, this.changeAdvancedSearch)} />
                 {table}
                 < Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </div>,
 
-            onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-den/new') : null,
-            backRoute: '/user/hcth',
+            onCreate: permission && permission.write ? () => this.props.history.push(`${baseUrl}/new`) : null,
+            backRoute,
         });
     }
 }

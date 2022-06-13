@@ -17,12 +17,12 @@ export default function dashboardTccbReducer(state = null, data) {
 
 
 T.initPage('pageDashboardTccb');
-export function getTotalGender(done) {
+export function getDashboardData(time, done) {
     return dispatch => {
-        const url = '/api/tccb/dashboard/total-gender';
-        T.get(url, item => {
+        const url = '/api/tccb/dashboard/get-data';
+        T.get(url, { time }, item => {
             if (item.error) {
-                T.notify('Lấy thông tin giói tính bị lỗi', 'danger');
+                T.notify('Lấy dữ liệu bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, item.error);
             } else {
                 if (done) done(item.data);

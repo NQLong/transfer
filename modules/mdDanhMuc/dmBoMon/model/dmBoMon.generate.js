@@ -1,6 +1,6 @@
-// Table name: DM_BO_MON { ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu, ma }
+// Table name: DM_BO_MON { ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu, ma, maPl }
 const keys = ['MA'];
-const obj2Db = { 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'maDv': 'MA_DV', 'qdThanhLap': 'QD_THANH_LAP', 'qdXoaTen': 'QD_XOA_TEN', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'ma': 'MA' };
+const obj2Db = { 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'maDv': 'MA_DV', 'qdThanhLap': 'QD_THANH_LAP', 'qdXoaTen': 'QD_XOA_TEN', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'ma': 'MA', 'maPl': 'MA_PL' };
 
 module.exports = app => {
     app.model.dmBoMon = {
@@ -76,18 +76,22 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DM_BO_MON.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            const sqlCount = 'SELECT COUNT(*) FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DM_BO_MON.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 

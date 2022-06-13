@@ -1,6 +1,6 @@
-// Table name: DT_KHUNG_DAO_TAO { id, namDaoTao, maKhoa, maNganh, tenNganh, trinhDoDaoTao, loaiHinhDaoTao, thoiGianDaoTao, tenVanBang, mucTieuChung, userModified, lastModified, mucTieuCuThe }
+// Table name: DT_KHUNG_DAO_TAO { id, namDaoTao, maKhoa, maNganh, tenNganh, trinhDoDaoTao, loaiHinhDaoTao, thoiGianDaoTao, tenVanBang, userModified, lastModified, mucTieu, chuyenNganh }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'namDaoTao': 'NAM_DAO_TAO', 'maKhoa': 'MA_KHOA', 'maNganh': 'MA_NGANH', 'tenNganh': 'TEN_NGANH', 'trinhDoDaoTao': 'TRINH_DO_DAO_TAO', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'thoiGianDaoTao': 'THOI_GIAN_DAO_TAO', 'tenVanBang': 'TEN_VAN_BANG', 'mucTieuChung': 'MUC_TIEU_CHUNG', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'mucTieuCuThe': 'MUC_TIEU_CU_THE' };
+const obj2Db = { 'id': 'ID', 'namDaoTao': 'NAM_DAO_TAO', 'maKhoa': 'MA_KHOA', 'maNganh': 'MA_NGANH', 'tenNganh': 'TEN_NGANH', 'trinhDoDaoTao': 'TRINH_DO_DAO_TAO', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'thoiGianDaoTao': 'THOI_GIAN_DAO_TAO', 'tenVanBang': 'TEN_VAN_BANG', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'mucTieu': 'MUC_TIEU', 'chuyenNganh': 'CHUYEN_NGANH' };
 
 module.exports = app => {
     app.model.dtKhungDaoTao = {
@@ -76,18 +76,22 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM DT_KHUNG_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DT_KHUNG_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DT_KHUNG_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            const sqlCount = 'SELECT COUNT(*) FROM DT_KHUNG_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DT_KHUNG_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DT_KHUNG_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 

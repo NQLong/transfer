@@ -74,7 +74,7 @@ class StaffEditNCKH extends AdminPage {
             nghiemThu: (ngayNghiemThu == -1 || ketThuc == -1) ? 1 : 0
         }, () => {
             this.tenDeTai.value(tenDeTai);
-            this.maSo.value(maSoCapQuanLy);
+            this.maSoCapQuanLy.value(maSoCapQuanLy);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             if (ngayNghiemThu != -1) {
                 this.nghiemThuCheck.value(0);
@@ -203,7 +203,7 @@ class StaffEditNCKH extends AdminPage {
             const changes = {
                 shcc: this.state.ownerShcc,
                 tenDeTai: this.getVal(this.tenDeTai),
-                maSoCapQuanLy: this.getVal(this.maSo),
+                maSoCapQuanLy: this.getVal(this.maSoCapQuanLy),
                 kinhPhi: this.getVal(this.kinhPhi),
                 batDau: this.getVal(this.batDau, true),
                 batDauType: this.state.batDauType,
@@ -285,7 +285,7 @@ class StaffEditNCKH extends AdminPage {
                     <h3 className='tile-title'>{!this.state.id ? 'Tạo mới đề tài' : 'Cập nhật đề tài'}</h3>
                     <div className='tile-body row'>
                         <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
-                        <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
+                        <FormTextBox className='col-md-6' ref={e => this.maSoCapQuanLy = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
                         <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng' />
 
                         <div className='form-group col-md-4'>Các mốc thời gian:</div>

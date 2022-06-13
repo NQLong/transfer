@@ -1,6 +1,6 @@
-// Table name: QT_HOP_DONG_VIEN_CHUC { loaiHopDong, soQd, ngayKyQuyetDinh, noiDung, nguoiKy, nguoiDuocThue, loaiHd, ngayBatDauLamViec, ngayKetThucHopDong, ngayKyHdTiepTheo, diaDiemLamViec, chucDanhChuyenMon, nhiemVu, hieuLucHopDong, ngayKyHopDong, maNgach, bac, heSo, thoiGianXetNangBacLuong, ma }
+// Table name: QT_HOP_DONG_VIEN_CHUC { loaiHopDong, soQd, ngayKyQuyetDinh, noiDung, nguoiKy, nguoiDuocThue, loaiHd, ngayBatDauLamViec, ngayKetThucHopDong, ngayKyHdTiepTheo, diaDiemLamViec, chucDanhChuyenMon, nhiemVu, hieuLucHopDong, ngayKyHopDong, maNgach, bac, heSo, thoiGianXetNangBacLuong, ma, soHopDong, namTotNghiep, ngheNghiepTruocTuyenDung }
 const keys = ['MA'];
-const obj2Db = { 'loaiHopDong': 'LOAI_HOP_DONG', 'soQd': 'SO_QD', 'ngayKyQuyetDinh': 'NGAY_KY_QUYET_DINH', 'noiDung': 'NOI_DUNG', 'nguoiKy': 'NGUOI_KY', 'nguoiDuocThue': 'NGUOI_DUOC_THUE', 'loaiHd': 'LOAI_HD', 'ngayBatDauLamViec': 'NGAY_BAT_DAU_LAM_VIEC', 'ngayKetThucHopDong': 'NGAY_KET_THUC_HOP_DONG', 'ngayKyHdTiepTheo': 'NGAY_KY_HD_TIEP_THEO', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'chucDanhChuyenMon': 'CHUC_DANH_CHUYEN_MON', 'nhiemVu': 'NHIEM_VU', 'hieuLucHopDong': 'HIEU_LUC_HOP_DONG', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'maNgach': 'MA_NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'thoiGianXetNangBacLuong': 'THOI_GIAN_XET_NANG_BAC_LUONG', 'ma': 'MA' };
+const obj2Db = { 'loaiHopDong': 'LOAI_HOP_DONG', 'soQd': 'SO_QD', 'ngayKyQuyetDinh': 'NGAY_KY_QUYET_DINH', 'noiDung': 'NOI_DUNG', 'nguoiKy': 'NGUOI_KY', 'nguoiDuocThue': 'NGUOI_DUOC_THUE', 'loaiHd': 'LOAI_HD', 'ngayBatDauLamViec': 'NGAY_BAT_DAU_LAM_VIEC', 'ngayKetThucHopDong': 'NGAY_KET_THUC_HOP_DONG', 'ngayKyHdTiepTheo': 'NGAY_KY_HD_TIEP_THEO', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'chucDanhChuyenMon': 'CHUC_DANH_CHUYEN_MON', 'nhiemVu': 'NHIEM_VU', 'hieuLucHopDong': 'HIEU_LUC_HOP_DONG', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'maNgach': 'MA_NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'thoiGianXetNangBacLuong': 'THOI_GIAN_XET_NANG_BAC_LUONG', 'ma': 'MA', 'soHopDong': 'SO_HOP_DONG', 'namTotNghiep': 'NAM_TOT_NGHIEP', 'ngheNghiepTruocTuyenDung': 'NGHE_NGHIEP_TRUOC_TUYEN_DUNG' };
 
 module.exports = app => {
     app.model.qtHopDongVienChuc = {
@@ -76,18 +76,22 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM QT_HOP_DONG_VIEN_CHUC' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_HOP_DONG_VIEN_CHUC.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_HOP_DONG_VIEN_CHUC' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            const sqlCount = 'SELECT COUNT(*) FROM QT_HOP_DONG_VIEN_CHUC' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_HOP_DONG_VIEN_CHUC.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_HOP_DONG_VIEN_CHUC' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 

@@ -60,11 +60,11 @@ module.exports = app => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             hocKy = thoiGianMoMon.hocKy,
             nam = thoiGianMoMon.nam;
-        let { data, id } = req.body,
-            isDuyet = data.isDuyet || 0,
+        let { data, id, isDuyet } = req.body,
             thoiGian = new Date().getTime(),
             changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
             isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
+
         if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
             res.send({ error: 'Không thuộc thời gian đăng ký hiện tại' });
             return;
@@ -94,7 +94,7 @@ module.exports = app => {
                 });
             });
             try {
-                data.data && data.data.length ? await updateDanhSachMonMo(data.data) : [];
+                data && data.length ? await updateDanhSachMonMo(data) : [];
                 app.model.dtDangKyMoMon.update({ id }, changes, (error, item) => res.send({ error, item }));
             } catch (error) {
                 res.send({ error });
@@ -104,7 +104,7 @@ module.exports = app => {
 
 
     //Phân quyền cho đơn vị ---------------------------------------------------------------------------------------------------------------
-    app.assignRoleHooks.addRoles('daoTao', { id: 'dtDangKyMoMon:manage', text: 'Đào tạo: Quản lý Mở môn' });
+    app.assignRoleHooks.addRoles('daoTao', { id: 'dtDangKyMoMon:manage', text: 'Đào tạo: Quản lý Mở môn học' });
 
     app.permissionHooks.add('staff', 'checkRoleDTDangKyMoMon', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
@@ -118,7 +118,7 @@ module.exports = app => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'daoTao');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dtDangKyMoMon:manage') {
-                app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:manage');
+                app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:manage', 'dtMonHoc:manage', 'dtChuongTrinhDaoTao:manage', 'dtNganhDaoTao:manage', 'dtDanhSachChuyenNganh:manage');
             }
         });
         resolve();

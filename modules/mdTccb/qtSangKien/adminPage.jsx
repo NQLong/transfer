@@ -11,14 +11,19 @@ import {
     from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
+const listCapAnhHuong = [
+    { id: 1, text: 'Cấp bộ' },
+    { id: 2, text: 'Cấp cơ sở' }
+];
+
 class EditModal extends AdminModal {
     state = {
         id: null,
     };
 
     onShow = (item) => {
-        let { id, shcc, maSo, tenSangKien, soQuyetDinh } = item ? item : {
-            id: '', shcc: '', maSo: '', tenSangKien: '', soQuyetDinh: ''
+        let { id, shcc, maSo, tenSangKien, soQuyetDinh, capAnhHuong } = item ? item : {
+            id: '', shcc: '', maSo: '', tenSangKien: '', soQuyetDinh: '', capAnhHuong: ''
         };
 
         this.setState({
@@ -28,6 +33,7 @@ class EditModal extends AdminModal {
             this.maSo.value(maSo ? maSo : '');
             this.tenSangKien.value(tenSangKien ? tenSangKien : '');
             this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
+            this.capAnhHuong.value(capAnhHuong ? capAnhHuong : '');
         });
     };
 
@@ -52,6 +58,7 @@ class EditModal extends AdminModal {
                 maSo: this.maSo.value(),
                 tenSangKien: this.tenSangKien.value(),
                 soQuyetDinh: this.soQuyetDinh.value(),
+                capAnhHuong: this.capAnhHuong.value(),
             };
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -67,6 +74,7 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
                 <FormTextBox className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} required />
                 <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required />
+                <FormSelect className='col-md-6' ref={e => this.capAnhHuong = e} label='Cấp ảnh hưởng' data={listCapAnhHuong} readOnly={readOnly} />
             </div>
         });
     }
@@ -98,7 +106,8 @@ class QtSangKien extends AdminPage {
         let { pageNumber, pageSize } = this.props && this.props.qtSangKien && this.props.qtSangKien.page ? this.props.qtSangKien.page : { pageNumber: 1, pageSize: 50 };
         const listDonVi = this.maDonVi?.value().toString() || '';
         const listShcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDonVi, listShcc };
+        const filterCapAnhHuong = this.filterCapAnhHuong.value()?.toString() || '';
+        const pageFilter = isInitial ? null : { listDonVi, listShcc, filterCapAnhHuong };
         this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -154,6 +163,7 @@ class QtSangKien extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
                     <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp ảnh hưởng</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
@@ -171,12 +181,13 @@ class QtSangKien extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>  
                             <span> {item.tenChucVu || ''}<br /> </span>
-                            {(item.tenDonVi || '').normalizedName()}
+                            {(item.tenDonVi || '')}
                         </>
                     )} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />
                     <TableCell type='text' content={(item.tenSangKien || '')} />
                     <TableCell type='text' content={(item.soQuyetDinh || '')} />
+                    <TableCell type='text' content={(item.capAnhHuong == 1 ? 'Cấp bộ' : (item.capAnhHuong == 2 ? 'Cấp cơ sở': ''))} />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -197,6 +208,7 @@ class QtSangKien extends AdminPage {
                 <div className='row'>
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' ref={e => this.filterCapAnhHuong = e} label='Cấp ảnh hưởng' data={listCapAnhHuong} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='col-12'>
                         <div className='row justify-content-between'>
                             <div className='col-md-6'>Tìm thấy: <b>{totalItem}</b> kết quả</div>

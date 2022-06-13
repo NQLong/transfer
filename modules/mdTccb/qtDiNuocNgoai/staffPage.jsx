@@ -1,16 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, renderTable, TableCell, FormCheckbox, FormSelect } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, renderTable, TableCell, FormCheckbox, FormSelect, FormFileBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
     getQtDiNuocNgoaiUserPage, deleteQtDiNuocNgoaiUserPage, createQtDiNuocNgoaiUserPage,
-    updateQtDiNuocNgoaiUserPage
+    updateQtDiNuocNgoaiUserPage, getThongKeMucDich, deleteFile
 } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmMucDichNuocNgoaiV2 } from 'modules/mdDanhMuc/dmMucDichNuocNgoai/redux';
+import { SelectAdapter_DmTiepNhanVeNuocV2 } from 'modules/mdDanhMuc/dmTiepNhanVeNuoc/redux';
+
 const EnumDateType = Object.freeze({
     0: { text: '' },
     1: { text: 'dd/mm/yyyy' },
@@ -21,36 +23,42 @@ const EnumDateType = Object.freeze({
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+const listBaoCaoTinhTrang = [
+    { id: 0, text: 'Chưa nộp' },
+    { id: 1, text: 'Đang chờ duyệt' },
+    { id: 2, text: 'Báo cáo bị trả lại' },
+    { id: 3, text: 'Đã nộp' },
+];
+const mapperBaoCaoTinhTrang = listBaoCaoTinhTrang.map(item => item.text);
+
 class EditModal extends AdminModal {
     state = {
         id: null,
         ngayDi: '',
         ngayVe: null,
-        dangDienRa: true,
         ngayDiType: 'dd/mm/yyyy',
         ngayVeType: 'dd/mm/yyyy',
         tiepNhan: false,
-        giaHan: false,
-        mucDich: '',
-        readOnly: false,
+        baoCaoTinhTrang: 0,
+        listFile: [],
+        noNeedTiepNhan: false
     };
-    // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc }
+    // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc, baoCaoTen, baoCaoNgayNop, baoCaoTinhTrang, baoCaoLyDoTraVe }
 
     onShow = (item) => {
-        let { id, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, today, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc } = item && item.item ? item.item : {
-            id: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null, today: new Date().getTime(), soQdTiepNhan: '', ngayQdTiepNhan: null, noiDungTiepNhan: '', ngayVeNuoc: null,
+        let { id, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc, baoCaoTen, baoCaoTinhTrang, baoCaoLyDoTraVe } = item && item.item ? item.item : {
+            id: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null, soQdTiepNhan: '', ngayQdTiepNhan: null, noiDungTiepNhan: '', ngayVeNuoc: null, baoCaoTen: '[]', baoCaoTinhTrang: 0, baoCaoLyDoTraVe: '',
         };
-
+        let listFile = T.parse(baoCaoTen, []);
         this.setState({
             id, ngayDiType: ngayDiType ? ngayDiType : 'dd/mm/yyyy',
             ngayVeType: ngayVeType ? ngayVeType : 'dd/mm/yyyy',
             ngayDi, ngayVe,
-            dangDienRa: ngayVe ? (ngayVe == -1 || ngayVe >= today) : true,
             tiepNhan: soQdTiepNhan ? true : false,
             shcc: item.shcc,
-            giaHan: false,
-            mucDich: mucDich,
-            readOnly: this.props.canEdit,
+            baoCaoTinhTrang,
+            listFile,
+            noNeedTiepNhan: ngayDi && ngayVe ? (T.dayDiff(new Date(ngayDi), new Date(ngayVe)) < 30 ? true : false) : false
         }, () => {
             if (quocGia) {
                 quocGia = quocGia.split(',');
@@ -65,11 +73,8 @@ class EditModal extends AdminModal {
 
             this.ngayDiType.setText({ text: ngayDiType ? ngayDiType : 'dd/mm/yyyy' });
             this.ngayDi.setVal(ngayDi || '');
-            this.denNayCheck.value(this.state.dangDienRa);
             this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
-            if (this.state.ngayVe) {
-                this.state.ngayVe != -1 && this.ngayVe.setVal(ngayVe);
-            } else this.ngayVe.setVal(null);
+            this.ngayVe.setVal(ngayVe || '');
             if (this.state.tiepNhan) {
                 this.tiepNhanCheck.value(true);
                 $('#tiepNhan').show();
@@ -80,9 +85,73 @@ class EditModal extends AdminModal {
             this.ngayQdTiepNhan.value(ngayQdTiepNhan || '');
             this.noiDungTiepNhan.value(noiDungTiepNhan || '');
             this.ngayVeNuoc.value(ngayVeNuoc || '');
+            this.baoCaoLyDoTraVe.value(baoCaoLyDoTraVe || '');
+            this.fileBox.setData('baoCaoDiNuocNgoaiStaffFile:' + item.shcc);
         });
     };
 
+    deleteFile = (e, data) => {
+        const { index, shcc, file } = data;
+        e.preventDefault();
+        T.confirm('Xóa dữ liệu', 'Bạn có muốn xóa tập tin này không?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteFile(shcc, file, () => {
+                let listFile = this.state.listFile;
+                listFile.splice(index, 1);
+                this.setState({ listFile });
+            });
+        });
+    };
+    // format: /shcc/dateCreated_nameFile
+    split = (input) => {
+        let arr = input.split('/');
+        let shcc = arr[1];
+        let suffix = arr[2];
+        let date = suffix.split('_')[0];
+        let name = suffix.substring(date.length + 1);
+        return { shcc, date, name };
+    };
+    tableListFile = (data, permission) => {
+        return renderTable({
+            getDataSource: () => data,
+            stickyHead: false,
+            emptyTable: 'Chưa có file báo cáo nào!',
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
+                    <th style={{ width: '100%' }}>Tên tập tin</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngày upload</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => {
+                let { shcc, date, name } = this.split(item);
+                return (
+                    <tr key={index}>
+                        <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
+                            <a href={'/api/di-nuoc-ngoai/download' + item} download>{name}</a>
+                        </>
+                        } />
+                        <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(date), 'dd/mm/yyyy HH:MM')}></TableCell>
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, { index, shcc, file: item })}>
+                            <a className='btn btn-info' href={'/api/di-nuoc-ngoai/download' + item} download>
+                                <i className='fa fa-lg fa-download' />
+                            </a>
+                        </TableCell>
+                    </tr>
+                );
+            }
+        });
+    }
+
+    getBaoCaoTinhTrang = () => {
+        const { listFile, baoCaoTinhTrang } = this.state;
+        if (listFile.length > 0) {
+            if (baoCaoTinhTrang == 3) return 3;
+            return 1;
+        }
+        return 0;
+    }
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
@@ -104,6 +173,10 @@ class EditModal extends AdminModal {
             ngayQdTiepNhan: this.state.tiepNhan ? Number(this.ngayQdTiepNhan.value()) : null,
             noiDungTiepNhan: this.state.tiepNhan ? this.noiDungTiepNhan.value() : null,
             ngayVeNuoc: this.state.tiepNhan ? this.ngayVeNuoc.value() : null,
+
+            baoCaoTinhTrang: this.getBaoCaoTinhTrang(),
+            baoCaoTen: T.stringify(this.state.listFile, '[]'),
+            baoCaoLyDoTraVe: this.getBaoCaoTinhTrang() == 2 ? this.baoCaoLyDoTraVe.value() : '',
         };
         if (!this.noiDung.value()) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
@@ -123,66 +196,141 @@ class EditModal extends AdminModal {
         } else if (this.state.tiepNhan && !this.soQdTiepNhan.value()) {
             T.notify('Số quyết định tiếp nhận trống', 'danger');
             this.soQdTiepNhan.focus();
+        } else if (this.state.tiepNhan && !this.ngayQdTiepNhan.value()) {
+            T.notify('Ngày quyết định tiếp nhận trống', 'danger');
+            this.soQdTiepNhan.focus();
+        // } else if (this.baoCaoCheck.value() && !this.baoCaoLyDoTraVe.value()) {
+        //     T.notify('Lý do báo cáo bị trả về bị trống', 'danger');
+        //     this.baoCaoLyDoTraVe.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
-    handleNgayVe = (value) => {
-        this.setState({ dangDienRa: value });
-    }
-
-    handleGiaHan = (value) => {
-        if (value) {
-            this.setState({ giaHan: true, readOnly: false }, () => {
-                this.ghiChu.value('Đang chờ gia hạn');
-                this.mucDich.value('16');
-            });
-        } else {
-            this.setState({ giaHan: false, readOnly: true }, () => {
-                this.mucDich.value(this.state.mucDich);
-                this.ghiChu.value('');
-            });
-        }
+    onSuccess = (response) => {
+        if (response.data) {
+            let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
+            listFile.push(response.data);
+            this.setState({ listFile });
+        } else if (response.error) T.notify(response.error, 'danger');
     }
 
     render = () => {
-        const readOnly = this.state.readOnly;
+        const permission = {
+            write: true,
+            delete: true
+        };
+        const readOnly = this.props.canEdit;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình đi nước ngoài' : 'Tạo mới quá trình đi nước ngoài',
             size: 'elarge',
             body: <div className='row'>
-                <FormTextBox className='col-md-3' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={this.props.canEdit} />
-                <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={this.props.canEdit} />
+                <FormTextBox className='col-md-3' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
                 <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={this.props.canEdit} />
-                <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={this.props.canEdit} />
-                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={this.props.canEdit} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
-                <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={this.props.canEdit} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={readOnly} />
+                <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
 
-                <div className='form-group col-md-5'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
+                <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
                     label={
                         <div style={{ display: 'flex' }}>Ngày đi (&nbsp; <Dropdown ref={e => this.ngayDiType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ngayDiType: item })} readOnly={this.props.canEdit} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ ngayDiType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={this.props.canEdit} /></div>
-                <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra' onChange={this.handleNgayVe} className='form-group col-md-2' readOnly={readOnly} />
-                <div className='form-group col-md-5' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
+                    type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
                     label={
-                        <div style={{ display: 'flex' }}>{this.state.dangDienRa ? 'Ngày về dự kiến' : 'Ngày về'} (&nbsp; <Dropdown ref={e => this.ngayVeType = e}
+                        <div style={{ display: 'flex' }}>Ngày về (&nbsp; <Dropdown ref={e => this.ngayVeType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayVeType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ngayVeType ? typeMapper[this.state.ngayVeType] : null} readOnly={readOnly} /></div>
-                {this.state.tiepNhan && <FormCheckbox label='Đã tiếp nhận' className='form-group col-md-6' ref={e => this.tiepNhanCheck = e} readOnly={true} />}
+                {(this.state.tiepNhan || this.state.noNeedTiepNhan) && <FormCheckbox label={this.state.noNeedTiepNhan ? 'Mặc định tiếp nhận do đi dưới 30 ngày' : 'Đã tiếp nhận'} className='form-group col-md-6' ref={e => this.tiepNhanCheck = e} readOnly={true} />}
                 <div className='row form-group col-12' id='tiepNhan'>
-                    <FormTextBox className='col-md-4' ref={e => this.soQdTiepNhan = e} type='text' label='Số quyết định tiếp nhận' readOnly={this.props.canEdit} required />
-                    <FormDatePicker className='col-md-4' ref={e => this.ngayQdTiepNhan = e} type='date-mask' label='Ngày quyết định tiếp nhận' readOnly={this.props.canEdit} />
-                    <FormDatePicker className='col-md-4' ref={e => this.ngayVeNuoc = e} type='date-mask' label='Ngày về nước' readOnly={this.props.canEdit} />
-                    <FormRichTextBox className='col-md-12' ref={e => this.noiDungTiepNhan = e} rows={3} readOnly={this.props.canEdit} label='Nội dung tiếp nhận' placeholder='Nhập nội dung tiếp nhận về nước (tối đa 1000 ký tự)' />
+                    <FormTextBox className='col-md-4' ref={e => this.soQdTiepNhan = e} type='text' label='Số quyết định tiếp nhận' readOnly={readOnly} required />
+                    <FormDatePicker className='col-md-4' ref={e => this.ngayQdTiepNhan = e} type='date-mask' label='Ngày quyết định tiếp nhận' readOnly={readOnly} required />
+                    <FormDatePicker className='col-md-4' ref={e => this.ngayVeNuoc = e} type='date-mask' label='Ngày về nước' readOnly={readOnly} />
+                    <FormSelect className='col-md-12' ref={e => this.noiDungTiepNhan = e} readOnly={readOnly} label='Nội dung tiếp nhận' data={SelectAdapter_DmTiepNhanVeNuocV2} />
                 </div>
-                {!this.state.tiepNhan && <FormCheckbox label='Bấm vào đây nếu bạn muốn gia hạn' onChange={this.handleGiaHan} className='form-group col-md-6' />}
+                <div className='form-group col-12'>
+                    <h3 className='tile-title'>Danh sách tập tin báo cáo</h3>
+                    <div className='tile-body row'>
+                        <div className='form-group col-md-7'>
+                            {this.tableListFile(this.state.listFile, permission)}
+                        </div>
+                        <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />
+                    </div>
+                </div>
+                <FormTextBox className='col-md-12' ref={e => this.baoCaoLyDoTraVe = e} type='text' label='Lý do báo cáo bị trả về' readOnly={readOnly} required />
+            </div>
+        });
+    }
+}
+
+class ThongKeMucDichModal extends AdminModal {
+    state = {
+        data: [],
+        totalItem: 0,
+    }
+
+    tableListMucDich = (data) => {
+        return renderTable({
+            getDataSource: () => data,
+            stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
+                    <th style={{ width: '100%' }}>Mục đích</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Số lượng</th>
+                </tr>
+            ),
+            renderRow: (item, index) => {
+                return (
+                    <tr key={index}>
+                        <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ color: 'blue', whiteSpace: 'nowrap' }} content={item.id} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.len} />
+                    </tr>
+                );
+            }
+        });
+    }
+
+    setUp = (data = [], keyGroup) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        let filterData = [];
+        let totalItem = 0;
+        Object.keys(dataGroupBy).filter(item => dataGroupBy[item].length > 0).map(item => {
+            filterData.push({ id: item, len: dataGroupBy[item].length });
+            totalItem += dataGroupBy[item].length;
+        });
+        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+            return -(a.len - b.len);
+        });
+        return [filterData, totalItem];
+    }
+
+    onShow = () => {
+        this.props.thongKeMucDich(this.props.pageC, this.props.filter, data => {
+            let dataSetUp = this.setUp(data, 'tenMucDich');
+            this.setState({
+                data: dataSetUp[0],
+                totalItem: dataSetUp[1]
+            });
+        });
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thống kê',
+            size: 'large',
+            body: <div className='row'>
+                <div className='form-group col-md-12' style={{ marginTop: '20px' }}>
+                    <div>{this.tableListMucDich(this.state.data)}</div>
+                    <big><b>{'Tổng cộng: ' + this.state.totalItem.toString()}</b></big>
+                </div>
             </div>
         });
     }
@@ -193,8 +341,9 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: null, tinhTrang: null, loaiHocVi: null, mucDich: null } });
-            this.getPage();
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: null, tinhTrang: null, loaiHocVi: null, mucDich: null } }, () => {
+                this.getPage();
+            });
         });
     }
 
@@ -242,7 +391,8 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mục đích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nội dung</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng báo cáo</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -263,9 +413,10 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{item.ngayVe >= item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Đang ở<br/>nước ngoài</i></span> : item.soQdTiepNhan ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
+                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><b><i>Đang ở<br/>nước ngoài</i></b></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
                             </>
                         )}></TableCell>
+                        <TableCell type='text' style={{ color: item.baoCaoTinhTrang == 0 ? 'red' : 'blue'}} content={mapperBaoCaoTinhTrang[item.baoCaoTinhTrang]}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                         </TableCell>
@@ -283,20 +434,20 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                 'Công tác ngoài nước'
             ],
             content: <>
-                <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                    <button className='btn btn-info' type='button' style={{ marginRight: '10px' }} onClick={e => e.preventDefault() || this.thongKeMucDich.show()}>
+                        <i className='fa fa-fw fa-lg fa-th-list' />Thống kê mục đích
+                    </button>
                 </div>
                 <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} shcc={this.shcc} canEdit={!permission.write}
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} canEdit={!permission.write} deleteFile={this.props.deleteFile}
                     create={this.props.createQtDiNuocNgoaiUserPage} update={this.props.updateQtDiNuocNgoaiUserPage}
                 />
+                <ThongKeMucDichModal ref={e => this.thongKeMucDich = e} thongKeMucDich={this.props.getThongKeMucDich} filter={this.state.filter} pageC={pageCondition} />
             </>,
             backRoute: '/user',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
@@ -307,6 +458,6 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtDiNuocNgoai: state.tccb.qtDiNuocNgoai });
 const mapActionsToProps = {
     getQtDiNuocNgoaiUserPage, deleteQtDiNuocNgoaiUserPage,
-    updateQtDiNuocNgoaiUserPage, createQtDiNuocNgoaiUserPage,
+    updateQtDiNuocNgoaiUserPage, createQtDiNuocNgoaiUserPage, getThongKeMucDich, deleteFile
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDiNuocNgoaiUserPage);

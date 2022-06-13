@@ -16,7 +16,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/ngach-luong/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNgachCdnn.getAll({}, '*', 'ma', (error, items) => {
+        app.model.dmNgachCdnn.getAll({}, '*', 'ten,ma', (error, items) => {
             if (items == null) items = [];
             const solve = (index) => {
                 if (index < items.length) {

@@ -180,11 +180,25 @@ export function createQtKhenThuongAll(items, done) {
                 T.notify('Tạo khen thưởng bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                if (done) {
-                    T.notify('Tạo khen thưởng thành công!', 'success');
-                    dispatch(getQtKhenThuongAllPage());
-                    done && done(data);
-                }
+                T.notify('Tạo khen thưởng thành công!', 'success');
+                dispatch(getQtKhenThuongAllPage());
+                done && done(data);
+            }
+        }, () => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtKhenThuongAllMultiple(items, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/khen-thuong-all/create-multiple';
+        T.post(url, { items }, data => {
+            if (data.error.length) {
+                T.notify('Tạo khen thưởng bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, data.error);
+            } else {
+                T.notify('Tạo khen thưởng thành công!', 'success');
+                dispatch(getQtKhenThuongAllPage());
+                done && done(data);
             }
         }, () => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
     };

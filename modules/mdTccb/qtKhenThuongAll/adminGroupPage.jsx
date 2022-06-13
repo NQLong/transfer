@@ -274,12 +274,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>
-                <div className='tile'>
+                    <div style={{ marginBottom: '10px' }}>Tìm thấy: <b>{totalItem}</b> kết quả.</div>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}

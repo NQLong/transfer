@@ -28,14 +28,26 @@ module.exports = app => {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
+
         app.model.dtNganhDaoTao.getPage(pageNumber, pageSize, {
-            statement: '(:donVi) IS NULL OR khoa = (: donVi)',
-            parameter: { donVi }
+            statement: '((:donVi) IS NULL OR khoa = (: donVi)) AND (lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText)',
+            parameter: { donVi, searchText: `%${(req.query.condition || '').toLowerCase()}%` }
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
+    });
+
+    app.get('/api/dao-tao/nganh-dao-tao/filter', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        app.model.dtNganhDaoTao.getAll(
+            {
+                statement: '(:khoa IS NULL OR khoa = :khoa) AND (lower(tenNganh) LIKE :searchText OR lower(maNganh) LIKE :searchText)',
+                parameter: {
+                    khoa: req.query.donVi,
+                    searchText: `%${req.query.condition || ''}%`
+                }
+            }, (error, items) => res.send({ error, items }));
     });
 
     app.post('/api/dao-tao/nganh-dao-tao', app.permission.check('dtNganhDaoTao:write'), (req, res) => {

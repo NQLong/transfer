@@ -1,33 +1,33 @@
 module.exports = app => {
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#FFE47A' },
+    //     },
+    // };
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#00e34c' },
-        },
-    };
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1030: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 4 },
+            9503: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#FFE47A', color: '#000000' },
         },
     };
 
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3014: { title: 'Bằng phát minh', link: '/user/tccb/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 5 },
+            3014: { title: 'Bằng phát minh', link: '/user/tccb/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#FFE47A', color: '#000000', groupIndex: 5 },
         },
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu },
         { name: 'qtBangPhatMinh:readOnly', menu: menuTCCB },
         { name: 'qtBangPhatMinh:read', menu },
         { name: 'qtBangPhatMinh:write' },
         { name: 'qtBangPhatMinh:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/bang-phat-minh', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/bang-phat-minh/group/:shcc', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bang-phat-minh/group/:shcc', app.permission.check('qtBangPhatMinh:readOnly'), app.templates.admin);
     app.get('/user/bang-phat-minh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -94,13 +94,13 @@ module.exports = app => {
         });
     });
     ///END USER ACTIONS
-    
+
     app.get('/api/khcn/qua-trinh/bang-phat-minh/page/:pageNumber/:pageSize', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null };
-        app.model.qtBangPhatMinh.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear,  searchTerm, (error, page) => {
+        app.model.qtBangPhatMinh.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -126,14 +126,45 @@ module.exports = app => {
             }
         });
     });
-    
-    app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => 
-        app.model.qtBangPhatMinh.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) =>
-        app.model.qtBangPhatMinh.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        app.model.qtBangPhatMinh.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Bằng phát minh');
+            res.send({ error, item });
+        });
+    });
 
-    app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) =>
-        app.model.qtBangPhatMinh.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.post('/api/qua-trinh/bang-phat-minh/create-multiple', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        const { listShcc, tenBang, soHieu, namCap, noiCap, tacGia, sanPham, loaiBang } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Bằng phát minh');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, tenBang, soHieu, namCap, noiCap, tacGia, sanPham, loaiBang
+            };
+            app.model.qtBangPhatMinh.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
+    app.put('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        app.model.qtBangPhatMinh.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Bằng phát minh');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => {
+        app.model.qtBangPhatMinh.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Bằng phát minh');
+            res.send({ error });
+        });
+    });
 
 };

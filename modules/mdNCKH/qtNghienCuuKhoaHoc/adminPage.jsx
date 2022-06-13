@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker, renderTable } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createQtNckhStaff,
+    createQtNckhMultiple,
     updateQtNckhStaff, deleteQtNckhStaff,
     getQtNghienCuuKhoaHocGroupPage, getQtNghienCuuKhoaHocPage
 }
@@ -58,7 +58,7 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(shcc ? shcc : '');
             this.tenDeTai.value(tenDeTai);
-            this.maSo.value(maSoCapQuanLy);
+            this.maSoCapQuanLy.value(maSoCapQuanLy);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             if (ngayNghiemThu != -1) {
                 this.nghiemThuCheck.value(0);
@@ -98,6 +98,19 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            batDau: this.batDau.getVal(),
+            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
+            batDauType: this.state.batDauType,
+            ketThucType: !this.state.denNay ? this.state.ketThucType : '',
+            tenDeTai: this.tenDeTai.value(),
+            maSoCapQuanLy: this.maSoCapQuanLy.value(),
+            kinhPhi: this.kinhPhi.value(),
+            vaiTro: this.vaiTro.value(),
+            ketQua: this.ketQua.value(),
+            ngayNghiemThu: !this.state.denNay ? this.ngayNghiemThu.getVal() : null,
+            ngayNghiemThuType: !this.state.denNay ? this.state.ngayNghiemThuType : '',
+        };
         if (listMa.length == 0) {
             T.notify('Cán bộ thực hiện đề tài, dự án trống', 'danger');
             this.maCanBo.focus();
@@ -129,36 +142,13 @@ class EditModal extends AdminModal {
             T.notify('Ngày kết thúc lớn hơn ngày nghiệm thu', 'danger');
             this.ketThuc.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    batDau: this.batDau.getVal(),
-                    ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
-                    batDauType: this.state.batDauType,
-                    ketThucType: !this.state.denNay ? this.state.ketThucType : '',
-                    tenDeTai: this.tenDeTai.value(),
-                    maSoCapQuanLy: this.maSoCapQuanLy.value(),
-                    kinhPhi: this.kinhPhi.value(),
-                    vaiTro: this.vaiTro.value(),
-                    ketQua: this.ketQua.value(),
-                    ngayNghiemThu: !this.state.denNay ? this.ngayNghiemThu.getVal() : null,
-                    ngayNghiemThuType: !this.state.denNay ? this.state.ngayNghiemThuType : '',
-                };
-                if (index == listMa.length - 1) {
-                    if (this.state.id) {
-                        this.props.update(this.state.id, changes, this.hide);
-                    } else {
-                        this.props.create(changes, this.hide);
-                    }
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes) : this.props.create(changes);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -198,8 +188,8 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
                 <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
-                <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
-                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly}/>
+                <FormTextBox className='col-md-6' ref={e => this.maSoCapQuanLy = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly} />
 
                 <div className='form-group col-md-4'>Các mốc thời gian: </div>
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Chưa kết thúc' onChange={this.handleKetThuc} className='form-group col-md-4' readOnly={readOnly} />
@@ -358,7 +348,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -405,7 +395,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         {
@@ -455,12 +445,12 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     deleteFile={this.props.deleteFile}
-                    create={this.props.createQtNckhStaff} update={this.props.updateQtNckhStaff}
+                    create={this.props.createQtNckhMultiple} update={this.props.updateQtNckhStaff}
                 />
             </>,
             backRoute: '/user/' + this.menu,
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.read ? (e) => {
                 e.preventDefault();
                 const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : {
                     maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0,
@@ -473,7 +463,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
-    createQtNckhStaff, updateQtNckhStaff, deleteQtNckhStaff,
+    createQtNckhMultiple, updateQtNckhStaff, deleteQtNckhStaff,
     getQtNghienCuuKhoaHocGroupPage, getQtNghienCuuKhoaHocPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHoc);

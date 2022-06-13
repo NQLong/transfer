@@ -342,3 +342,67 @@ export function deleteQtKeoDaiCongTacStaffUser(id, email, done) {
         }, () => T.notify('Xóa thông tin kéo dài công tác bị lỗi', 'danger'));
     };
 }
+
+export function getListInYear(year, done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/keo-dai-cong-tac/get-list-year';
+        T.get(url, { year }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách dự kiến kéo dài công tác bị lỗi', 'danger');
+                console.error('GET: ' + url + '. ' + data.error);
+            } else {
+                done && done(data.items);
+            }
+        }, () => T.notify('Lấy danh sách dự kiến kéo dài công tác bị lỗi', 'danger'));
+    };
+}
+
+export function createMultiQtKeoDaiCongTac(listData, done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/keo-dai-cong-tac/multiple';
+        T.post(url, { listData }, data => {
+            if (data.error && data.error.length) {
+                T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error('PUT: ' + url + '. ' + data.error.toString());
+            } else {
+                done && done(data.item);
+            }
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+    };
+}
+
+export function getListItem(pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    return () => {
+        const url = '/api/tccb/qua-trinh/keo-dai-cong-tac/download-excel-all';
+        T.get(url, { condition: pageCondition, filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách kéo dài công tác bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.items);
+            }
+        }, (error) => T.notify('Lấy danh sách kéo dài công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+    };
+}
+
+export function updateMultipleQuyetDinh(items, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/keo-dai-cong-tac/update-quyet-dinh';
+        T.put(url, { items }, res => {
+            if (res.error.length > 0) {
+                T.notify('Cập nhật quyết định kéo dài công tác bị lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + res.error);
+            } else {
+                if (done) {
+                    T.notify('Cập nhật quyết định kéo dài công tác thành công!', 'info');
+                    dispatch(getQtKeoDaiCongTacPage());
+                    done && done(items);
+                }
+            }
+        }, () => T.notify('Cập nhật quyết định kéo dài công tác bị lỗi', 'danger'));
+    };
+}

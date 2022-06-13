@@ -1,13 +1,14 @@
 import { Tooltip } from '@mui/material';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
-import Pagination from 'view/component/Pagination';
+import { AdminModal, FormDatePicker, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { getPageDtThoiGianMoMon, createDtThoiGianMoMon, deleteDtThoiGianMoMon, updateDtThoiGianMoMon } from './redux';
 
 export class TaoThoiGianMoMon extends AdminModal {
     batDau = [];
     ketThuc = [];
+    nam = {};
     state = { edit: {} }
     renderData = (list, pageSize, pageNumber, permission) => renderTable({
         getDataSource: () => list,
@@ -16,7 +17,7 @@ export class TaoThoiGianMoMon extends AdminModal {
 
         renderHead: () => (<tr>
             <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>#</th>
-            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm</th>
+            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm học</th>
             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Học kỳ</th>
             <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mở ngày</th>
             <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Đóng ngày</th>
@@ -27,8 +28,10 @@ export class TaoThoiGianMoMon extends AdminModal {
         renderRow: (item, index) => (
             <tr key={index}>
                 <TableCell style={{ textAlign: 'right', whiteSpace: 'nowrap' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nam} />
-                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={'Học kỳ ' + item.hocKy} />
+                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={
+                    <FormSelect style={{ marginBottom: '0' }} ref={e => this.nam[index] = e} data={SelectAdapter_DtCauTrucKhungDaoTao} readOnly />
+                } />
+                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.hocKy} />
                 <TableCell style={{ textAlign: 'center' }} content={
                     <FormDatePicker style={{ marginBottom: '0' }} ref={e => this.batDau[index] = e} type='date-mask' readOnly={!item.edit} />
                 } />
@@ -109,6 +112,7 @@ export class TaoThoiGianMoMon extends AdminModal {
             const list = (page.list || []).map(item => ({ ...item, edit: false }));
             this.setState({ list, pageNumber: page.pageNumber, pageSize: page.pageSize, pageTotal: page.pageTotal, totalItem: page.totalItem }, () => {
                 list.forEach((item, index) => {
+                    this.nam[index] && this.nam[index].value(item.nam);
                     this.batDau[index] && this.batDau[index].value(item.batDau);
                     this.ketThuc[index] && this.ketThuc[index].value(item.ketThuc);
                 });
@@ -160,16 +164,16 @@ export class TaoThoiGianMoMon extends AdminModal {
         });
     }
     render = () => {
-        let { list = [], pageNumber = 1, pageSize = 25, pageTotal = 1, totalItem = 1 } = this.state;
+        let { list = [], pageNumber = 1, pageSize = 25 } = this.state;
         let permission = this.props.permission || { write: false, delete: false }, readOnly = !permission.write;
         return this.renderModal({
             title: 'Mở thời gian đăng ký môn mới',
             size: 'elarge',
             body: <div className='row'>
-                <FormTextBox type='year' ref={e => this.year = e} label='Năm' className='col-md-3' readOnly={readOnly} />
-                <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-2' data={[1, 2, 3]} readOnly={readOnly} />
-                <FormDatePicker type='date-mask' ref={e => this.batDauMoMon = e} label='Ngày mở' className='col-md-3' readOnly={readOnly} />
-                <FormDatePicker type='date-mask' ref={e => this.ketThucMoMon = e} label='Ngày đóng' className='col-md-3' readOnly={readOnly} />
+                <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.year = e} label='Năm học' className='col-md-6' readOnly={readOnly} />
+                <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-6' data={[1, 2, 3]} readOnly={readOnly} />
+                <FormDatePicker type='date-mask' ref={e => this.batDauMoMon = e} label='Ngày mở' className='col-md-6' readOnly={readOnly} />
+                <FormDatePicker type='date-mask' ref={e => this.ketThucMoMon = e} label='Ngày đóng' className='col-md-5' readOnly={readOnly} />
                 {permission.write && <div className='form-group col-md-1 d-flex align-items-end justify-content-end' style={{ paddingLeft: 0 }}>
                     <Tooltip title='Tạo thời gian đăng ký mới' arrow ><button className='btn btn-success' type='button' onClick={e => e.preventDefault() || this.create()}>
                         <i className='fa fa-lg fa-plus' />
@@ -177,8 +181,6 @@ export class TaoThoiGianMoMon extends AdminModal {
                     </Tooltip>
                 </div>}
                 <div className='form-group col-md-12' style={{ marginTop: '20px' }}>
-                    <div> <Pagination style={{ position: 'initial', marginBottom: '20px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
-                        getPage={this.props.getPageDtThoiGianMoMon} /></div>
                     {this.renderData(list, pageSize, pageNumber, permission)}
                 </div>
             </div>

@@ -44,7 +44,7 @@ T.initPage('pageDmSvBacDaoTao');
 export function getDmSvBacDaoTaoPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmSvBacDaoTao', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/danh-muc/dao-tao/bac-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/danh-muc/bac-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, {
             condition: pageCondition
         }, data => {
@@ -61,7 +61,7 @@ export function getDmSvBacDaoTaoPage(pageNumber, pageSize, pageCondition, done) 
 
 export function getDmSvBacDaoTao(ma, done) {
     return () => {
-        const url = `/api/danh-muc/dao-tao/bac-dao-tao/item/${ma}`;
+        const url = `/api/danh-muc/bac-dao-tao/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin bậc đào tạo bị lỗi!', 'danger');
@@ -75,7 +75,7 @@ export function getDmSvBacDaoTao(ma, done) {
 
 export function createDmSvBacDaoTao(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/dao-tao/bac-dao-tao';
+        const url = '/api/danh-muc/bac-dao-tao';
         T.post(url, { data: item }, data => {
             if (data.error) {
                 T.notify(data.error.message || 'Tạo bậc đào tạo bị lỗi', 'danger');
@@ -92,7 +92,7 @@ export function createDmSvBacDaoTao(item, done) {
 
 export function deleteDmSvBacDaoTao(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/dao-tao/bac-dao-tao';
+        const url = '/api/danh-muc/bac-dao-tao';
         T.delete(url, { maBac: ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục bậc đào tạo bị lỗi!', 'danger');
@@ -107,7 +107,7 @@ export function deleteDmSvBacDaoTao(ma) {
 
 export function updateDmSvBacDaoTao(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/dao-tao/bac-dao-tao';
+        const url = '/api/danh-muc/bac-dao-tao';
         T.put(url, { maBac: ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify(data.error.message || 'Cập nhật thông tin bậc đào tạo bị lỗi', 'danger');
@@ -128,7 +128,7 @@ export function changeDmSvBacDaoTao(item) {
 
 export const SelectAdapter_DmSvBacDaoTao = {
     ajax: true,
-    url: '/api/danh-muc/dao-tao/bac-dao-tao/page/1/20',
+    url: '/api/danh-muc/bac-dao-tao/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maBac, text: item.tenBac })) : [] }),
     fetchOne: (maBac, done) => (getDmSvBacDaoTao(maBac, item => done && done({ id: item.maBac, text: item.tenBac })))()

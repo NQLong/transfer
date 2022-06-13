@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox, AdminPage } from 'view/component/AdminPage';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
@@ -13,10 +13,12 @@ import ComponentToChucKhac from '../tccbToChucKhac/componentToChucKhac';
 import { getStaffEdit } from './redux';
 import { SelectAdapter_DmHangThuongBinh } from 'modules/mdDanhMuc/dmHangThuongBinh/redux';
 
-class ComponentCaNhan extends React.Component {
-    state = { image: '' };
-    shcc = ''; email = '';
-
+class ComponentCaNhan extends AdminPage {
+    state = { image: '', dangVien: 0, doanVien: 0, congDoan: 0 };
+    // shcc = ''; email = '';
+    componentDidMount() {
+        this.props.shcc && this.props.getStaffEdit(this.props.shcc, item => this.value(item.item));
+    }
     handleHo = (e) => {
         this.ho.value(e.target.value.toUpperCase());
     }
@@ -25,10 +27,9 @@ class ComponentCaNhan extends React.Component {
         this.ten.value(e.target.value.toUpperCase());
     }
 
-    value = function (item) {
-        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan }, () => {
+    value = (item) => {
+        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan, emailTruong: item.email }, () => {
             this.shcc = item.shcc;
-            this.email = item.email;
             this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
             this.donVi.value(item.maDonVi);
             this.maTheCanBo.value(item.shcc);
@@ -81,13 +82,13 @@ class ComponentCaNhan extends React.Component {
             this.giaDinhChinhSach.value(item.giaDinhChinhSach ? item.giaDinhChinhSach : '');
             this.danhHieuPhongTangCaoNhat.value(item.danhHieu ? item.danhHieu : '');
 
-            this.componentToChucKhac.value(item.shcc, item.email);
         });
 
     }
 
     imageChanged = (data) => {
         if (data && data.image) {
+            T.notify('Cập nhật ảnh đại diện thành công!', 'success');
             const user = Object.assign({}, this.props.system.user, { image: data.image });
             this.props.readOnly && this.props.updateSystemState({ user });
         }
@@ -107,14 +108,28 @@ class ComponentCaNhan extends React.Component {
         return '';
     };
 
-    handleNewShcc = (value) => {
-        let curShcc = value.currentTarget.value;
+    handleNewShcc = () => {
+        let curShcc = this.maTheCanBo.value();
         if (curShcc && curShcc != '' && curShcc.length == 8 && curShcc != this.shcc) {
             this.props.getStaffEdit(curShcc, data => {
                 if (data.item && !data.error) {
                     T.confirm('Cảnh báo', `Mã số <b>${data.item.shcc}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
                         }. <br/><br/> Vui lòng nhập mã số khác!`, 'warning', true, isConfirm => {
                             isConfirm && this.shcc.value('');
+                        });
+                }
+            });
+        }
+    }
+
+    handleEmailHCMUSSH = () => {
+        let curEmail = this.emailTruong.value();
+        if (curEmail && curEmail != '' && T.validateEmail(curEmail) && curEmail != this.state.emailTruong) {
+            this.props.getStaffEdit({ email: curEmail }, data => {
+                if (data.item && !data.error) {
+                    T.confirm('Cảnh báo', `Email <b>${data.item.email}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
+                        }. <br/><br/> Vui lòng nhập email khác!`, 'warning', true, isConfirm => {
+                            isConfirm && this.emailTruong.value('');
                         });
                 }
             });
@@ -140,6 +155,7 @@ class ComponentCaNhan extends React.Component {
                     ten: this.getValue(this.ten),
                     biDanh: this.getValue(this.biDanh),
                     phai: this.getValue(this.phai),
+                    maDonVi: this.getValue(this.donVi),
                     ngaySinh: this.getValue(this.ngaySinh) ? this.getValue(this.ngaySinh).getTime() : '',
                     maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan,
                     maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh,
@@ -150,7 +166,7 @@ class ComponentCaNhan extends React.Component {
                     cmndNoiCap: this.getValue(this.cmndNoiCap),
                     dienThoaiCaNhan: this.getValue(this.soDienThoaiCaNhan),
                     dienThoaiBaoTin: this.getValue(this.soDienThoaiBaoTin),
-                    emailTruong,
+                    email: emailTruong,
                     emailCaNhan: this.getValue(this.emailCaNhan),
                     quocGia: this.getValue(this.quocTich),
                     danToc: this.getValue(this.danToc),
@@ -195,46 +211,46 @@ class ComponentCaNhan extends React.Component {
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
-                <div className='tile-body row' style={{ marginTop: '-30px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <FormImageBox ref={e => this.imageBox = e} style={{ display: 'block' }} description='Nhấp hoặc kéo thả để thay đổi ảnh cá nhân'
+                <div className='tile-body row'>
+                    <div style={{ display: 'flex', flex: 'wrap', alignItems: 'center' }}>
+                        <FormImageBox ref={e => this.imageBox = e} description='Nhấp hoặc kéo thả để thay đổi ảnh cá nhân'
                             postUrl='/user/upload' uploadType='CanBoImage' onSuccess={this.imageChanged} className='col-md-3 rounded-circle' isProfile={true} />
-
-                        <div style={{ marginLeft: '10px' }} className='col-md-9'>
-                            <br />
+                        <div className='col-md-9'>
                             <div className='row'>
                                 <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' style={{ textTransform: 'uppercase', display: readOnly ? 'none' : 'block' }} className='col-md-4' onChange={this.handleHo} required maxLength={100} readOnly={readOnly} />
                                 <FormTextBox ref={e => this.ten = e} label='Tên' style={{ textTransform: 'uppercase', display: readOnly ? 'none' : 'block' }} className='col-md-4' onChange={this.handleTen} required maxLength={100} readOnly={readOnly} />
                                 <FormTextBox ref={e => this.hoTen = e} label='Họ và tên' style={{ display: readOnly ? 'block' : 'none' }} className='col-md-8' readOnly />
                                 <FormTextBox ref={e => this.biDanh = e} label='Bí danh' className='col-md-4' maxLength={30} readOnly={readOnly} />
 
-                                <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-sm-8' readOnly={readOnly} required data={SelectAdapter_DmDonVi} />
-                                <FormTextBox ref={e => this.maTheCanBo = e} label='Mã thẻ' className='form-group col-sm-4' readOnly={readOnly} required maxLength={10} onChange={this.handleNewShcc} />
+                                <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-md-8' readOnly={readOnly} required data={SelectAdapter_DmDonVi} />
+                                <FormTextBox ref={e => this.maTheCanBo = e} label='Mã thẻ' className='form-group col-md-4' readOnly={readOnly} required maxLength={10} onChange={this.handleNewShcc} />
 
-                                <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-sm-8' label='Ngày sinh' required readOnly={readOnly} />
-                                <FormSelect ref={e => this.phai = e} label='Giới tính' className='col-sm-4' required data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} />
-                                <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-sm-12' readOnly={readOnly} />
-                                <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-sm-12' readOnly={readOnly} />
+                                <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-md-8' label='Ngày sinh' required readOnly={readOnly} />
+                                <FormSelect ref={e => this.phai = e} label='Giới tính' className='col-md-4' required data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} />
+
                             </div>
                         </div>
                     </div>
+                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' readOnly={readOnly} />
+                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' readOnly={readOnly} />
                     <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-12' requiredSoNhaDuong={true} />
                     <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-12' requiredSoNhaDuong={true} />
 
-                    <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='form-group col-md-4' />
-                    <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp CMND/CCCD' className='form-group col-md-4' />
-                    <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' className='form-group col-md-4' />
+                    <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD/Số định danh' className='form-group col-md-4' />
+                    <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp' className='form-group col-md-4' />
+                    <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp' className='form-group col-md-4' />
                     <div className='form-group col-12' />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-12' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân (khác email trường)' className='form-group col-md-4' />
-                    <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='SĐT cá nhân' className='col-md-4' maxLength={10} />
-                    <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label={<span>SĐT báo tin (<a href='#' onClick={e => e.preventDefault() || this.soDienThoaiBaoTin.value(this.soDienThoaiCaNhan.value())}>Nhấn vào đây nếu giống <b>SĐT cá nhân</b></a>)</span>} placeholder='SĐT báo tin' className='col-md-4' maxLength={10} />
+                    <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân (khác email trường)' className='form-group col-md-6' />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={readOnly} onChange={this.handleEmailHCMUSSH} />
+                    <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='SĐT cá nhân' className='col-md-6' maxLength={10} />
+                    <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label={<span>SĐT báo tin (<a href='#' onClick={e => e.preventDefault() || (this.soDienThoaiCaNhan.value() ? this.soDienThoaiBaoTin.value(this.soDienThoaiCaNhan.value()) : T.notify('Điện thoại cá nhân trống', 'warning'))}>Nhấn vào đây nếu giống <b>SĐT cá nhân</b></a>)</span>} placeholder='SĐT báo tin' className='col-md-6' maxLength={10} />
 
                     <div className='form-group col-md-12'></div>
 
                     <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} readOnly={readOnly} />
                     <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-4' data={SelectAdapter_DmDanTocV2} readOnly={readOnly} />
                     <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-4' data={SelectAdapter_DmTonGiaoV2} readOnly={readOnly} />
+
                     <FormTextBox type='number' step={1} ref={e => this.chieuCao = e} label='Chiều cao (cm)' className='form-group col-md-3' suffix=' cm' />
                     <FormTextBox type='number' step={0.1} ref={e => this.canNang = e} label='Cân nặng (kg)' className='form-group col-md-3' suffix=' kg' />
                     <FormSelect ref={e => this.nhomMau = e} label='Nhóm máu' className='form-group col-md-3' data={SelectAdapter_DmNhomMauV2} />
@@ -242,8 +258,6 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox ref={e => this.tinhTrangSucKhoe = e} label='Tình trạng sức khỏe' className='form-group col-md-3' />
                     <FormRichTextBox ref={e => this.soTruong = e} label='Sở trường' className='form-group col-md-6' />
                     <FormRichTextBox ref={e => this.tuNhanXet = e} label='Tự nhận xét' className='form-group col-md-6' />
-
-                    <div className='form-group col-md-12'></div>
 
                     <FormCheckbox ref={e => this.doanVien = e} label='Đoàn viên' onChange={value => this.setState({ doanVien: value })} className='col-sm-12' />
                     {this.state.doanVien ? <FormDatePicker ref={e => this.ngayVaoDoan = e} type='date-mask' label='Ngày vào Đoàn' className='col-sm-4' /> : null}
@@ -261,7 +275,7 @@ class ComponentCaNhan extends React.Component {
                     {this.state.congDoan ? <FormTextBox ref={e => this.noiVaoCongDoan = e} label='Nơi vào Công đoàn' className='form-group col-md-8' /> : null}
 
                     {!create && <div className='form-group col-md-12'>
-                        <ComponentToChucKhac ref={e => this.componentToChucKhac = e} label='Tổ chức chính trị - xã hội, nghề nghiệp khác' userEdit={this.props.readOnly} />
+                        <ComponentToChucKhac label='Tổ chức chính trị - xã hội, nghề nghiệp khác' shcc={this.props.shcc} />
                     </div>}
 
                     <div className='form-group col-md-12' />
@@ -274,7 +288,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox className='form-group col-md-6' ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' />
                     <FormTextBox className='form-group col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />
                 </div>
-            </div>
+            </div >
         );
     }
 }

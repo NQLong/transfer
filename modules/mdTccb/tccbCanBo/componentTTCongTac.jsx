@@ -9,20 +9,13 @@ import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import ComponentChucVu from '../qtChucVu/componentChucVu';
 import { getStaffEdit } from './redux';
-// const EnumDateType = Object.freeze({
-//     0: { text: '' },
-//     1: { text: 'dd/mm/yyyy' },
-//     2: { text: 'mm/yyyy' },
-//     3: { text: 'yyyy' },
-// }),
+
 const typeMapper = {
     'yyyy': 'year',
     'mm/yyyy': 'month-mask',
     'dd/mm/yyyy': 'date-mask'
 };
 class ComponentTTCongTac extends AdminPage {
-    state = {};
-    shcc = '';
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
@@ -30,7 +23,6 @@ class ComponentTTCongTac extends AdminPage {
             doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
             dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi || item.dataNghiViec
         }, () => {
-            this.shcc = item.shcc;
             this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
             this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
             this.ngayBienChe.value(item.ngayBienChe && item.ngayBienChe != 1 ? item.ngayBienChe : '');
@@ -38,9 +30,6 @@ class ComponentTTCongTac extends AdminPage {
             this.ngach.value(item.ngach ? item.ngach : '');
             this.dienHopDong.value(item.hopDongCanBo ? item.hopDongCanBo : '');
             this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo : '');
-
-            this.componentChucVuChinhQuyen.value(1, this.shcc);
-            this.componentChucVuDoanThe.value(0, this.shcc);
 
             this.bacLuong.value(item.bacLuong ? item.bacLuong : '');
             this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
@@ -70,7 +59,6 @@ class ComponentTTCongTac extends AdminPage {
                     this.mucDich.value(mucDich);
                     this.quocGia.value(quocGia ? quocGia.split(',') : '');
                 });
-
             }
 
             if (this.state.daNghi) {
@@ -129,7 +117,7 @@ class ComponentTTCongTac extends AdminPage {
     }
 
     render() {
-        const { create = false, readOnly = true } = this.props;
+        const { create = false, readOnly = true, shcc } = this.props;
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin công tác</h3>
@@ -139,24 +127,25 @@ class ComponentTTCongTac extends AdminPage {
                     <FormDatePicker type='date-mask' className='col-6' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={readOnly} />
                     <FormTextBox className='col-12' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={readOnly} />
                     <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-12' ref={e => this.ngach = e} label='Chức danh nghề nghiệp' readOnly={readOnly} />
-                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={readOnly} />
-                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-8' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={readOnly} />
+                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly />
+                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-8' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly />
                     <div className='col-md-12 form-group' style={{ display: create ? 'none' : 'block' }}>
-                        <ComponentChucVu ref={e => this.componentChucVuChinhQuyen = e} label='Chức vụ chính quyền:' userEdit={this.props.userEdit} />
-                        <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể:' userEdit={this.props.userEdit} />
+                        <ComponentChucVu label='Chức vụ chính quyền:' shcc={shcc} type='CQ' />
+                        <ComponentChucVu label='Chức vụ đoàn thể:' shcc={shcc} type='DT' />
                     </div>
 
-                    <FormTextBox ref={e => this.bacLuong = e} className='col-md-2' label='Bậc lương' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.heSo = e} className='col-md-2' label='Hệ số' readOnly={readOnly} />
-                    <FormDatePicker type='date-mask' ref={e => this.ngayHuong = e} className='col-md-4' label='Ngày hưởng' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.tiLePhuCapThamNien = e} className='col-md-2' label='Phụ cấp thâm niên' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.tiLePhuCapUuDai = e} className='col-md-2' label='Phụ cấp ưu đãi' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.heSo = e} className='col-md-3' label='Hệ số' readOnly={readOnly} />
+                    <FormDatePicker type='date-mask' ref={e => this.ngayHuong = e} className='col-md-6' label='Ngày hưởng' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.tiLePhuCapThamNien = e} className='col-md-6' label='Phụ cấp thâm niên' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.tiLePhuCapUuDai = e} className='col-md-6' label='Phụ cấp ưu đãi' readOnly={readOnly} />
 
                     <FormTextBox ref={e => this.soBhxh = e} className='col-md-6' label='Mã số Bảo hiểm xã hội' readOnly={readOnly} />
                     <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-3' label='Tháng bắt đầu' type='month-mask' readOnly={readOnly} />
                     <FormDatePicker ref={e => this.ngayKetThucBhxh = e} className='col-md-3' label='Tháng kết thúc' type='month-mask' readOnly={readOnly} />
                     <FormTextBox ref={e => this.soBhyt = e} className='col-md-6' label='Mã thẻ Bảo hiểm y tế' />
                     <FormSelect ref={e => this.noiKhamBenhBanDau = e} className='col-md-6' label='Nơi khám chữa bệnh ban đầu' data={SelectAdapter_DmBenhVienV2} />
+
                     <div className='form-group col-md-12'></div>
 
                     <FormCheckbox ref={e => this.doiTuongBoiDuong = e} label='Đối tượng bồi dưỡng kiến thức Quốc phòng và An ninh' onChange={value => this.setState({ doiTuongBoiDuong: value })} className='col-md-12' />
@@ -165,8 +154,6 @@ class ComponentTTCongTac extends AdminPage {
                     {this.state.tinhTrangBoiDuong ? <FormTextBox type='year' ref={e => this.namBoiDuong = e} label='Năm bồi dưỡng' className='col-md-2' required={this.state.tinhTrangBoiDuong} /> : null}
                     {this.state.tinhTrangBoiDuong ? <FormTextBox ref={e => this.khoaBoiDuong = e} label='Khóa bồi dưỡng' placeholder='Ghi rõ khóa mấy, dành cho đối tượng nào' className='col-md-4' required={this.state.tinhTrangBoiDuong} /> : null}
 
-                    <div className='form-group col-md-12'></div>
-                    <div className='form-group col-md-12'></div>
                     {!create && <>
                         <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-12' readOnly />
                         {this.state.dangONuocNgoai ?

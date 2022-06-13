@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getRolePage, createRole, updateRole, deleteRole } from './redux';
+import { getRolePage, createRole, updateRole, deleteRole, UpdateSessionRole } from './redux';
 import Pagination from 'view/component/Pagination';
-
 class RoleModal extends React.Component {
     state = { isAdmin: false };
     modal = React.createRef();
@@ -130,6 +129,12 @@ class RolePage extends React.Component {
         this.roleModal.current.show(item, isAdmin);
     }
 
+    refreshSessionRole = (e, id) => {
+        e.preventDefault();
+        T.confirm('Cập nhật session', 'Bạn có chắc bạn muốn cập nhật session của vai trò này?', true, isConfirm =>
+            isConfirm && this.props.UpdateSessionRole(id));
+    };
+
     changeRoleActive = (item) => {
         this.props.updateRole(item.id, { active: item.active ? 0 : 1 }, () => this.props.getRolePage());
     }
@@ -194,6 +199,10 @@ class RolePage extends React.Component {
                                     <td>
                                         <div className='btn-group'>
                                             {permissionWrite ?
+                                                <a className='btn btn-warning' href='#' onClick={e => this.refreshSessionRole(e, item.id)}>
+                                                    <i className='fa fa-lg fa-refresh' />
+                                                </a> : ''}
+                                            {permissionWrite ?
                                                 <a className='btn btn-primary' href='#' onClick={e => this.editRole(e, item)}>
                                                     <i className='fa fa-lg fa-edit' />
                                                 </a> : ''}
@@ -230,5 +239,5 @@ class RolePage extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system, role: state.role });
-const mapActionsToProps = { getRolePage, createRole, updateRole, deleteRole };
+const mapActionsToProps = { getRolePage, createRole, updateRole, deleteRole, UpdateSessionRole };
 export default connect(mapStateToProps, mapActionsToProps)(RolePage);

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3007: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-briefcase', backgroundColor: '#1a76b8', groupIndex: 2 },
+            3007: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-briefcase', backgroundColor: '#9B693B', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -97,11 +97,11 @@ module.exports = app => {
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/get-dai-dien/:shcc', checkGetStaffPermission, (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => {
-            if (error) res.send({ error });
-            else {
-                app.model.qtChucVu.get({ shcc: item.shcc, chucVuChinh: 1 }, (e, result) => {
-                    if (e) res.send({ error: e });
-                    else res.send({ item: app.clone(item, { chucVu: result.maChucVu }) });
+            if (error) {
+                res.send({ error });
+            } else {
+                app.model.qtChucVu.get({ shcc: item.shcc, chucVuChinh: 1 }, (error, result) => {
+                    res.send({ error, item: app.clone(item, { chucVu: result.maChucVu }) });
                 });
             }
         });
@@ -110,17 +110,25 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/newest/:shcc', app.permission.check('staff:login'), (req, res) => {
         app.model.qtHopDongLaoDong.get({ nguoiDuocThue: req.params.shcc }, 'ngayKyHopDong', 'NGAY_KY_HOP_DONG DESC', (error, result) => res.send({ error, result }));
     });
-    
+
     app.post('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.create(req.body.item, (error, item) => res.send({ error, item }));
+        app.model.qtHopDongLaoDong.create(req.body.item, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hợp đồng lao động');
+            res.send({ error, item });
+        });
     });
 
     app.put('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.update({ ma: req.body.ma }, req.body.changes, (error, items) => res.send({ error, items }));
+        app.model.qtHopDongLaoDong.update({ ma: req.body.ma }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hợp đồng lao động');
+            res.send({ error, item });
+        });
     });
-
     app.delete('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:delete'), (req, res) => {
-        app.model.qtHopDongLaoDong.delete({ ma: req.body.ma }, errors => res.send({ errors }));
+        app.model.qtHopDongLaoDong.delete({ ma: req.body.ma }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hợp đồng lao động');
+            res.send({ error });
+        });
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/:ma', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
@@ -128,21 +136,24 @@ module.exports = app => {
             app.model.qtHopDongLaoDong.download(req.params.ma, (error, item) => {
                 if (error || !item) {
                     res.send({ error });
-                }
-                else {
+                } else {
                     const source = app.path.join(__dirname, 'resource', 'hdld_word.docx');
-
+                    const canCuUyQuyen = 'Căn cứ Giấy ủy quyền số 297/GUQ-XHNV-TCCB ngày 05 tháng 4 năm 2022 của Hiệu trưởng Trường Đại học Khoa học Xã hội và Nhân văn, ĐHQG-HCM về việc giao kết hợp đồng làm việc và hợp đồng lao động đối với viên chức và người lao động có trình độ từ thạc sĩ trở xuống (gọi tắt là Giấy Ủy quyền số 297/GUQ-XHNV-TCCB).';
+                    const daiDienUyQuyen = 'Đại diện cho Trường Đại học Khoa học Xã hội và Nhân văn, Đại học Quốc gia Thành phố Hồ Chí Minh theo Giấy ủy quyền số 297/GUQ-XHNV-TCCB.';
                     new Promise(resolve => {
                         let hopDong = item.rows[0];
                         const data = {
+                            canCuUyQuyen: hopDong.maChucVuNguoiKy == '003' ? canCuUyQuyen : '',
+                            daiDienUyQuyen: hopDong.maChucVuNguoiKy == '003' ? daiDienUyQuyen : '',
                             soHopDong: hopDong.soHopDong,
                             daiDienKy: (hopDong.hoNguoiKy + ' ' + hopDong.tenNguoiKy).normalizedName(),
-                            chucVuDaiDienKy: hopDong.chucVuNguoiKy === '003' ? (hopDong.chucVuNguoiKy.normalizedName() + ' ' + hopDong.donViNguoiKy.normalizedName()) : hopDong.chucVuNguoiKy.normalizedName(),
+                            chucVuDaiDienKy: hopDong.maChucVuNguoiKy === '003' ? (hopDong.chucVuNguoiKy.normalizedName() + ' ' + hopDong.donViNguoiKy.normalizedName()) : hopDong.chucVuNguoiKy.normalizedName(),
                             phaiNK: hopDong.phaiNK,
-                            quocTichKy: hopDong.quocTichKy ? hopDong.quocTichKy : 'Việt Nam',
+                            quocTichKy: hopDong.quocTichKy ? hopDong.quocTichKy.normalizedName() : 'Việt Nam',
                             hoTenCanBo: (hopDong.ho + ' ' + hopDong.ten).normalizedName(),
                             phai: hopDong.phai,
-                            quocTichCanBo: hopDong.quocTich ? hopDong.quocTich : '',
+                            gioiTinh: hopDong.phai == 'Ông' ? 'Nam' : 'Nữ',
+                            quocTichCanBo: hopDong.quocTich ? hopDong.quocTich.normalizedName() : '',
                             tonGiao: hopDong.tonGiao ? hopDong.tonGiao : '',
                             danToc: hopDong.danToc ? hopDong.danToc : '',
                             ngaySinh: hopDong.ngaySinh ? app.date.viDateFormat(new Date(hopDong.ngaySinh)) : '',
@@ -166,29 +177,28 @@ module.exports = app => {
                             cmndNoiCap: hopDong.cmndNoiCap ? hopDong.cmndNoiCap : '',
 
                             loaiHopDong: hopDong.loaiHopDong ? hopDong.loaiHopDong : '',
-                            batDauLamViec: hopDong.batDauLamViec ? app.date.viDateFormat(new Date(hopDong.batDauLamViec)) : '',
+                            batDauHopDong: hopDong.batDauHopDong ? app.date.viDateFormat(new Date(hopDong.batDauHopDong)) : '',
                             ketThucHopDong: hopDong.ketThucHopDong ? app.date.viDateFormat(new Date(hopDong.ketThucHopDong)) : '',
                             diaDiemLamViec: hopDong.diaDiemLamViec ? hopDong.diaDiemLamViec.normalizedName() : '',
-                            ngach: hopDong.tenNgach ? hopDong.tenNgach : '',
+                            chucDanhChuyenMon: hopDong.chucDanhChuyenMon,
                             chiuSuPhanCong: hopDong.chiuSuPhanCong ? (hopDong.chiuSuPhanCong.length < 15 ? 'Theo sự phân công của Trưởng đơn vị: ' + hopDong.diaDiemLamViec.normalizedName() : hopDong.chiuSuPhanCong) : '',
                             chiuTrachNhiem: 'Trưởng đơn vị: ' + hopDong.diaDiemLamViec.normalizedName(),
                             bac: hopDong.bac ? hopDong.bac : '',
                             heSo: hopDong.heSo ? hopDong.heSo : '',
                             ngayKyHopDong: hopDong.ngayKyHopDong ? app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)) : '',
+                            ngayKyDate: (new Date(hopDong.ngayKyHopDong)).getDate(),
+                            ngayKyMonth: (new Date(hopDong.ngayKyHopDong)).getMonth() + 1,
+                            ngayKyYear: (new Date(hopDong.ngayKyHopDong)).getFullYear(),
                             phanTramHuong: hopDong.phanTramHuong ? hopDong.phanTramHuong : '',
                             hieuTruong: hopDong.maChucVuNguoiKy === '003' ? 'TL. HIỆU TRƯỞNG' : 'HIỆU TRƯỞNG',
                             truongPhongTCCB: hopDong.maChucVuNguoiKy === '003' ? 'TRƯỞNG PHÒNG TC-CB' : '',
-                            isThuViec: hopDong.loaiHopDong.includes('thử việc') ? '(Thử việc)' : ''
+                            isThuViec: hopDong.loaiHopDong.includes('thử việc') ? '(Thử việc)' : '',
+                            kiTenUyQuyen: hopDong.maChucVuNguoiKy == '003' ? 'TUQ. HIỆU TRƯỞNG' : '',
+                            kiTenChucVu: hopDong.maChucVuNguoiKy == '003' ? 'TRƯỞNG PHÒNG TC-CB' : 'HIỆU TRƯỞNG',
                         };
                         resolve(data);
                     }).then((data) => {
-                        app.docx.generateFile(source, data, (error, data) => {
-                            if (error)
-                                res.send({ error });
-                            else {
-                                res.send({ data });
-                            }
-                        });
+                        app.docx.generateFile(source, data, (error, data) => res.send({ error, data }));
                     });
                 }
             });
@@ -293,23 +303,16 @@ module.exports = app => {
                 }).catch((error) => {
                     res.send({ error });
                 });
-
-
             }
         });
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/get-truong-phong-tccb', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
         app.model.dmChucVu.get({ ten: 'Trưởng phòng' }, (error, result) => {
-            if (error) res.send({ error });
-            else {
-                app.model.qtChucVu.get({ maChucVu: result.ma, maDonVi: 30, chucVuChinh: 1 }, (er, truongPhongTCCB) => {
-                    if (er) res.send({ error: er });
-                    else {
-                        
-                        res.send({ truongPhongTCCB });
-                    }
-                });
+            if (error) {
+                res.send({ error });
+            } else {
+                app.model.qtChucVu.get({ maChucVu: result.ma, maDonVi: 30, chucVuChinh: 1 }, (error, truongPhongTCCB) => res.send({ error, truongPhongTCCB }));
             }
         });
     });
@@ -328,13 +331,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
-        app.model.qtHopDongLaoDong.getMaxShccByDonVi(req.params.maDonVi, (error, item) => {
-            if (error) {
-                res.send({ error });
-            } else {
-                res.send({ preShcc: item && item.outBinds && item.outBinds.ret ? item.outBinds.ret + 1 : 1 });
-            }
-        });
+    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), async (req, res) => {
+        let result = await app.model.qtHopDongLaoDong.getShccAuto(req.params.maDonVi);
+        res.send(result);
     });
 };

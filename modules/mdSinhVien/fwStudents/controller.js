@@ -25,8 +25,8 @@ module.exports = app => {
 
     //API----------------------------------------------------------------------------------------------------------------
     app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), (req, res) => {
-        let studentId = req.session.user.studentId ? req.session.user.studentId.trim() : '';
-        app.model.fwStudents.get({ mssv: studentId }, (error, sinhVien) => {
+        let mssv = req.session.user.data?.mssv.trim() || '';
+        app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             if (error || !sinhVien) {
                 res.send({ error: 'Không tìm thấy thông tin sinh viên!' });
             } else {
@@ -68,7 +68,7 @@ module.exports = app => {
     });
 
     app.delete('/api/students/:mssv', app.permission.check('student:delete'), (req, res) => {
-        app.model.sinhVien.delete({ mssv: req.params.mssv }, (error) => res.send({ error }));
+        app.model.fwStudents.delete({ mssv: req.params.mssv }, (error) => res.send({ error }));
     });
 
     app.put('/api/user/student', app.permission.check('student:login'), (req, res) => {

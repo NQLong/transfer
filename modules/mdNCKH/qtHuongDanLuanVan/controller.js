@@ -1,34 +1,34 @@
 module.exports = app => {
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9054: { title: 'Quá trình hướng dẫn đề tài', link: '/user/khcn/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37' },
+    //     },
+    // };
+
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9054: { title: 'Quá trình hướng dẫn luận văn', link: '/user/khcn/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37' },
-        },
-    };
-
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1003: { title: 'Hướng dẫn luận văn', link: '/user/huong-dan-luan-van', icon: 'fa-university', backgroundColor: '#decf45', groupIndex: 4 },
+            9054: { title: 'Hướng dẫn đề tài', link: '/user/huong-dan-luan-van', icon: 'fa-university', backgroundColor: '#E19443' },
         },
     };
 
     const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 5 },
+            3018: { title: 'Quá trình hướng dẫn đề tài', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#E19443', groupIndex: 5 },
         },
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu },
         { name: 'qtHuongDanLuanVan:read', menu },
         { name: 'qtHuongDanLuanVan:readOnly', menu: menuTCCB },
         { name: 'qtHuongDanLuanVan:write' },
         { name: 'qtHuongDanLuanVan:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/hdlv', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/hdlv/group/:shcc', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:readOnly'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv/group/:shcc', app.permission.check('qtHuongDanLuanVan:readOnly'), app.templates.admin);
     app.get('/user/huong-dan-luan-van', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -85,14 +85,45 @@ module.exports = app => {
         app.model.qtHuongDanLuanVan.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
-        app.model.qtHuongDanLuanVan.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        app.model.qtHuongDanLuanVan.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Hướng dẫn luận văn');
+            res.send({ error, item });
+        });
+    });
 
-    app.put('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
-        app.model.qtHuongDanLuanVan.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/hdlv/create-multiple', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        const { listShcc, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Hướng dẫn luận văn');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao
+            };
+            app.model.qtHuongDanLuanVan.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
 
-    app.delete('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
-        app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        app.model.qtHuongDanLuanVan.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Hướng dẫn luận văn');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) => {
+        app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hướng dẫn luận văn');
+            res.send({ error });
+        });
+    });
 
     app.post('/api/user/qua-trinh/hdlv', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {

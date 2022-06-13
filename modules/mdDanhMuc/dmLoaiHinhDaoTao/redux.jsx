@@ -47,7 +47,7 @@ T.initPage(PageName);
 export function getDmLoaiHinhDaoTaoPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage(PageName, pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/danh-muc/loai-hinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/danh-muc/comment/loai-hinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hình đào tạo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -63,7 +63,7 @@ export function getDmLoaiHinhDaoTaoPage(pageNumber, pageSize, pageCondition, don
 
 export function getDmLoaiHinhDaoTaoAll(condition, done) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao/all';
+        const url = '/api/danh-muc/comment/loai-hinh-dao-tao/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hình đào tạo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -78,7 +78,7 @@ export function getDmLoaiHinhDaoTaoAll(condition, done) {
 
 export function getDmLoaiHinhDaoTao(ma, done) {
     return () => {
-        const url = `/api/danh-muc/loai-hinh-dao-tao/item/${ma}`;
+        const url = `/api/danh-muc/comment/loai-hinh-dao-tao/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin loại hình đào tạo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -92,7 +92,7 @@ export function getDmLoaiHinhDaoTao(ma, done) {
 
 export function createDmLoaiHinhDaoTao(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao';
+        const url = '/api/danh-muc/comment/loai-hinh-dao-tao';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo tình trạng sinh viên bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -108,7 +108,7 @@ export function createDmLoaiHinhDaoTao(item, done) {
 
 export function deleteDmLoaiHinhDaoTao(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao';
+        const url = '/api/danh-muc/comment/loai-hinh-dao-tao';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục loại hình đào tạo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -123,7 +123,7 @@ export function deleteDmLoaiHinhDaoTao(ma) {
 
 export function updateDmLoaiHinhDaoTao(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao';
+        const url = '/api/danh-muc/comment/loai-hinh-dao-tao';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin loại hình đào tạo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -152,7 +152,7 @@ export const SelectAdapter_DmLoaiHinhDaoTao = {
 export const SelectAdapter_DmLoaiHinhDaoTaoV2 = {
     ajax: true,
     data: params => ({ condition: params.term, kichHoat: 1 }),
-    url: '/api/danh-muc/loai-hinh-dao-tao/page/1/20',
+    url: '/api/danh-muc/comment/loai-hinh-dao-tao/page/1/20',
     getOne: getDmLoaiHinhDaoTao,
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmLoaiHinhDaoTao(ma, item => done && done({ id: item.ma, text: item.ten })))(),

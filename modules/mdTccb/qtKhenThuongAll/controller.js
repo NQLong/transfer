@@ -33,16 +33,16 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3005: { title: 'Quá trình khen thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 3 }
+            3005: { title: 'Quá trình khen thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#36A8CA', groupIndex: 3 }
         }
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1004: {
-                title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift', color: '#000000',
-                backgroundColor: '#ec91ba', groupIndex: 2
+            1006: {
+                title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift',
+                backgroundColor: '#016699', groupIndex: 2
             }
         }
     };
@@ -177,6 +177,26 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/tccb/qua-trinh/khen-thuong-all/create-multiple', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
+        const { listMa, loaiDoiTuong, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh } = req.body.items, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listMa.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Khen thưởng');
+                res.send({ error: errorList });
+                return;
+            }
+            const ma = listMa[index];
+            const dataAdd = {
+                ma, loaiDoiTuong, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh 
+            };
+            app.model.qtKhenThuongAll.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
+    });
+
     app.post('/api/tccb/qua-trinh/khen-thuong-all/multiple', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
         const qtKhenThuongAll = req.body.qtKhenThuongAll, errorList = [];
         for (let i = 0; i <= qtKhenThuongAll.length; i++) {
@@ -201,7 +221,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Khen thưởng');
-            res.send(error);
+            res.send({ error });
         });
     });
 

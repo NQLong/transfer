@@ -2,14 +2,16 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3016: { title: 'Quá trình đào tạo, bồi dưỡng', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 5 },
+            3016: {
+                title: 'Quá trình đào tạo, bồi dưỡng', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#7ae6e6', groupIndex: 0, color: '#000000'
+            },
         },
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1015: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 0 },
+            1008: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 4 },
         },
     };
 
@@ -29,9 +31,9 @@ module.exports = app => {
     app.get('/api/qua-trinh/dao-tao/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listLoaiBang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        app.model.qtDaoTao.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listLoaiBang, searchTerm, (error, page) => {
+            searchTerm = req.query.condition || '';
+        let filter = app.stringify(req.query.filter || {});
+        app.model.qtDaoTao.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -45,9 +47,9 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/dao-tao/group/page/:pageNumber/:pageSize', app.permission.check('qtDaoTao:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        app.model.qtDaoTao.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
+            searchTerm = req.query.condition || '';
+        let filter = app.stringify(req.query.filter || {});
+        app.model.qtDaoTao.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -68,49 +70,22 @@ module.exports = app => {
         app.model.qtDaoTao.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.post('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = req.body.data;
-            app.model.qtDaoTao.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.qtDaoTao.create(req.body.data, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.put('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.qtDaoTao.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            const changes = req.body.changes;
-                            app.model.qtDaoTao.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
-                        }
-                    });
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.qtDaoTao.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
     });
 
     app.delete('/api/user/qua-trinh/dao-tao', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtDaoTao.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            app.model.qtDaoTao.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
-                        }
-                    });
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.qtDaoTao.delete({ id: req.body.id }, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
+    });
+
+    app.get('/api/tccb/qua-trinh/dao-tao/:id', app.permission.check('staff:login'), (req, res) => {
+        app.model.qtDaoTao.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
     app.get('/api/qua-trinh/dao-tao/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listLoaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
@@ -120,9 +95,9 @@ module.exports = app => {
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (listLoaiBang == 'null') listLoaiBang = null;
-        app.model.qtDaoTao.download(listShcc, listDv, fromYear, toYear, listLoaiBang, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtDaoTao.download(listShcc, listDv, fromYear, toYear, listLoaiBang, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('daotaoboiduong');
@@ -153,7 +128,7 @@ module.exports = app => {
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenLoaiBangCap });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTrinhDo });
                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.chuyenNganh });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenCoSoDaoTao });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenTruong });
                         cells.push({ cell: 'K' + (index + 2), alignment: 'left', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'L' + (index + 2), alignment: 'left', border: '1234', value: (item.ketThuc != null && item.ketThuc != 0) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.tenHinhThuc });
@@ -169,4 +144,54 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/api/qua-trinh/dao-tao/download/:shcc/:fileName', app.permission.orCheck('staff:read', 'staff:login'), (req, res) => {
+        const { shcc, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/minhChungHocVi/${shcc}`);
+
+        if (app.fs.existsSync(dir)) {
+            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+            for (const serverFileName of serverFileNames) {
+                const clientFileIndex = serverFileName.indexOf(fileName);
+                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                    return res.sendFile(app.path.join(dir, serverFileName));
+                }
+            }
+        }
+        res.send('Không tìm thấy tập tin');
+    });
+
+    app.createFolder(app.path.join(app.assetPath, '/minhChungHocVi'));
+
+    app.uploadHooks.add('minhChungHocVi', (req, fields, files, params, done) =>
+        app.permission.has(req, () => minhChungHocVi(req, fields, files, params, done), done, 'staff:login'));
+
+    const minhChungHocVi = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('minhChungHocVi') && files.minhChungHocVi && files.minhChungHocVi.length > 0) {
+            const srcPath = files.minhChungHocVi[0].path,
+                userData = fields.userData[0],
+                shcc = userData.substring(userData.indexOf(':') + 1),
+                originalFilename = files.minhChungHocVi[0].originalFilename,
+                filePath = '/' + shcc + '/' + (new Date().getTime()).toString() + '_' + originalFilename,
+                destPath = app.assetPath + '/minhChungHocVi' + filePath,
+                validUploadFileType = ['.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg', '.heic'],
+                baseNamePath = app.path.extname(srcPath);
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/minhChungHocVi/' + shcc)
+                );
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error) {
+                        done({ error });
+                    } else {
+                        done({ data: filePath });
+                    }
+                });
+            }
+        }
+    };
+
 };

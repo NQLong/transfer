@@ -51,7 +51,7 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(shcc ? shcc : this.props.shcc);
             this.tenDeTai.value(tenDeTai);
-            this.maSo.value(maSoCapQuanLy);
+            this.maSoCapQuanLy.value(maSoCapQuanLy);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             if (ngayNghiemThu != -1) {
                 this.nghiemThuCheck.value(0);
@@ -167,7 +167,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
                 <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
-                <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.maSoCapQuanLy = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
                 <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly}/>
 
                 <div className='form-group col-md-4'>Các mốc thời gian: </div>
@@ -337,7 +337,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

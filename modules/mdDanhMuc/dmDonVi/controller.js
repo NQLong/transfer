@@ -27,8 +27,18 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
+    app.get('/api/danh-muc/don-vi/all', app.permission.check('staff:login'), (req, res) => {
+        let searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            kichHoat = req.query.kichHoat || null;
+
+        let statement = 'lower(ten) LIKE :searchTerm', parameter = { searchTerm: `%${searchTerm.toLowerCase()}%` };
+        if (kichHoat) {
+            statement = 'lower(ten) LIKE :searchTerm AND kichHoat = 1';
+        }
+        app.model.dmDonVi.getAll({ statement, parameter }, '*', 'maPl,ten', (error, items) => {
+            items.unshift({ ma: 0, ten: 'Trường ĐH Khoa học Xã hội và Nhân văn - TPHCM' });
+            res.send({ error, items });
+        });
     });
 
     app.get('/api/danh-muc/don-vi/get-in-list', app.permission.orCheck('manager:read', 'staff:login'), (req, res) => {
@@ -38,8 +48,13 @@ module.exports = app => {
         }, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/don-vi/item/:ma', app.permission.check('staff:login'), (req, res) => {
-        app.model.dmDonVi.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    app.get('/api/danh-muc/don-vi/item/:ma', app.permission.orCheck('staff:login', 'student:login'), (req, res) => {
+        if (req.params.ma == 0) res.send({
+            item: {
+                ma: 0, ten: 'Trường ĐH Khoa học Xã hội và Nhân văn - TPHCM'
+            }
+        });
+        else app.model.dmDonVi.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/don-vi', app.permission.check('dmDonVi:write'), (req, res) => {

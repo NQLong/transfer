@@ -168,6 +168,24 @@ export function createQtDiNuocNgoai(data, done) {
     };
 }
 
+export function createMultipleQtDiNuocNgoai(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/di-nuoc-ngoai-multiple';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                if (done) {
+                    T.notify('Thêm thông tin quá trình đi nước ngoài thành công!', 'info');
+                    dispatch(getQtDiNuocNgoaiPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+    };
+}
+
 export function updateQtDiNuocNgoai(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/di-nuoc-ngoai';
@@ -292,5 +310,38 @@ export function createQtDiNuocNgoaiGroupPageMa(data, done) {
                 }
             }
         }, () => T.notify('Tạo đi nước ngoài bị lỗi!', 'danger'));
+    };
+}
+
+export function getThongKeMucDich(pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    return () => {
+        const url = '/api/tccb/qua-trinh/di-nuoc-ngoai/thong-ke-muc-dich';
+        T.get(url, { condition: pageCondition, filter }, data => {
+            if (data.error) {
+                T.notify('Thống kê danh sách mục đích đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.items);
+            }
+        }, (error) => T.notify('Thống kê danh sách mục đích đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+    };
+}
+
+export function deleteFile(shcc, file, done) {
+    return () => {
+        const url = '/api/qua-trinh/di-nuoc-ngoai/delete-file';
+        T.put(url, { shcc, file }, data => {
+            if (data.error) {
+                console.error('PUT: ' + url + '.', data.error);
+                T.notify('Xóa file đính kèm lỗi!', 'danger');
+            } else {
+                T.notify('Xóa file đính kèm thành công!', 'success');
+                done && done();
+            }
+        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
     };
 }

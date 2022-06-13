@@ -1,6 +1,6 @@
-// Table name: QT_NGHIEN_CUU_KHOA_HOC { id, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, shcc, batDau, ketThuc, batDauType, ketThucType, ngayNghiemThuType, thoiGian, fileMinhChung, inLlkh }
+// Table name: QT_NGHIEN_CUU_KHOA_HOC { id, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, shcc, batDau, ketThuc, batDauType, ketThucType, ngayNghiemThuType, thoiGian, fileMinhChung, inLlkh, hinhThuc, tinhTrang, maSo, capQuanLy, quyMo }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'tenDeTai': 'TEN_DE_TAI', 'maSoCapQuanLy': 'MA_SO_CAP_QUAN_LY', 'kinhPhi': 'KINH_PHI', 'vaiTro': 'VAI_TRO', 'ngayNghiemThu': 'NGAY_NGHIEM_THU', 'ketQua': 'KET_QUA', 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'ngayNghiemThuType': 'NGAY_NGHIEM_THU_TYPE', 'thoiGian': 'THOI_GIAN', 'fileMinhChung': 'FILE_MINH_CHUNG', 'inLlkh': 'IN_LLKH' };
+const obj2Db = { 'id': 'ID', 'tenDeTai': 'TEN_DE_TAI', 'maSoCapQuanLy': 'MA_SO_CAP_QUAN_LY', 'kinhPhi': 'KINH_PHI', 'vaiTro': 'VAI_TRO', 'ngayNghiemThu': 'NGAY_NGHIEM_THU', 'ketQua': 'KET_QUA', 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'ngayNghiemThuType': 'NGAY_NGHIEM_THU_TYPE', 'thoiGian': 'THOI_GIAN', 'fileMinhChung': 'FILE_MINH_CHUNG', 'inLlkh': 'IN_LLKH', 'hinhThuc': 'HINH_THUC', 'tinhTrang': 'TINH_TRANG', 'maSo': 'MA_SO', 'capQuanLy': 'CAP_QUAN_LY', 'quyMo': 'QUY_MO' };
 
 module.exports = app => {
     app.model.qtNghienCuuKhoaHoc = {
@@ -76,18 +76,22 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM QT_NGHIEN_CUU_KHOA_HOC' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_NGHIEN_CUU_KHOA_HOC.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_NGHIEN_CUU_KHOA_HOC' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
+            const sqlCount = 'SELECT COUNT(*) FROM QT_NGHIEN_CUU_KHOA_HOC' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    let result = {};
+                    let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
+                    result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
+                    result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
+                    leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_NGHIEN_CUU_KHOA_HOC.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_NGHIEN_CUU_KHOA_HOC' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
+                    });
+                }
             });
         },
 

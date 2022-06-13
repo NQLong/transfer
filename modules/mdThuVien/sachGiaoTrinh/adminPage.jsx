@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
-    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
+    updateSachGTStaff, deleteSachGTStaff,
+    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage, createSachGiaoTrinhMultiple
 } from './redux';
 
 import { DateInput } from 'view/component/Input';
@@ -47,6 +47,16 @@ class EditModal extends AdminModal {
         if (!Array.isArray(listMa)) {
             listMa = [listMa];
         }
+        let changes = {
+            ten: this.ten.value(),
+            theLoai: this.theLoai.value(),
+            namSanXuat: this.namSanXuat.getVal() ? new Date(this.namSanXuat.getVal()).getFullYear() : null,
+            nhaSanXuat: this.nhaSanXuat.value(),
+            chuBien: this.chuBien.value(),
+            sanPham: this.sanPham.value(),
+            butDanh: this.butDanh.value(),
+            quocTe: this.quocTe.value()
+        };
         if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
@@ -60,29 +70,13 @@ class EditModal extends AdminModal {
             T.notify('Nhà xuất bản trống', 'danger');
             this.nhaSanXuat.focus();
         } else {
-            listMa.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    ten: this.ten.value(),
-                    theLoai: this.theLoai.value(),
-                    namSanXuat: this.namSanXuat.getVal() ? new Date(this.namSanXuat.getVal()).getFullYear() : null,
-                    nhaSanXuat: this.nhaSanXuat.value(),
-                    chuBien: this.chuBien.value(),
-                    sanPham: this.sanPham.value(),
-                    butDanh: this.butDanh.value(),
-                    quocTe: this.quocTe.value()
-                };
-                if (index == listMa.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            if (this.state.id) {
+                changes.shcc = listMa[0];
+                this.props.update(this.state.id, changes, this.hide);
+            } else {
+                changes.listShcc = listMa;
+                this.props.create(changes, this.hide);
+            }
         }
     }
 
@@ -110,7 +104,7 @@ class SachGiaoTrinh extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/library', () => {
+        T.ready('/user/tccb', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -221,19 +215,19 @@ class SachGiaoTrinh extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {item.tenChucVu && <span> {item.tenChucVu || ''}<br /> </span>}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
-                        {!this.checked && <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(
                             <>
-                                <span><i style={{ color: 'blue' }}>{item.ten}</i><br /><br /></span>
+                                <span><i style={{ color: 'blue' }}>{item.ten}</i><br /></span>
                                 {item.theLoai ? <span><b>Thể loại: </b><span style={{ whiteSpace: 'nowrap' }}>{item.theLoai}<br /></span></span> : null}
                                 {item.butDanh ? <span><b>Bút danh: </b><i>{item.butDanh}</i></span> : null}
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(
                             <>
                                 <span><b>Nhà XB: </b><span style={{ color: 'blue' }}>{item.nhaSanXuat}</span></span><br />
                                 <span><b>Năm XB:</b> <span >{item.namSanXuat}</span></span> <br />
@@ -258,7 +252,7 @@ class SachGiaoTrinh extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/library/sach-giao-trinh/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/sach-giao-trinh/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -272,7 +266,7 @@ class SachGiaoTrinh extends AdminPage {
             icon: 'fa fa-book',
             title: 'Sách, giáo trình cán bộ',
             breadcrumb: [
-                <Link key={0} to='/user/library'>Thư viện</Link>,
+                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Sách, giáo trình cán bộ'
             ],
             advanceSearch: <>
@@ -292,18 +286,18 @@ class SachGiaoTrinh extends AdminPage {
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createSachGTStaff} update={this.props.updateSachGTStaff}
+                    create={this.props.createSachGiaoTrinhMultiple} update={this.props.updateSachGTStaff}
                 />
             </>,
-            backRoute: '/user/library',
+            backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.library.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
-    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
-    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
+    updateSachGTStaff, deleteSachGTStaff,
+    getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage, createSachGiaoTrinhMultiple
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinh);

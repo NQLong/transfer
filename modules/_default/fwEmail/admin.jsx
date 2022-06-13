@@ -108,7 +108,6 @@ export default class EmailPage extends React.Component {
                                 <div className='tab-pane active show'><EmailItem ref={this.emailContact} id='emailContact'
                                     params='{name}, {subject}, {message}' /></div>
                             </div>
-
                         </div>
                     </div>
                 </div>

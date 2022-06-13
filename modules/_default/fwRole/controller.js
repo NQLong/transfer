@@ -58,6 +58,19 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/resfresh-email-role/:id', app.permission.check('role:write'), (req, res) => {
+        app.model.fwUserRole.getAll({ roleId: req.params.id }, (error, items) => {
+            if (error) res.send({ error });
+            else {
+                let listEmail = items.map(item => {
+                    return item.email;
+                });
+                app.session.refresh(...listEmail);
+                res.send('OK');
+            }
+        });
+    });
+
     app.post('/api/role', app.permission.check('role:write'), (req, res) => {
         let role = req.body.role;
         delete role.id;

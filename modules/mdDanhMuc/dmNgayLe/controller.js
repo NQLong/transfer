@@ -9,7 +9,7 @@ module.exports = app => {
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7007: { title: 'Danh sách ngày lễ trong năm', link: '/user/dao-tao/ngay-le', backgroundColor: '#FF9074', groupIndex: 2 }
+            7007: { title: 'Danh sách ngày lễ trong năm', link: '/user/dao-tao/ngay-le', backgroundColor: '#FF9074', groupIndex: 2, icon: 'fa-yelp' }
         },
     };
     app.permission.add(

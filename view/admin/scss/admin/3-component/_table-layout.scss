@@ -18,3 +18,20 @@
     width: $width;
   }
 }
+
+.table-header {
+    .header-content {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        
+    }
+    .btn-group {
+        visibility: hidden;
+    }
+
+    &:hover {
+        .btn-group {
+            visibility: visible;
+        }
+    }
+};

@@ -133,8 +133,18 @@ export const SelectAdapter_DtNganhDaoTao = {
 
 export const SelectAdapter_DtNganhDaoTaoMa = {
     ajax: true,
-    url: '/api/dao-tao/nganh-dao-tao/page/1/20',
+    url: '/api/dao-tao/nganh-dao-tao/page/1/100',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}`, name: item.tenNganh })) : [] }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}`, name: item.tenNganh, khoa: item.khoa })) : [] }),
     fetchOne: (maNganh, done) => (getDtNganhDaoTao(maNganh, item => done && done({ id: item.maNganh, text: item.maNganh })))(),
+};
+
+export const SelectAdapter_DtNganhDaoTaoFilter = (donVi) => {
+    return {
+        ajax: true,
+        url: '/api/dao-tao/nganh-dao-tao/filter',
+        data: params => ({ condition: params.term, donVi }),
+        processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}`, khoa: item.khoa })) : [] }),
+        fetchOne: (maNganh, done) => (getDtNganhDaoTao(maNganh, item => done && done({ id: item.maNganh, text: item.tenNganh })))(),
+    };
 };

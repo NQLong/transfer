@@ -2,14 +2,14 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3002: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 }
+            3002: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#28586F', groupIndex: 0 }
         }
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 }
+            1001: { title: 'Thông tin cán bộ', link: '/user/profile', icon: 'fa-address-card-o', backgroundColor: '#456578', pin: true }
         }
     };
 
@@ -33,6 +33,7 @@ module.exports = app => {
             else resolve();
         });
     });
+
 
     //Hook staff-------------------------------------------------------------------------------------------------
     app.permissionHooks.add('staff', 'checkKhoaBoMon', (user, staff) => new Promise(resolve => {
@@ -60,8 +61,8 @@ module.exports = app => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = JSON.stringify(req.query.filter || {});
-
+        let time = req.query.timeCondition || new Date().getTime();
+        const filter = JSON.stringify({ ...req.query.filter, time });
         app.model.canBo.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -109,7 +110,6 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => {
             if (error) {
                 res.send({ error });
-                return;
             } else {
                 app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
                     item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
@@ -127,6 +127,28 @@ module.exports = app => {
         app.model.canBo.getGiangVien(searchTerm, (error, items) => res.send({ items: items.rows }));
     });
 
+    app.get('/api/staff/get-chuyen-nganh-all', app.permission.check('staff:login'), (req, res) => {
+        let condition = { statement: 'ngayNghi IS NULL', parameter: {} };
+        if (req.query && req.query.condition) {
+            if (typeof (req.query.condition) == 'object') {
+                if (req.query.condition.searchText) {
+                    condition = {
+                        statement: 'ngayNghi IS NULL AND lower(chuyenNganh) LIKE :searchText',
+                        parameter: { searchText: `%${req.query.condition.searchText.toLowerCase()}%` }
+                    };
+                }
+            } else {
+                condition = {
+                    statement: 'ngayNghi IS NULL AND lower(chuyenNganh) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
+                };
+            }
+        }
+        app.model.canBo.getAll(condition, 'chuyenNganh', '', (error, items) => {
+            res.send({ error, items });
+        });
+    });
+
     // app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
     //     app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
     //         res.send({ error, shcc });
@@ -142,8 +164,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), async (req, res) => {
-        app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
+    app.get('/api/staff/edit/item', app.permission.check('staff:login'), async (req, res) => {
+        app.model.canBo.get(req.query.condition, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
@@ -156,26 +178,40 @@ module.exports = app => {
         const newItem = req.body.canBo;
         app.model.canBo.get({ shcc: newItem.shcc }, (error, item) => {
             if (item) {
-                res.status(403).send({ error: { exist: true, message: 'Cán bộ ' + newItem.shcc.toString() + ' đã tồn tại' } });
+                res.send({ error: { exist: true, message: 'Cán bộ ' + newItem.shcc.toString() + ' đã tồn tại' } });
             } else if (error) {
-                res.status(500).send({ error });
+                res.send({ error });
             } else {
                 app.model.canBo.create(newItem, (error, item) => {
+                    app.tccbSaveCRUD(req.session.user.email, 'C', 'Hồ sơ cán bộ');
+                    app.model.fwUser.create({
+                        email: item.email,
+                        active: 1,
+                        isStaff: 1,
+                        firstName: item.ho,
+                        lastName: item.ten,
+                        shcc: item.shcc
+                    });
                     res.send({ error, item });
                 });
             }
         });
     });
 
-    app.put('/api/staff', app.permission.check('staff:write'), (req, res) => {
-        app.model.canBo.update({ shcc: req.body.shcc }, req.body.changes, (error, item) => {
-            if (item && !error) app.notification.send({ toEmail: item.email, title: 'Lý lịch được cập nhật thành công', subTitle: `Bởi ${req.session.user.lastName} ${req.session.user.firstName} (${req.session.user.email})`, icon: 'fa-check-square-o', iconColor: 'success' });
+    app.put('/api/staff', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.canBo.update({ shcc }, req.body.changes, (error, item) => {
+            req.session.user.permissions.includes('staff:write') && app.tccbSaveCRUD(req.session.user.email, 'U', 'Hồ sơ cán bộ');
+            // if (item && !error) app.notification.send({ toEmail: item.email, title: 'Lý lịch được cập nhật thành công', subTitle: `Bởi ${req.session.user.lastName} ${req.session.user.firstName}`, icon: 'fa-check-square-o', iconColor: 'success' });
             res.send({ error, item });
-        });
+        }) : res.send({ error: 'No permission' });
     });
+
+
 
     app.delete('/api/staff', app.permission.check('staff:delete'), (req, res) => {
         app.model.canBo.delete({ shcc: req.body.shcc }, error => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Hồ sơ cán bộ');
             new Promise(resolve => {
                 app.model.quanHeCanBo.delete({ shcc: req.body.shcc }, () => {
                     resolve();
@@ -289,568 +325,13 @@ module.exports = app => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, () => {
-                    resolve();
-                });
+                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, () => resolve());
             })).then(() => {
                 res.send({ error });
             });
         });
     });
 
-    app.post('/api/staff/quan-he', app.permission.check('staff:write'), (req, res) =>
-        app.model.quanHeCanBo.create(req.body.data, (error, item) => res.send({ error, item })));
-
-    app.put('/api/staff/quan-he', app.permission.check('staff:write'), (req, res) =>
-        app.model.quanHeCanBo.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/staff/quan-he', app.permission.check('staff:write'), (req, res) =>
-        app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error)));
-
-    app.post('/api/staff/multiple', app.permission.check('staff:write'), (req, res) => {
-        const canBoList = req.body.canBoList;
-        const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
-            tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
-            trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
-
-        new Promise(resolve => {
-            app.model.dmDanToc.getAll((error, items) => {
-                (items || []).forEach(item => danTocMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        }).then(() => new Promise(resolve => {
-            app.model.dmTonGiao.getAll((error, items) => {
-                (items || []).forEach(item => tonGiaoMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDoLyLuanChinhTri.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoLyLuanChinhTriMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmDonVi.getAll((error, items) => {
-                (items || []).forEach(item => donViMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmChucVu.getAll((error, items) => {
-                (items || []).forEach(item => chucVuMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTinhThanhPho.getAll((error, items) => {
-                (items || []).forEach(item => tinhMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuanHuyen.getAll((error, items) => {
-                (items || []).forEach(item => huyenMapping[item.maTinhThanhPho + ':' + item.tenQuanHuyen.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmPhuongXa.getAll((error, items) => {
-                (items || []).forEach(item => xaMapping[item.maQuanHuyen + ':' + item.tenPhuongXa.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuocGia.getAll((error, items) => {
-                (items || []).forEach(item => quocGiaMapping[item.tenQuocGia.toLowerCase()] = item.maCode);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmChucDanhKhoaHoc.getAll((error, items) => {
-                (items || []).forEach(item => chucDanhMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDo.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDoQuanLyNhaNuoc.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoQuanLyNhaNuocMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmTrinhDoTinHoc.getAll((error, items) => {
-                (items || []).forEach(item => trinhDoTinHocMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuanHeGiaDinh.getAll((error, items) => {
-                (items || []).forEach(item => quanHeMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmNgoaiNgu.getAll((error, items) => {
-                (items || []).forEach(item => ngoaiNguMapping[item.ten.toLowerCase()] = item.ma);
-                resolve();
-            });
-        })).then(() => {
-            const handleCanBo = (index = 0) => {
-                let item = canBoList[index];
-                if (index < canBoList.length) {
-                    let canBo = {
-                        shcc: item.shcc,
-                        ten: item.hoTen.split(' ')[item.hoTen.split(' ').length - 1].toUpperCase(),
-                        ho: item.hoTen.substring(0, item.hoTen.indexOf(item.hoTen.split(' ')[item.hoTen.split(' ').length - 1])).toUpperCase().trim(),
-                        phai: item.phai.toLowerCase() == 'nam' ? '01' : item.phai.toLowerCase() == 'nữ' ? '02' : null,
-                        dienThoaiCaNhan: item.dienThoaiCaNhan,
-                        email: item.email,
-                        ngaySinh: item.ngaySinh,
-                        ngayBatDauCongTac: item.ngayBatDauCongTac,
-                        ngayBienChe: item.ngayBienChe,
-                        chucVuDoanThe: item.chucVuDoanThe,
-                        chucVuDang: item.chucVuDang,
-                        chucVuKiemNhiem: item.chucVuKiemNhiem,
-                        maTrinhDoLlct: item.trinhDoLlct && trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] ? trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] : null,
-                        maTrinhDoQlnn: item.trinhDoQlnn && trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] ? trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] : null,
-                        maTrinhDoTinHoc: item.trinhDoTinHoc && trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] ? trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] : null,
-                        hoKhau: item.hoKhau,
-                        diaChiHienTai: item.diaChiHienTai,
-                        danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : null,
-                        tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : null,
-                        dangVien: item.ngayVaoDang || item.ngayVaoDangChinhThuc || item.noiDangDb || item.noiDangDb ? 1 : 0,
-                        maDonVi: item.donVi && donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] ? donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] : null,
-                        emailCaNhan: item.emailCaNhan,
-                        biDanh: item.biDanh,
-                        dienThoaiBaoTin: item.dienThoaiBaoTin,
-                        ngheNghiepCu: item.ngheNghiepCu,
-                        cmnd: item.cmnd,
-                        cmndNgayCap: item.cmndNgayCap,
-                        cmndNoiCap: item.cmndNoiCap,
-                        chucVuKhac: item.chucVuKhac,
-                        quocGia: item.quocGia && quocGiaMapping[item.quocGia.toLowerCase()] ? quocGiaMapping[item.quocGia.toLowerCase()] : null,
-                        chucDanh: item.chucDanh && chucDanhMapping[item.chucDanh.toLowerCase()] ? chucDanhMapping[item.chucDanh.toLowerCase()] : null,
-                        trinhDoPhoThong: item.trinhDoPhoThong ? typeof (item.trinhDoPhoThong) == 'object' ? item.trinhDoPhoThong.getDate() + '/' + item.trinhDoPhoThong.getMonth() : item.trinhDoPhoThong.replaceAll('//', '/') : null,
-                        hocVi: item.hocVi && trinhDoMapping[item.hocVi.toLowerCase()] ? trinhDoMapping[item.hocVi.toLowerCase()] : null,
-                        chuyenNganh: item.chuyenNganh,
-                        sucKhoe: item.sucKhoe,
-                        canNang: item.canNang,
-                        chieuCao: item.chieuCao,
-                        ngayNhapNgu: item.ngayNhapNgu,
-                        ngayXuatNgu: item.ngayXuatNgu,
-                        quanHamCaoNhat: item.quanHam,
-                        hangThuongBinh: item.hangThuongBinh,
-                        giaDinhChinhSach: item.giaDinhChinhSach,
-                        danhHieu: item.danhHieu,
-                        ngayVaoDang: item.ngayVaoDang,
-                        ngayVaoDangChinhThuc: item.ngayVaoDangChinhThuc,
-                        noiDangDb: item.noiDangDb,
-                        noiDangCt: item.noiDangCt,
-                        ngayVaoDoan: item.ngayVaoDoan,
-                        noiVaoDoan: item.noiVaoDoan,
-                        soTruong: item.soTruong,
-                        nhomMau: item.nhomMau,
-                        soBhxh: item.soBhxh,
-                        doanVien: item.noiVaoDoan || item.ngayVaoDoan ? 1 : 0,
-                        namChucDanh: item.namChucDanh,
-                        namHocVi: item.namHocVi,
-                        noiSinh: item.noiSinh,
-                        queQuan: item.nguyenQuan
-                    };
-                    // if (item.noiSinh) {
-                    //     let dsNoiSinh = item.noiSinh.split(/[-,]/);
-                    //     if (dsNoiSinh.length == 1) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[0].toLowerCase()] ? tinhMapping[dsNoiSinh[0].toLowerCase()] : null;
-                    //     } else if (dsNoiSinh.length == 2) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[1].toLowerCase().trim()] ? xaMapping[dsNoiSinh[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNoiSinh) canBo.maHuyenNoiSinh = huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNoiSinh.length == 3) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[2].toLowerCase().trim()] ? xaMapping[dsNoiSinh[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNoiSinh) canBo.maHuyenNoiSinh = huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNoiSinh) canBo.maXaNoiSinh = xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNoiSinh.length == 4) {
-                    //         canBo.maTinhNoiSinh = tinhMapping[dsNoiSinh[3].toLowerCase().trim()] ? xaMapping[dsNoiSinh[3].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNoiSinh) canBo.maHuyenNoiSinh = huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[2].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNoiSinh + ':' + dsNoiSinh[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNoiSinh) canBo.maXaNoiSinh = xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNoiSinh + ':' + dsNoiSinh[1].toLowerCase().trim()] : null;
-                    //     }
-                    // }
-                    // if (item.nguyenQuan) {
-                    //     let dsNguyenQuan = item.nguyenQuan.split(/[-,]/);
-                    //     if (dsNguyenQuan.length == 1) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[0].toLowerCase()] ? tinhMapping[dsNguyenQuan[0].toLowerCase()] : null;
-                    //     } else if (dsNguyenQuan.length == 2) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[1].toLowerCase().trim()] ? xaMapping[dsNguyenQuan[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNguyenQuan) canBo.maHuyenNguyenQuan = huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNguyenQuan.length == 3) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[2].toLowerCase().trim()] ? xaMapping[dsNguyenQuan[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNguyenQuan) canBo.maHuyenNguyenQuan = huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNguyenQuan) canBo.maXaNguyenQuan = xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[0].toLowerCase().trim()] : null;
-                    //     } else if (dsNguyenQuan.length == 4) {
-                    //         canBo.maTinhNguyenQuan = tinhMapping[dsNguyenQuan[3].toLowerCase().trim()] ? xaMapping[dsNguyenQuan[3].toLowerCase().trim()] : null;
-                    //         if (canBo.maTinhNguyenQuan) canBo.maHuyenNguyenQuan = huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[2].toLowerCase().trim()] ? huyenMapping[canBo.maTinhNguyenQuan + ':' + dsNguyenQuan[2].toLowerCase().trim()] : null;
-                    //         if (canBo.maHuyenNguyenQuan) canBo.maXaNguyenQuan = xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] ? xaMapping[canBo.maHuyenNguyenQuan + ':' + dsNguyenQuan[1].toLowerCase().trim()] : null;
-                    //     }
-                    // }
-                    if (canBo.shcc) {
-                        app.model.canBo.get({ shcc: canBo.shcc }, (error, cbItem) => {
-                            if (cbItem == null) {
-                                app.model.canBo.create(canBo, (error2, newCb) => {
-                                    if (!error2 && newCb) {
-                                        if (item.quanHe && item.quanHe.length > 0) {
-                                            const handleQuanHe = (index = 0) => {
-                                                let quanHe = item.quanHe[index];
-                                                if (index < item.quanHe.length) {
-                                                    let newQuanHe = {
-                                                        hoTen: quanHe.hoTen,
-                                                        moiQuanHe: quanHeMapping[quanHe.quanHe.toLowerCase()],
-                                                        namSinh: new Date(quanHe.namSinh).getTime(),
-                                                        queQuan: quanHe.queQuan,
-                                                        diaChi: quanHe.diaChi,
-                                                        type: quanHe.type,
-                                                        shcc: newCb.shcc,
-                                                        ngheNghiep: quanHe.ngheNghiep
-                                                    };
-                                                    app.model.quanHeCanBo.create(newQuanHe, () => {
-                                                        handleQuanHe(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQuanHe();
-                                        }
-
-                                        if (item.trinhDoNgoaiNgu && item.trinhDoNgoaiNgu.length > 0) {
-                                            const handleNgoaiNgu = (index = 0) => {
-                                                let ngoaiNgu = item.trinhDoNgoaiNgu[index];
-                                                if (index < item.trinhDoNgoaiNgu.length) {
-                                                    let newNgoaiNgu = {
-                                                        loaiNgonNgu: ngoaiNguMapping[ngoaiNgu.loaiNgonNgu.toLowerCase()],
-                                                        shcc: newCb.shcc,
-                                                        trinhDo: ngoaiNgu.trinhDo
-                                                    };
-                                                    app.model.trinhDoNgoaiNgu.create(newNgoaiNgu, () => {
-                                                        handleNgoaiNgu(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleNgoaiNgu();
-                                        }
-
-                                        if (item.qtHtct && item.qtHtct.length > 0) {
-                                            const handleQTHTCT = (index = 0) => {
-                                                let htct = item.qtHtct[index];
-                                                if (index < item.qtHtct.length) {
-                                                    const newHtct = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: htct.batDau,
-                                                        ketThuc: htct.ketThuc,
-                                                        batDauType: htct.batDauType,
-                                                        ketThucType: htct.ketThucType,
-                                                        noiDung: htct.noiDung
-                                                    };
-                                                    app.model.qtHocTapCongTac.create(newHtct, () => {
-                                                        handleQTHTCT(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTHTCT();
-                                        }
-
-                                        if (item.qtDaoTao && item.qtDaoTao.length > 0) {
-                                            const handleQTDaoTao = (index = 0) => {
-                                                let daoTao = item.qtDaoTao[index];
-                                                if (index < item.qtDaoTao.length) {
-                                                    const newDaoTao = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: daoTao.batDau,
-                                                        ketThuc: daoTao.ketThuc,
-                                                        batDauType: daoTao.batDauType,
-                                                        ketThucType: daoTao.ketThucType,
-                                                        tenTruong: daoTao.tenTruong,
-                                                        chuyenNganh: daoTao.chuyenNganh,
-                                                        hinhThuc: daoTao.hinhThuc,
-                                                        loaiBangCap: daoTao.loaiBangCap,
-                                                        thoiGian: daoTao.thoiGian
-                                                    };
-                                                    app.model.qtDaoTao.create(newDaoTao, () => {
-                                                        handleQTDaoTao(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTDaoTao();
-                                        }
-
-                                        if (item.qtNuocNgoai && item.qtNuocNgoai.length > 0) {
-                                            const handleQTNuocNgoai = (index = 0) => {
-                                                let nuocNgoai = item.qtNuocNgoai[index];
-                                                if (index < item.qtNuocNgoai.length) {
-                                                    const newNuocNgoai = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: nuocNgoai.batDau,
-                                                        ketThuc: nuocNgoai.ketThuc,
-                                                        batDauType: nuocNgoai.batDauType,
-                                                        ketThucType: nuocNgoai.ketThucType,
-                                                        quocGia: nuocNgoai.quocGia,
-                                                        noiDung: nuocNgoai.noiDung
-                                                    };
-                                                    app.model.qtNuocNgoai.create(newNuocNgoai, () => {
-                                                        handleQTNuocNgoai(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTNuocNgoai();
-                                        }
-
-                                        if (item.qtKhenThuong && item.qtKhenThuong.length > 0) {
-                                            const handleQTKhenThuong = (index = 0) => {
-                                                let khenThuong = item.qtKhenThuong[index];
-                                                if (index < item.qtKhenThuong.length) {
-                                                    const newKhenThuong = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: khenThuong.batDau,
-                                                        ketThuc: khenThuong.ketThuc,
-                                                        batDauType: khenThuong.batDauType,
-                                                        ketThucType: khenThuong.ketThucType,
-                                                        capQuyetDinh: khenThuong.capQuyetDinh,
-                                                        noiDung: khenThuong.noiDung
-                                                    };
-                                                    app.model.qtKhenThuong.create(newKhenThuong, () => {
-                                                        handleQTKhenThuong(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTKhenThuong();
-                                        }
-
-                                        if (item.qtKyLuat && item.qtKyLuat.length > 0) {
-                                            const handleQTKyLuat = (index = 0) => {
-                                                let kyLuat = item.qtKyLuat[index];
-                                                if (index < item.qtKyLuat.length) {
-                                                    const newKyLuat = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: kyLuat.batDau,
-                                                        ketThuc: kyLuat.ketThuc,
-                                                        batDauType: kyLuat.batDauType,
-                                                        ketThucType: kyLuat.ketThucType,
-                                                        capQuyetDinh: kyLuat.capQuyetDinh,
-                                                        lyDoHinhThuc: kyLuat.lyDoHinhThuc
-                                                    };
-                                                    app.model.qtKyLuat.create(newKyLuat, () => {
-                                                        handleQTKyLuat(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTKyLuat();
-                                        }
-
-                                        if (item.qtNCKH && item.qtNCKH.length > 0) {
-                                            const handleQTNCKH = (index = 0) => {
-                                                let nckh = item.qtNCKH[index];
-                                                if (index < item.qtNCKH.length) {
-                                                    const newNckh = {
-                                                        shcc: newCb.shcc,
-                                                        batDau: nckh.batDau,
-                                                        ketThuc: nckh.ketThuc,
-                                                        batDauType: nckh.batDauType,
-                                                        ketThucType: nckh.ketThucType,
-                                                        tenDeTai: nckh.tenDeTai,
-                                                        maSoCapQuanLy: nckh.maSoCapQuanLy,
-                                                        kinhPhi: nckh.kinhPhi,
-                                                        vaiTro: nckh.vaiTro,
-                                                        ketQua: nckh.ketQua,
-                                                        thoiGian: nckh.thoiGian,
-                                                        ngayNghiemThu: nckh.ngayNghiemThu,
-                                                        ngayNghiemThuType: nckh.ngayNghiemThuType
-                                                    };
-                                                    app.model.qtNghienCuuKhoaHoc.create(newNckh, () => {
-                                                        handleQTNCKH(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleQTNCKH();
-                                        }
-
-                                        if (item.qtHuongDan && item.qtHuongDan.length > 0) {
-                                            const handleHuongDan = (index = 0) => {
-                                                let huongDan = item.qtHuongDan[index];
-                                                if (index < item.qtHuongDan.length) {
-                                                    const newHuongDan = {
-                                                        shcc: newCb.shcc,
-                                                        hoTen: huongDan.hoTen,
-                                                        tenLuanVan: huongDan.tenLuanVan,
-                                                        namTotNghiep: huongDan.namTotNghiep,
-                                                        sanPham: huongDan.sanPham,
-                                                        bacDaoTao: huongDan.bacDaoTao
-                                                    };
-                                                    app.model.qtHuongDanLuanVan.create(newHuongDan, () => {
-                                                        handleHuongDan(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleHuongDan();
-                                        }
-
-                                        if (item.sachGiaoTrinh && item.sachGiaoTrinh.length > 0) {
-                                            const handleSachGiaoTrinh = (index = 0) => {
-                                                let sach = item.sachGiaoTrinh[index];
-                                                if (index < item.sachGiaoTrinh.length) {
-                                                    const newSach = {
-                                                        shcc: newCb.shcc,
-                                                        ten: sach.ten,
-                                                        theLoai: sach.theLoai,
-                                                        nhaSanXuat: sach.nhaSanXuat,
-                                                        namSanXuat: sach.namSanXuat,
-                                                        chuBien: sach.chuBien,
-                                                        sanPham: sach.sanPham,
-                                                        butDanh: sach.butDanh,
-                                                        quocTe: sach.quocTe
-                                                    };
-                                                    app.model.sachGiaoTrinh.create(newSach, () => {
-                                                        handleSachGiaoTrinh(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleSachGiaoTrinh();
-                                        }
-
-                                        if (item.baiVietKhoaHoc && item.baiVietKhoaHoc.length > 0) {
-                                            const handleBaiViet = (index = 0) => {
-                                                let baiViet = item.baiVietKhoaHoc[index];
-                                                if (index < item.baiVietKhoaHoc.length) {
-                                                    const newBaiViet = {
-                                                        shcc: newCb.shcc,
-                                                        tenTacGia: baiViet.tenTacGia,
-                                                        namXuatBan: baiViet.namXuatBan,
-                                                        tenBaiViet: baiViet.tenBaiViet,
-                                                        tenTapChi: baiViet.tenTapChi,
-                                                        soHieuIssn: baiViet.soHieuIssn,
-                                                        sanPham: baiViet.sanPham,
-                                                        diemIf: baiViet.diemIf,
-                                                        quocTe: baiViet.quocTe
-                                                    };
-                                                    app.model.qtBaiVietKhoaHoc.create(newBaiViet, () => {
-                                                        handleBaiViet(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleBaiViet();
-                                        }
-
-                                        if (item.kyYeu && item.kyYeu.length > 0) {
-                                            const handleKyYeu = (index = 0) => {
-                                                let kYeu = item.kyYeu[index];
-                                                if (index < item.kyYeu.length) {
-                                                    const newKYeu = {
-                                                        shcc: newCb.shcc,
-                                                        tenTacGia: kYeu.tenTacGia,
-                                                        tenHoiNghi: kYeu.tenHoiNghi,
-                                                        tenBaiViet: kYeu.tenBaiViet,
-                                                        noiToChuc: kYeu.noiToChuc,
-                                                        soHieuIssn: kYeu.soHieuIssn,
-                                                        thoiGian: kYeu.thoiGian,
-                                                        sanPham: kYeu.sanPham,
-                                                        quocTe: kYeu.quocTe
-                                                    };
-                                                    app.model.qtKyYeu.create(newKYeu, () => {
-                                                        handleKyYeu(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleKyYeu();
-                                        }
-
-                                        if (item.giaiThuong && item.giaiThuong.length > 0) {
-                                            const handleGiaiThuong = (index = 0) => {
-                                                let gt = item.giaiThuong[index];
-                                                if (index < item.giaiThuong.length) {
-                                                    const newGT = {
-                                                        shcc: newCb.shcc,
-                                                        tenGiaiThuong: gt.tenGiaiThuong,
-                                                        noiDung: gt.noiDung,
-                                                        noiCap: gt.noiCap,
-                                                        namCap: gt.namCap
-                                                    };
-                                                    app.model.qtGiaiThuong.create(newGT, () => {
-                                                        handleGiaiThuong(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleGiaiThuong();
-                                        }
-
-                                        if (item.bangPMSC && item.bangPMSC.length > 0) {
-                                            const handleBangPMSC = (index = 0) => {
-                                                let bang = item.bangPMSC[index];
-                                                if (index < item.bangPMSC.length) {
-                                                    const newBang = {
-                                                        shcc: newCb.shcc,
-                                                        tenBang: bang.tenBang,
-                                                        soHieu: bang.soHieu,
-                                                        namCap: bang.namCap,
-                                                        noiCap: bang.noiCap,
-                                                        tacGia: bang.tacGia,
-                                                        sanPham: bang.sanPham,
-                                                        loaiBang: bang.loaiBang
-                                                    };
-                                                    app.model.qtBangPhatMinh.create(newBang, () => {
-                                                        handleBangPMSC(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleBangPMSC();
-                                        }
-
-                                        if (item.ungDungThuongMai && item.ungDungThuongMai.length > 0) {
-                                            const handleUngDungThuongMai = (index = 0) => {
-                                                let ungDung = item.ungDungThuongMai[index];
-                                                if (index < item.ungDungThuongMai.length) {
-                                                    const newUngDung = {
-                                                        shcc: newCb.shcc,
-                                                        tenCongNghe: ungDung.tenCongNghe,
-                                                        hinhThuc: ungDung.hinhThuc,
-                                                        namChuyenGia: ungDung.namChuyenGia,
-                                                        sanPham: ungDung.sanPham
-                                                    };
-                                                    app.model.qtUngDungThuongMai.create(newUngDung, () => {
-                                                        handleUngDungThuongMai(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleUngDungThuongMai();
-                                        }
-
-                                        if (item.lamViecNgoai && item.lamViecNgoai.length > 0) {
-                                            const handleLamViecNgoai = (index = 0) => {
-                                                let LVN = item.lamViecNgoai[index];
-                                                if (index < item.lamViecNgoai.length) {
-                                                    const newLVN = {
-                                                        shcc: newCb.shcc,
-                                                        noiLamViec: LVN.noiLamViec,
-                                                        noiDung: LVN.noiDung,
-                                                        batDau: LVN.batDau,
-                                                        ketThuc: LVN.ketThuc,
-                                                        batDauType: LVN.batDauType,
-                                                        ketThucType: LVN.ketThucType
-                                                    };
-                                                    app.model.qtLamViecNgoai.create(newLVN, () => {
-                                                        handleLamViecNgoai(index + 1);
-                                                    });
-                                                }
-                                            };
-                                            handleLamViecNgoai();
-                                        }
-                                    }
-                                    handleCanBo(index + 1);
-                                });
-                            } else {
-                                handleCanBo(index + 1);
-                            }
-                        });
-                    } else {
-                        handleCanBo(index + 1);
-                    }
-                } else {
-                    res.send({ error: null });
-                }
-            };
-
-            handleCanBo();
-        });
-
-    });
 
     app.getCanBoProfile = (res, canBo) => {
         let result = app.clone(canBo),
@@ -858,20 +339,18 @@ module.exports = app => {
         new Promise(resolve => {
             app.model.fwUser.get({ email: canBo.email }, (error, user) => {
                 result = app.clone(canBo, { image: user?.image || '' });
-                resolve();
+                resolve(result);
             });
-        }).then(() => new Promise(resolve => {
-            app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
+        }).then((result) => new Promise(resolve => {
+            app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, quanHeCanBo) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin quan hệ cán bộ !' });
-                } else if (items == null) {
-                    result = app.clone(result, { items: null });
+                    res.send({ error: 'Lỗi khi lấy thông tin quan hệ gia đình cán bộ !' });
                 } else {
-                    result = app.clone(result, { items: items.rows });
+                    result = app.clone(result, { quanHeCanBo: quanHeCanBo?.rows || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.dmDonVi.get({ ma: canBo.maDonVi, kichHoat: 1 }, (error, item) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đơn vị cán bộ !' });
@@ -880,20 +359,18 @@ module.exports = app => {
                 } else {
                     result = app.clone(result, { tenDonVi: item.ten });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
-                } else if (toChucKhac == null) {
-                    result = app.clone(result, { toChucKhac: null });
                 } else {
-                    result = app.clone(result, { toChucKhac });
+                    result = app.clone(result, { toChucKhac: toChucKhac || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.qtDaoTao.getCurrentOfStaff(canBo.shcc, curTime, (error, daoTaoCurrent) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đào tạo hiện tại!' });
@@ -902,113 +379,86 @@ module.exports = app => {
                 } else {
                     result = app.clone(result, { daoTaoCurrent: daoTaoCurrent.rows });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getTDCT(canBo.shcc, (error, llct) => {
+        })).then((result) => new Promise(resolve => {
+            app.model.qtDaoTao.getHV(canBo.shcc, (error, daoTaoBoiDuong) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
-                } else if (llct == null || llct.rows.length == 0) {
-                    result = app.clone(result, { llct: null });
+                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo, bồi dưỡng!' });
                 } else {
-                    result = app.clone(result, { llct: llct.rows[0] });
+                    result = app.clone(result, { daoTaoBoiDuong: daoTaoBoiDuong.rows || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getQLNN(canBo.shcc, (error, qlnn) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
-                } else if (qlnn == null || qlnn.length == 0) {
-                    result = app.clone(result, { qlnn: null });
-                } else {
-                    result = app.clone(result, { qlnn: qlnn.rows[0] });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getHV(canBo.shcc, (error, hocViCB) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ học vấn, đào tạo !' });
-                } else if (hocViCB == null || hocViCB.length == 0) {
-                    result = app.clone(result, { hocViCB: null });
-                } else {
-                    result = app.clone(result, { hocViCB: hocViCB.rows });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getCC(canBo.shcc, (error, chungChi) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ cử nhân !' });
-                } else if (chungChi == null || chungChi.length == 0) {
-                    result = app.clone(result, { chungChi: null });
-                } else {
-                    result = app.clone(result, { chungChi: chungChi.rows });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
-                } else if (tinHoc == null || tinHoc.length == 0) {
-                    result = app.clone(result, { tinHoc: null });
-                } else {
-                    result = app.clone(result, { tinHoc: tinHoc.rows[0] });
-                }
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
+        })).then((result) => new Promise(resolve => {
             app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
                 }
-                else if (trinhDoNN == null) {
-                    result = app.clone(result, { trinhDoNN: null });
-                } else {
-                    result = app.clone(result, { trinhDoNN: trinhDoNN });
+                else {
+                    result = app.clone(result, { trinhDoNN: trinhDoNN || [] });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            let dataCV = [];
+        })).then((result) => new Promise(resolve => {
+            let chucVuChinhQuyen = [], chucVuDoanThe = [];
             app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ !' });
-                } else if (chucVu == null) {
-                    result = app.clone(result, { chucVu: [] });
+                    res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ!' });
                 } else {
-                    chucVu.rows.forEach(i => {
-                        dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
-                    });
-                    result = app.clone(result, { chucVu: dataCV });
+                    chucVuChinhQuyen = chucVu.rows.filter(i => i.loaiChucVu == 1);
+                    chucVuDoanThe = chucVu.rows.filter(i => i.loaiChucVu != 1);
+                    result = app.clone(result, { chucVuChinhQuyen, chucVuDoanThe });
                 }
-                resolve();
+                resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            app.model.qtHopDongLaoDong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hopDongLD) => {
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongDonViTraLuong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, dvtl) => {
+                if (error) {
+                    res.send({ error: 'Lỗi khi lấy thông tin hợp đồng đơn vị!' });
+                } else if (dvtl) {
+                    result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: new Date(dvtl.ngayKyHopDong).setHours(0, 0, 0), loaiHopDongCanBo: dvtl.loaiHopDong });
+                    resolve(result);
+                } else
+                    resolve(result);
+            });
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongTrachNhiem.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong', 'NGAY_KY_HOP_DONG DESC', (error, tn) => {
+                if (error) {
+                    res.send({ error: 'Lỗi khi lấy thông tin hợp đồng trách nhiệm!' });
+                } else if (tn) {
+                    let ngayKyHopDong = new Date(tn.ngayKyHopDong).setHours(0, 0, 0);
+                    if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
+                        result = app.clone(result, { hopDongCanBo: 'TN', hopDongCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: '' });
+                    } resolve(result);
+                } else
+                    resolve(result);
+            });
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongLaoDong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hdld) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng lao động !' });
-                } else if (!hopDongLD) {
-                    result = app.clone(result, { hopDongCanBo: 'VC' });
-                } else {
-                    result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: hopDongLD.ngayKyHopDong, loaiHopDongCanBo: hopDongLD.loaiHopDong });
-                }
-                resolve();
+                } else if (hdld) {
+                    let ngayKyHopDong = new Date(hdld.ngayKyHopDong).setHours(0, 0, 0);
+                    if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
+                        result = app.clone(result, { hopDongCanBo: 'LĐ', canBoCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdld.loaiHopDong });
+                    } resolve(result);
+                } else
+                    resolve(result);
             });
-        })).then(() => new Promise(resolve => {
-            app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hopDongVC) => {
+        })).then((result) => new Promise(resolve => {
+            app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hdvc) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng làm việc !' });
-                } else if (!hopDongVC)
-                    result = app.clone(result, { hopDongCanBo: 'LĐ' });
-                else {
-                    result = app.clone(result, { hopDongCanBo: 'VC', hopDongCanBoNgay: hopDongVC.ngayKyHopDong, loaiHopDongCanBo: hopDongVC.loaiHopDong });
-                }
-                resolve();
+                } else if (hdvc) {
+                    let ngayKyHopDong = new Date(hdvc.ngayKyHopDong).setHours(0, 0, 0);
+                    if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
+                        result = app.clone(result, { canBoCanBo: 'VC', canBoCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdvc.loaiHopDong });
+                    } resolve(result);
+                } else
+                    resolve(result);
             });
-        })).then(() => {
+        })).then((result) => {
             res.send({ item: result });
         });
     };
@@ -1027,322 +477,138 @@ module.exports = app => {
     app.get('/api/can-bo-ky/:shcc', checkGetStaffPermission, (req, res) => {
         app.model.canBo.getCanBoBenA(req.params.shcc, (error, item) => res.send({ error, item }));
     });
-    app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            const changes = req.body.changes, email = req.session.user.email;
-            app.model.canBo.get({ email }, (error, canBo) => {
-                if (!canBo) {
-                    changes.email = req.session.user.email;
-                    app.model.canBo.create(changes, (error, item) => {
-                        res.send({ error, item });
-                    });
-                } else {
-                    app.model.canBo.update({ email }, changes, (error, item) => {
-                        if (item && !error) app.notification.send({ toEmail: email, title: 'Cập nhật lý lịch cán bộ thành công', icon: 'fa-check-square-o', iconColor: 'success' });
-                        res.send({ error, item });
-                    });
-                }
-            });
 
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.post('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = req.body.data;
-            app.model.quanHeCanBo.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.put('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.quanHeCanBo.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = req.body.changes;
-                        app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.delete('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.quanHeCanBo.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error));
-                    } else {
-                        res.send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.get('/user/staff/:shcc/word', app.permission.check('staff:login'), (req, res) => {
-        if (req.params && req.params.shcc) {
-            app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
-                if (error || canBo == null) {
+    app.get('/api/staff/get-ly-lich/:shcc', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.params.shcc);
+        if (shcc) {
+            app.model.canBo.getLyLich(shcc, (error, item) => {
+                if (error || !item || !item.rows || !item.rows.length || !item.rows[0]) {
                     res.send({ error });
                 } else {
-                    const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
-                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
-                        trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
-                    const source = app.path.join(__dirname, 'resource', 'Mau-2C-BNV-2008.docx');
+                    let canBo = item.rows[0],
+                        { qtChucVu, qtDaoTao, qtHocTapCongTac, quanHeGiaDinh, toChucKhac } = item;
 
-                    new Promise(resolve => {
-                        app.model.dmDanToc.getAll((error, items) => {
-                            (items || []).forEach(item => danTocMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    }).then(() => new Promise(resolve => {
-                        app.model.dmTonGiao.getAll((error, items) => {
-                            (items || []).forEach(item => tonGiaoMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDoLyLuanChinhTri.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoLyLuanChinhTriMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmDonVi.getAll((error, items) => {
-                            (items || []).forEach(item => donViMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmChucVu.getAll((error, items) => {
-                            (items || []).forEach(item => chucVuMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTinhThanhPho.getAll((error, items) => {
-                            (items || []).forEach(item => tinhMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmQuanHuyen.getAll((error, items) => {
-                            (items || []).forEach(item => huyenMapping[item.ma] = item.tenQuanHuyen);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmPhuongXa.getAll((error, items) => {
-                            (items || []).forEach(item => xaMapping[item.ma] = item.tenPhuongXa);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmQuocGia.getAll((error, items) => {
-                            (items || []).forEach(item => quocGiaMapping[item.maCode] = item.tenQuocGia);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmChucDanhKhoaHoc.getAll((error, items) => {
-                            (items || []).forEach(item => chucDanhMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDo.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDoQuanLyNhaNuoc.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoQuanLyNhaNuocMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmTrinhDoTinHoc.getAll((error, items) => {
-                            (items || []).forEach(item => trinhDoTinHocMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmQuanHeGiaDinh.getAll((error, items) => {
-                            (items || []).forEach(item => quanHeMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.dmNgoaiNgu.getAll((error, items) => {
-                            (items || []).forEach(item => ngoaiNguMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        const data = {
-                            HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
-                            otherName: canBo.biDanh ? canBo.biDanh : '',
-                            cmnd: canBo.cmnd ? canBo.cmnd : '',
-                            ngayCap: app.date.viDateFormat(new Date(canBo.cmndNgayCap)),
-                            dob: new Date(canBo.ngaySinh).getDate(),
-                            mob: new Date(canBo.ngaySinh).getMonth() + 1,
-                            yob: new Date(canBo.ngaySinh).getFullYear(),
-                            sex: canBo.phai == '01' ? 'Nam' : canBo.phai == '02' ? 'Nữ' : '',
-                            // gioi tinh 00 sua lai -> neu ko co data thi de trong
-                            // nsXa: canBo.maXaNoiSinh ? xaMapping[canBo.maXaNoiSinh] + ',' : '',
-                            // nsHuyen: canBo.maHuyenNoiSinh ? huyenMapping[canBo.maHuyenNoiSinh] + ',' : '',
-                            // nsTinh: canBo.tinhNoiSinh ? tinhMapping[canBo.maTinhNoiSinh] : '',
-                            // qqXa: canBo.maXaNguyenQuan ? xaMapping[canBo.xaNguyenQuan] + ',' : '',
-                            // qqHuyen: canBo.maHuyenNguyenQuan ? huyenMapping[canBo.maHuyenNguyenQuan] + ',' : '',
-                            // qqTinh: canBo.maTinhNguyenQuan ? tinhMapping[canBo.maTinhNguyenQuan] : '',
-                            noiSinh: canBo.noiSinh ? canBo.noiSinh : '',
-                            queQuan: canBo.queQuan ? canBo.queQuan : '',
-                            danToc: canBo.danToc ? danTocMapping[canBo.danToc] : '',
-                            tonGiao: canBo.tonGiao ? tonGiaoMapping[canBo.tonGiao] : 'Không',
-                            hoKhau: canBo.hoKhau ? canBo.hoKhau : '',
-                            diaChiHienTai: canBo.diaChiHienTai ? canBo.diaChiHienTai : '',
-                            ngheNghiepCu: canBo.ngheNghiepCu ? canBo.ngheNghiepCu : '',
-                            ngayBatDauCongTac: canBo.ngayBatDauCongTac ? app.date.viDateFormat(new Date(canBo.ngayBatDauCongTac)) : '',
-                            ngayBienChe: canBo.ngayBienChe ? app.date.viDateFormat(new Date(canBo.ngayBienChe)) : '',
-                            // ngach_cong_chuc: canBo.tenNgach ? canBo.tenNgach : '',
-                            // ma_ngach: canBo.maNgach ? canBo.maNgach : '',
-                            // bac_luong: canBo.bacLuong ? canBo.bacLuong : '',
-                            // he_so_luong: canBo.heSoLuong ? canBo.heSoLuong : '',
-                            // ngay_huong_luong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
-                            // phu_cap_cv: canBo.phuCapCongViec ? canBo.phuCapCongViec : '',
-                            trinh_do_llct: canBo.maTrinhDoLlct ? trinhDoLyLuanChinhTriMapping[canBo.maTrinhDoLlct] : '',
-                            trinh_do_qlnn: canBo.maTrinhDoQlnn ? trinhDoQuanLyNhaNuocMapping[canBo.maTrinhDoQlnn] : '',
-                            trinhDoPhoThong: canBo.trinhDoPhoThong ? canBo.trinhDoPhoThong : '',
-                            // trinh_do_nn: canBo.trinhDoNn ? canBo.trinhDoQlnn : '',
-                            trinh_do_tin_hoc: canBo.maTrinhDoTinHoc ? trinhDoTinHocMapping[canBo.maTrinhDoTinHoc] : '',
-                            trinh_do: canBo.hocVi ? trinhDoMapping[canBo.hocVi] : '',
-                            chucVu: canBo.maChucVu ? chucVuMapping[canBo.maChucVu] : '',
-                            donVi: canBo.maDonVi ? donViMapping[canBo.maDonVi] : '',
-                            quanhe: [],
-                            quanHeInLaw: [],
-                            ngoaiNgu: [],
-                            daoTao: [],
-                            htct: [],
-                            // chuyenngach0: chuyenngach && chuyenngach[0] ? chuyenngach[0] : null,
-                            // chuyenngach1: chuyenngach && chuyenngach[1] ? chuyenngach[1] : null,
-                            // chuyenngach2: chuyenngach && chuyenngach[2] ? chuyenngach[2] : null,
-                            // chuyenngach3: chuyenngach && chuyenngach[3] ? chuyenngach[3] : null,
-                            nhomMau: canBo.nhomMau ? canBo.nhomMau : '',
-                            sucKhoe: canBo.sucKhoe ? canBo.sucKhoe : '',
-                            canNang: canBo.canNang ? canBo.canNang : '',
-                            chieuCao: canBo.chieuCao ? Math.floor(Number(canBo.chieuCao) / 100) + 'm' + (Number(canBo.chieuCao) % 100) : '',
-                            ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
-                            ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(new Date(canBo.ngayVaoDangChinhThuc)) : '',
-                            danhHieu: canBo.danhHieu ? canBo.danhHieu : '',
-                            soTruong: canBo.soTruong ? canBo.soTruong : '',
-                            bhxh: canBo.soBhxh ? canBo.soBhxh : '',
-                            ngayNhapNgu: canBo.ngayNhapNgu ? app.date.viDateFormat(new Date(canBo.ngayNhapNgu)) : '',
-                            ngayXuatNgu: canBo.ngayXuatNgu ? app.date.viDateFormat(new Date(canBo.ngayXuatNgu)) : '',
-                            quanHam: canBo.quanHam ? canBo.quanHam : '',
-                            hangThuongBinh: canBo.hangThuongBinh ? canBo.hangThuongBinh : '',
-                            giaDinhChinhSach: canBo.giaDinhChinhSach ? canBo.giaDinhChinhSach : ''
-                        };
-                        resolve(data);
+                    qtDaoTao.map(item => {
+                        item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
+                        item.ketThuc = item.ketThuc ? (item.ketThuc == -1 ? ' - nay' : ' - ' + app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType)) : '';
+                        item.tenTrinhDo = item.tenTrinhDo || item.trinhDo || '';
+                        item.tenHinhThuc = item.tenHinhThuc || '';
+                        item.coSo = item.coSo || '';
+                        return item;
+                    });
 
-                    })).then((data) => new Promise(resolve => {
-                        app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, qhItems) => {
-                            if (!error && qhItems && qhItems.length > 0) {
-                                const handleQuanHe = (index = 0) => {
-                                    let item = qhItems[index];
-                                    if (index < qhItems.length) {
-                                        if (item.type == 0) data.quanhe.push({
-                                            moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
-                                            hoTen: item.hoTen,
-                                            namSinh: item.namSinh ? new Date(item.namSinh).getFullYear() : '',
-                                            queQuan: item.queQuan ? item.queQuan : '',
-                                            ngheNghiep: item.ngheNghiep ? item.ngheNghiep : '',
-                                            diaChi: item.diaChi ? item.diaChi : ''
-                                        }); else data.quanHeInLaw.push({
-                                            moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
-                                            hoTen: item.hoTen,
-                                            namSinh: item.namSinh ? new Date(item.namSinh).getFullYear() : '',
-                                            queQuan: item.queQuan ? item.queQuan : '',
-                                            ngheNghiep: item.ngheNghiep ? item.ngheNghiep : '',
-                                            diaChi: item.diaChi ? item.diaChi : ''
-                                        });
-                                        handleQuanHe(index + 1);
-                                    }
-                                };
-                                handleQuanHe();
-                            }
-                            resolve(data);
+                    const getMaxDaoTao = (ten) => {
+                        let data = qtDaoTao.filter(item => item.chuyenNganh == ten);
+                        if (!data.length) return '';
+                        else return data.reduce((prev, cur) => {
+                            return (prev.batDau > cur.batDau && prev.ketThuc != -1) ? prev : cur;
                         });
-                    })).then((data) => new Promise(resolve => {
-                        app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, nnItems) => {
-                            if (!error && nnItems && nnItems.length > 0) {
-                                const handleNgoaiNgu = (index = 0) => {
-                                    let item = nnItems[index];
-                                    if (index < nnItems.length) {
-                                        if (item.loaiNgonNgu) data.ngoaiNgu.push({
-                                            ngonNgu: ngoaiNguMapping[item.loaiNgonNgu],
-                                            trinhDo: item.trinhDo
-                                        });
-                                        handleNgoaiNgu(index + 1);
-                                    }
-                                };
-                                handleNgoaiNgu();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => new Promise(resolve => {
-                        app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, dtItems) => {
-                            if (!error && dtItems && dtItems.length > 0) {
-                                const handleDaoTao = (index = 0) => {
-                                    let item = dtItems[index];
-                                    if (index < dtItems.length) {
-                                        data.daoTao.push({
-                                            coSo: item.tenTruong,
-                                            chuyenNganh: item.chuyenNganh ? item.chuyenNganh : '',
-                                            batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
-                                            ketThuc: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '',
-                                            hinhThuc: item.hinhThuc ? item.hinhThuc : '',
-                                            vanBang: item.loaiBangCap ? item.loaiBangCap : '',
-                                            thoiGian: item.thoiGian ? item.thoiGian + ' tháng' : ''
-                                        });
-                                        handleDaoTao(index + 1);
-                                    }
-                                };
-                                handleDaoTao();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => new Promise(resolve => {
-                        app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, htctItems) => {
-                            if (!error && htctItems && htctItems.length > 0) {
-                                const handleHtct = (index = 0) => {
-                                    let item = htctItems[index];
-                                    if (index < htctItems.length) {
-                                        data.htct.push({
-                                            noiDung: item.noiDung ? item.noiDung : '',
-                                            batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
-                                            ketThuc: item.ketThuc ? item.ketThuc == -1 ? 'đến nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''
-                                        });
-                                        handleHtct(index + 1);
-                                    }
-                                };
-                                handleHtct();
-                            }
-                            resolve(data);
-                        });
-                    })).then((data) => {
-                        app.docx.generateFile(source, data, (error, data) => {
-                            if (error)
-                                res.send({ error });
-                            else
-                                res.send({ data });
-                        });
+                    };
+
+                    let llct = getMaxDaoTao('Lý luận chính trị'),
+                        qlnn = getMaxDaoTao('Quản lý nhà nước'),
+                        tinHoc = getMaxDaoTao('Tin học');
+                    if (!qtHocTapCongTac.length) {
+                        qtHocTapCongTac = [{
+                            batDau: '',
+                            ketThuc: '',
+                            noiDung: ''
+                        }];
+                    }
+                    else qtHocTapCongTac.map(item => {
+                        item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
+                        item.ketThuc = item.ketThuc == -1 ? 'nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType);
+                        return item;
+                    });
+
+                    quanHeGiaDinh.map(item => {
+                        item.namSinh = new Date(item.namSinh).getFullYear();
+                        item.ngheNghiep = item.ngheNghiep || '';
+                        item.noiCongTac = item.noiCongTac || '';
+                        return item;
+                    });
+                    if (!toChucKhac.length) {
+                        toChucKhac = [{
+                            tenToChuc: '',
+                            ngayThamGia: '',
+                            moTa: ''
+                        }];
+                    } else toChucKhac.map(item => {
+                        item.ngayThamGia = item.ngayThamGia ? app.date.dateTimeFormat(new Date(item.ngayThamGia), 'dd/mm/yyyy') : '';
+                    });
+                    const type = req.query.type;
+                    const source = app.path.join(__dirname, 'resource', type == 'cc' ? 'Mau-2C-BNV-2008.docx' : 'HSVC.docx');
+                    const data = {
+                        HO_TEN: (canBo.ho + ' ' + canBo.ten).toUpperCase(),
+                        otherName: '',
+                        cmnd: canBo.cmnd || '',
+                        ngayCap: app.date.viDateFormat(new Date(canBo.ngayCapCmnd)),
+                        dob: new Date(canBo.ngaySinh).getDate(),
+                        mob: new Date(canBo.ngaySinh).getMonth() + 1,
+                        yob: new Date(canBo.ngaySinh).getFullYear(),
+                        sex: canBo.gioiTinh,
+                        nsXa: canBo.xaNoiSinh ? canBo.xaNoiSinh + ',' : '',
+                        nsHuyen: canBo.huyenNoiSinh ? canBo.huyenNoiSinh + ',' : '',
+                        nsTinh: canBo.tinhNoiSinh ? canBo.tinhNoiSinh : '',
+                        qqXa: canBo.xaNguyenQuan ? canBo.xaNguyenQuan + ',' : '',
+                        qqHuyen: canBo.huyenNguyenQuan ? canBo.huyenNguyenQuan + ',' : '',
+                        qqTinh: canBo.tinhNguyenQuan ? canBo.tinhNguyenQuan : '',
+                        hienTai: (canBo.soNhaHienTai ? canBo.soNhaHienTai + ', ' : '')
+                            + (canBo.xaHienTai ? canBo.xaHienTai + ', ' : '')
+                            + (canBo.huyenHienTai ? canBo.huyenHienTai + ', ' : '')
+                            + (canBo.tinhHienTai ? canBo.tinhHienTai : ''),
+                        thuongTru: (canBo.soNhaThuongTru ? canBo.soNhaThuongTru + ', ' : '')
+                            + (canBo.xaThuongTru ? canBo.xaThuongTru + ', ' : '')
+                            + (canBo.huyenThuongTru ? canBo.huyenThuongTru + ', ' : '')
+                            + (canBo.tinhThuongTru ? canBo.tinhThuongTru : ''),
+                        ngheTuyen: canBo.ngheTuyen || '',
+                        ngayTuyen: canBo.ngayTuyen ? app.date.viDateFormat(new Date(canBo.ngayTuyen)) : '',
+                        coQuanTuyen: canBo.coQuanTuyen || 'Đại học KHXH&NV HCM',
+                        maNgach: canBo.maNgach || '',
+                        tenNgach: canBo.tenNgach || '',
+                        bacLuong: canBo.bacLuong || '',
+                        heSoLuong: canBo.heSoLuong || '',
+                        ngayHuongLuong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
+                        danToc: canBo.danToc || '',
+                        tonGiao: canBo.tonGiao || '',
+                        phuCapChucVu: qtChucVu[0]?.phuCapChucVu || '',
+                        chucVu: qtChucVu[0]?.chucVu || '',
+                        donVi: qtChucVu[0]?.donVi || '',
+                        phoThong: canBo.phoThong || '',
+                        hocVi: canBo.hocVi || '',
+                        ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
+                        ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(new Date(canBo.ngayVaoDangChinhThuc)) : '',
+                        ngayNhapNgu: canBo.ngayNhapNgu ? app.date.viDateFormat(new Date(canBo.ngayNhapNgu)) : '',
+                        ngayXuatNgu: canBo.ngayXuatNgu ? app.date.viDateFormat(new Date(canBo.ngayXuatNgu)) : '',
+                        quanHam: canBo.quanHam || '',
+                        soTruong: canBo.soTruong || '',
+                        sucKhoe: canBo.sucKhoe || '',
+                        chieuCao: canBo.chieuCao || '',
+                        canNang: canBo.canNang || '',
+                        nhomMau: canBo.nhomMau || '',
+                        hangThuongBinh: canBo.hangThuongBinh || '',
+                        giaDinhChinhSach: canBo.giaDinhChinhSach || '',
+                        bhxh: canBo.soBaoHiemXaHoi || '',
+                        toChucKhac,
+                        qtDaoTao,
+                        llct: llct.tenTrinhDo || '',
+                        tinHoc: tinHoc.tenTrinhDo || '',
+                        qlnn: qlnn.tenTrinhDo || '',
+                        qtHocTapCongTac,
+                        ngoaiNgu: canBo.ngoaiNgu || '',
+                        quanHe: quanHeGiaDinh.filter(i => i.loai == 0),
+                        quanHeInLaw: quanHeGiaDinh.filter(i => i.loai == 1),
+                        danhHieu: ''
+                    };
+                    app.docx.generateFile(source, data, (error, data) => {
+                        if (error)
+                            res.send({ error });
+                        else
+                            res.send({ data });
                     });
                 }
             });
-        }
+        } else res.send({ error: 'No permission' });
     });
 
     app.get('/user/staff/:shcc/word-llkh', app.permission.check('staff:login'), (req, res) => {
@@ -1480,10 +746,7 @@ module.exports = app => {
 
                     })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
-                            if (error) {
-                                res.send({ error });
-                            } else
-                                res.send({ data });
+                            res.send({ error, data });
                         });
                     });
                 }
@@ -2247,52 +1510,537 @@ module.exports = app => {
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
 
-    app.get('/api/staff/download-excel/:filter', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.download(req.params.filter, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+    app.get('/api/staff/get-all-chuyen-nganh', app.permission.check('staff:read'), (req, res) => {
+        app.model.canBo.getAll({
+            statement: 'lower(chuyenNganh) LIKE (:searchTerm)',
+            parameter: {
+                searchTerm: `%${req.query.condition || ''}%`
+            }
+        }, 'chuyenNganh', null, (error, items) => res.send({ error, items }));
+    });
+    app.get('/api/staff/download-excel/:filter/:searchTerm', checkGetStaffPermission, (req, res) => {
+        let searchTerm = req.params.searchTerm;
+        if (searchTerm == 'null') searchTerm = '';
+
+        app.model.canBo.download(req.params.filter, searchTerm, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('Sheet1');
                 new Promise(resolve => {
                     let cells = [
-                        // Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, chucVuDoanThe, chucVuDang, chucVuKiemNhiem, hoKhau, diaChiHienTai, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, hopDongCanBo, hopDongCanBoNgay, userModified, lastModified, dangNghiThaiSan, ngayBatDauNghiThaiSan, ngayKetThucNghiThaiSan, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, dangNghiKhongHuongLuong, ngayBatDauNghiKhongHuongLuong, ngayKetThucNghiKhongHuongLuong, lyDoNghiKhongHuongLuong, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, phuCapChucVu, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, loaiHopDong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh }
+                        // Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, chucVuDoanThe, chucVuDang, chucVuKiemNhiem, hoKhau, diaChiHienTai, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, canBoCanBo, canBoCanBoNgay, userModified, lastModified, dangNghiThaiSan, ngayBatDauNghiThaiSan, ngayKetThucNghiThaiSan, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, dangNghiKhongHuongLuong, ngayBatDauNghiKhongHuongLuong, ngayKetThucNghiKhongHuongLuong, lyDoNghiKhongHuongLuong, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, phuCapChucVu, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, loaiHopDong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh }
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
-                        { cell: 'B1', value: 'MÃ SỐ CÁN BỘ', bold: true, border: '1234' },
-                        { cell: 'C1', value: 'HỌ', bold: true, border: '1234' },
-                        { cell: 'D1', value: 'TÊN', bold: true, border: '1234' },
-                        { cell: 'E1', value: 'NGÀY SINH', bold: true, border: '1234' },
-                        { cell: 'F1', value: 'QUÊ QUÁN', bold: true, border: '1234' },
-                        { cell: 'G1', value: 'DÂN TỘC', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'TÔN GIÁO', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'CHỨC VỤ', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'BỔ NHIỆM NGÀY', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' }
+                        { cell: 'B1', value: 'Mã số VC&NLD', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'Họ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'Tên', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'Giới tính', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'Ngày sinh', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'Quê quán', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Dân tộc', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Tôn giáo', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'Chức vụ', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Bổ nhiệm ngày', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'Đơn vị công tác', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'Năm bắt đầu công tác', bold: true, border: '1234' },
+                        { cell: 'N1', value: 'Chức danh nghề nghiệp', bold: true, border: '1234' },
+                        { cell: 'O1', value: 'Mã ngạch', bold: true, border: '1234' },
+                        { cell: 'P1', value: 'Hệ số lương hiện hữu', bold: true, border: '1234' },
+                        { cell: 'Q1', value: 'Bậc trong ngạch', bold: true, border: '1234' },
+                        { cell: 'R1', value: 'Phụ cấp thâm niên vượt khung', bold: true, border: '1234' },
+                        { cell: 'S1', value: 'Thời điểm tính nâng bậc lương lần sau', bold: true, border: '1234' },
+                        { cell: 'T1', value: 'Phụ cấp chức vụ', bold: true, border: '1234' },
+                        { cell: 'U1', value: 'Trình độ chuyên môn', bold: true, border: '1234' },
+                        { cell: 'V1', value: 'Quốc gia tốt nghiệp', bold: true, border: '1234' },
+                        { cell: 'W1', value: 'Chuyên ngành', bold: true, border: '1234' },
+                        { cell: 'X1', value: 'Năm đạt học vị TS', bold: true, border: '1234' },
+                        { cell: 'Y1', value: 'Chức danh khoa học', bold: true, border: '1234' },
+                        { cell: 'Z1', value: 'Năm bổ nhiệm', bold: true, border: '1234' },
+                        { cell: 'AA1', value: 'Ngành chuyên môn', bold: true, border: '1234' },
+                        { cell: 'AB1', value: 'Danh hiệu nhà giáo (NGND, NGUT)', bold: true, border: '1234' },
+                        { cell: 'AC1', value: 'Biên chế', bold: true, border: '1234' },
+                        { cell: 'AD1', value: 'Ngày vào biên chế', bold: true, border: '1234' },
+                        { cell: 'AE1', value: 'Đảng viên', bold: true, border: '1234' },
+                        { cell: 'AF1', value: 'Ghi chú', bold: true, border: '1234' },
+                        { cell: 'AG1', value: 'Số CMND', bold: true, border: '1234' },
+                        { cell: 'AH1', value: 'Ngày cấp', bold: true, border: '1234' },
+                        { cell: 'AI1', value: 'Nơi cấp', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
                         cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.ho });
                         cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.ten });
-                        cells.push({ cell: 'E' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.queQuan });
-                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDanToc });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTonGiao });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.chucVuChinh });
-                        cells.push({ cell: 'J' + (index + 2), alignment: 'center', border: '1234', value: item.boNhiemNgay ? app.date.dateTimeFormat(new Date(item.boNhiemNgay), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.chucDanhNgheNghiep });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
+                        cells.push({ cell: 'F' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.queQuan });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenDanToc });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenTonGiao });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.chucVuChinh });
+                        cells.push({ cell: 'K' + (index + 2), alignment: 'center', border: '1234', value: item.boNhiemNgay ? app.date.dateTimeFormat(new Date(item.boNhiemNgay), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.ngayBatDauCongTac ? app.date.dateTimeFormat(new Date(item.ngayBatDauCongTac), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
+                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.ngach });
+                        cells.push({ cell: 'P' + (index + 2), border: '1234', value: item.heSoLuong });
+                        cells.push({ cell: 'Q' + (index + 2), border: '1234', value: item.bacLuong });
+                        cells.push({ cell: 'R' + (index + 2), border: '1234', value: item.tyLeVuotKhung ? item.tyLeVuotKhung.toString() + '%' : '' });
+                        cells.push({ cell: 'S' + (index + 2), border: '1234', value: item.mocNangLuong ? app.date.dateTimeFormat(new Date(item.mocNangLuong), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'T' + (index + 2), border: '1234', value: item.phuCapChucVu });
+                        cells.push({ cell: 'U' + (index + 2), border: '1234', value: item.hocVi ? item.hocVi : item.trinhDoPhoThong });
+                        cells.push({ cell: 'V' + (index + 2), border: '1234', value: item.danhSahcQuocGiaHocViNoiTotNghiep });
+                        cells.push({ cell: 'W' + (index + 2), border: '1234', value: item.chuyenNganh });
+                        cells.push({ cell: 'X' + (index + 2), border: '1234', value: item.namHocVi ? app.date.dateTimeFormat(new Date(item.namHocVi), 'yyyy') : '' });
+                        cells.push({ cell: 'Y' + (index + 2), border: '1234', value: item.hocHam });
+                        cells.push({ cell: 'Z' + (index + 2), border: '1234', value: item.namChucDanh ? app.date.dateTimeFormat(new Date(item.namChucDanh), 'yyyy') : '' });
+                        cells.push({ cell: 'AA' + (index + 2), border: '1234', value: item.chuyenNganhChucDanh });
+                        cells.push({ cell: 'AB' + (index + 2), border: '1234', value: item.danhHieu });
+                        cells.push({ cell: 'AC' + (index + 2), border: '1234', value: item.ngayBienChe ? 'X' : '' });
+                        cells.push({ cell: 'AD' + (index + 2), border: '1234', value: (item.ngayBienChe && item.ngayBienChe != 1) ? app.date.dateTimeFormat(new Date(item.ngayBienChe), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'AE' + (index + 2), border: '1234', value: item.dangVien ? 'X' : '' });
+                        cells.push({ cell: 'AF' + (index + 2), border: '1234', value: item.ghiChu });
+                        cells.push({ cell: 'AG' + (index + 2), border: '1234', value: item.cmnd });
+                        cells.push({ cell: 'AH' + (index + 2), border: '1234', value: item.cmndNgayCap ? app.date.dateTimeFormat(new Date(item.cmndNgayCap), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'AI' + (index + 2), border: '1234', value: item.cmndNoiCap });
                     });
                     resolve(cells);
                 }).then((cells) => {
                     app.excel.write(worksheet, cells);
-                    app.excel.attachment(workbook, res, 'Danh sach can bo.xlsx');
+                    app.excel.attachment(workbook, res, 'DANH_SACH_CAN_BO.xlsx');
                 }).catch((error) => {
                     res.send({ error });
                 });
             }
         });
+    });
 
+    app.get('/api/staff/by-email/:email', app.permission.check('staff:read'), (req, res) => {
+        app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
+    });
+
+    app.post('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        if (shcc) {
+            let data = { ...req.body.data, shcc };
+            app.model.quanHeCanBo.create(data, (error, item) => res.send({ error, item }));
+        } else res.send({ error: 'No permission' });
+    });
+
+    app.put('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.quanHeCanBo.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })) : res.send({ error: 'No permission' });
+    });
+
+    app.delete('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
+        let shcc = app.model.canBo.validShcc(req, req.body.shcc);
+        shcc ? app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error)) : res.send({ error: 'No permission' });
+    });
+
+    app.get('/api/staff/download-monthly-report', checkGetStaffPermission, (req, res) => {
+        const workbook = app.excel.create(),
+            worksheet = workbook.addWorksheet('Sheet1');
+        const promiseCalDonVi = new Promise((resolve) => {
+            let cells = [{ cell: 'A1', value: 'Thống kê Đơn vị thuộc Trường', border: '1234', bold: true }];
+            cells.push({ cell: 'B1', value: 'Số lượng', border: '1234', bold: true });
+            app.model.dmDonVi.getAll((error, data) => {
+                data = data.groupBy('maPl');
+                cells.push({ cell: 'A2', value: 'Phòng chức năng, Thư viện, Bảo tàng, CS.TĐ', border: '1234' });
+                cells.push({ cell: 'B2', number: data['2']?.length, border: '1234' });
+                cells.push({ cell: 'A3', value: 'Khoa', border: '1234' });
+                cells.push({ cell: 'B3', number: data['1']?.length, border: '1234' });
+                cells.push({ cell: 'A4', value: 'Bộ môn', border: '1234' });
+                cells.push({ cell: 'B4', number: data['5']?.length, border: '1234' });
+                cells.push({ cell: 'A5', value: 'Trung tâm', border: '1234' });
+                cells.push({ cell: 'B5', number: data['3']?.length, border: '1234' });
+                cells.push({ cell: 'A6', value: 'Công ty', border: '1234' });
+                cells.push({ cell: 'B6', number: data['6']?.length, border: '1234' });
+                cells.push({ cell: 'A7', value: 'Đoàn thể', border: '1234' });
+                cells.push({ cell: 'B7', number: data['4']?.length, border: '1234' });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalBoMon = new Promise((resolve) => {
+            let cells = [{ cell: 'A8', value: 'Thống kê Đơn vị thuộc Phòng/Khoa/Trung tâm', border: '1234', bold: true }];
+            app.model.dmBoMon.getAll((error, data) => {
+                data = data.groupBy('maPl');
+                cells.push({ cell: 'A9', value: 'Bộ môn thuộc Khoa/Trung tâm', border: '1234' });
+                cells.push({ cell: 'B9', number: data['1']?.length, border: '1234' });
+                cells.push({ cell: 'A10', value: 'Phòng thuộc Khoa', border: '1234' });
+                cells.push({ cell: 'B10', number: data['2']?.length, border: '1234' });
+                cells.push({ cell: 'A11', value: 'Bộ Trung tâm thuộc Khoa/Phòng', border: '1234' });
+                cells.push({ cell: 'B11', number: data['3']?.length, border: '1234' });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalVCQL = new Promise((resolve) => {
+            let cells = [{ cell: 'A13', value: 'Thống kê viên chức quản lí', border: '1234', bold: true }];
+            cells.push({ cell: 'B13', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C13', value: 'Không tính kiêm nhiệm', border: '1234', bold: true });
+            let calVCQLCapTruong = 0;
+            let calVCQLCapTruongKhongKiemNhiem = 0;
+            let calVCQLCapKhoa = 0;
+            let calVCQLCapKhoaKhongKiemNhiem = 0;
+            app.model.qtChucVu.getAll((error, data) => {
+                data.forEach((item) => {
+                    if (item.maBoMon == null) calVCQLCapTruong++;
+                    if (item.maBoMon == null && item.chucVuChinh == 1) calVCQLCapTruongKhongKiemNhiem++;
+                    if (item.maBoMon) calVCQLCapKhoa++;
+                    if (item.maBoMon && item.chucVuChinh == 1) calVCQLCapKhoaKhongKiemNhiem++;
+                });
+                cells.push({ cell: 'A14', value: 'VCQL cấp đơn vị thuộc trường', border: '1234' });
+                cells.push({ cell: 'B14', number: calVCQLCapTruong, border: '1234' });
+                cells.push({ cell: 'C14', number: calVCQLCapTruongKhongKiemNhiem, border: '1234' });
+                cells.push({ cell: 'A15', value: 'VCQL cấp đơn vị thuộc phòng, ban, khoa, bộ môn, trung tâm', border: '1234' });
+                cells.push({ cell: 'B15', number: calVCQLCapKhoa, border: '1234' });
+                cells.push({ cell: 'C15', number: calVCQLCapKhoaKhongKiemNhiem, border: '1234' });
+                cells.push({ cell: 'A16', value: 'Tổng cộng', border: '1234', bold: true });
+                cells.push({ cell: 'B16', number: calVCQLCapTruong + calVCQLCapKhoa, border: '1234', bold: true });
+                cells.push({ cell: 'C16', number: calVCQLCapTruongKhongKiemNhiem + calVCQLCapKhoaKhongKiemNhiem, border: '1234', bold: true });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalCanBo = new Promise(resolve => {
+            let cells = [{ cell: 'A18', value: 'Loại hình biên chế/hợp đồng', border: '1234', bold: true }];
+            cells.push({ cell: 'B18', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C18', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D18', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E18', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            let calBienChe = 0;
+            let calHopDong = 0;
+            let calBienCheNu = 0;
+            let calHopDongNu = 0;
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL',
+                parameter: {}
+            }, (error, data) => {
+                data.forEach((item) => {
+                    if (item.ngayBienChe) {
+                        calBienChe++;
+                        if (item.phai == '02') calBienCheNu++;
+                    } else {
+                        calHopDong++;
+                        if (item.phai == '02') calHopDongNu++;
+                    }
+                });
+                let total = calBienChe + calHopDong;
+                cells.push({ cell: 'A19', value: 'Biên chế', border: '1234' });
+                cells.push({ cell: 'B19', number: calBienChe, border: '1234' });
+                cells.push({ cell: 'C19', value: Number.parseFloat(calBienChe * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D19', number: calBienCheNu, border: '1234' });
+                cells.push({ cell: 'E19', value: Number.parseFloat(calBienCheNu * 100 / (calBienCheNu + calHopDongNu)).toFixed(2), border: '1234' });
+                cells.push({ cell: 'A20', value: 'Hợp đồng', border: '1234' });
+                cells.push({ cell: 'B20', number: calHopDong, border: '1234' });
+                cells.push({ cell: 'C20', value: Number.parseFloat(calHopDong * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D20', number: calHopDongNu, border: '1234' });
+                cells.push({ cell: 'E20', value: Number.parseFloat(calHopDongNu * 100 / (calBienCheNu + calHopDongNu)).toFixed(2), border: '1234' });
+                cells.push({ cell: 'A21', value: 'Tổng cộng', border: '1234', bold: true });
+                cells.push({ cell: 'B21', number: total, border: '1234', bold: true });
+                cells.push({ cell: 'C21', value: 100.00, border: '1234', bold: true });
+                cells.push({ cell: 'D21', number: calBienCheNu + calHopDongNu, border: '1234', bold: true });
+                cells.push({ cell: 'E21', value: 100.00, border: '1234', bold: true });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalChucDanhNgheNghiep = new Promise(resolve => {
+            let cells = [{ cell: 'A23', value: 'Cơ cấu', border: '1234', bold: true }];
+            cells.push({ cell: 'B23', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C23', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D23', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E23', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            let listNhom = [0, 0, 0, 0, 0];
+            let listNhomNu = [0, 0, 0, 0, 0];
+            let chuyenVienDaoTao = 0, chuyenVienDaoTaoNu = 0;
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL',
+                parameter: {}
+            }, (error, data) => {
+                const traverse = (index = 0) => {
+                    if (index >= data.length) {
+                        let total = listNhom[0] + listNhom[1] + listNhom[2] + listNhom[3] + listNhom[4],
+                            totalNu = listNhomNu[0] + listNhomNu[1] + listNhomNu[2] + listNhomNu[3] + listNhomNu[4];
+                        cells.push({ cell: 'A24', value: 'Giảng viên', border: '1234' });
+                        cells.push({ cell: 'B24', number: listNhom[0], border: '1234' });
+                        cells.push({ cell: 'C24', value: Number.parseFloat(listNhom[0] * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D24', number: listNhomNu[0], border: '1234' });
+                        cells.push({ cell: 'E24', value: Number.parseFloat(listNhomNu[0] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A25', value: 'Nghiên cứu viên', border: '1234' });
+                        cells.push({ cell: 'B25', number: listNhom[1], border: '1234' });
+                        cells.push({ cell: 'C25', value: Number.parseFloat(listNhom[1] * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D25', number: listNhomNu[1], border: '1234' });
+                        cells.push({ cell: 'E25', value: Number.parseFloat(listNhomNu[1] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A26', value: 'Chuyên viên phục vụ đào tạo và NCKH', border: '1234' });
+                        cells.push({ cell: 'B26', number: chuyenVienDaoTao, border: '1234' });
+                        cells.push({ cell: 'C26', value: Number.parseFloat(chuyenVienDaoTao * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D26', number: chuyenVienDaoTaoNu, border: '1234' });
+                        cells.push({ cell: 'E26', value: Number.parseFloat(chuyenVienDaoTaoNu * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A27', value: 'Chuyên viên hành chính và nhân viên phục vụ', border: '1234' });
+                        cells.push({ cell: 'B27', number: (total - chuyenVienDaoTao - listNhom[0] - listNhom[1]), border: '1234' });
+                        cells.push({ cell: 'C27', value: Number.parseFloat((total - chuyenVienDaoTao - listNhom[0] - listNhom[1]) * 100 / total).toFixed(2), border: '1234' });
+                        cells.push({ cell: 'D27', number: (totalNu - chuyenVienDaoTaoNu - listNhomNu[0] - listNhomNu[1]), border: '1234' });
+                        cells.push({ cell: 'E27', value: Number.parseFloat((totalNu - chuyenVienDaoTaoNu - listNhomNu[0] - listNhomNu[1]) * 100 / totalNu).toFixed(2), border: '1234' });
+
+                        cells.push({ cell: 'A28', value: 'Tổng', border: '1234', bold: true });
+                        cells.push({ cell: 'B28', number: total, border: '1234', bold: true });
+                        cells.push({ cell: 'C28', value: 100.00, border: '1234', bold: true });
+                        cells.push({ cell: 'D28', number: totalNu, border: '1234', bold: true });
+                        cells.push({ cell: 'E28', value: 100.00, border: '1234', bold: true });
+                        resolve(cells);
+                        return;
+                    }
+                    app.model.dmNgachCdnn.get({ ma: data[index].ngach }, (error, itemNgach) => {
+                        if (itemNgach) {
+                            if (itemNgach.nhom && itemNgach.nhom <= 5) {
+                                let nhom = itemNgach.nhom;
+                                listNhom[nhom - 1] += 1;
+                                if (data[index].phai == '02') listNhomNu[nhom - 1] += 1;
+                            }
+                            if (data[index].ngach == '01.003') {
+                                if (data[index].isCvdt == 1) {
+                                    chuyenVienDaoTao += 1;
+                                    if (data[index].phai == '02') chuyenVienDaoTaoNu += 1;
+                                }
+                            }
+                        }
+                        traverse(index + 1);
+                    });
+                };
+                traverse();
+            });
+        });
+
+        const promiseCalTrinhDoCanBo = new Promise(resolve => {
+            let cells = [{ cell: 'A30', value: 'Trình độ VC, NLĐ', border: '1234', bold: true }];
+            cells.push({ cell: 'B30', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C30', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D30', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E30', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL',
+                parameter: {}
+            }, (error, data) => {
+                let dataHocVi = data.groupBy('hocVi');
+                let dataChucDanh = data.groupBy('chucDanh');
+                ['01', '02', '03', '04', '05'].forEach((key,) => {
+                    if (!(key in dataHocVi)) {
+                        dataHocVi[key] = [];
+                    }
+                });
+                ['01', '02'].forEach((key,) => {
+                    if (!(key in dataChucDanh)) {
+                        dataChucDanh[key] = [];
+                    }
+                });
+                let dataHocViNu = {};
+                let dataChucDanhNu = {};
+                let total = data.length;
+                let totalNu = 0;
+                for (const [key, list] of Object.entries(dataHocVi)) {
+                    dataHocViNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') {
+                            dataHocViNu[key] += 1;
+                            totalNu += 1;
+                        }
+                    });
+                }
+                for (const [key, list] of Object.entries(dataChucDanh)) {
+                    dataChucDanhNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') dataChucDanhNu[key] += 1;
+                    });
+                }
+                cells.push({ cell: 'A31', value: 'Giáo sư', border: '1234' });
+                cells.push({ cell: 'B31', number: dataChucDanh['01'].length, border: '1234' });
+                cells.push({ cell: 'C31', value: Number.parseFloat(dataChucDanh['01'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D31', number: dataChucDanhNu['01'], border: '1234' });
+                cells.push({ cell: 'E31', value: Number.parseFloat(dataChucDanhNu['01'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A32', value: 'Phó giáo sư', border: '1234' });
+                cells.push({ cell: 'B32', number: dataChucDanh['02'].length, border: '1234' });
+                cells.push({ cell: 'C32', value: Number.parseFloat(dataChucDanh['02'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D32', number: dataChucDanhNu['02'], border: '1234' });
+                cells.push({ cell: 'E32', value: Number.parseFloat(dataChucDanhNu['02'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A33', value: 'Tiến sĩ + Tiến sĩ khoa học (không bao gồm GS, PGS)', border: '1234' });
+                cells.push({ cell: 'B33', number: (dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length), border: '1234' });
+                cells.push({ cell: 'C33', value: Number.parseFloat((dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length) * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D33', number: (dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']), border: '1234' });
+                cells.push({ cell: 'E33', value: Number.parseFloat((dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']) * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A34', value: 'Thạc sĩ', border: '1234' });
+                cells.push({ cell: 'B34', number: dataHocVi['03'].length, border: '1234' });
+                cells.push({ cell: 'C34', value: Number.parseFloat(dataHocVi['03'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D34', number: dataHocViNu['03'], border: '1234' });
+                cells.push({ cell: 'E34', value: Number.parseFloat(dataHocViNu['03'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A35', value: 'Cử nhân', border: '1234' });
+                cells.push({ cell: 'B35', number: dataHocVi['04'].length, border: '1234' });
+                cells.push({ cell: 'C35', value: Number.parseFloat(dataHocVi['04'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D35', number: dataHocViNu['04'], border: '1234' });
+                cells.push({ cell: 'E35', value: Number.parseFloat(dataHocViNu['04'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A36', value: 'Kỹ sư', border: '1234' });
+                cells.push({ cell: 'B36', number: dataHocVi['05'].length, border: '1234' });
+                cells.push({ cell: 'C36', value: Number.parseFloat(dataHocVi['05'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D36', number: dataHocViNu['05'], border: '1234' });
+                cells.push({ cell: 'E36', value: Number.parseFloat(dataHocViNu['05'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                let remain = total;
+                remain -= dataHocVi['01'].length;
+                remain -= dataHocVi['02'].length;
+                remain -= dataHocVi['03'].length;
+                remain -= dataHocVi['04'].length;
+                remain -= dataHocVi['05'].length;
+
+                let remainNu = totalNu;
+                remainNu -= dataHocViNu['01'];
+                remainNu -= dataHocViNu['02'];
+                remainNu -= dataHocViNu['03'];
+                remainNu -= dataHocViNu['04'];
+                remainNu -= dataHocViNu['05'];
+
+                cells.push({ cell: 'A37', value: 'Còn lại', border: '1234' });
+                cells.push({ cell: 'B37', number: remain, border: '1234' });
+                cells.push({ cell: 'C37', value: Number.parseFloat(remain * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D37', number: remainNu, border: '1234' });
+                cells.push({ cell: 'E37', value: Number.parseFloat(remainNu * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A38', value: 'Tổng', border: '1234', bold: true });
+                cells.push({ cell: 'B38', number: total, border: '1234', bold: true });
+                cells.push({ cell: 'C38', value: 100.00, border: '1234', bold: true });
+                cells.push({ cell: 'D38', number: totalNu, border: '1234', bold: true });
+                cells.push({ cell: 'E38', value: 100.00, border: '1234', bold: true });
+                resolve(cells);
+            });
+        });
+
+        const promiseCalTrinhDoGiangVien = new Promise(resolve => {
+            let cells = [{ cell: 'A40', value: 'Trình độ giảng viên', border: '1234', bold: true }];
+            cells.push({ cell: 'B40', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C40', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            cells.push({ cell: 'D40', value: 'Số lượng nữ', border: '1234', bold: true });
+            cells.push({ cell: 'E40', value: 'Tỷ lệ (%)', border: '1234', bold: true });
+            app.model.canBo.getAll({
+                statement: 'ngayNghi IS NULL AND ngach IN (\'V.07.01.03\', \'15.109\', \'15.110\', \'V.07.01.01\', \'V.07.01.02\', \'15.111\')',
+                parameter: {}
+            }, (error, data) => {
+                let dataHocVi = data.groupBy('hocVi');
+                let dataChucDanh = data.groupBy('chucDanh');
+                ['01', '02', '03', '04'].forEach((key,) => {
+                    if (!(key in dataHocVi)) {
+                        dataHocVi[key] = [];
+                    }
+                });
+                ['01', '02'].forEach((key,) => {
+                    if (!(key in dataChucDanh)) {
+                        dataChucDanh[key] = [];
+                    }
+                });
+                let dataHocViNu = {};
+                let dataChucDanhNu = {};
+                let total = data.length;
+                let totalNu = 0;
+                for (const [key, list] of Object.entries(dataHocVi)) {
+                    dataHocViNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') {
+                            dataHocViNu[key] += 1;
+                            totalNu += 1;
+                        }
+                    });
+                }
+                for (const [key, list] of Object.entries(dataChucDanh)) {
+                    dataChucDanhNu[key] = 0;
+                    list.forEach((item) => {
+                        if (item.phai == '02') dataChucDanhNu[key] += 1;
+                    });
+                }
+                cells.push({ cell: 'A41', value: 'Giáo sư', border: '1234' });
+                cells.push({ cell: 'B41', number: dataChucDanh['01'].length, border: '1234' });
+                cells.push({ cell: 'C41', value: Number.parseFloat(dataChucDanh['01'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D41', number: dataChucDanhNu['01'], border: '1234' });
+                cells.push({ cell: 'E41', value: Number.parseFloat(dataChucDanhNu['01'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A42', value: 'Phó giáo sư', border: '1234' });
+                cells.push({ cell: 'B42', number: dataChucDanh['02'].length, border: '1234' });
+                cells.push({ cell: 'C42', value: Number.parseFloat(dataChucDanh['02'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D42', number: dataChucDanhNu['02'], border: '1234' });
+                cells.push({ cell: 'E42', value: Number.parseFloat(dataChucDanhNu['02'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A43', value: 'Tiến sĩ + Tiến sĩ khoa học (không bao gồm GS, PGS)', border: '1234' });
+                cells.push({ cell: 'B43', number: (dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length), border: '1234' });
+                cells.push({ cell: 'C43', value: Number.parseFloat((dataHocVi['01'].length + dataHocVi['02'].length - dataChucDanh['01'].length - dataChucDanh['02'].length) * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D43', number: (dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']), border: '1234' });
+                cells.push({ cell: 'E43', value: Number.parseFloat((dataHocViNu['01'] + dataHocViNu['02'] - dataChucDanhNu['01'] - dataChucDanhNu['02']) * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A44', value: 'Thạc sĩ', border: '1234' });
+                cells.push({ cell: 'B44', number: dataHocVi['03'].length, border: '1234' });
+                cells.push({ cell: 'C44', value: Number.parseFloat(dataHocVi['03'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D44', number: dataHocViNu['03'], border: '1234' });
+                cells.push({ cell: 'E44', value: Number.parseFloat(dataHocViNu['03'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A45', value: 'Cử nhân', border: '1234' });
+                cells.push({ cell: 'B45', number: dataHocVi['04'].length, border: '1234' });
+                cells.push({ cell: 'C45', value: Number.parseFloat(dataHocVi['04'].length * 100 / total).toFixed(2), border: '1234' });
+                cells.push({ cell: 'D45', number: dataHocViNu['04'], border: '1234' });
+                cells.push({ cell: 'E45', value: Number.parseFloat(dataHocViNu['04'] * 100 / totalNu).toFixed(2), border: '1234' });
+
+                cells.push({ cell: 'A46', value: 'Tổng', border: '1234', bold: true });
+                cells.push({ cell: 'B46', number: total, border: '1234', bold: true });
+                cells.push({ cell: 'C46', value: 100.00, border: '1234', bold: true });
+                cells.push({ cell: 'D46', number: totalNu, border: '1234', bold: true });
+                cells.push({ cell: 'E46', value: 100.00, border: '1234', bold: true });
+                resolve(cells);
+            });
+        });
+        const promiseUpdateNhanSu = new Promise(resolve => {
+            let currentDate = new Date();
+            currentDate.setDate(1);
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            let monthYear = currentDate.getMonth() + '/' + currentDate.getFullYear();
+            let cells = [{ cell: 'A48', value: 'Cập nhật tình hình về nhân sự trong Tháng ' + monthYear, border: '1234', bold: true }];
+            cells.push({ cell: 'B48', value: 'Số lượng', border: '1234', bold: true });
+            cells.push({ cell: 'C48', value: 'Ghi chú', border: '1234', bold: true });
+            cells.push({ cell: 'A49', value: 'Tuyển dụng', border: '1234' });
+            cells.push({ cell: 'A50', value: 'Chuyển về trường', border: '1234' });
+            cells.push({ cell: 'A51', value: 'Nghỉ việc, chấm dứt hợp đồng', border: '1234' });
+            cells.push({ cell: 'A52', value: 'Nghỉ hưu', border: '1234' });
+            cells.push({ cell: 'A53', value: 'Chuyển công tác', border: '1234' });
+            cells.push({ cell: 'A54', value: 'Xóa tên', border: '1234' });
+            resolve(cells);
+        });
+
+        const promiseCalcCongTac = new Promise(resolve => {
+            let currentDate = new Date();
+            currentDate.setDate(1);
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            let monthYear = currentDate.getMonth() + '/' + currentDate.getFullYear();
+            let cells = [{ cell: 'A56', value: 'Quyết định cử đi học trong Tháng ' + monthYear, border: '1234', bold: true }];
+            cells.push({ cell: 'B56', value: 'Nước ngoài', border: '1234', bold: true });
+            cells.push({ cell: 'C56', value: 'Trong nước', border: '1234', bold: true });
+            cells.push({ cell: 'A57', value: 'Tiến sĩ', border: '1234' });
+            cells.push({ cell: 'A58', value: 'Thạc sĩ', border: '1234' });
+            cells.push({ cell: 'A60', value: 'Báo cáo kết quả học tập trong Tháng ' + monthYear, border: '1234', bold: true });
+            cells.push({ cell: 'B60', value: 'Nước ngoài', border: '1234', bold: true });
+            cells.push({ cell: 'C60', value: 'Trong nước', border: '1234', bold: true });
+            cells.push({ cell: 'A61', value: 'Tiến sĩ', border: '1234' });
+            cells.push({ cell: 'A62', value: 'Thạc sĩ', border: '1234' });
+            resolve(cells);
+        });
+        Promise.all([promiseCalDonVi, promiseCalVCQL, promiseCalCanBo, promiseCalBoMon, promiseCalChucDanhNgheNghiep, promiseCalTrinhDoCanBo, promiseCalTrinhDoGiangVien, promiseUpdateNhanSu, promiseCalcCongTac]).then((values) => {
+            values = [].concat(...values);
+            app.excel.write(worksheet, values);
+            app.excel.attachment(workbook, res, 'BAO_CAO_HANG_THANG.xlsx');
+        }).catch((error) => {
+            res.send({ error });
+        });
     });
 };

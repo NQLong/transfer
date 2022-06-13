@@ -42,6 +42,7 @@ class EditModal extends AdminModal {
         diffYear: false,
         soNgayPhep2: 0,
         soNgayNghiPhepConLai2: 0,
+        ngayDiDuong: 0,
     };
     calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, currentId, dateCalc, done) => {
         new Promise(resolve => {
@@ -53,14 +54,14 @@ class EditModal extends AdminModal {
             }
             this.props.getAll(shcc, items => {
                 const solve = (idx = 0) => {
-                    if (idx == items.length)  {
+                    if (idx == items.length) {
                         resolve(result);
                         return;
                     }
                     if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
                         this.props.getNghiPhep(items[idx].lyDo, itemNghiPhep => {
                             let value = T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, this.props.danhSachNgayLe);
-                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
+                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep - (items[idx].ngayDiDuong ? items[idx].ngayDiDuong : 0), 0);
                             if (currentId != items[idx].id) result -= value;
                             solve(idx + 1);
                         });
@@ -75,8 +76,8 @@ class EditModal extends AdminModal {
         });
     };
     onShow = (item) => {
-        let { id, shcc, lyDo, batDau, batDauType, ketThuc, ketThucType, noiDen, ghiChu, lyDoKhac, ngayNghiPhep, ngayBatDauCongTac } = item ? item : {
-            id: '', shcc: '', lyDo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDen: '', ghiChu: '', lyDoKhac: '', ngayNghiPhep: 0, ngayBatDauCongTac: null
+        let { id, shcc, lyDo, batDau, batDauType, ketThuc, ketThucType, noiDen, ghiChu, lyDoKhac, ngayNghiPhep, ngayBatDauCongTac, ngayDiDuong } = item ? item : {
+            id: '', shcc: '', lyDo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDen: '', ghiChu: '', lyDoKhac: '', ngayNghiPhep: 0, ngayBatDauCongTac: null, ngayDiDuong: 0
         };
         if (shcc) {
             this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, id, new Date(batDau), soNgayNghiPhepConLai => {
@@ -101,6 +102,7 @@ class EditModal extends AdminModal {
             batDau, ketThuc, lyDoKhac: lyDo == '99' ? true : false,
             ngayPhepLyDo: ngayNghiPhep, shcc: shcc,
             ngayBatDauCongTac: ngayBatDauCongTac,
+            ngayDiDuong: ngayDiDuong || 0,
         }, () => {
             this.maCanBo.value(shcc);
             this.lyDo.value(lyDo || '');
@@ -112,6 +114,7 @@ class EditModal extends AdminModal {
             this.lyDoKhac.value(lyDoKhac || '');
             this.ghiChu.value(ghiChu || '');
             this.state.lyDoKhac ? $('#lyDoKhac').show() : $('#lyDoKhac').hide();
+            this.ngayDiDuong.value(ngayDiDuong || '');
         });
     };
 
@@ -127,6 +130,7 @@ class EditModal extends AdminModal {
             lyDo: this.lyDo.value(),
             ghiChu: this.ghiChu.value(),
             lyDoKhac: this.lyDoKhac.value(),
+            ngayDiDuong: this.ngayDiDuong.value(),
         };
         if (!this.maCanBo.value()) {
             T.notify('Danh sách cán bộ trống', 'danger');
@@ -146,8 +150,8 @@ class EditModal extends AdminModal {
         } else if (this.state.soNgayXinNghi == -1) {
             T.notify('Số ngày xin nghỉ là rất lớn', 'danger');
             this.batDau.focus();
-        } else if (this.state.soNgayNghiPhepConLai < this.state.soNgayPhep) {
-            T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.batDau).getFullYear()} là ${this.state.soNgayNghiPhepConLai} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep}`, 'danger');
+        } else if (this.state.soNgayNghiPhepConLai < this.state.soNgayPhep - this.state.ngayDiDuong) {
+            T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.batDau).getFullYear()} là ${this.state.soNgayNghiPhepConLai} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep - this.state.ngayDiDuong}`, 'danger');
             this.batDau.focus();
         } else if (this.state.diffYear && this.state.soNgayNghiPhepConLai2 < this.state.soNgayPhep2) {
             T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.ketThuc).getFullYear()} là ${this.state.soNgayNghiPhepConLai2} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep2}`, 'danger');
@@ -275,10 +279,10 @@ class EditModal extends AdminModal {
                         soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                     });
                 }
-                
+
             });
         } else {
-            this.setState({ lyDoKhac: false, ngayPhepLyDo: value.soNgayPhep}, () => {
+            this.setState({ lyDoKhac: false, ngayPhepLyDo: value.soNgayPhep }, () => {
                 $('#lyDoKhac').hide();
                 let { batDau, ketThuc, ngayPhepLyDo } = this.state;
                 if (batDau && ketThuc) {
@@ -289,6 +293,12 @@ class EditModal extends AdminModal {
             });
         }
     }
+
+    handleNgayDiDuong = (value) => {
+        this.setState({ ngayDiDuong: value || 0 });
+        if (!value) this.ngayDiDuong.value('');
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
@@ -296,28 +306,29 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={this.handleCanBo} required readOnly={readOnly} />
-                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
-                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
-                <FormSelect className='col-md-6' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
+                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue' }}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br /></span>}
+                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue' }}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br /></span>}
+                <FormSelect className='col-md-8' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
+                <FormTextBox className='col-md-4' type='number' ref={e => this.ngayDiDuong = e} label='Ngày đi đường' readOnly={readOnly} onChange={this.handleNgayDiDuong} />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
-            
-                <div className='form-group col-md-5'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
+
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu: &nbsp;<Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <div className='form-group col-md-7'><DateInput ref={e => this.ketThuc = e} onChange={this.handleKetThuc} placeholder='Thời gian kết thúc'
+                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} onChange={this.handleKetThuc} placeholder='Thời gian kết thúc'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc: &nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <span className='form-group col-md-5' style={{ color: 'blue'}}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>  }</span>
-                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-7' style={{ color: 'blue'}}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep} ngày </b></>}</span> }
+                <span className='form-group col-md-6' style={{ color: 'blue' }}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>}</span>
+                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-6' style={{ color: 'blue' }}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep - this.state.ngayDiDuong} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep - this.state.ngayDiDuong} ngày </b></>}</span>}
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Ghi chú (tối đa 200 ký tự)' />
             </div>
         });
@@ -326,7 +337,7 @@ class EditModal extends AdminModal {
 
 class QtNghiPhep extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
-    state = { filter: {}, danhSachNgayLe: []};
+    state = { filter: {}, danhSachNgayLe: [] };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -380,7 +391,7 @@ class QtNghiPhep extends AdminPage {
             toYear.setHours(23, 59, 59, 999);
             toYear = toYear.getTime();
         }
-        
+
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
         const tinhTrang = this.tinhTrang.value() == '' ? null : this.tinhTrang.value();
@@ -399,7 +410,6 @@ class QtNghiPhep extends AdminPage {
                     this.mulCanBo.value(filter.listShcc || filterCookie.listShcc);
                     this.tinhTrang.value(filter.tinhTrang || filterCookie.tinhTrang || '');
                     this.lyDo.value(filter.lyDo || filterCookie.lyDo || '');
-                    if (this.fromYear.value() || this.toYear.value() || this.mulCanBo.value() || this.maDonVi.value() || this.tinhTrang.value() || this.lyDo.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.fromYear.value('');
                     this.toYear.value('');
@@ -470,11 +480,12 @@ class QtNghiPhep extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị công tác</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do nghỉ</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br/>xin nghỉ</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br/>tính phép</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br />xin nghỉ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đi<br />đường</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br />tính phép</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lần nghỉ</th>}
@@ -493,9 +504,11 @@ class QtNghiPhep extends AdminPage {
                         )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {(item.tenDonVi || '').normalizedName()}
+                                {(item.tenDonVi || '')}
                             </>
                         )} />
+                        {!this.checked && <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />}
+                        {!this.checked && <TableCell type='text' content={item.noiDen} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -503,9 +516,8 @@ class QtNghiPhep extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />}
-                        {!this.checked && <TableCell type='text' content={item.noiDen} />}
                         {!this.checked && <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, this.state.danhSachNgayLe)} />}
+                        {!this.checked && <TableCell type='number' content={item.ngayDiDuong || 0} />}
                         {!this.checked && <TableCell type='number' content={(
                             <>
                                 {Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), this.state.danhSachNgayLe) - item.ngayNghiPhep, 0)}
@@ -516,7 +528,7 @@ class QtNghiPhep extends AdminPage {
                         {!this.checked && <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>{(item.batDau <= item.today && item.ketThuc >= item.today) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : (item.ketThuc < item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br/>thúc nghỉ</span> : <span style={{ color: 'black', whiteSpace: 'nowrap' }}>Chưa diễn ra</span>}</span>
+                                <span>{(item.batDau <= item.today && item.ketThuc >= item.today) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : (item.ketThuc < item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br />thúc nghỉ</span> : <span style={{ color: 'black', whiteSpace: 'nowrap' }}>Chưa diễn ra</span>}</span>
                             </>
                         )}></TableCell>}
                         {this.checked && <TableCell type='text' content={item.soLanNghi} />}
@@ -547,15 +559,15 @@ class QtNghiPhep extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian (bắt đầu)'  />
-                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian (bắt đầu)'  />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.lyDo = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiPhepV2}  allowClear={true} minimumResultsForSearch={-1} />
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian (bắt đầu)' />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian (bắt đầu)' />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.lyDo = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiPhepV2} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-2' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
-                            { id: 1, text: 'Đã kết thúc nghỉ' }, { id: 2, text: 'Đang nghỉ' }, { id : 3, text: 'Chưa diễn ra'}
+                            { id: 1, text: 'Đã kết thúc nghỉ' }, { id: 2, text: 'Đang nghỉ' }, { id: 3, text: 'Chưa diễn ra' }
                         ]} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}  allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}  allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -567,14 +579,11 @@ class QtNghiPhep extends AdminPage {
                 </div>
             </>,
             content: <>
-                {!this.checked && <div className='tile'>
-                    <h3 className='tile-title'>
-                        Thống kê
-                    </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
-                </div>}
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                        <div style={{ marginBottom: '10px' }}>Tìm thấy: <b>{totalItem}</b> kết quả.</div>
+                    </div>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}

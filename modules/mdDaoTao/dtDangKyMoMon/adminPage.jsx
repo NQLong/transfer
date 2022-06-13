@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminModal, AdminPage, CirclePageButton, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
+import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DtNganhDaoTao } from '../dtNganhDaoTao/redux';
 import TaoThoiGianMoMon from '../dtThoiGianMoMon/ThoiGianMoMonModal';
 import { getDtDangKyMoMonPage, createDangKyMoMon } from './redux';
@@ -44,7 +45,7 @@ class NganhModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormTextBox className='col-md-6' ref={e => this.hocKy = e} readOnly label='Học kỳ' />
-                <FormTextBox className='col-md-6' ref={e => this.namHoc = e} readOnly label='Năm' />
+                <FormSelect className='col-md-6' ref={e => this.namHoc = e} data={SelectAdapter_DtCauTrucKhungDaoTao} readOnly label='Năm' />
                 <FormTextBox className='col-md-6' ref={e => this.batDau = e} readOnly label='Mở ngày' />
                 <FormTextBox className='col-md-6' ref={e => this.ketThuc = e} readOnly label='Đóng ngày' />
                 <FormSelect className='col-md-12' ref={e => this.nganh = e} label='Chọn ngành' data={SelectAdapter_DtNganhDaoTao} onChange={value => this.setState({ khoa: value.khoa })} />
@@ -79,8 +80,8 @@ class DtDangKyMoMonPage extends AdminPage {
                     searchTerm: '', donViFilter: this.state.donViFilter
                 }, totalItem: 0, list: [], thoiGianMoMon: null
             };
-        const { batDau, ketThuc, hocKy, nam } = thoiGianMoMon ? thoiGianMoMon : {
-            batDau: '', ketThuc: '', hocKy: '', nam: ''
+        const { batDau, ketThuc, hocKy, namDaoTao } = thoiGianMoMon ? thoiGianMoMon : {
+            batDau: '', ketThuc: '', hocKy: '', namDaoTao: ''
         }, today = new Date().getTime();
         let permission = {
             write: permissionDaoTao.write || (permissionDaoTao.manage && today >= batDau && today <= ketThuc),
@@ -108,7 +109,7 @@ class DtDangKyMoMonPage extends AdminPage {
                     <TableCell contentClassName='multiple-lines-2' content={item.tenKhoaBoMon} />
                     <TableCell contentClassName='multiple-lines-4' content={`${item.maNganh}: ${item.tenNganh}`} />
                     <TableCell content={'HK' + item.hocKy} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.namHoc} />
+                    <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namHoc} />
                     <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.thoiGian} />
                     <TableCell contentClassName='multiple-lines-4' content={item.isDuyet ? 'Phòng Đào tạo đã xác nhận' : 'Phòng Đào tạo chưa xác nhận'} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`)} />
@@ -117,7 +118,7 @@ class DtDangKyMoMonPage extends AdminPage {
         return this.renderPage({
             title: 'Danh sách các đợt mở môn học trong học kỳ',
             icon: 'fa fa-paper-plane-o',
-            subTitle: thoiGianMoMon && <span style={{ color: 'red' }}>Học kỳ {hocKy} - năm {nam}: Từ <b>{T.dateToText(batDau, 'dd/mm/yyyy')}</b> đến <b>{T.dateToText(ketThuc, 'dd/mm/yyyy')}</b></span>,
+            subTitle: thoiGianMoMon && <h5 style={{ color: 'red', marginTop: '20' }}>Học kỳ <b>{hocKy}</b>, <b>{namDaoTao}</b>: Từ <b>{T.dateToText(batDau, 'dd/mm/yyyy')}</b> đến <b>{T.dateToText(ketThuc, 'dd/mm/yyyy')}</b></h5>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Danh sách đợt mở môn học'
@@ -140,7 +141,12 @@ class DtDangKyMoMonPage extends AdminPage {
                 }
             </>,
             backRoute: '/user/dao-tao',
-            onCreate: permission.write ? ((e) => e.preventDefault() || this.nganhModal.show()) : null
+            onCreate: (e) => {
+                e.preventDefault();
+                if (permissionDaoTao.manage) {
+                    this.nganhModal.show();
+                } else T.notify('Bạn không có quyền đăng ký tại đây!', 'danger');
+            }
         });
     }
 }

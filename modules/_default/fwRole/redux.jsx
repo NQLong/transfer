@@ -158,3 +158,17 @@ export const SelectAdapter_Roles = {
     getOne: getRole,
     processResultOne: response => response && ({ value: response.id, text: response.name }),
 };
+
+export function UpdateSessionRole(id, done) {
+    return () => {
+        T.get(`/api/resfresh-email-role/${id}`, result => {
+            if (result.error) {
+                T.notify('Có lỗi xảy ra', 'danger');
+                console.error(result.error);
+            } else {
+                T.notify('Cập nhật session cho role thành công', 'success');
+                done && done();
+            }
+        });
+    };
+}

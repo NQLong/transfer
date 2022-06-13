@@ -23,7 +23,6 @@ class HDLD_Details extends AdminPage {
                     if (data.error) {
                         T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                     } else {
-                        // console.log(data.item.canBoDuocThue);
                         data.item.qtHopDongLaoDong.isCvdt = data.item.canBoDuocThue.isCvdt;
                         this.phiaTruong.setVal(data.item.qtHopDongLaoDong);
                         this.phiaCanBo.setVal(data.item.canBoDuocThue);
@@ -53,9 +52,9 @@ class HDLD_Details extends AdminPage {
         });
     }
 
-    genNewShcc = (maDonVi, preShcc) => {
+    genNewShcc = (maDonVi, preShcc, nhomNgach) => {
         this.props.getPreShcc(maDonVi, (data) => {
-            preShcc = preShcc + '.' + data.preShcc.toString().padStart(4, '0');
+            preShcc = preShcc + '.' + (nhomNgach == 1 ? '0' : '5') + data.preShcc.toString().padStart(3, '0');
             this.phiaCanBo.setShcc(preShcc);
         });
     };

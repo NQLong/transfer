@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.library,
+        parentMenu: app.parentMenu.tccb,
         menus: {
-            8001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', pin: true },
+            3045: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/tccb/qua-trinh/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 5 },
         },
     };
 
@@ -19,8 +19,8 @@ module.exports = app => {
         { name: 'sachGiaoTrinh:write' },
         { name: 'sachGiaoTrinh:delete' },
     );
-    app.get('/user/library/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
-    app.get('/user/library/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
     // app.get('/user/sach-giao-trinh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ module.exports = app => {
     });
     ///END USER ACTIONS
 
-    app.get('/api/library/qua-trinh/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -104,7 +104,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/library/qua-trinh/sach-giao-trinh/group/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/sach-giao-trinh/group/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -119,14 +119,26 @@ module.exports = app => {
             }
         });
     });
-    app.post('/api/staff/sach-giao-trinh', app.permission.check('staff:write'), (req, res) =>
-        app.model.sachGiaoTrinh.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/staff/sach-giao-trinh', app.permission.check('staff:write'), (req, res) =>
-        app.model.sachGiaoTrinh.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.post('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        app.model.sachGiaoTrinh.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Sách giáo trình');
+            res.send({ error, item });
+        });
+    });
 
-    app.delete('/api/staff/sach-giao-trinh', app.permission.check('staff:write'), (req, res) =>
-        app.model.sachGiaoTrinh.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.put('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        app.model.sachGiaoTrinh.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Sách giáo trình');
+            res.send({ error, item });
+        });
+    });
+    app.delete('/api/staff/sach-giao-trinh', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        app.model.sachGiaoTrinh.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Sách giáo trình');
+            res.send({ error });
+        });
+    });
 
     app.post('/api/user/staff/sach-giao-trinh', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
@@ -135,6 +147,26 @@ module.exports = app => {
         } else {
             res.send({ error: 'Invalid parameter!' });
         }
+    });
+
+    app.post('/api/staff/sach-giao-trinh/create-multiple', app.permission.check('sachGiaoTrinh:write'), (req, res) => {
+        const { listShcc, ten, theLoai, namSanXuat, nhaSanXuat, chuBien, sanPham, butDanh, quocTe } = req.body.data, errorList = [];
+        const solve = (index = 0) => {
+            if (index == listShcc.length) {
+                app.tccbSaveCRUD(req.session.user.email, 'C', 'Sách giáo trình');
+                res.send({ error: errorList });
+                return;
+            }
+            const shcc = listShcc[index];
+            const dataAdd = {
+                shcc, ten, theLoai, namSanXuat, nhaSanXuat, chuBien, sanPham, butDanh, quocTe
+            };
+            app.model.sachGiaoTrinh.create(dataAdd, (error) => {
+                if (error) errorList.push(error);
+                solve(index + 1);
+            });
+        };
+        solve();
     });
 
     app.put('/api/user/staff/sach-giao-trinh', app.permission.check('staff:login'), (req, res) => {

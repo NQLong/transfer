@@ -2,17 +2,27 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, deleteMultiDtChuongTrinhDaoTao } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormRichTextBox, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
 import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import Loading from 'view/component/Loading';
+import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
+import T from 'view/js/common';
+import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
 
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
-    state = { isLoading: true }
+    state = {
+        isLoading: true,
+        // mucTieuDaoTao: {},
+        chuongTrinhDaoTao: {}
+    };
+    mucTieu = {};
+    chuongTrinh = {};
+    listMonHocChosen = []
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
@@ -21,25 +31,43 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.setState({ isLoading: false });
             const query = new URLSearchParams(this.props.location.search);
             const id = query.get('id');
+            const khoaDt = query.get('khoaDt');
             if (this.ma !== 'new') {
                 this.getData(this.ma);
             } else {
-                if (id > 0) {
-                    this.getData(id, true);
+                if (id >= 0 && khoaDt >= 0) {
+                    this.getData(id, true, khoaDt);
                     return;
                 }
-                const maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
-                this.khoa.value(maKhoa == 33 ? '' : maKhoa);
-                [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
+                this.maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
+                this.khoa.value(this.maKhoa == 33 ? '' : this.maKhoa);
             }
         });
     }
 
-    getData = (id, isClone = false) => {
+    pushMonHocChosen = (maMonHoc) => {
+        if (maMonHoc) {
+            if (this.listMonHocChosen.includes(maMonHoc)) {
+                T.notify('Trùng môn học, vui lòng chọn môn học khác', 'danger');
+                return false;
+            } else {
+                this.listMonHocChosen.push(maMonHoc);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    removeMonHoc = (maMonHoc) => {
+        if (maMonHoc) this.listMonHocChosen = this.listMonHocChosen.filter(item => item != maMonHoc);
+    }
+
+    getData = (id, isClone = false, khoaDt) => {
         this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
-            this.namDaoTao.value(!isClone ? data.namDaoTao : parseInt(data.namDaoTao) + 1);
             this.maNganh.value(data.maNganh);
+            this.chuyenNganh.value(data.chuyenNganh);
+            this.setState({ maNganh: data.maNganh });
             this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
             this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
             this.trinhDoDaoTao.value(data.trinhDoDaoTao);
@@ -47,17 +75,15 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
             this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
             this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
-            this.mucTieuChung.value(data.mucTieuChung);
-
-            let mucTieuCuThe = T.parse(data.mucTieuCuThe || '{}');
-            this.mucTieuCuThe1.value(mucTieuCuThe[1] || '');
-            this.mucTieuCuThe2.value(mucTieuCuThe[2] || '');
-            this.mucTieuCuThe3.value(mucTieuCuThe[3] || '');
-            this.mucTieuCuThe4.value(mucTieuCuThe[4] || '');
+            const mucTieu = T.parse(data.mucTieu || '{}');
+            this.khoaDt = !isClone ? data.namDaoTao : khoaDt;
             this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
-                //TODO: Group SQL
-                [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
+                SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(this.khoaDt, (rs) => {
+                    this.setNamDaoTao(rs, mucTieu, ctdt);
+                    this.namDaoTao.value(rs.id);
+                });
             });
+
         });
     }
 
@@ -71,6 +97,10 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 
     getValue = () => {
         try {
+            const mucTieu =
+                Object.keys(this.mucTieu).map(key => {
+                    return { id: key, value: this.mucTieu[key]?.value() };
+                });
             let data = {
                 maNganh: this.validation(this.maNganh),
                 tenNganhVi: this.validation(this.tenNganhVi),
@@ -84,12 +114,8 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 tenVanBangEn: this.validation(this.tenVanBangEn),
                 tenVanBang: T.stringify({ vi: this.tenVanBangVi.value(), en: this.tenVanBangEn.value() }),
                 maKhoa: this.validation(this.khoa),
-                mucTieuChung: this.validation(this.mucTieuChung),
-                mucTieu1: this.validation(this.mucTieuCuThe1),
-                mucTieu2: this.validation(this.mucTieuCuThe2),
-                mucTieu3: this.validation(this.mucTieuCuThe3),
-                mucTieu4: this.validation(this.mucTieuCuThe4),
-                mucTieuCuThe: T.stringify({ 1: this.mucTieuCuThe1.value(), 2: this.mucTieuCuThe2.value(), 3: this.mucTieuCuThe3.value(), 4: this.mucTieuCuThe4.value() })
+                mucTieu: T.stringify(mucTieu),
+                chuyenNganh: this.validation(this.chuyenNganh)
             };
             return data;
         } catch (selector) {
@@ -99,44 +125,72 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         }
     }
 
+    handleNganh = (value) => {
+        this.tenNganhVi.value(value.name);
+        this.khoa.value(value.khoa);
+        this.tenVanBangVi.value('Cử nhân ' + value.name);
+        this.setState({ tenNganhVi: value.name, maNganh: value?.id || null }, () => {
+            this.chuyenNganh.value('');
+            this.chuyenNganh.focus();
+        });
+    }
+
     save = () => {
         let data = this.getValue();
         if (data) {
-            const kienThucDaiCuong = this.kienThucDaiCuong.getValue() || { updateDatas: [], deleteDatas: [] };
-            const kienThucCoSoNganh = this.kienThucCoSoNganh.getValue() || { updateDatas: [], deleteDatas: [] };
-            const kienThucChuyenNganh = this.kienThucChuyenNganh.getValue() || { updateDatas: [], deleteDatas: [] };
-            const kienThucBoTro = this.kienThucBoTro.getValue() || { updateDatas: [], deleteDatas: [] };
-            const kienThucLVTN = this.kienThucLVTN.getValue() || { updateDatas: [], deleteDatas: [] };
-            const updateItems = [
-                ...kienThucDaiCuong.updateDatas,
-                ...kienThucCoSoNganh.updateDatas,
-                ...kienThucChuyenNganh.updateDatas,
-                ...kienThucBoTro.updateDatas,
-                ...kienThucLVTN.updateDatas
-            ];
-            // const deleteItems = [
-            //     ...kienThucDaiCuong.deleteDatas,
-            //     ...kienThucCoSoNganh.deleteDatas,
-            //     ...kienThucChuyenNganh.deleteDatas,
-            //     ...kienThucBoTro.deleteDatas,
-            //     ...kienThucLVTN.deleteDatas
-            // ];
-            const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
-            // const deleteDatas = { items: deleteItems };
-            this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
-                location.replace('/new', `/${item.id}`);
-                location.reload();
-            }) : this.props.updateDtChuongTrinhDaoTao(this.ma, updateDatas, () => {
-                // location.reload();
+            const kienThucs =
+                Object.keys(this.chuongTrinh).map(key => {
+                    return (this.chuongTrinh[key]?.getValue() || { updateDatas: [], deleteDatas: [] })?.updateDatas;
+                });
+            let updateItems = [];
+            kienThucs.forEach(kienThuc => {
+                updateItems = [...updateItems, ...kienThuc];
             });
-            // this.props.deleteMultiDtChuongTrinhDaoTao(deleteDatas, () => { });
+            const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
+            this.ma == 'new' ? (updateItems.length && this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
+                window.location = `/user/dao-tao/chuong-trinh-dao-tao/${item.id}`;
+            })) : (updateItems.length && this.props.updateDtChuongTrinhDaoTao(this.ma, updateDatas, () => {
+            }));
         }
     }
+
+    setNamDaoTao = (value, mucTieu, ctdt) => {
+        const { data, id } = value;
+        this.khoaDt = id;
+        const mucCha = T.parse(data.mucCha, {
+            // mucTieuDaoTao: {},
+            chuongTrinhDaoTao: {}
+        });
+        const mucCon = T.parse(data.mucCon, {
+            // mucTieuDaoTao: {},
+            chuongTrinhDaoTao: {}
+        });
+        this.setState({
+            namHoc: value.id,
+            // mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao },
+            chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao }
+        }, () => {
+            !ctdt && this.chuyenNganh.value('');
+            !ctdt && this.maNganh.focus();
+            Object.keys(this.chuongTrinh).forEach(key => {
+                const childs = mucCon.chuongTrinhDaoTao[key] || null;
+                const data = ctdt?.filter(item => item.maKhoiKienThuc === parseInt(mucCha.chuongTrinhDaoTao[key].id));
+                this.chuongTrinh[key]?.setVal(data, this.maKhoa, childs);
+            });
+            mucTieu?.forEach(mt => {
+                this.mucTieu[mt.id]?.value(mt.value);
+            });
+        });
+    }
+
     render() {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         const readOnly = !(permission.write || permission.manage),
             isPhongDaoTao = permission.write;
 
+        const {
+            // mucTieuDaoTao,
+            chuongTrinhDaoTao } = this.state;
         return this.renderPage({
             icon: 'fa fa-university',
             title: this.ma !== 'new' ? 'Chỉnh sửa chương trình đào tạo' : 'Tạo mới chương trình đào tạo',
@@ -152,39 +206,39 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                     <h3 className='tile-title'>1. Thông tin chung về chương trình đào tạo</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <div className='row col-12' style={{ display: 'flex', alignItems: 'end' }}>
-                                <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={value => {
-                                    this.tenNganhVi.value(value.name);
-                                    this.setState({ tenNganhVi: value.name });
-                                }} required />
-                                <div style={{ marginBottom: '0' }} className='form-group col-md-8'>
-                                    <FormTabs tabs={[
-                                        {
-                                            title: <>Tên ngành tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
-                                            component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên ngành (tiếng Việt)' required />
-                                        },
-                                        {
-                                            title: <>Tên ngành tiếng Anh  <span style={{ color: 'red' }}>*</span></>,
-                                            component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' required />
-                                        }
-                                    ]} />
-                                </div>
+                            <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
+
+                            <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
+                            <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' />
+                            <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
+                                <FormTabs tabs={[
+                                    {
+                                        title: <>Tên ngành tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
+                                        component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên ngành (tiếng Việt)' required />
+                                    },
+                                    {
+                                        title: <>Tên ngành tiếng Anh</>,
+                                        component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' />
+                                    }
+                                ]} />
                             </div>
 
-                            <FormTextBox ref={e => this.namDaoTao = e} label='Năm đào tạo' className='col-md-3' required readOnly={readOnly} />
 
-                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-3' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-3' required readOnly={readOnly} />
-                            <FormTextBox type='number' suffix=' năm' step={0.5} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-3' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect data={[
+                                { id: 4, text: '4 năm' },
+                                { id: 3.5, text: '3,5 năm' }
+                            ]} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
                             <div className='form-group col-md-12'>
                                 <label>Tên văn bằng sau khi tốt nghiệp: </label>
                                 <FormTabs tabs={[
                                     {
                                         title: <>Tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
-                                        component: <FormTextBox ref={e => this.tenVanBangVi = e} placeholder='Tên văn bằng (tiếng Việt)' />
+                                        component: <FormTextBox ref={e => this.tenVanBangVi = e} placeholder='Tên văn bằng (tiếng Việt)' required />
                                     },
                                     {
-                                        title: <>Tiếng Anh  <span style={{ color: 'red' }}>*</span></>,
+                                        title: <>Tiếng Anh</>,
                                         component: <FormTextBox ref={e => this.tenVanBangEn = e} placeholder='Tên văn bằng (tiếng Anh)' />
                                     }
                                 ]} />
@@ -194,29 +248,42 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                     </div>
                 </div>
 
-                <div className='tile'>
-                    <h3 className='tile-title'>2. Mục tiêu đào tạo</h3>
-                    <div className='tile-body'>
-                        <div className='row'>
-                            <h4 className='form-group col-12'>2.1. Mục tiêu chung <span style={{ color: 'red' }}>*</span></h4>
-                            <FormRichTextBox ref={e => this.mucTieuChung = e} placeholder='Mục tiêu chung' className='form-group col-12' rows={5} required />
-                            <h4 className='form-group col-12'>2.1. Mục tiêu cụ thể</h4>
-                            <p className='form-group col-12'>Sinh viên tốt nghiệp ngành {this.state.tenNganhVi || ''} có các kiến thức, kỹ năng và năng lực nghề nghiệp như sau:</p>
-
-                            {/*TODO: DT_MUC_TIEU_DAO_DAO*/}
-                            <FormRichTextBox ref={e => this.mucTieuCuThe1 = e} label={<b><i>1. Kiến thức và lập luận ngành</i></b>} placeholder='Kiến thức và lập luận ngành' className='form-group col-12' required />
-                            <FormRichTextBox ref={e => this.mucTieuCuThe2 = e} label={<b><i>2. Kỹ năng, phẩm chất cá nhân và nghề nghiệp</i></b>} placeholder='Kỹ năng, phẩm chất cá nhân và nghề nghiệp' className='form-group col-12' required />
-                            <FormRichTextBox ref={e => this.mucTieuCuThe3 = e} label={<b><i>3. Kỹ năng làm việc nhóm và giao tiếp</i></b>} placeholder='Kỹ năng làm việc nhóm và giao tiếp' className='form-group col-12' required />
-                            <FormRichTextBox ref={e => this.mucTieuCuThe4 = e} label={<b><i>4. Năng lực thực hành nghề nghiệp</i></b>} placeholder='Năng lực thực hành nghề nghiệp' className='form-group col-12' required />
+                {/* {mucTieuDaoTao && mucTieuDaoTao.parents &&
+                    <div className='tile'>
+                        <h3 className='tile-title'>2. Mục tiêu đào tạo</h3>
+                        <div className='tile-body'>
+                            <div className='row'>
+                                {
+                                    Object.keys(mucTieuDaoTao.parents).map((key) => {
+                                        const childs = mucTieuDaoTao.childs;
+                                        const pIdx = parseInt(key) + 1;
+                                        return (
+                                            <React.Fragment key={pIdx}>
+                                                <h4 className='form-group col-12'>{`2.${pIdx}. ${mucTieuDaoTao.parents[key]} `}<span style={{ color: 'red' }}>*</span></h4>
+                                                {
+                                                    childs[key] ? childs[key].map((cItem, idx) => {
+                                                        const { value } = cItem;
+                                                        return (<FormRichTextBox key={`${key}_${idx}`} ref={e => this.mucTieu[`${key}_${idx}`] = e} label={<b><i>{`${idx + 1}. ${value}`}</i></b>} placeholder={value} className='form-group col-12' required />);
+                                                    }) :
+                                                        <FormRichTextBox ref={e => this.mucTieu[key] = e} placeholder='Mục tiêu chung' className='form-group col-12' rows={5} required />
+                                                }
+                                            </React.Fragment>);
+                                    })
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <ComponentKienThuc title={'Kiến thức giáo dục đại cương'} khoiKienThucId={1} ref={e => this.kienThucDaiCuong = e} />
-                <ComponentKienThuc title={'Kiến thức cơ sở ngành'} khoiKienThucId={9} ref={e => this.kienThucCoSoNganh = e} />
-                <ComponentKienThuc title={'Kiến thức chuyên ngành'} khoiKienThucId={10} ref={e => this.kienThucChuyenNganh = e} />
-                <ComponentKienThuc title={'Kiến thức bổ trợ'} khoiKienThucId={33} ref={e => this.kienThucBoTro = e} />
-                <ComponentKienThuc title={'Thực tập, khóa luận/luận văn tốt nghiệp'} khoiKienThucId={11} ref={e => this.kienThucLVTN = e} />
+                } */}
+                {
+                    chuongTrinhDaoTao && chuongTrinhDaoTao.parents && Object.keys(chuongTrinhDaoTao.parents).map((key) => {
+                        const childs = chuongTrinhDaoTao.childs;
+                        const pIdx = `${this.khoaDt}_${key}`;
+                        const { id, text } = chuongTrinhDaoTao.parents[key];
+                        return (
+                            <ComponentKienThuc key={pIdx} title={text} khoiKienThucId={id} childs={childs[key]} ref={e => this.chuongTrinh[key] = e} pushMonHocChosen={this.pushMonHocChosen} removeMonHoc={this.removeMonHoc} />
+                        );
+                    })
+                }
 
             </>,
             backRoute: '/user/dao-tao/chuong-trinh-dao-tao',

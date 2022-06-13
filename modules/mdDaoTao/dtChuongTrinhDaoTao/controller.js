@@ -4,7 +4,7 @@ module.exports = app => {
         menus: {
             7006: {
                 title: 'Chương trình đào tạo', groupIndex: 1,
-                link: '/user/dao-tao/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#F4C053'
+                link: '/user/dao-tao/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#384C46'
             },
         },
     };
@@ -43,11 +43,78 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        const condition = req.query.condition || {};
-        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
-        app.model.dtChuongTrinhDaoTao.getAll(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
+    app.get('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        app.model.dtChuongTrinhDaoTao.getAll(req.query.condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
     });
+
+    app.get('/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/:khoa/:maNganh', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {
+        let { khoa, maNganh } = req.params;
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        //Lấy tất cả CTDT của ngành đó trong năm (e.g, Ngành Báo chí có 2 chuyên ngành vào năm 2022: Báo điện tử, Báo chính thống --> Lấy hết)
+        app.model.dtCauTrucKhungDaoTao.get({ khoa }, (error, item) => {
+            app.model.dtKhungDaoTao.getAll({ namDaoTao: item.id, maNganh }, (error, items) => {
+                if (error) res.send({ error });
+                else {
+                    let listPromise = items.map(item => {
+                        return new Promise(resolve =>
+                            app.model.dtChuongTrinhDaoTao.getAll({
+                                statement: 'maKhungDaoTao = :maKhungDaoTao AND khoa != 33 AND khoa != 32',
+                                parameter: { maKhungDaoTao: item.id }
+                            }, (error, listMonHocCtdt) => {
+                                listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
+                                resolve(listMonHocCtdt || []);
+                            }));
+                    });
+                    app.model.dtDanhSachMonMo.getAll({ nam: item.id, maNganh, hocKy: thoiGianMoMon.hocKy }, (error, danhSachMonMo) => {
+                        let danhSachMonMoChung = danhSachMonMo.filter(item => !item.chuyenNganh || item.chuyenNganh == ''),
+                            danhSachMonMoChuyenNganh = danhSachMonMo.filter(item => item.chuyenNganh && item.chuyenNganh != '');
+                        app.model.dtDanhSachChuyenNganh.getAll({ namHoc: item.id }, (error, danhSachChuyenNganh) => {
+                            if (error) res.send({ error });
+                            else {
+                                let chuyenNganhMapper = {};
+                                danhSachChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
+                                Promise.all(listPromise).then(listMonHocCtdt => {
+                                    let listMonHoc = listMonHocCtdt.flat().map(item => {
+                                        item.maNganh = maNganh;
+                                        return item;
+                                    });
+                                    let listMonHocChung = listMonHoc.filter((value, index, self) =>
+                                        index === self.findIndex((t) => (
+                                            t.maMonHoc === value.maMonHoc && t.tinhChatMon === 0
+                                        ))
+                                    ).map(item => {
+                                        item.isMo = danhSachMonMoChung.map(item => item.maMonHoc).includes(item.maMonHoc);
+                                        if (item.isMo) {
+                                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = danhSachMonMoChung.find(monChung => monChung.maMonHoc == item.maMonHoc)[textBox]);
+                                        }
+                                        item.chuyenNganh = '';
+                                        return item;
+                                    });
+                                    let monTheoChuyenNganh = listMonHoc
+                                        .filter(item => item.tinhChatMon == 1)
+                                        .map(item => {
+                                            item.isMo = danhSachMonMoChuyenNganh.map(item => ({ maMonHoc: item.maMonHoc, chuyenNganh: item.chuyenNganh })).some(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc && monChuyenNganh.chuyenNganh == item.chuyenNganh);
+                                            if (item.isMo) {
+                                                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc && monChuyenNganh.chuyenNganh == item.chuyenNganh)[textBox]);
+                                            }
+                                            item.tenChuyenNganh = chuyenNganhMapper[item.chuyenNganh];
+                                            return item;
+                                        })
+                                        .groupBy('tenChuyenNganh');
+                                    let listMonHocChuyenNganh = Object.keys(monTheoChuyenNganh).map(item => {
+                                        return { tenChuyenNganh: item, danhSachMonChuyenNganh: monTheoChuyenNganh[item] };
+                                    });
+                                    res.send({ listMonHocChung, listMonHocChuyenNganh });
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        });
+
+    });
+
 
     app.get('/api/dao-tao/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const condition = req.query.condition || {};
@@ -57,7 +124,13 @@ module.exports = app => {
 
     app.post('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         let dataKhung = req.body.item.data, dataMon = req.body.item.items || [];
-        app.model.dtKhungDaoTao.get({ namDaoTao: dataKhung.namDaoTao, maNganh: dataKhung.maNganh }, (error, createdCTDT) => {
+        const condition = {
+            statement: 'namDaoTao = :namDaoTao AND maNganh = :maNganh AND (chuyenNganh is NULL OR chuyenNganh = \'\' OR chuyenNganh = :chuyenNganh)',
+            parameter: {
+                namDaoTao: dataKhung.namDaoTao, maNganh: dataKhung.maNganh, chuyenNganh: dataKhung.chuyenNganh
+            }
+        };
+        app.model.dtKhungDaoTao.get(condition, (error, createdCTDT) => {
             if (!error && !createdCTDT) {
                 app.model.dtKhungDaoTao.create(dataKhung, (error, item) => {
                     if (!error) {
@@ -76,80 +149,12 @@ module.exports = app => {
                         create();
                     } else res.send({ error });
                 });
-            } else res.send({ error: `Mã ngành ${dataKhung.maNganh} năm ${dataKhung.namDaoTao} đã tồn tại!` });
+            } else res.send({ error: 'Chuyên ngành/Ngành đã tồn tại!' });
         });
 
     });
 
-    app.post('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
-        const { data } = req.body;
-        const { items, namDaoTao, maKhoa, id: idKhungDt } = data;
-        const dataImported = [];
-
-        const handleCreate = (index, idKhungDt) => {
-            if (index >= items.length) res.send({ items: dataImported });
-            else app.model.dtChuongTrinhDaoTao.get({ id: items[index].id }, (error, item) => {
-                const currentData = { ...items[index], ...{ maKhungDaoTao: idKhungDt } };
-                delete currentData['id'];
-                if (error) res.send({ error });
-                else if (item) {
-                    app.model.dtChuongTrinhDaoTao.update({ id: items[index].id }, currentData, (error, item) => {
-                        if (error) res.send({ error });
-                        else {
-                            dataImported.push(item);
-                        }
-                    });
-                    handleCreate(index + 1, idKhungDt);
-                }
-                else {
-                    app.model.dtChuongTrinhDaoTao.create(currentData, (error, item) => {
-                        if (error) res.send({ error });
-                        else {
-                            dataImported.push(item);
-                            handleCreate(index + 1);
-                        }
-                    });
-                }
-            });
-        };
-        if (idKhungDt > 0) {
-            app.model.dtKhungDaoTao.get({ id: idKhungDt }, (error, item) => {
-                if (error) res.send({ error });
-                else if (item) {
-                    const { id: idKhungDt, namDaoTao: dbNamDaoTao, maKhoa: dbMaKhoa } = item;
-                    const changes = {};
-                    if (namDaoTao != dbNamDaoTao) {
-                        changes[namDaoTao] = namDaoTao;
-                    }
-                    if (maKhoa != dbMaKhoa) {
-                        changes[maKhoa] = maKhoa;
-                    }
-                    app.model.dtKhungDaoTao.update({ id: idKhungDt }, changes, () => { });
-                    handleCreate(0, idKhungDt);
-                }
-                else {
-                    app.model.dtKhungDaoTao.create({ namDaoTao, maKhoa }, (error, item) => {
-                        if (error) res.send({ error });
-                        else {
-                            const { id: idKhungDt } = item;
-                            handleCreate(0, idKhungDt);
-                        }
-                    });
-                }
-            });
-        } else {
-            app.model.dtKhungDaoTao.create({ namDaoTao, maKhoa }, (error, item) => {
-                if (error) res.send({ error });
-                else {
-                    const { id: idKhungDt } = item;
-                    handleCreate(0, idKhungDt);
-                }
-            });
-        }
-
-    });
-
-    app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), async (req, res) => {
+    app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {
         let id = req.body.id, changes = req.body.changes;
         const updateCTDT = (listMonHoc) => new Promise((resolve, reject) => {
             app.model.dtChuongTrinhDaoTao.delete({ maKhungDaoTao: id }, (error) => {
@@ -176,32 +181,16 @@ module.exports = app => {
                 }
             });
         });
-        app.model.dtKhungDaoTao.get({ namDaoTao: changes.data.namDaoTao, maNganh: changes.data.maNganh }, async (error, createdCTDT) => {
-            if ((!error && !createdCTDT) || createdCTDT.id == id) {
-                try {
-                    let listMonHocCTDT = await updateCTDT(changes.items || []);
-                    app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
-                } catch (error) {
-                    res.send({ error });
-                }
-            } else res.send({ error: `Mã ngành ${changes.data.maNganh} năm ${changes.data.namDaoTao} đã tồn tại!` });
-        });
+        try {
+            let listMonHocCTDT = await updateCTDT(changes.items || []);
+            app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
-    app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
+    app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtChuongTrinhDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
-    });
-
-    app.delete('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
-        const { data } = req.body;
-        const { items } = data;
-        const handleDelete = (index) => {
-            if (index >= items.length) res.send();
-            app.model.dtChuongTrinhDaoTao.delete({ id: items[index].id }, (errors) => {
-                if (errors) res.send({ errors });
-            });
-        };
-        handleDelete(0);
     });
 
     //Phân quyền ------------------------------------------------------------------------------------------
@@ -218,7 +207,7 @@ module.exports = app => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'daoTao');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dtChuongTrinhDaoTao:manage') {
-                app.permissionHooks.pushUserPermission(user, 'dtChuongTrinhDaoTao:manage');
+                app.permissionHooks.pushUserPermission(user, 'dtChuongTrinhDaoTao:manage', 'dMonHoc:manage', 'dtDanhSachChuyenNganh:manage', 'dtNganhDaoTao:manage');
             }
         });
         resolve();

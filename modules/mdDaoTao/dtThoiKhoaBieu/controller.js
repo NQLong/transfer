@@ -10,25 +10,32 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'dtThoiKhoaBieu:read', menu },
+        { name: 'dtThoiKhoaBieu:manage', menu },
         { name: 'dtThoiKhoaBieu:write' },
         { name: 'dtThoiKhoaBieu:delete' }
     );
 
-    app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
+    app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
 
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        const user = req.session.user, permissions = user.permissions;
+        let donVi = '';
+        if (!permissions.includes('dtThoiKhoaBieu:read')) {
+            if (user.staff?.maDonVi) donVi = user.maDonVi;
+            else return res.send({ error: 'Permission denied!' });
+        }
+        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, donVi, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
                 const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
             }
         });
     });
@@ -46,17 +53,22 @@ module.exports = app => {
     app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         let item = req.body.item || [];
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        const onCreate = (index, monHoc) => new Promise(resolve => {
+        let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
+        const onCreate = (index, monHoc) => new Promise((resolve, reject) => {
             const save = (i, m) => {
-                if (i > parseInt(m.soNhom)) {
+                if (i > parseInt(m.soLop)) {
                     resolve(m);
                     return;
                 }
                 app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet }, (error, tkb) => {
-                    if (!error && !tkb) {
+                    if (error) reject(error);
+                    else if (!tkb) {
                         m.nhom = i;
+                        delete m.id;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi }, () => { });
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i }, (error, item) => {
+                                if (error || !item) reject(error);
+                            });
                         }
                     }
                     save(i + 1, m);
@@ -66,9 +78,8 @@ module.exports = app => {
         });
         let listPromise = item.map(monHoc => item = onCreate(1, monHoc));
         Promise.all(listPromise).then((values) => {
-            // app.model.dtThoiKhoaBieu.init();
             res.send({ item: values });
-        });
+        }).catch(error => res.send({ error }));
     });
 
     app.put('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
@@ -107,16 +118,41 @@ module.exports = app => {
         else app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
+    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), (req, res) => {
+        let { condition, changes } = req.body;
+        if (typeof condition == 'number') app.model.dtThoiKhoaBieu.update(condition, changes, (error, item) => res.send({ error, item }));
+        else if (typeof condition == 'object') {
+            let { nam, hocKy, maMonHoc, maNganh } = condition;
+            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, maNganh }, changes, (error, item) => res.send({ error, item }));
+        }
+        else app.model.dtThoiKhoaBieu.update({ id: condition }, changes, (error, item) => res.send({ error, item }));
+    });
+
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
         app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
     app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        app.model.dtThoiKhoaBieu.init((status) => res.send(status));
+        let ngayBatDau = req.query.ngayBatDau;
+        app.model.dtThoiKhoaBieu.init(ngayBatDau, (status) => res.send(status));
     });
 
-    app.get('/api/dao-tao/get-schedule/:phong', app.permission.check('dtThoiKhoaBieu:read'), (req, res) => {
-        let phong = req.params.phong;
-        app.model.dtThoiKhoaBieu.getLichPhong(phong, (error, items) => res.send({ error, items: items.rows }));
+    app.get('/api/dao-tao/get-schedule', app.permission.check('dtThoiKhoaBieu:read'), async (req, res) => {
+        let phong = req.query.phong;
+        const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let listNgayLe = await app.model.dmNgayLe.getAllNgayLeTrongNam(thoiGianMoMon.khoa);
+        app.model.dtThoiKhoaBieu.getCalendar(phong, thoiGianMoMon.nam, thoiGianMoMon.hocKy, (error, items) => {
+            res.send({ error, items: items?.rows || [], listNgayLe });
+        });
     });
+
+    //Quyền của đơn vị------------------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('daoTao', { id: 'dtThoiKhoaBieu:manage', text: 'Đào tạo: Phân công giảng dạy' });
+
+    app.permissionHooks.add('staff', 'checkRoleDTPhanCongGiangDay', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
+            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:manage');
+        }
+        resolve();
+    }));
 };

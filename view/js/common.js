@@ -83,7 +83,7 @@ const T = {
 
     getCookiePage: (cookieName, key) => {
         const pageData = T.storage(cookieName);
-        return pageData && pageData[key] ? pageData[key] : '';
+        return (pageData && pageData[key]) ? pageData[key] : '';
     },
 
     cookie: (cname, cvalue, exdays) => {
@@ -226,32 +226,39 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
-    confirmLoading: (title, text, successText = 'Thành công', failText = 'Thất bại', icon, buttonText, done) => {
+    confirmLoading: (title, text, successText = 'Thành công', failText = 'Thất bại', icon, buttonText, content, done) => {
         swal({
             title,
             text,
             icon,
+            content,
+            closeOnClickOutside: false,
+            closeOnEsc: false,
+            dangerMode: true,
             buttons: {
-                text: buttonText,
-                closeModal: false,
+                cancel: 'Hủy',
+                confirm: buttonText,
+                // closeModal: false,
             },
         })
-            .then(() => {
-                swal({
-                    title: "Loading",
-                    text: "Vui lòng giữ nguyên trang",
-                    icon: "warning",
-                    button: null,
-                });
-                done().then((data) => {
+            .then((value) => {
+                if (value) {
                     swal({
-                        title: data.success ? successText : failText,
-                        text: data.success ? data.success : data.error.message,
-                        icon: data.success ? "success" : "error",
+                        title: "Loading",
+                        text: "Vui lòng giữ nguyên trang",
+                        icon: "warning",
                         button: null,
-                        timer: 3000
                     });
-                });
+                    done(value).then((data) => {
+                        swal({
+                            title: data.success ? successText : failText,
+                            text: data.success ? data.success : data.error.message,
+                            icon: data.success ? "success" : "error",
+                            button: null,
+                            timer: 3000
+                        });
+                    });
+                }
             });
     },
 
@@ -361,6 +368,11 @@ const T = {
         months -= d1.getMonth();
         months += d2.getMonth();
         return months <= 0 ? 0 : months;
+    },
+
+    dayDiff: (d1, d2) => { //Difference in Days between two dates
+        let result = d2.getTime() - d1.getTime();
+        return Math.floor(result / (1000 * 60 * 60 * 24));
     },
 
     numberNgayNghi: (start, end, yearCalc, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end] ở năm yearCalc (nếu tồn tại)
@@ -585,12 +597,12 @@ String.prototype.normalizedName = function () {
     });
     return result.join(' ');
 }
-
 String.prototype.numberWithCommas = function () {
     return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 String.prototype.getFirstLetters = function () {
     const firstLetters = this
+        .toUpperCase()
         .split(' ')
         .map(word => word[0])
         .join('');

@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/danh-muc/loai-hinh-dao-tao',
+            path: '/user/danh-muc/comment/loai-hinh-dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

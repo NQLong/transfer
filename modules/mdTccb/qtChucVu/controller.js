@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3004: { title: 'Quá trình chức vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-black-tie', backgroundColor: '#c77a2e', color: 'black', groupIndex: 0 },
+            3004: { title: 'Quá trình chức vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-black-tie', backgroundColor: '#F5D7B0', groupIndex: 0, color: '#000' },
         },
     };
     app.permission.add(
@@ -20,12 +20,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            let filter = '{}';
-            try {
-                filter = JSON.stringify(req.query.filter || {});
-            } catch(error) {
-                console.log(error);
-            }
+        let filter = app.stringify(req.query.filter || {});
         app.model.qtChucVu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -41,12 +36,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            let filter = '{}';
-            try {
-                filter = JSON.stringify(req.query.filter || {});
-            } catch(error) {
-                console.log(error);
-            }
+        let filter = app.stringify(req.query.filter || {});
         app.model.qtChucVu.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -65,6 +55,7 @@ module.exports = app => {
     app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.data.shcc);
         app.model.qtChucVu.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Chức vụ');
             app.session.refresh(targetEmail);
             res.send({ error, item });
         });
@@ -72,7 +63,10 @@ module.exports = app => {
 
     app.put('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.changes.shcc);
-        app.model.qtChucVu.update({ stt: req.body.stt }, req.body.changes, (error, item) => {
+        let changes = req.body.changes;
+        if (changes && changes.thoiChucVu == 1) changes.chucVuChinh = 0;
+        app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Chức vụ');
             app.session.refresh(targetEmail);
             res.send({ error, item });
         });
@@ -81,14 +75,15 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.shcc);
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Chức vụ');
             app.session.refresh(targetEmail);
-            res.send(error);
+            res.send({ error });
         });
     });
 
-/// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
+    /// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
 
-/// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
+    /// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
         let { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
         if (listShcc == 'null') listShcc = null;
@@ -97,9 +92,9 @@ module.exports = app => {
         if (toYear == 'null') toYear = null;
         if (listCv == 'null') listCv = null;
         if (gioiTinh == 'null') gioiTinh = null;
-        app.model.qtChucVu.download(listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtChucVu.download(listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 let newRows = [];
                 for (let idx = 0; idx < result.rows.length; idx++) {
@@ -153,7 +148,7 @@ module.exports = app => {
                         let hoTen = item.ho + ' ' + item.ten;
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
-                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });  
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
                         cells.push({ cell: 'D' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinh == '01' ? 'Nam' : 'Nữ' });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: donViChinh });
