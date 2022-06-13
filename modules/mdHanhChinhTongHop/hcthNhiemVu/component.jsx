@@ -35,17 +35,6 @@ export class RefreshStatusModal extends AdminModal {
             T.notify('Vui lòng nhập lý do !', 'danger');
             this.ten.focus();
         }
-        // const changes = {
-        //     ten: this.ten.value(),
-        //     tenVietTat: this.tenVietTat.value(),
-        //     kichHoat: this.kichHoat.value() ? 1 : 0,
-        // };
-        // if (changes.ten == '') {
-        //     T.notify('Tên đơn vị công văn bị trống!', 'danger');
-        //     this.ten.focus();
-        // } else {
-        //     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-        // }
         e.preventDefault();
     }
 
@@ -140,16 +129,6 @@ export class CanBoNhan extends AdminPage {
                 const currentId = currentCanBoNhan.map(item => item.id);
                 this.props.getList({ ma: this.props.target, ids: currentId });
             }));
-    }
-
-    refreshTrangThai = (e) => {
-        // T.confirm('', `Bạn có chắc bạn muốn thay đổi quyền cán bộ ${(item.hoCanBoNhan + ' ' + item.tenCanBoNhan).trim().normalizedName()} thành ${vaiTro[vaiTroMoi].text}?`, true,
-        //     isConfirm => isConfirm && this.props.updateCanBoNhanNhiemVu(updateData, () => {
-        //         const currentCanBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
-        //         const currentId = currentCanBoNhan.map(item => item.id);
-        //         this.props.getList({ ma: this.props.target, ids: currentId });
-        //     }));
-        this.showModal(e);
     }
 
     canBoNhanData = () => {

@@ -5,16 +5,13 @@ module.exports = app => {
         return new Promise(resolve => {
             const result = {};
             const solveAnItem = (index) => {
-                console.log(arguments);
                 if (index < arguments.length) {
                     const key = arguments[index];
-                    console.log(key);
                     if (typeof key == 'function') {
                         key(result);
                         resolve(result);
                     } else {
                         app.model.hcthSetting.get({ key }, (error, item) => {
-                            console.log(item);
                             result[key] = (error == null && item) ? item.value : null;
                             solveAnItem(index + 1);
                         });

@@ -472,7 +472,6 @@ export function reopenNhiemVu(id, canBoNhan, nguoiTao, done) {
 
 export function refreshCanBoNhanStatus(data, done) {
     return () => {
-        console.log(data);
         const url = `/api/hcth/nhiem-vu/reset-trang-thai/${data.id}`;
         T.post(url, data, res => {
             if (res.error) {

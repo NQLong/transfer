@@ -97,7 +97,7 @@ class HcthSettingAdminPage extends AdminPage {
                         <div className='tab-pane fade active show' id='chiDaoEmail'>
                             <div className='tile-body'>
                                 <FormTextBox ref={e => this.chiDaoEmailTitle = e} label='Tiêu đề' readOnly={readOnly} />
-                                <FormEditor ref={e => this.chiDaoEmailEditor = e} label='Nội dung email' smallText='Tham số: {name}, {id}' height={400} />
+                                <FormEditor ref={e => this.chiDaoEmailEditor = e} label='Nội dung email' smallText='Tham số: {id}' height={400} />
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('chiDaoEmailTitle', 'chiDaoEmailEditor')}>

@@ -68,7 +68,6 @@ module.exports = (app) => {
             );
         }
         catch (error) {
-            console.error(error);
             return false;
         }
     };
@@ -722,9 +721,8 @@ module.exports = (app) => {
         }
     });
 
-    const onCreateResetCanBoNhanStatusNotification = ({ maNhiemVu, phanHoi, nguoiTaoShcc, canBoNhan = []}) => new Promise((resolve, reject) => {
+    const onCreateResetCanBoNhanStatusNotification = ({ maNhiemVu, phanHoi, nguoiTaoShcc, canBoNhan = [] }) => new Promise((resolve, reject) => {
         try {
-            console.log(maNhiemVu, phanHoi, nguoiTaoShcc, canBoNhan);
             let listEmployees = [];
             listEmployees.push(nguoiTaoShcc);
             listEmployees = listEmployees.concat(canBoNhan);
@@ -739,8 +737,7 @@ module.exports = (app) => {
                     const nguoiTao = canBos.find(canBo => canBo.shcc === nguoiTaoShcc);
                     const dsNguoiNhan = canBos.filter(canBo => canBo.shcc !== nguoiTaoShcc);
                     const hoTenNguoiTao = nguoiTao?.ho + ' ' + nguoiTao?.ten;
-                    
-                    const subTitle = `${hoTenNguoiTao} đã phản hồi nhiệm vụ ${maNhiemVu}: ${phanHoi}`;
+                    const subTitle = `${hoTenNguoiTao} đã thay đổi  nhiệm vụ ${maNhiemVu}: ${phanHoi}`;
                     createNotification(dsNguoiNhan.map(item => item.email), { title: 'Nhiệm vụ', icon: 'fa-list-alt', iconColor: 'primary', subTitle, link: `/user/nhiem-vu/${maNhiemVu}` }, (error) => {
                         if (error) reject(error);
                         else resolve();
@@ -755,7 +752,6 @@ module.exports = (app) => {
 
     app.post('/api/hcth/nhiem-vu/reset-trang-thai/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
-            console.log(req.body);
             const { phanHoi, shccCanBoNhan, hoCanBoNhan, tenCanBoNhan } = req.body;
             const nhiemVuId = req.params.id;
             const shccNguoiTao = req.session?.user?.staff?.shcc;
@@ -767,14 +763,14 @@ module.exports = (app) => {
                     name: (hoCanBoNhan + ' ' + tenCanBoNhan).normalizedName()
                 }),
                 hanhDong: 'RESET'
-            }).then(async () => {
-                    await onCreateResetCanBoNhanStatusNotification({
-                        maNhiemVu: nhiemVuId,
-                        phanHoi,
-                        nguoiTaoShcc: req.session?.user?.staff?.shcc,
-                        canBoNhan: [shccCanBoNhan]
-                    }).then(() => res.send({ error: null }));
             });
+            await onCreateResetCanBoNhanStatusNotification({
+                    maNhiemVu: nhiemVuId,
+                    phanHoi,
+                    nguoiTaoShcc: req.session?.user?.staff?.shcc,
+                    canBoNhan: [shccCanBoNhan]
+            });
+            res.send({ error: null });
         } catch (error) {
             res.send({ error });
         }
