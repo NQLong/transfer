@@ -160,7 +160,7 @@ module.exports = (app) => {
         Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
     };
 
-    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async(req, res) => {
+    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
             app.model.hcthCongVanDen.get({ id: req.body.id }, async (error, congVan) => {
@@ -683,21 +683,21 @@ module.exports = (app) => {
                 dsCanBo: [...canBoChiDao, ''],
             }
         }, 'email', 'email', async (error, canBos) => {
-            if (error) throw(error);
+            if (error) throw (error);
             else {
                 const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
-                let mailTitle = chiDaoEmailTitle,
-                mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
-                mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `https://hcmussh.edu.vn/user/cong-van-den/${item.id}`);
+                const rootUrl = app.rootUrl;
+                let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
+                    mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
                 if (app.isDebug) {
                     app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
-                        if (error) throw(error);
+                        if (error) throw (error);
                     });
                 } else {
-                    canBos.map(canBo => new Promise(() => {
-                        app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
-                            if (error) throw(error);
-                        });
+                    canBos.map(canBo => new Promise(() => { 
+                        app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => { 
+                            if (error) throw (error); 
+                        }); 
                     }));
                 }
             }
