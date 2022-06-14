@@ -15,8 +15,8 @@ module.exports = app => {
         });
     });
 
-    app.model.hcthHistory.getAllHistoryFrom = (target, type) => new Promise((resolve, reject) => {
-        app.model.hcthHistory.getAllFrom(target, type, (error, item) => {
+    app.model.hcthHistory.getAllHistoryFrom = (target, targettype, sorttype) => new Promise((resolve, reject) => {
+        app.model.hcthHistory.getAllFrom(target, targettype, sorttype, (error, item) => {
             handleResult(resolve, reject, item, error);
         });
     });
