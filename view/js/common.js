@@ -5,6 +5,9 @@ import './sweetalert.min.js';
 import FileSaver from 'file-saver';
 
 const T = {
+    title: title => {
+        document.title = title && title != '' ? `${document.notification || ''} ${title} | USSH-VNUHCM` : 'USSH-VNUHCM';
+    },
     FileSaver,
     rootUrl: window.location.protocol + '//' + window.location.hostname, // rootUrl: 'https://hcmussh.edu.vn',
     sexes: ['Nam', 'Nữ'],

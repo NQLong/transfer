@@ -48,7 +48,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     pushMonHocChosen = (maMonHoc) => {
         if (maMonHoc) {
             if (this.listMonHocChosen.includes(maMonHoc)) {
-                T.notify('Trùng môn học, vui lòng chọn môn học khác', 'danger');
+                T.notify(`Trùng môn học <b>${maMonHoc}<b/>, vui lòng chọn môn học khác`, 'danger');
                 return false;
             } else {
                 this.listMonHocChosen.push(maMonHoc);

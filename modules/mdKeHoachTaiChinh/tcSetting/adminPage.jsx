@@ -65,7 +65,7 @@ class TcSettingAdminPage extends AdminPage {
             content: <div className='row'>
                 <div className='col-md-6'>
                     <div className='tile'>
-                        <h3 className='tile-header'>Cấu hình</h3>
+                        <h3 className='tile-title'>Cấu hình</h3>
                         <FormTextBox ref={e => this.hocPhiNamHoc = e} label='Học phí: Năm học' type='year' readOnly={readOnly} />
                         <FormSelect ref={e => this.hocPhiHocKy = e} label='Học phí: Học kỳ' data={[1, 2, 3]} readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
@@ -76,7 +76,7 @@ class TcSettingAdminPage extends AdminPage {
                     </div>
 
                     <div className='tile'>
-                        <h3 className='tile-header'>Email</h3>
+                        <h3 className='tile-title'>Email</h3>
                         <FormTextBox ref={e => this.email = e} label='Email' type='email' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-success' type='button' onClick={() => this.save('email')}>
@@ -84,7 +84,7 @@ class TcSettingAdminPage extends AdminPage {
                             </button>
                         </div>
 
-                        <h3 className='tile-header'>Mật khẩu email</h3>
+                        <h3 className='tile-title'>Mật khẩu email</h3>
                         <FormTextBox ref={e => this.emailPassword1 = e} label='Mật khẩu email' type='password' readOnly={readOnly} />
                         <FormTextBox ref={e => this.emailPassword2 = e} label='Nhập lại mật khẩu email' type='password' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
@@ -97,7 +97,7 @@ class TcSettingAdminPage extends AdminPage {
 
                 <div className='col-md-6'>
                     <div className='tile'>
-                        <h3 className='tile-header'>Ngân hàng: Chuỗi bí mật</h3>
+                        <h3 className='tile-title'>Ngân hàng: Chuỗi bí mật</h3>
                         <FormTextBox ref={e => this.secretCodeBidv = e} label='BIDV' readOnly={readOnly} />
                         <FormTextBox ref={e => this.secretCodeVcb = e} label='VCB' readOnly={readOnly} />
                         <FormTextBox ref={e => this.secretCodeAgri = e} label='Agribank' readOnly={readOnly} />
@@ -109,7 +109,7 @@ class TcSettingAdminPage extends AdminPage {
                     </div>
 
                     <div className='tile'>
-                        <h3 className='tile-header'>Hướng dẫn đóng học phí</h3>
+                        <h3 className='tile-title'>Hướng dẫn đóng học phí</h3>
                         <FormEditor ref={e => this.hocPhiHuongDan = e} height={400} readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiHuongDan')}>
