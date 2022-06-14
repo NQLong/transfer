@@ -120,8 +120,8 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM FW_USER' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (error, res) => {
+            const sqlCount = 'SELECT COUNT(*) FROM FW_USER' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
                     reject(error);

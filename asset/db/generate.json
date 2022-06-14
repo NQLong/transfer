@@ -14086,6 +14086,40 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "FW_SMS": {
+            "active": true,
+            "moduleName": "fwSms",
+            "modelName": "fwSms",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "SENT_DATE": {
+                    "value": "sentDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                },
+                "TOTAL": {
+                    "value": "total",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "EMAIL",
+                "SENT_DATE"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }

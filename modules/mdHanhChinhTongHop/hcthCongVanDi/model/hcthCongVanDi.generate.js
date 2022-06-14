@@ -4,7 +4,7 @@ const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ng
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
-        create: (data, done) => {
+        create: (data, done) => new Promise((resolve, reject) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
                 if (obj2Db[column]) {
@@ -15,61 +15,105 @@ module.exports = app => {
             });
 
             if (statement.length == 0) {
-                done('Data is empty!');
+                done && done('Data is empty!');
+                reject('Data is empty!');
             } else {
                 const sql = 'INSERT INTO HCTH_CONG_VAN_DI (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.hcthCongVanDi.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.hcthCongVanDi.get({ rowId: resultSet.lastRowid }).then(item => {
+                            done && done(null, item);
+                            resolve(item);
+                        }).catch(error => {
+                            done && done(error);
+                            reject(error);
+                        });
                     } else {
-                        done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
+                        done && done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
+                        reject(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
                 });
             }
-        },
+        }),
 
-        get: (condition, selectedColumns, orderBy, done) => {
-            if (typeof condition == 'function') {
+        get: (condition, selectedColumns, orderBy, done) => new Promise((resolve, reject) => {
+            if (condition == undefined) {
+                done = null;
+                condition = {};
+                selectedColumns = '*';
+            } else if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
                 selectedColumns = '*';
             } else if (selectedColumns && typeof selectedColumns == 'function') {
                 done = selectedColumns;
                 selectedColumns = '*';
+            } else {
+                selectedColumns = selectedColumns ? selectedColumns : '*';
             }
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
-        },
+            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                if (error) {
+                    done && done(error);
+                    reject(error);
+                } else {
+                    const item = resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null;
+                    done && done(null, item);
+                    resolve(item);
+                }
+            });
+        }),
 
-        getAll: (condition, selectedColumns, orderBy, done) => {
-            if (typeof condition == 'function') {
+        getAll: (condition, selectedColumns, orderBy, done) => new Promise((resolve, reject) => {
+            if (condition == undefined) {
+                done = null;
+                condition = {};
+                selectedColumns = '*';
+            } else if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
                 selectedColumns = '*';
             } else if (selectedColumns && typeof selectedColumns == 'function') {
                 done = selectedColumns;
                 selectedColumns = '*';
+            } else {
+                selectedColumns = selectedColumns ? selectedColumns : '*';
             }
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
-        },
+            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                if (error) {
+                    done && done(error);
+                    reject(error);
+                } else {
+                    const items = resultSet && resultSet.rows ? resultSet.rows : [];
+                    done && done(null, items);
+                    resolve(items);
+                }
+            });
+        }),
 
-        getPage: (pageNumber, pageSize, condition, selectedColumns, orderBy, done) => {
-            if (typeof condition == 'function') {
+        getPage: (pageNumber, pageSize, condition, selectedColumns, orderBy, done) => new Promise((resolve, reject) => {
+            if (condition == undefined) {
+                done = null;
+                condition = {};
+                selectedColumns = '*';
+            } else if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
                 selectedColumns = '*';
             } else if (selectedColumns && typeof selectedColumns == 'function') {
                 done = selectedColumns;
                 selectedColumns = '*';
+            } else {
+                selectedColumns = selectedColumns ? selectedColumns : '*';
             }
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
@@ -79,7 +123,8 @@ module.exports = app => {
             const sqlCount = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
-                    done(error);
+                    done && done(error);
+                    reject(error);
                 } else {
                     let result = {};
                     let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
@@ -88,14 +133,20 @@ module.exports = app => {
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                     const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT HCTH_CONG_VAN_DI.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                     app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                        done(error, result);
+                        if (error) {
+                            done && done(error);
+                            reject(error);
+                        } else {
+                            result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                            done && done(null, result);
+                            resolve(result);
+                        }
                     });
                 }
             });
-        },
+        }),
 
-        update: (condition, changes, done) => {
+        update: (condition, changes, done) => new Promise((resolve, reject) => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
@@ -103,66 +154,136 @@ module.exports = app => {
                 const sql = 'UPDATE HCTH_CONG_VAN_DI SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.hcthCongVanDi.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.hcthCongVanDi.get({ rowId: resultSet.lastRowid }).then(item => {
+                            done && done(null, item);
+                            resolve(item);
+                        }).catch(error => {
+                            done && done(error);
+                            reject(error);
+                        });
                     } else {
-                        done(error);
+                        done && done(error);
+                        reject(error);
                     }
                 });
             } else {
-                done('No changes!');
+                done && done('No changes!');
+                reject('No changes!');
             }
-        },
+        }),
 
-        delete: (condition, done) => {
-            if (done == null) {
+        delete: (condition, done) => new Promise((resolve, reject) => {
+            if (condition == undefined) {
+                done = null;
+                condition = {};
+            } else if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'DELETE FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, error => done(error));
-        },
+            app.database.oracle.connection.main.execute(sql, parameter, error => {
+                if (error) {
+                    done && done(error);
+                    reject(error);
+                } else {
+                    done && done();
+                    resolve();
+                }
+            });
+        }),
 
-        count: (condition, done) => {
-            if (done == null) {
+        count: (condition, done) => new Promise((resolve, reject) => {
+            if (condition == undefined) {
+                done = null;
+                condition = {};
+            } else if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
-        },
+            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
+                if (error) {
+                    done && done(error);
+                    reject(error);
+                } else {
+                    done && done(null, result);
+                    resolve(result);
+                }
+            });
+        }),
 
-        searchPage: (pagenumber, pagesize, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, done) => {
+        searchPage: (pagenumber, pagesize, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_page(:pagenumber, :pagesize, :macanbo, :donvigui, :donvi, :loaicongvan, :loaivanban, :donvinhanngoai, :donvixem, :canboxem, :loaicanbo, :status, :timetype, :fromtime, :totime, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
 
-        updateSoCongVanDi: (ma, donvigui, nam, done) => {
+        updateSoCongVanDi: (ma, donvigui, nam, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN hcth_cong_van_di_update_so_cong_van(:ma, :donvigui, :nam); END;',
                 { ma, donvigui, nam }, done);
-        },
+        }),
 
-        getAllPhanHoi: (idnhiemvu, done) => {
+        getAllPhanHoi: (idnhiemvu, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_phan_hoi(:idnhiemvu); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idnhiemvu }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idnhiemvu }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
 
-        getHcthStaff: (done) => {
+        getHcthStaff: (done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_hcth_staff(); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
 
-        getAllStaff: (congvanid, done) => {
+        getAllStaff: (congvanid, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_staff(:congvanid); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
 
-        searchSelector: (pagenumber, pagesize, filterparam, searchterm, done) => {
+        searchSelector: (pagenumber, pagesize, filterparam, searchterm, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_selector(:pagenumber, :pagesize, :filterparam, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filterparam, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filterparam, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
     };
 };
