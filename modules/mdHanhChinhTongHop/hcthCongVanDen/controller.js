@@ -437,7 +437,7 @@ module.exports = (app) => {
             }
             const files = await app.model.hcthFile.getAllFile({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
-            const history = await app.model.hcthHistory.getAllHistoryFrom(id, CONG_VAN_TYPE);
+            const history = await app.model.hcthHistory.getAllHistoryFrom(id, CONG_VAN_TYPE, req.query.historySortType);
             const canBoChiDao = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, CONG_VAN_TYPE);
             const quyenChiDao = canBoChiDao?.rows.map(cb => cb.shccCanBoNhan).join(',');
             const chiDao = await app.model.hcthChiDao.getAllChiDao(id, CONG_VAN_TYPE);
@@ -463,7 +463,7 @@ module.exports = (app) => {
 
 
     app.get('/api/hcth/cong-van-den/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
 
