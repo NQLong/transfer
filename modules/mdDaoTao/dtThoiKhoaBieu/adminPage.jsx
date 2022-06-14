@@ -13,6 +13,7 @@ import T from 'view/js/common';
 import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
+import { SelectAdapter_NamDaoTaoFilter } from '../dtChuongTrinhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -188,18 +189,20 @@ class DtThoiKhoaBieuPage extends AdminPage {
     soLuongDuKien = {}
     sucChua = {}
     check = {}
-    state = { page: null, isEdit: {}, sucChua: {}, filter: {} }
+    state = { page: null, isEdit: {}, sucChua: {}, filter: {}, idNamDaoTao: '', hocKy: '' }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.initData(searchText || '');
             T.showSearchBox(() => { });
+            this.setState({idNamDaoTao: '', hocKy: ''});
         });
         this.initData();
     }
 
     initData = (searchText = '', filter = this.state.filter) => {
         this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText, page => {
-            let { nam = null, hocKy = null, maKhoaBoMon = null, maNganh = null } = filter;
+            let { maKhoaBoMon = null, maNganh = null } = filter;
+            const {idNamDaoTao: nam = null, hocKy = null } = this.state;
             page.list = page.list.filter(item => {
                 return (!maNganh || item.maNganh == maNganh)
                     && (!maKhoaBoMon || item.maKhoaBoMon == maKhoaBoMon)
@@ -459,6 +462,20 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Thời khoá biểu'
             ],
+            header: permission.read && <><FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '10px' }} placeholder='Năm học' onChange={value => {
+                T.clearSearchBox();
+                console.log(value);
+                this.setState({ idNamDaoTao: value ? value.id : '' }, () => {
+                    this.initData();
+                });
+            }} data={SelectAdapter_NamDaoTaoFilter} allowClear={true} />
+                <FormSelect style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' onChange={value => {
+                    T.clearSearchBox();
+                    console.log(value);
+                    this.setState({ hocKy: value ? value.id : '' }, () => {
+                        this.initData();
+                    });
+                }} data={[1, 2, 3]} allowClear={true} /></>,
             content: <>
                 {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null}
                 <div className='tile'>{table}</div>
