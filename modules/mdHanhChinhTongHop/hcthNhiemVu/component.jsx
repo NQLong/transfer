@@ -37,9 +37,9 @@ export class RefreshStatusModal extends AdminModal {
 
     render = () => {
         return this.renderModal({
-            title: 'Nhập lý do thay đổi',
+            title: 'Xóa trạng thái người tham gia',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.phanHoi = e} />
+                <FormTextBox label='Lý do' type='text' className='col-md-12' ref={e => this.phanHoi = e} />
             </div>
         });
     }
@@ -179,6 +179,13 @@ export class CanBoNhan extends AdminPage {
         }
     });
 
+    resetUserStatus = (data, done) => {
+        this.props.refreshCanBoNhanStatus(data, () =>{
+            this.props.getHistory();
+            done && done();
+        });
+    }
+
     onSubmit = () => {
         const shccs = this.canBoNhan.value();
         const vaiTro = this.vaiTro.value();
@@ -229,7 +236,7 @@ export class CanBoNhan extends AdminPage {
                         </div>
                     </div>
                 </div>
-                <RefreshStatusModal ref={e => this.modal = e} onSave={this.props.refreshCanBoNhanStatus} nhiemVuId={this.props.target} />
+                <RefreshStatusModal ref={e => this.modal = e} onSave={this.resetUserStatus} nhiemVuId={this.props.target} />
             </div>
         );
     }

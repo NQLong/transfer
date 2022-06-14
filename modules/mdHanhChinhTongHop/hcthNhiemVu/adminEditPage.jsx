@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { CanBoNhan, History, LienKet, ListFiles, PhanHoi } from './component';
-import { clearHcthNhiemVu, completeNhiemVu, closeNhiemVu, reopenNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getHistory, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu, refreshCanBoNhanStatus} from './redux';
+import { clearHcthNhiemVu, completeNhiemVu, closeNhiemVu, reopenNhiemVu, createCanBoNhanNhiemVu, createLienKet, createNhiemVu, createPhanHoi, deleteFile, deleteLienKet, deleteNhiemVu, getCongVanCacPhongSelector, getCongVanDenSelector, getHistory, getLienKet, getListCanBoNhanNhiemVu, getNhiemVu, getPhanHoi, removeCanBoNhanNhiemVu, searchNhiemVu, updateCanBoNhanNhiemVu, updateLienKet, updateNhiemVu, refreshCanBoNhanStatus } from './redux';
 const { doUuTienMapper, vaiTro, trangThaiNhiemVu } = require('../constant');
 
 // const tienDoSelector = [...Array(11).keys()].map(i => ({ id: i * 10, text: `${i * 10}%` }));
@@ -227,6 +227,12 @@ class AdminEditPage extends AdminPage {
             this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });
     }
 
+    canFinish = () => {
+        const canBoNhan = this.props.hcthNhiemVu?.item?.canBoNhan || [];
+        const user = canBoNhan.find(item => item.shccCanBoNhan == this.props.system?.user?.staff?.shcc);
+        return user && user.trangThai != 'COMPLETED';
+    }
+
     render() {
         const
             isNew = !this.state.id,
@@ -235,7 +241,7 @@ class AdminEditPage extends AdminPage {
             buttons = [];
         const isShowCloseTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai !== trangThaiNhiemVu.DONG.id;
         const isShowReopenTaskBtn = !sitePermission.isParticipant && sitePermission.editTrangThai && this.state.id && this.state.trangThai === trangThaiNhiemVu.DONG.id;
-        if (sitePermission.isParticipant && this.state.trangThai !== trangThaiNhiemVu.DONG.id)
+        if (sitePermission.isParticipant && this.state.trangThai !== trangThaiNhiemVu.DONG.id && this.canFinish())
             buttons.push({ icon: 'fa-check', onClick: this.onComplete, className: 'btn-success' });
         if (isShowCloseTaskBtn)
             buttons.push({ icon: 'fa-lock', onClick: this.onClose, className: 'btn-danger' });
@@ -284,5 +290,5 @@ class AdminEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthNhiemVu: state.hcth.hcthNhiemVu });
-const mapActionsToProps = { completeNhiemVu, reopenNhiemVu, closeNhiemVu, getHistory, clearHcthNhiemVu, updateCanBoNhanNhiemVu, deleteFile, deleteLienKet, getCongVanCacPhongSelector, createNhiemVu, updateNhiemVu, deleteNhiemVu, searchNhiemVu, getNhiemVu, createPhanHoi, getPhanHoi, createLienKet, updateLienKet, getLienKet, createCanBoNhanNhiemVu, getListCanBoNhanNhiemVu, removeCanBoNhanNhiemVu, getCongVanDenSelector, refreshCanBoNhanStatus};
+const mapActionsToProps = { completeNhiemVu, reopenNhiemVu, closeNhiemVu, getHistory, clearHcthNhiemVu, updateCanBoNhanNhiemVu, deleteFile, deleteLienKet, getCongVanCacPhongSelector, createNhiemVu, updateNhiemVu, deleteNhiemVu, searchNhiemVu, getNhiemVu, createPhanHoi, getPhanHoi, createLienKet, updateLienKet, getLienKet, createCanBoNhanNhiemVu, getListCanBoNhanNhiemVu, removeCanBoNhanNhiemVu, getCongVanDenSelector, refreshCanBoNhanStatus };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

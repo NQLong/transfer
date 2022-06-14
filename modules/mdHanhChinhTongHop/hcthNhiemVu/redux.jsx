@@ -430,7 +430,7 @@ export function getHistory(id, context, done) {
 }
 
 export function completeNhiemVu(id, done) {
-    return () => {
+    return (dispatch) => {
         const url = `/api/hcth/nhiem-vu/hoan-thanh/${id}`;
         T.get(url, res => {
             if (res.error) {
@@ -438,6 +438,7 @@ export function completeNhiemVu(id, done) {
                 console.error('GET: ' + url + '. ', res.error);
             } else {
                 T.notify('Cập nhật lịch sử thành công', 'success');
+                dispatch(getListCanBoNhanNhiemVu({ ma: id }));
                 done && done(res.items);
             }
         }, () => T.notify('Cập nhật lịch sử lỗi', 'danger'));
@@ -483,7 +484,7 @@ export function refreshCanBoNhanStatus(data, done) {
                 console.error('GET: ' + url + '. ', res.error);
             } else {
                 T.notify('Thay đổi trạng thái thành công', 'success');
-                dispatch(getListHistory(data.id));
+                // dispatch(getListHistory(data.id));
                 dispatch(getListCanBoNhanNhiemVu({ ma: data.id}));
                 done && done();
             }
