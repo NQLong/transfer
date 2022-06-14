@@ -29,6 +29,7 @@ module.exports = app => {
         };
 
         http.request(option, (res) => {
+            console.log('Response: ', res);
             if (res.statusCode == 200) {
                 res.on('data', (data) => {
                     if (data.code == 1) {
@@ -43,7 +44,6 @@ module.exports = app => {
                     } else res.send({ error: 'Unsuccessful request' });
                 });
             } else res.send({ error: 'Requesting to Viettel has been failed' });
-
         });
     });
 };
