@@ -701,7 +701,7 @@ class AdminEditPage extends AdminPage {
 
                 {!isNew &&
                     <div className="tile">
-                        <h3 className='tile-title'><i className={`fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
+                        <h3 className='tile-title'><i className={`btn fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
                     </div>
                 }
