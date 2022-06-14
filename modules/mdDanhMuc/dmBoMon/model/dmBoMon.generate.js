@@ -4,7 +4,7 @@ const obj2Db = { 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'maDv': 'MA_DV', 
 
 module.exports = app => {
     app.model.dmBoMon = {
-        create: (data, done) => new Promise((resolve, reject) => {
+        create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
                 if (obj2Db[column]) {
@@ -15,105 +15,61 @@ module.exports = app => {
             });
 
             if (statement.length == 0) {
-                done && done('Data is empty!');
-                reject('Data is empty!');
+                done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO DM_BO_MON (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.dmBoMon.get({ rowId: resultSet.lastRowid }).then(item => {
-                            done && done(null, item);
-                            resolve(item);
-                        }).catch(error => {
-                            done && done(error);
-                            reject(error);
-                        });
+                        app.model.dmBoMon.get({ rowId: resultSet.lastRowid }, done);
                     } else {
-                        done && done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
-                        reject(error ? error : 'Execute SQL command fail! Sql = ' + sql);
+                        done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
                 });
             }
-        }),
+        },
 
-        get: (condition, selectedColumns, orderBy, done) => new Promise((resolve, reject) => {
-            if (condition == undefined) {
-                done = null;
-                condition = {};
-                selectedColumns = '*';
-            } else if (typeof condition == 'function') {
+        get: (condition, selectedColumns, orderBy, done) => {
+            if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
                 selectedColumns = '*';
             } else if (selectedColumns && typeof selectedColumns == 'function') {
                 done = selectedColumns;
                 selectedColumns = '*';
-            } else {
-                selectedColumns = selectedColumns ? selectedColumns : '*';
             }
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                if (error) {
-                    done && done(error);
-                    reject(error);
-                } else {
-                    const item = resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null;
-                    done && done(null, item);
-                    resolve(item);
-                }
-            });
-        }),
+            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
+        },
 
-        getAll: (condition, selectedColumns, orderBy, done) => new Promise((resolve, reject) => {
-            if (condition == undefined) {
-                done = null;
-                condition = {};
-                selectedColumns = '*';
-            } else if (typeof condition == 'function') {
+        getAll: (condition, selectedColumns, orderBy, done) => {
+            if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
                 selectedColumns = '*';
             } else if (selectedColumns && typeof selectedColumns == 'function') {
                 done = selectedColumns;
                 selectedColumns = '*';
-            } else {
-                selectedColumns = selectedColumns ? selectedColumns : '*';
             }
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                if (error) {
-                    done && done(error);
-                    reject(error);
-                } else {
-                    const items = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done && done(null, items);
-                    resolve(items);
-                }
-            });
-        }),
+            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
+        },
 
-        getPage: (pageNumber, pageSize, condition, selectedColumns, orderBy, done) => new Promise((resolve, reject) => {
-            if (condition == undefined) {
-                done = null;
-                condition = {};
-                selectedColumns = '*';
-            } else if (typeof condition == 'function') {
+        getPage: (pageNumber, pageSize, condition, selectedColumns, orderBy, done) => {
+            if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
                 selectedColumns = '*';
             } else if (selectedColumns && typeof selectedColumns == 'function') {
                 done = selectedColumns;
                 selectedColumns = '*';
-            } else {
-                selectedColumns = selectedColumns ? selectedColumns : '*';
             }
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
@@ -123,8 +79,7 @@ module.exports = app => {
             const sqlCount = 'SELECT COUNT(*) FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
-                    done && done(error);
-                    reject(error);
+                    done(error);
                 } else {
                     let result = {};
                     let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
@@ -133,20 +88,14 @@ module.exports = app => {
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                     const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DM_BO_MON.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                     app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                        if (error) {
-                            done && done(error);
-                            reject(error);
-                        } else {
-                            result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                            done && done(null, result);
-                            resolve(result);
-                        }
+                        result.list = resultSet && resultSet.rows ? resultSet.rows : [];
+                        done(error, result);
                     });
                 }
             });
-        }),
+        },
 
-        update: (condition, changes, done) => new Promise((resolve, reject) => {
+        update: (condition, changes, done) => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
@@ -154,66 +103,36 @@ module.exports = app => {
                 const sql = 'UPDATE DM_BO_MON SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.dmBoMon.get({ rowId: resultSet.lastRowid }).then(item => {
-                            done && done(null, item);
-                            resolve(item);
-                        }).catch(error => {
-                            done && done(error);
-                            reject(error);
-                        });
+                        app.model.dmBoMon.get({ rowId: resultSet.lastRowid }, done);
                     } else {
-                        done && done(error);
-                        reject(error);
+                        done(error);
                     }
                 });
             } else {
-                done && done('No changes!');
-                reject('No changes!');
+                done('No changes!');
             }
-        }),
+        },
 
-        delete: (condition, done) => new Promise((resolve, reject) => {
-            if (condition == undefined) {
-                done = null;
-                condition = {};
-            } else if (typeof condition == 'function') {
+        delete: (condition, done) => {
+            if (done == null) {
                 done = condition;
                 condition = {};
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'DELETE FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, error => {
-                if (error) {
-                    done && done(error);
-                    reject(error);
-                } else {
-                    done && done();
-                    resolve();
-                }
-            });
-        }),
+            app.database.oracle.connection.main.execute(sql, parameter, error => done(error));
+        },
 
-        count: (condition, done) => new Promise((resolve, reject) => {
-            if (condition == undefined) {
-                done = null;
-                condition = {};
-            } else if (typeof condition == 'function') {
+        count: (condition, done) => {
+            if (done == null) {
                 done = condition;
                 condition = {};
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM DM_BO_MON' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
-                if (error) {
-                    done && done(error);
-                    reject(error);
-                } else {
-                    done && done(null, result);
-                    resolve(result);
-                }
-            });
-        }),
+            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
+        },
     };
 };
