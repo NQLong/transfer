@@ -161,10 +161,14 @@ export function deleteFile(id, fileId, file, done) {
 }
 
 
-export function getNhiemVu(id, done) {
+export function getNhiemVu(id, context, done) {
+    if (!context || typeof context == 'function') {
+        done = context;
+        context = {};
+    }
     return dispatch => {
         const url = `/api/hcth/nhiem-vu/${id}`;
-        T.get(url, data => {
+        T.get(url, context, data => {
             if (data.error) {
                 console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy nhiệm vụ bị lỗi!', 'danger');
@@ -292,7 +296,7 @@ export function getListHistory(id, done) {
 // Cán bộ nhận nhiệm vụ
 
 export function createCanBoNhanNhiemVu(ma, nguoiTao, canBoNhan, vaiTro, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/hcth/nhiem-vu/can-bo-nhan';
         T.post(url, { ma, nguoiTao, canBoNhan, vaiTro }, res => {
             if (res.error) {
@@ -300,7 +304,6 @@ export function createCanBoNhanNhiemVu(ma, nguoiTao, canBoNhan, vaiTro, done) {
                 console.error('POST: ' + url, res.error);
             } else {
                 T.notify('Tạo cán bộ thành công', 'success');
-                if (ma) dispatch(getListHistory(ma));
                 done && done(res.items);
             }
         }, () => T.notify('Tạo cán bộ bị lỗi', 'danger'));
@@ -308,7 +311,7 @@ export function createCanBoNhanNhiemVu(ma, nguoiTao, canBoNhan, vaiTro, done) {
 }
 
 export function updateCanBoNhanNhiemVu(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/hcth/nhiem-vu/can-bo-nhan';
         T.put(url, data, res => {
             if (res.error) {
@@ -316,7 +319,6 @@ export function updateCanBoNhanNhiemVu(data, done) {
                 console.error('PUT: ' + url, res.error);
             } else {
                 T.notify('Cập nhật vai trò cán bộ thành công', 'success');
-                dispatch(getListHistory(data.nhiemVuId));
                 done && done(res.item);
             }
         }, () => T.notify('Cập nhật vai trò cán bộ bị lỗi', 'danger'));
@@ -339,7 +341,7 @@ export function getListCanBoNhanNhiemVu({ ma = null, ids = null }, done) {
 }
 
 export function removeCanBoNhanNhiemVu(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/hcth/nhiem-vu/can-bo-nhan';
         T.delete(url, data, res => {
             if (res.error) {
@@ -347,7 +349,6 @@ export function removeCanBoNhanNhiemVu(data, done) {
                 console.error('DELETE: ' + url + '. ', res.error);
             } else {
                 T.notify('Xoá cán bộ thành công', 'success');
-                dispatch(getListHistory(data.nhiemVuId));
                 done && done();
             }
         }, () => T.notify('Xoá cán bộ bị lỗi', 'danger'));
@@ -409,10 +410,14 @@ export function clearHcthNhiemVu(done) {
     };
 }
 
-export function getHistory(id, done) {
+export function getHistory(id, context, done) {
+    if (!context || typeof context == 'function') {
+        done = context;
+        context = {};
+    }
     return dispatch => {
         const url = `/api/hcth/nhiem-vu/lich-su/${id}`;
-        T.get(url, res => {
+        T.get(url, context, res => {
             if (res.error) {
                 T.notify('Lấy lịch sử nhiệm vụ lỗi', 'danger');
                 console.error('GET: ' + url + '. ' + res.error);
@@ -433,7 +438,6 @@ export function completeNhiemVu(id, done) {
                 console.error('GET: ' + url + '. ', res.error);
             } else {
                 T.notify('Cập nhật lịch sử thành công', 'success');
-                dispatch(getHistory(id));
                 dispatch(getListCanBoNhanNhiemVu({ ma: id }));
                 done && done(res.items);
             }
@@ -480,7 +484,7 @@ export function refreshCanBoNhanStatus(data, done) {
                 console.error('GET: ' + url + '. ', res.error);
             } else {
                 T.notify('Thay đổi trạng thái thành công', 'success');
-                dispatch(getListHistory(data.id));
+                // dispatch(getListHistory(data.id));
                 dispatch(getListCanBoNhanNhiemVu({ ma: data.id}));
                 done && done();
             }

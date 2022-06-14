@@ -246,10 +246,14 @@ export function updateStatus(data, done) {
     };
 }
 
-export function getHistory(id, done) {
+export function getHistory(id, context, done) {
+    if (!context || typeof context == 'function') {
+        done = context;
+        context = {};
+    }
     return dispatch => {
         const url = `/api/hcth/cong-van-cac-phong/lich-su/${id}`;
-        T.get(url, res => {
+        T.get(url, context, res => {
             if (res.error) {
                 T.notify('Lấy lịch sử công văn lỗi', 'danger');
                 console.error('GET: ' + url + '. ' + res.error);
