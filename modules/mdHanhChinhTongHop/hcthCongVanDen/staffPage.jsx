@@ -275,7 +275,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             </div>,
 
             onCreate: permission && permission.write ? () => this.props.history.push(`${baseUrl}/new`) : null,
-            backRoute,
+            backRoute
         });
     }
 }

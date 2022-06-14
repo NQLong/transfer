@@ -434,6 +434,7 @@ export function completeNhiemVu(id, done) {
             } else {
                 T.notify('Cập nhật lịch sử thành công', 'success');
                 dispatch(getHistory(id));
+                dispatch(getListCanBoNhanNhiemVu({ ma: id }));
                 done && done(res.items);
             }
         }, () => T.notify('Cập nhật lịch sử lỗi', 'danger'));
@@ -467,6 +468,23 @@ export function reopenNhiemVu(id, canBoNhan, nguoiTao, done) {
                 done && done();
             }
         }, () => T.notify('Mở nhiệm vụ lỗi', 'danger'));
+    };
+}
+
+export function refreshCanBoNhanStatus(data, done) {
+    return dispatch => {
+        const url = `/api/hcth/nhiem-vu/reset-trang-thai/${data.id}`;
+        T.post(url, data, res => {
+            if (res.error) {
+                T.notify('Thay đổi trạng thái thành công lỗi', 'danger');
+                console.error('GET: ' + url + '. ', res.error);
+            } else {
+                T.notify('Thay đổi trạng thái thành công', 'success');
+                dispatch(getListHistory(data.id));
+                dispatch(getListCanBoNhanNhiemVu({ ma: data.id}));
+                done && done();
+            }
+        }, () => T.notify('Thay đổi trạng thái thành công lỗi', 'danger'));
     };
 }
 
