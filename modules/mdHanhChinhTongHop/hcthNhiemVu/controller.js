@@ -50,12 +50,11 @@ module.exports = (app) => {
 
     const checkNhiemVuPermission = async (req, nhiemVu, nhiemVuId) => {
         try {
-
             const permissions = req.session.user?.permissions || [];
             if (!nhiemVu) {
                 nhiemVu = await app.model.hcthNhiemVu.asyncGet({ id: nhiemVuId });
-                const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: nhiemVuId, loai: 'NHIEM_VU' }, '*', 'id');
-                const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(nhiemVuId, 'NHIEM_VU');
+                const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: nhiemVuId, loai: NHIEM_VU }, '*', 'id');
+                const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(nhiemVuId, NHIEM_VU);
                 nhiemVu.canBoNhan = canBoNhan?.rows || [];
                 nhiemVu.donViNhan = donViNhan || [];
             }
@@ -68,7 +67,6 @@ module.exports = (app) => {
             );
         }
         catch (error) {
-            console.error(error);
             return false;
         }
     };
@@ -112,13 +110,13 @@ module.exports = (app) => {
         if (deleteList.length > 0)
             await app.model.hcthDonViNhan.asyncDelete({ statement: 'id in (:ids)', parameter: { ids: deleteList } });
         if (diff.length > 0)
-            await app.model.hcthDonViNhan.createFromList(diff, ma, 'NHIEM_VU');
+            await app.model.hcthDonViNhan.createFromList(diff, ma, NHIEM_VU);
     };
 
 
     const createCanBoNhan = (danhSachCanBo, nguoiTao, vaiTro, id) => {
         const promises = danhSachCanBo.map(canBo => new Promise((resolve, reject) => {
-            app.model.hcthCanBoNhan.create({ canBoNhan: canBo, nguoiTao, ma: id, loai: 'NHIEM_VU', vaiTro }, (error, item) => {
+            app.model.hcthCanBoNhan.create({ canBoNhan: canBo, nguoiTao, ma: id, loai: NHIEM_VU, vaiTro }, (error, item) => {
                 if (error) reject(error); else resolve(item);
             });
         }));
@@ -135,15 +133,33 @@ module.exports = (app) => {
     });
 
     const vaiTroCanBoNhan = {
-        PARTICIPANT: 'PARTICIPANT',
-        MANAGER: 'MANAGER'
+        PARTICIPANT: {
+            id: 'PARTICIPANT',
+            text: 'Người tham gia',
+            color: 'info',
+            icon: 'fa-user-times'
+        },
+        MANAGER: {
+            id: 'MANAGER',
+            text: 'Quản trị viên',
+            color: 'warning',
+            icon: 'fa-user-plus'
+        }
     };
 
     const CAN_BO_NHAN_ACTION = {
         ADD: 'add',
         REMOVE: 'remove',
-        CHANGE_ROLE: 'changeRole'
+        CHANGE_ROLE: 'changeRole',
+        RESET_STATUS: 'reset_status'
     };
+
+    const TRANG_THAI_CAN_BO_NHAN = {
+        READ: 'READ',
+        COMPLETED: 'COMPLETED'
+    };
+
+    const NHIEM_VU = 'NHIEM_VU';
 
     const createNotification = (emails, notification, done) => {
         const prmomises = [];
@@ -156,7 +172,7 @@ module.exports = (app) => {
         Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
     };
 
-    const onCreateCanBoNhanNotification = ({ maNhiemVu, nguoiTaoShcc, canBoNhan, vaiTro = '', hanhDong }) => new Promise((resolve, reject) => {
+    const onCreateCanBoNhanNotification = ({ maNhiemVu, nguoiTaoShcc, canBoNhan, vaiTro = '', phanHoi = '', hanhDong }) => new Promise((resolve, reject) => {
         try {
             let listEmployees = [];
             listEmployees.push(nguoiTaoShcc);
@@ -172,7 +188,7 @@ module.exports = (app) => {
                     const nguoiTao = canBos.find(canBo => canBo.shcc === nguoiTaoShcc);
                     const dsNguoiNhan = canBos.filter(canBo => canBo.shcc !== nguoiTaoShcc);
                     const hoTenNguoiTao = nguoiTao?.ho + ' ' + nguoiTao?.ten;
-                    const tenVaiTro = vaiTro === '' ? '' : vaiTro === 'PARTICIPANT' ? 'người tham gia' : 'quản trị viên';
+                    const tenVaiTro = vaiTro === '' ? '' : vaiTroCanBoNhan[vaiTro].text;
                     let subTitle = '';
                     let iconColor = '';
                     let icon = '';
@@ -187,10 +203,15 @@ module.exports = (app) => {
                             iconColor = 'danger';
                             icon = 'fa-tasks';
                             break;
+                        case CAN_BO_NHAN_ACTION.RESET_STATUS:
+                            subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã đặt lại trạng thái của bạn ở nhiệm vụ #${maNhiemVu} vì lý do :${phanHoi}.`;
+                            iconColor = 'primary';
+                            icon = 'fa-tasks';
+                            break;
                         default:
                             subTitle = `${hoTenNguoiTao.trim().normalizedName()} đã thay đổi vai trò của bạn sang ${tenVaiTro} trong nhiêm vụ #${maNhiemVu}.`;
-                            iconColor = vaiTro === 'PARTICIPANT' ? 'infor' : 'warning';
-                            icon = vaiTro === 'PARTICIPANT' ? 'fa-user-times' : 'fa-user-plus';
+                            iconColor = vaiTroCanBoNhan[vaiTro].color;
+                            icon = vaiTroCanBoNhan[vaiTro].icon;
                     }
                     createNotification(dsNguoiNhan.map(item => item.email), { title: 'Nhiệm vụ', icon, iconColor, subTitle, link: `/user/nhiem-vu/${maNhiemVu}` }, (error) => {
                         if (error) reject(error);
@@ -250,11 +271,11 @@ module.exports = (app) => {
         try {
             const { canBoNhan = [], fileList = [], donViNhan = [], ...data } = req.body;
             const nhiemVu = await app.model.hcthNhiemVu.asyncCreate({ ...data, trangThai: trangThaiNhiemVu.MO.id });
-            await app.model.hcthDonViNhan.createFromList(donViNhan, nhiemVu.id, 'NHIEM_VU');
+            await app.model.hcthDonViNhan.createFromList(donViNhan, nhiemVu.id, NHIEM_VU);
             await updateCanBoNhan(canBoNhan, nhiemVu.id);
             app.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
             await updateListFile(fileList, nhiemVu.id);
-            await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
+            await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
             if (canBoNhan.length > 0) {
                 app.model.hcthCanBoNhan.getAll({
                     statement: 'id IN (:canBoNhan)',
@@ -271,12 +292,13 @@ module.exports = (app) => {
                                     quantity: canBoInVaiTro.length,
                                     role: vaiTro
                                 };
-                                await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note) });
+                                await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note) });
                                 onCreateCanBoNhanNotification({
                                     maNhiemVu: nhiemVu.id,
                                     nguoiTaoShcc: req.session.user.shcc,
                                     canBoNhan: canBoInVaiTro.map(item => item.canBoNhan),
                                     vaiTro,
+                                    phanHoi: '',
                                     hanhDong: CAN_BO_NHAN_ACTION.ADD
                                 });
                             }
@@ -296,9 +318,9 @@ module.exports = (app) => {
                 { id, changes } = req.body,
                 { fileList = [], donViNhan = [], ...data } = changes;
             const nhiemVu = app.model.hcthNhiemVu.asyncUpdate({ id }, data);
-            await updateDonViNhan(await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', ''), donViNhan, id);
+            await updateDonViNhan(await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: NHIEM_VU }, '*', ''), donViNhan, id);
             await updateListFile(fileList, id);
-            await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: id, shcc: req.session.user.shcc, hanhDong: action.UPDATE });
+            await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: id, shcc: req.session.user.shcc, hanhDong: action.UPDATE });
 
             res.send({ error: null, item: nhiemVu });
 
@@ -388,7 +410,7 @@ module.exports = (app) => {
                     if (error) {
                         done && done({ error });
                     } else {
-                        app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: 'NHIEM_VU', ma: id === 'new' ? null : id }, (error, item) => {
+                        app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: NHIEM_VU, ma: id === 'new' ? null : id }, (error, item) => {
                             done && done({ error, item });
                         });
                     }
@@ -416,9 +438,9 @@ module.exports = (app) => {
 
     const readNhiemVu = async (nhiemVuId, shccCanBo, creator) => {
         if (!shccCanBo || shccCanBo == creator) return;
-        const lichSuDoc = await app.model.hcthHistory.asyncGet({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccCanBo, hanhDong: action.READ });
+        const lichSuDoc = await app.model.hcthHistory.asyncGet({ loai: NHIEM_VU, key: nhiemVuId, shcc: shccCanBo, hanhDong: action.READ });
         if (!lichSuDoc) {
-            return await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccCanBo, hanhDong: action.READ });
+            return await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: nhiemVuId, shcc: shccCanBo, hanhDong: action.READ });
         }
         return lichSuDoc;
     };
@@ -427,11 +449,11 @@ module.exports = (app) => {
         try {
             const id = req.params.id;
             const nhiemVuItem = await app.model.hcthNhiemVu.asyncGet({ id });
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, 'NHIEM_VU');
-            const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, 'NHIEM_VU');
-            const listFile = await app.model.hcthFile.getAllFile({ ma: id, loai: 'NHIEM_VU' }, '*', 'thoiGian');
-            const lienKet = await app.model.hcthLienKet.getAllLienKet(id, 'NHIEM_VU', null, null);
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', 'id');
+            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, NHIEM_VU);
+            const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, NHIEM_VU);
+            const listFile = await app.model.hcthFile.getAllFile({ ma: id, loai: NHIEM_VU }, '*', 'thoiGian');
+            const lienKet = await app.model.hcthLienKet.getAllLienKet(id, NHIEM_VU, null, null);
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: NHIEM_VU }, '*', 'id');
 
             const nhiemVu = {
                 ...nhiemVuItem,
@@ -447,9 +469,17 @@ module.exports = (app) => {
             }
             else if (laNguoiThamGia(req, nhiemVu) || laTruongDonViNhan(req, nhiemVu)) {
                 await readNhiemVu(nhiemVu.id, req.session.user.shcc, nhiemVu.nguoiTao);
+                const isTrangThaiNull = nhiemVu.canBoNhan.some(canBo => canBo.shccCanBoNhan === req.session?.user?.staff?.shcc && !canBo.trangThai);
+                if (isTrangThaiNull) {
+                    const oldCanBoNhan = nhiemVu.canBoNhan;
+                    const updateIndex = oldCanBoNhan.findIndex(canBo => canBo.shccCanBoNhan === req.session?.user?.staff?.shcc);
+                    await app.model.hcthCanBoNhan.asyncUpdate({ loai: NHIEM_VU, ma: id, canBoNhan: oldCanBoNhan[updateIndex].shccCanBoNhan }, { trangThai: TRANG_THAI_CAN_BO_NHAN.READ });
+                    oldCanBoNhan[updateIndex].trangThai = TRANG_THAI_CAN_BO_NHAN.READ;
+                    nhiemVu.canBoNhan = oldCanBoNhan.slice(0);
+                }
             }
 
-            const history = await app.model.hcthHistory.getAllHistoryFrom(nhiemVu.id, 'NHIEM_VU', req.query.historySortType);
+            const history = await app.model.hcthHistory.getAllHistoryFrom(nhiemVu.id, NHIEM_VU, req.query.historySortType);
             nhiemVu.history = history?.rows || [];
             res.send({ error: null, item: nhiemVu });
         } catch (error) {
@@ -458,7 +488,7 @@ module.exports = (app) => {
     });
 
     app.post('/api/hcth/nhiem-vu/phan-hoi', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthPhanHoi.create({ ...req.body.data, loai: 'NHIEM_VU' }, (error, item) => {
+        app.model.hcthPhanHoi.create({ ...req.body.data, loai: NHIEM_VU }, (error, item) => {
             res.send({ error, item });
         });
     });
@@ -466,7 +496,7 @@ module.exports = (app) => {
     app.get('/api/hcth/nhiem-vu/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
 
         const id = parseInt(req.params.id);
-        app.model.hcthPhanHoi.getAllFrom(id, 'NHIEM_VU', (error, items) => {
+        app.model.hcthPhanHoi.getAllFrom(id, NHIEM_VU, (error, items) => {
             res.send({ error, items: items.rows });
         });
 
@@ -474,7 +504,7 @@ module.exports = (app) => {
 
     // cán bộ nhận nhiệm vụ API
     const isCanBoNhanExists = (canBoNhan, id) => new Promise((resolve, reject) => {
-        app.model.hcthCanBoNhan.get({ statement: 'CAN_BO_NHAN in (:shccs) and LOAI = :loai and ma = :ma', parameter: { shccs: canBoNhan, loai: 'NHIEM_VU', ma: id } }, (error, item) => {
+        app.model.hcthCanBoNhan.get({ statement: 'CAN_BO_NHAN in (:shccs) and LOAI = :loai and ma = :ma', parameter: { shccs: canBoNhan, loai: NHIEM_VU, ma: id } }, (error, item) => {
             if (error) {
                 reject(error);
             }
@@ -498,12 +528,13 @@ module.exports = (app) => {
                         quantity: canBoNhan.length,
                         role: vaiTro
                     };
-                    await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: ma, shcc: nguoiTao, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note) });
+                    await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: ma, shcc: nguoiTao, hanhDong: action.ADD_EMPLOYEES, ghiChu: JSON.stringify(note) });
                     onCreateCanBoNhanNotification({
                         maNhiemVu: ma,
                         nguoiTaoShcc: nguoiTao,
                         canBoNhan,
                         vaiTro,
+                        phanHoi: '',
                         hanhDong: CAN_BO_NHAN_ACTION.ADD
                     });
                 }
@@ -523,12 +554,13 @@ module.exports = (app) => {
                     name: (hoCanBo + ' ' + tenCanBo).trim().normalizedName(),
                     role: vaiTroMoi
                 };
-                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.CHANGE_ROLE, ghiChu: JSON.stringify(note) });
+                const history = await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.CHANGE_ROLE, ghiChu: JSON.stringify(note) });
                 onCreateCanBoNhanNotification({
                     maNhiemVu: nhiemVuId,
                     nguoiTaoShcc: shccNguoiTao,
                     canBoNhan: shccCanBoNhan,
                     vaiTro: vaiTroMoi,
+                    phanHoi: '',
                     hanhDong: CAN_BO_NHAN_ACTION.CHANGE_ROLE
                 });
                 res.send({ error, item, history });
@@ -545,11 +577,12 @@ module.exports = (app) => {
                 const note = {
                     name: (hoNguoiXoa + ' ' + tenNguoiXoa).trim().normalizedName()
                 };
-                const history = await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.REMOVE_EMPOYEE, ghiChu: JSON.stringify(note) });
+                const history = await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: nhiemVuId, shcc: shccNguoiTao, hanhDong: action.REMOVE_EMPOYEE, ghiChu: JSON.stringify(note) });
                 onCreateCanBoNhanNotification({
                     maNhiemVu: nhiemVuId,
                     nguoiTaoShcc: shccNguoiTao,
                     canBoNhan: shccCanBoNhan,
+                    phanHoi: '',
                     hanhDong: CAN_BO_NHAN_ACTION.REMOVE
                 });
                 res.send({ error, item, history });
@@ -560,7 +593,7 @@ module.exports = (app) => {
 
     app.post('/api/hcth/nhiem-vu/can-bo-nhan/list', app.permission.check('staff:login'), async (req, res) => {
         const { ids, ma } = req.body;
-        app.model.hcthCanBoNhan.getAllFrom(ma || null, 'NHIEM_VU', (ids || []).toString(), (error, result) => {
+        app.model.hcthCanBoNhan.getAllFrom(ma || null, NHIEM_VU, (ids || []).toString(), (error, result) => {
 
             res.send({ error: error, items: result?.rows });
         });
@@ -580,7 +613,7 @@ module.exports = (app) => {
     app.post('/api/hcth/nhiem-vu/lien-ket', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { id, lienKet, loaiLienKet } = req.body;
-            await createListLienKet(lienKet, loaiLienKet, id, 'NHIEM_VU');
+            await createListLienKet(lienKet, loaiLienKet, id, NHIEM_VU);
             res.send({ error: null });
         } catch (error) {
             res.send({ error });
@@ -589,7 +622,7 @@ module.exports = (app) => {
 
     app.get('/api/hcth/nhiem-vu/lien-ket/:id', app.permission.check('staff:login'), async (req, res) => {
         const id = parseInt(req.params.id);
-        app.model.hcthLienKet.getAllFrom(id, 'NHIEM_VU', null, null, (error, result) => {
+        app.model.hcthLienKet.getAllFrom(id, NHIEM_VU, null, null, (error, result) => {
             res.send({ error: error, items: result?.rows });
         });
     });
@@ -608,7 +641,7 @@ module.exports = (app) => {
             file = req.body.file,
             nhiemVu = id || null,
             filePath = app.assetPath + '/nhiemVu/' + (id ? id + '/' : 'new/') + file;
-        app.model.hcthFile.delete({ id: fileId, ma: nhiemVu, loai: 'NHIEM_VU' }, (error) => {
+        app.model.hcthFile.delete({ id: fileId, ma: nhiemVu, loai: NHIEM_VU }, (error) => {
             if (error) {
                 res.send({ error });
             }
@@ -623,26 +656,30 @@ module.exports = (app) => {
     // history
     app.post('/api/hcth/nhiem-vu/lich-su/list', app.permission.check('staff:login'), async (req, res) => {
         const { id } = req.body;
-        app.model.hcthHistory.getAllFrom(id, 'NHIEM_VU', req.query.historySortType, (error, result) => {
+        app.model.hcthHistory.getAllFrom(id, NHIEM_VU, req.query.historySortType, (error, result) => {
             res.send({ error: error, items: result?.rows });
         });
     });
 
     app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'NHIEM_VU', req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), NHIEM_VU, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
     app.get('/api/hcth/nhiem-vu/hoan-thanh/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const nhiemVuItem = await app.model.hcthNhiemVu.asyncGet({ id });
-            const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, 'NHIEM_VU');
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'NHIEM_VU' }, '*', 'id');
+            const canBoNhan = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, NHIEM_VU);
+            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: NHIEM_VU }, '*', 'id');
             if (laNguoiThamGia(req, {
                 ...nhiemVuItem, canBoNhan: canBoNhan?.rows || [],
                 donViNhan: donViNhan || []
             })) {
-                await app.model.hcthHistory.asyncCreate({ loai: 'NHIEM_VU', key: id, shcc: req.session.user?.shcc, hanhDong: action.COMPLETE });
+                await app.model.hcthHistory.asyncCreate({ loai: NHIEM_VU, key: id, shcc: req.session.user?.shcc, hanhDong: action.COMPLETE });
+                const updateCanBoNhan = await app.model.hcthCanBoNhan.asyncGet({ loai: NHIEM_VU, canBoNhan: req.session?.user?.staff?.shcc, ma: id });
+                if (updateCanBoNhan) {
+                    await app.model.hcthCanBoNhan.asyncUpdate({ id: updateCanBoNhan.id }, { trangThai: TRANG_THAI_CAN_BO_NHAN.COMPLETED });
+                }
                 res.send({ error: null });
             }
         } catch (error) {
@@ -659,7 +696,7 @@ module.exports = (app) => {
                     res.send({ error });
                 } else {
                     const _newHistory = {
-                        loai: 'NHIEM_VU',
+                        loai: NHIEM_VU,
                         key: id,
                         shcc: req.session.user?.shcc,
                         hanhDong: action.CLOSE
@@ -695,7 +732,7 @@ module.exports = (app) => {
                     res.send({ error });
                 } else {
                     const _newHistory = {
-                        loai: 'NHIEM_VU',
+                        loai: NHIEM_VU,
                         key: id,
                         shcc: req.session.user?.shcc,
                         hanhDong: action.REOPEN
@@ -721,5 +758,36 @@ module.exports = (app) => {
             res.send({ error });
         }
     });
+
+    app.post('/api/hcth/nhiem-vu/reset-trang-thai/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const { content, shccCanBoNhan, hoCanBoNhan, tenCanBoNhan } = req.body;
+            const nhiemVuId = req.params.id;
+            const shccNguoiTao = req.session?.user?.staff?.shcc;
+            await app.model.hcthCanBoNhan.asyncUpdate({ ma: nhiemVuId, loai: NHIEM_VU, canBoNhan: shccCanBoNhan }, { trangThai: TRANG_THAI_CAN_BO_NHAN.READ });
+            await app.model.hcthHistory.asyncCreate({
+                loai: NHIEM_VU,
+                key: nhiemVuId,
+                shcc: shccNguoiTao,
+                ghiChu: JSON.stringify({
+                    name: (hoCanBoNhan + ' ' + tenCanBoNhan).normalizedName(),
+                    status: TRANG_THAI_CAN_BO_NHAN.READ
+                }),
+                hanhDong: action.RESET
+            });
+
+            onCreateCanBoNhanNotification({
+                maNhiemVu: nhiemVuId,
+                nguoiTaoShcc: req.session?.user?.staff?.shcc,
+                canBoNhan: [shccCanBoNhan],
+                phanHoi: content,
+                hanhDong: CAN_BO_NHAN_ACTION.RESET_STATUS
+            });
+            res.send({ error: null });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };
+
 

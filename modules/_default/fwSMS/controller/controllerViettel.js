@@ -2,12 +2,15 @@ module.exports = app => {
     const http = require('http');
 
     app.get('/api/sms-service/viettel', async (res, req) => {
-        const { usernameViettel: user, passViettel: pass, brandName: brandname, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
+        // let { usernameViettel: user, passViettel: pass, brandName: brandname, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
 
-        let { phone, smsContent } = req.body;
+        // let { phone, smsContent } = req.body;
 
-        phone = '0901303938'; //temp
-        smsContent = 'Hello, we are HCMUSSH'; //temp
+        let user = 'demo_sms',
+            pass = 'DemoSMS@#123',
+            brandname = 'MobiService',
+            phone = '0901303938', //temp
+            smsContent = 'Chuc mung sinh nhat quy khach hang'; //temp
 
         const tranId = `${phone}_${new Date().getTime()}`;
         const dataRequest = {
@@ -32,7 +35,7 @@ module.exports = app => {
                         app.model.fwSms.create({
                             email: req.session.user.email,
                             sentDate: new Date().getTime(),
-                            total: currentTotal - data.total
+                            total: data.total
                         }, (error, item) => {
                             if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total }, () => res.send({ item }));
                             else res.send({ error });
@@ -42,14 +45,5 @@ module.exports = app => {
             } else res.send({ error: 'Requesting to Viettel has been failed' });
 
         });
-
-
-
-
-
-
-
-
-
     });
 };

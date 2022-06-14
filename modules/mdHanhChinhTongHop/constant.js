@@ -34,6 +34,7 @@ module.exports = {
         COMPLETE: 'COMPLETE',
         CLOSE: 'CLOSE',
         REOPEN: 'REOPEN',
+        RESET: 'RESET',
         VIEW: 'VIEW'
     },
 
