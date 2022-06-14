@@ -12,6 +12,7 @@ import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
 import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
+import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -52,7 +53,7 @@ class ThoiGianPhanCongGiangDay extends AdminModal {
 class AddingModal extends AdminModal {
     onShow = () => {
         // this.khoaDangKy.value(maPhongDaoTao);
-        this.soNhom.value(1);
+        this.soLop.value(1);
         this.soTiet.value(1);
         this.soBuoi.value(1);
         this.soLuongDuKien.value(50);
@@ -63,11 +64,10 @@ class AddingModal extends AdminModal {
         const data = {
             maMonHoc: this.maMonHoc.value(),
             soTietBuoi: this.soTiet.value(),
-            soNhom: this.soNhom.value(),
+            soLop: this.soLop.value(),
             soBuoiTuan: this.soBuoi.value(),
             khoaDangKy: this.khoaDangKy.value(),
             maNganh: this.maNganh.value(),
-            hocKySinhVien: this.hocKySinhVien.value(),
             soLuongDuKien: this.soLuongDuKien.value(),
             loaiMonHoc: Number(this.loaiMonHoc.value())
         };
@@ -78,9 +78,9 @@ class AddingModal extends AdminModal {
         } else if (!data.soTietBuoi || data.soTietBuoi <= 0) {
             T.notify('Số tiết không hợp lệ', 'danger');
             this.soTiet.focus();
-        } else if (!data.soNhom || data.soNhom <= 0) {
-            T.notify('Số nhóm không hợp lệ', 'danger');
-            this.soNhom.focus();
+        } else if (!data.soLop || data.soLop <= 0) {
+            T.notify('Số lớp không hợp lệ', 'danger');
+            this.soLop.focus();
         } else if (!data.soBuoiTuan || data.soBuoiTuan <= 0) {
             T.notify('Số buổi không hợp lệ', 'danger');
             this.soBuoi.focus();
@@ -90,9 +90,6 @@ class AddingModal extends AdminModal {
         } else if (!data.maNganh) {
             T.notify('Mã ngành bị trống', 'danger');
             this.maNganh.focus();
-        } else if (!data.hocKySinhVien) {
-            T.notify('Học kỳ SV bị trống', 'danger');
-            this.hocKySinhVien.focus();
         } else if (!data.soLuongDuKien || data.soLuongDuKien <= 0) {
             T.notify('Số lượng dự kiến không hợp lệ', 'danger');
             this.soLuongDuKien.focus();
@@ -109,17 +106,16 @@ class AddingModal extends AdminModal {
     render = () => {
         return this.renderModal({
             title: 'Mở môn học',
-            size: 'elarge',
+            size: 'large',
             submitText: 'Mở môn học',
             body: <div className='row'>
-                <FormTextBox type='year' ref={e => this.nam = e} className='col-md-4' label='Năm' />
-                <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-4' />
-                <FormSelect ref={e => this.hocKySinhVien = e} data={[1, 2, 3, 4, 5, 6, 7, 8]} label='Học kỳ SV' className='col-md-4' />
+                <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-6' label='Năm' />
+                <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-6' />
                 <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' label='Khoa mở' onChange={this.handleDonVi} />
                 <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoFilter(this.state.khoaDangKy || null)} className='col-md-6' label='Chuyên ngành' />
                 <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' />
                 <FormCheckbox ref={e => this.loaiMonHoc = e} label='Tự chọn' style={{ marginBottom: '0' }} className='col-md-2' />
-                <FormTextBox type='number' ref={e => this.soNhom = e} className='col-md-3' label='Số nhóm' />
+                <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' />
                 <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' />
                 <FormTextBox type='number' ref={e => this.soBuoi = e} className='col-md-3' label='Số buổi /tuần' />
                 <FormTextBox type='number' ref={e => this.soLuongDuKien = e} className='col-md-3' label='Số lượng SV dự kiến /lớp' />
