@@ -685,15 +685,21 @@ module.exports = (app) => {
         }, 'email', 'email', async (error, canBos) => {
             if (error) throw(error);
             else {
-                const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
+                const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
                 let mailTitle = chiDaoEmailTitle,
                 mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
                 mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `https://hcmussh.edu.vn/user/cong-van-den/${item.id}`);
-                canBos.map(canBo => new Promise(() => {
-                    app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                if (app.isDebug) {
+                    app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
                         if (error) throw(error);
                     });
-                }));
+                } else {
+                    canBos.map(canBo => new Promise(() => {
+                        app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                            if (error) throw(error);
+                        });
+                    }));
+                }
             }
         });
     };
