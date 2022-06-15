@@ -115,7 +115,7 @@ class CanBoTheoDonVi extends AdminPage {
         let nhomRoles = ['ttDoanhNghiep'];
         daoTaoPermission && nhomRoles.push('daoTao');
         congVanPermission.manage && nhomRoles.push('quanLyCongVanDen', 'hcthQuanLyCongVanDi');
-        managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong', 'manageHcthSetting');
+        managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong');
         const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};
         let table = renderTable({
             emptyTable: 'Đơn vị chưa có cán bộ',

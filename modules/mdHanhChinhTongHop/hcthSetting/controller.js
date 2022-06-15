@@ -1,7 +1,5 @@
 module.exports = app => {
 
-    const { MA_HCTH } = require('../constant');
-
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
@@ -33,33 +31,4 @@ module.exports = app => {
         app.model.hcthSetting.delete({ key }, error => res.send({ error }));
     });
 
-    // Phân quyền setting ------------------------------------------------------------------------------------------------------------------------
-
-    const manageHcthSettingRole = 'manageHcthSetting';
-    app.assignRoleHooks.addRoles(manageHcthSettingRole, { id: 'hcthSetting:manage', text: 'Hành chính - Tổng hợp: Quản lí cấu hình' });
-
-    app.assignRoleHooks.addHook(manageHcthSettingRole, async (req, roles) => {
-        const userPermissions = req.session.user ? req.session.user.permissions : [];
-        if (req.query.nhomRole && req.query.nhomRole == manageHcthSettingRole && userPermissions.includes('hcth:manage')) {
-            const assignRolesList = app.assignRoleHooks.get(manageHcthSettingRole).map(item => item.id);
-            return roles && roles.length && assignRolesList.contains(roles);
-        }
-    });
-
-    app.permissionHooks.add('staff', 'checkRoleHcthQuanLyCauHinh', (user, staff) => new Promise(resolve => {
-        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
-            app.permissionHooks.pushUserPermission(user, 'hcthSetting:manage', 'hcthSetting:read', 'hcthSetting:write', 'hcthSetting:delete');
-        }
-        resolve();
-    }));
-
-    app.permissionHooks.add('assignRole', 'checkRoleHcthQuanLyCauHinh', (user, assignRoles) => new Promise(resolve => {
-        const inScopeRoles = assignRoles.filter(role => role.nhomRole == manageHcthSettingRole);
-        inScopeRoles.forEach(role => {
-            if (role.tenRole === 'hcthSetting:manage') {
-                app.permissionHooks.pushUserPermission(user, 'hcthSetting:read', 'hcthSetting:write', 'hcthSetting:delete');
-            }
-        });
-        resolve();
-    }));
 };
