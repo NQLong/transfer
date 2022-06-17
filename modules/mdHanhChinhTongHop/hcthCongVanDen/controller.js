@@ -170,7 +170,7 @@ module.exports = (app) => {
                         if (errors)
                             res.send({ errors, item });
                         else {
-                            const canBoNhanChiDao = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(req.body.id, CONG_VAN_TYPE);
+                            const canBoNhanChiDao = await app.model.hcthCanBoNhan.getAllFrom(req.body.id, CONG_VAN_TYPE);
                             const listCanBoChiDaoShcc = canBoNhanChiDao?.rows.length > 0 ? canBoNhanChiDao.rows.map(canBo => canBo.shccCanBoNhan) : [];
                             const newCanBoNhanChiDao = changes.quyenChiDao !== '' ? changes.quyenChiDao.split(',') : [];
                             if (newCanBoNhanChiDao.length > listCanBoChiDaoShcc.length) {
@@ -356,8 +356,8 @@ module.exports = (app) => {
     app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
-            const congVan = await app.model.hcthCongVanDen.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
+            const congVan = await app.model.hcthCongVanDen.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
             } else {
@@ -390,7 +390,7 @@ module.exports = (app) => {
                 return true;
             }
             if (req.query.nhiemVu) {
-                const count = (await app.model.hcthLienKet.asyncCount({
+                const count = (await app.model.hcthLienKet.count({
                     keyA: req.query.nhiemVu,
                     loaiA: 'NHIEM_VU',
                     loaiB: 'CONG_VAN_DEN',
@@ -416,9 +416,9 @@ module.exports = (app) => {
 
     const viewCongVanDen = async (congVanId, shccCanBo, creator) => {
         if (shccCanBo == creator) return;
-        const lichSuDoc = await app.model.hcthHistory.asyncGet({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
+        const lichSuDoc = await app.model.hcthHistory.get({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
         if (!lichSuDoc) {
-            return await app.model.hcthHistory.asyncCreate({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
+            return await app.model.hcthHistory.create({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
         }
         return lichSuDoc;
     };
@@ -428,19 +428,19 @@ module.exports = (app) => {
             const id = parseInt(req.params.id);
             if (isNaN(id))
                 throw { status: 400, message: 'Invalid id' };
-            const congVan = await app.model.hcthCongVanDen.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
+            const congVan = await app.model.hcthCongVanDen.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
             else {
                 await viewCongVanDen(id, req.session.user.shcc, congVan.nguoiTao);
             }
-            const files = await app.model.hcthFile.getAllFile({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
-            const history = await app.model.hcthHistory.getAllHistoryFrom(id, CONG_VAN_TYPE);
-            const canBoChiDao = await app.model.hcthCanBoNhan.getAllCanBoNhanFrom(id, CONG_VAN_TYPE);
+            const files = await app.model.hcthFile.getAll({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
+            const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
+            const history = await app.model.hcthHistory.getAllFrom(id, CONG_VAN_TYPE, req.query.historySortType);
+            const canBoChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE);
             const quyenChiDao = canBoChiDao?.rows.map(cb => cb.shccCanBoNhan).join(',');
-            const chiDao = await app.model.hcthChiDao.getAllChiDao(id, CONG_VAN_TYPE);
+            const chiDao = await app.model.hcthChiDao.getCongVanChiDao(id, CONG_VAN_TYPE);
             res.send({
                 item: {
                     ...congVan,
@@ -463,7 +463,7 @@ module.exports = (app) => {
 
 
     app.get('/api/hcth/cong-van-den/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
 
@@ -499,13 +499,13 @@ module.exports = (app) => {
         try {
             let { id, trangThai } = req.body.data;
             trangThai = parseInt(trangThai);
-            const congVan = await app.model.hcthCongVanDen.getCVD({ id });
+            const congVan = await app.model.hcthCongVanDen.get({ id });
             if (congVan.trangThai == trangThai || !trangThai) {
                 res.send({ error: null, item: congVan });
             }
             else {
                 const newCongVan = await updateCongvanDen(id, { trangThai });
-                await app.model.hcthHistory.asyncCreate({
+                await app.model.hcthHistory.create({
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
@@ -521,7 +521,7 @@ module.exports = (app) => {
     app.get('/api/hcth/cong-van-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_TYPE);
+            const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
             res.send({ error: null, items: phanHoi });
         }
         catch (error) {

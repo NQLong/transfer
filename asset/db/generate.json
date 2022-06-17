@@ -14120,6 +14120,46 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "HCTH_CONG_VAN_TRINH_KY": {
+            "active": true,
+            "moduleName": "hcthCongVanTrinhKy",
+            "modelName": "hcthCongVanTrinhKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_134309\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "THOI_GIAN": {
+                    "value": "thoiGian",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                },
+                "FILE_CONG_VAN": {
+                    "value": "fileCongVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }

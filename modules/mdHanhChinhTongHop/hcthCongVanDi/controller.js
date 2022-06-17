@@ -373,8 +373,8 @@ module.exports = app => {
     app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
+            const congVan = await app.model.hcthCongVanDi.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
             } else {
@@ -404,7 +404,7 @@ module.exports = app => {
                 return true;
             }
             if (req.query.nhiemVu) {
-                const count = await app.model.hcthLienKet.asyncCount({
+                const count = await app.model.hcthLienKet.count({
                     keyA: req.query.nhiemVu,
                     loaiA: 'NHIEM_VU',
                     loaiB: 'CONG_VAN_DI',
@@ -437,14 +437,14 @@ module.exports = app => {
             if (isNaN(id)) {
                 throw { status: 400, message: 'Invalid id' };
             }
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
+            const congVan = await app.model.hcthCongVanDi.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
             if (!(await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            const files = await app.model.hcthFile.getAllFile({ ma: id, loai: 'DI' }, '*', 'thoiGian');
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, 'DI');
-            const history = await app.model.hcthHistory.getAllHistoryFrom(id, 'DI');
+            const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
+            const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
+            const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
 
             res.send({
                 item: {
@@ -502,7 +502,7 @@ module.exports = app => {
 
 
     app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
     const createNotification = (emails, notification, done) => {
@@ -708,7 +708,7 @@ module.exports = app => {
     app.put('/api/hcth/cong-van-cac-phong/status', app.permission.check('staff:login'), async (req, res) => {
         try {
             let { id, trangThai, donViGui } = req.body.data;
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
+            const congVan = await app.model.hcthCongVanDi.get({ id });
             if (congVan.trangThai == trangThai || !trangThai) {
                 res.send({ error: null, item: congVan });
             } else {
@@ -716,14 +716,14 @@ module.exports = app => {
                     await createSoCongVan(id, donViGui);
                 }
                 const newCongVan = await updateCongVanDi(id, { trangThai });
-                await app.model.hcthHistory.asyncCreate({
+                await app.model.hcthHistory.create({
                     key: id,
                     loai: CONG_VAN_DI_TYPE,
                     thoiGian: new Date().getTime(),
                     shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
-                const canBoGui = await app.model.hcthHistory.getStaff({ key: id, hanhDong: 'CREATE' }, 'shcc', '');
+                const canBoGui = await app.model.hcthHistory.get({ key: id, hanhDong: 'CREATE' }, 'shcc', '');
                 await onStatusChange(newCongVan, congVan.trangThai, trangThai, canBoGui.shcc);
                 res.send({ newCongVan });
             }
@@ -735,7 +735,7 @@ module.exports = app => {
     app.put('/api/hcth/cong-van-cac-phong/read/:id', app.permission.check('staff:login'), async (req, res) => {
         const { id, shcc } = req.body.data;
         // check permission
-        const check = await app.model.hcthHistory.asyncGet({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
+        const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
 
         // console.log(check);
         // console.log(shcc);
@@ -744,7 +744,7 @@ module.exports = app => {
                 throw 400;
             }
             // console.log(id);
-            await app.model.hcthHistory.asyncCreate({
+            await app.model.hcthHistory.create({
                 key: id,
                 loai: CONG_VAN_DI_TYPE,
                 thoiGian: new Date().getTime(),
@@ -760,7 +760,7 @@ module.exports = app => {
     app.get('/api/hcth/cong-van-cac-phong/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_DI_TYPE);
+            const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_DI_TYPE);
             res.send({ error: null, item: phanHoi });
         } catch (error) {
             res.send({ error });
