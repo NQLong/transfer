@@ -11,7 +11,10 @@ module.exports = app => {
             1098: { title: 'Học phí', link: '/user/hoc-phi' },
         },
     };
-    app.permission.add({ name: 'tcHocPhi:read', menu }, { name: 'student:login', menu: menuStudent }, 'tcHocPhi:write', 'tcHocPhi:delete');
+    app.permission.add(
+        { name: 'tcHocPhi:read', menu }, 'tcHocPhi:write', 'tcHocPhi:delete',
+        { name: 'student:login', menu: menuStudent },
+    );
 
     app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
