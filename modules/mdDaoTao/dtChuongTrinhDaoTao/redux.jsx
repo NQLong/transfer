@@ -68,7 +68,7 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
     const page = T.updatePage('pageDtChuongTrinhDaoTao', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dao-tao/chuong-trinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter }, data => {
+        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter, namDaoTao: pageCondition?.namDaoTao }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -197,6 +197,13 @@ export const SelectAdapter_ChuongTrinhDaoTaoFilter = (maNganh = null) => {
         processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })) : [] }),
         fetchOne: (ma, done) => (getDtChuongTrinhDaoTao(ma, item => done && done({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })))()
     };
+};
+
+export const SelectAdapter_NamDaoTaoFilter = {
+    ajax: true,
+    url: '/api/dao-tao/chuong-trinh-dao-tao/all-nam-dao-tao',
+    data: params => ({ searchText: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.id, text: item.namDaoTao })) : [] }),
 };
 
 
