@@ -1,5 +1,5 @@
 module.exports = app => {
-    const http = require('node:http');
+    const http = require('http');
 
     app.post('/api/sms-service/viettel', async (req, res) => {
         try {

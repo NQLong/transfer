@@ -6660,7 +6660,8 @@
                 "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
                 "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
-                "hcth_cong_van_di_search_selector": "searchSelector"
+                "hcth_cong_van_di_search_selector": "searchSelector",
+                "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
@@ -14147,12 +14148,59 @@
                     "nullable": false,
                     "size": "20,0"
                 },
-                "FILE_CONG_VAN": {
-                    "value": "fileCongVan",
+                "CONG_VAN": {
+                    "value": "congVan",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_CAN_BO_KY": {
+            "active": true,
+            "moduleName": "hcthCanBoKy",
+            "modelName": "hcthCanBoKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_134312\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGUOI_KY": {
+                    "value": "nguoiKy",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "CONG_VAN_TRINH_KY": {
+                    "value": "congVanTrinhKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [
