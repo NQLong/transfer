@@ -1,3 +1,4 @@
+
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
@@ -117,6 +118,19 @@ export function getTcHocPhiHuongDan(done) {
             else {
                 dispatch({ type: TcHocPhiGetHuongDan, result: result?.hocPhiHuongDan });
                 done && done(result);
+            }
+        });
+    };
+}
+
+export function vnPayGoToTransaction(done) {
+    return () => {
+        T.get('/api/vnpay/create-bill', (result) => {
+            if (result.error) {
+                T.notify('Thanh toán bằng VNPAY thất bại!', 'danger');
+                console.error(result.error);
+            } else {
+                done(result);
             }
         });
     };

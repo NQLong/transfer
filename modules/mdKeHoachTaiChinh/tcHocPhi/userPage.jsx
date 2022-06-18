@@ -1,9 +1,10 @@
+import { Tooltip } from '@mui/material';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getTcHocPhiPage, getTcHocPhiHuongDan } from './redux';
+import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction } from './redux';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -11,6 +12,26 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
+class ThanhToanModal extends AdminModal {
+    render = () => {
+        return this.renderModal({
+            title: 'Phương thức thanh toán',
+            body: <div className='row' >
+                <Tooltip title='Thanh toán qua VNPAY' arrow>
+                    <button className='btn btn-warning' style={{ width: '90%', margin: 'auto' }} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction(link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src='/img/logo/vnpay.svg' alt='VNPAY' style={{ maxWidth: 80, marginRight: 20 }} /> Thanh toán thông qua VNPAY
+                    </button>
+
+                </Tooltip>
+            </div>
+        });
+    }
+}
 class Modal extends AdminModal {
     state = { hocPhiHuongDan: null }
 
@@ -65,6 +86,7 @@ class UserPage extends AdminPage {
                     <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Họ và tên</th>
                     <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
                     <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Công nợ (vnđ)</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
@@ -75,6 +97,14 @@ class UserPage extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                        item.congNo && <Tooltip title='Thanh toán' arrow>
+                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                <i className='fa fa-lg fa-usd ' />
+                            </button>
+                        </Tooltip>
+                    } />
+
                 </tr>
             )
         });
@@ -99,6 +129,7 @@ class UserPage extends AdminPage {
                 {table}
                 <Pagination getPage={this.props.getTcHocPhiPage} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} style={{ marginLeft: '70px' }} />
                 <Modal ref={e => this.modal = e} />
+                <ThanhToanModal ref={e => this.thanhToanModal = e} vnPayGoToTransaction={this.props.vnPayGoToTransaction} />
             </div>
         });
     }
@@ -106,6 +137,6 @@ class UserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);

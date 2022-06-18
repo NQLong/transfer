@@ -29,8 +29,8 @@ module.exports = app => {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
-
-        app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, donVi, searchTerm, (error, result) => {
+        const namDaoTao = req.query.namDaoTao;
+        app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, donVi, searchTerm, namDaoTao, (error, result) => {
             if (error) res.send({ error });
             else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = result;
@@ -38,6 +38,9 @@ module.exports = app => {
                     searchTerm,
                     donViFilter: donVi
                 };
+                if (namDaoTao) {
+                    pageCondition = { ...pageCondition, namDaoTao: namDaoTao };
+                }
                 res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list, pageCondition } });
             }
         });
@@ -45,6 +48,12 @@ module.exports = app => {
 
     app.get('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtChuongTrinhDaoTao.getAll(req.query.condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/dao-tao/chuong-trinh-dao-tao/all-nam-dao-tao/', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        const { maKhoa } = req.query;
+        const condition = maKhoa ? {maKhoa} : {};
+        app.model.dtCauTrucKhungDaoTao.getAllNamDaoTao(condition, 'id, namDaoTao', 'namDaoTao ASC', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/:khoa/:maNganh', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), async (req, res) => {

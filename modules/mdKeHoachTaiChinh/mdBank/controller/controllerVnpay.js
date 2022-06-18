@@ -1,0 +1,158 @@
+module.exports = app => {
+    const dateFormat = require('dateformat');
+    const querystring = require('qs');
+    const crypto = require('crypto');
+    // const https = require('https');
+
+    function sortObject(obj) {
+        let sorted = {};
+        let str = [];
+        let key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                str.push(encodeURIComponent(key));
+            }
+        }
+        str.sort();
+        for (key = 0; key < str.length; key++) {
+            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
+        }
+        return sorted;
+    }
+
+    app.get('/api/vnpay/create-bill', app.permission.check('student:login'), async (req, res) => {
+        try {
+            const student = req.session.user;
+            if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
+            const mssv = student.data.mssv;
+            const ipAddr = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress;
+
+            const { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl');
+
+            const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
+            let { congNo } = dataHocPhi;
+            const vnp_OrderInfo = `USSH: Học phí SV ${mssv}, học kỳ ${hocKy} NH ${namHoc} - ${namHoc + 1}`;
+            const now = new Date(), vnp_CreateDate = dateFormat(now, 'yyyymmddHHmmss'),
+                vnp_IpAddr = ipAddr,
+                vnp_Locale = 'vn',
+                vnp_TxnRef = `${mssv}_${vnp_CreateDate}`;
+
+            const vnp_Amount = congNo * 100;
+            let params = {
+                vnp_Version, vnp_Command, vnp_TmnCode, vnp_Locale, vnp_CurrCode, vnp_TxnRef, vnp_OrderInfo, vnp_Amount, vnp_ReturnUrl, vnp_IpAddr, vnp_CreateDate
+            };
+
+            params = sortObject(params);
+
+            const signData = querystring.stringify(params, { encode: false });
+            const hmac = crypto.createHmac('sha512', vnp_HashSecret);
+
+            const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+            params = app.clone(params, { vnp_SecureHash });
+
+            const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
+            await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
+            // res.redirect(urlRequest);
+            res.send(urlRequest);
+        } catch (error) {
+            console.log(error);
+            res.send({ error });
+        }
+    });
+
+    app.get('/vnpay_ipn', async (req, res) => {
+        try {
+            // const ipAddr = req.headers['x-forwarded-for'] ||
+            //     req.connection.remoteAddress ||
+            //     req.socket.remoteAddress ||
+            //     req.connection.socket.remoteAddress;
+
+            //TODO: trust ip
+
+            let params = req.query;
+            console.log('vnpay_ipn', params);
+            let secureHash = params['vnp_SecureHash'];
+
+            delete params['vnp_SecureHash'];
+            delete params['vnp_SecureHashType'];
+
+            let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+
+            const { vnp_TmnCode, vnp_HashSecret } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode');
+
+            let { vnp_Amount, vnp_PayDate, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = params;
+            params = sortObject(params);
+
+            let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
+
+            const signData = querystring.stringify(params, { encode: false });
+            const hmac = crypto.createHmac('sha512', vnp_HashSecret),
+                vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+
+            if (secureHash === vnp_SecureHash) {
+                if (vnp_TransactionStatus != '00') {
+                    res.send({ error: 'Transaction failed!' });
+                } else {
+                    const result = await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TransactionNo, new Date(vnp_PayDate).getTime(), mssv, 1, vnp_TmnCode, vnp_Amount, secureHash);
+                    res.send({ result });
+                }
+            } else {
+                res.send({ error: 'Hash failed!' });
+            }
+        }
+        catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/get-query', async (req, res) => {
+        const student = req.session.user;
+        if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
+        const ipAddr = req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
+
+        const { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayQueryUrl } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayQueryUrl');
+        const dataOrders = await app.model.tcHocPhiOrders.getAll({ namHoc, hocKy });
+        const vnp_Command = 'querydr';
+
+        let params = {
+            vnp_IpAddr: ipAddr, vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_CurrCode, vnp_Command, vnp_ReturnUrl
+        };
+
+        dataOrders.forEach(order => {
+            params.vnp_TxnRef = order.refId;
+            params.vnp_OrderInfo = encodeURIComponent(order.orderInfo);
+            params.vnp_CreateDate = dateFormat(new Date(), 'yyyymmddHHmmss');
+            params.vnp_TransDate = order.refId.split('_')[1];
+            params.vnp_SecureHashType = 'sha512';
+
+            sortObject(params);
+            const signData = querystring.stringify(params, { encode: false });
+            const hmac = crypto.createHmac('sha512', vnp_HashSecret);
+            params.vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+
+            console.log(params);
+            console.log(vnpayQueryUrl);
+            const keys = Object.keys(params);
+            let query = '';
+            keys.forEach(key => {
+                query = query.concat(`${key}=${params[key]}&`);
+            });
+            console.log(vnpayQueryUrl + '?' + query);
+            // https.request(vnpayQueryUrl, (res) => {
+            //     console.log(res);
+            //     res.on('data', (chunk) => {
+            //         console.log(`BODY: ${chunk}`);
+
+            //     });
+            // });
+
+        });
+        res.send('OK');
+    });
+};

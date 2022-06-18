@@ -13949,8 +13949,8 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "IS_SUCCESS": {
-                    "value": "isSuccess",
+                "STATUS": {
+                    "value": "status",
                     "dataType": "NUMBER",
                     "dataDefault": "1",
                     "nullable": true,
@@ -14154,6 +14154,20 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [

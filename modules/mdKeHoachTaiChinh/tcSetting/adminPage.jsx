@@ -94,31 +94,6 @@ class TcSettingAdminPage extends AdminPage {
                         </div>
                     </div>
                 </div>
-
-                <div className='col-md-6'>
-                    <div className='tile'>
-                        <h3 className='tile-title'>Ngân hàng: Chuỗi bí mật</h3>
-                        <FormTextBox ref={e => this.secretCodeBidv = e} label='BIDV' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.secretCodeVcb = e} label='VCB' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.secretCodeAgri = e} label='Agribank' readOnly={readOnly} />
-                        <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('secretCodeBidv', 'secretCodeVcb', 'secretCodeAgri')}>
-                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className='tile'>
-                        <h3 className='tile-title'>Hướng dẫn đóng học phí</h3>
-                        <FormEditor ref={e => this.hocPhiHuongDan = e} height={400} readOnly={readOnly} />
-                        <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiHuongDan')}>
-                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <div className='col-md-12'>
                     <ul className='nav nav-tabs'>
                         <li className='nav-item'>
