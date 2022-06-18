@@ -189,6 +189,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
     soLuongDuKien = {}
     sucChua = {}
     check = {}
+    loaiMonHoc = {}
     state = { page: null, isEdit: {}, sucChua: {}, filter: {}, idNamDaoTao: '', hocKy: '' }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
@@ -225,7 +226,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     this.soLuongDuKien[indexOfItem].value(item.soLuongDuKien);
                     this.sucChua[indexOfItem] = item.sucChua;
                     this.check[indexOfItem].value(item.isMo);
-
+                    this.loaiMonHoc[indexOfItem].value(item.loaiMonHoc || 0);
                     if (index == list.length - 1) this.setState({ sucChua: this.sucChua });
                 });
             });
@@ -265,17 +266,21 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 thu: this.thu[index].value(),
                 sucChua: this.state.sucChua[index],
                 soLuongDuKien: this.soLuongDuKien[index].value()
-            }, () => {
-                // let item = data.item;
-                // this.tietBatDau[index].value(item.tietBatDau);
-                // this.thu[index].value(item.thu);
+            }, (data) => {
+                let item = data.item;
+                this.tietBatDau[index].value(item.tietBatDau);
+                this.thu[index].value(item.thu);
                 // this.soTiet[index].value(item.soTiet);
-                location.reload();
+                // location.reload();
             });
     };
 
     handleCheck = (value, item) => {
         this.props.updateDtThoiKhoaBieuCondition(item, { isMo: Number(value) }, data => data.item && this.initData());
+    }
+
+    handleCheckLoaiMonHoc = (value, item) => {
+        this.props.updateDtThoiKhoaBieuCondition(item, { loaiMonHoc: Number(value) }, data => data.item && this.initData());
     }
 
     renderThoiGianPhanCong = (data) => {
@@ -323,6 +328,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Ngành</th>
                         <th rowSpan='2' style={{ width: '25%', textAlign: 'center', verticalAlign: 'middle' }}>Mã</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Môn học</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Tự chọn</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Lớp</th>
                         <th rowSpan='2' style={{ width: '25%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Phòng</th>
                         <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
@@ -355,6 +361,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
                             <i> {item.tenKhoaBoMon}</i>
                         </>} />
+                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
+                            <FormCheckbox ref={e => this.loaiMonHoc[indexOfItem] = e} onChange={value => this.handleCheckLoaiMonHoc(value, item)} readOnly={!!item.phong} />
+                        }/>
                         <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.nhom}${item.buoi > 1 ? ` (${item.buoi})` : ''} `} />
                         <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
                             <>
