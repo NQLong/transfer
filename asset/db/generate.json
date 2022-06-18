@@ -6660,7 +6660,8 @@
                 "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
                 "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
-                "hcth_cong_van_di_search_selector": "searchSelector"
+                "hcth_cong_van_di_search_selector": "searchSelector",
+                "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
@@ -14153,6 +14154,20 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [
@@ -14204,60 +14219,6 @@
             },
             "primaryKeys": [
                 "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "TC_HOC_PHI_ORDERS": {
-            "active": true,
-            "moduleName": "tcHocPhiOrders",
-            "modelName": "tcHocPhiOrders",
-            "columns": {
-                "REF_ID": {
-                    "value": "refId",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 50
-                },
-                "NAM_HOC": {
-                    "value": "namHoc",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
-                },
-                "HOC_KY": {
-                    "value": "hocKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "AMOUNT": {
-                    "value": "amount",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "BANK": {
-                    "value": "bank",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 20
-                },
-                "ORDER_INFO": {
-                    "value": "orderInfo",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 2000
-                }
-            },
-            "primaryKeys": [
-                "REF_ID"
             ],
             "foreignKeys": [],
             "type": "table"
