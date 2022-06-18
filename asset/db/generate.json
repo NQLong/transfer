@@ -14321,6 +14321,9 @@
             "active": true,
             "moduleName": "tcSandbox",
             "modelName": "tcHocPhiSandbox",
+            "methods": {
+                "TC_HOC_PHI_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "MSSV": {
                     "value": "mssv",
@@ -14377,6 +14380,9 @@
             "active": true,
             "moduleName": "tcSandbox",
             "modelName": "tcHocPhiTransactionSandbox",
+            "methods": {
+                "TC_HOC_PHI_TRANSACTION_SANDBOX_ADD_BILL": "addBill"
+            },
             "columns": {
                 "TRANS_ID": {
                     "value": "transId",

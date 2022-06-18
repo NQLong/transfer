@@ -215,5 +215,18 @@ module.exports = app => {
                 }
             });
         }),
+
+        addBill: (namHoc, hocKy, bank, transId, transDate, customerId, billId, serviceId, amount, checksum, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_transaction_sandbox_add_bill(:namHoc, :hocKy, :bank, :transId, :transDate, :customerId, :billId, :serviceId, :amount, :checksum); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, namHoc, hocKy, bank, transId, transDate, customerId, billId, serviceId, amount, checksum }, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                });
+        }),
     };
 };
