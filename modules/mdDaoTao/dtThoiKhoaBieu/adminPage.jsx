@@ -226,7 +226,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     this.soLuongDuKien[indexOfItem].value(item.soLuongDuKien);
                     this.sucChua[indexOfItem] = item.sucChua;
                     this.check[indexOfItem].value(item.isMo);
-                    this.loaiMonHoc[indexOfItem].value(item.loaiMonHoc || 0);
+                    this.loaiMonHoc[indexOfItem].value(item.loaiMonHoc);
                     if (index == list.length - 1) this.setState({ sucChua: this.sucChua });
                 });
             });
@@ -280,7 +280,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
     }
 
     handleCheckLoaiMonHoc = (value, item) => {
-        this.props.updateDtThoiKhoaBieuCondition(item, { loaiMonHoc: Number(value) }, data => data.item && this.initData());
+        this.props.updateDtThoiKhoaBieu(item.id, { loaiMonHoc: Number(value) }, data => data.item && this.initData());
     }
 
     renderThoiGianPhanCong = (data) => {
