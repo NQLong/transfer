@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.finance,
         menus: {
-            5002: { title: 'Học phí', link: '/user/finance/hoc-phi' },
+            5003: { title: 'Học phí', link: '/user/finance/hoc-phi' },
         },
     };
     const menuStudent = {

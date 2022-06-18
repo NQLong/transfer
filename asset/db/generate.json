@@ -13948,8 +13948,8 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "IS_SUCCESS": {
-                    "value": "isSuccess",
+                "STATUS": {
+                    "value": "status",
                     "dataType": "NUMBER",
                     "dataDefault": "1",
                     "nullable": true,
@@ -14147,8 +14147,8 @@
                     "nullable": false,
                     "size": "20,0"
                 },
-                "FILE_CONG_VAN": {
-                    "value": "fileCongVan",
+                "CONG_VAN": {
+                    "value": "congVan",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
@@ -14157,6 +14157,107 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_CAN_BO_KY": {
+            "active": true,
+            "moduleName": "hcthCanBoKy",
+            "modelName": "hcthCanBoKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_134312\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGUOI_KY": {
+                    "value": "nguoiKy",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "CONG_VAN_TRINH_KY": {
+                    "value": "congVanTrinhKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_ORDERS": {
+            "active": true,
+            "moduleName": "tcHocPhiOrders",
+            "modelName": "tcHocPhiOrders",
+            "columns": {
+                "REF_ID": {
+                    "value": "refId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "AMOUNT": {
+                    "value": "amount",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BANK": {
+                    "value": "bank",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "ORDER_INFO": {
+                    "value": "orderInfo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                }
+            },
+            "primaryKeys": [
+                "REF_ID"
             ],
             "foreignKeys": [],
             "type": "table"
