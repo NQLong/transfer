@@ -1,5 +1,4 @@
 module.exports = app => {
-    const SecretCode = 'AGRI-XHNV';
     const serviceId = 'HocPhi';
     const crypto = require('crypto');
     // console.log(crypto.createHash('md5').update(`${SecretCode}|${serviceId}|2156031059`).digest('hex'));
@@ -7,11 +6,11 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/agri/getbill', async (req, res) => {
-        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeAgri: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeAgri');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
         const { customer_id, service_id, checksum } = req.body,
-            myChecksum = crypto.createHash('md5').update(`${SecretCode}|${service_id}|${customer_id}`).digest('hex');
+            myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
         console.log('getbill', { customer_id, service_id, checksum });
 
         if (service_id != serviceId) {
@@ -48,11 +47,11 @@ module.exports = app => {
 
     app.post('/api/agri/paybill', async (req, res) => {
         try {
-            let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+            let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeAgri: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeAgri');
             namHoc = Number(namHoc);
             hocKy = Number(hocKy);
             const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
-                myChecksum = crypto.createHash('md5').update(`${SecretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
+                myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
             console.log('paybill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
 
             if (service_id != serviceId) {
