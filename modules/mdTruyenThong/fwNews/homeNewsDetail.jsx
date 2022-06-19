@@ -4,7 +4,7 @@ import { getNewsByUser } from './redux';
 import SectionSideBar from 'view/component/SectionSideBar';
 
 class NewsDetail extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { language: '' };
     }
@@ -44,7 +44,7 @@ class NewsDetail extends React.Component {
                 <a key={index} href='#' className='tag-cloud-link'>{T.language.parse(categorieItem.text)}</a>);
             let attachments = item.listAttachment ? attachments = item.listAttachment.map((item, index) =>
                 <div key={index}>
-                    <a href={'/download/' + item.path} download>{item.nameDisplay} </a>
+                    <a href={'/api/storage/download/' + item.path} download>{item.nameDisplay} </a>
                 </div>
             ) : null;
             let content = T.language.parse(item.content)
@@ -84,7 +84,7 @@ class NewsDetail extends React.Component {
                                 {attachments &&
                                     <div>
                                         Tệp tin đính kèm:
-                                   {attachments}
+                                        {attachments}
                                     </div>}
                                 {width < 500 ? <div style={{ width: '100%', }}>
                                     <img src='https://i.giphy.com/media/Y3alJyRof3xcddXkew/giphy.webp' style={{ width: '100%', height: '100%', }} />
