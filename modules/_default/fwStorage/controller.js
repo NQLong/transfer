@@ -87,7 +87,7 @@ module.exports = app => {
         }
     };
 
-    app.get('/api/storage/download/:name', app.permission.check('storage:read'), (req, res) => {
+    app.get('/api/storage/download/:name', (req, res) => {
         const fileName = req.params.name, path = app.path.join(app.documentPath, fileName);
         app.model.fwStorage.get({ path: fileName }, (error, item) => {
             if (app.fs.existsSync(path) && !error && item) {
@@ -99,6 +99,7 @@ module.exports = app => {
         });
 
     });
+
     app.get('/api/storage/all', app.permission.check('storage:read'), (req, res) => {
         app.model.fwStorage.getAll({}, '*', 'nameDisplay asc', (error, items) => {
             res.send({ error, items });
