@@ -60,7 +60,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/vnpay/ipn', async (req, res) => {
+    app.get('/vnpay/ipn', async (req, res) => {
         try {
             // const ipAddr = req.headers['x-forwarded-for'] ||
             //     req.connection.remoteAddress ||
