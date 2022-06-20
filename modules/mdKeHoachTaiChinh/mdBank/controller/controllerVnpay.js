@@ -49,9 +49,9 @@ module.exports = app => {
 
             const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
             params = app.clone(params, { vnp_SecureHash });
-
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
+            // console.log(urlRequest);
             // res.redirect(urlRequest);
             res.send(urlRequest);
         } catch (error) {
