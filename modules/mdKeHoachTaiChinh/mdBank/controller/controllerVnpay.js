@@ -49,9 +49,9 @@ module.exports = app => {
 
             const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
             params = app.clone(params, { vnp_SecureHash });
-
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
+            // console.log(urlRequest);
             // res.redirect(urlRequest);
             res.send(urlRequest);
         } catch (error) {
@@ -60,7 +60,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/vnpay/ipn', async (req, res) => {
+    app.get('/vnpay/ipn', async (req, res) => {
         try {
             // const ipAddr = req.headers['x-forwarded-for'] ||
             //     req.connection.remoteAddress ||
