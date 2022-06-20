@@ -60,15 +60,18 @@ module.exports = app => {
         }
     });
 
+    const WHITE_LIST_IP = [
+        '113.52.45.78', '116.97.245.130', '42.118.107.252', '113.20.97.250', '203.171.19.146', '103.220.87.4', '113.160.92.202'
+    ];
     app.get('/vnpay/ipn', async (req, res) => {
         try {
-            // const ipAddr = req.headers['x-forwarded-for'] ||
-            //     req.connection.remoteAddress ||
-            //     req.socket.remoteAddress ||
-            //     req.connection.socket.remoteAddress;
+            const ipAddr = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress;
 
             //TODO: trust ip
-
+            if (!WHITE_LIST_IP.includes(ipAddr)) throw ('Not in trusted IP!');
             let vnp_Params = req.query;
             let secureHash = vnp_Params['vnp_SecureHash'];
 
