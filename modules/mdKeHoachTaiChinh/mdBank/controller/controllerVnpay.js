@@ -3,7 +3,7 @@ module.exports = app => {
     const querystring = require('qs');
     const crypto = require('crypto');
     // const https = require('https');
-
+    const fs = require('fs');
     function sortObject(obj) {
         let sorted = {};
         let str = [];
@@ -34,7 +34,7 @@ module.exports = app => {
 
             const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
             let { congNo } = dataHocPhi;
-            const vnp_OrderInfo = `USSH: Học phí SV ${mssv}, học kỳ ${hocKy} NH ${namHoc} - ${namHoc + 1}`;
+            const vnp_OrderInfo = `USSH: Học phí SV ${mssv}, học kỳ ${hocKy} NH ${namHoc} - ${parseInt(namHoc) + 1}`;
             const now = new Date(), vnp_CreateDate = dateFormat(now, 'yyyymmddHHmmss'),
                 vnp_IpAddr = ipAddr,
                 vnp_Locale = 'vn',
@@ -51,8 +51,7 @@ module.exports = app => {
             params = app.clone(params, { vnp_SecureHash });
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
-            // console.log(urlRequest);
-            // res.redirect(urlRequest);
+
             res.send(urlRequest);
         } catch (error) {
             console.log(error);
@@ -63,12 +62,25 @@ module.exports = app => {
     const WHITE_LIST_IP = [
         '113.52.45.78', '116.97.245.130', '42.118.107.252', '113.20.97.250', '203.171.19.146', '103.220.87.4', '113.160.92.202'
     ];
+
     app.get('/vnpay/ipn', async (req, res) => {
         try {
             const ipAddr = req.headers['x-forwarded-for'] ||
                 req.connection.remoteAddress ||
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
+
+            fs.readFile(app.path.join(app.assetPath, 'vnpayLog.json'), (err, data) => {
+                if (err) throw err;
+                let currentLogs = app.parse(data);
+                const updateLog = {
+                    ...currentLogs, [new Date().getTime()]: {
+                        'IP call to USSH': ipAddr,
+                        'Query': req.query
+                    }
+                };
+                fs.writeFileSync(app.path.join(app.assetPath, 'vnpayLog.json'), JSON.stringify(updateLog));
+            });
 
             //TODO: trust ip
             if (!WHITE_LIST_IP.includes(ipAddr)) throw ('Not in trusted IP!');
@@ -85,23 +97,29 @@ module.exports = app => {
             let { vnp_Amount, vnp_PayDate, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = vnp_Params;
             let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
 
+            if (vnp_TransactionStatus == 99) res.send({ RspCode: '00', Message: 'Confirm Success' });
+            vnp_Amount = parseInt(vnp_Amount) / 100;
+            const student = await app.model.fwStudents.get({ mssv });
+            const order = await app.model.tcHocPhiOrders.get({ refId: vnp_TxnRef });
+            if (!student || !order) res.send({ RspCode: '01', Message: 'Order Not Found' });
+
+            if (parseInt(order.amount) != parseInt(vnp_Amount)) res.send({ RspCode: '04', Message: 'Invalid amount' });
+
+            const transaction = await app.model.tcHocPhiTransaction.get({ transId: vnp_TxnRef });
+            if (transaction) res.send({ Message: 'Order already confirmed', RspCode: '02' });
             const signData = querystring.stringify(vnp_Params, { encode: false });
             const hmac = crypto.createHmac('sha512', vnp_HashSecret),
                 vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
             if (secureHash === vnp_SecureHash) {
-                if (vnp_TransactionStatus != '00') {
-                    res.send({ error: 'Transaction failed!' });
-                } else {
-                    await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TransactionNo, new Date(vnp_PayDate).getTime(), mssv, 1, vnp_TmnCode, vnp_Amount, secureHash);
-                    res.send({ RspCode: '00', Message: 'success' });
-                }
+                await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, new Date(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                res.send({ RspCode: '00', Message: 'Confirm Success' });
             } else {
-                res.send({ RspCode: '97', Message: 'Fail checksum' });
+                res.send({ RspCode: '97', Message: 'Invalid Checksum' });
             }
         }
         catch (error) {
-            res.send({ error });
+            res.send({ RspCode: '99', Message: 'Node error' });
         }
     });
 
