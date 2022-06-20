@@ -70,17 +70,14 @@ module.exports = app => {
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
 
-            fs.readFile(app.path.join(app.assetPath, 'vnpayLog.json'), (err, data) => {
-                if (err) throw err;
-                let currentLogs = app.parse(data);
-                const updateLog = {
-                    ...currentLogs, [new Date().getTime()]: {
-                        'IP call to USSH': ipAddr,
-                        'Query': req.query
-                    }
-                };
-                fs.writeFileSync(app.path.join(app.assetPath, 'vnpayLog.json'), JSON.stringify(updateLog));
-            });
+            let currentLogs = app.parse(fs.readFileSync(app.path.join(app.assetPath, 'vnpayLog.json')));
+            const updateLog = {
+                ...currentLogs, [new Date().getTime()]: {
+                    'IP VNPAY': ipAddr,
+                    'Query': req.query
+                }
+            };
+            fs.writeFileSync(app.path.join(app.assetPath, 'vnpayLog.json'), JSON.stringify(updateLog));
 
             //TODO: trust ip
             if (!WHITE_LIST_IP.includes(ipAddr)) throw ('Not in trusted IP!');
