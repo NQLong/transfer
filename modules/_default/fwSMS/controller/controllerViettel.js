@@ -1,77 +1,65 @@
 module.exports = app => {
     const http = require('http');
+    app.permission.add('fwSms-viettel:send');
 
-    app.post('/api/sms-service/viettel', async (req, res) => {
+    // eslint-disable-next-line no-control-regex
+    const checkNonLatinChar = (string) => /[^\u0000-\u00ff]/.test(string);
+    app.post('/api/sms-service/viettel', app.permission.check('fwSms-viettel:send'), async (req, res) => {
         try {
-            let { usernameViettel: user, passViettel: pass, brandName: brandname, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
-
-            let { phone, smsContent } = req.body;
-
+            let { usernameViettel: user, passViettel: pass, brandName, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
+            let { phone, mess } = req.body;
             // let user = 'demo_sms',
             //     pass = 'DemoSMS@#123',
-            //     brandname = 'MobiService',
+            //     brandName = 'MobiService',
             //     phone = '0901303938', //temp
-            //     smsContent = 'Chuc mung sinh nhat quy khach hang'; //temp
-
+            //     mess = 'Chuc mung sinh nhat quy khach hang'; //temp
+            let dataEncode = 0;
+            if (checkNonLatinChar(mess)) dataEncode = 1;
             const tranId = `${phone}_${new Date().getTime()}`;
-            const dataRequest = {
-                user, pass, tranId, phone, dataEncode: 1, smsContent, brandname
-            };
+            const dataRequest = JSON.stringify({ user, pass, tranId, phone, dataEncode, mess, brandName });
             const option = {
                 host: '125.212.226.79',
                 port: 9020,
-                path: '/service/zalo_api',
+                path: '/service/sms_api',
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // json: dataRequest
+                headers: { 'Content-Type': 'application/json; charset=utf-8' }
             };
 
-            const request = http.request(option, (res) => {
-                console.log('Status: ' + res.statusCode);
-                console.log('Headers: ' + JSON.stringify(res.headers));
-                res.setEncoding('utf8');
-                res.on('data', (chunk) => {
-                    console.log(`BODY: ${chunk}`);
-                    if (chunk.code == 1) {
-                        app.model.fwSms.create({
-                            email: req.session.user.email,
-                            sentDate: new Date().getTime(),
-                            total: Math.abs(currentTotal - chunk.total)
-                        }, (error, item) => {
-                            if (!error || item) app.model.setting.setValue({ totalSMSViettel: chunk.total }, () => res.send({ item }));
-                            else res.send({ error });
-                        });
+            const request = http.request(option, (_res) => {
+                _res.on('data', async (chunk) => {
+                    let resData = {};
+                    try {
+                        resData = JSON.parse(chunk.toString());
+                    } catch (e) {
+                        console.error(e);
+                    }
+
+                    if (resData.code == 1) {
+                        try {
+                            const item = await app.model.fwSms.create({
+                                email: req.session.user.email,
+                                sentDate: new Date().getTime(),
+                                total: Math.abs(currentTotal - resData.total)
+                            });
+
+                            if (item) {
+                                app.model.setting.setValue({ totalSMSViettel: resData.total }, () => res.send({ item }));
+                            }
+                            else res.end();
+                        } catch (error) {
+                            res.send({ error });
+                        }
                     } else res.send({ error: 'Unsuccessful request' });
                 });
-                res.on('end', () => {
-                    console.log('No more data in response.');
-                });
-                // if (res.statusCode == 200) {
-                //     res.on('data', (data) => {
-                // if (data.code == 1) {
-                //     app.model.fwSms.create({
-                //         email: req.session.user.email,
-                //         sentDate: new Date().getTime(),
-                //         total: Math.abs(currentTotal - data.total)
-                //     }, (error, item) => {
-                //         if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total }, () => res.send({ item }));
-                //         else res.send({ error });
-                //     });
-                // } else res.send({ error: 'Unsuccessful request' });
-                //     });
-                // } else res.send({ error: 'Requesting to Viettel has been failed' });
             });
             request.on('error', (e) => {
-                console.error(`problem with request: ${e.message}`);
+                console.error(`problem with request to viettel: ${e.message}`);
                 res.send({ error: e.message });
             });
-            request.write(JSON.stringify(dataRequest));
+            request.write(dataRequest);
             request.end();
         } catch (error) {
             res.send({ error });
         }
-
     });
 };
