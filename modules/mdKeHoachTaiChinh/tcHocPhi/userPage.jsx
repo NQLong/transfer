@@ -54,9 +54,18 @@ class Modal extends AdminModal {
     }
 }
 class UserPage extends AdminPage {
-    state = { hocPhiHuongDan: null }
+    state = { hocPhiHuongDan: null, isSuccess: false }
 
     componentDidMount() {
+        const query = new URLSearchParams(this.props.location.search);
+        if (query) {
+            const vnp_TransactionStatus = query.get('vnp_TransactionStatus');
+            if (vnp_TransactionStatus && vnp_TransactionStatus == '00') {
+                T.alert('Thanh toán thành công', 'success', false, 2000);
+                window.location = '/user/hoc-phi';
+            }
+        }
+
         T.ready('/user', () => {
             this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
                 const { settings: { namHoc, hocKy } } = data;
