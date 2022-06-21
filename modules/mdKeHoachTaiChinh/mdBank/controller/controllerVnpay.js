@@ -69,6 +69,7 @@ module.exports = app => {
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
 
+            console.log(req.query);
             let currentLogs = app.parse(app.fs.readFileSync(app.path.join(app.assetPath, 'vnpayLog.json')));
             const updateLog = {
                 ...currentLogs, [new Date().getTime()]: {
@@ -79,7 +80,7 @@ module.exports = app => {
             app.fs.writeFileSync(app.path.join(app.assetPath, 'vnpayLog.json'), JSON.stringify(updateLog));
 
             //TODO: trust ip
-            if (!WHITE_LIST_IP.includes(ipAddr)) throw ('Not in trusted IP!');
+            if (!WHITE_LIST_IP.includes(ipAddr)) res.send({ RspCode: '99', Message: `${ipAddr} is not in trusted IP list!` });
             let vnp_Params = req.query;
             let secureHash = vnp_Params['vnp_SecureHash'];
 
