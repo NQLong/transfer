@@ -1,20 +1,20 @@
 module.exports = app => {
 
-    Date.prototype.yyyymmdd = function() {
+    Date.prototype.yyyymmdd = function () {
         return this.toISOString().slice(0, 10).replace(/-/g, '');
     };
-    
+
     const get2 = (x) => ('0' + x).slice(-2);
-    
+
     app.date = {
         dateFormat: (date) => {
             return get2(date.getMonth() + 1) + '/' + get2(date.getDate()) + '/' + date.getFullYear();
         },
-        
+
         viDateFormat: (date) => {
             return get2(date.getDate()) + '/' + get2(date.getMonth() + 1) + '/' + date.getFullYear();
         },
-        
+
         viTimeFormat: (date) => {
             return get2(date.getHours()) + ':' + get2(date.getMinutes());
         },
@@ -34,10 +34,20 @@ module.exports = app => {
             months += d2.getMonth();
             return months <= 0 ? 0 : months;
         },
-        
+
         dayDiff: (d1, d2) => { //Difference in Days between two dates
             let result = d2.getTime() - d1.getTime();
             return Math.floor(result / (1000 * 60 * 60 * 24));
+        },
+
+        fullFormatToDate: (string) => {
+            let year = string.substring(0, 4);
+            let month = string.substring(4, 6);
+            let day = string.substring(6, 8);
+            let hour = string.substring(8, 10);
+            let minute = string.substring(10, 12);
+            let second = string.substring(12, 14);
+            return new Date(year, month - 1, day, hour, minute, second).getTime();
         },
 
         numberNgayNghi: (start, end, yearCalc, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end] ở năm yearCalc (nếu tồn tại)
@@ -68,9 +78,10 @@ module.exports = app => {
                 start.setDate(start.getDate() + 1);
             }
             if (result > 70) { //Case: Quá nhiều ngày nghỉ
-                return -1; 
+                return -1;
             }
             return result;
         }
     };
+
 };

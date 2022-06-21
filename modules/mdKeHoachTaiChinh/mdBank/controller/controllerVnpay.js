@@ -19,6 +19,7 @@ module.exports = app => {
         return sorted;
     }
 
+
     app.get('/api/vnpay/start-thanh-toan', app.permission.check('student:login'), async (req, res) => {
         try {
             const student = req.session.user;
@@ -109,7 +110,7 @@ module.exports = app => {
                 vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
             if (secureHash === vnp_SecureHash) {
-                await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, new Date(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
                 res.send({ RspCode: '00', Message: 'Confirm Success' });
             } else {
                 res.send({ RspCode: '97', Message: 'Invalid Checksum' });
