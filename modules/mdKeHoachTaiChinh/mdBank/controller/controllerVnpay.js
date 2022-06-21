@@ -54,7 +54,6 @@ module.exports = app => {
 
             res.send(urlRequest);
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
@@ -70,8 +69,6 @@ module.exports = app => {
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
 
-            console.log('IP: ', ipAddr);
-            console.log('query: ', req.query);
             const logFilePath = app.path.join(app.assetPath, 'vnpayLog.json');
             let currentLogs = app.fs.existsSync(logFilePath) ? app.parse(app.fs.readFileSync(app.path.join(app.assetPath, 'vnpayLog.json'))) : {};
             const updateLog = {
@@ -98,7 +95,7 @@ module.exports = app => {
             let { vnp_Amount, vnp_PayDate, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = vnp_Params;
             let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
 
-            //
+            // Fail Transaction
             if (vnp_TransactionStatus == 99) return res.send({ RspCode: '00', Message: 'Confirm Success' });
 
             vnp_Amount = parseInt(vnp_Amount / 100);
@@ -106,31 +103,26 @@ module.exports = app => {
             const order = await app.model.tcHocPhiOrders.get({ refId: vnp_TxnRef });
             if (!student || !order) return res.send({ RspCode: '01', Message: 'Order Not Found' });
 
-            //
+            //Invalid Amount
             if (parseInt(order.amount) != vnp_Amount) return res.send({ RspCode: '04', Message: 'Invalid amount' });
 
             const transaction = await app.model.tcHocPhiTransaction.get({ transId: vnp_TxnRef });
 
-            //
+            // Order already confirmed
             if (transaction) return res.send({ Message: 'Order already confirmed', RspCode: '02' });
             const signData = querystring.stringify(vnp_Params, { encode: false });
             const hmac = crypto.createHmac('sha512', vnp_HashSecret),
                 vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
-            console.log('secureHash', secureHash);
-            console.log('vnp_SecureHash', vnp_SecureHash);
-
             if (secureHash === vnp_SecureHash) {
-                console.log('Add Bill');
-                const result = await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
-                console.log('Add bill result: ', result);
+                await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
                 res.send({ RspCode: '00', Message: 'Confirm Success' });
             } else {
                 res.send({ RspCode: '97', Message: 'Invalid Checksum' });
             }
         }
         catch (error) {
-            console.log('error catch', error);
+            console.error('Error catch VNPAY: ', error);
             res.send({ RspCode: '99', Message: 'Node error' });
         }
     });
@@ -143,7 +135,7 @@ module.exports = app => {
             req.socket.remoteAddress ||
             req.connection.socket.remoteAddress;
 
-        const { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayQueryUrl } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayQueryUrl');
+        const { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayQueryUrl');
         const dataOrders = await app.model.tcHocPhiOrders.getAll({ namHoc, hocKy });
         const vnp_Command = 'querydr';
 
@@ -163,22 +155,11 @@ module.exports = app => {
             const hmac = crypto.createHmac('sha512', vnp_HashSecret);
             params.vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
-            console.log(params);
-            console.log(vnpayQueryUrl);
             const keys = Object.keys(params);
             let query = '';
             keys.forEach(key => {
                 query = query.concat(`${key}=${params[key]}&`);
             });
-            console.log(vnpayQueryUrl + '?' + query);
-            // https.request(vnpayQueryUrl, (res) => {
-            //     console.log(res);
-            //     res.on('data', (chunk) => {
-            //         console.log(`BODY: ${chunk}`);
-
-            //     });
-            // });
-
         });
         res.send('OK');
     });

@@ -107,11 +107,11 @@ class UserPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
-                        item.congNo && <Tooltip title='Thanh toán' arrow>
+                        item.congNo ? <Tooltip title='Thanh toán' arrow>
                             <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                 <i className='fa fa-lg fa-usd ' />
                             </button>
-                        </Tooltip>
+                        </Tooltip> : null
                     } />
 
                 </tr>
