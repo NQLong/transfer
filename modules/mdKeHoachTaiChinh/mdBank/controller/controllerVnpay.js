@@ -122,7 +122,7 @@ module.exports = app => {
 
             if (secureHash === vnp_SecureHash) {
                 console.log('Add Bill');
-                const result = await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                const result = await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
                 console.log('Add bill result: ', result);
                 res.send({ RspCode: '00', Message: 'Confirm Success' });
             } else {

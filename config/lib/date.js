@@ -47,7 +47,7 @@ module.exports = app => {
             let hour = string.substring(8, 10);
             let minute = string.substring(10, 12);
             let second = string.substring(12, 14);
-            return new Date(year, month - 1, day, hour, minute, second).getTime();
+            return new Date(year, month - 1, day, hour, minute, second);
         },
 
         numberNgayNghi: (start, end, yearCalc, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end] ở năm yearCalc (nếu tồn tại)
