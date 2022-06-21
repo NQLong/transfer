@@ -3,7 +3,6 @@ module.exports = app => {
     const querystring = require('qs');
     const crypto = require('crypto');
     // const https = require('https');
-    const fs = require('fs');
     function sortObject(obj) {
         let sorted = {};
         let str = [];
@@ -70,14 +69,14 @@ module.exports = app => {
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
 
-            let currentLogs = app.parse(fs.readFileSync(app.path.join(app.assetPath, 'vnpayLog.json')));
+            let currentLogs = app.parse(app.fs.readFileSync(app.path.join(app.assetPath, 'vnpayLog.json')));
             const updateLog = {
                 ...currentLogs, [new Date().getTime()]: {
                     'IP VNPAY': ipAddr,
                     'Query': req.query
                 }
             };
-            fs.writeFileSync(app.path.join(app.assetPath, 'vnpayLog.json'), JSON.stringify(updateLog));
+            app.fs.writeFileSync(app.path.join(app.assetPath, 'vnpayLog.json'), JSON.stringify(updateLog));
 
             //TODO: trust ip
             if (!WHITE_LIST_IP.includes(ipAddr)) throw ('Not in trusted IP!');
