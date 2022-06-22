@@ -15,7 +15,11 @@ module.exports = app => {
         });
         return result.join(' ');
     };
-    
+
+    String.prototype.numberWithCommas = function () {
+        return this.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
     String.prototype.getFirstLetters = function () {
         const firstLetters = this
             .toUpperCase()
