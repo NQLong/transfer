@@ -20,7 +20,7 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:login', menu },
+        // { name: 'staff:login', menu },
         { name: 'qtBangPhatMinh:readOnly', menu: menuTCCB },
         { name: 'qtBangPhatMinh:read', menu },
         { name: 'qtBangPhatMinh:write' },

@@ -413,11 +413,11 @@ module.exports = app => {
                 resolve(result);
             });
         })).then((result) => new Promise(resolve => {
-            app.model.qtHopDongDonViTraLuong.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, dvtl) => {
+            app.model.qtHopDongDonViTraLuong.get({ shcc: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, dvtl) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng đơn vị!' });
                 } else if (dvtl) {
-                    result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: new Date(dvtl.ngayKyHopDong).setHours(0, 0, 0), loaiHopDongCanBo: dvtl.loaiHopDong });
+                    result = app.clone(result, { hopDongCanBo: 'DVTL', hopDongCanBoNgay: new Date(dvtl.ngayKyHopDong).setHours(0, 0, 0), loaiHopDongCanBo: dvtl.loaiHopDong });
                     resolve(result);
                 } else
                     resolve(result);
@@ -441,7 +441,7 @@ module.exports = app => {
                 } else if (hdld) {
                     let ngayKyHopDong = new Date(hdld.ngayKyHopDong).setHours(0, 0, 0);
                     if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
-                        result = app.clone(result, { hopDongCanBo: 'LĐ', canBoCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdld.loaiHopDong });
+                        result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdld.loaiHopDong });
                     } resolve(result);
                 } else
                     resolve(result);
@@ -453,12 +453,16 @@ module.exports = app => {
                 } else if (hdvc) {
                     let ngayKyHopDong = new Date(hdvc.ngayKyHopDong).setHours(0, 0, 0);
                     if (result.hopDongCanBoNgay && result.hopDongCanBoNgay < ngayKyHopDong) {
-                        result = app.clone(result, { canBoCanBo: 'VC', canBoCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdvc.loaiHopDong });
+                        result = app.clone(result, { hopDongCanBo: 'VC', hopDongCanBoNgay: ngayKyHopDong, loaiHopDongCanBo: hdvc.loaiHopDong });
                     } resolve(result);
                 } else
                     resolve(result);
             });
         })).then((result) => {
+            if (!result.hopDongCanBo || result.hopDongCanBo == '') {
+                result.loaiHopDongCanBo = '00';
+                result.hopDongCanBo = '00';
+            }
             res.send({ item: result });
         });
     };
