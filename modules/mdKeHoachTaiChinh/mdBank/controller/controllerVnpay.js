@@ -125,11 +125,11 @@ module.exports = app => {
                     .replaceAll('{tc_address}', tcAddress)
                     .replaceAll('{tc_phone}', tcPhone)
                     .replaceAll('{tc_email}', tcEmail)
-                    .replaceAll('{support_phone}', tcSupportPhone));
+                    .replaceAll('{support_phone}', tcSupportPhone) || '');
 
                 app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
 
-                student.dienThoaiCaNhan && app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, req.session.user.email);
+                await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, req.session.user.email);
 
                 res.send({ RspCode: '00', Message: 'Confirm Success' });
             } else {

@@ -2,12 +2,10 @@ module.exports = app => {
     const http = require('http');
 
     app.permission.add('fwSms-viettel:send');
-    // eslint-disable-next-line no-control-regex
-    const checkNonLatinChar = (string) => /[^\u0000-\u00ff]/.test(string);
 
-    app.sms = {
-        sendByViettel: async (phone, mess, emailSent) => await initViettelSms({ phone, mess }, emailSent)
-    };
+
+    app.sms.sendByViettel = async (phone, mess, emailSent) => await initViettelSms({ phone, mess }, emailSent);
+
 
     const initViettelSms = async (body, email) => {
         try {
@@ -18,7 +16,7 @@ module.exports = app => {
             //     brandName = 'MobiService',
             //     phone = '0901303938', //temp
             //     mess = 'Chuc mung sinh nhat quy khach hang'; //temp
-            let dataEncode = parseInt(checkNonLatinChar(mess));
+            let dataEncode = parseInt(app.sms.checkNonLatinChar(mess));
 
             const tranId = `${phone}_${new Date().getTime()}`;
             const dataRequest = JSON.stringify({ user, pass, tranId, phone, dataEncode, mess, brandName });
@@ -64,11 +62,9 @@ module.exports = app => {
                 });
                 request.write(dataRequest);
                 request.end();
-                resolve({ success: true });
             });
         } catch (error) {
             console.error(error);
-            return;
         }
     };
 
@@ -76,7 +72,7 @@ module.exports = app => {
         try {
             let email = req.session.user.email, body = req.body;
             const result = await initViettelSms(body, email);
-            if (result && result.success) res.send('Sent SMS successfully!');
+            if (result && result.success) res.send({ success: 'Sent SMS successfully!' });
             else throw (result.error || result);
         } catch (error) {
             res.send({ error });
