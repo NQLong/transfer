@@ -23,7 +23,7 @@ module.exports = app => {
         });
     };
 
-    app.model.tcSetting.setValue = (data, done) => {
+    app.model.tcSetting.setValue = (data, done) => new Promise(resolve => {
         let keys = Object.keys(data),
             errorSum = null;
         const solveAnItem = index => {
@@ -45,10 +45,11 @@ module.exports = app => {
                 });
             } else if (done) {
                 done(errorSum);
+                resolve(errorSum);
             }
         };
         solveAnItem(0);
-    };
+    });
 
     app.model.tcSetting.init = (data, done) => {
         const keys = Object.keys(data);

@@ -58,7 +58,7 @@ module.exports = app => {
     //Nodemailer
     const nodemailer = require('nodemailer');
 
-    app.email.normalSendEmail = (mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, successCallback, errorCallback) => {
+    app.email.normalSendEmail = (mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, successCallback, errorCallback) => new Promise((resolve, reject) => {
         let transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
@@ -80,11 +80,13 @@ module.exports = app => {
             if (error) {
                 console.error(error);
                 if (errorCallback) errorCallback(error);
+                reject(error);
             } else {
                 console.log('Send mail to ' + mailTo + ' successful.');
                 if (successCallback) successCallback();
+                resolve();
             }
         });
-    };
+    });
 
 };
