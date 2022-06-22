@@ -491,7 +491,7 @@ module.exports = app => {
                 } else {
                     let canBo = item.rows[0],
                         { qtChucVu, qtDaoTao, qtHocTapCongTac, quanHeGiaDinh, toChucKhac } = item;
-
+                    let chucVuKiemNhiems = qtChucVu.filter(item => !item.chucVuChinh);
                     qtDaoTao.map(item => {
                         item.batDau = app.date.dateTimeFormat(new Date(item.batDau), item.batDauType);
                         item.ketThuc = item.ketThuc ? (item.ketThuc == -1 ? ' - nay' : ' - ' + app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType)) : '';
@@ -578,6 +578,7 @@ module.exports = app => {
                         phuCapChucVu: qtChucVu[0]?.phuCapChucVu || '',
                         chucVu: qtChucVu[0]?.chucVu || '',
                         donVi: qtChucVu[0]?.donVi || '',
+                        chucVuKiemNhiem: chucVuKiemNhiems.length ? chucVuKiemNhiems.map(item => `${item.chucVu} - ${item.donVi}`).join(', ') : '',
                         phoThong: canBo.phoThong || '',
                         hocVi: canBo.hocVi || '',
                         ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
