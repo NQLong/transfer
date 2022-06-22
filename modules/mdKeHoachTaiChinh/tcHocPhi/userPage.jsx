@@ -62,7 +62,8 @@ class UserPage extends AdminPage {
             const vnp_TransactionStatus = query.get('vnp_TransactionStatus');
             if (vnp_TransactionStatus && vnp_TransactionStatus == '00') {
                 T.alert('Thanh toán thành công', 'success', false, 2000);
-                window.location = '/user/hoc-phi';
+                // window.location = '/user/hoc-phi';
+                //TODO: Email SMS
             }
         }
 
