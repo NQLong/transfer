@@ -137,4 +137,5 @@ module.exports = (app, http, config) => {
     require('./lib/schedule')(app);
     require('./lib/language')(app);
     require('./lib/docx')(app);
+    require('./lib/sms')(app);
 };

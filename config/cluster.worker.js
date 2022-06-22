@@ -46,7 +46,6 @@ module.exports = (cluster, isDebug) => {
     require('./packages')(app, server, appConfig);
     require('./authentication')(app);
     require('./permission')(app);
-    require('./sms')(app);
     require('./authentication.google')(app, appConfig);
 
     // Init -----------------------------------------------------------------------------------------------------------
