@@ -99,8 +99,8 @@ module.exports = app => {
         } else if (checksum != myChecksum) {
             res.send({ result_code: '007' });
         } else {
-            const modelHocPhi = type === types.PRODUCTION ? app.mode.tcHocPhi : app.model.tcHocPhiSandbox;
-            const modelHocPhiTransaction = type = types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
+            const modelHocPhi = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+            const modelHocPhiTransaction = type === types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
             modelHocPhi.get({ namHoc, hocKy, mssv: customer_id }, (error, hocPhi) => {
                 if (error) {
                     res.send({ result_code: '096' });
