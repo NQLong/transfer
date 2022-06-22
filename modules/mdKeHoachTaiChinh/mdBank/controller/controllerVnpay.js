@@ -125,8 +125,8 @@ module.exports = app => {
                     .replaceAll('{tc_address}', tcAddress)
                     .replaceAll('{tc_phone}', tcPhone)
                     .replaceAll('{tc_email}', tcEmail)
+                    .replaceAll('{amount}', vnp_Amount.numberWithCommas())
                     .replaceAll('{support_phone}', tcSupportPhone) || '');
-
                 app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
 
                 await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, req.session.user.email);
