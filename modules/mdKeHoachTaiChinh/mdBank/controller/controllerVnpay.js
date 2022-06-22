@@ -121,7 +121,7 @@ module.exports = app => {
                     .replaceAll('{hoc_ky}', hocKy)
                     .replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
                     .replaceAll('{mssv}', mssv)
-                    .replaceAll('{time}', app.date.dateFormat(transaction))
+                    .replaceAll('{time}', app.date.dateFormat(new Date(transaction.transDate)))
                     .replaceAll('{tc_address}', tcAddress)
                     .replaceAll('{tc_phone}', tcPhone)
                     .replaceAll('{tc_email}', tcEmail)
