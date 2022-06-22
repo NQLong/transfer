@@ -24,7 +24,7 @@ class AdminMenu extends React.Component {
     }
 
     componentDidMount() {
-        T.ready(() => {
+        $(document).ready(() => {
             this.handleToggle();
         });
     }

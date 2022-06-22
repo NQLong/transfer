@@ -9,14 +9,14 @@ module.exports = app => {
 
     const initViettelSms = async (body, email) => {
         try {
-            let { usernameViettel: user, passViettel: pass, brandName, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
+            let { usernameViettel: user, passViettel: pass, brandName } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
             let { phone, mess } = body;
             // let user = 'demo_sms',
             //     pass = 'DemoSMS@#123',
             //     brandName = 'MobiService',
             //     phone = '0901303938', //temp
             //     mess = 'Chuc mung sinh nhat quy khach hang'; //temp
-            let dataEncode = parseInt(app.sms.checkNonLatinChar(mess));
+            let dataEncode = Number(app.sms.checkNonLatinChar(mess));
 
             const tranId = `${phone}_${new Date().getTime()}`;
             const dataRequest = JSON.stringify({ user, pass, tranId, phone, dataEncode, mess, brandName });
@@ -37,13 +37,13 @@ module.exports = app => {
                             console.error(e);
                             resolve({ error: e });
                         }
-
+                        console.log('VIETTEL RESDATA = ', resData);
                         if (resData.code == 1) {
                             try {
                                 const item = await app.model.fwSms.create({
                                     email,
                                     sentDate: new Date().getTime(),
-                                    total: Math.abs(currentTotal - resData.total)
+                                    total: resData.total
                                 });
 
                                 if (item) {

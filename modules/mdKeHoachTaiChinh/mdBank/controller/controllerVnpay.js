@@ -115,21 +115,22 @@ module.exports = app => {
                 vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
             if (secureHash === vnp_SecureHash) {
-                const transaction = await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
                 let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiSmsDong', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
                 [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
                     .replaceAll('{hoc_ky}', hocKy)
                     .replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
                     .replaceAll('{mssv}', mssv)
-                    .replaceAll('{time}', app.date.dateFormat(new Date(transaction.transDate)))
+                    .replaceAll('{time}', app.date.viDateFormat(app.date.fullFormatToDate(vnp_PayDate)))
                     .replaceAll('{tc_address}', tcAddress)
                     .replaceAll('{tc_phone}', tcPhone)
                     .replaceAll('{tc_email}', tcEmail)
-                    .replaceAll('{amount}', vnp_Amount.numberWithCommas())
+                    .replaceAll('{amount}', vnp_Amount.toString().numberWithCommas())
                     .replaceAll('{support_phone}', tcSupportPhone) || '');
                 app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
 
-                await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, req.session.user.email);
+                console.log(hocPhiSmsDong);
+                await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
 
                 res.send({ RspCode: '00', Message: 'Confirm Success' });
             } else {
