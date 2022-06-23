@@ -5,7 +5,7 @@ module.exports = (app) => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1054: { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f', pin: true },
+            // 1054: { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f', pin: true },
         },
     };
 

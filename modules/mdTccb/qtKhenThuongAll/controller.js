@@ -40,10 +40,10 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1006: {
-                title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift',
-                backgroundColor: '#016699', groupIndex: 2
-            }
+            // 1006: {
+            //     title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift',
+            //     backgroundColor: '#016699', groupIndex: 2
+            // }
         }
     };
 
@@ -187,7 +187,7 @@ module.exports = app => {
             }
             const ma = listMa[index];
             const dataAdd = {
-                ma, loaiDoiTuong, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh 
+                ma, loaiDoiTuong, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh
             };
             app.model.qtKhenThuongAll.create(dataAdd, (error) => {
                 if (error) errorList.push(error);

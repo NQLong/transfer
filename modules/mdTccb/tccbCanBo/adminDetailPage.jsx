@@ -13,7 +13,7 @@ import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
 class CanBoPage extends AdminPage {
     shcc = null
-    state = { item: null, create: false, load: true }
+    state = { item: null, create: false, load: true, lastModified: null }
     componentDidMount() {
         T.hideSearchBox();
         T.ready('/user/tccb', () => {
@@ -29,6 +29,7 @@ class CanBoPage extends AdminPage {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                     }
                     else {
+                        this.setState({ lastModified: data.item.lastModified, staff: data.item });
                         this.setUp(data.item);
                     }
                 });
@@ -60,9 +61,9 @@ class CanBoPage extends AdminPage {
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = !this.state.create ? this.componentTrinhDo.getAndValidate() : {};
         if (this.shcc) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
+            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.shcc, { ...caNhanData, ...congTacData, ...trinhDoData });
         } else {
-            caNhanData && congTacData && trinhDoData && this.props.createStaff({ ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.props.history.push('/user/tccb/staff'));
+            caNhanData && congTacData && trinhDoData && this.props.createStaff({ ...caNhanData, ...congTacData, ...trinhDoData }, () => this.props.history.push('/user/tccb/staff'));
         }
     }
 
@@ -72,6 +73,7 @@ class CanBoPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Hồ sơ cá nhân',
+            subTitle: <span>Chỉnh sửa lần cuối lúc <span style={{ color: 'blue' }}>{this.state.lastModified ? T.dateToText(this.state.lastModified) : ''}</span></span>,
             breadcrumb: [
                 <Link key={0} to='/user/staff'>Cán bộ</Link>,
                 'Lý lịch cán bộ',
