@@ -453,6 +453,7 @@ module.exports = app => {
                     donViNhan: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 0).map((item) => item.donViNhan) : []).toString(),
                     donViNhanNgoai: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 1).map((item) => item.donViNhan) : []
                     ).toString(),
+                    yeuCauKy: [],
                     listFile: files || [],
                     history: history?.rows || [],
                 },

@@ -43,6 +43,8 @@ import {
     SelectAdapter_DmLoaiCongVan
 } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { YeuCauKy, YeuCauKyModal } from '../hcthCongVanTrinhKy/component';
+import { createCongVanTrinhKy } from '../hcthCongVanTrinhKy/redux';
 const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
 
 const listTrangThai = {
@@ -228,7 +230,7 @@ class AdminEditPage extends AdminPage {
         if (this.state.id) {
             const queryParams = new URLSearchParams(window.location.search);
             const nhiemVu = queryParams.get('nhiemVu');
-            const context = {historySortType: this.state.historySortType};
+            const context = { historySortType: this.state.historySortType };
             if (nhiemVu) context.nhiemVu = nhiemVu;
             this.setState({ isLoading: false });
             this.props.getCongVanDi(Number(this.state.id), context, (item) => this.setData(item));
@@ -461,8 +463,19 @@ class AdminEditPage extends AdminPage {
                 this.donViGui?.value(id);
                 done && done({ error, item });
             }
-            this.modal.hide();
+            this.donViGuiNhanModal.hide();
         });
+    }
+
+    canCreateSignRequest = () => {
+        return true;
+        if (!this.state.id) return false;
+        if (this.state.loaiCongVan == loaiCongVan.DON_VI.id) {
+
+        } else {
+            return this.state.trangThai = trangThaiCongVanDi.DA_DUYET.id;
+        }
+
     }
 
     tableListFile = (data, id, permission, canAddFile) => renderTable({
@@ -496,6 +509,9 @@ class AdminEditPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={
                         canAddFile ? e => this.deleteFile(e, index, item) : null}>
+                        {this.canCreateSignRequest() && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(item); }}>
+                            <i className='fa fa-lg fa-pencil' />
+                        </a>}
                         <a className='btn btn-info' href={linkFile} download title='Tải về'>
                             <i className='fa fa-lg fa-download' />
                         </a>
@@ -651,7 +667,7 @@ class AdminEditPage extends AdminPage {
                             <span style={{ marginRight: '2px' }}>Đơn vị nhận bên ngoài</span>
                             {!this.canReadOnly() && <>
                                 (
-                                <Link to='#' onClick={() => this.modal.show(null)}>Nhấn vào đây để thêm</Link>
+                                <Link to='#' onClick={() => this.donViGuiNhanModal.show(null)}>Nhấn vào đây để thêm</Link>
                                 ) </>
                             }
                         </span>)} placeholder='Chọn đơn vị nhận bên ngoài' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có đơn vị nhận' />
@@ -699,17 +715,19 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
 
+                <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} />
+
                 {!isNew &&
                     <div className="tile">
                         <h3 className='tile-title'><i className={`btn fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
-                    </div>
+                    </div> 
                 }
-                <EditModal ref={e => this.modal = e}
+                <EditModal ref={e => this.donViGuiNhanModal = e}
                     permissions={dmDonViGuiCvPermission}
                     create={this.onCreateDonViNhanNgoai}
                 />
-
+                <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} />
             </>),
             backRoute,
             onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4') && ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) && !this.checkNotDonVi()) ? this.save : null,
@@ -735,7 +753,8 @@ const mapActionsToProps = {
     getPhanHoi,
     // createHistory,
     createDmDonViGuiCv,
-    readCongVanDi
-    // getHistory
+    readCongVanDi,
+    // getHistory,
+    createCongVanTrinhKy
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
