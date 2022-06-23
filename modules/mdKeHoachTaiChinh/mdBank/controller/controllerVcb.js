@@ -2,12 +2,27 @@ module.exports = app => {
     const serviceIdVcb = 'EDU';
     const providerIdVcb = 'NVAN';
     const crypto = require('crypto');
+    const types = {
+        SANDBOX: 'sandbox',
+        PRODUCTION: 'production'
+    };
 
     // VCB --------------------------------------------------------------------------------------------------------------------------------------
+    // production
     app.post('/api/VCBPayment/Inquiry', async (req, res) => {
-        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb');
+        await getBill(types.PRODUCTION, req, res);
+    });
+
+    // sandbox
+    app.post('/api/VCBPayment/Sandbox/Inquiry', async (req, res) => {
+        await getBill(types.SANDBOX, req, res);
+    });
+
+    const getBill = async (type, req, res) => {
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb, secretCodeVcbSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb', 'secretCodeVcbSandbox');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
+        const secretCode = type === types.PRODUCTION ? secretCodeVcb : secretCodeVcbSandbox;
         let { context, payload, signature } = req.body;
         if (!(context && payload)) {
             res.sendStatus(400);
@@ -39,7 +54,8 @@ module.exports = app => {
                         context.errorCode = 18;
                         res.send({ context, signature: signatureResponse });
                     } else {
-                        app.model.tcHocPhi.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
+                        const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+                        model.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
                             if (error) {
                                 context.status = 'FAILURE';
                                 context.errorCode = 400;
@@ -94,12 +110,23 @@ module.exports = app => {
             }
         }
 
+    };
+
+    // production
+    app.post('/api/VCBPayment/Payment', async (req, res) => {
+        await paybill(types.PRODUCTION, req, res);
     });
 
-    app.post('/api/VCBPayment/Payment', async (req, res) => {
-        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb');
+    // sandbox
+    app.post('/api/VCBPayment/Sandbox/Payment', async (req, res) => {
+        await paybill(types.SANDBOX, req, res);
+    });
+
+    const paybill = async (type, req, res) => {
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb, secretCodeVcbSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb', 'secretCodeVcbSandbox');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
+        const secretCode = type === types.PRODUCTION ? secretCodeVcb : secretCodeVcbSandbox;
         let { context, payload, signature } = req.body;
         if (!(context && payload)) {
             res.sendStatus(400);
@@ -126,9 +153,11 @@ module.exports = app => {
                             context.errorCode = 18;
                             res.send({ context });
                         } else {
+                            const modelHocPhi = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+                            const modelHocPhiTransaction = type === types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
                             const dataResponse = `${channelId}|${channelRefNumber}|${responseMsgId}|${secretCode}`,
                                 signature = crypto.createHash('md5').update(dataResponse).digest('hex');
-                            app.model.tcHocPhi.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
+                            modelHocPhi.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
                                 if (error) {
                                     context.status = 'FAILURE';
                                     context.errorCode = 400;
@@ -165,7 +194,7 @@ module.exports = app => {
                                                 res.send({ context, signature });
                                                 return;
                                             } else {
-                                                app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VCB', `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, parseInt(billInfo.amount), signature, (error, result) => {
+                                                modelHocPhiTransaction.addBill(namHoc, hocKy, 'VCB', `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, parseInt(billInfo.amount), signature, (error, result) => {
                                                     if (error || !result || !result.outBinds || !result.outBinds.ret) {
                                                         billResult.push({
                                                             billId: billInfo.billId,
@@ -202,7 +231,5 @@ module.exports = app => {
                 res.send({ context, signature });
             }
         }
-
-
-    });
+    };
 };

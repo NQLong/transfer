@@ -27,6 +27,7 @@ class TcHocPhiTransactionEditPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>STT</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngân hàng</th>
                     <th style={{ width: '30%', textAlign: 'right' }}>Mã hoá đơn</th>
                     <th style={{ width: '30%', textAlign: 'right' }}>Thời gian giao dịch</th>
                     <th style={{ width: '40%', textAlign: 'right' }}>Số tiền</th>
@@ -35,6 +36,7 @@ class TcHocPhiTransactionEditPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell style={{ textAlign: 'right' }} content={item.bank} />
                     <TableCell style={{ textAlign: 'right' }} content={item.billId} />
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'right' }} content={parseInt(item.transDate)} />
                     <TableCell style={{ textAlign: 'right' }} content={(item.amount?.toString() || '').numberWithCommas()} />
