@@ -113,7 +113,7 @@ module.exports = app => {
                 } else if (!hocPhi) {
                     res.send({ result_code: '025' });
                 } else {
-                    modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, amount, checksum, (error, result) => {
+                    modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum, (error, result) => {
                         if (error || !result || !result.outBinds || !result.outBinds.ret) {
                             res.send({ result_code: '096' });
                         } else {
