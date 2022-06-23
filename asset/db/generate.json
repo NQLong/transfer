@@ -13933,7 +13933,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 2000
                 },
                 "NAM_HOC": {
                     "value": "namHoc",
@@ -14148,8 +14148,8 @@
                     "nullable": false,
                     "size": "20,0"
                 },
-                "CONG_VAN": {
-                    "value": "congVan",
+                "FILE_CONG_VAN": {
+                    "value": "fileCongVan",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
