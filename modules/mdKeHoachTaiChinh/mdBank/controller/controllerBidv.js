@@ -5,9 +5,6 @@ module.exports = app => {
         SANDBOX: 'sandbox',
         PRODUCTION: 'production'
     };
-    // console.log(crypto.createHash('md5').update(`${secretCode}|${serviceId}|2156031059`).digest('hex'));
-    // console.log(crypto.createHash('md5').update(`${secretCode}|${1000}|20221000|1500000`).digest('hex'));
-
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
     // production
@@ -20,9 +17,12 @@ module.exports = app => {
         await getBill(types.SANDBOX, req, res);
     });
 
-    app.post('/api/test-md5', async (req, res) => {
-        const { secretCode, trans_id, bill_id, amount } = req.body;
-        res.send(crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex'));
+    app.post('/api/bidv-md5', async (req, res) => {
+        const { service_id, customer_id, secretCode, trans_id, bill_id, amount } = req.body;
+        res.send({
+            paybill: crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex'),
+            getbill: crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex')
+        });
     });
 
     const getBill = async (type, req, res) => {
@@ -43,13 +43,13 @@ module.exports = app => {
             res.send({ result_code: '007' });
         } else {
             const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
-            model.get({ namHoc, hocKy, mssv: customer_id }, (error, hocPhi) => {
+            model.get({ namHoc, hocKy, mssv: customer_id.toString() }, (error, hocPhi) => {
                 if (error) {
                     res.send({ result_code: '096' });
                 } else if (!hocPhi || hocPhi.congNo <= 0) {
                     res.send({ result_code: '025' });
                 } else {
-                    app.model.fwStudents.get({ mssv: customer_id }, (error, sinhVien) => {
+                    app.model.fwStudents.get({ mssv: customer_id.toString() }, (error, sinhVien) => {
                         if (error) {
                             res.send({ result_code: '096' });
                         } else if (!sinhVien) {
@@ -59,7 +59,7 @@ module.exports = app => {
                                 result_code: '000', result_desc: 'success',
                                 data: {
                                     service_id,
-                                    customer_id, customer_name: (sinhVien.ho + ' ' + sinhVien.ten).toUpperCase(), customer_addr: '',
+                                    customer_id: customer_id.toString(), customer_name: (sinhVien.ho + ' ' + sinhVien.ten).toUpperCase(), customer_addr: '',
                                     type: 0, matchAmount: hocPhi.congNo,
                                 },
                             });
