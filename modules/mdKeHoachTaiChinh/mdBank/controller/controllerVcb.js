@@ -154,7 +154,7 @@ module.exports = app => {
                             res.send({ context });
                         } else {
                             const modelHocPhi = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
-                            const modelHocPhiTransaction = type = types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
+                            const modelHocPhiTransaction = type === types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
                             const dataResponse = `${channelId}|${channelRefNumber}|${responseMsgId}|${secretCode}`,
                                 signature = crypto.createHash('md5').update(dataResponse).digest('hex');
                             modelHocPhi.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
