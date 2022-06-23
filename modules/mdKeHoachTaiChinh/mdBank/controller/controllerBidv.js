@@ -20,6 +20,11 @@ module.exports = app => {
         await getBill(types.SANDBOX, req, res);
     });
 
+    app.post('/api/test-md5', async (req, res) => {
+        const { secretCode, trans_id, bill_id, amount } = req.body;
+        res.send(crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex'));
+    });
+
     const getBill = async (type, req, res) => {
         let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeBidv, secretCodeBidvSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeBidv', 'secretCodeBidvSandbox');
         namHoc = Number(namHoc);
@@ -91,8 +96,9 @@ module.exports = app => {
         const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
         console.log('paybill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
+        console.log('mychecksum', myChecksum);
 
-        if (!(trans_id && trans_date && customer_id && bill_id && service_id && amount)) {
+        if (!(trans_id && trans_date && customer_id && bill_id && service_id && amount && checksum)) {
             res.send({ result_code: '145' });
         } else if (service_id != serviceId) {
             res.send({ result_code: '020' });
