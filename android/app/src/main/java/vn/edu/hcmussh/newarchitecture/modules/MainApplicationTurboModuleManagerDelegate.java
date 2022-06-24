@@ -1,4 +1,4 @@
-package com.hcmussh.newarchitecture.modules;
+package vn.edu.hcmussh.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

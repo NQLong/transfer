@@ -1,4 +1,4 @@
-package com.hcmussh.newarchitecture.components;
+package vn.edu.hcmussh.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;
