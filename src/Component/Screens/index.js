@@ -11,15 +11,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from 'react-native-paper';
 import Scan from './Scan';
 import HomeScreen from './HomeScreen';
+import DefaultTabScreen from './DefaultTabScreen';
 
 const TuyenSinh = createStackNavigator();
 
 const DefaultScreen: () => Node = ({ navigation, route }) => {
     const { colors } = useTheme();
     return (
-        <TuyenSinh.Navigator initialRouteName='Home' tabBarOptions={{ tabStyle: { height: 0 }, style: { backgroundColor: 'transparent' } }} screenOptions={{ headerShown: false, tabBarVisible: false }}>
+        <TuyenSinh.Navigator initialRouteName='Home' tabBarOptions={{ tabStyle: { height: 200 }, style: { backgroundColor: 'red' } }} screenOptions={{ headerShown: false, tabBarVisible: true }}>
             <TuyenSinh.Screen name='Home' component={HomeScreen} />
-            <TuyenSinh.Screen name='Scanner' component={Scan} />
+            <TuyenSinh.Screen name='TabScreen' component={DefaultTabScreen} />
         </TuyenSinh.Navigator>
     )
 }

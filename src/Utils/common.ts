@@ -4,6 +4,7 @@ import { Platform, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import CookieManager from '@react-native-cookies/cookies';
 import Config from '@/Config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const instance = axios.create({
     baseURL: Config.API_URL,
@@ -15,7 +16,9 @@ const instance = axios.create({
 });
 
 instance.interceptors.response.use(
-    (response) => response ? response.data : null,
+    (response) => {
+        return response ? response.data : null
+    },
     ({ message, response: { data, status } }) => {
         return Promise.reject({ message, data, status });
     }
@@ -61,15 +64,15 @@ const T: ({ [propName: string]: any }) = {
             await CookieManager.clearAll();
         }
     },
-    validateEmail: (email: string) : boolean => (/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i).test(String(email).toLowerCase()),
+    validateEmail: (email: string): boolean => (/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i).test(String(email).toLowerCase()),
     get: instance.get,
     post: instance.post,
     put: instance.put,
     delete: instance.delete,
-    alert: (title: string, message: string, buttons: any[] = [{ text: 'Ok' }]) : void => {
+    alert: (title: string, message: string, buttons: any[] = [{ text: 'Ok' }]): void => {
         Alert.alert(title, message, buttons);
     },
-    confirm: (title: string, message: string, dangerMode: boolean, action) : void => {
+    confirm: (title: string, message: string, dangerMode: boolean, action): void => {
         Alert.alert(title, message, [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -120,6 +123,98 @@ T.language.parse = (text, getAll?: boolean): string | object => {
     if (obj.en == null) obj.en = text;
     return getAll ? obj : obj[T.language()];
 };
+
+T.verifyToken = async (token, email = Config.DEBUG_EMAIL) => {
+    T.clearCookie();
+    const axiosInstance = axios.create({
+        baseURL: Config.API_URL,
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        timeout: 3000
+    });
+
+    axiosInstance.interceptors.response.use(
+        (response) => {
+            return response || null
+        },
+        ({ message, response: { data, status } }) => {
+            return Promise.reject({ message, data, status });
+        }
+    );
+    try {
+        const body = { idToken: token, email };
+        const response = await axiosInstance.post('/auth/signin', body);
+        console.log(response.headers['set-cookie']);
+        const cookies = response.headers['set-cookie'];
+        const siginInCookie = cookies.find(item => item.startsWith(Config.COOKIE_NAME));
+        console.log({ cookies, siginInCookie, data: response.data });
+        if (siginInCookie) {
+            await T.storage.set('siginInCookie', siginInCookie);
+            return true;
+        }
+    } catch (error) {
+        return false;
+    }
+
+};
+
+T.storage = {
+    get: async (key) => {
+        try {
+            const res = {}
+            res[key] = await AsyncStorage.getItem(key);
+            return res;
+        } catch (error) {
+            return null;
+        }
+    },
+
+    set: async (key, value) => {
+        try {
+            await AsyncStorage.setItem(key, value);
+            return true;
+        } catch (error) {
+            return null;
+        }
+    },
+
+    remove: async (key) => {
+        try {
+            await AsyncStorage.removeItem(key);
+            return true;
+        } catch (error) {
+            return null;
+        }
+    },
+
+    clear: async () => {
+        try {
+            await AsyncStorage.clear();
+            return true;
+        } catch (error) {
+            return null;
+
+        }
+
+    }
+};
+T.setCookie = async () => {
+    const data = await T.storage.get('siginInCookie');
+    if (data && data.cookie) {
+        console.log({ data })
+        CookieManager.setFromResponse(Config.API_URL, data.cookie);
+    }
+}
+
+T.hasCookie = async (key = Config.COOKIE_NAME) => {
+    const cookie = await CookieManager.get(Config.API_URL);
+    return cookie[key];
+}
+
+T.isDebug = Config.API_URL != 'https://hcmussh.edu.vn/';
+T.isDebug = false;
 
 // @ts-ignore
 String.prototype.viText = function () {
