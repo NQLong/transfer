@@ -138,7 +138,7 @@ class QtHopDongDvtlPage extends AdminPage {
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'justify' }} content={(
                             item.loaiHopDong != '07' ?
                                 <p>
-                                    <b style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'Hợp đồng')}</b><br />
+                                    <b style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong?.replace('Hợp đồng lao động', 'Hợp đồng') || ''}</b><br />
                                     <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.batDauLamViec ? new Date(item.batDauLamViec).ddmmyyyy() : ''}</span></span><br />
                                     <span style={{ whiteSpace: 'nowrap' }}>Đến ngày: <span style={{ color: 'blue' }}>{item.ketThucHopDong ? new Date(item.ketThucHopDong).ddmmyyyy() : ''}</span></span>
                                 </p> :
