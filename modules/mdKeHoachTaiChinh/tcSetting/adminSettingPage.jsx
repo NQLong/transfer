@@ -56,7 +56,8 @@ class AdminSettingsPage extends AdminPage {
                 <div className='col-md-6'>
                     <div className='tile'>
                         <h3 className='tile-title'>VNPAY</h3>
-                        <FormTextBox ref={e => this.vnp_TmnCode = e} label='Mã website' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.vnp_TmnCode = e} label='Mã VNPAY' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.vnp_TmnCodeAgribank = e} label='Mã AGRIBANK_VNPAY ' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_HashSecret = e} label='Secret key' type='password' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_Version = e} label='Version VNPay' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_Command = e} label='Mã lệnh (default: pay)' readOnly={readOnly} />
@@ -65,7 +66,7 @@ class AdminSettingsPage extends AdminPage {
                         <FormTextBox ref={e => this.vnpayQueryUrl = e} label='VNPAY query bill url' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_ReturnUrl = e} label='URL sau khi thanh toán thành công' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'vnpayUrl', 'vnpayQueryUrl')}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_TmnCode', 'vnp_TmnCodeAgribank', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'vnpayUrl', 'vnpayQueryUrl')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>
@@ -83,7 +84,7 @@ class AdminSettingsPage extends AdminPage {
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>
-                    </div> 
+                    </div>
                 </div>
                 <div className='col-md-6'>
                     <div className='tile'>
@@ -96,7 +97,7 @@ class AdminSettingsPage extends AdminPage {
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>
-                    </div> 
+                    </div>
                 </div>
             </div>,
         });

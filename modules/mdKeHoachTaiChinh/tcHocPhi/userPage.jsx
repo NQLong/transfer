@@ -17,10 +17,20 @@ class ThanhToanModal extends AdminModal {
         return this.renderModal({
             title: 'Phương thức thanh toán',
             body: <div className='row' >
-                <Tooltip title='Thanh toán qua VNPAY' arrow>
-                    <button className='btn btn-warning' style={{ width: '90%', margin: 'auto' }} onClick={e => {
+                <Tooltip title='Thanh toán bằng Agribank (thông qua VNPAY)' arrow placement='top'>
+                    <button className='btn' style={{ width: '90%', margin: 'auto', marginBottom: '20px' }} onClick={e => {
                         e.preventDefault();
-                        this.props.vnPayGoToTransaction(link => {
+                        this.props.vnPayGoToTransaction('agribank', link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src='/img/logo/agribank.svg' alt='Agribank' style={{ maxWidth: 80, marginRight: 20 }} /> Thanh toán bằng AGRIBANK
+                    </button>
+                </Tooltip>
+                <Tooltip title='Thanh toán bằng VNPAY' arrow>
+                    <button className='btn' style={{ width: '90%', margin: 'auto' }} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction('vnpay', link => {
                             window.location.href = link;
                         });
                     }}>
@@ -60,10 +70,9 @@ class UserPage extends AdminPage {
         const query = new URLSearchParams(this.props.location.search);
         if (query) {
             const vnp_TransactionStatus = query.get('vnp_TransactionStatus');
-            if (vnp_TransactionStatus && vnp_TransactionStatus == '00') {
-                T.alert('Thanh toán thành công', 'success', false, 2000);
-                // window.location = '/user/hoc-phi';
-                //TODO: Email SMS
+            if (vnp_TransactionStatus) {
+                vnp_TransactionStatus == '00' ? T.alert('Thanh toán thành công', 'success', false) : T.alert('Thanh toán thất bại', 'error', false);
+                window.history.pushState('', '', '/user/hoc-phi');
             }
         }
 

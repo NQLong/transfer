@@ -20,9 +20,11 @@ module.exports = app => {
     }
 
 
-    app.get('/api/vnpay/start-thanh-toan', app.permission.check('student:login'), async (req, res) => {
+    app.get('/api/vnpay/start-thanh-toan/:bank', app.permission.check('student:login'), async (req, res) => {
         try {
             const student = req.session.user;
+            const bank = req.params.bank;
+            if (!bank || !['vnpay', 'agribank'].includes(bank)) throw 'Permission reject!';
             if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
             const mssv = student.data.mssv;
             const ipAddr = req.headers['x-forwarded-for'] ||
@@ -30,7 +32,7 @@ module.exports = app => {
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
 
-            const { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl');
+            let { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl, vnp_TmnCodeAgribank } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl', 'vnp_TmnCodeAgribank');
 
             const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
             let { congNo } = dataHocPhi;
@@ -41,6 +43,7 @@ module.exports = app => {
                 vnp_TxnRef = `${mssv}_${vnp_CreateDate}`;
 
             const vnp_Amount = congNo * 100;
+            vnp_TmnCode = bank == 'vnpay' ? vnp_TmnCode : vnp_TmnCodeAgribank;
             let params = { vnp_Version, vnp_Command, vnp_TmnCode, vnp_Locale, vnp_CurrCode, vnp_TxnRef, vnp_OrderInfo, vnp_Amount, vnp_ReturnUrl, vnp_IpAddr, vnp_CreateDate };
             params = sortObject(params);
 
@@ -117,27 +120,13 @@ module.exports = app => {
             if (secureHash === vnp_SecureHash) {
                 if (vnp_TransactionStatus == '00') {
                     await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
-                    let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiSmsDong', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
-                    [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
-                        .replaceAll('{hoc_ky}', hocKy)
-                        .replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
-                        .replaceAll('{mssv}', mssv)
-                        .replaceAll('{time}', app.date.viDateFormat(app.date.fullFormatToDate(vnp_PayDate)))
-                        .replaceAll('{tc_address}', tcAddress)
-                        .replaceAll('{tc_phone}', tcPhone)
-                        .replaceAll('{tc_email}', tcEmail)
-                        .replaceAll('{amount}', vnp_Amount.toString().numberWithCommas())
-                        .replaceAll('{support_phone}', tcSupportPhone) || '');
-                    app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
 
-                    console.log(hocPhiSmsDong);
-                    await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
+                    await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, vnp_Amount, vnp_PayDate });
 
                     res.send({ RspCode: '00', Message: 'Confirm Success' });
                 } else {
                     res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });
                 }
-
             } else {
                 res.send({ RspCode: '97', Message: 'Invalid Checksum' });
             }

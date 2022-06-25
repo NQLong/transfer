@@ -123,9 +123,9 @@ export function getTcHocPhiHuongDan(done) {
     };
 }
 
-export function vnPayGoToTransaction(done) {
+export function vnPayGoToTransaction(bank, done) {
     return () => {
-        T.get('/api/vnpay/start-thanh-toan', (result) => {
+        T.get(`/api/vnpay/start-thanh-toan/${bank}`, (result) => {
             if (result.error) {
                 T.notify('Thanh toán bằng VNPAY thất bại!', 'danger');
                 console.error(result.error);
