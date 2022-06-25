@@ -107,21 +107,15 @@ module.exports = app => {
         } else {
             const modelHocPhi = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
             const modelHocPhiTransaction = type === types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
-            modelHocPhi.get({ namHoc, hocKy, mssv: customer_id }, (error, hocPhi) => {
-                if (error) {
-                    res.send({ result_code: '096' });
-                } else if (!hocPhi) {
-                    res.send({ result_code: '025' });
-                } else {
-                    modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum, (error, result) => {
-                        if (error || !result || !result.outBinds || !result.outBinds.ret) {
-                            res.send({ result_code: '096' });
-                        } else {
-                            res.send({ result_code: '000', result_desc: 'success' });
-                        }
-                    });
-                }
-            });
+            let hocPhi = modelHocPhi.get({ namHoc, hocKy, mssv: customer_id });
+            if (!hocPhi) {
+                res.send({ result_code: '025' });
+            } else {
+                let student = await app.model.fwStudents.get({ mssv: customer_id });
+                await modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum);
+                await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
+                res.send({ result_code: '000', result_desc: 'success' });
+            }
         }
     };
 };
