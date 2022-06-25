@@ -1,6 +1,6 @@
 import T from '@/Utils/common';
 import crypto from 'crypto-js';
-
+import { GoogleSignin, } from '@react-native-google-signin/google-signin';
 
 export const login = async (data) => {
     let string = `${data.cmnd}|${data.secretCode}`.replace(/\s +/g, '');
@@ -8,6 +8,20 @@ export const login = async (data) => {
     const response = await T.post('/api/sign-in-app', { data, checksum });
     return response;
 }
+
+export const googleSignin = async () => {
+    try {
+        await GoogleSignin.hasPlayServices();
+        const userInfo = await GoogleSignin.signIn();
+        return userInfo;
+    } catch (error) {
+        console.error(error);
+        alert('Đăng nhập thất bại');
+    }
+}
+
+
+
 
 export const checkQr = async (settings, data) => {
     if (settings.user) {
@@ -34,6 +48,21 @@ export const updateHoSo = async (settings, data, hopLe, notLatest) => {
 
 }
 
+export function getState(done) {
+    return dispatch => {
+        const url = '/api/state'
+        T.get(url).then(res => {
+            if (res.error) {
+                alert('Lấy thông tin hệ thống thất bại');
+                console.error('GET: ', url, res.error);
+            } else
+                dispatch({ type: 'system:UpdateState', state: res });
+                done && done();
+        }).catch(() => {
+            alert('Lấy thông tin hệ thống thất bại')
+        })
+    }
+}
 // Reducer ===================================================================================================
 export default function settingReducer(state = {}, data) {
     switch (data.type) {

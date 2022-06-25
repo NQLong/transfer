@@ -7,7 +7,9 @@ import Reactotron from 'reactotron-react-native';
 // import news from './news';
 // import daiHoi from './daiHoi';
 import settings from './settings';
-const reducers = combineReducers({ settings });
+import hcthCongVanDen from '@/Component/Screens/hcth/hcthCongVanDen/redux';
+
+const reducers = combineReducers({ settings, hcthCongVanDen });
 
 const persistConfig = {
     key: 'root',
