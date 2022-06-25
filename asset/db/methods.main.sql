@@ -4075,14 +4075,12 @@ BEGIN
     OPEN my_cursor FOR
         SELECT *
         FROM (SELECT cvtk.ID           as "id",
-                     cvtk.CONG_VAN     as "congVanId",
+                     cvtk.FILE_CONG_VAN     as "congVanId",
                      cvtk.NGUOI_TAO    as "nguoiTao",
                      cvtk.THOI_GIAN    as "thoiGian",
                      cbt.HO            as "hoNguoiTao",
                      cbt.TEN           as "tenNguoiTao",
-                     cvd.TRICH_YEU     as "trichYeu",
-                     cvd.SO_CONG_VAN   as "soCongVan",
-                     cvd.LOAI_CONG_VAN as "loaiCongVan",
+
 
                      (SELECT LISTAGG(
                                      CASE
@@ -4104,7 +4102,7 @@ BEGIN
                          )                R
               FROM HCTH_CONG_VAN_TRINH_KY cvtk
                        LEFT JOIN TCHC_CAN_BO cbt on cbt.SHCC = cvtk.NGUOI_TAO
-                       LEFT JOIN HCTH_CONG_VAN_DI cvd on cvd.id = cvtk.CONG_VAN
+                       LEFT JOIN HCTH_FILE hcthfile on hcthfile.LOAI='DI' and hcthfile.ID = cvtk.FILE_CONG_VAN
               WHERE
 -- check if user is related to congVanTrinhKy
 (
@@ -14627,6 +14625,7 @@ BEGIN
                      CB.DANH_HIEU                                               AS "danhHieu",
                      CB.DANG_VIEN                                               AS "dangVien",
                      CB.GHI_CHU                                                 AS "ghiChuStaff",
+                     CB.LAST_MODIFIED                                           as "lastModified",
                      (SELECT DMCV.TEN
                       FROM QT_CHUC_VU QTCV
                                LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = QTCV.MA_CHUC_VU
@@ -15057,11 +15056,16 @@ BEGIN
                staff.CMND_NGAY_CAP                                    as "ngayCapCmnd",
                staff.CMND_NOI_CAP                                     as "noiCapCmnd",
                staff.SO_BHXH                                          as "soBaoHiemXaHoi",
-               (select rtrim(xmlagg(xmlelement(e, daoTao.CHUYEN_NGANH, ' - ', daoTao.TRINH_DO, ', ').extract('//text()') order by
+               chucDanh.TEN                                           AS "chucDanh",
+               staff.NAM_CHUC_DANH                                    AS "namChucDanh",
+
+               (select rtrim(xmlagg(xmlelement(e, daoTao.CHUYEN_NGANH, ' - ', daoTao.TRINH_DO, ', ').extract('//text()')
+                                    order by
                                     null).getclobval(), ', ')
                 FROM QT_DAO_TAO daoTao
-                 LEFT JOIN DM_BANG_DAO_TAO bdt on daoTao.LOAI_BANG_CAP = bdt.MA
-                WHERE daoTao.SHCC = mtcb AND daoTao.LOAI_BANG_CAP = 5)       AS "ngoaiNgu"
+                         LEFT JOIN DM_BANG_DAO_TAO bdt on daoTao.LOAI_BANG_CAP = bdt.MA
+                WHERE daoTao.SHCC = mtcb
+                  AND daoTao.LOAI_BANG_CAP = 5)                       AS "ngoaiNgu"
         FROM TCHC_CAN_BO STAFF
                  LEFT JOIN DM_PHUONG_XA xaNoiSinh
                            ON STAFF.MA_XA_NOI_SINH = xaNoiSinh.MA_PHUONG_XA
@@ -15081,22 +15085,21 @@ BEGIN
                  LEFT JOIN DM_NGACH_CDNN ngach ON ngach.MA = staff.NGACH
                  left join DM_TRINH_DO hocVi ON hocVi.MA = staff.HOC_VI
                  LEFT JOIN DM_NHOM_MAU nhomMau ON nhomMau.MA = staff.NHOM_MAU
+                 LEFT JOIN DM_CHUC_DANH_KHOA_HOC chucDanh ON chucDanh.MA = staff.CHUC_DANH
+
         WHERE STAFF.SHCC = mtcb;
 
     OPEN QT_CHUC_VU FOR
         SELECT DM_DON_VI.TEN      AS "donVi",
                DM_CHUC_VU.TEN     AS "chucVu",
-               DM_CHUC_VU.PHU_CAP as "phuCapChucVu"
-        FROM (SELECT MAX(cv1.NGAY_RA_QD) AS maxNgayRaQD
-              FROM QT_CHUC_VU cv1
-              WHERE cv1.SHCC = mtcb
-                AND cv1.CHUC_VU_CHINH = 1
-              GROUP BY cv1.SHCC) cvMax
-                 INNER JOIN QT_CHUC_VU cv ON cv.NGAY_RA_QD = cvMax.maxNgayRaQD
+               DM_CHUC_VU.PHU_CAP as "phuCapChucVu",
+               cv.CHUC_VU_CHINH   AS "chucVuChinh"
+        FROM QT_CHUC_VU cv
                  LEFT JOIN DM_CHUC_VU ON DM_CHUC_VU.MA = CV.MA_CHUC_VU
                  LEFT JOIN DM_DON_VI ON DM_DON_VI.MA = CV.MA_DON_VI
                  LEFT JOIN DM_BO_MON ON DM_BO_MON.MA = CV.MA_BO_MON
-        WHERE cv.SHCC = mtcb;
+        WHERE cv.SHCC = mtcb
+          and cv.THOI_CHUC_VU = 0;
 
     OPEN QUAN_HE_GIA_DINH FOR
         SELECT quanhe.HO_TEN       AS "hoTen",
@@ -15142,7 +15145,8 @@ BEGIN
                  LEFT JOIN DM_BANG_DAO_TAO bdt on qtdt.LOAI_BANG_CAP = bdt.MA
                  LEFT JOIN DM_HINH_THUC_DAO_TAO htdt on qtdt.HINH_THUC = htdt.MA
                  LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TDDT.MA = qtdt.TRINH_DO
-        where qtdt.SHCC = mtcb AND qtdt.KET_THUC != -1;
+        where qtdt.SHCC = mtcb
+          AND qtdt.KET_THUC != -1;
 
     return CAN_BO;
 END;
