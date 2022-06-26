@@ -3,6 +3,8 @@ import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TcHocPhiGetPage = 'TcHocPhi:GetPage';
+const TcHocPhiGet = 'TcHocPhi:Get';
+
 const TcHocPhiUpdate = 'TcHocPhi:Update';
 const TcHocPhiGetHuongDan = 'TcHocPhi:GetHuongDan';
 
@@ -10,6 +12,8 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
     switch (data.type) {
         case TcHocPhiGetPage:
             return Object.assign({}, state, { page: data.page });
+        case TcHocPhiGet:
+            return Object.assign({}, state, { data: data.result });
         case TcHocPhiGetHuongDan:
             return Object.assign({}, state, { hocPhiHuongDan: data.result });
         case TcHocPhiUpdate:
@@ -118,6 +122,20 @@ export function getTcHocPhiHuongDan(done) {
             else {
                 dispatch({ type: TcHocPhiGetHuongDan, result: result?.hocPhiHuongDan });
                 done && done(result);
+            }
+        });
+    };
+}
+
+export function getHocPhi(mssv) {
+    return dispatch => {
+        const url = '/api/finance/user/hoc-phi';
+        T.get(url, { mssv }, result => {
+            if (result.error) {
+                T.notify('Lỗi khi lấy thông tin học phí!', 'danger');
+                console.error(result.error);
+            } else {
+                dispatch({ type: TcHocPhiGet, result });
             }
         });
     };
