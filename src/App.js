@@ -44,7 +44,8 @@ const App: () => Node = () => {
       background: '#ffffff',
       text: '#000000',
       accent: '#f1c40f',
-      error: '#dc3545'
+      error: '#dc3545',
+      white: 'white',
     }
   };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import CongVanDen from './hcth/hcthCongVanDen/CongVanDen';
+import CongVanDenPage from './hcth/hcthCongVanDen/CongVanDenPage';
 import User from './User';
 import { useTheme } from 'react-native-paper';
 
@@ -16,16 +16,19 @@ export default DefaultScreenTabs = ({ navigation }) => {
 
     return (
         <Tab.Navigator
-            initialRouteName="congVanDen"
+            initialRouteName="congVanDenPage"
             screenOptions={{
                 tabBarActiveTintColor: colors.primary,
+                headerStyle: {backgroundColor: colors.primary},
+                headerTitleStyle: {color: colors.white}
             }}
         >
             <Tab.Screen
-                name="congVanDen"
-                component={CongVanDen}
+                name="congVanDenPage"
+                component={CongVanDenPage}
                 options={{
                     headerTitle: 'Công văn đến',
+                    tabBarLabel: 'Công văn đến',
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="document-text-outline" color={color} size={size} />
                     ),
@@ -36,6 +39,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
                 component={User}
                 options={{
                     headerTitle: 'Trang cá nhân',
+                    tabBarLabel: 'Trang cá nhân',
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person-circle-outline" color={color} size={size} />
                     ),
