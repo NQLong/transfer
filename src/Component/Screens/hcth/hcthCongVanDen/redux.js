@@ -23,6 +23,7 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
     }
     return dispatch => {
         const url = `/api/hcth/cong-van-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
+        dispatch({ type: HcthCongVanDenSearchPage, page: null });
         T.get(url).then(data => {
             if (data.error) {
                 T.alert('Công văn đến', 'Lấy danh sách công văn đến bị lỗi');
@@ -57,6 +58,6 @@ export function getCongVanDen(id, context, done) {
                 dispatch({ type: HcthCongVanDenGet, item: data.item });
                 done && done(data.item);
             }
-        }).catch(() => T.alert('Công văn đến', 'Xóa file đính kèm bị lỗi!'));
+        }).catch(() => T.alert('Công văn đến', 'Lấy công văn đến bị lỗi!'));
     };
 };

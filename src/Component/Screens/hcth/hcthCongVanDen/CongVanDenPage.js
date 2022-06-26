@@ -1,5 +1,5 @@
 import T from '@/Utils/common';
-import { renderScrollView, Seperator } from '@/Utils/componennt';
+import { renderScrollView, Separator } from '@/Utils/componennt';
 import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,7 +39,7 @@ const CongVanDenPage = ({ navigation }) => {
                         <Text style={{ color: '#333333', }}>Số CV: {item.soCongVan || 'Chưa có'}</Text>
                         <Text style={{ color: '#333333', }}>{item.ngayNhan && T.dateToText(new Date(item.ngayNhan))}</Text>
                     </View>
-                    <Seperator height={1} style={{ marginTop: 5, marginBottom: 5 }} />
+                    <Separator height={1} style={{ marginTop: 5, marginBottom: 5 }} />
                     <View>
                         <Text style={{ color: '#333333', }}>{item.trichYeu}</Text>
                     </View>
