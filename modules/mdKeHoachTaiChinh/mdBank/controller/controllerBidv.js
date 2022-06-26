@@ -9,18 +9,28 @@ module.exports = app => {
 
     // production
     app.post('/api/bidv-nvxhhcm/getbill', async (req, res) => {
-        await getBill(types.PRODUCTION, req, res);
+        try {
+            await getBill(types.PRODUCTION, req, res);
+        } catch (error) {
+            console.error('GET BILL BIDV: ', error);
+            res.send({ result_code: '096' });
+        }
     });
 
-    // sanbox
+    // sandbox
     app.post('/api/bidv-nvxhhcm/sandbox/getbill', async (req, res) => {
-        await getBill(types.SANDBOX, req, res);
+        try {
+            await getBill(types.SANDBOX, req, res);
+        } catch (error) {
+            console.error('GET BILL BIDV: ', error);
+            res.send({ result_code: '096' });
+        }
     });
 
     app.post('/api/bidv-md5', async (req, res) => {
         const { service_id, customer_id, secretCode, trans_id, bill_id, amount } = req.body;
         res.send({
-            paybill: crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex'),
+            payBill: crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex'),
             getbill: crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex')
         });
     });
@@ -43,59 +53,52 @@ module.exports = app => {
             res.send({ result_code: '007' });
         } else {
             const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
-            model.get({ namHoc, hocKy, mssv: customer_id.toString() }, (error, hocPhi) => {
-                if (error) {
-                    res.send({ result_code: '096' });
-                } else if (!hocPhi || hocPhi.congNo <= 0) {
-                    res.send({ result_code: '025' });
-                } else {
-                    app.model.fwStudents.get({ mssv: customer_id.toString() }, (error, sinhVien) => {
-                        if (error) {
-                            res.send({ result_code: '096' });
-                        } else if (!sinhVien) {
-                            res.send({ result_code: '017' });
-                        } else {
-                            res.send({
-                                result_code: '000', result_desc: 'success',
-                                data: {
-                                    service_id,
-                                    customer_id: customer_id.toString(), customer_name: (sinhVien.ho + ' ' + sinhVien.ten).toUpperCase(), customer_addr: '',
-                                    type: 0, matchAmount: hocPhi.congNo,
-                                },
-                            });
-                        }
+            const hocPhi = await model.get({ namHoc, hocKy, mssv: customer_id.toString() });
+            if (!hocPhi) res.send({ result_code: '001' });
+            else if (hocPhi.congNo <= 0) res.send({ result_code: '025' });
+            else {
+                let student = await app.model.fwStudents.get({ mssv: customer_id.toString() });
+                if (!student) res.send({ result_code: '017' });
+                else {
+                    res.send({
+                        result_code: '000', result_desc: 'success',
+                        data: {
+                            service_id,
+                            customer_id: customer_id.toString(), customer_name: (student.ho + ' ' + student.ten).toUpperCase(), customer_addr: '',
+                            type: 0, matchAmount: hocPhi.congNo,
+                        },
                     });
                 }
-            });
+            }
         }
     };
 
     // production
-    app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
+    app.post('/api/bidv-nvxhhcm/payBill', async (req, res) => {
         try {
-            await paybill(types.PRODUCTION, req, res);
+            await payBill(types.PRODUCTION, req, res);
         } catch (error) {
             res.send({ result_code: '096' });
         }
     });
 
     // sandbox
-    app.post('/api/bidv-nvxhhcm/sandbox/paybill', async (req, res) => {
+    app.post('/api/bidv-nvxhhcm/sandbox/payBill', async (req, res) => {
         try {
-            await paybill(types.SANDBOX, req, res);
+            await payBill(types.SANDBOX, req, res);
         } catch (error) {
             res.send({ result_code: '096' });
         }
     });
 
-    const paybill = async (type, req, res) => {
+    const payBill = async (type, req, res) => {
         let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeBidv, secretCodeBidvSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeBidv', 'secretCodeBidvSandbox');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
         const secretCode = type === types.PRODUCTION ? secretCodeBidv : secretCodeBidvSandbox;
         const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
-        console.log('paybill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
+        console.log('payBill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
         console.log('mychecksum', myChecksum);
 
         if (!(trans_id && trans_date && customer_id && bill_id && service_id && amount && checksum)) {
@@ -107,7 +110,7 @@ module.exports = app => {
         } else {
             const modelHocPhi = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
             const modelHocPhiTransaction = type === types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
-            let hocPhi = modelHocPhi.get({ namHoc, hocKy, mssv: customer_id });
+            let hocPhi = await modelHocPhi.get({ namHoc, hocKy, mssv: customer_id });
             if (!hocPhi) {
                 res.send({ result_code: '025' });
             } else {
