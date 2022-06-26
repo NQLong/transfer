@@ -444,7 +444,7 @@ module.exports = (app) => {
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi || [],
+                    phanHoi: phanHoi?.rows || [],
                     donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     danhSachChiDao: chiDao?.rows || [],
