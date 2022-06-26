@@ -101,7 +101,7 @@ module.exports = app => {
                 if (!student) res.send({ result_code: '017' });
                 else {
                     await modelTransaction.addBill(namHoc, hocKy, 'AGRI', `AGRI-${trans_id}`, app.date.fullFormatToDate(trans_date), customer_id, bill_id, service_id, amount, checksum);
-                    await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
+                    // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
                     res.send({ result_code: '000', result_desc: 'success' });
                 }
             }

@@ -1,7 +1,7 @@
 module.exports = app => {
     const serviceIdVcb = 'EDU';
     const providerIdVcb = 'NVAN';
-    const dateFormat = require('dateformat');
+    // const dateFormat = require('dateformat');
 
     const crypto = require('crypto');
     const types = {
@@ -165,8 +165,8 @@ module.exports = app => {
                                 context.errorCode = 21;
                                 res.send({ context, signature });
                             } else {
-                                const hocPhi = modelHocPhi.get({ namHoc, hocKy, mssv: customerCode }),
-                                    student = app.model.fwStudents.get({ mssv: customerCode });
+                                const hocPhi = modelHocPhi.get({ namHoc, hocKy, mssv: customerCode });
+                                // student = app.model.fwStudents.get({ mssv: customerCode });
                                 if (!hocPhi) {
                                     context.status = 'FAILURE';
                                     context.errorCode = 17;
@@ -205,7 +205,7 @@ module.exports = app => {
                                     }
                                     context.status = 'SUCCESS';
                                     if (!billResult.length) {
-                                        await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: totalPaymentAmount, payDate: dateFormat(new Date(requestDateTime, 'yyyymmddHHmmss')) });
+                                        // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: totalPaymentAmount, payDate: dateFormat(new Date(requestDateTime, 'yyyymmddHHmmss')) });
                                     }
                                     return res.send({
                                         context,
