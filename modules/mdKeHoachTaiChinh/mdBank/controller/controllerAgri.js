@@ -74,6 +74,7 @@ module.exports = app => {
         try {
             await payBill(types.SANDBOX, req, res);
         } catch (error) {
+            console.error(error);
             res.send({ result_code: '096' });
         }
     });
@@ -100,7 +101,7 @@ module.exports = app => {
                 const student = await app.model.fwStudents.get({ mssv: customer_id.toString() });
                 if (!student) res.send({ result_code: '017' });
                 else {
-                    await modelTransaction.addBill(namHoc, hocKy, 'AGRI', `AGRI-${trans_id}`, app.date.fullFormatToDate(trans_date), customer_id, bill_id, service_id, amount, checksum);
+                    await modelTransaction.addBill(namHoc, hocKy, 'AGRI', `AGRI-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, amount, checksum);
                     // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
                     res.send({ result_code: '000', result_desc: 'success' });
                 }
