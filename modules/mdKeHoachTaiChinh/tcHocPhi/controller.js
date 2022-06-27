@@ -56,7 +56,7 @@ module.exports = app => {
             let sinhVien = await app.model.fwStudents.get({ mssv });
             if (!sinhVien) throw 'Not found student!';
             else {
-                const items = app.model.tcHocPhiTransaction.getAll({
+                const items = await app.model.tcHocPhiTransaction.getAll({
                     customerId: mssv, hocKy, namHoc
                 });
                 res.send({ items, sinhVien, hocKy, namHoc });
