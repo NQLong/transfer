@@ -12,7 +12,7 @@ class DaoTaoDetail extends AdminPage {
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa quá trình đào tạo, bồi dưỡng', 'Bạn muốn gửi yêu cầu xóa quá trình đào tạo, bồi dưỡng này?', 'warning', false, isConfirm => {
-            isConfirm && this.props.createTccbSupport(item, { qtId: item.id, type: 'delete', qt: 'qtDaoTao' });
+            isConfirm && this.props.createTccbSupport(item, {}, { qtId: item.id, type: 'delete', qt: 'qtDaoTao' });
         });
     }
     render = () => {
