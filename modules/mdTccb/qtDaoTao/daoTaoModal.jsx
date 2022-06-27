@@ -35,7 +35,6 @@ export class DaoTaoModal extends AdminModal {
     }
 
     onShow = (data) => {
-        console.log(data);
         //data for adminPage, daoTaoDetail: data: { item: }
         //data for support: data: { data: {}, qtId }
         let item = data?.item || data?.data || null;
@@ -202,7 +201,6 @@ export class DaoTaoModal extends AdminModal {
     }
 
     render = () => {
-        console.log(this.props.isSupport, this.state.type);
         let readOnly = this.props.readOnly || this.props.isSupport;
         const displayElement = this.state.loaiBangCap ? 'block' : 'none';
         return this.renderModal({
