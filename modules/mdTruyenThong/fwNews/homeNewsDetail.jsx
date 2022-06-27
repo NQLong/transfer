@@ -10,7 +10,7 @@ const texts = {
     en: {
         attachments: 'Attachment files:',
     }
-}
+};
 
 class NewsDetail extends React.Component {
     constructor (props) {
