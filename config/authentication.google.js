@@ -83,7 +83,7 @@ module.exports = (app) => {
         return payload;
     };
 
-    app.post('/auth/signin', async (req, res) => {
+    app.post('/auth/mobile/signin', async (req, res) => {
         try {
             const { idToken, email } = req.body;
             let userEmail = '';
