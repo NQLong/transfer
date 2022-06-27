@@ -1,17 +1,11 @@
 import { Tooltip } from '@mui/material';
+
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
-import Pagination from 'view/component/Pagination';
+import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
+
 import T from 'view/js/common';
-import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction } from './redux';
-
-const yearDatas = () => {
-    return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
-};
-
-const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
-
+import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi } from './redux';
 class ThanhToanModal extends AdminModal {
     render = () => {
         return this.renderModal({
@@ -77,85 +71,85 @@ class UserPage extends AdminPage {
         }
 
         T.ready('/user', () => {
-            this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
-                const { settings: { namHoc, hocKy } } = data;
-                this.year.value(namHoc);
-                this.term.value(hocKy);
-            });
+            // this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
+            //     const { settings: { namHoc, hocKy } } = data;
+            //     this.year.value(namHoc);
+            //     this.term.value(hocKy);
+            //     this.setState({ namHoc, hocKy });
+            // });
+            this.props.getHocPhi();
             this.props.getTcHocPhiHuongDan();
         });
     }
 
     render() {
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
-            pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
-        };
+        const user = this.props.system.user,
+            tcHocPhi = this.props.tcHocPhi || {},
+            { hocPhi, hocPhiDetail } = tcHocPhi.data || {};
         const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
+        const style = (width = 'auto', textAlign = 'left') => ({ width, textAlign, whiteSpace: 'nowrap', backgroundColor: '#1b489f', color: '#fff' });
         let table = renderTable({
             emptyTable: 'Không có dữ liệu học phí',
-            stickyHead: true,
             header: 'thead-light',
-            style: { marginTop: 16 },
-            getDataSource: () => list,
+            getDataSource: () => hocPhiDetail,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Học kỳ</th>
-                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>MSSV</th>
-                    <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Họ và tên</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Công nợ (vnđ)</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                    <th style={style()}>STT</th>
+                    {/* <th style={style('10%', 'right')}>Chọn thanh toán</th> */}
+                    <th style={style('70%')}>Môn học</th>
+                    <th style={style('10%', 'right')}>Số tín chỉ</th>
+                    <th style={style('20%', 'right')}>Thành tiền</th>
+
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK${item.hocKy}`} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
-                        item.congNo ? <Tooltip title='Thanh toán' arrow>
-                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
-                                <i className='fa fa-lg fa-usd ' />
-                            </button>
-                        </Tooltip> : null
-                    } />
-
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    {/* {item.active ? <TableCell type='checkbox' content={item.active || ''} /> : <TableCell content='Đã thanh toán' style={{ textAlign: 'center' }} />} */}
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc} - ${item.tenMonHoc}`} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.soTinChi} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${(item.soTien?.toString() || '').numberWithCommas()} vnđ`} />
                 </tr>
             )
         });
         return this.renderPage({
             title: 'Học phí',
+            subTitle: <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a>,
             icon: 'fa fa-money',
-            header: <><FormSelect ref={e => this.year = e} style={{ width: '100px', marginBottom: '0', marginRight: 10 }} placeholder='Năm học' data={yearDatas()} onChange={
-                value => this.props.getTcHocPhiPage(undefined, undefined, {
-                    searchTerm: '',
-                    settings: { namHoc: value && value.id, hocKy: this.term.value() }
-                })
-            } /><FormSelect ref={e => this.term = e} style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' data={termDatas} onChange={
-                value => this.props.getTcHocPhiPage(undefined, undefined, {
-                    searchTerm: '',
-                    settings: { namHoc: this.year.value(), hocKy: value && value.id }
-                })
-            } /></>,
             breadcrumb: ['Học phí'],
             backRoute: '/user',
-            content: <div className='tile'>
-                <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a><br />
+            content: hocPhi ? <div className='tile'>
+                <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
+                <div style={{ textAlign: 'left' }}>
+                    <b style={{ fontSize: '18px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
+                    MSSV: <span>{user ? user.data.mssv : ''}</span><br />
+                    Khoa/Bộ môn: <span>{user ? user.data.tenKhoa : ''}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <span style={{ fontSize: '18px' }}>Học phí học kỳ {hocPhi.hocKy || ''}, năm học {hocPhi.namHoc ? `${hocPhi.namHoc} - ${Number(hocPhi.namHoc) + 1}` : ''} </span>
+                    <Tooltip title='Thanh toán' placement='top' arrow>
+                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                            Thanh toán
+                        </button>
+                    </Tooltip>
+                </div>
+
+                <div className='tile-footer' style={{ marginBottom: '0' }} />
                 {table}
-                <Pagination getPage={this.props.getTcHocPhiPage} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} style={{ marginLeft: '70px' }} />
+                <div className='tile-footer' style={{ textAlign: 'right' }}>
+                    <p>Tổng học phí: <b>{hocPhi.hocPhi.toString().numberWithCommas()} vnđ </b></p>
+                </div>
+
                 <Modal ref={e => this.modal = e} />
                 <ThanhToanModal ref={e => this.thanhToanModal = e} vnPayGoToTransaction={this.props.vnPayGoToTransaction} />
-            </div>
+            </div> : loadSpinner()
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);
