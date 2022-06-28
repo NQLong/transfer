@@ -163,10 +163,10 @@ module.exports = (app) => {
     app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
-            app.model.hcthCongVanDen.get({ id: req.body.id }, async (error, congVan) => {
+            await app.model.hcthCongVanDen.get({ id: req.body.id }, async (error, congVan) => {
                 if (error) throw error;
                 else {
-                    app.model.hcthCongVanDen.update({ id: req.body.id }, changes, async (errors, item) => {
+                    await app.model.hcthCongVanDen.update({ id: req.body.id }, changes, async (errors, item) => {
                         if (errors)
                             res.send({ errors, item });
                         else {
@@ -675,9 +675,9 @@ module.exports = (app) => {
         });
     });
 
-    const sendChiDaoCongVanDenMailToRectors = (item) => {
+    const sendChiDaoCongVanDenMailToRectors = async (item) => {
         const canBoChiDao = item.quyenChiDao?.split(',') || [];
-        app.model.canBo.getAll({
+        await app.model.canBo.getAll({
             statement: 'shcc IN (:dsCanBo)',
             parameter: {
                 dsCanBo: [...canBoChiDao, ''],
@@ -694,11 +694,11 @@ module.exports = (app) => {
                         if (error) throw (error);
                     });
                 } else {
-                    canBos.map(canBo => new Promise(() => { 
+                    canBos.map(canBo => {
                         app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => { 
                             if (error) throw (error); 
                         }); 
-                    }));
+                    });
                 }
             }
         });
