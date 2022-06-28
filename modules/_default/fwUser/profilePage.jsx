@@ -28,6 +28,9 @@ class ProfileCanBo extends AdminPage {
                 <>
                     {this.state.isLoad && <Loading />}
                     <ProfileCommon ref={e => this.profileCommon = e} />
+                    <div className='tile'>
+
+                    </div>
                 </>,
         });
     }
