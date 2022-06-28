@@ -181,7 +181,7 @@ export function getCongVanDen(id, context, done) {
                 dispatch({ type: HcthCongVanDenGet, item: data.item });
                 done && done(data.item);
             }
-        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy công văn đến bị lỗi!', 'danger'));
     };
 }
 

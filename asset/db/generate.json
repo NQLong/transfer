@@ -6660,7 +6660,8 @@
                 "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
                 "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
-                "hcth_cong_van_di_search_selector": "searchSelector"
+                "hcth_cong_van_di_search_selector": "searchSelector",
+                "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
@@ -13932,7 +13933,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 2000
                 },
                 "NAM_HOC": {
                     "value": "namHoc",
@@ -13948,8 +13949,8 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "IS_SUCCESS": {
-                    "value": "isSuccess",
+                "STATUS": {
+                    "value": "status",
                     "dataType": "NUMBER",
                     "dataDefault": "1",
                     "nullable": true,
@@ -14117,6 +14118,413 @@
             "primaryKeys": [
                 "EMAIL",
                 "SENT_DATE"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_CONG_VAN_TRINH_KY": {
+            "active": true,
+            "moduleName": "hcthCongVanTrinhKy",
+            "modelName": "hcthCongVanTrinhKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_134309\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "THOI_GIAN": {
+                    "value": "thoiGian",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                },
+                "FILE_CONG_VAN": {
+                    "value": "fileCongVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_CAN_BO_KY": {
+            "active": true,
+            "moduleName": "hcthCanBoKy",
+            "modelName": "hcthCanBoKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_134312\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGUOI_KY": {
+                    "value": "nguoiKy",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "CONG_VAN_TRINH_KY": {
+                    "value": "congVanTrinhKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_ORDERS": {
+            "active": true,
+            "moduleName": "tcHocPhiOrders",
+            "modelName": "tcHocPhiOrders",
+            "columns": {
+                "REF_ID": {
+                    "value": "refId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "AMOUNT": {
+                    "value": "amount",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BANK": {
+                    "value": "bank",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "ORDER_INFO": {
+                    "value": "orderInfo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                }
+            },
+            "primaryKeys": [
+                "REF_ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_ORDERS_SANDBOX": {
+            "active": true,
+            "moduleName": "tcSandBox",
+            "modelName": "tcHocPhiOrdersSandbox",
+            "columns": {
+                "REF_ID": {
+                    "value": "refId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "AMOUNT": {
+                    "value": "amount",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BANK": {
+                    "value": "bank",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "ORDER_INFO": {
+                    "value": "orderInfo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                }
+            },
+            "primaryKeys": [
+                "REF_ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_SANDBOX": {
+            "active": true,
+            "moduleName": "tcSandBox",
+            "modelName": "tcHocPhiSandbox",
+            "columns": {
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "1,0"
+                },
+                "HOC_PHI": {
+                    "value": "hocPhi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CONG_NO": {
+                    "value": "congNo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "HOC_KY",
+                "MSSV",
+                "NAM_HOC"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_TRANSACTION_SANDBOX": {
+            "active": true,
+            "moduleName": "tcSandBox",
+            "modelName": "tcHocPhiTransactionSandbox",
+            "methods": {
+                "TC_HOC_PHI_TRANSACTION_SANDBOX_ADD_BILL": "addBill"
+            },
+            "columns": {
+                "TRANS_ID": {
+                    "value": "transId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "TRANS_DATE": {
+                    "value": "transDate",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "CUSTOMER_ID": {
+                    "value": "customerId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BILL_ID": {
+                    "value": "billId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "SERVICE_ID": {
+                    "value": "serviceId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "AMOUNT": {
+                    "value": "amount",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CHECKSUM": {
+                    "value": "checksum",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "STATUS": {
+                    "value": "status",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "BANK": {
+                    "value": "bank",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                }
+            },
+            "primaryKeys": [
+                "TRANS_ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_DETAIL": {
+            "active": true,
+            "moduleName": "tcHocPhiDetail",
+            "modelName": "tcHocPhiDetail",
+            "columns": {
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_MON_HOC": {
+                    "value": "maMonHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "SO_TIN_CHI": {
+                    "value": "soTinChi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "SO_TIEN": {
+                    "value": "soTien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "HOC_KY",
+                "MA_MON_HOC",
+                "MSSV",
+                "NAM_HOC"
             ],
             "foreignKeys": [],
             "type": "table"

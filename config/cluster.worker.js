@@ -52,14 +52,6 @@ module.exports = (cluster, isDebug) => {
     app.createTemplate('home', 'admin', 'unit');
     app.loadModules();
     app.get('/user', app.permission.check(), app.templates.admin);
-    app.get('/download/:name', (req, res) => {
-        const fileName = req.params.name, path = app.path.join(app.documentPath, fileName);
-        if (app.fs.existsSync(path)) {
-            res.download(path, fileName);
-        } else {
-            // res.redirect('/404.html');
-        }
-    });
 
     let hasUpdate = new Set(); //Mỗi lần nodemon restart nó chỉ updateSessionUser 1 lần
     app.get('*', (req, res, next) => {

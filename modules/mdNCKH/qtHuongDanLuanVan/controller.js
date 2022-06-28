@@ -21,7 +21,7 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:login', menu },
+        // { name: 'staff:login', menu },
         { name: 'qtHuongDanLuanVan:read', menu },
         { name: 'qtHuongDanLuanVan:readOnly', menu: menuTCCB },
         { name: 'qtHuongDanLuanVan:write' },

@@ -1,4 +1,5 @@
 module.exports = (app) => {
+    const { OAuth2Client } = require('google-auth-library');
     const passport = require('passport');
     const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
@@ -70,5 +71,40 @@ module.exports = (app) => {
             // delete req.session.processRoute;
         });
         // app.updateSessionUser(req, req.user, () => res.redirect('/user'));
+    });
+
+    app.googleO2client = new OAuth2Client(GoogleStrategyConfig.clientID);
+    app.verifyIdToken = async (token) => {
+        const ticket = await app.googleO2client.verifyIdToken({
+            idToken: token,
+            audience: GoogleStrategyConfig.clientID,  // Specify the CLIENT_ID of the app that accesses the backend
+        });
+        const payload = ticket.getPayload();
+        return payload;
+    };
+
+    app.post('/auth/mobile/signin', async (req, res) => {
+        try {
+            const { idToken, email } = req.body;
+            let userEmail = '';
+            if (idToken) {
+                const userInfo = await app.verifyIdToken(idToken);
+                userEmail = userInfo?.email;
+            } else if (app.isDebug) {
+                userEmail = email;
+            }
+            if (!userEmail)
+                throw 401;
+            else {
+                const user = await app.model.fwUser.get({ email: userEmail });
+                if (!user) throw {};
+                app.updateSessionUser(req, user, () => {
+                    res.send({ message: 'Đăng nhập thành công', email: user.email });
+                });
+            }
+        }
+        catch (error) {
+            res.status(401).send({ message: 'Đăng nhập không thành công', error });
+        }
     });
 };

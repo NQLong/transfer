@@ -5,9 +5,16 @@ module.exports = app => {
             5001: { title: 'Cấu hình', link: '/user/finance/setting' },
         },
     };
-    app.permission.add({ name: 'TcSetting:read', menu }, 'TcSetting:write', 'TcSetting:delete');
+    const adminMenu = {
+        parentMenu: app.parentMenu.finance,
+        menus: {
+            5002: { title: 'Cấu hình Admin', link: '/user/finance/admin-setting' },
+        },
+    };
+    app.permission.add({ name: 'TcSetting:read', menu }, { name: 'TcSetting:admin', menu: adminMenu }, 'TcSetting:write', 'TcSetting:delete');
 
     app.get('/user/finance/setting', app.permission.check('TcSetting:read'), app.templates.admin);
+    app.get('/user/finance/admin-setting', app.permission.check('TcSetting:read'), app.templates.admin);
 
     //APIs ------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/finance/setting/all', app.permission.check('TcSetting:read'), async (req, res) => {

@@ -209,6 +209,7 @@ class StaffPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mã ngạch</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Hệ số lương</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Diện cán bộ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Lần cuối cập nhật dữ liệu</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
@@ -244,6 +245,7 @@ class StaffPage extends AdminPage {
                             <span>{item.loaiCanBo + (item.loaiCanBo == 'Hợp đồng' && item.isHdtn ? ' (Trách nhiệm)' : '')}<br /></span>
                             <small style={{ color: 'blue' }}>{(item.ngayBienChe && item.ngayBienChe != 1) ? T.dateToText(item.ngayBienChe, 'dd/mm/yyyy') : ''}</small>
                         </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='date' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.lastModified} />
                     <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}>
                         <Tooltip title='Đánh dấu nghỉ việc' arrow>
                             <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.nghiViec.show(item)}>

@@ -10,9 +10,9 @@ module.exports = app => {
                 });
             } else if (done) {
                 done(result);
-                resolve();
+                resolve(result);
             } else {
-                resolve();
+                resolve(result);
             }
         };
         solveAnItem(0);

@@ -11,7 +11,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1008: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 4 },
+            // 1008: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 4 },
         },
     };
 

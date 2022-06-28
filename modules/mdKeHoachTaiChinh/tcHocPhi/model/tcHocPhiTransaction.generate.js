@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_TRANSACTION { transId, transDate, customerId, billId, serviceId, amount, checksum, namHoc, hocKy, isSuccess, bank }
+// Table name: TC_HOC_PHI_TRANSACTION { transId, transDate, customerId, billId, serviceId, amount, checksum, namHoc, hocKy, status, bank }
 const keys = ['TRANS_ID'];
-const obj2Db = { 'transId': 'TRANS_ID', 'transDate': 'TRANS_DATE', 'customerId': 'CUSTOMER_ID', 'billId': 'BILL_ID', 'serviceId': 'SERVICE_ID', 'amount': 'AMOUNT', 'checksum': 'CHECKSUM', 'namHoc': 'NAM_HOC', 'hocKy': 'HOC_KY', 'isSuccess': 'IS_SUCCESS', 'bank': 'BANK' };
+const obj2Db = { 'transId': 'TRANS_ID', 'transDate': 'TRANS_DATE', 'customerId': 'CUSTOMER_ID', 'billId': 'BILL_ID', 'serviceId': 'SERVICE_ID', 'amount': 'AMOUNT', 'checksum': 'CHECKSUM', 'namHoc': 'NAM_HOC', 'hocKy': 'HOC_KY', 'status': 'STATUS', 'bank': 'BANK' };
 
 module.exports = app => {
     app.model.tcHocPhiTransaction = {
@@ -216,9 +216,9 @@ module.exports = app => {
             });
         }),
 
-        addBill: (namHoc, hocKy, bank, transId, transDate, customerId, billId, serviceId, amount, checksum, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_transaction_add_bill(:namHoc, :hocKy, :bank, :transId, :transDate, :customerId, :billId, :serviceId, :amount, :checksum); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, namHoc, hocKy, bank, transId, transDate, customerId, billId, serviceId, amount, checksum }, (error, result) => {
+        addBill: (namhoc, hocky, ebank, transid, transdate, customerid, billid, serviceid, eamount, echecksum, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_transaction_add_bill(:namhoc, :hocky, :ebank, :transid, :transdate, :customerid, :billid, :serviceid, :eamount, :echecksum); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, namhoc, hocky, ebank, transid, transdate, customerid, billid, serviceid, eamount, echecksum }, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

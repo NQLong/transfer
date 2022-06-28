@@ -293,5 +293,18 @@ module.exports = app => {
                     }
                 }));
         }),
+
+        downloadExcel: (macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_download_excel(:macanbo, :donvigui, :donvi, :loaicongvan, :loaivanban, :donvinhanngoai, :donvixem, :canboxem, :loaicanbo, :status, :timetype, :fromtime, :totime, :searchterm, :totalitem); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
     };
 };

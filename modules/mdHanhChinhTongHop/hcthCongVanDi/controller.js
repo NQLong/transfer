@@ -373,8 +373,8 @@ module.exports = app => {
     app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
+            const congVan = await app.model.hcthCongVanDi.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req)) {
                 throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
             } else {
@@ -404,7 +404,7 @@ module.exports = app => {
                 return true;
             }
             if (req.query.nhiemVu) {
-                const count = await app.model.hcthLienKet.asyncCount({
+                const count = await app.model.hcthLienKet.count({
                     keyA: req.query.nhiemVu,
                     loaiA: 'NHIEM_VU',
                     loaiB: 'CONG_VAN_DI',
@@ -437,14 +437,14 @@ module.exports = app => {
             if (isNaN(id)) {
                 throw { status: 400, message: 'Invalid id' };
             }
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
+            const congVan = await app.model.hcthCongVanDi.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
             if (!(await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            const files = await app.model.hcthFile.getAllFile({ ma: id, loai: 'DI' }, '*', 'thoiGian');
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, 'DI');
-            const history = await app.model.hcthHistory.getAllHistoryFrom(id, 'DI', req.query.historySortType);
+            const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
+            const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
+            const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
 
             res.send({
                 item: {
@@ -708,7 +708,7 @@ module.exports = app => {
     app.put('/api/hcth/cong-van-cac-phong/status', app.permission.check('staff:login'), async (req, res) => {
         try {
             let { id, trangThai, donViGui } = req.body.data;
-            const congVan = await app.model.hcthCongVanDi.getCVD({ id });
+            const congVan = await app.model.hcthCongVanDi.get({ id });
             if (congVan.trangThai == trangThai || !trangThai) {
                 res.send({ error: null, item: congVan });
             } else {
@@ -716,14 +716,14 @@ module.exports = app => {
                     await createSoCongVan(id, donViGui);
                 }
                 const newCongVan = await updateCongVanDi(id, { trangThai });
-                await app.model.hcthHistory.asyncCreate({
+                await app.model.hcthHistory.create({
                     key: id,
                     loai: CONG_VAN_DI_TYPE,
                     thoiGian: new Date().getTime(),
                     shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
-                const canBoGui = await app.model.hcthHistory.getStaff({ key: id, hanhDong: 'CREATE' }, 'shcc', '');
+                const canBoGui = await app.model.hcthHistory.get({ key: id, hanhDong: 'CREATE' }, 'shcc', '');
                 await onStatusChange(newCongVan, congVan.trangThai, trangThai, canBoGui.shcc);
                 res.send({ newCongVan });
             }
@@ -735,7 +735,7 @@ module.exports = app => {
     app.put('/api/hcth/cong-van-cac-phong/read/:id', app.permission.check('staff:login'), async (req, res) => {
         const { id, shcc } = req.body.data;
         // check permission
-        const check = await app.model.hcthHistory.asyncGet({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
+        const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
 
         // console.log(check);
         // console.log(shcc);
@@ -744,7 +744,7 @@ module.exports = app => {
                 throw 400;
             }
             // console.log(id);
-            await app.model.hcthHistory.asyncCreate({
+            await app.model.hcthHistory.create({
                 key: id,
                 loai: CONG_VAN_DI_TYPE,
                 thoiGian: new Date().getTime(),
@@ -760,13 +760,183 @@ module.exports = app => {
     app.get('/api/hcth/cong-van-cac-phong/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const phanHoi = await app.model.hcthPhanHoi.getAllPhanHoiFrom(id, CONG_VAN_DI_TYPE);
+            const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_DI_TYPE);
             res.send({ error: null, item: phanHoi });
         } catch (error) {
             res.send({ error });
         }
     }
     );
+
+    app.get('/api/hcth/cong-van-cac-phong/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+        let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
+        let donViXem = '', canBoXem = '';
+        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+
+        if (donViGui == 'null') donViGui = null;
+        if (donViNhan == 'null') donViNhan = null;
+        if (canBoNhan == 'null') canBoNhan = null;
+        if (loaiCongVan == 'null') loaiCongVan = null;
+        if (loaiVanBan == 'null') loaiVanBan = null;
+        if (donViNhanNgoai == 'null') donViNhanNgoai = null;
+        if (status == 'null') status = null;
+        if (timeType == 'null') timeType = null;
+        if (fromTime == 'null') fromTime = null;
+        if (toTime == 'null') toTime = null;
+        if (congVanYear == 'null') congVanYear = null;
+
+        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
+        const hcthPermission = getUserPermission(req, 'hcth', ['manage']),
+            hcthManagePermission = getUserPermission(req, 'hcthCongVanDi', ['manage']);
+        const user = req.session.user;
+        const permissions = user.permissions;
+
+        donViXem = req.session?.user?.staff?.donViQuanLy || [];
+        donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes('donViCongVanDi:manage') && req.session?.user?.staff?.maDonVi || '';
+        canBoXem = req.session?.user?.shcc || '';
+
+        let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.manage ? 2 : 0;
+
+        if (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent) || hcthManagePermission.manage) {
+            donViXem = '';
+            canBoXem = '';
+        }
+
+        if (congVanYear && Number(congVanYear) > 1900) {
+            timeType = 1;
+            fromTime = new Date(`${congVanYear}-01-01`).getTime();
+            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
+        }
+
+        // console.log({ canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status, timeType, fromTime, toTime, searchTerm });
+        app.model.hcthCongVanDi.downloadExcel(canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
+            } else {
+                // console.log(result);
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('congvancacphong');
+                const cells = [
+                    {
+                        header: 'STT', width: 10, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Ngày gửi', width: 15, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Ngày ký', width: 15, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Trích yếu', width: 50, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Số công văn', width: 20, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Đơn vị gửi', width: 30, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    },
+                    {
+                        header: 'Đơn vị, cán bộ nhận', width: 45, style: {
+                            border: {
+                                top: { style: 'thin' },
+                                left: { style: 'thin' },
+                                bottom: { style: 'thin' },
+                                right: { style: 'thin' }
+                            }
+                        }
+                    }
+                ];
+
+                worksheet.columns = cells;
+                worksheet.getRow(1).alignment = {
+                    ...worksheet.getRow(1).alignment,
+                    vertical: 'middle',
+                    horizontal: 'center',
+                    wrapText: true
+                };
+                worksheet.getRow(1).font = {
+                    name: 'Times New Roman',
+                    family: 4,
+                    size: 12,
+                    bold: true
+                };
+
+                worksheet.getRow(1).height = 40;
+                result.rows.forEach((item, index) => {
+                    worksheet.getRow(index + 2).alignment = {
+                        ...worksheet.getRow(index + 2).alignment,
+                        vertical: 'middle',
+                        horizontal: 'center',
+                        wrapText: true
+                    };
+                    worksheet.getRow(index + 2).font = {
+                        name: 'Times New Roman',
+                        size: 12
+                    };
+                    worksheet.getCell('A' + (index + 2)).value = index + 1;
+                    worksheet.getCell('B' + (index + 2)).value = item.ngayGui ? app.date.dateTimeFormat(new Date(item.ngayGui), 'dd/mm/yyyy') : '';
+                    worksheet.getCell('C' + (index + 2)).value = item.ngayKy ? app.date.dateTimeFormat(new Date(item.ngayKy), 'dd/mm/yyyy') : '';
+                    worksheet.getCell('D' + (index + 2)).value = item.trichYeu;
+                    worksheet.getCell('D' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+                    worksheet.getCell('E' + (index + 2)).value = item.soCongVan;
+                    worksheet.getCell('F' + (index + 2)).value = item.tenDonViGui;
+                    worksheet.getCell('F' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+
+                    const donViNhan = item.danhSachDonViNhan?.split(';').map(item => item + '\r\n').join('') || '';
+                    const canBoNhan = item.danhSachCanBoNhan?.split(';').map(item => item + '\r\n').join('') || '';
+                    const donViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';').map(item => item + '\r\n').join('') || '';
+                    worksheet.getCell('G' + (index + 2)).value = donViNhan != '' || donViNhanNgoai != '' || canBoNhan != '' ? donViNhan + donViNhanNgoai + canBoNhan : '';
+                    worksheet.getCell('G' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+                });
+                // console.log(cells);
+                // resolve(cells);
+                let fileName = 'congvancacphong.xlsx';
+                app.excel.attachment(workbook, res, fileName);
+            }
+        });
+    });
 
     const onStatusChange = (item, before, after, shcc) =>
         new Promise((resolve) => {
