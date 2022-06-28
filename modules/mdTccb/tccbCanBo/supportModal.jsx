@@ -21,7 +21,7 @@ export class SupportModal extends AdminModal {
         this.phai.value(phai);
         this.maDonVi.value(maDonVi);
         this.biDanh.value(biDanh || '');
-        this.ngaySinh.value(Number(ngaySinh));
+        this.ngaySinh.value(ngaySinh ? Number(ngaySinh) : '');
         this.quocTich.value(quocGia);
         this.tonGiao.value(tonGiao);
         this.emailTruong.value(email);
@@ -30,16 +30,16 @@ export class SupportModal extends AdminModal {
 
         this.ngheNghiepCu.value(ngheNghiepCu || '');
         this.ngayBatDauCongTac.value(Number(ngayBatDauCongTac) || '');
-        this.ngayBienChe.value(ngayBienChe && ngayBienChe != 1 ? ngayBienChe : '');
-        this.donViTuyenDung.value(donViTuyenDung ? donViTuyenDung : JSON.parse(this.props.system.schoolName).vi);
+        this.ngayBienChe.value(ngayBienChe && ngayBienChe != 1 ? Number(ngayBienChe) : '');
+        this.donViTuyenDung.value(donViTuyenDung ? donViTuyenDung : 'Trường Đại học Khoa học Xã hội và Nhân văn, ĐHQG TPHCM');
 
         this.soBhxh.value(soBhxh || '');
-        this.ngayBatDauBhxh.value(Number(ngayBatDauBhxh) || '');
-        this.ngayKetThucBhxh.value(Number(ngayKetThucBhxh) || '');
+        this.ngayBatDauBhxh.value(ngayBatDauBhxh ? Number(ngayBatDauBhxh) : '');
+        this.ngayKetThucBhxh.value(ngayKetThucBhxh ? Number(ngayKetThucBhxh) : '');
         this.thongTinKhac.value(thongTinKhac || '');
         this.bacLuong.value(bacLuong || '');
         this.heSoLuong.value(heSoLuong || '');
-        this.ngayHuongLuong.value(Number(ngayHuongLuong) || '');
+        this.ngayHuongLuong.value(ngayHuongLuong ? Number(ngayHuongLuong) : '');
         this.tyLePhuCapThamNien.value(tyLePhuCapThamNien);
         this.tyLePhuCapUuDai.value(tyLePhuCapUuDai);
     }
