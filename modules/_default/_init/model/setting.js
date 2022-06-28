@@ -1,5 +1,5 @@
 module.exports = app => {
-    app.model.setting.getValue = (keys, done) => {
+    app.model.setting.getValue = (keys, done) => new Promise(resolve => {
         let result = {};
         const solveAnItem = (index) => {
             if (index < keys.length) {
@@ -10,10 +10,13 @@ module.exports = app => {
                 });
             } else if (done) {
                 done(result);
+                resolve(result);
+            } else {
+                resolve(result);
             }
         };
         solveAnItem(0);
-    };
+    });
 
     app.model.setting.setValue = (data, done) => {
         let keys = Object.keys(data),

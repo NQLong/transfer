@@ -127,7 +127,8 @@ class StaffEditPage extends AdminPage {
         phanHoi: [],
         user: {},
         shcc: null,
-        chucVu: null
+        chucVu: null,
+        historySortType: 'DESC'
     }
 
 
@@ -288,7 +289,7 @@ class StaffEditPage extends AdminPage {
         if (this.state.id) {
             const queryParams = new URLSearchParams(window.location.search);
             const nhiemVu = queryParams.get('nhiemVu');
-            const context = {};
+            const context = { historySortType: this.state.historySortType };
             if (nhiemVu) context.nhiemVu = nhiemVu;
             this.props.getCongVanDen(Number(this.state.id), context, (item) => this.setState({ isLoading: false }, () => this.setData(item)));
         } else this.setData();
@@ -345,7 +346,7 @@ class StaffEditPage extends AdminPage {
             this.quyenChiDaoRef[shcc].value(!value);
             T.notify('Chọn ít nhất 1 cán bộ chỉ đạo đối với công văn cần chỉ đạo!', 'danger');
         }
-        else this.setState({ quyenChiDao: newQuyenChiDao }, () => this.state.id && permissions.includes('rectors:login') && this.props.updateQuyenChiDao(this.state.id, shcc, this.state.trangThai,value, (res) => {
+        else this.setState({ quyenChiDao: newQuyenChiDao }, () => this.state.id && permissions.includes('rectors:login') && this.props.updateQuyenChiDao(this.state.id, shcc, this.state.trangThai, value, (res) => {
             T.notify(`${value ? 'Thêm' : 'Xoá'} cán bộ chỉ đạo ${res.error ? 'lỗi' : ' thành công'}`, `${res.error ? 'danger' : 'success'}`);
         }));
     }
@@ -600,7 +601,7 @@ class StaffEditPage extends AdminPage {
     }
 
     onChangeStatus = (status, done) => {
-        this.props.updateStatus({ id: this.state.id, trangThai: status }, () => this.setState({ trangThai: status }, () => this.props.getHistory(this.state.id, () => done && done())));
+        this.props.updateStatus({ id: this.state.id, trangThai: status }, () => this.setState({ trangThai: status }, () => this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }, () => done && done())));
     }
 
     sortByChucVuChinh = (a, b) => a.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG ? -1 : b.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG ? 1 : 0;
@@ -660,7 +661,7 @@ class StaffEditPage extends AdminPage {
                             this.props.updateQuyenChiDao(this.state.id, this.state.quyenChiDao.join(','), this.state.trangThai, true, (res) => {
                                 if (res.error) T.notify('Thêm quyền chỉ đạo lỗi', 'danger');
                                 else T.notify('Thêm quyền chỉ đạo thành công', 'success');
-                            
+
                             });
                         });
                     });
@@ -679,6 +680,13 @@ class StaffEditPage extends AdminPage {
                 this.setQuyenChiDao();
             }
         });
+    }
+
+    onChangeHistorySort = (e) => {
+        e.preventDefault();
+        const current = this.state.historySortType,
+            next = current == 'DESC' ? 'ASC' : 'DESC';
+        this.setState({ historySortType: next }, () => this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }));
     }
 
     render() {
@@ -758,7 +766,7 @@ class StaffEditPage extends AdminPage {
                     </div>
                 </div>
                 {this.state.id && (<div className='tile'>
-                    <h3 className='tile-title'> Lịch sử</h3>
+                    <h3 className='tile-title'><i className={`btn fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
                     {this.renderHistory(this.props.hcthCongVanDen?.item?.history, this.props.system?.user?.staff?.shcc)}
                 </div>)}
                 <EditModal ref={e => this.modal = e}
@@ -774,19 +782,5 @@ class StaffEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDen: state.hcth.hcthCongVanDen });
-const mapActionsToProps = {
-    createHcthCongVanDen,
-    updateHcthCongVanDen,
-    getCongVanDen,
-    deleteFile,
-    createDmDonViGuiCv,
-    getStaffPage,
-    createChiDao,
-    createPhanHoi,
-    updateStatus,
-    getPhanHoi,
-    getHistory,
-    getChiDao,
-    updateQuyenChiDao
-};
+const mapActionsToProps = { createHcthCongVanDen, updateHcthCongVanDen, getCongVanDen, deleteFile, createDmDonViGuiCv, getStaffPage, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao, updateQuyenChiDao };
 export default connect(mapStateToProps, mapActionsToProps)(StaffEditPage);

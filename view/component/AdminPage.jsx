@@ -443,7 +443,7 @@ class FormYearBox extends React.Component {
         return (
             <div className={'form-group ' + (className || '')} style={style}>
                 {displayElement}
-                <InputMask ref={e => this.input = e} className='form-control' mask={'2099'} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
+                <InputMask ref={e => this.input = e} className='form-control' mask={'2099'} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[089]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
                 {smallText ? <small>{smallText}</small> : null}
             </div>);
     }
@@ -784,7 +784,7 @@ export class FormDatePicker extends React.Component {
             <div className={'form-group ' + (className || '')} style={style}>
                 {label && <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>}{readOnly && this.state.value ? <> {label && ':'} <b>{this.state.readOnlyText}</b></> : readOnly && readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
                 {(type.endsWith('-mask') || type == 'date-month') ? (
-                    <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
+                    <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[089]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
                 ) : (
                     <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: placeholder || label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
                 )}
@@ -992,7 +992,7 @@ export class AdminPage extends React.Component {
 
 
     renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
-
+        T.title(title);
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
             createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới' />;

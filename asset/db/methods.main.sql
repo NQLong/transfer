@@ -968,7 +968,7 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION DT_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, donVi IN STRING,
-                                             searchTerm IN STRING,
+                                             searchTerm IN STRING, namDaoTao IN STRING,
                                              totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -987,7 +987,8 @@ BEGIN
         OR LOWER(TRIM(DNDT.MA_NGANH)) LIKE sT
         OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
         OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
-        OR LOWER(TRIM(DV.TEN)) LIKE sT);
+        OR LOWER(TRIM(DV.TEN)) LIKE sT)
+      AND (namDaoTao IS NULL OR namDaoTao = '' OR TO_NUMBER(namDaoTao) = KDT.NAM_DAO_TAO);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -1022,6 +1023,7 @@ BEGIN
                   OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
                   OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
                   OR LOWER(TRIM(DV.TEN)) LIKE sT)
+                AND (namDaoTao IS NULL OR namDaoTao = '' OR TO_NUMBER(namDaoTao) = KDT.NAM_DAO_TAO)
               ORDER BY KDT.NAM_DAO_TAO DESC)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -1173,6 +1175,7 @@ BEGIN
                      TKB.MA_MON_HOC       AS              "maMonHoc",
                      TKB.NGAY_BAT_DAU     AS              "ngayBatDau",
                      TKB.NGAY_KET_THUC    AS              "ngayKetThuc",
+                     TKB.LOAI_MON_HOC     AS              "loaiMonHoc",
                      TKB.NHOM             AS              "nhom",
                      TKB.SO_LUONG_DU_KIEN AS              "soLuongDuKien",
                      DV.TEN               AS              "tenKhoaBoMon",
@@ -1629,6 +1632,54 @@ BEGIN
              LEFT JOIN TCHC_CAN_BO cb on qtcv.SHCC = cb.SHCC
         WHERE (qtcv.MA_CHUC_VU = '001')
             OR (qtcv.MA_CHUC_VU = '003' AND qtcv.MA_DON_VI = '30');
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_CAN_BO_KY_GET_ALL_FROM(
+    congVanTrinhKy in number) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN my_cursor FOR
+        SELECT hcthcbk.ID         as "id",
+               hcthcbk.NGUOI_TAO  as "shccNguoiTao",
+               hcthcbk.NGUOI_KY   as "nguoiKy",
+               cbk.HO             as "hoCanBoNhan",
+               cbk.TEN            as "tenCanBoNhan",
+               nt.HO              as "hoNguoiTao",
+               nt.TEN             as "tenNguoiTao",
+               hcthcbk.TRANG_THAI as "trangThai"
+        from HCTH_CAN_BO_KY hcthcbk
+                 LEFT JOIN TCHC_CAN_BO cbk on hcthcbk.NGUOI_KY = cbk.SHCC
+                 LEFT JOIN TCHC_CAN_BO nt on nt.SHCC = hcthcbk.NGUOI_TAO
+        where (hcthcbk.CONG_VAN_TRINH_KY = congVanTrinhKy)
+        order by hcthcbk.id;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_CAN_BO_KY_GET_LIST(
+    congVanTrinhKy in number) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN my_cursor FOR
+        SELECT hcthcbk.ID         as "id",
+               hcthcbk.NGUOI_TAO  as "shccNguoiTao",
+               hcthcbk.NGUOI_KY   as "nguoiKy",
+               cbk.HO             as "hoCanBoNhan",
+               cbk.TEN            as "tenCanBoNhan",
+               nt.HO              as "hoNguoiTao",
+               nt.TEN             as "tenNguoiTao",
+               hcthcbk.TRANG_THAI as "trangThai"
+        from HCTH_CAN_BO_KY hcthcbk
+                 LEFT JOIN TCHC_CAN_BO cbk on hcthcbk.NGUOI_KY = cbk.SHCC
+                 LEFT JOIN TCHC_CAN_BO nt on nt.SHCC = hcthcbk.NGUOI_TAO
+        where (hcthcbk.CONG_VAN_TRINH_KY = congVanTrinhKy)
+        order by hcthcbk.id;
     RETURN my_cursor;
 END;
 
@@ -3989,6 +4040,77 @@ BEGIN
     hcthCVD.SO_CONG_VAN = soCongVan
     WHERE hcthCVD.ID = ma;
     commit;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE(
+    pageNumber IN OUT NUMBER,
+    pageSize IN OUT NUMBER,
+    filterParam in STRING,
+    searchTerm IN STRING,
+    totalItem OUT NUMBER,
+    pageTotal OUT NUMBER
+) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+
+BEGIN
+
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM HCTH_CONG_VAN_TRINH_KY cvtk
+-- LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
+    where (1 = 1);
+    IF pageNumber < 1 THEN
+        pageNumber := 1;
+    END IF;
+    IF pageSize < 1 THEN
+        pageSize := 1;
+    END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT cvtk.ID           as "id",
+                     cvtk.FILE_CONG_VAN     as "congVanId",
+                     cvtk.NGUOI_TAO    as "nguoiTao",
+                     cvtk.THOI_GIAN    as "thoiGian",
+                     cbt.HO            as "hoNguoiTao",
+                     cbt.TEN           as "tenNguoiTao",
+
+
+                     (SELECT LISTAGG(
+                                     CASE
+                                         WHEN cb.HO IS NULL THEN cb.TEN
+                                         WHEN cb.TEN IS NULL THEN cb.HO
+                                         ELSE CONCAT(CONCAT(cb.HO, ' '), cb.TEN)
+                                         END,
+                                     ';'
+                                 ) WITHIN GROUP (
+                                         order by cb.TEN
+                                         ) as "hoVaTenCanBo"
+                      FROM HCTH_CAN_BO_KY cbk
+                               LEFT JOIN TCHC_CAN_BO cb on cbk.NGUOI_KY = cb.SHCC
+                      where cbk.CONG_VAN_TRINH_KY = cvtk.id
+                     )                 as "danhSachCanBoKy",
+
+                     ROW_NUMBER() OVER (
+                         ORDER BY cvtk.ID DESC
+                         )                R
+              FROM HCTH_CONG_VAN_TRINH_KY cvtk
+                       LEFT JOIN TCHC_CAN_BO cbt on cbt.SHCC = cvtk.NGUOI_TAO
+                       LEFT JOIN HCTH_FILE hcthfile on hcthfile.LOAI='DI' and hcthfile.ID = cvtk.FILE_CONG_VAN
+              WHERE
+-- check if user is related to congVanTrinhKy
+(
+    1 = 1
+    ))
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY 'id' DESC;
+    RETURN my_cursor;
 END;
 
 /
@@ -14503,6 +14625,7 @@ BEGIN
                      CB.DANH_HIEU                                               AS "danhHieu",
                      CB.DANG_VIEN                                               AS "dangVien",
                      CB.GHI_CHU                                                 AS "ghiChuStaff",
+                     CB.LAST_MODIFIED                                           as "lastModified",
                      (SELECT DMCV.TEN
                       FROM QT_CHUC_VU QTCV
                                LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = QTCV.MA_CHUC_VU
@@ -14933,11 +15056,16 @@ BEGIN
                staff.CMND_NGAY_CAP                                    as "ngayCapCmnd",
                staff.CMND_NOI_CAP                                     as "noiCapCmnd",
                staff.SO_BHXH                                          as "soBaoHiemXaHoi",
-               (select rtrim(xmlagg(xmlelement(e, daoTao.CHUYEN_NGANH, ' - ', daoTao.TRINH_DO, ', ').extract('//text()') order by
+               chucDanh.TEN                                           AS "chucDanh",
+               staff.NAM_CHUC_DANH                                    AS "namChucDanh",
+
+               (select rtrim(xmlagg(xmlelement(e, daoTao.CHUYEN_NGANH, ' - ', daoTao.TRINH_DO, ', ').extract('//text()')
+                                    order by
                                     null).getclobval(), ', ')
                 FROM QT_DAO_TAO daoTao
-                 LEFT JOIN DM_BANG_DAO_TAO bdt on daoTao.LOAI_BANG_CAP = bdt.MA
-                WHERE daoTao.SHCC = mtcb AND daoTao.LOAI_BANG_CAP = 5)       AS "ngoaiNgu"
+                         LEFT JOIN DM_BANG_DAO_TAO bdt on daoTao.LOAI_BANG_CAP = bdt.MA
+                WHERE daoTao.SHCC = mtcb
+                  AND daoTao.LOAI_BANG_CAP = 5)                       AS "ngoaiNgu"
         FROM TCHC_CAN_BO STAFF
                  LEFT JOIN DM_PHUONG_XA xaNoiSinh
                            ON STAFF.MA_XA_NOI_SINH = xaNoiSinh.MA_PHUONG_XA
@@ -14957,22 +15085,21 @@ BEGIN
                  LEFT JOIN DM_NGACH_CDNN ngach ON ngach.MA = staff.NGACH
                  left join DM_TRINH_DO hocVi ON hocVi.MA = staff.HOC_VI
                  LEFT JOIN DM_NHOM_MAU nhomMau ON nhomMau.MA = staff.NHOM_MAU
+                 LEFT JOIN DM_CHUC_DANH_KHOA_HOC chucDanh ON chucDanh.MA = staff.CHUC_DANH
+
         WHERE STAFF.SHCC = mtcb;
 
     OPEN QT_CHUC_VU FOR
         SELECT DM_DON_VI.TEN      AS "donVi",
                DM_CHUC_VU.TEN     AS "chucVu",
-               DM_CHUC_VU.PHU_CAP as "phuCapChucVu"
-        FROM (SELECT MAX(cv1.NGAY_RA_QD) AS maxNgayRaQD
-              FROM QT_CHUC_VU cv1
-              WHERE cv1.SHCC = mtcb
-                AND cv1.CHUC_VU_CHINH = 1
-              GROUP BY cv1.SHCC) cvMax
-                 INNER JOIN QT_CHUC_VU cv ON cv.NGAY_RA_QD = cvMax.maxNgayRaQD
+               DM_CHUC_VU.PHU_CAP as "phuCapChucVu",
+               cv.CHUC_VU_CHINH   AS "chucVuChinh"
+        FROM QT_CHUC_VU cv
                  LEFT JOIN DM_CHUC_VU ON DM_CHUC_VU.MA = CV.MA_CHUC_VU
                  LEFT JOIN DM_DON_VI ON DM_DON_VI.MA = CV.MA_DON_VI
                  LEFT JOIN DM_BO_MON ON DM_BO_MON.MA = CV.MA_BO_MON
-        WHERE cv.SHCC = mtcb;
+        WHERE cv.SHCC = mtcb
+          and cv.THOI_CHUC_VU = 0;
 
     OPEN QUAN_HE_GIA_DINH FOR
         SELECT quanhe.HO_TEN       AS "hoTen",
@@ -15018,7 +15145,8 @@ BEGIN
                  LEFT JOIN DM_BANG_DAO_TAO bdt on qtdt.LOAI_BANG_CAP = bdt.MA
                  LEFT JOIN DM_HINH_THUC_DAO_TAO htdt on qtdt.HINH_THUC = htdt.MA
                  LEFT JOIN DM_TRINH_DO_DAO_TAO TDDT ON TDDT.MA = qtdt.TRINH_DO
-        where qtdt.SHCC = mtcb AND qtdt.KET_THUC != -1;
+        where qtdt.SHCC = mtcb
+          AND qtdt.KET_THUC != -1;
 
     return CAN_BO;
 END;
@@ -15052,6 +15180,54 @@ BEGIN
     RETURN my_cursor;
 
 end;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_SANDBOX_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, imssv IN STRING,
+                                       searchTerm IN STRING, filter IN STRING,
+                                       totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(502) := '%' || lower(searchTerm) || '%';
+    namHoc    NUMBER(4);
+    hocKy     NUMBER(1);
+BEGIN
+    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
+
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM TC_HOC_PHI_SANDBOX HP
+             LEFT JOIN FW_STUDENT FS on HP.MSSV = FS.MSSV
+    WHERE (imssv IS NULL OR imssv = '' OR imssv = HP.MSSV) AND
+          (NAM_HOC = namHoc AND HOC_KY = hocKy)
+      AND (searchTerm = ''
+        OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT HP.MSSV                  AS         "mssv",
+                     HP.NAM_HOC               AS         "namHoc",
+                     HP.HOC_KY                AS         "hocKy",
+                     HP.CONG_NO               AS         "congNo",
+                     HP.HOC_PHI               AS         "hocPhi",
+                     (FS.HO || ' ' || FS.TEN) AS         "hoTenSinhVien",
+                     ROW_NUMBER() OVER (ORDER BY FS.TEN) R
+              FROM TC_HOC_PHI_SANDBOX HP
+                       LEFT JOIN FW_STUDENT FS on HP.MSSV = FS.MSSV
+              WHERE (imssv IS NULL OR imssv = '' OR imssv = HP.MSSV) AND
+                    (NAM_HOC = namHoc AND HOC_KY = hocKy)
+                AND (searchTerm = ''
+                  OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT))
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+END ;
 
 /
 --EndMethod--
@@ -15104,20 +15280,42 @@ END ;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_ADD_BILL(NAM_HOC IN STRING, HOC_KY IN STRING, BANK IN STRING, TRANS_ID IN STRING, TRANS_DATE IN STRING, CUSTOMER_ID IN STRING, BILL_ID IN STRING, SERVICE_ID IN STRING, AMOUNT IN NUMBER, CHECKSUM IN STRING) RETURN NUMBER
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_ADD_BILL(namHoc IN STRING, hocKy IN STRING, eBank IN STRING, transId IN STRING, transDate IN STRING, customerId IN STRING, billId IN STRING, serviceId IN STRING, eAmount IN NUMBER, eChecksum IN STRING) RETURN NUMBER
 AS
     DA_DONG NUMBER;
 BEGIN
-    INSERT INTO TC_HOC_PHI_TRANSACTION (BANK, TRANS_ID, TRANS_DATE, CUSTOMER_ID, BILL_ID, SERVICE_ID, AMOUNT, CHECKSUM, NAM_HOC, HOC_KY, IS_SUCCESS)
-        VALUES (BANK, TRANS_ID, TRANS_DATE, CUSTOMER_ID, BILL_ID, SERVICE_ID, AMOUNT, CHECKSUM, NAM_HOC, HOC_KY, 1);
+    INSERT INTO TC_HOC_PHI_TRANSACTION (BANK, TRANS_ID, TRANS_DATE, CUSTOMER_ID, BILL_ID, SERVICE_ID, AMOUNT, CHECKSUM, NAM_HOC, HOC_KY, STATUS)
+        VALUES (eBank, transId, transDate, customerId, billId, serviceId, eAmount, eChecksum, namHoc, hocKy, 1);
 
-    SELECT SUM(T.AMOUNT) INTO DA_DONG FROM TC_HOC_PHI_TRANSACTION T WHERE T.NAM_HOC=NAM_HOC AND T.HOC_KY=HOC_KY AND T.CUSTOMER_ID=CUSTOMER_ID AND T.IS_SUCCESS=1;
+    SELECT SUM(T.AMOUNT) INTO DA_DONG FROM TC_HOC_PHI_TRANSACTION T WHERE T.NAM_HOC=namHoc AND T.HOC_KY=hocKy AND T.CUSTOMER_ID=customerId AND T.STATUS=1;
 
     IF DA_DONG IS NULL THEN
-        UPDATE TC_HOC_PHI_TRANSACTION T SET T.IS_SUCCESS=0 WHERE T.TRANS_ID=TRANS_ID;
+        UPDATE TC_HOC_PHI_TRANSACTION T SET T.STATUS=0 WHERE T.TRANS_ID=transId;
         return 0;
     ELSE
-        UPDATE TC_HOC_PHI T SET T.CONG_NO=T.HOC_PHI-DA_DONG WHERE T.NAM_HOC=NAM_HOC AND T.HOC_KY=HOC_KY AND T.MSSV=CUSTOMER_ID;
+        UPDATE TC_HOC_PHI T SET T.CONG_NO=T.HOC_PHI-DA_DONG WHERE T.NAM_HOC=namHoc AND T.HOC_KY=hocKy AND T.MSSV=customerId;
+        COMMIT;
+        return 1;
+    END IF;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_SANDBOX_ADD_BILL(namHoc IN STRING, hocKy IN STRING, eBank IN STRING, transId IN STRING, transDate IN STRING, customerId IN STRING, billId IN STRING, serviceId IN STRING, eAmount IN NUMBER, eChecksum IN STRING) RETURN NUMBER
+AS
+    DA_DONG NUMBER;
+BEGIN
+    INSERT INTO TC_HOC_PHI_TRANSACTION_SANDBOX (BANK, TRANS_ID, TRANS_DATE, CUSTOMER_ID, BILL_ID, SERVICE_ID, AMOUNT, CHECKSUM, NAM_HOC, HOC_KY, STATUS)
+        VALUES (eBank, transId, transDate, customerId, billId, serviceId, eAmount, eChecksum, namHoc, hocKy, 1);
+
+    SELECT SUM(T.AMOUNT) INTO DA_DONG FROM TC_HOC_PHI_TRANSACTION_SANDBOX T WHERE T.NAM_HOC=namHoc AND T.HOC_KY=hocKy AND T.CUSTOMER_ID=customerId AND T.STATUS=1;
+
+    IF DA_DONG IS NULL THEN
+        UPDATE TC_HOC_PHI_TRANSACTION_SANDBOX T SET T.STATUS=0 WHERE T.TRANS_ID=transId;
+        return 0;
+    ELSE
+        UPDATE TC_HOC_PHI_SANDBOX T SET T.CONG_NO=T.HOC_PHI-DA_DONG WHERE T.NAM_HOC=namHoc AND T.HOC_KY=hocKy AND T.MSSV=customerId;
         COMMIT;
         return 1;
     END IF;

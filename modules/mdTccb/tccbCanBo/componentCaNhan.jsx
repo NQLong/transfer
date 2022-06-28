@@ -231,8 +231,8 @@ class ComponentCaNhan extends AdminPage {
                             </div>
                         </div>
                     </div>
-                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' readOnly={readOnly} />
-                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' readOnly={readOnly} />
+                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
+                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
                     <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-12' requiredSoNhaDuong={true} />
                     <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-12' requiredSoNhaDuong={true} />
 

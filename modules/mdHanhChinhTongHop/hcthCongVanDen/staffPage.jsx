@@ -275,6 +275,12 @@ class HcthCongVanDenStaffPage extends AdminPage {
             </div>,
 
             onCreate: permission && permission.write ? () => this.props.history.push(`${baseUrl}/new`) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                let filter = T.stringify(this.state.filter);
+                if (filter.includes('%')) filter = '{}';
+                T.download(`/api/hcth/cong-van-den/download-excel/${filter}`, 'CONG_VAN_DEN.xlsx');
+            },
             backRoute,
         });
     }

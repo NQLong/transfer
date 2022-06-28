@@ -12,15 +12,16 @@ export class SupportModal extends AdminModal {
         //For TCCB Staff: data = { data: {} }
         let item = data.item || data.data || null;
 
-        let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh, thongTinKhac } = item;
+        let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh, thongTinKhac, bacLuong, heSoLuong, tyLePhuCapThamNien, tyLePhuCapUuDai, ngayHuongLuong } = item;
         data.data && this.setState({ item, qtId: data.qtId, type: data.type, oldData: data.oldData });
+        console.log(ngayHuongLuong);
         data.item && this.setState({ shcc: item.shcc, dataBanDau: item });
         this.ho.value(ho);
         this.ten.value(ten);
         this.phai.value(phai);
         this.maDonVi.value(maDonVi);
         this.biDanh.value(biDanh || '');
-        this.ngaySinh.value(Number(ngaySinh));
+        this.ngaySinh.value(ngaySinh ? Number(ngaySinh) : '');
         this.quocTich.value(quocGia);
         this.tonGiao.value(tonGiao);
         this.emailTruong.value(email);
@@ -29,13 +30,18 @@ export class SupportModal extends AdminModal {
 
         this.ngheNghiepCu.value(ngheNghiepCu || '');
         this.ngayBatDauCongTac.value(Number(ngayBatDauCongTac) || '');
-        this.ngayBienChe.value(ngayBienChe && ngayBienChe != 1 ? ngayBienChe : '');
-        this.donViTuyenDung.value(donViTuyenDung ? donViTuyenDung : JSON.parse(this.props.system.schoolName).vi);
+        this.ngayBienChe.value(ngayBienChe && ngayBienChe != 1 ? Number(ngayBienChe) : '');
+        this.donViTuyenDung.value(donViTuyenDung ? donViTuyenDung : 'Trường Đại học Khoa học Xã hội và Nhân văn, ĐHQG TPHCM');
 
         this.soBhxh.value(soBhxh || '');
-        this.ngayBatDauBhxh.value(Number(ngayBatDauBhxh) || '');
-        this.ngayKetThucBhxh.value(Number(ngayKetThucBhxh) || '');
+        this.ngayBatDauBhxh.value(ngayBatDauBhxh ? Number(ngayBatDauBhxh) : '');
+        this.ngayKetThucBhxh.value(ngayKetThucBhxh ? Number(ngayKetThucBhxh) : '');
         this.thongTinKhac.value(thongTinKhac || '');
+        this.bacLuong.value(bacLuong || '');
+        this.heSoLuong.value(heSoLuong || '');
+        this.ngayHuongLuong.value(ngayHuongLuong ? Number(ngayHuongLuong) : '');
+        this.tyLePhuCapThamNien.value(tyLePhuCapThamNien);
+        this.tyLePhuCapUuDai.value(tyLePhuCapUuDai);
     }
 
     onSubmit = (e) => {
@@ -63,6 +69,11 @@ export class SupportModal extends AdminModal {
                 soBhxh: getValue(this.soBhxh),
                 ngayBatDauBhxh: getValue(this.ngayBatDauBhxh) ? getValue(this.ngayBatDauBhxh).getTime() : '',
                 ngayKetThucBhxh: getValue(this.ngayKetThucBhxh) ? getValue(this.ngayKetThucBhxh).getTime() : '',
+                bacLuong: getValue(this.bacLuong),
+                heSoLuong: getValue(this.heSoLuong),
+                ngayHuongLuong: getValue(this.ngayHuongLuong) ? getValue(this.ngayHuongLuong).getTime() : '',
+                tyLePhuCapThamNien: getValue(this.tyLePhuCapThamNien),
+                tyLePhuCapUuDai: getValue(this.tyLePhuCapUuDai),
                 thongTinKhac: getValue(this.thongTinKhac),
             };
             if (Object.keys(data).every(key =>
@@ -116,6 +127,11 @@ export class SupportModal extends AdminModal {
                 <FormDatePicker type='date-mask' className='col-6' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={readOnly} />
                 <FormTextBox className='col-12' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={readOnly} />
 
+                <FormTextBox ref={e => this.bacLuong = e} className='col-md-4' label='Bậc lương' readOnly={readOnly} />
+                <FormTextBox ref={e => this.heSoLuong = e} className='col-md-4' label='Hệ số lương' readOnly={readOnly} />
+                <FormDatePicker type='date-mask' ref={e => this.ngayHuongLuong = e} className='col-md-4' label='Ngày hưởng lương' readOnly={readOnly} />
+                <FormTextBox ref={e => this.tyLePhuCapThamNien = e} className='col-md-6' label='Phụ cấp thâm niên' readOnly={readOnly} />
+                <FormTextBox ref={e => this.tyLePhuCapUuDai = e} className='col-md-6' label='Phụ cấp ưu đãi' readOnly={readOnly} />
                 <FormTextBox ref={e => this.soBhxh = e} className='col-md-6' label='Mã số Bảo hiểm xã hội' readOnly={readOnly} />
                 <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-3' label='Tháng bắt đầu' type='month-mask' readOnly={readOnly} />
                 <FormDatePicker ref={e => this.ngayKetThucBhxh = e} className='col-md-3' label='Tháng kết thúc' type='month-mask' readOnly={readOnly} />

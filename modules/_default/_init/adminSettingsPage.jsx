@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { saveSystemState, createFooterItem, updateFooterItem, swapFooterItem, getFooterSystem, deleteFooterItem } from './reduxSystem';
+import { saveSystemState, createFooterItem, updateFooterItem, swapFooterItem, getFooterSystem, deleteFooterItem, updateFwSetting, getValueFwSetting } from './reduxSystem';
 import ImageBox from 'view/component/ImageBox';
+import { FormTextBox } from 'view/component/AdminPage';
 
+const listKeysViettel = ['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel'];
 class EditFooterModal extends React.Component {
     modal = React.createRef();
     state = {
@@ -121,6 +123,9 @@ class SettingsPage extends React.Component {
     componentDidMount() {
         this.getFooterSystem();
         T.ready('/user/truyen-thong', () => {
+            this.props.getValueFwSetting(listKeysViettel, (data) => {
+                listKeysViettel.forEach(ref => this[ref].value(data[ref] || ''));
+            });
             $('.menuList').sortable({
                 start: (e, ui) => {
                     $(this).attr('data-prevIndex', ui.item.index());
@@ -158,6 +163,15 @@ class SettingsPage extends React.Component {
             instagram: $(this.instagram.current).val().trim(),
             linkMap: $(this.linkMap.current).val().trim()
         });
+    }
+
+    save = function () {
+        const changes = {};
+        for (let i = 0; i < arguments.length; i++) {
+            const key = arguments[i];
+            changes[key] = this[key].value();
+        }
+        arguments.length && this.props.updateFwSetting(changes);
     }
 
     saveMapInfo = () => {
@@ -275,7 +289,18 @@ class SettingsPage extends React.Component {
                                 </button>
                             </div>
                         </div>
-
+                        <div className='tile'>
+                            <h3 className='tile-title'>Viettel SMS</h3>
+                            <FormTextBox ref={e => this.brandName = e} label='Tên thương hiệu (cấp cho Viettel)' />
+                            <FormTextBox ref={e => this.usernameViettel = e} label='Username' />
+                            <FormTextBox ref={e => this.passViettel = e} label='Password' />
+                            <FormTextBox ref={e => this.totalSMSViettel = e} label='Tổng số tin nhắn' readOnly />
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.save('brandName', 'usernameViettel', 'passViettel')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
+                        </div>
 
                     </div>
 
@@ -338,6 +363,7 @@ class SettingsPage extends React.Component {
                                 </button>
                             </div>
                         </div>
+
                         <EditFooterModal ref={this.modal} create={this.createFooterItem} update={this.props.updateFooterItem} />
                         <div className='tile'>
                             <h3 className='tile-title'>Footer</h3>
@@ -392,5 +418,5 @@ class SettingsPage extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { saveSystemState, createFooterItem, swapFooterItem, updateFooterItem, getFooterSystem, deleteFooterItem };
+const mapActionsToProps = { saveSystemState, createFooterItem, swapFooterItem, updateFooterItem, getFooterSystem, deleteFooterItem, updateFwSetting, getValueFwSetting };
 export default connect(mapStateToProps, mapActionsToProps)(SettingsPage);
