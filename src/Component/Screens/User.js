@@ -1,42 +1,37 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { TouchableOpacity, Text, View, Dimensions, StyleSheet } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import T from '@/Utils/common';
+import { signOut } from '@/Store/settings';
+import { MenuItem, Tile } from '@/Utils/componennt';
+import React, { useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-const deviceWidth = Dimensions.get('screen').width;
-const deviceHeight = Dimensions.get('screen').height;
+import { useDispatch, useSelector } from 'react-redux';
 
 
-const User = ({ navigation }) => {
-    const settings = useSelector(state => state?.settings);
+
+const User = () => {
     const dispatch = useDispatch();
+    const user = useSelector(state => state?.settings?.user);
     const { colors } = useTheme();
     const [disableLogout, setDisableLogout] = useState(false);
 
-    const signOut = async () => {
+    const onSignOut = async () => {
         await setDisableLogout(true);
-        await T.storage.clear();
-        await T.clearCookie();
-        await GoogleSignin.signOut();
-        dispatch({ type: 'system:UpdateState', state: null });
-        setDisableLogout(false);
+        dispatch(signOut(() => setDisableLogout(false)));
     };
 
 
 
     return (
-        <View>
-            <Fragment>
-                <View style={{ alignItems: 'center', marginTop: 50 }}>
-                    <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={signOut} disabled={disableLogout}>
-                        <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Đăng xuất</Text>
-                    </TouchableOpacity>
-                </View>
-            </Fragment>
-        </View>
+        <ScrollView>
+            <Tile>
+                <MenuItem title='Họ và Tên' value={`${user?.lastName || ''} ${user?.firstName || ''}`.trim().normalizedName()} />
+                <MenuItem title='Email' value={user?.email} />
+            </Tile>
+            <View style={{ alignItems: 'center', marginTop: 20, flex: 1 }}>
+                <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={onSignOut} disabled={disableLogout}>
+                    <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Đăng xuất</Text>
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
     );
 }
 

@@ -1,8 +1,9 @@
 import T from '@/Utils/common';
 
 
-const HcthCongVanDenSearchPage = 'HcthCongVanDen:SearchPage'
-const HcthCongVanDenGet = 'HcthCongVanDen:Get';
+export const HcthCongVanDenSearchPage = 'HcthCongVanDen:SearchPage'
+export const HcthCongVanDenGet = 'HcthCongVanDen:Get';
+export const HcthCongVanDenGetMorePage = 'HcthCongVanDen:GetMorePage'
 
 export default function congVanDenReducer(state = {}, data) {
     switch (data.type) {
@@ -10,6 +11,11 @@ export default function congVanDenReducer(state = {}, data) {
             return Object.assign({}, state, { item: data.item });
         case HcthCongVanDenSearchPage:
             return Object.assign({}, state, { page: data.page });
+        case HcthCongVanDenGetMorePage:
+            const newPageInfo = data.page;
+            const newList= [...state.page.list, ...newPageInfo.list];
+            newPageInfo.list = newList;
+            return Object.assign({}, state, { page: newPageInfo });
         default:
             return state;
     }
@@ -23,7 +29,6 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
     }
     return dispatch => {
         const url = `/api/hcth/cong-van-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
-        dispatch({ type: HcthCongVanDenSearchPage, page: null });
         T.get(url).then(data => {
             if (data.error) {
                 T.alert('Công văn đến', 'Lấy danh sách công văn đến bị lỗi');
@@ -37,6 +42,27 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
         }).catch(error => console.error(`GET: ${url}.`, error));
     };
 };
+
+export function getMoreCongVanDenPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    return dispatch => {
+        const url = `/api/hcth/cong-van-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
+        T.get(url).then(data => {
+            if (data.error) {
+                T.alert('Công văn đến', 'Lấy danh sách công văn đến bị lỗi');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (pageCondition) data.page.pageCondition = pageCondition;
+                if (filter) data.page.filter = filter;
+                dispatch({ type: HcthCongVanDenGetMorePage, page: data.page });
+                done && done(data.page);
+            }
+        }).catch(error => console.error(`GET: ${url}.`, error));
+    };
+}
 
 export function getCongVanDen(id, context, done) {
     if (typeof context === 'function') {

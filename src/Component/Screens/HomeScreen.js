@@ -3,16 +3,15 @@
  * @flow strict-local
  */
 
-import React, { useEffect, useState } from 'react';
+import { getState, signOut } from '@/Store/settings';
+import T from '@/Utils/common';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import type { Node } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, TouchableOpacity, TextInput, Platform, StyleSheet, Image } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { useTheme } from 'react-native-paper';
-import { login, googleSignin, verifyToken, getState } from '@/Store/settings';
-import T from '@/Utils/common';
-import { GoogleSignin, GoogleSigninButton, statusCodes, } from '@react-native-google-signin/google-signin';
+import { useDispatch, useSelector } from 'react-redux';
 
 GoogleSignin.configure({
     webClientId: '318805336792-3g9b03uc6tk8b6ra1v49otm7ajddb8oi.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
@@ -33,30 +32,36 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
     const { colors } = useTheme();
     const style = T.style(colors);
     const [loginDisable, setLoginDisable] = useState(true);
-    // const rollBackScreen = route.params && route.params.rollBackScreen ? route.params.rollBackScreen : 'ProfileScreen';
-    // const hideHeader = route.params && route.params.hideHeader;
+
 
     const init = async () => {
         if (T.isDebug) {
             await T.verifyToken();
             if (!await T.hasCookie()) {
-                alert('debugEmail khôn hợp lệ')
+                dispatch(signOut());
+                alert('debugEmail khôn hợp lệ');
             } else
                 return getSystemState();
         } else {
-            const currentUser = await GoogleSignin.getCurrentUser();
+            let currentUser;
+            try {
+                currentUser = await GoogleSignin.getCurrentUser();
+            } catch {
+                currentUser = null;
+            }
             if (currentUser) {
                 await T.setCookie();
                 if (await T.hasCookie()) {
                     return getSystemState();
                 }
+                dispatch(signOut());
             }
             enableLogin();
         }
     }
 
-    const getSystemState = () => {
-        dispatch(getState());
+    const getSystemState = (done) => {
+        dispatch(getState(done));
     };
 
     const enableLogin = () => setLoginDisable(false);
@@ -66,19 +71,24 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
     }, []);
 
     useEffect(() => {
-        if (settings) {
+        if (settings?.user?.email) {
             navigation.navigate('TabScreen');
-        } (!settings)
-        enableLogin();
+        } else
+            enableLogin();
     }, [settings]);
-    
+
 
 
     // // };
     const signin = async () => {
-        const userInfo = await googleSignin();
-        if (userInfo && await T.verifyToken(userInfo.idToken))
-            getSystemState();
+        try {
+            const userInfo = await T.googleSignin();
+            if (userInfo && await T.verifyToken(userInfo.idToken))
+                getSystemState();
+            else dispatch(signOut());
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     return (
@@ -88,7 +98,7 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
                 <Animatable.View animation='fadeInUpBig' style={{ ...styles.mainArea, backgroundColor: colors.background }}>
 
                     <View style={{ backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-                        <Image source={{ uri: 'https://hcmussh.edu.vn/img/favicon.png' }} style={{ width: 300, height: 200, backgroundColor: 'transparent' }} />
+                        <Image source={require('../../Asset/Img/hcmussh.png')} style={{ width: '100%', height: undefined, aspectRatio: 255 / 177, backgroundColor: 'transparent' }} />
                     </View>
 
                     <View style={{ alignItems: 'center', marginTop: 50 }}>

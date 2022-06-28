@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import CongVanDenPage from './hcth/hcthCongVanDen/CongVanDenPage';
 import User from './User';
 import { useTheme } from 'react-native-paper';
+import { Button } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,8 +21,8 @@ export default DefaultScreenTabs = ({ navigation }) => {
             initialRouteName="congVanDenPage"
             screenOptions={{
                 tabBarActiveTintColor: colors.primary,
-                headerStyle: {backgroundColor: colors.primary},
-                headerTitleStyle: {color: colors.white}
+                headerStyle: { backgroundColor: colors.primary },
+                headerTitleStyle: { color: colors.white }
             }}
         >
             <Tab.Screen
@@ -32,6 +34,12 @@ export default DefaultScreenTabs = ({ navigation }) => {
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="document-text-outline" color={color} size={size} />
                     ),
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => { navigation.navigate('congVanDenPage', {abc:'abc'}) }} style={{ width: 30, marginRight: 15 }}>
+                            <Ionicons name='search-outline' color='white' style={{ fontSize: 25 }} />
+                        </TouchableOpacity>
+                    ),
+
                 }}
             />
             <Tab.Screen

@@ -1,12 +1,14 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, FlatList } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import T from './common';
 
 
-
-export const renderScrollView = ({ content = null, style = {} }) => {
-    return <ScrollView style={{ ...style, }}>
+export const renderScrollView = ({ content = null, style = {}, refreshControl, onScroll = null, ref }) => {
+    return <ScrollView style={{ ...style, }} refreshControl={refreshControl} bounces={true} onScroll={onScroll} ref={ref}>
         {content}
-    </ScrollView>
+    </ScrollView >
 }
 
 
@@ -15,32 +17,66 @@ export const Separator = ({ color = '#E1E4E7', width = '100%', height = 1, style
 }
 
 export const MenuItem = ({ bottomValue = null, title = '', value = null, button, expand, style, valueStyle = {},
-    bottomValueStyle = {}, titleStyle }) => {
-    return <View style={{ paddingBottom: 10, paddingTop: 10, ...style }}>
+    bottomValueStyle = {}, titleStyle, isExpand, onTitleClick = null }) => {
+    return <View style={{ paddingBottom: 10, paddingTop: 10, borderColor: '#868FA0', borderTopWidth: 1, ...style }}>
         <View style={{ display: 'flex', justifyItem: 'center', flexDirection: 'row', paddingRight: 10, paddingLeft: 10 }}>
-            <View style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, paddingRight: 10 }}>
+            <TouchableOpacity onPress={() => onTitleClick && onTitleClick()} disabled={!onTitleClick} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, paddingRight: 10 }}>
                 <Text style={{ fontSize: 20, color: 'black', ...titleStyle }}>{title}</Text>
                 {bottomValue && <Text style={{ fontSize: 15, color: 'black', ...bottomValueStyle }}>{bottomValue}</Text>}
-            </View>
-            {value && <Text style={{ fontSize: 15, alignSelf: 'center', color: 'black', ...valueStyle }}>{value}</Text>}
-            {button && button}
+            </TouchableOpacity>
+            {value ? <Text style={{ fontSize: 15, alignSelf: 'center', color: 'black', ...valueStyle }}>{value}</Text> : null}
+            {button ? button : null}
         </View>
-        {expand && <View>{expand}</View>}
+        {isExpand && expand ? <View>{expand}</View> : null}
     </View>
 }
 
-export const Menu = (props) => {
+export const Tile = (props) => {
     const { style = {} } = props;
-    const items = props.children || [];
-    const children = [];
-    items.map((item, key) => { children.push(item); key != items.length - 1 ? children.push(<Separator color={'#868FA0'} />) : null })
-    return <View style={{ borderBottomWidth: 1, borderTopWidth: 1, flex: 1, borderColor: '#868FA0', ...style }}>
-        {children}
+    return <View style={{ backgroundColor: 'white', marginTop: 10, ...style }}>
+        {props.children}
     </View>
 }
+
+export const Comment = ({ image, name, timestamp, content, style = {} }) => {
+    return <View style={{ flexDirection: 'row', width: '85%', ...style }}>
+        <View><Image source={{ uri: image }} style={{ width: 40, height: 40, borderRadius: 50, shadowRadius: 5, borderColor: '#868FA0', borderWidth: 1 }} /></View>
+        <View style={{ width: '100%', marginLeft: 15, marginRight: 15, padding: 5, borderWidth: 1, borderRadius: 10, borderTopLeftRadius: 0, borderColor: '#868FA0' }}>
+            <View style={{ flexDirection: 'column', borderBottomWidth: 1, borderColor: '#868FA0' }}>
+                <Text style={{ fontFamily: 'Work Sans', color: 'black', fontSize: 15, fontWeight: 'bold' }}>{name}</Text>
+                <Text style={{ fontFamily: 'Work Sans', color: 'black', fontSize: 10 }}>{T.dateToText(new Date(timestamp), 'HH:MM, dd/mm/yyyy')}</Text>
+            </View>
+            <Text style={{ fontFamily: 'Work Sans', color: 'black', fontSize: 15, marginTop: 5 }}>{content}</Text>
+        </View>
+    </View>
+}
+
+export const FormTextBox = ({ placeholder, onChangeText, value, icon, style }) => {
+    return (<View style={{...styles.formInput, ...style}}>
+        {icon ? icon : null}
+        <TextInput placeholder={placeholder} placeholderTextColor='#999999' style={styles.textInput} autoCapitalize='none' value={value} onChangeText={onChangeText} />
+    </View>);
+};
 
 const styles = StyleSheet.create({
     menuTitle: {
         fontFamily: 'Work Sans', color: 'black', fontSize: 30, fontWeight: 'bold'
-    }
+    },
+    formInput: {
+        flexDirection: 'row',
+        marginTop: 10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#CCC',
+        padding: 10,
+        paddingBottom: Platform.OS === 'ios' ? 10 : 0,
+        borderRadius: 5
+    },
+    textInput: {
+        flex: 1,
+        marginTop: Platform.OS === 'ios' ? 0 : -12,
+        paddingLeft: 10,
+        color: '#333333',
+        fontSize: 20
+    },
 })

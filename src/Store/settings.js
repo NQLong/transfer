@@ -1,6 +1,6 @@
 import T from '@/Utils/common';
 import crypto from 'crypto-js';
-import { GoogleSignin, } from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export const login = async (data) => {
     let string = `${data.cmnd}|${data.secretCode}`.replace(/\s +/g, '');
@@ -9,16 +9,7 @@ export const login = async (data) => {
     return response;
 }
 
-export const googleSignin = async () => {
-    try {
-        await GoogleSignin.hasPlayServices();
-        const userInfo = await GoogleSignin.signIn();
-        return userInfo;
-    } catch (error) {
-        console.error(error);
-        alert('Đăng nhập thất bại');
-    }
-}
+
 
 
 
@@ -57,10 +48,24 @@ export function getState(done) {
                 console.error('GET: ', url, res.error);
             } else
                 dispatch({ type: 'system:UpdateState', state: res });
-                done && done();
+            done && done();
         }).catch(() => {
             alert('Lấy thông tin hệ thống thất bại')
         })
+    }
+}
+
+export function signOut(done) {
+    return dispatch => {
+        console.log('logging out');
+        T.post('/logout').catch(error => console.error('Lỗi đăng xuất', error)).finally(() => {
+            dispatch({ type: 'system:UpdateState', state: null });
+            Promise.all([
+                T.storage.clear(),
+                T.clearCookie(),
+                GoogleSignin.signOut()
+            ]).catch((error) => console.error('Lỗi đăng xuất', error)).finally(() => done && done());
+        });
     }
 }
 // Reducer ===================================================================================================

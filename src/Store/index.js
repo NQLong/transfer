@@ -19,7 +19,7 @@ const persistConfig = {
 export const store = configureStore({
     reducer: persistReducer(persistConfig, reducers),
     middleware: (getDefaultMiddleware) => {
-        const middlewares = getDefaultMiddleware({ serializableCheck: false });
+        const middlewares = getDefaultMiddleware({ serializableCheck: false, immutableCheck: false });
         if (__DEV__ && !process.env.JEST_WORKER_ID) {
             Reactotron
                 .setAsyncStorageHandler(AsyncStorage)

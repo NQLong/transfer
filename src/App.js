@@ -29,7 +29,8 @@ window.T = T;
 LogBox.ignoreLogs([
   "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
   'RCTBridge required dispatch_sync to load RNGestureHandlerModule. This may lead to deadlocks',
-  'Non-serializable values were found in the navigation state'
+  'Non-serializable values were found in the navigation state',
+  'ViewPropTypes will be removed',
 ]);
 
 const App: () => Node = () => {

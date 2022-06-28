@@ -5,6 +5,8 @@ import axios from 'axios';
 import CookieManager from '@react-native-cookies/cookies';
 import Config from '@/Config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin, } from '@react-native-google-signin/google-signin';
+
 
 const instance = axios.create({
     baseURL: Config.API_URL,
@@ -124,6 +126,17 @@ T.language.parse = (text, getAll?: boolean): string | object => {
     return getAll ? obj : obj[T.language()];
 };
 
+T.googleSignin = async () => {
+    try {
+        await GoogleSignin.hasPlayServices();
+        const userInfo = await GoogleSignin.signIn();
+        return userInfo;
+    } catch (error) {
+        console.error(error);
+        T.alert('Đăng nhập','Đăng nhập thất bại');
+    }
+}
+
 T.verifyToken = async (token, email = Config.DEBUG_EMAIL) => {
     T.clearCookie();
     const axiosInstance = axios.create({
@@ -145,16 +158,16 @@ T.verifyToken = async (token, email = Config.DEBUG_EMAIL) => {
     );
     try {
         const body = { idToken: token, email };
-        const response = await axiosInstance.post('/auth/signin', body);
-        console.log(response.headers['set-cookie']);
+        const response = await axiosInstance.post('/auth/mobile/signin', body);
         const cookies = response.headers['set-cookie'];
         const siginInCookie = cookies.find(item => item.startsWith(Config.COOKIE_NAME));
-        console.log({ cookies, siginInCookie, data: response.data });
         if (siginInCookie) {
             await T.storage.set('siginInCookie', siginInCookie);
             return true;
         }
     } catch (error) {
+        console.error(error);
+        T.alert('Đăng nhập', 'Đăng nhập thất bại');
         return false;
     }
 
@@ -219,24 +232,30 @@ T.storage = {
             return true;
         } catch (error) {
             return null;
-
         }
 
     }
 };
 T.setCookie = async () => {
     const data = await T.storage.get('siginInCookie');
-    if (data && data.cookie) {
+    if (data && data.siginInCookie) {
         console.log({ data })
-        CookieManager.setFromResponse(Config.API_URL, data.cookie);
+        await CookieManager.setFromResponse(Config.API_URL, data.siginInCookie);
     }
 }
+
+T.isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize, paddingToBottom }) => {
+    const paddingToBottomValue = paddingToBottom || 20;
+    return layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottomValue;
+};
+
 
 T.hasCookie = async (key = Config.COOKIE_NAME) => {
     const cookie = await CookieManager.get(Config.API_URL);
     return cookie[key];
 }
-
+T.config = Config;
 T.isDebug = Config.API_URL != 'https://hcmussh.edu.vn/';
 // T.isDebug = false;
 
@@ -249,5 +268,14 @@ String.prototype.viText = function () {
 String.prototype.replaceAll = function (search, replacement) {
     return this.replace(new RegExp(search, 'g'), replacement);
 };
+
+// @ts-ignore
+String.prototype.normalizedName = function () {
+    let convertToArray = this.toLowerCase().split(' ');
+    let result = convertToArray.map(function (val) {
+        return val.replace(val.charAt(0), val.charAt(0).toUpperCase());
+    });
+    return result.join(' ');
+}
 
 export default T;
