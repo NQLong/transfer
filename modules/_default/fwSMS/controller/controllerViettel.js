@@ -1,49 +1,81 @@
 module.exports = app => {
     const http = require('http');
 
-    app.get('/api/sms-service/viettel', async (res, req) => {
-        // let { usernameViettel: user, passViettel: pass, brandName: brandname, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
+    app.permission.add('fwSms-viettel:send');
 
-        // let { phone, smsContent } = req.body;
 
-        let user = 'demo_sms',
-            pass = 'DemoSMS@#123',
-            brandname = 'MobiService',
-            phone = '0901303938', //temp
-            smsContent = 'Chuc mung sinh nhat quy khach hang'; //temp
+    app.sms.sendByViettel = async (phone, mess, emailSent) => await initViettelSms({ phone, mess }, emailSent);
 
-        const tranId = `${phone}_${new Date().getTime()}`;
-        const dataRequest = {
-            user, pass, tranId, phone, dataEncode: 1, smsContent, brandname
-        };
-        const option = {
-            host: '125.212.226.79',
-            port: 9020,
-            path: '/service/zalo_api',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'charser': 'utf8'
-            },
-            json: dataRequest
-        };
 
-        http.request(option, (res) => {
-            if (res.statusCode == 200) {
-                res.on('data', (data) => {
-                    if (data.code == 1) {
-                        app.model.fwSms.create({
-                            email: req.session.user.email,
-                            sentDate: new Date().getTime(),
-                            total: data.total
-                        }, (error, item) => {
-                            if (!error || item) app.model.setting.setValue({ totalSMSViettel: data.total }, () => res.send({ item }));
-                            else res.send({ error });
-                        });
-                    } else res.send({ error: 'Unsuccessful request' });
+    const initViettelSms = async (body, email) => {
+        try {
+            let { usernameViettel: user, passViettel: pass, brandName } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
+            let { phone, mess } = body;
+            // let user = 'demo_sms',
+            //     pass = 'DemoSMS@#123',
+            //     brandName = 'MobiService',
+            //     phone = '0901303938', //temp
+            //     mess = 'Chuc mung sinh nhat quy khach hang'; //temp
+            let dataEncode = Number(app.sms.checkNonLatinChar(mess));
+
+            const tranId = `${phone}_${new Date().getTime()}`;
+            const dataRequest = JSON.stringify({ user, pass, tranId, phone, dataEncode, mess, brandName });
+            const option = {
+                host: '125.212.226.79',
+                port: 9020,
+                path: '/service/sms_api',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=utf-8' }
+            };
+            return new Promise(resolve => {
+                const request = http.request(option, (_res) => {
+                    _res.on('data', async (chunk) => {
+                        let resData = {};
+                        try {
+                            resData = JSON.parse(chunk.toString());
+                        } catch (e) {
+                            console.error(e);
+                            resolve({ error: e });
+                        }
+                        console.log('VIETTEL RESDATA = ', resData);
+                        if (resData.code == 1) {
+                            try {
+                                const item = await app.model.fwSms.create({
+                                    email,
+                                    sentDate: new Date().getTime(),
+                                    total: resData.total
+                                });
+
+                                if (item) {
+                                    await app.model.setting.setValue({ totalSMSViettel: resData.total });
+                                    resolve({ success: true });
+                                } else resolve({ error: 'Create model SMS fail' });
+                            } catch (error) {
+                                console.error('Request is successfull but callback has error: ', error);
+                                resolve({ error: 'Create model SMS fail' });
+                            }
+                        } else resolve({ error: 'Unsuccessful request' });
+                    });
                 });
-            } else res.send({ error: 'Requesting to Viettel has been failed' });
+                request.on('error', (e) => {
+                    resolve({ error: `Problem with request to viettel: ${e.message}` });
+                });
+                request.write(dataRequest);
+                request.end();
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-        });
+    app.post('/api/sms-service/viettel', app.permission.check('fwSms-viettel:send'), async (req, res) => {
+        try {
+            let email = req.session.user.email, body = req.body;
+            const result = await initViettelSms(body, email);
+            if (result && result.success) res.send({ success: 'Sent SMS successfully!' });
+            else throw (result.error || result);
+        } catch (error) {
+            res.send({ error });
+        }
     });
 };

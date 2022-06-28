@@ -85,7 +85,7 @@ export class ComponentPhiaCanBo extends React.Component {
     };
 
     handleNewShcc = (value) => {
-        let curShcc = value.currentTarget.value;
+        let curShcc = value?.target.value || '';
         if (curShcc && curShcc != '' && curShcc.length == 8) {
             this.props.getStaffEdit(curShcc, data => {
                 if (data.item && !data.error) {

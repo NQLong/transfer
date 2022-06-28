@@ -39,6 +39,7 @@ export class DaoTaoModal extends AdminModal {
         //data for support: data: { data: {}, qtId }
         let item = data?.item || data?.data || null;
         // console.log(item.hinhThuc);
+        data.item && this.setState({ shcc: item.shcc, dataBanDau: item });
         let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenTruong, hinhThuc, loaiBangCap, minhChung, shcc } = item || {
             id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
             tenTruong: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: '', minhChung: '[]', shcc: ''
@@ -98,7 +99,7 @@ export class DaoTaoModal extends AdminModal {
         }
         else {
             if (!this.props.readOnly && this.props.isCanBo) {
-                this.props.create(this.state.oldData, changes, tccbSupport, this.hide);
+                this.props.create(this.state.dataBanDau, changes, tccbSupport, this.hide);
             }
             else {
                 this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -184,7 +185,7 @@ export class DaoTaoModal extends AdminModal {
                     <tr key={index}>
                         <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
-                            <a href={'/api/qua-trinh/dao-tao/download' + item} download>{name}</a>
+                            <a href={'/api/qua-trinh/dao-tao/download' + item + `?t=${new Date().getTime()}`} target='blank'>{name}</a>
                         </>
                         } />
                         <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(date), 'dd/mm/yyyy HH:MM')}></TableCell>
@@ -200,7 +201,6 @@ export class DaoTaoModal extends AdminModal {
     }
 
     render = () => {
-        console.log(this.props.isSupport, this.state.type);
         let readOnly = this.props.readOnly || this.props.isSupport;
         const displayElement = this.state.loaiBangCap ? 'block' : 'none';
         return this.renderModal({

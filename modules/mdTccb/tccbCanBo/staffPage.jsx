@@ -92,7 +92,7 @@ class StaffUserPage extends AdminPage {
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} phai={this.state.phai} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={shcc} readOnly={!permission.write} />
                 <ComponentHTCT />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} readOnly={true} />
 
                 <SupportModal ref={e => this.supportModal = e} create={this.props.createTccbSupport} system={this.props.system} />
                 {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '185px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}

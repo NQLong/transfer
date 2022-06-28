@@ -62,6 +62,7 @@ class ComponentTrinhDo extends AdminPage {
         }
     }
     render = () => {
+        const readOnly = this.props.readOnly;
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin về trình độ</h3>
@@ -81,10 +82,10 @@ class ComponentTrinhDo extends AdminPage {
                     <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' />
                     <DaoTaoDetail hocVi='Tiến sĩ' shcc={this.props.shcc} style={{ display: this.state.tienSi ? 'block' : 'none' }} />
 
-                    <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '02', text: 'Phó giáo sư' }, { id: '01', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear />
-                    <FormTextBox ref={e => this.chuyenNganhChucDanh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />
-                    <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận chức danh' className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' />
+                    <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '02', text: 'Phó giáo sư' }, { id: '01', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear readOnly={readOnly} />
+                    <FormTextBox ref={e => this.chuyenNganhChucDanh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' readOnly={readOnly} />
+                    <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận chức danh' className='form-group col-md-3' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' readOnly={readOnly} />
                     <div className='form-group col-md-12' />
                     <label className='form-group col-md-12'>Ngoại ngữ: </label>
                     <DaoTaoDetail chungChi='Ngoại ngữ' shcc={this.props.shcc} />
@@ -93,13 +94,13 @@ class ComponentTrinhDo extends AdminPage {
                     <DaoTaoDetail chungChi='Tin học' shcc={this.props.shcc} />
 
                     <label className='form-group col-md-12'>Lý luận chính trị:</label>
-                    <DaoTaoDetail chungChi='Lý luận chính trị' shcc={this.props.shcc} />
+                    <DaoTaoDetail chungChi='Lý luận chính trị' shcc={this.props.shcc} canEdit={true} />
 
                     <label className='form-group col-md-12'>Quản lý nhà nước:</label>
-                    <DaoTaoDetail chungChi='Quản lý nhà nước' shcc={this.props.shcc} />
+                    <DaoTaoDetail chungChi='Quản lý nhà nước' shcc={this.props.shcc} canEdit={true} />
 
                     <label className='form-group col-md-12'>Tình hình đào tạo, bồi dưỡng hiện tại:</label>
-                    <DaoTaoDetail chungChi='Hiện tại' shcc={this.props.shcc} />
+                    <DaoTaoDetail chungChi='Hiện tại' shcc={this.props.shcc} canEdit={true} />
                 </div>
             </div>
         );

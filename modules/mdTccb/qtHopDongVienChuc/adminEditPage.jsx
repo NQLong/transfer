@@ -39,7 +39,6 @@ const EnumLoaiCanBo = Object.freeze({
     2: { text: 'Cán bộ cũ' }
 });
 
-
 class QtHopDongVienChucEditPage extends QTForm {
     constructor (props) {
         super(props);
@@ -57,7 +56,6 @@ class QtHopDongVienChucEditPage extends QTForm {
         this.tonGiao = React.createRef();
         this.ngaySinh = React.createRef();
         this.phai = React.createRef();
-        // this.chucVuNguoiKy = React.createRef();
         this.hocVanTrinhDo = React.createRef();
         this.hocVanChuyenNganh = React.createRef();
         this.cmnd = React.createRef();
@@ -541,9 +539,6 @@ class QtHopDongVienChucEditPage extends QTForm {
                 <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                     <i className='fa fa-lg fa-save' />
                 </button>
-                {/* {this.urlMa ? <button type='button' title='Save and export LL2C Word' className='btn btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px', color: 'white', backgroundColor: 'rgb(76, 110, 245)' }} onClick={this.downloadWord}>
-                    <i className='fa fa-lg fa-file-word-o' />
-                </button> : null} */}
             </main>
         );
 

@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1007: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#E36273', groupIndex: 2 },
+            // 1007: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#E36273', groupIndex: 2 },
         },
     };
 
@@ -141,7 +141,7 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/tccb/qua-trinh/ky-luat/create-multiple', app.permission.check('qtKyLuat:write'), (req, res) => { 
+    app.post('/api/tccb/qua-trinh/ky-luat/create-multiple', app.permission.check('qtKyLuat:write'), (req, res) => {
         const { listShcc, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh } = req.body.data, errorList = [];
         const solve = (index = 0) => {
             if (index == listShcc.length) {
