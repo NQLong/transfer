@@ -432,7 +432,7 @@ module.exports = (app) => {
             const donViNhan = await app.model.hcthDonViNhan.getAllDVN({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
-            else {
+            else if (req.session.user.shcc && req.session.user.shcc !== undefined && req.session.user.shcc !== '') {
                 await viewCongVanDen(id, req.session.user.shcc, congVan.nguoiTao);
             }
             const files = await app.model.hcthFile.getAllFile({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
