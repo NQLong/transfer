@@ -14,6 +14,7 @@ export class SupportModal extends AdminModal {
 
         let { ho, ten, phai, biDanh, maDonVi, ngaySinh, quocGia, tonGiao, email, maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh, maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan, ngheNghiepCu, ngayBatDauCongTac, ngayBienChe, donViTuyenDung, soBhxh, ngayBatDauBhxh, ngayKetThucBhxh, thongTinKhac, bacLuong, heSoLuong, tyLePhuCapThamNien, tyLePhuCapUuDai, ngayHuongLuong } = item;
         data.data && this.setState({ item, qtId: data.qtId, type: data.type, oldData: data.oldData });
+        console.log(ngayHuongLuong);
         data.item && this.setState({ shcc: item.shcc, dataBanDau: item });
         this.ho.value(ho);
         this.ten.value(ten);
@@ -38,7 +39,7 @@ export class SupportModal extends AdminModal {
         this.thongTinKhac.value(thongTinKhac || '');
         this.bacLuong.value(bacLuong || '');
         this.heSoLuong.value(heSoLuong || '');
-        this.ngayHuongLuong.value(ngayHuongLuong);
+        this.ngayHuongLuong.value(Number(ngayHuongLuong) || '');
         this.tyLePhuCapThamNien.value(tyLePhuCapThamNien);
         this.tyLePhuCapUuDai.value(tyLePhuCapUuDai);
     }
