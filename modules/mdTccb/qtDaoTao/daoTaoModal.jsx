@@ -185,7 +185,7 @@ export class DaoTaoModal extends AdminModal {
                     <tr key={index}>
                         <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
-                            <a href={'/api/qua-trinh/dao-tao/download' + item} download>{name}</a>
+                            <a href={'/api/qua-trinh/dao-tao/download' + item + `?t=${new Date().getTime()}`} target='blank'>{name}</a>
                         </>
                         } />
                         <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(date), 'dd/mm/yyyy HH:MM')}></TableCell>
