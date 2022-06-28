@@ -16,7 +16,7 @@ export class PhanHoiModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        getValue(this.phanHoi) && T.confirm('Gửi phản hồi', 'Gửi phản hồi và từ chối yêu cầu này?', 'warning', true, isConfirm => {
+        getValue(this.phanHoi) && T.confirm('Gửi phản hồi', 'Gửi phản hồi cho cán bộ này?', 'warning', true, isConfirm => {
             if (isConfirm) {
                 let dataPhanHoi = {
                     maYeuCau: getValue(this.maYeuCau),
@@ -41,7 +41,7 @@ export class PhanHoiModal extends AdminModal {
         });
         const permission = this.props.permission;
         return this.renderModal({
-            title: 'Phản hồi lý do từ chối yêu cầu',
+            title: 'Phản hồi yêu cầu',
             size: 'elarge',
             isShowSubmit: false,
             body: <>
@@ -50,7 +50,7 @@ export class PhanHoiModal extends AdminModal {
                     <FormTextBox className='col-md-4' ref={e => this.canBoYeuCau = e} label='Cán bộ yêu cầu' readOnly />
                     <FormTextBox className='col-md-4' ref={e => this.qt = e} label='Về' readOnly />
                 </div>
-                <h5 style={{ marginBottom: '15px' }}>Phản hồi</h5>
+                <h5 style={{ marginBottom: '15px' }}>Thông tin phản hồi</h5>
                 {comments && comments.length ? comments.map((comment, index) => comment.noiDung && <div key={index}><Comment data={comment} /></div>) : 'Chưa có phản hồi'}
                 {permission.write && <div className='row'>
                     <FormRichTextBox style={{ marginTop: '15px' }} className='col-md-12' ref={e => this.phanHoi = e} placeholder='Phản hồi' icon={
