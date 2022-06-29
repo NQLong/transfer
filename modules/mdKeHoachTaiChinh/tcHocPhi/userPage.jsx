@@ -139,10 +139,10 @@ class UserPage extends AdminPage {
             backRoute: '/user',
             content: hocPhi ? <div className='tile'>
                 <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
-                <div style={{ textAlign: 'left' }}>
-                    <b style={{ fontSize: '18px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
-                    MSSV: <span>{user ? user.data.mssv : ''}</span><br />
-                    Khoa/Bộ môn: <span>{user ? user.data.tenKhoa : ''}</span>
+                <div style={{ textAlign: 'center' }}>
+                    <b style={{ fontSize: '20px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
+                    <span style={{ fontSize: '18px' }}>{user ? user.data.mssv : ''}</span><br />
+                    <span style={{ fontSize: '18px' }}>{user ? 'K. ' + user.data.tenKhoa : ''}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
