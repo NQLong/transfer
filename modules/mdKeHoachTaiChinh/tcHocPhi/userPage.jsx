@@ -8,30 +8,49 @@ import T from 'view/js/common';
 import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi } from './redux';
 class ThanhToanModal extends AdminModal {
     render = () => {
+        let styleButton = { width: '90%', margin: 'auto', marginBottom: '20px', height: '50px', display: 'inline-flex', alignItems: 'center' },
+            styleLogo = { maxWidth: 100, marginRight: 30, marginLeft: 20 };
         return this.renderModal({
             title: 'Phương thức thanh toán',
             body: <div className='row' >
-                <Tooltip title='Thanh toán bằng Agribank (thông qua VNPAY)' arrow placement='top'>
-                    <button className='btn' style={{ width: '90%', margin: 'auto', marginBottom: '20px' }} onClick={e => {
+                <Tooltip title='Thanh toán qua Agribank' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('agribank', link => {
                             window.location.href = link;
                         });
                     }}>
-                        <img src='/img/logo/agribank.svg' alt='Agribank' style={{ maxWidth: 80, marginRight: 20 }} /> Thanh toán bằng AGRIBANK
+                        <img src={`/img/logo/agribank.png?t=${new Date().getTime()}`} alt='Agribank' style={styleLogo} /><span>Thanh toán qua AGRIBANK</span>
                     </button>
                 </Tooltip>
-                <Tooltip title='Thanh toán bằng VNPAY' arrow>
-                    <button className='btn' style={{ width: '90%', margin: 'auto' }} onClick={e => {
+
+                <Tooltip title='Thanh toán qua Vietcombank' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                    }}>
+                        <img src={`/img/logo/vcb.png?t=${new Date().getTime()}`} alt='Vietcombank' style={styleLogo} />Thanh toán qua Vietcombank
+                    </button>
+                </Tooltip>
+                <Tooltip title='Thanh toán qua BIDV' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                    }}>
+                        <img src={`/img/logo/logo_bidv.png?t=${new Date().getTime()}`} alt='BIDV' style={styleLogo} /> Thanh toán qua BIDV
+                    </button>
+                </Tooltip>
+
+                <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('vnpay', link => {
                             window.location.href = link;
                         });
                     }}>
-                        <img src='/img/logo/vnpay.svg' alt='VNPAY' style={{ maxWidth: 80, marginRight: 20 }} /> Thanh toán thông qua VNPAY
+                        <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
                     </button>
 
                 </Tooltip>
+
             </div>
         });
     }
@@ -120,10 +139,10 @@ class UserPage extends AdminPage {
             backRoute: '/user',
             content: hocPhi ? <div className='tile'>
                 <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
-                <div style={{ textAlign: 'left' }}>
-                    <b style={{ fontSize: '18px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
-                    MSSV: <span>{user ? user.data.mssv : ''}</span><br />
-                    Khoa/Bộ môn: <span>{user ? user.data.tenKhoa : ''}</span>
+                <div style={{ textAlign: 'center' }}>
+                    <b style={{ fontSize: '20px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
+                    <span style={{ fontSize: '18px' }}>{user ? user.data.mssv : ''}</span><br />
+                    <span style={{ fontSize: '18px' }}>{user ? 'K. ' + user.data.tenKhoa : ''}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
@@ -139,6 +158,8 @@ class UserPage extends AdminPage {
                 {table}
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <p>Tổng học phí: <b>{hocPhi.hocPhi.toString().numberWithCommas()} vnđ </b></p>
+                    <p>Đã đóng: <b>{(hocPhi.hocPhi - hocPhi.congNo).toString().numberWithCommas()} vnđ </b></p>
+
                 </div>
 
                 <Modal ref={e => this.modal = e} />
