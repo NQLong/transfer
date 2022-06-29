@@ -39,6 +39,7 @@ export const Tile = (props) => {
 }
 
 export const Comment = ({ image, name, timestamp, content, style = {} }) => {
+    console.log({image})
     return <View style={{ flexDirection: 'row', width: '85%', ...style }}>
         <View><Image source={{ uri: image }} style={{ width: 40, height: 40, borderRadius: 50, shadowRadius: 5, borderColor: '#868FA0', borderWidth: 1 }} /></View>
         <View style={{ width: '100%', marginLeft: 15, marginRight: 15, padding: 5, borderWidth: 1, borderRadius: 10, borderTopLeftRadius: 0, borderColor: '#868FA0' }}>

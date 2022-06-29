@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCongVanDen, HcthCongVanDenGet } from './redux';
+import { getCongVanDen, HcthCongVanDenGet, createPhanHoi, getPhanHoi, createChiDao, getChiDao } from './redux';
 import { useTheme } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { FloatingAction } from "react-native-floating-action";
+// import { FloatingAction } from "react-native-floating-action";
 
 import { Tile, MenuItem, Comment, FormTextBox } from '@/Utils/componennt';
 import T from '@/Utils/common';
@@ -40,8 +40,81 @@ const action = {
     VIEW: 'VIEW'
 };
 
+const DonViNhan = () => {
+    const list = useSelector(state => state?.hcthCongVanDen?.item?.danhSachDonViNhan);
+    const { colors } = useTheme();
+    const [isExpand, setIsExpand] = useState(false);
+    console.log(list);
+    const renderContent = () => {
+        if (!list)
+            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+        else if (!list.length)
+            return <Text>Chưa có đơn vị nhận</Text>
+        else {
+            const items = list.map((item, key) => {
+                const style = {}
+                if (key == 0)
+                    style.borderTopWidth = 0;
+                return <MenuItem titleStyle={{ fontSize: 15 }} title={item.ten} key={key} style={style} />
+            });
+            return items;
+        };
+    }
+
+    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
+        {renderContent()}
+    </View >;
+    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
+        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
+        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
+    </TouchableOpacity>;
+
+
+    return <Tile style={{}}>
+        <MenuItem style={{ borderBottomWidth: 1 }} title='Đơn vị nhận' isExpand={isExpand} button={button} expand={expand} />
+    </Tile>
+}
+
+const CanBoNhan = () => {
+    const list = useSelector(state => state?.hcthCongVanDen?.item?.danhSachCanBoNhan);
+    const { colors } = useTheme();
+    const [isExpand, setIsExpand] = useState(false);
+    const renderContent = () => {
+        if (!list)
+            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+        else if (!list.length)
+            return <Text>Chưa có cán bộ nhận</Text>
+        else {
+            const items = list.map((item, key) => {
+                const style = {}
+                if (key == 0)
+                    style.borderTopWidth = 0;
+                return <MenuItem titleStyle={{ fontSize: 15 }} title={`${item.ho} ${item.ten}`.normalizedName() + ` - ${item.shcc}`} key={key} style={style} />
+            });
+            return items;
+        };
+    }
+
+
+    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
+        {renderContent()}
+    </View >;
+    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
+        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
+        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
+    </TouchableOpacity>;
+
+
+    return <Tile style={{}}>
+        <MenuItem style={{ borderBottomWidth: 1 }} title='Cán bộ nhận' isExpand={isExpand} button={button} expand={expand} />
+    </Tile>
+}
+
 const PhanHoi = () => {
     const list = useSelector(state => state?.hcthCongVanDen?.item?.phanHoi);
+    const id = useSelector(state => state?.hcthCongVanDen?.item?.id);
+    const shcc = useSelector(state => state?.settings?.user?.shcc);
+    const dispatch = useDispatch();
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(false);
     const [phanHoi, setPhanHoi] = useState('');
@@ -52,19 +125,30 @@ const PhanHoi = () => {
             return <Text>Chưa có phản hồi</Text>
         else {
             const items = list.map((item, key) => {
-                return <Comment style={{ marginLeft: 5, marginBottom: 10 }} key={key} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.ngayTao} image={item.image ? item.image : T.config.API_URL + 'img/avatar.png'} content={item.noiDung} />
+                return <Comment style={{ marginLeft: 5, marginBottom: 10 }} key={key} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.ngayTao} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.noiDung} />
             });
             return items;
         };
+    }
+
+
+    const onSubmit = () => {
+        const data = {
+            key: id,
+            canBoGui: shcc,
+            noiDung: phanHoi,
+            ngayTao: new Date().getTime(),
+        };
+        dispatch(createPhanHoi(data, () => dispatch(getPhanHoi(id, () => setPhanHoi('')))));
     }
 
     const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
         {renderContent()}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <FormTextBox style={{ flex: 1, marginRight: 10 }} value={phanHoi} onChangeText={text => setPhanHoi(text)} placeholder='Nhập phản hồi' />
-            <TouchableOpacity>
+            {shcc ? <TouchableOpacity onPress={onSubmit}>
                 <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
-            </TouchableOpacity>
+            </TouchableOpacity> : null}
         </View>
     </View >;
     const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
@@ -82,7 +166,11 @@ const ChiDao = () => {
     const list = useSelector(state => state?.hcthCongVanDen?.item?.danhSachChiDao);
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(false);
-    const [chiDao, setChiDao] = useState('')
+    const [chiDao, setChiDao] = useState('');
+    const id = useSelector(state => state?.hcthCongVanDen?.item?.id);
+    const shcc = useSelector(state => state?.settings?.user?.shcc);
+    const dispatch = useDispatch();
+
     const renderContent = () => {
 
         if (!list)
@@ -91,17 +179,29 @@ const ChiDao = () => {
             return <Text>Chưa có chỉ đạo</Text>
         else {
             const items = list.map((item, key) => {
-                return <Comment style={{ marginLeft: 5, marginBottom: 10 }} key={key} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.thoiGian} image={item.image ? item.image : T.config.API_URL + 'img/avatar.png'} content={item.chiDao} />
+                console.log({ item })
+                return <Comment style={{ marginLeft: 5, marginBottom: 10 }} key={key} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.thoiGian} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.chiDao} />
             });
             return items;
         };
     }
 
+    const onSubmit = () => {
+        const data = {
+            canBo: shcc,
+            chiDao: chiDao,
+            thoiGian: new Date().getTime(),
+            congVan: id,
+        };
+        dispatch(createChiDao(data, () => dispatch(getChiDao(id, () => setChiDao('')))));
+    }
+
+
     const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
         {renderContent()}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <FormTextBox style={{ flex: 1, marginRight: 10 }} value={chiDao} onChangeText={text => setChiDao(text)} placeholder='Nhập chỉ đạo' />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={onSubmit}>
                 <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
             </TouchableOpacity>
         </View>
@@ -238,6 +338,12 @@ const CongVanDen = ({ navigation, route }) => {
         dispatch(getCongVanDen(congVanId, context, done));
     };
 
+    // navigation.setOptions({
+    //     headerRight: () => {
+    //         return <Text style={{ color: 'white' }}> abcasdasd </Text>
+    //     }
+    // })
+
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -265,48 +371,17 @@ const CongVanDen = ({ navigation, route }) => {
     if (!item)
         return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
 
-    const actions = [
-        {
-            text: "Accessibility",
-            icon: <Ionicons name={'chevron-down-outline'} size={20} />,
-            name: "bt_accessibility",
-            position: 2
-        },
-        {
-            text: "Language",
-            icon: <Ionicons name={'chevron-forward-outline'} size={20} />,
-            name: "bt_language",
-            position: 1
-        },
-        {
-            text: "Location",
-            icon: <Ionicons name={'chevron-forward-outline'} size={20} />,
-            name: "bt_room",
-            position: 3
-        },
-        {
-            text: "Video",
-            icon: <Ionicons name={'chevron-forward-outline'} size={20} />,
-            name: "bt_videocam",
-            position: 4
-        }
-    ];
-
 
     return renderScrollView({
         content: <>
             {genneralInfo()}
+            <CanBoNhan />
+            <DonViNhan />
             <ChiDao />
             <PhanHoi />
             <FileList navigation={navigation} />
             <History />
             <View style={{ marginBottom: 50 }} />
-            <FloatingAction
-                actions={actions}
-                onPressItem={name => {
-                    console.log(`selected button: ${name}`);
-                }}
-            />
         </>,
         style: {},
         refreshControl: <RefreshControl colors={["#9Bd35A", "#689F38"]} refreshing={refreshing} onRefresh={onRefresh} />,
