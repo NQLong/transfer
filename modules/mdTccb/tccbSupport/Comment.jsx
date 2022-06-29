@@ -2,7 +2,10 @@ import React from 'react';
 
 export default class Comment extends React.Component {
     render() {
-        let { avatar, name, time, content } = this.props.data;
+        let { avatar, name,
+            time, content } = this.props.data;
+        avatar = '/img/avatar.png';
+        name = 'Phòng Tổ chức - Cán bộ';
         return (
             <div className='comment-card col-md-12'>
                 <div className='col-md-12'>
