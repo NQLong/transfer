@@ -49,18 +49,51 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.check('tcHocPhi:read'), async (req, res) => {
-        const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings(),
-            mssv = req.params.mssv;
-        app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
-            if (error) res.send({ error });
-            else if (!sinhVien) res.send({ error: 'Sinh viên không tồn tại' });
+    app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.orCheck('tcHocPhi:read'), async (req, res) => {
+        try {
+            const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings(),
+                mssv = req.params.mssv;
+            let sinhVien = await app.model.fwStudents.get({ mssv });
+            if (!sinhVien) throw 'Not found student!';
             else {
-                app.model.tcHocPhiTransaction.getAll({
+                const items = await app.model.tcHocPhiTransaction.getAll({
                     customerId: mssv, hocKy, namHoc
-                }, (error, items) => res.send({ error, items, sinhVien, hocKy, namHoc }));
+                });
+                res.send({ items, sinhVien, hocKy, namHoc });
             }
-        });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/finance/user/hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
+        try {
+            const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings();
+            const user = req.session.user, permissions = user.permissions;
+            let mssv = '';
+            console.log(user);
+            if (!permissions.includes('tcHocPhi:read')) {
+                mssv = user.data.mssv;
+                const khoa = await app.model.dmDonVi.get({ ma: user.data.khoa }, 'ten');
+                user.data.tenKhoa = khoa.ten;
+            } else mssv = req.query.mssv;
+            console.log(mssv);
+            const hocPhi = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy });
+            console.log(hocPhi);
+            const hocPhiDetail = await app.model.tcHocPhiDetail.getAll({ mssv, namHoc, hocKy });
+            console.log(hocPhiDetail);
+            for (const item of hocPhiDetail) {
+                const monHoc = await app.model.dmMonHoc.get({ ma: item.maMonHoc });
+                if (monHoc) {
+                    item.tenMonHoc = app.parse(monHoc.ten).vi;
+                }
+            }
+            console.log(hocPhiDetail);
+            res.send({ hocPhi, hocPhiDetail });
+        } catch (error) {
+            console.error('ERROR Get student fee: ', error);
+            res.send({ error });
+        }
     });
 
     app.put('/api/finance/hoc-phi', app.permission.check('tcHocPhi:write'), (req, res) => {

@@ -166,7 +166,7 @@ module.exports = app => {
 
     app.get('/api/staff/edit/item', app.permission.check('staff:login'), async (req, res) => {
         app.model.canBo.get(req.query.condition, (error, canBo) => {
-            if (error || canBo == null) {
+            if (error) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
                 app.getCanBoProfile(res, canBo);

@@ -1,9 +1,9 @@
-// Table name: TCHC_CAN_BO_HOP_DONG_DVTL_TN { shcc, email, gioiTinh, ho, ten, quocGia, danToc, tonGiao, ngaySinh, noiSinhMaTinh, nguyenQuanMaTinh, cuTruMaTinh, cuTruMaHuyen, cuTruMaXa, cuTruSoNha, thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha, hocVanTrinhDo, hocVanChuyenNganh, khoaHocChucDanh, khoaHocChuyenNganh, cmnd, cmndNgayCap, cmndNoiCap, hopDongCanBo, hopDongCanBoNgay, dienThoai }
-const keys = ['SHCC'];
-const obj2Db = { 'shcc': 'SHCC', 'email': 'EMAIL', 'gioiTinh': 'GIOI_TINH', 'ho': 'HO', 'ten': 'TEN', 'quocGia': 'QUOC_GIA', 'danToc': 'DAN_TOC', 'tonGiao': 'TON_GIAO', 'ngaySinh': 'NGAY_SINH', 'noiSinhMaTinh': 'NOI_SINH_MA_TINH', 'nguyenQuanMaTinh': 'NGUYEN_QUAN_MA_TINH', 'cuTruMaTinh': 'CU_TRU_MA_TINH', 'cuTruMaHuyen': 'CU_TRU_MA_HUYEN', 'cuTruMaXa': 'CU_TRU_MA_XA', 'cuTruSoNha': 'CU_TRU_SO_NHA', 'thuongTruMaTinh': 'THUONG_TRU_MA_TINH', 'thuongTruMaHuyen': 'THUONG_TRU_MA_HUYEN', 'thuongTruMaXa': 'THUONG_TRU_MA_XA', 'thuongTruSoNha': 'THUONG_TRU_SO_NHA', 'hocVanTrinhDo': 'HOC_VAN_TRINH_DO', 'hocVanChuyenNganh': 'HOC_VAN_CHUYEN_NGANH', 'khoaHocChucDanh': 'KHOA_HOC_CHUC_DANH', 'khoaHocChuyenNganh': 'KHOA_HOC_CHUYEN_NGANH', 'cmnd': 'CMND', 'cmndNgayCap': 'CMND_NGAY_CAP', 'cmndNoiCap': 'CMND_NOI_CAP', 'hopDongCanBo': 'HOP_DONG_CAN_BO', 'hopDongCanBoNgay': 'HOP_DONG_CAN_BO_NGAY', 'dienThoai': 'DIEN_THOAI' };
+// Table name: TC_HOC_PHI_DETAIL { mssv, hocKy, namHoc, maMonHoc, soTinChi, soTien, active }
+const keys = ['HOC_KY', 'MA_MON_HOC', 'MSSV', 'NAM_HOC'];
+const obj2Db = { 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'maMonHoc': 'MA_MON_HOC', 'soTinChi': 'SO_TIN_CHI', 'soTien': 'SO_TIEN', 'active': 'ACTIVE' };
 
 module.exports = app => {
-    app.model.tchcCanBoHopDongDvtlTn = {
+    app.model.tcHocPhiDetail = {
         create: (data, done) => new Promise((resolve, reject) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -18,10 +18,10 @@ module.exports = app => {
                 done && done('Data is empty!');
                 reject('Data is empty!');
             } else {
-                const sql = 'INSERT INTO TCHC_CAN_BO_HOP_DONG_DVTL_TN (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                const sql = 'INSERT INTO TC_HOC_PHI_DETAIL (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.tchcCanBoHopDongDvtlTn.get({ rowId: resultSet.lastRowid }).then(item => {
+                        app.model.tcHocPhiDetail.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
                             resolve(item);
                         }).catch(error => {
@@ -55,7 +55,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM TCHC_CAN_BO_HOP_DONG_DVTL_TN' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
@@ -87,7 +87,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TCHC_CAN_BO_HOP_DONG_DVTL_TN' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
@@ -120,7 +120,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sqlCount = 'SELECT COUNT(*) FROM TCHC_CAN_BO_HOP_DONG_DVTL_TN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sqlCount = 'SELECT COUNT(*) FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
@@ -131,7 +131,7 @@ module.exports = app => {
                     result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT TCHC_CAN_BO_HOP_DONG_DVTL_TN.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM TCHC_CAN_BO_HOP_DONG_DVTL_TN' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT TC_HOC_PHI_DETAIL.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                     app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                         if (error) {
                             done && done(error);
@@ -151,10 +151,10 @@ module.exports = app => {
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
-                const sql = 'UPDATE TCHC_CAN_BO_HOP_DONG_DVTL_TN SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                const sql = 'UPDATE TC_HOC_PHI_DETAIL SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.tchcCanBoHopDongDvtlTn.get({ rowId: resultSet.lastRowid }).then(item => {
+                        app.model.tcHocPhiDetail.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
                             resolve(item);
                         }).catch(error => {
@@ -182,7 +182,7 @@ module.exports = app => {
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'DELETE FROM TCHC_CAN_BO_HOP_DONG_DVTL_TN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'DELETE FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, error => {
                 if (error) {
                     done && done(error);
@@ -204,7 +204,7 @@ module.exports = app => {
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT COUNT(*) FROM TCHC_CAN_BO_HOP_DONG_DVTL_TN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'SELECT COUNT(*) FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
                 if (error) {
                     done && done(error);

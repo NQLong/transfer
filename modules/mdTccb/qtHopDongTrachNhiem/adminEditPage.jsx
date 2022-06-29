@@ -32,7 +32,7 @@ const EnumLoaiCanBo = Object.freeze({
 });
 
 class QtHopDongTrachNhiemEditPage extends AdminPage {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { item: null, canBoCu: false, hdkxdtg: false, thoiGianHd: '', shcc: '', isTaoMoi: true };
 
@@ -72,7 +72,6 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
     getData = () => {
         if (this.urlMa) {
             this.props.getHopDongTrachNhiem(this.ma, data => {
-                console.log(data);
                 if (data.error) {
                     T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                 } else {
@@ -97,13 +96,12 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
     }
 
     setVal = (data = {}) => {
-        console.log(data);
         const {
             nguoiDuocThue = '', hieuLucHopDong = '', chiuSuPhanCong = '',
             congViecDuocGiao = '', diaDiemLamViec = '',
             ketThucHopDong = null,
             ngayKyHopDong = '', ngayKyHdTiepTheo = '', nguoiKy = '',
-            soHopDong = '', ngach = '', tienLuong = '' 
+            soHopDong = '', ngach = '', tienLuong = ''
         } = data ? data : {};
 
         this.handleChucVu(data.nguoiKy);
@@ -128,7 +126,6 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
     }
 
     validate = (selector) => {
-        console.log(selector);
         const data = selector.value();
         const isRequired = selector.props.required;
         if (data || data === 0 || data != '') return data;
@@ -137,7 +134,7 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
         }
         return null;
     };
-    
+
     getVal = () => {
         try {
             const data = {
@@ -188,8 +185,7 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
                 ngayKyHopDong: this.validate(this.ngayKyHopDong)?.getTime(),
             };
             return data;
-        } catch(selector) {
-            console.log(selector.props);
+        } catch (selector) {
             T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
             return false;
         }
@@ -295,7 +291,7 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
                     else T.confirm('Xác nhận', 'Lưu hợp đồng và <b> không cập nhật </b> dữ liệu cán bộ?', 'warning', true, isConfirm => {
                         if (isConfirm) this.state.isTaoMoi ? this.props.createQtHopDongTrachNhiem(data) : this.props.updateQtHopDongTrachNhiem(this.ma, data);
                     });
-                } 
+                }
             });
         } else {
             T.confirm('Xác nhận', 'Lưu hợp đồng và <b> thêm dữ liệu cán bộ mới </b>?', 'warning', true, isConfirm => {
@@ -394,14 +390,14 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
                                 </div>
                                 <div className='form-group col-xl-4 col-md-6'><FormDatePicker type='date-mask' ref={e => this.ngaySinh = e} label='Ngày sinh' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} required /></div>
                             </> : <>
-                                <div className='form-group col-xl-12 col-md-12'><FormTextBox style={{ textTransform: 'uppercase' }} ref={e => this.shcc = e} maxLength={10} label='Mã số cán bộ' required readOnly={true}/> </div>
+                                <div className='form-group col-xl-12 col-md-12'><FormTextBox style={{ textTransform: 'uppercase' }} ref={e => this.shcc = e} maxLength={10} label='Mã số cán bộ' required readOnly={true} /> </div>
                                 <div className='form-group col-xl-3 col-md-6'><FormTextBox style={{ textTransform: 'uppercase' }} ref={e => this.ho = e} maxLength={100} label='Họ và tên lót' required /> </div>
                                 <div className='form-group col-xl-3 col-md-4'><FormTextBox ref={e => this.ten = e} label='Tên' maxLength={20} required /> </div>
                                 <div className='form-group col-xl-3 col-md-4'><FormDatePicker type='date-mask' ref={e => this.ngaySinh = e} label='Ngày sinh' min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} required /> </div>
 
                             </>
                         }
-                        <div className='form-group col-xl-4 col-md-4'><FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' placeholder='Nhập số CMND/CCCD' required/> </div>
+                        <div className='form-group col-xl-4 col-md-4'><FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' placeholder='Nhập số CMND/CCCD' required /> </div>
                         <div className='form-group col-xl-4 col-md-4'><FormDatePicker type='date-mask' ref={e => this.cmndNgayCap = e} label='Ngày cấp CMND/CCCD' /> </div>
                         <div className='form-group col-xl-4 col-md-4'><FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' /> </div>
                         <div className='form-group col-xl-2 col-md-4'><FormSelect data={SelectAdapter_DmGioiTinhV2} ref={e => this.gioiTinh = e} label='Giới tính' /> </div>
@@ -429,11 +425,11 @@ class QtHopDongTrachNhiemEditPage extends AdminPage {
                     <div className='tile-body row'>
                         <div className='form-group col-xl-6 col-md-6'><FormDatePicker type='date-mask' ref={e => this.ngayKyHopDong = e} label='Ngày ký hợp đồng' onChange={this.handleTuNgay} required /></div>
                         <div className='form-group col-xl-3 col-md-6'><FormDatePicker type='date-mask' ref={e => this.hieuLucHopDong = e} label='Ngày hiệu lực hợp đồng' required onChange={this.handleNgayBatDau} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><FormDatePicker type='date-mask' ref={e => this.batDauLamViec = e} label='Ngày bắt đầu làm việc' readOnly/></div>
+                        <div className='form-group col-xl-3 col-md-6'><FormDatePicker type='date-mask' ref={e => this.batDauLamViec = e} label='Ngày bắt đầu làm việc' readOnly /></div>
                         <div className='form-group col-xl-4 col-md-6' id='ketThucHd'><FormDatePicker type='date-mask' ref={e => this.ketThucHopDong = e} label='Ngày kết thúc hợp đồng' required /></div>
                         <div className='form-group col-xl-4 col-md-6' id='kyTiepTheo'><FormDatePicker type='date-mask' ref={e => this.ngayKyHopDongTiepTheo = e} label='Ngày ký hợp đồng tiếp theo' /></div>
-                        <div className='form-group col-xl-6 col-md-12'><FormSelect data={SelectAdapter_DmNgachCdnnV2} ref={e => this.chucDanhNgheNghiep = e} label='Chức danh nghề nghiệp' onChange={this.genNewShcc}/></div>
-                        <div className='form-group col-xl-6 col-md-12'><FormSelect data={SelectAdapter_DmDonVi} ref={e => this.diaDiemLamViec = e} label='Địa điểm làm việc' onChange={this.genNewShcc}/></div>
+                        <div className='form-group col-xl-6 col-md-12'><FormSelect data={SelectAdapter_DmNgachCdnnV2} ref={e => this.chucDanhNgheNghiep = e} label='Chức danh nghề nghiệp' onChange={this.genNewShcc} /></div>
+                        <div className='form-group col-xl-6 col-md-12'><FormSelect data={SelectAdapter_DmDonVi} ref={e => this.diaDiemLamViec = e} label='Địa điểm làm việc' onChange={this.genNewShcc} /></div>
                         <div className='form-group col-xl-4 col-md-4'><FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' /></div>
                         <div className='form-group col-xl-4 col-md-4'><FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự phân công' /></div>
                         <div className='form-group col-xl-4 col-md-4'><FormTextBox ref={e => this.tienLuong = e} label='Tiền lương' /></div>

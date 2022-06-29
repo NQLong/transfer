@@ -3,6 +3,15 @@ import { connect } from 'react-redux';
 import { getNewsByUser } from './redux';
 import SectionSideBar from 'view/component/SectionSideBar';
 
+const texts = {
+    vi: {
+        attachments: 'Tệp tin đính kèm:',
+    },
+    en: {
+        attachments: 'Attachment files:',
+    }
+};
+
 class NewsDetail extends React.Component {
     constructor (props) {
         super(props);
@@ -35,6 +44,7 @@ class NewsDetail extends React.Component {
     }
 
     render() {
+        const language = T.language(texts);
         const item = this.props.news && this.props.news.userNews ? this.props.news.userNews : null;
         const width = $(window).width();
         if (item == null) {
@@ -42,7 +52,7 @@ class NewsDetail extends React.Component {
         } else {
             let categories = !item.categories ? [] : item.categories.map((categorieItem, index) =>
                 <a key={index} href='#' className='tag-cloud-link'>{T.language.parse(categorieItem.text)}</a>);
-            let attachments = item.listAttachment ? attachments = item.listAttachment.map((item, index) =>
+            let attachments = item.listAttachment ? item.listAttachment.map((item, index) =>
                 <div key={index}>
                     <a href={'/api/storage/download/' + item.path} download>{item.nameDisplay} </a>
                 </div>
@@ -83,7 +93,7 @@ class NewsDetail extends React.Component {
                                     }} />
                                 {attachments &&
                                     <div>
-                                        Tệp tin đính kèm:
+                                        {language.attachments}
                                         {attachments}
                                     </div>}
                                 {width < 500 ? <div style={{ width: '100%', }}>

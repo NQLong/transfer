@@ -432,9 +432,22 @@ module.exports = (app) => {
             const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
-            else {
+            else if (req.session.user?.shcc) {
                 await viewCongVanDen(id, req.session.user.shcc, congVan.nguoiTao);
             }
+            let danhSachDonViNhan = [];
+            let danhSachCanBoNhan = [];
+            if (donViNhan?.length) {
+                danhSachDonViNhan = await app.model.dmDonVi.getAll({
+                    statement: `MA in (${donViNhan.map(item => item.donViNhan).toString()})`,
+                    parameter: {},
+                }, 'ma, ten', 'ma');
+            }
+            if (congVan?.canBoNhan && congVan?.canBoNhan.length)
+                danhSachCanBoNhan = await app.model.canBo.getAll({
+                    statement: 'SHCC IN (:danhSachShcc)',
+                    parameter: { danhSachShcc: congVan?.canBoNhan.split(',') }
+                }, 'shcc,ten,ho,email', 'ten');
             const files = await app.model.hcthFile.getAll({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
             const history = await app.model.hcthHistory.getAllFrom(id, CONG_VAN_TYPE, req.query.historySortType);
@@ -444,12 +457,14 @@ module.exports = (app) => {
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi || [],
+                    phanHoi: phanHoi?.rows || [],
                     donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     danhSachChiDao: chiDao?.rows || [],
                     history: history?.rows || [],
-                    quyenChiDao
+                    quyenChiDao,
+                    danhSachDonViNhan,
+                    danhSachCanBoNhan,
                 }
             });
         } catch (error) {
@@ -522,7 +537,7 @@ module.exports = (app) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
-            res.send({ error: null, items: phanHoi });
+            res.send({ error: null, items: phanHoi.rows || [] });
         }
         catch (error) {
             res.send({ error });
@@ -860,16 +875,16 @@ module.exports = (app) => {
                 const workBook = app.excel.create();
                 const ws = workBook.addWorksheet('Cong_van_den');
                 const defaultColumns = [
-                    { header: 'STT', key: 'stt', width: 10},
+                    { header: 'STT', key: 'stt', width: 10 },
                     { header: 'Số lưu riêng (các ô bên cạnh - số được đánh bên trái của cv đến - dùng để kiếm cv)', key: 'soDen', width: 10 },
-                    { header: 'NGÀY', key: 'ngay', width: 15},
-                    { header: 'ĐƠN VỊ GỬI', key: 'donViGuiCv', width: 30},
-                    { header: 'SỐ CV', key: 'soCV', width: 20},
-                    { header: 'NGÀY CV', key: 'ngayCongVan', width: 15},
-                    { header: 'NỘI DUNG', key: 'trichYeu', width: 50},
-                    { header: 'ĐƠN VỊ, NGƯỜI NHẬN', key: 'donViNguoiNhan', width: 30},
-                    { header: 'NGÀY HẾT HẠN', key: 'ngayHetHan', width: 15},
-                    { header: 'CHỈ ĐẠO CỦA HIỆU TRƯỞNG', key: 'chiDao', width: 30},
+                    { header: 'NGÀY', key: 'ngay', width: 15 },
+                    { header: 'ĐƠN VỊ GỬI', key: 'donViGuiCv', width: 30 },
+                    { header: 'SỐ CV', key: 'soCV', width: 20 },
+                    { header: 'NGÀY CV', key: 'ngayCongVan', width: 15 },
+                    { header: 'NỘI DUNG', key: 'trichYeu', width: 50 },
+                    { header: 'ĐƠN VỊ, NGƯỜI NHẬN', key: 'donViNguoiNhan', width: 30 },
+                    { header: 'NGÀY HẾT HẠN', key: 'ngayHetHan', width: 15 },
+                    { header: 'CHỈ ĐẠO CỦA HIỆU TRƯỞNG', key: 'chiDao', width: 30 },
                 ];
                 ws.columns = defaultColumns;
                 ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center', wrapText: true };
@@ -879,29 +894,29 @@ module.exports = (app) => {
                     family: 4,
                     size: 12,
                     bold: true,
-                    color: { argb: 'FF000000'}
+                    color: { argb: 'FF000000' }
                 };
                 page.rows.forEach((item, index) => {
                     ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center', wrapText: true };
                     ws.getRow(index + 2).font = { name: 'Times New Roman' };
                     ws.getCell('A' + (index + 2)).value = index + 1;
                     ws.getCell('B' + (index + 2)).value = item.soDen;
-                    ws.getCell('B' + (index + 2)).font = { ...ws.getRow(index + 2).font, bold: true }; 
+                    ws.getCell('B' + (index + 2)).font = { ...ws.getRow(index + 2).font, bold: true };
                     ws.getCell('C' + (index + 2)).value = app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy');
                     ws.getCell('D' + (index + 2)).value = item.tenDonViGuiCV;
-                    ws.getCell('D' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('D' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                     ws.getCell('E' + (index + 2)).value = item.soCongVan ? item.soCongVan : '';
                     ws.getCell('F' + (index + 2)).value = item.ngayCongVan ? app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy') : '';
                     ws.getCell('G' + (index + 2)).value = item.trichYeu;
-                    ws.getCell('G' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('G' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                     const donViNhan = item.danhSachDonViNhan?.split(';').map(dv => dv + '\r\n').join('') || '';
                     const canBoNhan = item.danhSachCanBoNhan?.split(';').map(cb => cb + '\r\n').join('') || '';
                     ws.getCell('H' + (index + 2)).value = canBoNhan !== '' || donViNhan !== '' ? canBoNhan + donViNhan : '';
-                    ws.getCell('H' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('H' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                     ws.getCell('I' + (index + 2)).value = item.ngayHetHan !== 0 ? app.date.dateTimeFormat(new Date(item.ngayHetHan), 'dd/mm/yyyy') : '';
-                    ws.getCell('I' + (index + 2)).font = { ...ws.getRow(index + 2).font, color: { argb: 'FFFF0000'}};
+                    ws.getCell('I' + (index + 2)).font = { ...ws.getRow(index + 2).font, color: { argb: 'FFFF0000' } };
                     ws.getCell('J' + (index + 2)).value = item.chiDao?.split('|').map(cd => cd + '\r\n').join('');
-                    ws.getCell('J' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('J' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                 });
                 let fileName = `Cong_van_den_${Date.now()}.xlsx`;
                 app.excel.attachment(workBook, res, fileName);

@@ -295,8 +295,14 @@ class HcthCongVanDi extends AdminPage {
                         <FormDatePicker type='date' className='col-md-4' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
                     </>)}
                 </div>
-            </>
+            </>,
+            onExport: (e) => {
+                e.preventDefault();
+                let filter = T.stringify(this.state.filter);
 
+                if (filter.includes('%')) filter = '{}';
+                T.download(`/api/hcth/cong-van-cac-phong/download-excel/${filter}`, 'CONG_VAN_CAC_PHONG.xlsx');
+            }
         });
     }
 }

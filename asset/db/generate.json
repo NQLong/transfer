@@ -13933,7 +13933,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 2000
                 },
                 "NAM_HOC": {
                     "value": "namHoc",
@@ -14148,8 +14148,8 @@
                     "nullable": false,
                     "size": "20,0"
                 },
-                "CONG_VAN": {
-                    "value": "congVan",
+                "FILE_CONG_VAN": {
+                    "value": "fileCongVan",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
@@ -14265,7 +14265,7 @@
         },
         "TC_HOC_PHI_ORDERS_SANDBOX": {
             "active": true,
-            "moduleName": "tcHocPhiOrdersSandbox",
+            "moduleName": "tcSandBox",
             "modelName": "tcHocPhiOrdersSandbox",
             "columns": {
                 "REF_ID": {
@@ -14319,7 +14319,7 @@
         },
         "TC_HOC_PHI_SANDBOX": {
             "active": true,
-            "moduleName": "tcHocPhiSandbox",
+            "moduleName": "tcSandBox",
             "modelName": "tcHocPhiSandbox",
             "columns": {
                 "MSSV": {
@@ -14375,8 +14375,11 @@
         },
         "TC_HOC_PHI_TRANSACTION_SANDBOX": {
             "active": true,
-            "moduleName": "tcHocPhiTransactionSandbox",
+            "moduleName": "tcSandBox",
             "modelName": "tcHocPhiTransactionSandbox",
+            "methods": {
+                "TC_HOC_PHI_TRANSACTION_SANDBOX_ADD_BILL": "addBill"
+            },
             "columns": {
                 "TRANS_ID": {
                     "value": "transId",
@@ -14458,6 +14461,70 @@
             },
             "primaryKeys": [
                 "TRANS_ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_DETAIL": {
+            "active": true,
+            "moduleName": "tcHocPhiDetail",
+            "modelName": "tcHocPhiDetail",
+            "columns": {
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_MON_HOC": {
+                    "value": "maMonHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "SO_TIN_CHI": {
+                    "value": "soTinChi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "SO_TIEN": {
+                    "value": "soTien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "HOC_KY",
+                "MA_MON_HOC",
+                "MSSV",
+                "NAM_HOC"
             ],
             "foreignKeys": [],
             "type": "table"

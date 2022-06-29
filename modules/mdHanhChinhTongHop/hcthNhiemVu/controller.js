@@ -457,7 +457,7 @@ module.exports = (app) => {
 
             const nhiemVu = {
                 ...nhiemVuItem,
-                phanHoi: phanHoi || [],
+                phanHoi: phanHoi?.rows || [],
                 listFile: listFile || [],
                 canBoNhan: canBoNhan?.rows || [],
                 lienKet: lienKet?.rows || [],

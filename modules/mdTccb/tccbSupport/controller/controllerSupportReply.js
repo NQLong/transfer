@@ -9,8 +9,8 @@ module.exports = app => {
                     let emailCanBoYeuCau = await app.getEmailByShcc(dataPhanHoi.canBoYeuCau);
                     app.notification.send({
                         toEmail: emailCanBoYeuCau,
-                        title: 'Yêu cầu hỗ trợ bị từ chối',
-                        subTitle: `Phản hồi của phòng TCCB: ${dataPhanHoi.noiDung}`,
+                        title: `Nội dung phản hồi #${dataPhanHoi.maYeuCau}`,
+                        subTitle: dataPhanHoi.noiDung,
                         icon: 'fa-universal-access',
                         iconColor: 'warning',
                         link: '/user/support',
