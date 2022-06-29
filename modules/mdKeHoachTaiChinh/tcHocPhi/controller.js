@@ -71,21 +71,27 @@ module.exports = app => {
             const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings();
             const user = req.session.user, permissions = user.permissions;
             let mssv = '';
+            console.log(user);
             if (!permissions.includes('tcHocPhi:read')) {
                 mssv = user.data.mssv;
                 const khoa = await app.model.dmDonVi.get({ ma: user.data.khoa }, 'ten');
                 user.data.tenKhoa = khoa.ten;
             } else mssv = req.query.mssv;
+            console.log(mssv);
             const hocPhi = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy });
+            console.log(hocPhi);
             const hocPhiDetail = await app.model.tcHocPhiDetail.getAll({ mssv, namHoc, hocKy });
+            console.log(hocPhiDetail);
             for (const item of hocPhiDetail) {
                 const monHoc = await app.model.dmMonHoc.get({ ma: item.maMonHoc });
                 if (monHoc) {
                     item.tenMonHoc = app.parse(monHoc.ten).vi;
                 }
             }
+            console.log(hocPhiDetail);
             res.send({ hocPhi, hocPhiDetail });
         } catch (error) {
+            console.error('ERROR Get student fee: ', error);
             res.send({ error });
         }
     });
