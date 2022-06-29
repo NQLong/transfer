@@ -13,40 +13,40 @@ class ThanhToanModal extends AdminModal {
         return this.renderModal({
             title: 'Phương thức thanh toán',
             body: <div className='row' >
-                <Tooltip title='Thanh toán bằng Agribank (thông qua VNPAY)' arrow placement='top'>
+                <Tooltip title='Thanh toán qua Agribank' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('agribank', link => {
                             window.location.href = link;
                         });
                     }}>
-                        <img src='/img/logo/agribank.svg' alt='Agribank' style={styleLogo} /><span>Thanh toán bằng AGRIBANK</span>
+                        <img src={`/img/logo/agribank.png?t=${new Date().getTime()}`} alt='Agribank' style={styleLogo} /><span>Thanh toán qua AGRIBANK</span>
                     </button>
                 </Tooltip>
 
-                <Tooltip title='Thanh toán bằng Vietcombank' arrow placement='top'>
+                <Tooltip title='Thanh toán qua Vietcombank' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                     }}>
-                        <img src='/img/logo/vcb.svg' alt='Vietcombank' style={styleLogo} />Thanh toán thông qua Vietcombank
+                        <img src={`/img/logo/vcb.png?t=${new Date().getTime()}`} alt='Vietcombank' style={styleLogo} />Thanh toán qua Vietcombank
                     </button>
                 </Tooltip>
-                <Tooltip title='Thanh toán bằng BIDV' arrow placement='top'>
+                <Tooltip title='Thanh toán qua BIDV' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                     }}>
-                        <img src='/img/logo/logo_bidv.png' alt='BIDV' style={styleLogo} /> Thanh toán thông qua BIDV
+                        <img src={`/img/logo/logo_bidv.png?t=${new Date().getTime()}`} alt='BIDV' style={styleLogo} /> Thanh toán qua BIDV
                     </button>
                 </Tooltip>
 
-                <Tooltip title='Thanh toán bằng VNPAY' arrow placement='top'>
+                <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('vnpay', link => {
                             window.location.href = link;
                         });
                     }}>
-                        <img src='/img/logo/vnpay.svg' alt='VNPAY' style={styleLogo} /> Thanh toán thông qua VNPAY
+                        <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
                     </button>
 
                 </Tooltip>
