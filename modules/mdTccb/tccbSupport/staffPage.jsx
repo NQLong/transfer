@@ -54,10 +54,10 @@ class AdminSupportPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian gửi</th>
                     <th style={{ width: '25%', whiteSpace: 'nowrap', textAlign: 'center' }}>Loại</th>
                     <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Yêu cầu về</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ xử lý</th>
+                    {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ xử lý</th> */}
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian xử lý</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trạng thái</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phản hồi</th>
                 </tr>
             ),
             renderRow: (item, index) => (
@@ -74,7 +74,7 @@ class AdminSupportPage extends AdminPage {
                         : ''}</>} />
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={TYPE_MAPPER[item.type]} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={QT_MAPPER[item.qt]} />
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{item.canBoXuLy?.normalizedName() || ''}<br />{item.shccAssign}</>} />
+                    {/* <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{item.canBoXuLy?.normalizedName() || ''}<br />{item.shccAssign}</>} /> */}
                     <TableCell content={<>{item.modifiedDate ?
                         <>
                             {T.dateToText(item.modifiedDate, 'dd/mm/yyyy')}

@@ -138,11 +138,11 @@ class UserPage extends AdminPage {
                     <tr key={index} style={{ backgroundColor: item.read == 1 ? 'rgba(0, 0, 0, 0.05)' : '' }}>
                         <TableCell type='number' style={{ verticalAlign: 'middle' }} content={index + 1} />
                         <TableCell type='text' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', borderRight: 'none' }} content={<>
-                            <span className='fa-stack fa-lg'>
+                            <span className='fa-stack fa-2x'>
                                 <i className='fa fa-circle fa-stack-2x' style={{ color: item.iconColor }} />
                                 <i className={`fa ${item.icon} fa-stack-1x fa-inverse`} />
                             </span><br />
-                            <p className='app-notification__meta'>{new Date(item.sendTime).getText()}</p>
+                            <p className='app-notification__meta'>{T.dateToText(item.sendTime)}</p>
                         </>} />
                         <TableCell type='text' className='no-alignment' style={{ width: '100%', borderLeft: 'none' }} content={<>
                             <UrlItem link={item.targetLink} onClick={e => buttons.length == 0 ? this.readNotify(item.id) : e.preventDefault()}>
