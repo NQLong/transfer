@@ -89,13 +89,7 @@ class UserPage extends AdminPage {
             }
         }
 
-        T.ready('/user', () => {
-            // this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
-            //     const { settings: { namHoc, hocKy } } = data;
-            //     this.year.value(namHoc);
-            //     this.term.value(hocKy);
-            //     this.setState({ namHoc, hocKy });
-            // });
+        T.ready('/user/hoc-phi', () => {
             this.props.getHocPhi();
             this.props.getTcHocPhiHuongDan();
         });
@@ -115,18 +109,15 @@ class UserPage extends AdminPage {
                 <tr>
                     <th style={style()}>STT</th>
                     {/* <th style={style('10%', 'right')}>Chọn thanh toán</th> */}
-                    <th style={style('70%')}>Môn học</th>
-                    <th style={style('10%', 'right')}>Số tín chỉ</th>
-                    <th style={style('20%', 'right')}>Thành tiền</th>
+                    <th style={style('100%')}>Loại phí</th>
+                    <th style={style('auto', 'right')}>Tổng thu</th>
 
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    {/* {item.active ? <TableCell type='checkbox' content={item.active || ''} /> : <TableCell content='Đã thanh toán' style={{ textAlign: 'center' }} />} */}
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc} - ${item.tenMonHoc}`} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.soTinChi} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${(item.soTien?.toString() || '').numberWithCommas()} vnđ`} />
                 </tr>
             )
@@ -137,21 +128,21 @@ class UserPage extends AdminPage {
             icon: 'fa fa-money',
             breadcrumb: ['Học phí'],
             backRoute: '/user',
-            content: hocPhi ? <div className='tile'>
+            content: user && hocPhi ? <div className='tile'>
                 <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
                 <div style={{ textAlign: 'center' }}>
                     <b style={{ fontSize: '20px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
                     <span style={{ fontSize: '18px' }}>{user ? user.data.mssv : ''}</span><br />
-                    <span style={{ fontSize: '18px' }}>{user ? 'K. ' + user.data.tenKhoa : ''}</span>
+                    <span style={{ fontSize: '18px' }}>{user ? user.data.tenKhoa : ''}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <span style={{ fontSize: '18px' }}>Học phí học kỳ {hocPhi.hocKy || ''}, năm học {hocPhi.namHoc ? `${hocPhi.namHoc} - ${Number(hocPhi.namHoc) + 1}` : ''} </span>
-                    <Tooltip title='Thanh toán' placement='top' arrow>
+                    <i style={{ fontSize: '16px' }}>Học phí học kỳ {hocPhi.hocKy || ''}, năm học {hocPhi.namHoc ? `${hocPhi.namHoc} - ${Number(hocPhi.namHoc) + 1}` : ''} </i>
+                    {hocPhi.congNo && <Tooltip title='Thanh toán' placement='top' arrow>
                         <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                             Thanh toán
                         </button>
-                    </Tooltip>
+                    </Tooltip>}
                 </div>
 
                 <div className='tile-footer' style={{ marginBottom: '0' }} />
@@ -159,7 +150,6 @@ class UserPage extends AdminPage {
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <p>Tổng học phí: <b>{hocPhi.hocPhi.toString().numberWithCommas()} vnđ </b></p>
                     <p>Đã đóng: <b>{(hocPhi.hocPhi - hocPhi.congNo).toString().numberWithCommas()} vnđ </b></p>
-
                 </div>
 
                 <Modal ref={e => this.modal = e} />
