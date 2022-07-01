@@ -110,6 +110,10 @@ module.exports = (app) => {
             index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
+        hocPhi: {
+            index: 6200, title: 'Học phí', link: '/user/hoc-phi', icon: 'fa-credit-card',
+            subMenusRender: false
+        },
         daoTao: {
             index: 7000, title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-diamond',
             subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'DANH SÁCH']

@@ -6,6 +6,13 @@ module.exports = app => {
         }
     };
 
+    const menuHocPhi = {
+        parentMenu: app.parentMenu.hocPhi,
+        // menus: {
+        //     1016: { title: 'Thông tin cá nhân sinh viên', link: '/user/sinh-vien/info', icon: 'fa-user-circle-o', backgroundColor: '#eb9834', groupIndex: 0 }
+        // }
+    };
+
     const menuStudents = {
         parentMenu: app.parentMenu.students,
         menus: {
@@ -15,6 +22,7 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'student:login', menu },
+        { name: 'student:login', menu: menuHocPhi },
         { name: 'student:read', menu: menuStudents },
         { name: 'student:write' },
         { name: 'student:delete' }
