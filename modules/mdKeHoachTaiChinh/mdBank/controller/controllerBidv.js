@@ -74,7 +74,7 @@ module.exports = app => {
     };
 
     // production
-    app.post('/api/bidv-nvxhhcm/payBill', async (req, res) => {
+    app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
         try {
             await payBill(types.PRODUCTION, req, res);
         } catch (error) {
@@ -83,7 +83,7 @@ module.exports = app => {
     });
 
     // sandbox
-    app.post('/api/bidv-nvxhhcm/sandbox/payBill', async (req, res) => {
+    app.post('/api/bidv-nvxhhcm/sandbox/paybill', async (req, res) => {
         try {
             await payBill(types.SANDBOX, req, res);
         } catch (error) {
