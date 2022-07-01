@@ -364,6 +364,8 @@ const T = {
         }
     },
 
+    isObject: (value) => value && value.constructor == ({}).constructor,
+
     // TIME Operation ----------------------------------
     monthDiff: (d1, d2) => { //Difference in Months between two dates
         var months;
@@ -415,8 +417,18 @@ const T = {
 
 T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 
+// Language
+let languages = ['vi', 'en'];
 T.language = texts => {
-    let lg = window.location.pathname.includes('/en')
+    const cookieLg = T.cookie('language');
+    let lg = 'vi', pathname = window.location.pathname;
+    // if (pathname.includes('/en') || pathname.includes('/news-en') || pathname.includes('/article')) {
+    //     lg = 'en';
+    // } else if (pathname.includes('/nvduc/de')) {
+    //     lg = 'de';
+    // } else if ()
+
+    lg = window.location.pathname.includes('/en')
         || window.location.pathname.includes('/news-en')
         || window.location.pathname.includes('/nvduc/de')
         || window.location.pathname.includes('/article') ? 'en' : 'vi';
@@ -424,6 +436,7 @@ T.language = texts => {
     if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
+T.language.setLanguages = _languages => languages = _languages && Array.isArray(_languages) && _languages.length ? _languages : ['vi', 'en'];
 T.language.next = () => {
     let language = window.location.pathname.includes('/en')
         || window.location.pathname.includes('/news-en')
