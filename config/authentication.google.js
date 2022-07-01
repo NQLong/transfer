@@ -94,10 +94,11 @@ module.exports = (app) => {
                 userEmail = email;
             }
             if (!userEmail)
-                throw 401;
+                throw 'Tài khoản không hợp lệ';
             else {
                 const user = await app.model.fwUser.get({ email: userEmail });
-                if (!user) throw {};
+                console.log({userEmail, user});
+                if (!user) throw 'Tài khoản không tồn tại';
                 app.updateSessionUser(req, user, () => {
                     res.send({ message: 'Đăng nhập thành công', email: user.email });
                 });

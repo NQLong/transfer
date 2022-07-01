@@ -418,7 +418,7 @@ module.exports = (app) => {
         if (shccCanBo == creator) return;
         const lichSuDoc = await app.model.hcthHistory.get({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
         if (!lichSuDoc) {
-            return await app.model.hcthHistory.create({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
+            return await app.model.hcthHistory.create({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW, thoiGian: new Date().getTime() });
         }
         return lichSuDoc;
     };
@@ -529,6 +529,40 @@ module.exports = (app) => {
             }
         } catch (error) {
             res.send({ error });
+        }
+    });
+
+
+    app.put('/api/hcth/cong-van-den/tra-lai', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
+        try {
+            const { id, lyDo } = req.body;
+            let congVan = await app.model.hcthCongVanDen.get({ id });
+            const userShcc = req.session.user?.shcc;
+            const quyenChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE),
+                canBoChiDao = (quyenChiDao?.rows || []).map(item => item.shccCanBoNhan);
+            const userPermission = req.session.user?.permissions || [];
+            if (!congVan) throw 'Công văn không tồn tại';
+            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể trả lại công văn này';
+            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền trả lại công văn này';
+            else if (!lyDo) throw 'Vui lòng nhập lý do trả lại công văn';
+            else {
+                const chiDao = {
+                    canBo: req.session.user?.shcc,
+                    chiDao: lyDo,
+                    thoiGian: new Date().getTime(),
+                    congVan: id,
+                    loai: CONG_VAN_TYPE,
+                    action: action.RETURN,
+                };
+                await app.model.hcthChiDao.create(chiDao);
+                congVan = await app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiSwitcher.TRA_LAI_BGH.id });
+                res.send({ item: congVan });
+            }
+        } catch (error) {
+            if (typeof error == 'string')
+                res.send({ error: { errorMessage: error } });
+            else
+                res.send({error});
         }
     });
 
