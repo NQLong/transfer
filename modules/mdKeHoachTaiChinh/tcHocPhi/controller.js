@@ -85,29 +85,35 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/finance/hoc-phi', app.permission.check('tcHocPhi:write'), (req, res) => {
-        const { item: { mssv, namHoc, hocKy }, changes } = req.body;
-        delete changes['congNo'];
-        app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, (error, item) => {
-            if (!error && item) {
+    app.put('/api/finance/hoc-phi', app.permission.check('tcHocPhi:write'), async (req, res) => {
+        try {
+            const { item: { mssv, namHoc, hocKy }, changes } = req.body;
+            delete changes['congNo'];
+            let item = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy });
+            if (item) {
                 const hocPhiCu = item.hocPhi;
-                item.hocPhi = changes['hocPhi'];
-                getCongNo(item, ({ congNo }) => {
-                    changes['congNo'] = congNo;
-                    app.model.tcHocPhi.update({ mssv }, changes, (error, item) => {
-                        const logItem = {
-                            mssv: mssv,
-                            hocKy: hocKy,
-                            namHoc: namHoc,
-                            duLieuCu: JSON.stringify({ hocPhi: hocPhiCu }),
-                            duLieuMoi: JSON.stringify({ hocPhi: item.hocPhi })
-                        };
-                        app.tcHocPhiSaveLog(req.session.user.email, 'U', logItem);
-                        res.send({ error, item });
-                    });
-                });
-            }
-        });
+                item.hocPhi = changes.hocPhi;
+                let congNo = await getCongNo(item);
+                changes.congNo = congNo;
+                console.log(changes);
+                const updateItem = await app.model.tcHocPhi.update({ mssv, namHoc, hocKy }, changes);
+                if (updateItem) {
+                    const logItem = {
+                        mssv: mssv,
+                        hocKy: hocKy,
+                        namHoc: namHoc,
+                        duLieuCu: JSON.stringify({ hocPhi: hocPhiCu }),
+                        duLieuMoi: JSON.stringify({ hocPhi: item.hocPhi })
+                    };
+                    app.tcHocPhiSaveLog(req.session.user.email, 'U', logItem);
+                    item.congNo = congNo;
+                    res.send({ item });
+                } else throw 'Lỗi cập nhật học phí';
+            } else throw 'Không tồn tại học phí';
+        } catch (error) {
+            res.send({ error });
+        }
+
     });
 
     app.post('/api/finance/hoc-phi/upload', app.permission.check('tcHocPhi:write'), async (req, res) => {
@@ -124,7 +130,7 @@ module.exports = app => {
                 } else {
                     item = await app.model.tcHocPhi.create({ mssv, namHoc, hocKy, hocPhi: sumHocPhi, congNo: sumHocPhi, ngayTao });
                 }
-                if (!item) throw 'Update học phí fail!';
+                if (!item) throw 'Cập nhật học phí lỗi!';
             }
             for (const khoanPhi of data) {
                 let { mssv, soTien, loaiPhi, namHoc, hocKy } = khoanPhi;
@@ -142,13 +148,12 @@ module.exports = app => {
         }
     });
 
-    const getCongNo = async (item, done) => {
+    const getCongNo = async (item) => {
         const { mssv, hocKy, namHoc, hocPhi } = item;
         const items = await app.model.tcHocPhiTransaction.getAll({
             customerId: mssv, hocKy, namHoc
         });
         const congNo = hocPhi - items.reduce((partialSum, item) => partialSum + parseInt(item.amount), 0);
-        done && done(congNo);
         return congNo;
     };
 
@@ -167,59 +172,59 @@ module.exports = app => {
 
     const tcHocPhiImportData = async (fields, files, done) => {
         let worksheet = null;
-        new Promise((resolve, reject) => {
-            if (fields.userData && fields.userData[0] && fields.userData[0] == 'TcHocPhiData' && files.TcHocPhiData && files.TcHocPhiData.length) {
-                const srcPath = files.TcHocPhiData[0].path;
-                const workbook = app.excel.create();
-                workbook.xlsx.readFile(srcPath).then(() => {
-                    app.deleteFile(srcPath);
-                    worksheet = workbook.getWorksheet(1);
-                    worksheet ? resolve() : reject('Invalid excel file!');
-                });
-            }
-        }).then(async () => {
-            const items = [];
-            const duplicateDatas = [];
-            let index = 2;
-            try {
-                while (true) {
-                    if (!worksheet.getCell('A' + index).value) {
-                        done({ items, duplicateDatas });
-                        break;
-                    } else {
-                        const namHoc = worksheet.getCell('A' + index).value;
-                        const hocKy = (worksheet.getCell('B' + index).value || 'HK').replace('HK', '');
-                        let loaiPhi = worksheet.getCell('D' + index).value;
-                        const soTien = worksheet.getCell('E' + index).value;
-                        const mssv = worksheet.getCell('C' + index).value?.toString().trim() || '';
-                        const itemLoaiPhi = await app.model.tcLoaiPhi.get({ ten: loaiPhi });
-                        loaiPhi = itemLoaiPhi.id;
-                        const row = { namHoc, hocKy, mssv, soTien, loaiPhi, tenLoaiPhi: itemLoaiPhi.ten };
-                        if (mssv) {
-                            //check MSSV
-                            let student = await app.model.fwStudents.get({ mssv });
-                            if (student) {
-                                let hoTenSinhVien = `${student.ho} ${student.ten}`,
-                                    tmpRow = { ...row, hoTenSinhVien };
-                                let hocPhi = await app.model.tcHocPhiDetail.get({ mssv, namHoc, hocKy, loaiPhi });
-                                if (hocPhi) {
-                                    const { soTien: curFee } = hocPhi;
-                                    tmpRow = { ...tmpRow, curFee };
-                                    duplicateDatas.push(mssv);
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'TcHocPhiData' && files.TcHocPhiData && files.TcHocPhiData.length) {
+            const srcPath = files.TcHocPhiData[0].path;
+            let workbook = app.excel.create();
+            workbook = await app.excel.readFile(srcPath);
+            if (workbook) {
+                app.deleteFile(srcPath);
+                worksheet = workbook.getWorksheet(1);
+                if (worksheet) {
+                    const items = [];
+                    const duplicateDatas = [];
+                    let index = 2;
+                    try {
+                        while (true) {
+                            if (!worksheet.getCell('A' + index).value) {
+                                done({ items, duplicateDatas });
+                                break;
+                            } else {
+                                const namHoc = worksheet.getCell('A' + index).value;
+                                const hocKy = (worksheet.getCell('B' + index).value || 'HK').replace('HK', '');
+                                let loaiPhi = worksheet.getCell('D' + index).value;
+                                const soTien = worksheet.getCell('E' + index).value;
+                                const mssv = worksheet.getCell('C' + index).value?.toString().trim() || '';
+                                const itemLoaiPhi = await app.model.tcLoaiPhi.get({ ten: loaiPhi });
+                                loaiPhi = itemLoaiPhi.id;
+                                const row = { namHoc, hocKy, mssv, soTien, loaiPhi, tenLoaiPhi: itemLoaiPhi.ten };
+                                if (mssv) {
+                                    //check MSSV
+                                    let student = await app.model.fwStudents.get({ mssv });
+                                    if (student) {
+                                        let hoTenSinhVien = `${student.ho} ${student.ten}`,
+                                            tmpRow = { ...row, hoTenSinhVien };
+                                        let hocPhi = await app.model.tcHocPhiDetail.get({ mssv, namHoc, hocKy, loaiPhi });
+                                        if (hocPhi) {
+                                            const { soTien: curFee } = hocPhi;
+                                            tmpRow = { ...tmpRow, curFee };
+                                            duplicateDatas.push(mssv);
+                                        }
+                                        items.push(tmpRow);
+                                    }
                                 }
-                                items.push(tmpRow);
+                                index++;
+
                             }
                         }
-                        index++;
-
+                    } catch (error) {
+                        console.error(error);
+                        done({ error });
                     }
+                } else {
+                    done({ error: 'No worksheet!' });
                 }
-            } catch (error) {
-                console.error(error);
-                done({ error });
-            }
-
-        });
+            } else done({ error: 'No workbook!' });
+        }
     };
 
     const yearDatas = () => {
