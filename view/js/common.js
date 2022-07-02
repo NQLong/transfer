@@ -422,18 +422,15 @@ let languages = ['vi', 'en'];
 T.language = texts => {
     const cookieLg = T.cookie('language');
     let lg = 'vi', pathname = window.location.pathname;
-    // if (pathname.includes('/en') || pathname.includes('/news-en') || pathname.includes('/article')) {
-    //     lg = 'en';
-    // } else if (pathname.includes('/nvduc/de')) {
-    //     lg = 'de';
-    // } else if ()
+    if (pathname.includes('/en') || pathname.includes('/news-en') || pathname.includes('/article')) {
+        lg = 'en';
+    } else if (pathname.includes('/nvduc/de')) {
+        lg = 'de';
+    } else if (cookieLg && languages.includes(cookieLg)) {
+        lg = cookieLg;
+    }
 
-    lg = window.location.pathname.includes('/en')
-        || window.location.pathname.includes('/news-en')
-        || window.location.pathname.includes('/nvduc/de')
-        || window.location.pathname.includes('/article') ? 'en' : 'vi';
-
-    if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
+    // if (lg != 'vi' && lg != 'en') lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
 T.language.setLanguages = _languages => languages = _languages && Array.isArray(_languages) && _languages.length ? _languages : ['vi', 'en'];
