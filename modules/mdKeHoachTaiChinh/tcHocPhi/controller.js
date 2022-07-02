@@ -70,8 +70,7 @@ module.exports = app => {
                 const khoa = await app.model.dmDonVi.get({ ma: user.data.khoa }, 'ten');
                 user.data.tenKhoa = khoa.ten;
             } else mssv = req.query.mssv;
-            const hocPhi = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy });
-            const hocPhiDetail = await app.model.tcHocPhiDetail.getAll({ mssv, namHoc, hocKy });
+            const [hocPhi, hocPhiDetail] = await Promise.all([app.model.tcHocPhi.get({ mssv, namHoc, hocKy }), app.model.tcHocPhiDetail.getAll({ mssv, namHoc, hocKy })]);
             for (const item of hocPhiDetail) {
                 const loaiPhi = await app.model.tcLoaiPhi.get({ id: item.loaiPhi });
                 if (loaiPhi) {
@@ -85,6 +84,26 @@ module.exports = app => {
         }
     });
 
+    app.get('/api/finance/user/get-all-hoc-phi', app.permission.orCheck('student:login', 'tcHocPhi:read'), async (req, res) => {
+        try {
+            const user = req.session.user, permissions = user.permissions;
+            let mssv = '';
+            if (!permissions.includes('tcHocPhi:read')) {
+                mssv = user.data.mssv;
+            } else mssv = req.query.mssv;
+            const data = await app.model.tcHocPhi.getAllFeeOfStudent(mssv);
+            const { rows: hocPhiAll, hocphidetailall: hocPhiDetailAll } = data;
+            // let data = {};
+            // hocPhiAll.forEach(hocPhi => {
+
+            // });
+            res.send({ hocPhiAll: hocPhiAll.groupBy('namHoc'), hocPhiDetailAll: hocPhiDetailAll.groupBy('namHoc') });
+        } catch (error) {
+            res.send({ error });
+        }
+
+    });
+
     app.put('/api/finance/hoc-phi', app.permission.check('tcHocPhi:write'), async (req, res) => {
         try {
             const { item: { mssv, namHoc, hocKy }, changes } = req.body;
@@ -95,7 +114,6 @@ module.exports = app => {
                 item.hocPhi = changes.hocPhi;
                 let congNo = await getCongNo(item);
                 changes.congNo = congNo;
-                console.log(changes);
                 const updateItem = await app.model.tcHocPhi.update({ mssv, namHoc, hocKy }, changes);
                 if (updateItem) {
                     const logItem = {
@@ -123,18 +141,21 @@ module.exports = app => {
             const dataMergeMssv = data.groupBy('mssv');
             let dataHocPhi = {};
             for (const sinhVien of Object.keys(dataMergeMssv)) {
-                let { mssv, namHoc, hocKy } = dataMergeMssv[sinhVien][0];
-                const condition = { mssv, namHoc, hocKy };
-                let sumHocPhi = dataMergeMssv[sinhVien].reduce((sum, item) => sum + parseInt(item.soTien), 0);
-                dataHocPhi = await app.model.tcHocPhi.get(condition);
-                if (dataHocPhi) {
-                    let allTracsactionsCurrent = await app.model.tcHocPhiTransaction.getAll({ customerId: mssv, namHoc, hocKy });
-                    const newCongNo = sumHocPhi - allTracsactionsCurrent.reduce((sumCurrentCongNo, item) => sumCurrentCongNo + parseInt(item.amount || 0), 0);
-                    dataHocPhi = await app.model.tcHocPhi.update(condition, { hocPhi: sumHocPhi, ngayTao, congNo: newCongNo });
-                } else {
-                    dataHocPhi = await app.model.tcHocPhi.create({ ...condition, hocPhi: sumHocPhi, congNo: sumHocPhi, ngayTao });
+                for (let index = 0; index < dataMergeMssv[sinhVien].length; index++) {
+                    let { mssv, namHoc, hocKy } = dataMergeMssv[sinhVien][index];
+                    const condition = { mssv, namHoc, hocKy };
+                    let sumHocPhi = dataMergeMssv[sinhVien].filter(item => item.hocKy == hocKy && item.namHoc == namHoc).reduce((sum, item) => sum + parseInt(item.soTien), 0);
+                    dataHocPhi = await app.model.tcHocPhi.get(condition);
+                    if (dataHocPhi) {
+                        let allTracsactionsCurrent = await app.model.tcHocPhiTransaction.getAll({ customerId: mssv, namHoc, hocKy });
+                        const newCongNo = sumHocPhi - allTracsactionsCurrent.reduce((sumCurrentCongNo, item) => sumCurrentCongNo + parseInt(item.amount || 0), 0);
+                        dataHocPhi = await app.model.tcHocPhi.update(condition, { hocPhi: sumHocPhi, ngayTao, congNo: newCongNo });
+                    } else {
+                        dataHocPhi = await app.model.tcHocPhi.create({ ...condition, hocPhi: sumHocPhi, congNo: sumHocPhi, ngayTao });
+                    }
+                    if (!dataHocPhi) throw 'Cập nhật học phí lỗi!';
                 }
-                if (!dataHocPhi) throw 'Cập nhật học phí lỗi!';
+
             }
             for (const khoanPhi of data) {
                 let { mssv, soTien, loaiPhi, namHoc, hocKy } = khoanPhi;

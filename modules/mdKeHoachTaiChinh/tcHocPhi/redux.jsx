@@ -4,6 +4,7 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TcHocPhiGetPage = 'TcHocPhi:GetPage';
 const TcHocPhiGet = 'TcHocPhi:Get';
+const TcHocPhiAll = 'TcHocPhi:All';
 
 const TcHocPhiUpdate = 'TcHocPhi:Update';
 const TcHocPhiGetHuongDan = 'TcHocPhi:GetHuongDan';
@@ -14,6 +15,8 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case TcHocPhiGet:
             return Object.assign({}, state, { data: data.result });
+        case TcHocPhiAll:
+            return Object.assign({}, state, { dataAll: data.result });
         case TcHocPhiGetHuongDan:
             return Object.assign({}, state, { hocPhiHuongDan: data.result });
         case TcHocPhiUpdate:
@@ -34,7 +37,6 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
                         if (updatedPage.list[i].mssv == updatedItem.mssv) {
                             updatedItem['hoTenSinhVien'] = updatedPage.list[i]['hoTenSinhVien'];
                             updatedPage.list[i] = updatedItem;
-                            console.log(updatedPage.list);
                             break;
                         }
                     }
@@ -128,6 +130,20 @@ export function getTcHocPhiHuongDan(done) {
     };
 }
 
+export function getAllHocPhiStudent(mssv, done) {
+    return dispatch => {
+        const url = '/api/finance/user/get-all-hoc-phi';
+        T.get(url, { mssv }, result => {
+            if (result.error) {
+                T.notify('Lỗi khi lấy thông tin học phí!', 'danger');
+                console.error(result.error);
+            } else {
+                done && done(result);
+                dispatch({ type: TcHocPhiAll, result });
+            }
+        });
+    };
+}
 export function getHocPhi(mssv, done) {
     return dispatch => {
         const url = '/api/finance/user/hoc-phi';
