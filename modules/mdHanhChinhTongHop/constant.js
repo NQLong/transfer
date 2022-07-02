@@ -35,7 +35,10 @@ module.exports = {
         CLOSE: 'CLOSE',
         REOPEN: 'REOPEN',
         RESET: 'RESET',
-        VIEW: 'VIEW'
+        VIEW: 'VIEW',
+        ADD_SIGN_REQUEST: 'ADD_SIGN_REQUEST',
+        REMOVE_SIGN_REQUEST: 'REMOVE_SIGN_REQUEST',
+        UPDATE_SIGN_REQUEST: 'UPDATE_SIGN_REQUEST',
     },
 
     CONG_VAN_TYPE: 'DEN',

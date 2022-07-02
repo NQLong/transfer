@@ -44,7 +44,7 @@ import {
 } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { YeuCauKy, YeuCauKyModal } from '../hcthCongVanTrinhKy/component';
-import { createCongVanTrinhKy } from '../hcthCongVanTrinhKy/redux';
+import { createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy } from '../hcthCongVanTrinhKy/redux';
 const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
 
 const listTrangThai = {
@@ -468,14 +468,16 @@ class AdminEditPage extends AdminPage {
     }
 
     canCreateSignRequest = () => {
-        return true;
-        if (!this.state.id) return false;
-        if (this.state.loaiCongVan == loaiCongVan.DON_VI.id) {
+        //return true;
+        // if (!this.state.id) return false;
+        // if (this.state.loaiCongVan == loaiCongVan.DON_VI.id) {
 
-        } else {
-            return this.state.trangThai = trangThaiCongVanDi.DA_DUYET.id;
-        }
-
+        // } else {
+        //     return this.state.trangThai = trangThaiCongVanDi.DA_DUYET.id;
+        // }
+        const hcthCongVanDiPermission = this.getUserPermission('hcthCongVanDi', ['manage']);
+        if (hcthCongVanDiPermission.manage) return true;
+        return false;
     }
 
     tableListFile = (data, id, permission, canAddFile) => renderTable({
@@ -715,7 +717,14 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
 
-                <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} />
+                <YeuCauKy 
+                    hcthCongVanDi={this.props.hcthCongVanDi} 
+                    deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} 
+                    id={this.state.id}
+                    permission={permission}
+                    {...this.props} 
+                    onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item);}}
+                />
 
                 {!isNew &&
                     <div className="tile">
@@ -727,7 +736,13 @@ class AdminEditPage extends AdminPage {
                     permissions={dmDonViGuiCvPermission}
                     create={this.onCreateDonViNhanNgoai}
                 />
-                <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} />
+                <YeuCauKyModal 
+                    ref={e => this.yeuCauKyModal = e} 
+                    create={this.props.createCongVanTrinhKy} 
+                    update={this.props.updateCongVanTrinhKy}
+                    {...this.props} congVanId={this.state.id} 
+                    onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });}}
+                />
             </>),
             backRoute,
             onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4') && ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) && !this.checkNotDonVi()) ? this.save : null,
@@ -755,6 +770,8 @@ const mapActionsToProps = {
     createDmDonViGuiCv,
     readCongVanDi,
     // getHistory,
-    createCongVanTrinhKy
+    createCongVanTrinhKy,
+    deleteCongVanTrinhKy,
+    updateCongVanTrinhKy
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

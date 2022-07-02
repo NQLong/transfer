@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, FormTextBox, FormCheckbox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { Link } from 'react-router-dom';
-import { SelectAdapter_CongVanDi } from '../hcthCongVanDi/redux'
+import { SelectAdapter_CongVanDi } from '../hcthCongVanDi/redux';
 import { createCongVanTrinhKy, searchCongVanTrinhKy } from './redux';
 const { loaiCongVan } = require('../constant');
 
@@ -60,7 +59,7 @@ class HcthCongVanTrinhKyUserPage extends AdminPage {
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanTrinhKy && this.props.hcthCongVanTrinhKy.page ? this.props.hcthCongVanTrinhKy.page : { pageNumber: 1, pageSize: 50 };
         let pageFilter = isInitial ? {} : {};
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => { })
+            this.getPage(pageNumber, pageSize, '', () => { });
         });
     };
 
@@ -82,7 +81,7 @@ class HcthCongVanTrinhKyUserPage extends AdminPage {
                     <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Cán bộ kí</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trạng thái</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
-                </tr>
+                </tr>;
             },
             renderRow: (item) => {
                 const canBoKy = item.danhSachCanBoKy?.split(';') || [];
@@ -101,7 +100,8 @@ class HcthCongVanTrinhKyUserPage extends AdminPage {
                             </span>
                         ))} />
                     <TableCell type='text' content='' />
-                </tr>
+                    <TableCell type='buttons' content='' />
+                </tr>;
             },
         });
         return this.renderPage({

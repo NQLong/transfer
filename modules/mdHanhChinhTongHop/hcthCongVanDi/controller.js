@@ -445,6 +445,15 @@ module.exports = app => {
             const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
+            const vanBanTrinhKy = [];
+            
+            if (files.length > 0) {
+                await Promise.all(files.map(async (file) => {
+                    const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(file.id);
+                    console.log(congVanTrinhKy);
+                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({...item, ten: file.ten })));
+                }));
+            }
 
             res.send({
                 item: {
@@ -453,12 +462,13 @@ module.exports = app => {
                     donViNhan: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 0).map((item) => item.donViNhan) : []).toString(),
                     donViNhanNgoai: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 1).map((item) => item.donViNhan) : []
                     ).toString(),
-                    yeuCauKy: [],
+                    yeuCauKy: vanBanTrinhKy,
                     listFile: files || [],
                     history: history?.rows || [],
                 },
             });
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });

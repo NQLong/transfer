@@ -1,10 +1,11 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.hcth,
-        menus: {
-            505: { title: 'Công văn trình ký', link: '/user/hcth/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00' },
-        },
-    };
+    const { action } = require('../constant');
+    // const menu = {
+    //     parentMenu: app.parentMenu.hcth,
+    //     menus: {
+    //         505: { title: 'Công văn trình ký', link: '/user/hcth/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00' },
+    //     },
+    // };
     const userMenu = {
         parentMenu: app.parentMenu.user,
         menus: {
@@ -22,18 +23,36 @@ module.exports = app => {
         console.log('hello');
         try {
             console.log('hello');
-            const { fileCongVan, canBoKy = [] } = req.body;
-            const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.create({
-                nguoiTao: req.session.user?.shcc,
-                fileCongVan,
-                thoiGian: new Date().getTime(),
-            });
-            await app.model.hcthCanBoKy.createFromList(canBoKy.map(shcc => ({
-                nguoiTao: req.session.user?.shcc,
-                nguoiKy: shcc,
-                congVanTrinhKy: congVanTrinhKy.id
-            })));
-            res.send({ error: null });
+            const { tenFile, congVanId, fileCongVan, canBoKy = [] } = req.body;
+
+            const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan });
+
+            if (congVanTrinhKy) {
+                res.send({ error: 'Văn bản này đã được gửi yêu cầu kí. '});
+            } else {
+                 const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.create({
+                    nguoiTao: req.session.user?.shcc,
+                    fileCongVan,
+                    thoiGian: new Date().getTime(),
+                });
+                await app.model.hcthCanBoKy.createFromList(canBoKy.map(shcc => ({
+                    nguoiTao: req.session.user?.shcc,
+                    nguoiKy: shcc,
+                    congVanTrinhKy: congVanTrinhKy.id
+                })));
+
+                await app.model.hcthHistory.create({
+                    loai: 'DI',
+                    key: congVanId,
+                    shcc: req.session.user?.staff?.shcc || '',
+                    hanhDong: action.ADD_SIGN_REQUEST,
+                    ghiChu: JSON.stringify({
+                        tenFile: tenFile
+                    }),
+                    thoiGian: Date.now()
+                });
+                res.send({ error: null });
+            }
         } catch (error) {
             console.error(error);
             res.send({ error });
@@ -44,10 +63,15 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
-            {};
+        // let { } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :{};
+        
+        const user = req.session.user;
+        const permissions = user.permissions;
+        let shccCanBo = user?.shcc || '';
 
-        const shccCanBo = req.session.user?.shcc;
+        if (permissions.includes('rectors:login') || (!user.isStaff && !user.isStudent)) {
+            shccCanBo = '';
+        }
 
         const data = { shccCanBo };
         let filterParam;
@@ -57,7 +81,7 @@ module.exports = app => {
             filterParam = '{}';
         }
 
-        app.model.hcthCongVanTrinhKy.searchPage(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
+        app.model.hcthCongVanTrinhKy.searchPage(pageNumber, pageSize, shccCanBo, filterParam, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -66,7 +90,7 @@ module.exports = app => {
                 res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
-    });;
+    });
 
     app.get('/api/hcth/cong-van-trinh-ky/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
@@ -88,5 +112,73 @@ module.exports = app => {
         } catch (error) {
             req.send({ error });
         }
-    })
-}
+    });
+
+    app.put('/api/hcth/cong-van-trinh-ky', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = parseInt(req.body.id);
+
+            const { tenFile, canBoKy = [] } = req.body.changes;
+            
+            const canBoKyAfter = canBoKy;
+
+            const canBoKyBeforeLst = await app.model.hcthCanBoKy.getAll({ congVanTrinhKy: id });
+            
+            const canBoKyBefore = canBoKyBeforeLst.map(canBo => canBo.nguoiKy);
+
+            const newCanBoKy = canBoKyAfter.filter(canBo => !canBoKyBefore.includes(canBo));
+
+            const delCanBoKy = canBoKyBefore.filter(canBo => !canBoKyAfter.includes(canBo));
+            
+            delCanBoKy.length > 0 && await Promise.all(delCanBoKy.map(async(shcc) => {
+                await app.model.hcthCanBoKy.delete({ nguoiKy: shcc, nguoiTao: req.session.user?.shcc, congVanTrinhKy: id });
+            }));
+            
+            newCanBoKy.length > 0 && await app.model.hcthCanBoKy.createFromList(newCanBoKy.map(shcc => ({
+                nguoiTao: req.session.user?.shcc,
+                nguoiKy: shcc,
+                congVanTrinhKy: id
+            })));
+
+            await app.model.hcthHistory.create({
+                loai: 'DI',
+                key: id,
+                shcc: req.session.user?.staff?.shcc || '',
+                hanhDong: action.UPDATE_SIGN_REQUEST,
+                ghiChu: JSON.stringify({
+                    tenFile: tenFile
+                })
+            });
+
+            res.send({ error: null });
+
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.delete('/api/hcth/cong-van-trinh-ky', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const { id, congVanId, tenFile }= req.body;
+            
+            await app.model.hcthCongVanTrinhKy.delete({ id });
+            
+            await app.model.hcthCanBoKy.delete({ congVanTrinhKy: id});
+
+            await app.model.hcthHistory.create({
+                loai: 'DI',
+                key: congVanId,
+                shcc: req.session.user?.staff?.shcc || '',
+                hanhDong: action.REMOVE_SIGN_REQUEST,
+                ghiChu: JSON.stringify({
+                    tenFile: tenFile
+                })
+            });
+
+            res.send({ error: null });
+        } catch (error) {
+            console.log(error);
+            res.send({ error });
+        }
+    });
+};

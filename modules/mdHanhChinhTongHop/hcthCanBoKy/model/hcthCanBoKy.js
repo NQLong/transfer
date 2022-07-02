@@ -4,5 +4,5 @@ module.exports = app => {
     app.model.hcthCanBoKy.createFromList = (listCanBoKy) => {
         const promises = listCanBoKy.map(canBoKy => app.model.hcthCanBoKy.create(canBoKy));
         return Promise.all(promises);
-    }
+    };
 };

@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormTextBox, loadSpinner } from 'view/component/AdminPage';
-import { } from './component';
+import { AdminPage, loadSpinner } from 'view/component/AdminPage';
 import { getCongVanTrinhKy } from './redux';
-const { } = require('../constant');
 
 // const tienDoSelector = [...Array(11).keys()].map(i => ({ id: i * 10, text: `${i * 10}%` }));
 
@@ -31,9 +29,9 @@ class AdminEditPage extends AdminPage {
         else this.setData();
     }
 
-    setData = (data = null) => {
-        let { } = data ? data : {};
-    };
+    // setData = (data = null) => {
+    //     // let { } = data ? data : {};
+    // };
 
     renderContent = () => {
         const item = this.props.hcthCongVanTrinhKy?.item;
@@ -52,8 +50,8 @@ class AdminEditPage extends AdminPage {
     }
 
     render() {
-        const congVanTrinhKy = this.props.hcthCongVanTrinhKy || {},
-            { congVanKy, canBoKy } = congVanTrinhKy;
+        // const congVanTrinhKy = this.props.hcthCongVanTrinhKy || {},
+        //     // { congVanKy, canBoKy } = congVanTrinhKy;
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn trình ký',
