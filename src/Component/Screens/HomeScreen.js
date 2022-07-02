@@ -36,8 +36,7 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
 
     const init = async () => {
         if (T.isDebug) {
-            await T.verifyToken();
-            if (!await T.hasCookie()) {
+            if (!await T.verifyToken() || !await T.hasCookie()) {
                 dispatch(signOut());
                 alert('debugEmail khôn hợp lệ');
             } else

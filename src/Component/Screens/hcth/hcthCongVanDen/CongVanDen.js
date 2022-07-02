@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCongVanDen, HcthCongVanDenGet, createPhanHoi, getPhanHoi, createChiDao, getChiDao } from './redux';
-import { useTheme } from 'react-native-paper';
+import { getCongVanDen, HcthCongVanDenGet, createPhanHoi, getPhanHoi, createChiDao, getChiDao, traLaiCongVan } from './redux';
+import { Card, useTheme } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-// import { FloatingAction } from "react-native-floating-action";
+import { Menu, Divider, List, Text, Button } from 'react-native-paper';
 
-import { Tile, MenuItem, Comment, FormTextBox } from '@/Utils/componennt';
+import { Comment, FormTextBox, AdminModal } from '@/Utils/component';
 import T from '@/Utils/common';
-import { renderScrollView } from '@/Utils/componennt';
+import { renderScrollView } from '@/Utils/component';
 import Timeline from 'react-native-timeline-flatlist';
 
 const trangThai = {
@@ -43,71 +43,68 @@ const action = {
 const DonViNhan = () => {
     const list = useSelector(state => state?.hcthCongVanDen?.item?.danhSachDonViNhan);
     const { colors } = useTheme();
-    const [isExpand, setIsExpand] = useState(false);
-    console.log(list);
+    const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else if (!list.length)
-            return <Text>Chưa có đơn vị nhận</Text>
+            return <List.Item title={'Chưa có đơn vị nhận'} />
+
         else {
             const items = list.map((item, key) => {
-                const style = {}
-                if (key == 0)
-                    style.borderTopWidth = 0;
-                return <MenuItem titleStyle={{ fontSize: 15 }} title={item.ten} key={key} style={style} />
+                return <List.Item key={key} title={item.ten} right={() => null} />
             });
             return items;
         };
     }
 
-    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
-        {renderContent()}
-    </View >;
-    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
-        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
-        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
-    </TouchableOpacity>;
 
-
-    return <Tile style={{}}>
-        <MenuItem style={{ borderBottomWidth: 1 }} title='Đơn vị nhận' isExpand={isExpand} button={button} expand={expand} />
-    </Tile>
+    return (
+        <Card style={{ margin: 5 }} elevation={4}>
+            <List.Accordion id='donViNhan'
+                title='Đơn vị nhận'
+                left={props => {
+                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='business' />
+                }}
+                expanded={isExpand}
+                onPress={() => setIsExpand(!isExpand)}>
+                {renderContent()}
+            </List.Accordion>
+        </Card>
+    );
 }
 
 const CanBoNhan = () => {
     const list = useSelector(state => state?.hcthCongVanDen?.item?.danhSachCanBoNhan);
     const { colors } = useTheme();
-    const [isExpand, setIsExpand] = useState(false);
+    const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else if (!list.length)
-            return <Text>Chưa có cán bộ nhận</Text>
+            return <List.Item title={'Chưa có cán bộ nhận'} />
         else {
             const items = list.map((item, key) => {
-                const style = {}
-                if (key == 0)
-                    style.borderTopWidth = 0;
-                return <MenuItem titleStyle={{ fontSize: 15 }} title={`${item.ho} ${item.ten}`.normalizedName() + ` - ${item.shcc}`} key={key} style={style} />
+                return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()} right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item.shcc}</Text>} />
             });
             return items;
         };
     }
 
 
-    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
-        {renderContent()}
-    </View >;
-    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
-        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
-        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
-    </TouchableOpacity>;
-
-
-    return <Tile style={{}}>
-        <MenuItem style={{ borderBottomWidth: 1 }} title='Cán bộ nhận' isExpand={isExpand} button={button} expand={expand} />
-    </Tile>
+    return (
+        <Card style={{ margin: 5 }} elevation={4}>
+            <List.Accordion id='canBoNhan'
+                title='Cán bộ nhận'
+                left={props => {
+                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
+                }}
+                expanded={isExpand}
+                onPress={() => setIsExpand(!isExpand)}>
+                {renderContent()}
+            </List.Accordion>
+        </Card>
+    );
 }
 
 const PhanHoi = () => {
@@ -116,18 +113,22 @@ const PhanHoi = () => {
     const shcc = useSelector(state => state?.settings?.user?.shcc);
     const dispatch = useDispatch();
     const { colors } = useTheme();
-    const [isExpand, setIsExpand] = useState(false);
+    const [isExpand, setIsExpand] = useState(true);
     const [phanHoi, setPhanHoi] = useState('');
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
-        else if (!list.length)
-            return <Text>Chưa có phản hồi</Text>
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else {
-            const items = list.map((item, key) => {
-                return <Comment style={{ marginLeft: 5, marginBottom: 10 }} key={key} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.ngayTao} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.noiDung} />
-            });
-            return items;
+            const content = [];
+            if (!list.length)
+                content.push(<List.Item key='empty-phan-hoi' title={'Chưa có phản hồi'} />)
+            else {
+                list.forEach((item, key) => {
+                    content.push(<List.Item key={key} style={{ flex: 1, paddingBottom: 0, paddingTop: 0 }} left={() => null} title={() => (<Comment style={{ flex: 1 }} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.ngayTao} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.noiDung} />)} />);
+                });
+            }
+            content.push(phanHoiBox);
+            return content;
         };
     }
 
@@ -142,49 +143,56 @@ const PhanHoi = () => {
         dispatch(createPhanHoi(data, () => dispatch(getPhanHoi(id, () => setPhanHoi('')))));
     }
 
-    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
-        {renderContent()}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <FormTextBox style={{ flex: 1, marginRight: 10 }} value={phanHoi} onChangeText={text => setPhanHoi(text)} placeholder='Nhập phản hồi' />
-            {shcc ? <TouchableOpacity onPress={onSubmit}>
-                <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
-            </TouchableOpacity> : null}
-        </View>
-    </View >;
-    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
-        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
-        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
-    </TouchableOpacity>;
+    const phanHoiBox = (<List.Item key='phanHoiBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        <FormTextBox style={{ flex: 1, marginRight: 10 }} value={phanHoi} onChangeText={text => setPhanHoi(text)} placeholder='Nhập phản hồi' />
+        {shcc ? <TouchableOpacity onPress={onSubmit}>
+            <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
+        </TouchableOpacity> : null}
+    </View>)} />);
 
 
-    return <Tile style={{}}>
-        <MenuItem style={{ borderBottomWidth: 1 }} title='Phản hồi' isExpand={isExpand} button={button} expand={expand} />
-    </Tile>
+    return (
+        <Card style={{ margin: 5 }} elevation={4}>
+
+            <List.Accordion id='phanHoi'
+                title='Phản hồi'
+                left={props => {
+                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='chatbox-ellipses-outline' />
+                }}
+                expanded={isExpand}
+                onPress={() => setIsExpand(!isExpand)}>
+                {renderContent()}
+            </List.Accordion>
+        </Card>
+    );
+
 }
 
 const ChiDao = () => {
     const list = useSelector(state => state?.hcthCongVanDen?.item?.danhSachChiDao);
     const { colors } = useTheme();
-    const [isExpand, setIsExpand] = useState(false);
+    const [isExpand, setIsExpand] = useState(true);
     const [chiDao, setChiDao] = useState('');
     const id = useSelector(state => state?.hcthCongVanDen?.item?.id);
     const shcc = useSelector(state => state?.settings?.user?.shcc);
     const dispatch = useDispatch();
 
     const renderContent = () => {
-
         if (!list)
-            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
-        else if (!list.length)
-            return <Text>Chưa có chỉ đạo</Text>
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else {
-            const items = list.map((item, key) => {
-                console.log({ item })
-                return <Comment style={{ marginLeft: 5, marginBottom: 10 }} key={key} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.thoiGian} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.chiDao} />
-            });
-            return items;
-        };
-    }
+            const content = [];
+            if (!list.length)
+                content.push(<List.Item key='emptyChiDao' title={'Chưa có chỉ đạo'} />)
+            else {
+                list.forEach((item, key) => {
+                    content.push(<List.Item key={key} style={{ flex: 1, paddingBottom: 0, paddingTop: 0 }} left={() => null} title={() => (<Comment style={{ marginLeft: 5, }} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.thoiGian} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.chiDao} />)} />);
+                });
+            }
+            content.push(chiDaoBox);
+            return content;
+        }
+    };
 
     const onSubmit = () => {
         const data = {
@@ -196,25 +204,26 @@ const ChiDao = () => {
         dispatch(createChiDao(data, () => dispatch(getChiDao(id, () => setChiDao('')))));
     }
 
-
-    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
-        {renderContent()}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <FormTextBox style={{ flex: 1, marginRight: 10 }} value={chiDao} onChangeText={text => setChiDao(text)} placeholder='Nhập chỉ đạo' />
-            <TouchableOpacity onPress={onSubmit}>
-                <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
-            </TouchableOpacity>
-        </View>
-    </View>;
-    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
-        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
-        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
-    </TouchableOpacity>;
+    const chiDaoBox = (<List.Item key='chiDaoTextBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        <FormTextBox style={{ flex: 1, marginRight: 10 }} value={chiDao} onChangeText={text => setChiDao(text)} placeholder='Nhập chỉ đạo' />
+        {shcc ? <TouchableOpacity onPress={onSubmit}>
+            <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
+        </TouchableOpacity> : null}
+    </View>)} />);
 
 
-    return <Tile style={{}}>
-        <MenuItem style={{ borderBottomWidth: 1 }} title='Chỉ đạo' isExpand={isExpand} button={button} expand={expand} />
-    </Tile>
+    return <Card elevation={4} style={{ margin: 5 }}>
+        <List.Accordion id='chiDao'
+            title='Chỉ đạo'
+            left={props => {
+                return <Ionicons {...props} size={20} style={{ margin: 5 }} name='alert-circle-outline' />
+            }}
+            expanded={isExpand}
+            onPress={() => setIsExpand(!isExpand)}>
+            {renderContent()}
+        </List.Accordion>
+    </Card>
+
 }
 
 const actionToText = (value) => {
@@ -243,11 +252,11 @@ const FileList = ({ navigation }) => {
     const listFile = useSelector(state => state.hcthCongVanDen?.item?.listFile);
     const id = useSelector(state => state.hcthCongVanDen?.item?.id);
     const { colors } = useTheme();
-    const [isExpand, setIsExpand] = useState(false);
+    const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
 
         if (!listFile)
-            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else if (!listFile.length)
             return <Text>Chưa có tập tin công văn</Text>
         else {
@@ -258,24 +267,25 @@ const FileList = ({ navigation }) => {
                     style = {};
                 if (key == 0)
                     style.borderTopWidth = 0;
-                return <MenuItem key={key} style={style} title={item.ten} onTitleClick={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })} />
+                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.ten}</Text></TouchableOpacity>} />
             });
             return items;
         };
     }
 
-    const expand = <View style={{ marginTop: 10, paddingLeft: 10, paddingRight: 10 }}>
-        {renderContent()}
-    </View>;
-    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
-        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
-        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
-    </TouchableOpacity>;
 
+    return <Card style={{ margin: 5 }} elevation={4}>
 
-    return <Tile style={{}}>
-        <MenuItem style={{ borderBottomWidth: 1 }} title='Danh sách tập tin công văn' isExpand={isExpand} button={button} expand={expand} />
-    </Tile>
+        <List.Accordion id='files'
+            title='Danh sách tập tin công văn'
+            left={props => {
+                return <Ionicons {...props} size={20} style={{ margin: 5 }} name='document-text-outline' />
+            }}
+            expanded={isExpand}
+            onPress={() => setIsExpand(!isExpand)}>
+            {renderContent()}
+        </List.Accordion>
+    </Card>
 }
 
 
@@ -284,13 +294,13 @@ const History = () => {
     const user = useSelector(state => state.settings?.user);
     const userShcc = user.shcc;
     const { colors } = useTheme();
-    const [isExpand, setIsExpand] = useState(false);
+    const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
 
         if (!history)
-            return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else if (!history.length)
-            return <Text>Chưa có lịch sử</Text>
+            return <List.Item left={() => null} title={'Chưa có lịch sử'} />
         else {
             const data = history.map(item => {
                 const style = {};
@@ -308,41 +318,61 @@ const History = () => {
                     ...style
                 }
             });
+            return (<List.Item style={{ flex: 1 }} left={() => null} title={() => (<Timeline data={data} isUsingFlatlist={false} showTime={false} separator={true} />)} />);
 
-            return <Timeline data={data} isUsingFlatlist={false} showTime={false} separator={true} />
         };
     }
 
-    const expand = <View style={{ marginTop: 10 }}>
-        {renderContent()}
-    </View>;
-    const button = <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { setIsExpand(!isExpand) }} >
-        <Text style={{ fontSize: 15, color: 'black' }}>{isExpand ? 'Thu gọn' : 'Mở rộng'}</Text>
-        <Ionicons name={isExpand ? 'chevron-down-outline' : 'chevron-forward-outline'} size={20} />
-    </TouchableOpacity>;
 
-
-    return <Tile style={{}}>
-        <MenuItem style={{ borderBottomWidth: 1 }} title='Lịch sử công văn' isExpand={isExpand} button={button} expand={expand} />
-    </Tile>
+    return <Card style={{ margin: 5 }} elevation={4}>
+        <List.Accordion id='history'
+            title='Lịch sử'
+            left={props => {
+                return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
+            }}
+            expanded={isExpand}
+            onPress={() => setIsExpand(!isExpand)}>
+            {renderContent()}
+        </List.Accordion>
+    </Card>
 };
 
-const CongVanDen = ({ navigation, route }) => {
+class TraLaiCongVanModal extends AdminModal {
+    state = { lyDo: '' }
+
+    traLai = () => {
+        const data = {
+            lyDo: this.state.lyDo,
+            id: this.props.id
+        }
+        this.props.onTraLaiCongVan(data, this.hide);
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Trả lại công văn',
+            content: <>
+                <FormTextBox placeholder={'Lý do'} value={this.state.lyDo} onChangeText={value => this.setState({ lyDo: value })} />
+            </>,
+            button: [<Button key={1} color='red' onPress={this.traLai}>Trả lại</Button>]
+        });
+    }
+}
+
+const CongVanDen = (props) => {
+    const { navigation, route } = props
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanDen?.item);
     const [context, setContext] = useState({});
     const [refreshing, setRefreshing] = useState();
+    const [isMenuVisible, setIsMenuVisible] = React.useState(false);
+    const traLaiModal = useRef(null);
     const { colors } = useTheme();
     const getData = (done) => {
         const congVanId = route.params.congVanDenId;
         dispatch(getCongVanDen(congVanId, context, done));
     };
 
-    // navigation.setOptions({
-    //     headerRight: () => {
-    //         return <Text style={{ color: 'white' }}> abcasdasd </Text>
-    //     }
-    // })
 
 
     const onRefresh = () => {
@@ -357,34 +387,64 @@ const CongVanDen = ({ navigation, route }) => {
 
 
     const genneralInfo = () => {
-        return <Tile style={{ marginTop: 10, backgroundColor: 'white' }}>
-            <MenuItem title='Số công văn' value={item?.soCongVan || 'Chưa có'} />
-            <MenuItem title='Số đến' value={item?.soDen || 'Chưa có'} />
-            <MenuItem title='Ngày công văn' value={item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'} />
-            <MenuItem title='Ngày nhận' value={item?.ngayNhan ? T.dateToText(item.ngayNhan) : 'Chưa có'} />
-            <MenuItem title='Ngày hết hạn' value={item?.ngayHetHan ? T.dateToText(item.ngayHetHan) : 'Chưa có'} />
-            <MenuItem title='Trạng thái' value={Object.values(trangThai)[item.trangThai]?.text} />
-            <MenuItem title='Trích yếu' bottomValue={item?.trichYeu} style={{ borderBottomWidth: 1 }} />
-        </Tile>
+        return <Card style={{ margin: 5 }} elevation={4}>
+            <Card.Title title={`Công văn đến #${item.id}`} right={headerRightButton} />
+            <Card.Content>
+                <List.Item title='Số công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soCongVan || 'Chưa có'}</Text>} />
+                <List.Item title='Số đến' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soDen || 'Chưa có'}</Text>} />
+                <List.Item title='Ngày công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soDen || 'Chưa có'}</Text>} />
+                <List.Item title='Ngày nhận' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'}</Text>} />
+                <List.Item title='Ngày hết hạn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayHetHan ? T.dateToText(item.ngayHetHan) : 'Chưa có'}</Text>} />
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
+                <List.Item title='Trích yếu'
+                    // right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.trichYeu}</Text>}
+                    description={item?.trichYeu}
+                    descriptionNumberOfLines={null}
+                />
+            </Card.Content>
+        </Card>
     }
 
     if (!item)
-        return <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20 }} />
+        return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
 
+
+    const openMenu = () => setIsMenuVisible(true);
+    const closeMenu = () => setIsMenuVisible(false);
+    const onTraLaiCongVan = (data, done) => {
+        dispatch(traLaiCongVan(data, () => getData(done)))
+    }
+    const menuItems = [];
+    if (item?.trangThai == trangThai.CHO_DUYET.id) {
+        menuItems.push(<Menu.Item key='tra-lai' onPress={() => { closeMenu(); traLaiModal.current?.show(); }} title="Trả lại công văn" />);
+    }
+
+    // const headerRightButton = () => <Text>askdaks</Text>;
+    const headerRightButton = () => menuItems.length ? <Menu
+        visible={isMenuVisible}
+        onDismiss={closeMenu}
+        anchor={<TouchableOpacity onPress={openMenu}><Ionicons name={'menu-outline'} color='black' size={30} style={{ margin: 10 }} /></TouchableOpacity>}>
+        {menuItems}
+    </Menu> : null;
 
     return renderScrollView({
+        ...props,
         content: <>
             {genneralInfo()}
+            <FileList navigation={navigation} />
             <CanBoNhan />
             <DonViNhan />
             <ChiDao />
             <PhanHoi />
-            <FileList navigation={navigation} />
             <History />
+            <TraLaiCongVanModal ref={traLaiModal} id={item.id} onTraLaiCongVan={onTraLaiCongVan} />
             <View style={{ marginBottom: 50 }} />
+
         </>,
+        // scrollEnabled: !isModalShown,
+        headerRightButton: headerRightButton,
         style: {},
-        refreshControl: <RefreshControl colors={["#9Bd35A", "#689F38"]} refreshing={refreshing} onRefresh={onRefresh} />,
+        refreshControl: <RefreshControl colors={['#9Bd35A', '#689F38']} refreshing={refreshing} onRefresh={onRefresh} />,
     });
 };
 

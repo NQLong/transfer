@@ -1,8 +1,8 @@
 import { signOut } from '@/Store/settings';
-import { MenuItem, Tile } from '@/Utils/componennt';
+import { MenuItem, Tile } from '@/Utils/component';
 import React, { useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTheme, Card, List, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 
 
@@ -22,15 +22,15 @@ const User = () => {
 
     return (
         <ScrollView>
-            <Tile>
-                <MenuItem title='Họ và Tên' value={`${user?.lastName || ''} ${user?.firstName || ''}`.trim().normalizedName()} />
-                <MenuItem title='Email' value={user?.email} />
-            </Tile>
-            <View style={{ alignItems: 'center', marginTop: 20, flex: 1 }}>
-                <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={onSignOut} disabled={disableLogout}>
-                    <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Đăng xuất</Text>
-                </TouchableOpacity>
-            </View>
+            <Card style={{ margin: 5 }} elevation={4}>
+                <List.Item title={'Họ và tên'} right={() => <Text style={{ alignSelf: 'center' }} variant='bodyMedium'>{`${user?.lastName || ''} ${user?.firstName || ''}`.trim().normalizedName()}</Text>} />
+                <List.Item title={'Email'} right={() => <Text style={{ alignSelf: 'center' }} variant='bodyMedium'>{user?.email}</Text>} />
+                <View style={{ alignItems: 'center', marginTop: 20, flex: 1, marginBottom: 20 }}>
+                    <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={onSignOut} disabled={disableLogout}>
+                        <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Đăng xuất</Text>
+                    </TouchableOpacity>
+                </View>
+            </Card>
         </ScrollView>
     );
 }

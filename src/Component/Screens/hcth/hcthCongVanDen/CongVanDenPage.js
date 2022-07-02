@@ -1,5 +1,5 @@
 import T from '@/Utils/common';
-import { renderScrollView, Separator } from '@/Utils/componennt';
+import { renderScrollView, Separator } from '@/Utils/component';
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { useTheme } from 'react-native-paper';
@@ -10,8 +10,8 @@ import { getHcthCongVanDenSearchPage, HcthCongVanDenSearchPage, getMoreCongVanDe
 const initPageNumber = 1;
 const initPageSize = 20;
 
-const CongVanDenPage = ({ navigation, route }) => {
-
+const CongVanDenPage = (props) => {
+    const { navigation, route } = props;
     const hcthCongVanDen = useSelector(state => state?.hcthCongVanDen);
     const dispatch = useDispatch();
     const [filter, setFilter] = useState({ tab: 0 });
@@ -52,7 +52,7 @@ const CongVanDenPage = ({ navigation, route }) => {
                 const boderBottom = {};
                 if (key == list.lenth - 1)
                     boderBottom.borderBottomWidth = 1
-                return <TouchableOpacity disabled={refreshing} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })} key={item.id} style={{ marginBottom: 0, width: '100%', backgroundColor: 'white', borderTopWidth: 1, padding: 10, borderColor: '#868FA0' , ...boderBottom}}>
+                return <TouchableOpacity disabled={refreshing} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })} key={item.id} style={{ marginBottom: 0, width: '100%', backgroundColor: 'white', borderTopWidth: 1, padding: 10, borderColor: '#868FA0', ...boderBottom }}>
                     <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ color: '#333333', fontWeight: 'bold' }}>{item.soCongVan || 'Chưa có'}</Text>
                         <Text style={{ color: '#333333', }}>{item.ngayNhan && T.dateToText(new Date(item.ngayNhan))}</Text>
@@ -74,11 +74,12 @@ const CongVanDenPage = ({ navigation, route }) => {
     }
 
     return renderScrollView({
+        ...props,
         content: <>
             {renderCongVanList()}
             {isLoading && <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20, marginTop: 20 }} />}
         </>,
-        style: { },
+        style: {},
         refreshControl: <RefreshControl colors={["#9Bd35A", "#689F38"]} refreshing={refreshing} onRefresh={onRefresh} />,
         ref: scrollView,
         onScroll: ({ nativeEvent }) => {

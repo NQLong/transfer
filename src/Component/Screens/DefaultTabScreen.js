@@ -35,7 +35,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
                         <Ionicons name="document-text-outline" color={color} size={size} />
                     ),
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => { navigation.navigate('congVanDenPage', {abc:'abc'}) }} style={{ width: 30, marginRight: 15 }}>
+                        <TouchableOpacity onPress={() => { navigation.navigate('FilterCongVanDen') }} style={{ width: 30, marginRight: 15 }}>
                             <Ionicons name='search-outline' color='white' style={{ fontSize: 25 }} />
                         </TouchableOpacity>
                     ),

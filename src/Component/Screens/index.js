@@ -14,6 +14,7 @@ import HomeScreen from './HomeScreen';
 import DefaultTabScreen from './DefaultTabScreen';
 import CongVanDen from './hcth/hcthCongVanDen/CongVanDen';
 import ReadFile from './ReadFile';
+import CongVanDenFilter from './hcth/hcthCongVanDen/CongVanDenFilter';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +31,7 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerShown: false }} name='TabScreen' component={DefaultTabScreen} />
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='CongVanDen' component={CongVanDen} />
             <Stack.Screen options={{ headerTitle: '' }} name='ReadFile' component={ReadFile} />
+            <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='FilterCongVanDen' component={CongVanDenFilter} />
         </Stack.Navigator>
     )
 }

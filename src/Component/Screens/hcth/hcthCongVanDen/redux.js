@@ -80,7 +80,6 @@ export function getCongVanDen(id, context, done) {
         T.get(url, { params: context }).then(data => {
             if (data.error) {
                 if (data.error.status == 401) {
-                    // dispatch({ type: HcthCongVanDenGetError, error: 401 });
                     console.error('GET: ' + url + '.', data.error.message);
                 }
                 else
@@ -129,11 +128,25 @@ export function createChiDao(data, done) {
         T.post(url, { data }).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Thêm chỉ đạo bị lỗi');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('POST: ' + url + '. ', res.error);
             } else {
                 done && done(data);
             }
         }).catch(() => T.alert('Công văn đến', 'Thêm chỉ đạo bị lỗi'));
+    };
+}
+
+export function traLaiCongVan(data, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-den/tra-lai';
+        T.put(url, data).then(res => {
+            if (res.error) {
+                T.alert('Công văn đến', 'Trả lại công văn lỗi.\n' + res.error.errorMessage || '');
+                console.error('PUT: ' + url + '. ', res.error);
+            } else {
+                done && done(data);
+            }
+        }).catch(() => T.alert('Công văn đến', 'Trả lại công văn lỗi'));
     };
 }
 
