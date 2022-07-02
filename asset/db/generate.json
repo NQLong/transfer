@@ -13984,10 +13984,10 @@
                 },
                 "VALUE": {
                     "value": "value",
-                    "dataType": "NVARCHAR2",
+                    "dataType": "CLOB",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 2000
+                    "size": 4000
                 }
             },
             "primaryKeys": [
@@ -14511,6 +14511,13 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [

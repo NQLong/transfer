@@ -116,32 +116,37 @@ module.exports = app => {
 
     });
 
-    app.post('/api/finance/hoc-phi/upload', app.permission.check('tcHocPhi:write'), async (req, res) => {
+    app.post('/api/finance/hoc-phi/multiple', app.permission.check('tcHocPhi:write'), async (req, res) => {
         try {
-            const data = req.body.upload;
+            const data = req.body.data;
             const ngayTao = Date.now();
             const dataMergeMssv = data.groupBy('mssv');
+            let dataHocPhi = {};
             for (const sinhVien of Object.keys(dataMergeMssv)) {
                 let { mssv, namHoc, hocKy } = dataMergeMssv[sinhVien][0];
+                const condition = { mssv, namHoc, hocKy };
                 let sumHocPhi = dataMergeMssv[sinhVien].reduce((sum, item) => sum + parseInt(item.soTien), 0);
-                let item = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy });
-                if (item) {
-                    item = await app.model.tcHocPhi.update({ mssv, namHoc, hocKy }, { hocPhi: sumHocPhi, ngayTao });
+                dataHocPhi = await app.model.tcHocPhi.get(condition);
+                if (dataHocPhi) {
+                    let allTracsactionsCurrent = await app.model.tcHocPhiTransaction.getAll({ customerId: mssv, namHoc, hocKy });
+                    const newCongNo = sumHocPhi - allTracsactionsCurrent.reduce((sumCurrentCongNo, item) => sumCurrentCongNo + parseInt(item.amount || 0), 0);
+                    dataHocPhi = await app.model.tcHocPhi.update(condition, { hocPhi: sumHocPhi, ngayTao, congNo: newCongNo });
                 } else {
-                    item = await app.model.tcHocPhi.create({ mssv, namHoc, hocKy, hocPhi: sumHocPhi, congNo: sumHocPhi, ngayTao });
+                    dataHocPhi = await app.model.tcHocPhi.create({ ...condition, hocPhi: sumHocPhi, congNo: sumHocPhi, ngayTao });
                 }
-                if (!item) throw 'Cập nhật học phí lỗi!';
+                if (!dataHocPhi) throw 'Cập nhật học phí lỗi!';
             }
             for (const khoanPhi of data) {
                 let { mssv, soTien, loaiPhi, namHoc, hocKy } = khoanPhi;
+                if (!khoanPhi.ngayTao) khoanPhi.ngayTao = ngayTao;
                 const currentLoaiPhi = await app.model.tcHocPhiDetail.get({ mssv, namHoc, hocKy, loaiPhi });
                 if (!currentLoaiPhi) {
-                    await app.model.tcHocPhiDetail.create({ ...khoanPhi, ngayTao });
+                    await app.model.tcHocPhiDetail.create({ ...khoanPhi });
                 } else {
-                    await app.model.tcHocPhiDetail.update({ mssv, namHoc, hocKy, loaiPhi }, { soTien, ngayTao });
+                    await app.model.tcHocPhiDetail.update({ mssv, namHoc, hocKy, loaiPhi }, { soTien, ngayTao: khoanPhi.ngayTao });
                 }
             }
-            res.end();
+            res.send({ item: dataHocPhi });
         } catch (error) {
             console.error('Error import', error);
             res.send({ error });
