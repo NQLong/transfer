@@ -20,25 +20,29 @@ const CongVanDenPage = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const scrollView = useRef(null);
 
-
     const onRefresh = () => {
         setRefreshing(true);
         getData(initPageNumber, initPageSize, '', () => setRefreshing(false));
     }
 
 
-    const changeSearch = async () => {
+    const changeSearch = async (done) => {
         const { pageNumber = initPageNumber, pageSize = initPageSize } = hcthCongVanDen?.page || {};
-        getData(pageNumber, pageSize, '');
+        const { pageCondition = '', congVanYear } = route.params || {};
+        setFilter({congVanYear});
+        getData(pageNumber, pageSize, pageCondition, done);
     };
 
     const getData = (pageNumber, pageSize, pageCondition, done) => {
         dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition, filter, done));
     };
 
+
     useEffect(() => {
-        onRefresh();
-    }, []);
+        // console.log('hello');
+        setRefreshing(true)
+        changeSearch(() => setRefreshing(false));
+    }, [route.params])
 
     const list = hcthCongVanDen?.page?.list;
 

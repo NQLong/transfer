@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
 import { Button, Card, Dialog, Portal } from 'react-native-paper';
 import T from './common';
+import DropDownPicker from 'react-native-dropdown-picker';
 
-
-export const renderScrollView = ({ content = null, style = {}, refreshControl, onScroll = null, ref, navigation, route, headerRightButton = () => null, scrollEnabled = true }) => {
+export const renderScrollView = ({ nestedScrollEnabled = false, content = null, style = {}, refreshControl, onScroll = null, ref, navigation, route, headerRightButton = () => null, scrollEnabled = true }) => {
     // if (headerRightButton) {
     // navigation.setOptions({
     //     headerRight: headerRightButton
     // })
 
     // }
-    return <ScrollView style={{ ...style, }} refreshControl={refreshControl} bounces={true} onScroll={onScroll} ref={ref} scrollEnabled={scrollEnabled}>
+    return <ScrollView nestedScrollEnabled={nestedScrollEnabled} style={{ flex: 1, ...style, }} refreshControl={refreshControl} bounces={true} onScroll={onScroll} ref={ref} scrollEnabled={scrollEnabled}>
         {content}
     </ScrollView >
 }
@@ -106,7 +106,7 @@ export class AdminModal extends React.Component {
                     <Dialog.Content>
                         {content}
                     </Dialog.Content>
-                    <Dialog.Actions style={{marginBottom: 5}}>
+                    <Dialog.Actions style={{ marginBottom: 5 }}>
                         <Button onPress={this.hide}>Đóng</Button>
                         {button}
                     </Dialog.Actions>
@@ -118,3 +118,74 @@ export class AdminModal extends React.Component {
     render = () => null;
 }
 
+
+export class FormSelect extends React.Component {
+    state = {
+        open: false,
+        items: [],
+        value: null
+    }
+
+    componentDidMount() {
+        const { items } = this.props;
+        this.setState({ items });
+    }
+
+    value = () => {
+        return this.state.value
+    }
+
+    render() {
+        const { placeholder, label, style } = this.props;
+        console.log(this.state.value);
+        return <DropDownPicker
+            style={{ ...style }}
+            open={this.state.open}
+            value={this.state.value}
+            items={this.state.items}
+            setOpen={open => this.setState({ open })}
+            setValue={(getValue) => { console.log({ t: getValue() }); this.setState({ value: getValue() }) }}
+            setItems={items => this.setState({ items })}
+            listMode='MODAL'
+            placeholder={placeholder}
+            searchPlaceholder={placeholder}
+            modalProps={{
+                animationType: "fade",
+            }}
+            // modalContentContainerStyle={{ height: '50%', flex: 0 }}
+            searchable={true}
+            theme="LIGHT"
+            mode="BADGE"
+            badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926", "#00b4d8", "#e9c46a"]}
+        />
+    }
+}
+// export const FormSelect = ({}) => {
+//     const [open, setOpen] = useState(false);
+//     const [value, setValue] = useState([]);
+//     const [items, setItems] = useState([]);
+
+//     return (
+//         <View style={{
+//             backgroundColor: '#171717',
+//             flex: 1,
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//             paddingHorizontal: 15
+//         }}>
+//             <DropDownPicker
+//                 open={open}
+//                 value={value}
+//                 items={items}
+//                 setOpen={setOpen}
+//                 setValue={setValue}
+//                 setItems={setItems}
+
+//                 theme="DARK"
+//                 multiple={true}
+//                 mode="BADGE"
+//                 badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926", "#00b4d8", "#e9c46a"]}
+//             />
+//         </View>
+//     );
+// }

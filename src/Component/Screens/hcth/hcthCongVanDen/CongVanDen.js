@@ -387,7 +387,7 @@ const CongVanDen = (props) => {
 
 
     const genneralInfo = () => {
-        return <Card style={{ margin: 5 }} elevation={4}>
+        return <Card style={{ margin: 5, borderRadius: 20 }} elevation={4}>
             <Card.Title title={`Công văn đến #${item.id}`} right={headerRightButton} />
             <Card.Content>
                 <List.Item title='Số công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soCongVan || 'Chưa có'}</Text>} />
