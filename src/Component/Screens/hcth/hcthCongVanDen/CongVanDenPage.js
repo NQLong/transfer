@@ -1,8 +1,7 @@
+import React, { useEffect, useRef, useState } from 'react';
 import T from '@/Utils/common';
 import { renderScrollView } from '@/Utils/component';
-import { default as React, default as React, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
 import { Chip, Text, useTheme } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getHcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
@@ -14,8 +13,8 @@ const statusList = {
     MOI: { id: 0, text: 'Nháp', color: '#17a2b8' },
     CHO_DUYET: { id: 1, text: 'Chờ duyệt', color: '#007bff' },
     TRA_LAI_BGH: { id: 2, text: 'Trả lại', color: '#dc3545' },
-    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107'},
-    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545'  },
+    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107' },
+    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545' },
     DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
 };
 
@@ -88,17 +87,17 @@ const CongVanDenPage = (props) => {
     const list = hcthCongVanDen?.page?.list;
 
     const renderCongVanDenItem = (item, index) => {
-        let statusObj = Object.values(statusList).reduce((acc, ele) => ({...acc, [ele.id]: ele}), {});
-        return ( 
-                <Card elevation={4} key={item.id} style={{...styles.cardItem, borderLeftColor: statusObj[item.trangThai].color}} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
-                    <Card.Title title={item.soCongVan || 'Chưa có'} titleStyle={styles.cardTitle} subtitle={item.trichYeu} 
-                        right={(props) => <Text {...props} style={styles.dateLabel}>{T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</Text>}
-                        rightStyle={styles.rightSide}
-                        subtitleNumberOfLines={2}/>
-                    <Card.Content>
-                        <Badge style={{...styles.statusLabel, backgroundColor: statusObj[item.trangThai].color}}>{statusObj[item.trangThai].text}</Badge>
-                    </Card.Content>
-                </Card>
+        let statusObj = Object.values(statusList).reduce((acc, ele) => ({ ...acc, [ele.id]: ele }), {});
+        return (
+            <Card elevation={4} key={item.id} style={{ ...styles.cardItem, borderLeftColor: statusObj[item.trangThai].color }} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
+                <Card.Title title={item.soCongVan || 'Chưa có'} titleStyle={styles.cardTitle} subtitle={item.trichYeu}
+                    right={(props) => <Text {...props} style={styles.dateLabel}>{T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</Text>}
+                    rightStyle={styles.rightSide}
+                    subtitleNumberOfLines={2} />
+                <Card.Content>
+                    <Badge style={{ ...styles.statusLabel, backgroundColor: statusObj[item.trangThai].color }}>{statusObj[item.trangThai].text}</Badge>
+                </Card.Content>
+            </Card>
         )
     }
     const renderCongVanList = () => {
@@ -145,10 +144,10 @@ const CongVanDenPage = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#f8f8f8',
-      alignItems: 'center',
-      padding: 10
+        flex: 1,
+        backgroundColor: '#f8f8f8',
+        alignItems: 'center',
+        padding: 10
     },
     cardItem: {
         borderRadius: 10,
@@ -174,7 +173,7 @@ const styles = StyleSheet.create({
         marginTop: -25,
         marginRight: 20,
         alignItems: 'flex-start',
-    },  
+    },
     dateLabel: {
         marginTop: 0,
         fontSize: 12,
