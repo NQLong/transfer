@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View, TextInput, FlatList } from 'react-native';
 import { Button, Card, Dialog, List, Portal, TextInput as RNPInput, Text, Chip } from 'react-native-paper';
 import T from './common';
-import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const renderScrollView = ({ nestedScrollEnabled = false, content = null, style = {}, refreshControl, onScroll = null, ref, navigation, route, headerRightButton = null, scrollEnabled = true }) => {
-    if (headerRightButton) {
-        navigation.setOptions({
-            headerRight: headerRightButton
-        })
+    // if (headerRightButton) {
+    //     navigation.setOptions({
+    //         headerRight: headerRightButton
+    //     })
 
-    }
+    // }
     return <ScrollView nestedScrollEnabled={nestedScrollEnabled} style={{ flex: 1, ...style, }} refreshControl={refreshControl} bounces={true} onScroll={onScroll} ref={ref} scrollEnabled={scrollEnabled}>
         {content}
     </ScrollView >

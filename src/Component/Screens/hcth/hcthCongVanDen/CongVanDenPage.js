@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import T from '@/Utils/common';
 import { renderScrollView } from '@/Utils/component';
-import { ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
-import { Chip, Text, useTheme } from 'react-native-paper';
+import { ActivityIndicator, RefreshControl, StyleSheet, ScrollView, View } from 'react-native';
+import { Chip, Text, useTheme, Card, Badge } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getHcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
 
@@ -22,7 +22,8 @@ const CongVanDenPage = (props) => {
     const { navigation, route } = props;
     const hcthCongVanDen = useSelector(state => state?.hcthCongVanDen);
     const dispatch = useDispatch();
-    const filter = useSelector(state => state.hcthCongVanDen?.search) || {};
+    const search = useSelector(state => state.hcthCongVanDen?.search);
+    const filter = search || {};
     const [refreshing, setRefreshing] = useState(false);
     const { colors } = useTheme();
     const [isLoading, setIsLoading] = useState(false);
@@ -31,17 +32,17 @@ const CongVanDenPage = (props) => {
     /**
      * initial
      */
-    useEffect(() => {
-        onRefresh();
-    }, [])
-
+    // useEffect(() => {
+    //     onRefresh();
+    // }, []);
+    // console.log({filter});
 
     /**
      * onUpdate: reload when there is any change in search object
      */
     useEffect(() => {
         onRefresh();
-    }, [filter]);
+    }, [search]);
 
     /** 
      * handle function
@@ -75,6 +76,7 @@ const CongVanDenPage = (props) => {
             congVanYear: filter.congVanYear || '',
             donViNhanCongVan: filter.donViNhanCongVan || '',
             status: filter.status || '',
+            donViGuiCongVan: filter.donViGuiCongVan || '',
         }
         dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, filter.searchTerm || '', dataFilter, done));
     };
@@ -119,7 +121,11 @@ const CongVanDenPage = (props) => {
                 filterData.push({ key, label: filterLabel[key], value: textValue[key].toString() });
         });
         return <ScrollView horizontal style={{ flex: 1, padding: 10 }}>
-            {filterData.map(item => <Chip key={item.key} style={{ flex: 1, padding: 5, justifyContent: 'center', marginRight: 10 }} onClose={() => onRemoveSearchItem(item.key)} mode='outlined'>{`${item.label}: ${item.value}`}</Chip>)}
+            {filterData.map(item => <Chip key={item.key} style={{ flex: 1, maxWidth: 300, padding: 5, justifyContent: 'center', marginRight: 10 }} onClose={() => onRemoveSearchItem(item.key)} mode='outlined'>
+                {/* <View style={{ maxWidth: 300, justifyContent: 'center' }}> */}
+                    <Text style={{ fontSize: 12 }} numberOfLines={1} ellipsizeMode='tail'>{`${item.label}: ${item.value}`}</Text>
+                {/* </View> */}
+            </Chip>)}
         </ScrollView>
     };
 

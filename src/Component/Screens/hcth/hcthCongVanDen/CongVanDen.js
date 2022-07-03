@@ -1,22 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { getCongVanDen, HcthCongVanDenGet, createPhanHoi, getPhanHoi, createChiDao, getChiDao, traLaiCongVan, duyetCongVan, getStaffPage, updateQuyenChiDao } from './redux';
-import { Card, useTheme, Switch } from 'react-native-paper';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, RefreshControl, TouchableOpacity, View } from 'react-native';
+import { Button, Card, List, Menu, Switch, Text, useTheme, TextInput } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Menu, Divider, List, Text, Button } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
+import { createChiDao, createPhanHoi, duyetCongVan, getChiDao, getCongVanDen, getPhanHoi, getStaffPage, HcthCongVanDenGet, traLaiCongVan, updateQuyenChiDao } from './redux';
 
-import { Comment, FormTextBox, AdminModal } from '@/Utils/component';
 import T from '@/Utils/common';
-import { renderScrollView } from '@/Utils/component';
+import { AdminModal, Comment, FormTextBox, renderScrollView } from '@/Utils/component';
 import Timeline from 'react-native-timeline-flatlist';
 
 const trangThai = {
     MOI: { id: 0, text: 'Nháp', color: '#17a2b8' },
     CHO_DUYET: { id: 1, text: 'Chờ duyệt', color: '#007bff' },
     TRA_LAI_BGH: { id: 2, text: 'Trả lại', color: '#dc3545' },
-    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107'},
-    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545'  },
+    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107' },
+    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545' },
     DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
 };
 
@@ -112,7 +110,7 @@ const CanBoChiDao = (props) => {
     const trangThaiCv = useSelector(state => state?.hcthCongVanDen?.item?.trangThai);
     const user = useSelector(state => state?.settings?.user);
     const { colors } = useTheme();
-    const dispatch  = useDispatch();
+    const dispatch = useDispatch();
     const [isExpand, setIsExpand] = useState(true);
     const lstCanBoChiDao = list !== '' ? list.split(',') : [];
     const [canBoChiDao, setCanBoChiDao] = useState([]);
@@ -121,7 +119,7 @@ const CanBoChiDao = (props) => {
         setCanBoChiDao(lstCanBoChiDao);
     }, [list]);
 
-    const onChangeCanBoChiDao = (shcc, value) =>{
+    const onChangeCanBoChiDao = (shcc, value) => {
         let newQuyenChiDao = [...canBoChiDao];
         if (value) {
             newQuyenChiDao.push(shcc);
@@ -133,7 +131,7 @@ const CanBoChiDao = (props) => {
         }
         else {
             const congVanId = props.id;
-            dispatch(updateQuyenChiDao(congVanId, shcc,  trangThaiCv, value, (res) => {
+            dispatch(updateQuyenChiDao(congVanId, shcc, trangThaiCv, value, (res) => {
                 T.alert('Công văn đến', `${value ? 'Thêm' : 'Xoá'} cán bộ chỉ đạo ${!res.error || (res.error && Object.keys(res.error).length === 0) ? 'thành công' : 'lỗi'}`);
                 setCanBoChiDao(newQuyenChiDao);
             }));
@@ -147,14 +145,14 @@ const CanBoChiDao = (props) => {
             return <List.Item title={'Chưa có cán bộ chỉ đạo'} />
         else {
             const items = props.banGiamHieu.map((item, key) => {
-                return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()} 
-                left={() => user.permissions.includes('rectors:login') ? <Switch
-                    color="#007bff"
-                    style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
-                    value={canBoChiDao.includes(item.shcc)}
-                    onValueChange={(value) => onChangeCanBoChiDao(item.shcc, value)}
-                  /> : null}
-                right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item.shcc}</Text>} />
+                return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()}
+                    left={() => user.permissions.includes('rectors:login') ? <Switch
+                        color="#007bff"
+                        style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                        value={canBoChiDao.includes(item.shcc)}
+                        onValueChange={(value) => onChangeCanBoChiDao(item.shcc, value)}
+                    /> : null}
+                    right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item.shcc}</Text>} />
             });
             return items;
         };
@@ -212,12 +210,12 @@ const PhanHoi = () => {
         dispatch(createPhanHoi(data, () => dispatch(getPhanHoi(id, () => setPhanHoi('')))));
     }
 
-    const phanHoiBox = (<List.Item key='phanHoiBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+    const phanHoiBox = shcc ? <List.Item key='phanHoiBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
         <FormTextBox style={{ flex: 1, marginRight: 10 }} value={phanHoi} onChangeText={text => setPhanHoi(text)} placeholder='Nhập phản hồi' />
-        {shcc ? <TouchableOpacity onPress={onSubmit}>
+        <TouchableOpacity onPress={onSubmit}>
             <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
-        </TouchableOpacity> : null}
-    </View>)} />);
+        </TouchableOpacity>
+    </View>)} /> : null;
 
 
     return (
@@ -273,12 +271,12 @@ const ChiDao = () => {
         dispatch(createChiDao(data, () => dispatch(getChiDao(id, () => setChiDao('')))));
     }
 
-    const chiDaoBox = (<List.Item key='chiDaoTextBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+    const chiDaoBox = shcc ? <List.Item key='chiDaoTextBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
         <FormTextBox style={{ flex: 1, marginRight: 10 }} value={chiDao} onChangeText={text => setChiDao(text)} placeholder='Nhập chỉ đạo' />
-        {shcc ? <TouchableOpacity onPress={onSubmit}>
+        <TouchableOpacity onPress={onSubmit}>
             <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
-        </TouchableOpacity> : null}
-    </View>)} />);
+        </TouchableOpacity>
+    </View>)} /> : null;
 
 
     return <Card elevation={4} style={{ margin: 5 }}>
@@ -327,7 +325,7 @@ const FileList = ({ navigation }) => {
         if (!listFile)
             return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
         else if (!listFile.length)
-            return <Text>Chưa có tập tin công văn</Text>
+            return <List.Item title={'Chưa có tập tin công văn'} />
         else {
             const items = listFile.map((item, key) => {
                 const
@@ -421,7 +419,7 @@ class TraLaiCongVanModal extends AdminModal {
         return this.renderModal({
             title: 'Trả lại công văn',
             content: <>
-                <FormTextBox placeholder={'Lý do'} value={this.state.lyDo} onChangeText={value => this.setState({ lyDo: value })} />
+                <TextInput mode='outlined' label={'Lý do'} theme={{ roundness: 20 }} value={this.state.lyDo} onChangeText={value => this.setState({ lyDo: value })} />
             </>,
             button: [<Button key={1} color='red' onPress={this.traLai}>Trả lại</Button>]
         });
@@ -451,7 +449,7 @@ class DuyetCongVanModal extends AdminModal {
 }
 
 const CongVanDen = (props) => {
-    const { navigation, route } = props
+    const { navigation, route } = props;
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanDen?.item);
     const userPermissions = useSelector(state => state?.settings?.user?.permissions);
@@ -468,7 +466,7 @@ const CongVanDen = (props) => {
         const congVanId = route.params.congVanDenId;
         dispatch(getCongVanDen(congVanId, context, done));
         dispatch(getStaffPage(1, 100, '', { listDonVi: '68' }, (page) => {
-            setBanGiamHieu(page.list);   
+            setBanGiamHieu(page.list);
         }));
     };
 
@@ -488,15 +486,15 @@ const CongVanDen = (props) => {
         setQuyenChiDao(value);
         if (value) {
             const presiendents = banGiamHieu.filter(item => item.maChucVuChinh === '001').map(item => item.shcc);
-            const congVanId =  route.params.congVanDenId;
+            const congVanId = route.params.congVanDenId;
             dispatch(updateQuyenChiDao(congVanId, presiendents.join(','), item.trangThai, true, (res) => {
-                        if (res.error && Object.keys(res.error).length === 0) T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công');
-                        else T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
+                if (res.error && Object.keys(res.error).length === 0) T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công');
+                else T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
             }));
         } else {
             let newTrangThai = item.trangThai;
             if (newTrangThai == trangThai.CHO_DUYET.id) newTrangThai = trangThai.CHO_PHAN_PHOI.id;
-            const congVanId =  route.params.congVanDenId;
+            const congVanId = route.params.congVanDenId;
 
             dispatch(updateQuyenChiDao(congVanId, item.quyenChiDao, newTrangThai, false, (res) => {
                 if (res.error) T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
@@ -513,10 +511,10 @@ const CongVanDen = (props) => {
             <Card.Content>
                 <List.Item title='Số công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soCongVan || 'Chưa có'}</Text>} />
                 <List.Item title='Số đến' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soDen || 'Chưa có'}</Text>} />
-                <List.Item title='Ngày công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soDen || 'Chưa có'}</Text>} />
-                <List.Item title='Ngày nhận' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'}</Text>} />
+                <List.Item title='Ngày công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'}</Text>} />
+                <List.Item title='Ngày nhận' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayNhan ? T.dateToText(item.ngayNhan) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày hết hạn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayHetHan ? T.dateToText(item.ngayHetHan) : 'Chưa có'}</Text>} />
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center', color: Object.values(trangThai)[item.trangThai]?.color, fontWeight: 'bold'}}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center', color: Object.values(trangThai)[item.trangThai]?.color, fontWeight: 'bold' }}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
                 <List.Item title='Đơn vị gửi'
                     description={item?.tenDonViGui}
                     descriptionNumberOfLines={null}
@@ -525,16 +523,16 @@ const CongVanDen = (props) => {
                     description={item?.trichYeu}
                     descriptionNumberOfLines={null}
                 />
-                <List.Item title='Công văn cần chỉ đạo' 
-                right={() => 
-                    <Switch 
-                        color="#007bff"
-                        style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
-                        value={quyenChiDao}
-                        onValueChange={onChangeNeedConduct}
-                        disabled={!isPresident}
-                    />
-                } />
+                <List.Item title='Công văn cần chỉ đạo'
+                    right={() =>
+                        <Switch
+                            color="#007bff"
+                            style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                            value={quyenChiDao}
+                            onValueChange={onChangeNeedConduct}
+                            disabled={!isPresident}
+                        />
+                    } />
             </Card.Content>
         </Card>
     }
@@ -549,7 +547,7 @@ const CongVanDen = (props) => {
     const onDuyetCongVan = (data, done) => dispatch(duyetCongVan(data, () => getData(done)));
     const menuItems = [];
     if (item?.trangThai == trangThai.CHO_DUYET.id) {
-        menuItems.push(<Menu.Item key='duyet'  onPress={() => { closeMenu(); duyetModal.current?.show(); }} title="Duyệt công văn" />);
+        menuItems.push(<Menu.Item key='duyet' onPress={() => { closeMenu(); duyetModal.current?.show(); }} title="Duyệt công văn" />);
         menuItems.push(<Menu.Item key='tra-lai' onPress={() => { closeMenu(); traLaiModal.current?.show(); }} title="Trả lại công văn" />);
     }
 
@@ -557,7 +555,7 @@ const CongVanDen = (props) => {
     const headerRightButton = () => menuItems.length ? <Menu
         visible={isMenuVisible}
         onDismiss={closeMenu}
-        anchor={<TouchableOpacity onPress={openMenu}><Ionicons name={'menu-outline'} color='black' size={30} style={{ margin: 10 }} /></TouchableOpacity>}>
+        anchor={<TouchableOpacity onPress={openMenu}><Ionicons name={'ellipsis-vertical'} color='black' size={20} style={{ margin: 10 }} /></TouchableOpacity>}>
         {menuItems}
     </Menu> : null;
 
@@ -567,7 +565,7 @@ const CongVanDen = (props) => {
             {genneralInfo()}
             <FileList navigation={navigation} />
             <CanBoNhan />
-            {quyenChiDao && <CanBoChiDao id={route.params.congVanDenId} banGiamHieu={banGiamHieu}/>}
+            {quyenChiDao && <CanBoChiDao id={route.params.congVanDenId} banGiamHieu={banGiamHieu} />}
             <DonViNhan />
             <ChiDao />
             <PhanHoi />
