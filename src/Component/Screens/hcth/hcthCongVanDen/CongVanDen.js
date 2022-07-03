@@ -442,7 +442,7 @@ const CongVanDen = (props) => {
 
         </>,
         // scrollEnabled: !isModalShown,
-        headerRightButton: headerRightButton,
+        // headerRightButton: headerRightButton,
         style: {},
         refreshControl: <RefreshControl colors={['#9Bd35A', '#689F38']} refreshing={refreshing} onRefresh={onRefresh} />,
     });

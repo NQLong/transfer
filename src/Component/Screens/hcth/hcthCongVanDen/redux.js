@@ -6,6 +6,7 @@ export const HcthCongVanDenGet = 'HcthCongVanDen:Get';
 export const HcthCongVanDenGetMorePage = 'HcthCongVanDen:GetMorePage';
 export const HcthCongVanDenGetPhanHoi = 'HcthCongVanDen:GetPhanHoi';
 export const HcthCongVanDenGetChiDao = 'HcthCongVanDen:GetChiDao';
+export const HcthCongVanDenSearch = 'HcthCongVanDen:Search';
 
 export default function congVanDenReducer(state = {}, data) {
     switch (data.type) {
@@ -13,6 +14,8 @@ export default function congVanDenReducer(state = {}, data) {
             return Object.assign({}, state, { item: data.item });
         case HcthCongVanDenSearchPage:
             return Object.assign({}, state, { page: data.page });
+        case HcthCongVanDenSearch:
+            return Object.assign({}, state, { search: data.search });
         case HcthCongVanDenGetPhanHoi:
             return Object.assign({}, state, { item: { ...(state?.item || {}), phanHoi: data.phanHoi } });
         case HcthCongVanDenGetChiDao:
@@ -162,5 +165,28 @@ export function getChiDao(id, done) {
                 done && done(res.items);
             }
         }).catch((error) => { console.log(error); T.alert('Công văn đến', 'Lấy công văn chỉ đạo lỗi') });
+    };
+}
+
+export const SelectAdapter_DmDonViGuiCongVan = {
+    url: '/api/danh-muc/don-vi-gui-cong-van/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDmDonViGuiCv(id, (item) => done && done({ id: item.id, text: item.ten })))(),
+};
+
+export function getDmDonViGuiCv(id, done) {
+    return () => {
+        const url = `/api/danh-muc/don-vi-gui-cong-van/item/${id}`;
+        T.get(url, { id }).then(data => {
+            if (data.error) {
+                T.alert('Cảnh báo', 'Lấy thông tin đơn vị gửi công văn bị lỗi');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }).catch(error => {
+            console.error(`GET: ${url}.`, error);
+        });
     };
 }

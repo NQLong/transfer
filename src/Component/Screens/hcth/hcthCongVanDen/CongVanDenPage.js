@@ -1,11 +1,13 @@
 import T from '@/Utils/common';
 import { renderScrollView, Separator } from '@/Utils/component';
+import { objectTraps } from 'immer/dist/internal';
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
-import { useTheme } from 'react-native-paper';
-
+import { TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useTheme, Text } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { getHcthCongVanDenSearchPage, HcthCongVanDenSearchPage, getMoreCongVanDenPage } from './redux';
+import { getHcthCongVanDenSearchPage, HcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
 
 const initPageNumber = 1;
 const initPageSize = 20;
@@ -14,38 +16,69 @@ const CongVanDenPage = (props) => {
     const { navigation, route } = props;
     const hcthCongVanDen = useSelector(state => state?.hcthCongVanDen);
     const dispatch = useDispatch();
-    const [filter, setFilter] = useState({ tab: 0 });
+    const filter = useSelector(state => state.hcthCongVanDen?.search) || {};
     const [refreshing, setRefreshing] = useState(false);
     const { colors } = useTheme();
     const [isLoading, setIsLoading] = useState(false);
     const scrollView = useRef(null);
 
+    /**
+     * initial
+     */
+    useEffect(() => {
+        onRefresh();
+    }, [])
+
+
+    /**
+     * onUpdate: reload when there is any change in search object
+     */
+    useEffect(() => {
+        onRefresh();
+    }, [filter]);
+
+    /** 
+     * handle function
+     */
+
+    const onRemoveSearchItem = (key) => {
+        filter[key] = '';
+        dispatch({ type: HcthCongVanDenSearch, search: filter });
+        onRefresh();
+    }
+
     const onRefresh = () => {
         setRefreshing(true);
-        getData(initPageNumber, initPageSize, '', () => setRefreshing(false));
+        getData(initPageNumber, initPageSize, () => setRefreshing(false));
+    }
+
+    onLoadMore = () => {
+        const { pageNumber, pageSize, pageTotal } = hcthCongVanDen?.page || {};
+        if (!pageNumber || !pageSize || pageNumber == pageTotal) return;
+        setIsLoading(true);
+        // scrollView.current?.scrollToEnd({animated: true});
+        return dispatch(getMoreCongVanDenPage(pageNumber + 1, pageSize, '', filter, () => setIsLoading(false)));
     }
 
 
-    const changeSearch = async (done) => {
-        const { pageNumber = initPageNumber, pageSize = initPageSize } = hcthCongVanDen?.page || {};
-        const { pageCondition = '', congVanYear } = route.params || {};
-        setFilter({congVanYear});
-        getData(pageNumber, pageSize, pageCondition, done);
+    /**
+     * util function
+     */
+    const getData = (pageNumber, pageSize, done) => {
+        const dataFilter = {
+            congVanYear: filter.congVanYear || '',
+            donViNhanCongVan: filter.donViNhanCongVan || '',
+            status: filter.status || '',
+        }
+        dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, filter.searchTerm || '', dataFilter, done));
     };
 
-    const getData = (pageNumber, pageSize, pageCondition, done) => {
-        dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition, filter, done));
-    };
 
 
-    useEffect(() => {
-        // console.log('hello');
-        setRefreshing(true)
-        changeSearch(() => setRefreshing(false));
-    }, [route.params])
-
+    /**
+     * render functions
+     */
     const list = hcthCongVanDen?.page?.list;
-
     const renderCongVanList = () => {
         if (!list)
             return refreshing ? null : <ActivityIndicator size="large" color={colors.primary} />;
@@ -69,17 +102,24 @@ const CongVanDenPage = (props) => {
             });
     }
 
-    onLoadMore = () => {
-        const { pageNumber, pageSize, pageTotal } = hcthCongVanDen?.page || {};
-        if (!pageNumber || !pageSize || pageNumber == pageTotal) return;
-        setIsLoading(true);
-        // scrollView.current?.scrollToEnd({animated: true});
-        return dispatch(getMoreCongVanDenPage(pageNumber + 1, pageSize, '', filter, () => setIsLoading(false)));
-    }
+
+    const renderFilter = () => {
+        const filterLabel = { congVanYear: 'Thời gian', donViNhanCongVan: 'Đơn vị nhận', searchTerm: 'Tìm kiếm', status: 'Trạng thái', donViGuiCongVan: 'Đơn vị gửi công văn' }
+        const textValue = filter.textValue || {};
+        const filterData = [];
+        Object.keys(filter).forEach(key => {
+            if (filter[key] && filterLabel[key] && textValue[key])
+                filterData.push({ key, label: filterLabel[key], value: textValue[key].toString() });
+        });
+        return <ScrollView horizontal style={{ flex: 1, padding: 10 }}>
+            {filterData.map(item => <Chip key={item.key} style={{ flex: 1, padding: 5, justifyContent: 'center', marginRight: 10 }} onClose={() => onRemoveSearchItem(item.key)} mode='outlined'>{`${item.label}: ${item.value}`}</Chip>)}
+        </ScrollView>
+    };
 
     return renderScrollView({
         ...props,
         content: <>
+            {renderFilter()}
             {renderCongVanList()}
             {isLoading && <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20, marginTop: 20 }} />}
         </>,
