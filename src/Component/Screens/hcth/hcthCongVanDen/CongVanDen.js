@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCongVanDen, HcthCongVanDenGet, createPhanHoi, getPhanHoi, createChiDao, getChiDao, traLaiCongVan } from './redux';
-import { Card, useTheme } from 'react-native-paper';
+import { getCongVanDen, HcthCongVanDenGet, createPhanHoi, getPhanHoi, createChiDao, getChiDao, traLaiCongVan, duyetCongVan, getStaffPage, updateQuyenChiDao } from './redux';
+import { Card, useTheme, Switch } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Menu, Divider, List, Text, Button } from 'react-native-paper';
 
@@ -12,12 +12,12 @@ import { renderScrollView } from '@/Utils/component';
 import Timeline from 'react-native-timeline-flatlist';
 
 const trangThai = {
-    MOI: { id: 0, text: 'Nháp' },
-    CHO_DUYET: { id: 1, text: 'Chờ duyệt' },
-    TRA_LAI_BGH: { id: 2, text: 'Trả lại' },
-    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối' },
-    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)' },
-    DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối' },
+    MOI: { id: 0, text: 'Nháp', color: '#17a2b8' },
+    CHO_DUYET: { id: 1, text: 'Chờ duyệt', color: '#007bff' },
+    TRA_LAI_BGH: { id: 2, text: 'Trả lại', color: '#dc3545' },
+    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107'},
+    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545'  },
+    DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
 };
 
 const action = {
@@ -96,6 +96,75 @@ const CanBoNhan = () => {
         <Card style={{ margin: 5 }} elevation={4}>
             <List.Accordion id='canBoNhan'
                 title='Cán bộ nhận'
+                left={props => {
+                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
+                }}
+                expanded={isExpand}
+                onPress={() => setIsExpand(!isExpand)}>
+                {renderContent()}
+            </List.Accordion>
+        </Card>
+    );
+}
+
+const CanBoChiDao = (props) => {
+    const list = useSelector(state => state?.hcthCongVanDen?.item?.quyenChiDao);
+    const trangThaiCv = useSelector(state => state?.hcthCongVanDen?.item?.trangThai);
+    const user = useSelector(state => state?.settings?.user);
+    const { colors } = useTheme();
+    const dispatch  = useDispatch();
+    const [isExpand, setIsExpand] = useState(true);
+    const lstCanBoChiDao = list !== '' ? list.split(',') : [];
+    const [canBoChiDao, setCanBoChiDao] = useState([]);
+
+    useEffect(() => {
+        setCanBoChiDao(lstCanBoChiDao);
+    }, [list]);
+
+    const onChangeCanBoChiDao = (shcc, value) =>{
+        let newQuyenChiDao = [...canBoChiDao];
+        if (value) {
+            newQuyenChiDao.push(shcc);
+        } else {
+            newQuyenChiDao = newQuyenChiDao.filter((item) => item !== shcc);
+        }
+        if (newQuyenChiDao.length === 0) {
+            T.alert('Cập nhật cán bộ chỉ đạo', 'Chọn ít nhất 1 cán bộ chỉ đạo đối với công văn cần chỉ đạo!');
+        }
+        else {
+            const congVanId = props.id;
+            dispatch(updateQuyenChiDao(congVanId, shcc,  trangThaiCv, value, (res) => {
+                T.alert('Công văn đến', `${value ? 'Thêm' : 'Xoá'} cán bộ chỉ đạo ${!res.error || (res.error && Object.keys(res.error).length === 0) ? 'thành công' : 'lỗi'}`);
+                setCanBoChiDao(newQuyenChiDao);
+            }));
+        }
+    }
+
+    const renderContent = () => {
+        if (!canBoChiDao)
+            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+        else if (canBoChiDao.length <= 0)
+            return <List.Item title={'Chưa có cán bộ chỉ đạo'} />
+        else {
+            const items = props.banGiamHieu.map((item, key) => {
+                return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()} 
+                left={() => user.permissions.includes('rectors:login') ? <Switch
+                    color="#007bff"
+                    style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                    value={canBoChiDao.includes(item.shcc)}
+                    onValueChange={(value) => onChangeCanBoChiDao(item.shcc, value)}
+                  /> : null}
+                right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item.shcc}</Text>} />
+            });
+            return items;
+        };
+    }
+
+
+    return (
+        <Card style={{ margin: 5 }} elevation={4}>
+            <List.Accordion id='canBoNhan'
+                title='Cán bộ chỉ đạo'
                 left={props => {
                     return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
                 }}
@@ -359,18 +428,48 @@ class TraLaiCongVanModal extends AdminModal {
     }
 }
 
+class DuyetCongVanModal extends AdminModal {
+    state = { noiDung: '' }
+
+    duyet = () => {
+        const data = {
+            noiDung: this.state.noiDung,
+            id: this.props.id
+        }
+        this.props.onDuyetCongVan(data, this.hide);
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Duyệt công văn',
+            content: <>
+                <FormTextBox placeholder='Nội dung' value={this.state.noiDung} onChangeText={value => this.setState({ noiDung: value })} />
+            </>,
+            button: [<Button key={1} color='red' onPress={this.duyet}>Duyệt</Button>]
+        });
+    }
+}
+
 const CongVanDen = (props) => {
     const { navigation, route } = props
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanDen?.item);
+    const userPermissions = useSelector(state => state?.settings?.user?.permissions);
+    const isPresident = userPermissions.includes('rectors:login');
     const [context, setContext] = useState({});
     const [refreshing, setRefreshing] = useState();
     const [isMenuVisible, setIsMenuVisible] = React.useState(false);
+    const [banGiamHieu, setBanGiamHieu] = useState([]);
+    const [quyenChiDao, setQuyenChiDao] = useState(item?.quyenChiDao?.length > 0 || false);
     const traLaiModal = useRef(null);
+    const duyetModal = useRef(null);
     const { colors } = useTheme();
     const getData = (done) => {
         const congVanId = route.params.congVanDenId;
         dispatch(getCongVanDen(congVanId, context, done));
+        dispatch(getStaffPage(1, 100, '', { listDonVi: '68' }, (page) => {
+            setBanGiamHieu(page.list);   
+        }));
     };
 
 
@@ -385,6 +484,28 @@ const CongVanDen = (props) => {
         getData();
     }, []);
 
+    const onChangeNeedConduct = (value) => {
+        setQuyenChiDao(value);
+        if (value) {
+            const presiendents = banGiamHieu.filter(item => item.maChucVuChinh === '001').map(item => item.shcc);
+            const congVanId =  route.params.congVanDenId;
+            dispatch(updateQuyenChiDao(congVanId, presiendents.join(','), item.trangThai, true, (res) => {
+                        if (res.error && Object.keys(res.error).length === 0) T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công');
+                        else T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
+            }));
+        } else {
+            let newTrangThai = item.trangThai;
+            if (newTrangThai == trangThai.CHO_DUYET.id) newTrangThai = trangThai.CHO_PHAN_PHOI.id;
+            const congVanId =  route.params.congVanDenId;
+
+            dispatch(updateQuyenChiDao(congVanId, item.quyenChiDao, newTrangThai, false, (res) => {
+                if (res.error) T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
+                else {
+                    T.alert('Công văn đến', 'Xoá quyền chỉ đạo thành công');
+                }
+            }));
+        }
+    }
 
     const genneralInfo = () => {
         return <Card style={{ margin: 5, borderRadius: 20 }} elevation={4}>
@@ -395,12 +516,25 @@ const CongVanDen = (props) => {
                 <List.Item title='Ngày công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soDen || 'Chưa có'}</Text>} />
                 <List.Item title='Ngày nhận' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày hết hạn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayHetHan ? T.dateToText(item.ngayHetHan) : 'Chưa có'}</Text>} />
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center', color: Object.values(trangThai)[item.trangThai]?.color, fontWeight: 'bold'}}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
+                <List.Item title='Đơn vị gửi'
+                    description={item?.tenDonViGui}
+                    descriptionNumberOfLines={null}
+                />
                 <List.Item title='Trích yếu'
-                    // right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.trichYeu}</Text>}
                     description={item?.trichYeu}
                     descriptionNumberOfLines={null}
                 />
+                <List.Item title='Công văn cần chỉ đạo' 
+                right={() => 
+                    <Switch 
+                        color="#007bff"
+                        style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                        value={quyenChiDao}
+                        onValueChange={onChangeNeedConduct}
+                        disabled={!isPresident}
+                    />
+                } />
             </Card.Content>
         </Card>
     }
@@ -411,11 +545,11 @@ const CongVanDen = (props) => {
 
     const openMenu = () => setIsMenuVisible(true);
     const closeMenu = () => setIsMenuVisible(false);
-    const onTraLaiCongVan = (data, done) => {
-        dispatch(traLaiCongVan(data, () => getData(done)))
-    }
+    const onTraLaiCongVan = (data, done) => dispatch(traLaiCongVan(data, () => getData(done)));
+    const onDuyetCongVan = (data, done) => dispatch(duyetCongVan(data, () => getData(done)));
     const menuItems = [];
     if (item?.trangThai == trangThai.CHO_DUYET.id) {
+        menuItems.push(<Menu.Item key='duyet'  onPress={() => { closeMenu(); duyetModal.current?.show(); }} title="Duyệt công văn" />);
         menuItems.push(<Menu.Item key='tra-lai' onPress={() => { closeMenu(); traLaiModal.current?.show(); }} title="Trả lại công văn" />);
     }
 
@@ -433,11 +567,13 @@ const CongVanDen = (props) => {
             {genneralInfo()}
             <FileList navigation={navigation} />
             <CanBoNhan />
+            {quyenChiDao && <CanBoChiDao id={route.params.congVanDenId} banGiamHieu={banGiamHieu}/>}
             <DonViNhan />
             <ChiDao />
             <PhanHoi />
             <History />
             <TraLaiCongVanModal ref={traLaiModal} id={item.id} onTraLaiCongVan={onTraLaiCongVan} />
+            <DuyetCongVanModal ref={duyetModal} id={item.id} onDuyetCongVan={onDuyetCongVan} />
             <View style={{ marginBottom: 50 }} />
 
         </>,

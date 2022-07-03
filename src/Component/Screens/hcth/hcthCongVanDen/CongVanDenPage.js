@@ -1,16 +1,23 @@
 import T from '@/Utils/common';
-import { renderScrollView, Separator } from '@/Utils/component';
-import { objectTraps } from 'immer/dist/internal';
-import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
+import { renderScrollView } from '@/Utils/component';
+import { default as React, default as React, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useTheme, Text } from 'react-native-paper';
-import { Chip } from 'react-native-paper';
+import { Chip, Text, useTheme } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { getHcthCongVanDenSearchPage, HcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
+import { getHcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
 
 const initPageNumber = 1;
 const initPageSize = 20;
+
+const statusList = {
+    MOI: { id: 0, text: 'Nháp', color: '#17a2b8' },
+    CHO_DUYET: { id: 1, text: 'Chờ duyệt', color: '#007bff' },
+    TRA_LAI_BGH: { id: 2, text: 'Trả lại', color: '#dc3545' },
+    CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107'},
+    TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545'  },
+    DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
+};
 
 const CongVanDenPage = (props) => {
     const { navigation, route } = props;
@@ -79,27 +86,28 @@ const CongVanDenPage = (props) => {
      * render functions
      */
     const list = hcthCongVanDen?.page?.list;
+
+    const renderCongVanDenItem = (item, index) => {
+        let statusObj = Object.values(statusList).reduce((acc, ele) => ({...acc, [ele.id]: ele}), {});
+        return ( 
+                <Card elevation={4} key={item.id} style={{...styles.cardItem, borderLeftColor: statusObj[item.trangThai].color}} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
+                    <Card.Title title={item.soCongVan || 'Chưa có'} titleStyle={styles.cardTitle} subtitle={item.trichYeu} 
+                        right={(props) => <Text {...props} style={styles.dateLabel}>{T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</Text>}
+                        rightStyle={styles.rightSide}
+                        subtitleNumberOfLines={2}/>
+                    <Card.Content>
+                        <Badge style={{...styles.statusLabel, backgroundColor: statusObj[item.trangThai].color}}>{statusObj[item.trangThai].text}</Badge>
+                    </Card.Content>
+                </Card>
+        )
+    }
     const renderCongVanList = () => {
         if (!list)
             return refreshing ? null : <ActivityIndicator size="large" color={colors.primary} />;
         else if (list.lenth)
             return <Text>Chưa có danh sách công văn</Text>
         else
-            return list.map((item, key) => {
-                const boderBottom = {};
-                if (key == list.lenth - 1)
-                    boderBottom.borderBottomWidth = 1
-                return <TouchableOpacity disabled={refreshing} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })} key={item.id} style={{ marginBottom: 0, width: '100%', backgroundColor: 'white', borderTopWidth: 1, padding: 10, borderColor: '#868FA0', ...boderBottom }}>
-                    <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ color: '#333333', fontWeight: 'bold' }}>{item.soCongVan || 'Chưa có'}</Text>
-                        <Text style={{ color: '#333333', }}>{item.ngayNhan && T.dateToText(new Date(item.ngayNhan))}</Text>
-                    </View>
-                    <Separator height={1} style={{ marginTop: 5, marginBottom: 5 }} />
-                    <View>
-                        <Text style={{ color: '#333333', }}>{item.trichYeu}</Text>
-                    </View>
-                </TouchableOpacity >
-            });
+            return list.map((item, index) => renderCongVanDenItem(item, index));
     }
 
 
@@ -128,12 +136,50 @@ const CongVanDenPage = (props) => {
         ref: scrollView,
         onScroll: ({ nativeEvent }) => {
             if (T.isCloseToBottom(nativeEvent)) {
-                console.log('load more')
+                console.log('load more');
                 onLoadMore();
             }
         }
     });
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#f8f8f8',
+      alignItems: 'center',
+      padding: 10
+    },
+    cardItem: {
+        borderRadius: 10,
+        margin: 10,
+        borderLeftWidth: 3
+    },
+    cardTitle: {
+        fontSize: 14,
+        color: 'black',
+        textTransform: 'uppercase'
+    },
+    cardContent: {
+        display: 'flex',
+        justifyContent: 'space-between'
+    },
+    statusLabel: {
+        fontSize: 12,
+        paddingLeft: 15,
+        paddingRight: 15
+    },
+    rightSide: {
+        display: 'flex',
+        marginTop: -25,
+        marginRight: 20,
+        alignItems: 'flex-start',
+    },  
+    dateLabel: {
+        marginTop: 0,
+        fontSize: 12,
+    }
+});
 
 export default CongVanDenPage;
 

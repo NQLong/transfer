@@ -26,6 +26,7 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             headerStyle: { backgroundColor: colors.primary },
             headerTitleStyle: { color: colors.white },
             headerTintColor: 'white',
+            headerBackTitle: 'Trở lại'
         }}>
             <Stack.Screen options={{ headerShown: false }} name='Home' component={HomeScreen} />
             <Stack.Screen options={{ headerShown: false }} name='TabScreen' component={DefaultTabScreen} />

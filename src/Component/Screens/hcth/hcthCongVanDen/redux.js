@@ -7,6 +7,10 @@ export const HcthCongVanDenGetMorePage = 'HcthCongVanDen:GetMorePage';
 export const HcthCongVanDenGetPhanHoi = 'HcthCongVanDen:GetPhanHoi';
 export const HcthCongVanDenGetChiDao = 'HcthCongVanDen:GetChiDao';
 export const HcthCongVanDenSearch = 'HcthCongVanDen:Search';
+export const HcthCongVanDenGetStaffPage = 'HcthCongVanDen:GetStaggPage';
+export const HcthCongVanDenAddCanBoChiDao = 'HcthCongVanDen:AddCanBoChiDao';
+export const HcthCongVanDenRemoveCanBoChiDao = 'HcthCongVanDen:RemoveCanBoChiDao';
+export const HcthCongVanDenUpdateTrangThai = 'HcthCongVanDen:UpdateTrangThai';
 
 export default function congVanDenReducer(state = {}, data) {
     switch (data.type) {
@@ -25,6 +29,19 @@ export default function congVanDenReducer(state = {}, data) {
             const newList = [...state.page.list, ...newPageInfo.list];
             newPageInfo.list = newList;
             return Object.assign({}, state, { page: newPageInfo });
+        case HcthCongVanDenGetStaffPage:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), staff: data.page } });
+        case HcthCongVanDenAddCanBoChiDao:
+            const canBoChiDaoBefore = state?.item?.quyenChiDao.length > 0 ? state?.item?.quyenChiDao.split(',') : [];
+            canBoChiDaoBefore.push(data.quyenChiDao);
+            return Object.assign({}, state, { item: { ...(state?.item || {}), quyenChiDao: canBoChiDaoBefore.join(',') } })
+        case HcthCongVanDenRemoveCanBoChiDao:
+            const oldCanBoChiDao = state?.item?.quyenChiDao.split(',');
+            const removeCanBoChiDao = data.quyenChiDao.split(',');
+            const newCanBoChiDao = oldCanBoChiDao.filter(cb => !removeCanBoChiDao.includes(cb));
+            return Object.assign({}, state, { item: { ...(state?.item || {}), quyenChiDao: [...newCanBoChiDao].join(',') } })
+        case HcthCongVanDenUpdateTrangThai:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), trangThai: data.trangThai } })
         default:
             return state;
     }
@@ -74,6 +91,7 @@ export function getMoreCongVanDenPage(pageNumber, pageSize, pageCondition, filte
 }
 
 export function getCongVanDen(id, context, done) {
+    console.log(id);
     if (typeof context === 'function') {
         done = context;
         context = {};
@@ -153,6 +171,20 @@ export function traLaiCongVan(data, done) {
     };
 }
 
+export function duyetCongVan(data, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-den/duyet';
+        T.put(url, data).then(res => {
+            if (res.error) {
+                T.alert('Công văn đến', 'Duyệt công văn lỗi.\n' + res.error.errorMessage || '');
+                console.error('PUT: ' + url + '. ', res.error);
+            } else {
+                done && done(data);
+            }
+        }).catch(() => T.alert('Công văn đến', 'Duyệt công văn lỗi'));
+    };
+}
+
 export function getChiDao(id, done) {
     return dispatch => {
         const url = `/api/hcth/cong-van-den/chi-dao/${id}`;
@@ -187,6 +219,48 @@ export function getDmDonViGuiCv(id, done) {
             }
         }).catch(error => {
             console.error(`GET: ${url}.`, error);
+        });
+    };
+}
+export function getStaffPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    // const page = T.updatePage( pageNumber, pageSize, pageCondition, filter);
+    return () => {
+        const url = `/api/staff/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
+        T.get(url).then(data => {
+            if (data.error) {
+                T.alert('Công văn đến', 'Lấy danh sách cán bộ bị lỗi');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done(data.page);
+            }
+        }).catch(error => {
+            console.log(error);
+            T.notify('Lấy danh sách cán bộ bị lỗi', 'danger');
+
+        });
+    };
+}
+
+export function updateQuyenChiDao(id, shcc, trangThaiCv, status, done) {
+    return (dispatch) => {
+        const url = '/api/hcth/cong-van-den/quyen-chi-dao';
+        T.post(url, { id, shcc, trangThaiCv, status }).then(res => {
+            if (status) {
+                dispatch({ type: HcthCongVanDenAddCanBoChiDao, quyenChiDao: shcc});
+                dispatch({ type: HcthCongVanDenUpdateTrangThai, trangThai: trangThaiCv });
+            } else {
+                dispatch({ type: HcthCongVanDenRemoveCanBoChiDao, quyenChiDao: shcc});
+                dispatch({ type: HcthCongVanDenUpdateTrangThai, trangThai: trangThaiCv });
+            }
+            done && done(res);
+        })
+        .catch((error) => {
+            console.log(error);
+            T.alert('Công văn đến', 'Thêm cán bộ chỉ đạo lỗi');
         });
     };
 }
