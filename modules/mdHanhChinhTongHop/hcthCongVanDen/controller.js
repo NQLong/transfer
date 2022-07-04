@@ -447,7 +447,14 @@ module.exports = (app) => {
                 danhSachCanBoNhan = await app.model.canBo.getAll({
                     statement: 'SHCC IN (:danhSachShcc)',
                     parameter: { danhSachShcc: congVan?.canBoNhan.split(',') }
-                }, 'shcc,ten,ho,email', 'ten');
+                    }, 'shcc,ten,ho,email', 'ten');
+            
+            let donViGuiInfo = {};
+            
+            if (congVan?.donViGui) {
+                donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: congVan.donViGui }, 'id, ten', 'id');
+            }
+            
             const files = await app.model.hcthFile.getAll({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
             const history = await app.model.hcthHistory.getAllFrom(id, CONG_VAN_TYPE, req.query.historySortType);
@@ -465,6 +472,7 @@ module.exports = (app) => {
                     quyenChiDao,
                     danhSachDonViNhan,
                     danhSachCanBoNhan,
+                    tenDonViGui: donViGuiInfo?.ten || ''
                 }
             });
         } catch (error) {
@@ -556,6 +564,54 @@ module.exports = (app) => {
                 };
                 await app.model.hcthChiDao.create(chiDao);
                 congVan = await app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiSwitcher.TRA_LAI_BGH.id });
+                await app.model.hcthHistory.create({
+                    key: id, 
+                    loai: CONG_VAN_TYPE, 
+                    hanhDong: action.RETURN, 
+                    thoiGian: new Date().getTime(), 
+                    shcc: req.session?.user?.shcc
+                });
+                res.send({ item: congVan });
+            }
+        } catch (error) {
+            if (typeof error == 'string')
+                res.send({ error: { errorMessage: error } });
+            else
+                res.send({error});
+        }
+    });
+
+    app.put('/api/hcth/cong-van-den/duyet', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
+        try {
+            const { id, noiDung } = req.body;
+            console.log(req.body);
+            let congVan = await app.model.hcthCongVanDen.get({ id });
+            const userShcc = req.session.user?.shcc;
+            const quyenChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE),
+                canBoChiDao = (quyenChiDao?.rows || []).map(item => item.shccCanBoNhan);
+            const userPermission = req.session.user?.permissions || [];
+            if (!congVan) throw 'Công văn không tồn tại';
+            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể duyệt lại công văn này';
+            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền duyệt công văn này';
+            else if (!noiDung) throw 'Vui lòng nhập chỉ đạo';
+            else {
+                const chiDao = {
+                    canBo: req.session.user?.shcc,
+                    chiDao: noiDung,
+                    thoiGian: new Date().getTime(),
+                    congVan: id,
+                    loai: CONG_VAN_TYPE,
+                    action: action.APPROVE,
+                };
+                await app.model.hcthChiDao.create(chiDao);
+                congVan = await app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiSwitcher.CHO_PHAN_PHOI.id });
+                await app.model.hcthHistory.create({
+                    key: id, 
+                    loai: CONG_VAN_TYPE, 
+                    hanhDong: action.APPROVE, 
+                    thoiGian: new Date().getTime(), 
+                    shcc: req.session?.user?.shcc
+                });
                 res.send({ item: congVan });
             }
         } catch (error) {
@@ -847,20 +903,20 @@ module.exports = (app) => {
                 await createCanBoNhanChiDao(listCanBo, req.session.user?.staff?.shcc, req.body.id);
                 if (shcc !== req.session?.user?.staff.shcc) {
                     await createChiDaoNotification({
-                        id,
+                        id, 
                         quyenChiDao: shcc,
                     });
                 }
-                res.send({ error: null });
             } else {
                 app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiCv }, async (error) => {
                     if (error) throw error;
                     else {
-                        await deleteCanBoNhanChiDao(shcc, id, req.session?.user?.staff.shcc);
-                        res.send({ error: null });
+                        const shccNguoiTao = req.session?.user?.staff?.shcc || req.session?.user?.shcc;
+                        await deleteCanBoNhanChiDao(shcc, id, shccNguoiTao);
                     }
                 });
             }
+            res.send({ error: null });
         }
         catch (error) {
             res.send({ error });
