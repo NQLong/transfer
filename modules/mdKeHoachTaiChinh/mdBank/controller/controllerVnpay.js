@@ -77,20 +77,10 @@ module.exports = app => {
 
     app.get('/vnpay/ipn', async (req, res) => {
         try {
-            const ipAddr = req.headers['x-forwarded-for'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress;
-
-            const logFilePath = app.path.join(app.assetPath, 'vnpayLog.json');
-            let currentLogs = app.fs.existsSync(logFilePath) ? app.parse(app.fs.readFileSync(app.path.join(app.assetPath, 'vnpayLog.json'))) : {};
-            const updateLog = {
-                ...currentLogs, [new Date().getTime()]: {
-                    'IP VNPAY': ipAddr,
-                    'Query': req.query
-                }
-            };
-            app.fs.writeFileSync(logFilePath, JSON.stringify(updateLog));
+            // const ipAddr = req.headers['x-forwarded-for'] ||
+            //     req.connection.remoteAddress ||
+            //     req.socket.remoteAddress ||
+            //     req.connection.socket.remoteAddress;
 
             //TODO: trust ip
             // if (!WHITE_LIST_IP.includes(ipAddr)) return res.send({ RspCode: '99', Message: `${ipAddr} is not in trusted IP list!` });
@@ -105,7 +95,7 @@ module.exports = app => {
             let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
             const { vnp_TmnCode, vnp_HashSecret } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret');
 
-            let { vnp_Amount, vnp_PayDate, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = vnp_Params;
+            let { vnp_Amount, vnp_PayDate, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = vnp_Params;
             let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
 
             // Fail Transaction
@@ -129,7 +119,7 @@ module.exports = app => {
 
             if (secureHash === vnp_SecureHash) {
                 if (vnp_TransactionStatus == '00') {
-                    await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VNPAY', vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                    await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
 
                     await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, vnp_Amount, vnp_PayDate });
 
