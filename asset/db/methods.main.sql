@@ -4045,6 +4045,30 @@ END;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_GET_FROM(
+    fileId in number) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN my_cursor FOR
+        SELECT hcthcvtk.ID         as "id",
+               hcthcvtk.NGUOI_TAO  as "shccNguoiTao",
+               hcthcvtk.THOI_GIAN  as "thoiGian",
+               cbk.HO             as "hoCanBoNhan",
+               cbk.TEN            as "tenCanBoNhan",
+               nt.HO              as "hoNguoiTao",
+               nt.TEN             as "tenNguoiTao"
+        from HCTH_CONG_VAN_TRINH_KY hcthcvtk
+                LEFT JOIN HCTH_CAN_BO_KY hcthcbk on hcthcbk.CONG_VAN_TRINH_KY = hcthcvtk.ID
+                LEFT JOIN TCHC_CAN_BO cbk on hcthcbk.NGUOI_KY = cbk.SHCC
+                LEFT JOIN TCHC_CAN_BO nt on hcthcbk.NGUOI_TAO = nt.SHCC
+        where (hcthcvtk.FILE_CONG_VAN = fileId)
+        order by hcthcvtk.id;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE(
     pageNumber IN OUT NUMBER,
     pageSize IN OUT NUMBER,
@@ -14488,6 +14512,7 @@ AS
     toAge           NUMBER;
     time            NUMBER;
     listChuyenNganh STRING(100);
+    nhanSuDonVi     NUMBER;
 BEGIN
     SELECT JSON_VALUE(filter, '$.listShcc') INTO listShcc FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listDonVi') INTO listDonVi FROM DUAL;
@@ -14506,6 +14531,7 @@ BEGIN
     SELECT JSON_VALUE(filter, '$.fromAge') INTO fromAge FROM DUAL;
     SELECT JSON_VALUE(filter, '$.toAge') INTO toAge FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listChuyenNganh') INTO listChuyenNganh FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.nhanSuDonVi') INTO nhanSuDonVi FROM DUAL;
 
     SELECT COUNT(*)
     INTO totalItem
@@ -14554,7 +14580,8 @@ BEGIN
                                          EXISTS(
                                                  SELECT regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level)
                                                  from dual
-                                                 connect by regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
+                                                 connect by
+                                                         regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
                                                  INTERSECT
                                                  SELECT regexp_substr(listQuocGia, '[^,]+', 1, level)
                                                  from dual
@@ -14575,6 +14602,9 @@ BEGIN
             (listChuyenNganh IS NULL OR (CB.CHUYEN_NGANH IN (SELECT regexp_substr(listChuyenNganh, '[^,]+', 1, level)
                                                              from dual
                                                              connect by regexp_substr(listChuyenNganh, '[^,]+', 1, level) is not null)))
+            AND (
+                nhanSuDonVi IS NULL OR nhanSuDonVi = CB.MA_DON_VI
+                )
         )
       AND (NGAY_NGHI IS NULL OR NGAY_NGHI < time)
       AND (searchTerm = ''
@@ -14651,6 +14681,11 @@ BEGIN
                           WHEN CB.NGAY_BIEN_CHE IS NULL THEN 'Hợp đồng'
                           ELSE 'Biên chế'
                          END)                                                   AS "loaiCanBo",
+
+                     (SELECT LISTAGG(FAR.NHOM_ROLE, ',') WITHIN GROUP ( ORDER BY FAR.TEN_ROLE)
+                      FROM FW_ASSIGN_ROLE FAR
+                      WHERE FAR.NGUOI_DUOC_GAN = CB.SHCC
+                     )                                                          AS "nhomRole",
                      (select rtrim(xmlagg(xmlelement(e, dmqg.TEN_QUOC_GIA, '-').extract('//text()') order by
                                           null).getclobval(), '-')
                       FROM DM_QUOC_GIA dmqg
@@ -14727,7 +14762,8 @@ BEGIN
                                                    EXISTS(
                                                            SELECT regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level)
                                                            from dual
-                                                           connect by regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
+                                                           connect by
+                                                                   regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
                                                            INTERSECT
                                                            SELECT regexp_substr(listQuocGia, '[^,]+', 1, level)
                                                            from dual
@@ -14750,6 +14786,9 @@ BEGIN
                            (CB.CHUYEN_NGANH IN (SELECT regexp_substr(listChuyenNganh, '[^,]+', 1, level)
                                                 from dual
                                                 connect by regexp_substr(listChuyenNganh, '[^,]+', 1, level) is not null)))
+                      AND (
+                          nhanSuDonVi IS NULL OR nhanSuDonVi = CB.MA_DON_VI
+                          )
                   )
                 AND (NGAY_NGHI IS NULL OR NGAY_NGHI < time)
                 AND (searchTerm = ''
@@ -14906,6 +14945,7 @@ BEGIN
                CB_XULY.HO || ' ' || CB_XULY.TEN       as "canBoXuLy",
                CB_YEUCAU.HO || ' ' || CB_YEUCAU.TEN   as "canBoYeuCau",
                CB_PHANHOI.HO || ' ' || CB_PHANHOI.TEN as "canBoPhanHoi",
+               CB_PHANHOI.MA_DON_VI                   AS "donViCanBoPhanHoi",
                RPL.ID                                 as "id",
                RPL.MA_YEU_CAU                         AS "maYeuCau",
                RPL.NOI_DUNG                           AS "noiDung",
@@ -14918,7 +14958,7 @@ BEGIN
                  LEFT JOIN TCHC_CAN_BO CB_PHANHOI ON CB_PHANHOI.SHCC = RPL.NGUOI_PHAN_HOI
                  LEFT JOIN FW_USER USR ON USR.EMAIL = CB_PHANHOI.EMAIL
         WHERE RPL.MA_YEU_CAU = maYeuCau
-    ORDER BY  RPL.THOI_GIAN DESC;
+        ORDER BY RPL.THOI_GIAN DESC;
     RETURN TCCB_SP_REPLY;
 
 end;
