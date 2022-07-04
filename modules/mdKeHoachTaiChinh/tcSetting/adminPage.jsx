@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
-import { getTcThongTin } from '../tcThongTin/redux';
+// import { getTcThongTin } from '../tcThongTin/redux';
 class TcSettingAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/setting', () => {
@@ -222,5 +222,5 @@ class TcSettingAdminPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, TcSetting: state.finance.TcSetting });
-const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting, getTcThongTin };
+const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting, };
 export default connect(mapStateToProps, mapActionsToProps)(TcSettingAdminPage);
