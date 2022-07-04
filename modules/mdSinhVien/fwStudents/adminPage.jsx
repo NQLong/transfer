@@ -117,12 +117,12 @@ class AdminStudentsPage extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.gioiTinh ? (item.gioiTinh === 1 ? 'Nam' : 'Nữ') : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
                         <span><b>Dân tộc: </b>{item.danToc}<br /></span>
-                        <span><b>Quốc tịch: </b>{item.quocTich.normalizedName()}</span>
+                        <span><b>Quốc tịch: </b>{item.quocTich}</span>
                     </>} />
                     <TableCell type='text' content={item.tonGiao ? item.tonGiao : ''} />
 
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tinhThanhThuongTru ? item.tinhThanhThuongTru : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa ? item.tenKhoa.normalizedName() : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa ? item.tenKhoa : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                         item.namTuyenSinh ? <b>{item.namTuyenSinh}</b> : ''
                     } />

@@ -15,6 +15,6 @@ module.exports = app => {
             .replaceAll('{amount}', amount.toString().numberWithCommas())
             .replaceAll('{support_phone}', tcSupportPhone) || '');
         app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
-        await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
+        // await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
     };
 };
