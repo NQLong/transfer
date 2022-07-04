@@ -116,7 +116,7 @@ class UserPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${(item.soTien?.toString() || '').numberWithCommas()} vnđ`} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${(item.soTien?.toString() || '').numberWithDots()} vnđ`} />
                 </tr>
             )
         });
@@ -147,8 +147,8 @@ class UserPage extends AdminPage {
                                 <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div>Tổng học phí: <b>{current.hocPhi.toString().numberWithCommas()} vnđ </b></div>
-                                <div>Đã đóng: <b>{(current.hocPhi - current.congNo).toString().numberWithCommas()} vnđ </b></div>
+                                <div>Tổng học phí: <b>{current.hocPhi.toString().numberWithDots()} vnđ </b></div>
+                                <div>Đã đóng: <b>{(current.hocPhi - current.congNo).toString().numberWithDots()} vnđ </b></div>
                             </div>
 
                         </div>
