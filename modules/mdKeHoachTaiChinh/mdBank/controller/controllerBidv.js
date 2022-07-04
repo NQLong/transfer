@@ -111,9 +111,9 @@ module.exports = app => {
             if (!hocPhi) {
                 res.send({ result_code: '025' });
             } else {
-                // let student = await app.model.fwStudents.get({ mssv: customer_id });
+                let student = await app.model.fwStudents.get({ mssv: customer_id });
                 await modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum);
-                // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
+                type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
                 res.send({ result_code: '000', result_desc: 'success' });
             }
         }

@@ -131,11 +131,13 @@ class UserPage extends AdminPage {
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
                             <i style={{ fontSize: '16px' }}>Học kỳ {hocKy}</i>
-                            {current.congNo && <Tooltip title='Thanh toán' placement='top' arrow>
-                                <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
-                                    Thanh toán
-                                </button>
-                            </Tooltip>}
+                            {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)}</b> : <b>Đã thanh toán đủ.</b>
+                                // <Tooltip title='Thanh toán' placement='top' arrow>
+                                // <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                //     Thanh toán
+                                // </button>
+                                // </Tooltip>
+                            }
                         </div>
                         <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
                         {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
