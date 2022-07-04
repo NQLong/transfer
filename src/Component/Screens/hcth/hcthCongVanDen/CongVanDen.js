@@ -148,7 +148,7 @@ const CanBoChiDao = (props) => {
                 return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()}
                     left={() => user.permissions.includes('rectors:login') ? <Switch
                         color="#007bff"
-                        style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                        // style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
                         value={canBoChiDao.includes(item.shcc)}
                         onValueChange={(value) => onChangeCanBoChiDao(item.shcc, value)}
                     /> : null}
@@ -484,15 +484,19 @@ const CongVanDen = (props) => {
     }, []);
 
     const onChangeNeedConduct = (value) => {
+        setQuyenChiDao(value);
         if (value) {
             const presiendents = banGiamHieu.filter(item => item.maChucVuChinh === '001').map(item => item.shcc);
             const congVanId = route.params.congVanDenId;
             dispatch(updateQuyenChiDao(congVanId, presiendents.join(','), item.trangThai, true, (res) => {
                 if (!res.error) {
                     T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công')
-                    setQuyenChiDao(value);
+                    // setQuyenChiDao(value);
                 }
-                else T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
+                else {
+                    T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
+                    setQuyenChiDao(!value);
+                }
             }));
         } else {
             let newTrangThai = item.trangThai;
@@ -500,10 +504,12 @@ const CongVanDen = (props) => {
             const congVanId = route.params.congVanDenId;
 
             dispatch(updateQuyenChiDao(congVanId, item.quyenChiDao, newTrangThai, false, (res) => {
-                if (res.error) T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
+                if (res.error) {
+                    T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
+                    setQuyenChiDao(!value);
+                }
                 else {
                     T.alert('Công văn đến', 'Xoá quyền chỉ đạo thành công');
-                    setQuyenChiDao(value);
                 }
             }));
         }
@@ -531,7 +537,7 @@ const CongVanDen = (props) => {
                     right={() =>
                         <Switch
                             color="#007bff"
-                            style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                            // style={{ transform: [{ scaleX: 1 }, { scaleY: .8 }] }}
                             value={quyenChiDao}
                             onValueChange={onChangeNeedConduct}
                             disabled={!isPresident}

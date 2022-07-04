@@ -72,6 +72,7 @@ const CongVanDenPage = (props) => {
             donViGuiCongVan: filter.donViGuiCongVan || '',
             tab: 0,
         };
+        console.log(dataFilter);
         dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, filter.searchTerm || '', dataFilter, done));
     };
 
