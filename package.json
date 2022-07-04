@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.144",
+    "version": "1.0.147",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",

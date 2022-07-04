@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
-
+// import { getTcThongTin } from '../tcThongTin/redux';
 class TcSettingAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/setting', () => {
@@ -20,6 +20,7 @@ class TcSettingAdminPage extends AdminPage {
                     }
                 });
             });
+            this.props.getTcThongTin(items => this.setState({ dataThongTin: items }));
         });
     }
 
@@ -107,6 +108,16 @@ class TcSettingAdminPage extends AdminPage {
                                     <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                 </button>
                             </div>
+                        </div>
+                        <div className='tile'>
+                            <h3 className='tile-title'>Thông tin thu học phí</h3>
+                            {/* {renderTable({
+                                getDataSource: this.state.dataThongTin,
+                                header: 'thead-light',
+                                renderHead: () => (<tr>
+                                    <th style={{}}
+                                </tr>)
+                            })} */}
                         </div>
                     </div>
                     <div className='col-md-12'>
@@ -211,5 +222,5 @@ class TcSettingAdminPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, TcSetting: state.finance.TcSetting });
-const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting };
+const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting, };
 export default connect(mapStateToProps, mapActionsToProps)(TcSettingAdminPage);

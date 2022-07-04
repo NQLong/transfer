@@ -3,8 +3,6 @@ import { Tooltip } from '@mui/material';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
-
-import T from 'view/js/common';
 import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent } from './redux';
 class ThanhToanModal extends AdminModal {
     render = () => {
@@ -116,7 +114,7 @@ class UserPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${(item.soTien?.toString() || '').numberWithCommas()} vnđ`} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${T.numberDisplay(item.soTien ? Number(item.soTien) : '')} VNĐ`} />
                 </tr>
             )
         });
@@ -147,8 +145,8 @@ class UserPage extends AdminPage {
                                 <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div>Tổng học phí: <b>{current.hocPhi.toString().numberWithCommas()} vnđ </b></div>
-                                <div>Đã đóng: <b>{(current.hocPhi - current.congNo).toString().numberWithCommas()} vnđ </b></div>
+                                <div>Tổng học phí: <b>{T.numberDisplay(Number(current.hocPhi))} VNĐ </b></div>
+                                <div>Đã đóng: <b>{T.numberDisplay(Number(current.hocPhi) - Number(current.congNo))} VNĐ </b></div>
                             </div>
 
                         </div>

@@ -20,6 +20,10 @@ module.exports = app => {
         return this.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
+    String.prototype.numberWithDots = function () {
+        return this.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
     String.prototype.getFirstLetters = function () {
         const firstLetters = this
             .toUpperCase()
