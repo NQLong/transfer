@@ -16,7 +16,7 @@ class ThanhToanModal extends AdminModal {
                 <Tooltip title='Thanh toán qua Agribank' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
-                        this.props.vnPayGoToTransaction('agribank', link => {
+                        this.props.vnPayGoToTransaction('vnpay-agri', link => {
                             window.location.href = link;
                         });
                     }}>
@@ -27,6 +27,9 @@ class ThanhToanModal extends AdminModal {
                 <Tooltip title='Thanh toán qua Vietcombank' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
+                        this.props.vnPayGoToTransaction('vnpay-vcb', link => {
+                            window.location.href = link;
+                        });
                     }}>
                         <img src={`/img/logo/vcb.png?t=${new Date().getTime()}`} alt='Vietcombank' style={styleLogo} />Thanh toán qua Vietcombank
                     </button>
@@ -39,7 +42,7 @@ class ThanhToanModal extends AdminModal {
                     </button>
                 </Tooltip>
 
-                <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
+                {/* <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('vnpay', link => {
@@ -49,7 +52,7 @@ class ThanhToanModal extends AdminModal {
                         <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
                     </button>
 
-                </Tooltip>
+                </Tooltip> */}
 
             </div>
         });
@@ -104,7 +107,6 @@ class UserPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={style()}>STT</th>
-                    {/* <th style={style('10%', 'right')}>Chọn thanh toán</th> */}
                     <th style={style('100%')}>Loại phí</th>
                     <th style={style('auto', 'right')}>Tổng thu</th>
 
@@ -126,7 +128,7 @@ class UserPage extends AdminPage {
         return (
             <div className='tile' key={namHoc}>
                 <div className='tile-title'>Năm {namHoc} - {Number(namHoc) + 1}</div>
-                {Object.keys(dataHocKy).map(hocKy => {
+                {Object.keys(dataHocKy).sort((a, b) => Number(b) - Number(a)).map(hocKy => {
                     let current = dataHocKy[hocKy][0];
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
@@ -162,8 +164,8 @@ class UserPage extends AdminPage {
         const user = this.props.system.user,
             tcHocPhi = this.props.tcHocPhi || {},
             { hocPhiAll, hocPhiDetailAll } = tcHocPhi.dataAll || {};
-        console.log(hocPhiDetailAll);
         const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
+
         return this.renderPage({
             title: 'Học phí',
             subTitle: <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a>,
@@ -172,7 +174,7 @@ class UserPage extends AdminPage {
             backRoute: '/user',
             content: user && hocPhiAll ? <>
                 <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
-                {Object.keys(hocPhiAll).map(namHoc => this.renderSection(namHoc, {
+                {Object.keys(hocPhiAll).sort((a, b) => Number(b) - Number(a)).map(namHoc => this.renderSection(namHoc, {
                     dataTrongNam: hocPhiAll[namHoc],
                     dataDetailTrongNam: hocPhiDetailAll[namHoc]
                 }))}

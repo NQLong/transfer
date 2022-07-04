@@ -42,7 +42,6 @@ module.exports = app => {
         const secretCode = type === types.PRODUCTION ? secretCodeBidv : secretCodeBidvSandbox;
         const { customer_id, service_id, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
-        console.log('getbill', { customer_id, service_id, checksum });
 
         if (!(customer_id && service_id && checksum)) {
             res.send({ result_code: '145' });
@@ -64,7 +63,7 @@ module.exports = app => {
                         result_code: '000', result_desc: 'success',
                         data: {
                             service_id,
-                            customer_id: customer_id.toString(), customer_name: (student.ho + ' ' + student.ten).toUpperCase(), customer_addr: '',
+                            customer_id: customer_id.toString(), customer_name: `USSH ${student.ho}  ${student.ten}`.toUpperCase(), customer_addr: '',
                             type: 0, matchAmount: hocPhi.congNo,
                         },
                     });
@@ -98,8 +97,6 @@ module.exports = app => {
         const secretCode = type === types.PRODUCTION ? secretCodeBidv : secretCodeBidvSandbox;
         const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
-        console.log('payBill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
-        console.log('mychecksum', myChecksum);
 
         if (!(trans_id && trans_date && customer_id && bill_id && service_id && amount && checksum)) {
             res.send({ result_code: '145' });

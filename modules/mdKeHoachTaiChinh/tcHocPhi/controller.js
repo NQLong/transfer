@@ -93,10 +93,6 @@ module.exports = app => {
             } else mssv = req.query.mssv;
             const data = await app.model.tcHocPhi.getAllFeeOfStudent(mssv);
             const { rows: hocPhiAll, hocphidetailall: hocPhiDetailAll } = data;
-            // let data = {};
-            // hocPhiAll.forEach(hocPhi => {
-
-            // });
             res.send({ hocPhiAll: hocPhiAll.groupBy('namHoc'), hocPhiDetailAll: hocPhiDetailAll.groupBy('namHoc') });
         } catch (error) {
             res.send({ error });
