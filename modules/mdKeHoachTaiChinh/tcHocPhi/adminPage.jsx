@@ -1,8 +1,11 @@
+import { Tooltip } from '@mui/material';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { getTcHocPhiPage, updateHocPhi } from './redux';
+import T from 'view/js/common';
+import { SelectAdapter_TcLoaiPhi } from '../tcLoaiPhi/redux';
+import { getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi } from './redux';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -10,6 +13,105 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
+class Detail extends AdminModal {
+    onShow = (item) => {
+        let { mssv, namHoc, hocKy } = item;
+        this.props.getHocPhi(mssv, result => {
+            this.setState({ hocPhiDetail: result.hocPhiDetail || [], mssv, hocKy, namHoc });
+        });
+    }
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const { isChanged, hocPhiDetail } = this.state;
+        if (!isChanged) {
+            T.notify('Không có sự thay đổi nào', 'danger');
+        } else {
+            this.props.create(hocPhiDetail, () => {
+                T.notify('Cập nhật học phí hiện tại thành công', 'success');
+                this.hide();
+            });
+
+        }
+    }
+
+    onAdd = (e) => {
+        e.preventDefault();
+        let { mssv, namHoc, hocKy, hocPhiDetail } = this.state;
+        try {
+            const data = {
+                mssv, namHoc, hocKy,
+                loaiPhi: getValue(this.loaiPhi),
+                soTien: getValue(this.soTien),
+                tenLoaiPhi: this.loaiPhi.data().text,
+                ngayTao: Date.now()
+            };
+            if (hocPhiDetail.some(item => item.loaiPhi == data.loaiPhi)) {
+                T.confirm('Đã tồn tại loại phí này', 'Bạn có muốn ghi đè số tiền hiện tại không?', 'warning', true, isConfirm => {
+                    if (isConfirm) {
+                        T.notify('Ghi đè thành công!', 'success');
+                        hocPhiDetail.map(item => {
+                            if (item.loaiPhi == data.loaiPhi) item.soTien = parseInt(data.soTien);
+                            item.ngayTao = data.ngayTao;
+                            return item;
+                        });
+                        this.setState({ hocPhiDetail, isChanged: true });
+                        this.loaiPhi.clear();
+                        this.soTien.value('');
+                    }
+                });
+            }
+            else {
+                this.setState({ hocPhiDetail: [...this.state.hocPhiDetail, data], isChanged: true });
+                this.loaiPhi.clear();
+                this.soTien.value('');
+            }
+        } catch (input) {
+            T.notify(`${input?.props?.label || 'Dữ liệu'} bị trống`, 'danger');
+            input.focus();
+        }
+    }
+
+    render = () => {
+        const style = (width = 'auto', textAlign = 'left') => ({ width, textAlign, whiteSpace: 'nowrap', backgroundColor: '#1b489f', color: '#fff' }),
+            hocPhiDetail = this.state.hocPhiDetail;
+        let table = renderTable({
+            emptyTable: 'Không có dữ liệu học phí',
+            header: 'thead-light',
+            size: 'medium',
+            getDataSource: () => hocPhiDetail,
+            renderHead: () => (
+                <tr>
+                    <th style={style()}>STT</th>
+                    <th style={style('100%')}>Loại phí</th>
+                    <th style={style('auto', 'right')}>Số tiền</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.soTien?.toString() || '').numberWithCommas()} />
+                </tr>
+            )
+        });
+        return this.renderModal({
+            title: 'Chi tiết học phí học kỳ hiện tại',
+            body: <div className='row'>
+                <div className='form-group col-md-12' style={{ marginBottom: '30px' }}>{table}</div>
+                <FormSelect className='col-md-6' data={SelectAdapter_TcLoaiPhi} ref={e => this.loaiPhi = e} label='Loại phí' required onChange={() => this.soTien.focus()} />
+                <FormTextBox className='col-md-4' type='number' ref={e => this.soTien = e} label='Số tiền' required />
+                <div className='form-group col-md-2 d-flex align-items-end justify-content-end' >
+                    <Tooltip title='Thêm' arrow>
+                        <button className='btn btn-success' onClick={e => this.onAdd(e)}>
+                            <i className='fa fa-lg fa-plus' />
+                        </button>
+                    </Tooltip>
+                </div>
+            </div>
+        });
+    }
+}
 class EditModal extends AdminModal {
     state = { mssv: '', namHoc: '', hocKy: '', hocPhi: '' };
 
@@ -100,7 +202,13 @@ class TcHocPhiAdminPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
                     <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} />
+                        onEdit={() => this.modal.show(item)}>
+                        <Tooltip title='Chi tiết' arrow>
+                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.detailModal.show(item)}>
+                                <i className='fa fa-lg fa-eye' />
+                            </button>
+                        </Tooltip>
+                    </TableCell>
                 </tr>
             ),
         });
@@ -124,6 +232,7 @@ class TcHocPhiAdminPage extends AdminPage {
                 <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getTcHocPhiPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
+                <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
             </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null
         });
@@ -132,6 +241,6 @@ class TcHocPhiAdminPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, updateHocPhi
+    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi
 };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiAdminPage);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { uploadDsHocPhi } from './redux';
+import { createMultipleHocPhi } from './redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import FileBox from 'view/component/FileBox';
 
@@ -100,7 +100,7 @@ class TcHocPhiImportPage extends AdminPage {
     save = (e) => {
         const doSave = () => {
             const data = this.state.hocPhiAll;
-            this.props.uploadDsHocPhi(data, (error, data) => {
+            this.props.createMultipleHocPhi(data, (error, data) => {
                 if (error) {
                     T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
                 } else {
@@ -181,5 +181,5 @@ class TcHocPhiImportPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { uploadDsHocPhi };
+const mapActionsToProps = { createMultipleHocPhi };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiImportPage);
