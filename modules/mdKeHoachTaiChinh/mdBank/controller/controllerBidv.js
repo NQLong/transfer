@@ -53,12 +53,15 @@ module.exports = app => {
         } else {
             const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
             const hocPhi = await model.get({ namHoc, hocKy, mssv: customer_id.toString() });
-            if (!hocPhi) res.send({ result_code: '001' });
-            else if (hocPhi.congNo <= 0) res.send({ result_code: '025' });
-            else {
+            if (!hocPhi) {
+                res.send({ result_code: '001' });
+            } else if (hocPhi.congNo <= 0) {
+                res.send({ result_code: '025' });
+            } else {
                 let student = await app.model.fwStudents.get({ mssv: customer_id.toString() });
-                if (!student) res.send({ result_code: '017' });
-                else {
+                if (!student) {
+                    res.send({ result_code: '017' });
+                } else {
                     res.send({
                         result_code: '000', result_desc: 'success',
                         data: {
