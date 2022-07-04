@@ -14347,6 +14347,58 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "TC_THONG_TIN": {
+            "active": true,
+            "moduleName": "tcThongTin",
+            "modelName": "tcThongTin",
+            "columns": {
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NGAY_BAT_DAU": {
+                    "value": "ngayBatDau",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NGAY_KET_THUC": {
+                    "value": "ngayKetThuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DON_GIA": {
+                    "value": "donGia",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MODIFIED_DATE": {
+                    "value": "modifiedDate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
