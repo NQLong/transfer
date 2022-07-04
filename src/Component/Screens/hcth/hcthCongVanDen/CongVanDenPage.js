@@ -29,13 +29,6 @@ const CongVanDenPage = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const scrollView = useRef(null);
 
-    /**
-     * initial
-     */
-    // useEffect(() => {
-    //     onRefresh();
-    // }, []);
-    // console.log({filter});
 
     /**
      * onUpdate: reload when there is any change in search object
@@ -77,7 +70,8 @@ const CongVanDenPage = (props) => {
             donViNhanCongVan: filter.donViNhanCongVan || '',
             status: filter.status || '',
             donViGuiCongVan: filter.donViGuiCongVan || '',
-        }
+            tab: 0,
+        };
         dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, filter.searchTerm || '', dataFilter, done));
     };
 
@@ -141,7 +135,6 @@ const CongVanDenPage = (props) => {
         ref: scrollView,
         onScroll: ({ nativeEvent }) => {
             if (T.isCloseToBottom(nativeEvent)) {
-                console.log('load more');
                 onLoadMore();
             }
         }

@@ -458,7 +458,8 @@ const CongVanDen = (props) => {
     const [refreshing, setRefreshing] = useState();
     const [isMenuVisible, setIsMenuVisible] = React.useState(false);
     const [banGiamHieu, setBanGiamHieu] = useState([]);
-    const [quyenChiDao, setQuyenChiDao] = useState(item?.quyenChiDao?.length > 0 || false);
+    const danhSachQuyenChiDao = (item?.quyenChiDao && item.quyenChiDao.split(',')) || [];
+    const [quyenChiDao, setQuyenChiDao] = useState(danhSachQuyenChiDao.length > 0);
     const traLaiModal = useRef(null);
     const duyetModal = useRef(null);
     const { colors } = useTheme();
@@ -483,12 +484,14 @@ const CongVanDen = (props) => {
     }, []);
 
     const onChangeNeedConduct = (value) => {
-        setQuyenChiDao(value);
         if (value) {
             const presiendents = banGiamHieu.filter(item => item.maChucVuChinh === '001').map(item => item.shcc);
             const congVanId = route.params.congVanDenId;
             dispatch(updateQuyenChiDao(congVanId, presiendents.join(','), item.trangThai, true, (res) => {
-                if (res.error && Object.keys(res.error).length === 0) T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công');
+                if (!res.error) {
+                    T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công')
+                    setQuyenChiDao(value);
+                }
                 else T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
             }));
         } else {
@@ -500,6 +503,7 @@ const CongVanDen = (props) => {
                 if (res.error) T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
                 else {
                     T.alert('Công văn đến', 'Xoá quyền chỉ đạo thành công');
+                    setQuyenChiDao(value);
                 }
             }));
         }
