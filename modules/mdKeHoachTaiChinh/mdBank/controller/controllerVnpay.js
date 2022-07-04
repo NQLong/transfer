@@ -2,7 +2,7 @@ module.exports = app => {
     const dateFormat = require('dateformat');
     const querystring = require('qs');
     const crypto = require('crypto');
-    // const https = require('https');
+
     function sortObject(obj) {
         let sorted = {};
         let str = [];
@@ -24,15 +24,25 @@ module.exports = app => {
         try {
             const student = req.session.user;
             const bank = req.params.bank;
-            if (!bank || !['vnpay', 'agribank'].includes(bank)) throw 'Permission reject!';
+            let { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb');
+            const bankMapper = {
+                'agri': vnp_TmnCodeAgribank,
+                'vnpay-agri': vnp_TmnCodeVnpayAgribank,
+                'vcb': vnp_TmnCodeVcb,
+                'vnpay-vcb': vnp_TmnCodeVnpayVcb
+            }, hashMapper = {
+                'agri': vnp_HashSecretAgribank,
+                'vnpay-agri': vnp_HashSecretAgribank,
+                'vcb': vnp_HashSecretVcb,
+                'vnpay-vcb': vnp_HashSecretVcb
+            };
+            if (!bank || !Object.keys(bankMapper).includes(bank)) throw 'Permission reject!';
             if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
             const mssv = student.data.mssv;
             const ipAddr = req.headers['x-forwarded-for'] ||
                 req.connection.remoteAddress ||
                 req.socket.remoteAddress ||
                 req.connection.socket.remoteAddress;
-
-            let { vnp_TmnCode, vnp_HashSecret, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl, vnp_TmnCodeAgribank } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl', 'vnp_TmnCodeAgribank');
 
             const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
             let { congNo } = dataHocPhi;
@@ -42,8 +52,8 @@ module.exports = app => {
                 vnp_Locale = 'vn',
                 vnp_TxnRef = `${mssv}_${vnp_CreateDate}`;
 
-            const vnp_Amount = congNo * 100;
-            vnp_TmnCode = bank == 'vnpay' ? vnp_TmnCode : vnp_TmnCodeAgribank;
+            const vnp_Amount = congNo * 100, vnp_TmnCode = bankMapper[bank], vnp_HashSecret = hashMapper[bank];
+
             let params = { vnp_Version, vnp_Command, vnp_TmnCode, vnp_Locale, vnp_CurrCode, vnp_TxnRef, vnp_OrderInfo, vnp_Amount, vnp_ReturnUrl, vnp_IpAddr, vnp_CreateDate };
             params = sortObject(params);
 

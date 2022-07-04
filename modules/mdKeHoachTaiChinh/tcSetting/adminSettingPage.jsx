@@ -35,18 +35,12 @@ class AdminSettingsPage extends AdminPage {
             content: <div className='row'>
                 <div className='col-md-6'>
                     <div className='tile'>
-                        <h3 className='tile-title'>VNPAY (Sandbox)</h3>
-                        <FormTextBox ref={e => this.vnp_TmnCode_Sandbox = e} label='Mã website' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_HashSecret_Sandbox = e} label='Secret key' type='password' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_Version_Sandbox = e} label='Version VNPay' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_Command_Sandbox = e} label='Mã lệnh (default: pay)' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_CurrCode_Sandbox = e} label='Đơn vị tiền tệ (defaut: VND)' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnpayUrl_Sandbox = e} label='VNPAY create bill url' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnpayQueryUrl_Sandbox = e} label='VNPAY query bill url' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_ReturnUrl_Sandbox = e} label='URL sau khi thanh toán thành công' readOnly={readOnly} />
-
+                        <h3 className='tile-title'>VNPAY (Agribank)</h3>
+                        <FormTextBox ref={e => this.vnp_TmnCodeAgribank = e} label='Code luồng thu hộ' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.vnp_TmnCodeVnpayAgribank = e} label='Code luồng không thu hộ' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.vnp_HashSecretAgribank = e} label='Secret key Agribank' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_TmnCode_Sandbox', 'vnp_HashSecret_Sandbox', 'vnp_Version_Sandbox', 'vnp_Command_Sandbox', 'vnp_CurrCode_Sandbox', 'vnp_ReturnUrl_Sandbox', 'vnpayUrl_Sandbox', 'vnpayQueryUrl_Sandbox')}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>
@@ -55,18 +49,29 @@ class AdminSettingsPage extends AdminPage {
                 </div>
                 <div className='col-md-6'>
                     <div className='tile'>
-                        <h3 className='tile-title'>VNPAY</h3>
-                        <FormTextBox ref={e => this.vnp_TmnCode = e} label='Mã VNPAY' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_TmnCodeAgribank = e} label='Mã AGRIBANK_VNPAY ' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnp_HashSecret = e} label='Secret key' type='password' readOnly={readOnly} />
+                        <h3 className='tile-title'>VNPAY (Vietcombank)</h3>
+                        <FormTextBox ref={e => this.vnp_TmnCodeVcb = e} label='Code luồng thu hộ' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.vnp_TmnCodeVnpayVcb = e} label='Code luồng không thu hộ' readOnly={readOnly} />
+                        <FormTextBox ref={e => this.vnp_HashSecretVcb = e} label='Secret key VCB' readOnly={readOnly} />
+
+                        <div style={{ textAlign: 'right' }}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb')}>
+                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <div className='col-md-12'>
+                    <div className='tile'>
+                        <h3 className='tile-title'>VNPAY (Config)</h3>
                         <FormTextBox ref={e => this.vnp_Version = e} label='Version VNPay' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_Command = e} label='Mã lệnh (default: pay)' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_CurrCode = e} label='Đơn vị tiền tệ (defaut: VND)' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnpayUrl = e} label='VNPAY create bill url' readOnly={readOnly} />
-                        <FormTextBox ref={e => this.vnpayQueryUrl = e} label='VNPAY query bill url' readOnly={readOnly} />
                         <FormTextBox ref={e => this.vnp_ReturnUrl = e} label='URL sau khi thanh toán thành công' readOnly={readOnly} />
                         <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_TmnCode', 'vnp_TmnCodeAgribank', 'vnp_HashSecret', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'vnpayUrl', 'vnpayQueryUrl')}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnpayUrl', 'vnp_ReturnUrl')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>
