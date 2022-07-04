@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_DETAIL { mssv, hocKy, namHoc, loaiPhi, soTien, active }
+// Table name: TC_HOC_PHI_DETAIL { mssv, hocKy, namHoc, loaiPhi, soTien, active, ngayTao }
 const keys = ['HOC_KY', 'LOAI_PHI', 'MSSV', 'NAM_HOC'];
-const obj2Db = { 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'loaiPhi': 'LOAI_PHI', 'soTien': 'SO_TIEN', 'active': 'ACTIVE' };
+const obj2Db = { 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'loaiPhi': 'LOAI_PHI', 'soTien': 'SO_TIEN', 'active': 'ACTIVE', 'ngayTao': 'NGAY_TAO' };
 
 module.exports = app => {
     app.model.tcHocPhiDetail = {

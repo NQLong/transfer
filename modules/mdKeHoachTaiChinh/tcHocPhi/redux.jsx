@@ -4,6 +4,7 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TcHocPhiGetPage = 'TcHocPhi:GetPage';
 const TcHocPhiGet = 'TcHocPhi:Get';
+const TcHocPhiAll = 'TcHocPhi:All';
 
 const TcHocPhiUpdate = 'TcHocPhi:Update';
 const TcHocPhiGetHuongDan = 'TcHocPhi:GetHuongDan';
@@ -14,6 +15,8 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case TcHocPhiGet:
             return Object.assign({}, state, { data: data.result });
+        case TcHocPhiAll:
+            return Object.assign({}, state, { dataAll: data.result });
         case TcHocPhiGetHuongDan:
             return Object.assign({}, state, { hocPhiHuongDan: data.result });
         case TcHocPhiUpdate:
@@ -30,11 +33,10 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
                     }
                 }
                 if (updatedPage) {
-                    if (updatedItem.isDelete) updatedPage.list = updatedPage.list.filter(item => item.mssv != updatedItem.mssv);
-                    else for (let i = 0, n = updatedPage.list.length; i < n; i++) {
+                    for (let i = 0, n = updatedPage.list.length; i < n; i++) {
                         if (updatedPage.list[i].mssv == updatedItem.mssv) {
                             updatedItem['hoTenSinhVien'] = updatedPage.list[i]['hoTenSinhVien'];
-                            updatedPage.list.splice(i, 1, updatedItem);
+                            updatedPage.list[i] = updatedItem;
                             break;
                         }
                     }
@@ -81,14 +83,15 @@ export function getTcHocPhiTransactionByMssv(mssv, done) {
     };
 }
 
-export function uploadDsHocPhi(upload, done) {
-    return () => {
-        const url = '/api/finance/hoc-phi/upload';
-        T.post(url, { upload }, (data) => {
+export function createMultipleHocPhi(data, done) {
+    return dispatch => {
+        const url = '/api/finance/hoc-phi/multiple';
+        T.post(url, { data }, (data) => {
             if (!data.error) {
+                dispatch({ type: TcHocPhiUpdate, item: data.item });
                 done && done();
             } else {
-                T.notify('Upload danh sách học phí có lỗi ' + (data.error.item ? `tại ${data.error.item}` : ''), 'danger');
+                T.notify('Lưu danh sách học phí có lỗi', 'danger');
             }
         });
     };
@@ -127,7 +130,21 @@ export function getTcHocPhiHuongDan(done) {
     };
 }
 
-export function getHocPhi(mssv) {
+export function getAllHocPhiStudent(mssv, done) {
+    return dispatch => {
+        const url = '/api/finance/user/get-all-hoc-phi';
+        T.get(url, { mssv }, result => {
+            if (result.error) {
+                T.notify('Lỗi khi lấy thông tin học phí!', 'danger');
+                console.error(result.error);
+            } else {
+                done && done(result);
+                dispatch({ type: TcHocPhiAll, result });
+            }
+        });
+    };
+}
+export function getHocPhi(mssv, done) {
     return dispatch => {
         const url = '/api/finance/user/hoc-phi';
         T.get(url, { mssv }, result => {
@@ -135,6 +152,7 @@ export function getHocPhi(mssv) {
                 T.notify('Lỗi khi lấy thông tin học phí!', 'danger');
                 console.error(result.error);
             } else {
+                done && done(result);
                 dispatch({ type: TcHocPhiGet, result });
             }
         });
