@@ -63,7 +63,7 @@ module.exports = app => {
                         result_code: '000', result_desc: 'success',
                         data: {
                             service_id,
-                            customer_id: customer_id.toString(), customer_name: `USSH ${student.ho}  ${student.ten}`.toUpperCase(), customer_addr: '',
+                            customer_id: customer_id.toString(), customer_name: `USSH ${student.ho} ${student.ten}`.toUpperCase(), customer_addr: '',
                             type: 0, matchAmount: hocPhi.congNo,
                         },
                     });
