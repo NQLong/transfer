@@ -62,11 +62,13 @@ module.exports = app => {
                 if (!student) {
                     res.send({ result_code: '017' });
                 } else {
+                    let name = `USSH ${student.ho} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
+                    if (name.length > 40) name = `USSH ${student.ho.getFirstLetters()} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
                     res.send({
                         result_code: '000', result_desc: 'success',
                         data: {
                             service_id,
-                            customer_id: customer_id.toString(), customer_name: `USSH ${student.ho} ${student.ten}`.toUpperCase(), customer_addr: '',
+                            customer_id: customer_id.toString(), customer_name: name, customer_addr: '',
                             type: 0, matchAmount: hocPhi.congNo,
                         },
                     });
