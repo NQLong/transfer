@@ -119,6 +119,15 @@ export function deleteSinhVienAdmin(mssv, done) {
     };
 }
 
+export const SelectAdapter_FwStudent = {
+    ajax: true,
+    url: '/api/students/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })) : [] }),
+    fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
+};
+
+
 
 //User -----------------------------------------------------------------------------------------------
 export function getSinhVienEditUser(done) {
