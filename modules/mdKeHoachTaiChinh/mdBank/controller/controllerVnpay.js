@@ -119,7 +119,7 @@ module.exports = app => {
                         else if (vnp_TransactionStatus == '00') {
                             await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
 
-                            await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, vnp_Amount, vnp_PayDate });
+                            await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate });
 
                             res.send({ RspCode: '00', Message: 'Confirm Success' });
                         } else {
