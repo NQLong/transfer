@@ -69,6 +69,7 @@ export class FormMultipleLanguage extends React.Component {
                          this.element[code].value(text[code]);
                      }
                  });
+                 // eslint-disable-next-line no-empty
              } else {
 
              }

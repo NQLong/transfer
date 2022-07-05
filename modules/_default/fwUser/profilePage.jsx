@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormRichTextBox, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormTextBox } from 'view/component/AdminPage';
 import { userGetStaff, updateStaffUser } from 'modules/mdTccb/tccbCanBo/redux';
 import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';

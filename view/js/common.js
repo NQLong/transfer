@@ -420,30 +420,35 @@ T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) 
 // Language
 let languages = ['vi', 'en'];
 T.language = texts => {
+    let lg = 'vi', pathname = window.location.pathname, query = new URLSearchParams(window.location.search);
+    const lang = query.get('lang');
     const cookieLg = T.cookie('language');
-    let lg = 'vi', pathname = window.location.pathname;
-    if (pathname.includes('/en') || pathname.includes('/news-en') || pathname.includes('/article')) {
+
+    if (pathname.endsWith('/en') || pathname.startsWith('/news-en') || pathname.startsWith('/article')) {
         lg = 'en';
-    } else if (pathname.includes('/nvduc/de')) {
-        lg = 'de';
-    } else if (cookieLg && languages.includes(cookieLg)) {
-        lg = cookieLg;
+    } else if (lang && languages.includes(lang.toLowerCase())) {
+        lg = lang.toLowerCase();
+        T.cookie('language', lang.toLowerCase());
+    } else if (cookieLg && languages.includes(cookieLg.toLowerCase())) {
+        lg = cookieLg.toLowerCase();
     }
 
-    // if (lg != 'vi' && lg != 'en') lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
+
 T.language.setLanguages = _languages => languages = _languages && Array.isArray(_languages) && _languages.length ? _languages : ['vi', 'en'];
 T.language.next = () => {
-    let language = window.location.pathname.includes('/en')
-        || window.location.pathname.includes('/news-en')
-        || window.location.pathname.includes('/article') ? 'en' : 'vi';
-    // const language = T.cookie('language');
-    return (language == null || language == 'en') ? 'vi' : 'en';
+    const cookieLg = T.cookie('language');
+    if (!cookieLg) return languages[0];
+    let index = languages.indexOf(cookieLg);
+    if (index == -1) index = 0; // No language
+    else index++; // Next language
+    if (index >= languages.length) index -= languages.length; // If larger than length, reset
+    return languages[index];
 };
 T.language.current = () => {
-    const language = T.cookie('language');
-    return (language == null || language == 'en') ? 'en' : 'vi';
+    const cookieLg = T.cookie('language');
+    return cookieLg ? cookieLg : languages[0];
 };
 T.language.switch = () => {
     const language = T.language.next();
@@ -452,10 +457,15 @@ T.language.switch = () => {
 };
 T.language.parse = (text, getAll) => {
     let obj = {};
-    try { obj = JSON.parse(text) } catch { };
-    if (obj.vi == null) obj.vi = text;
-    if (obj.en == null) obj.en = text;
-    return getAll ? obj : obj[T.language()];
+    try { obj = JSON.parse(text); } catch (e) { obj = {}; }
+    languages.forEach(language => {
+        if (obj[language] == null && !Object.keys(obj).length) obj[language] = text;
+    });
+    if (typeof getAll == 'string' && languages.includes(getAll)) {
+        return obj[getAll];
+    } else {
+        return getAll ? obj : obj[T.language()];
+    }
 };
 T.language.getMonth = () => ({
     vi: ['Tháng một', 'Tháng hai', 'Tháng ba', 'Tháng tư', 'Tháng năm', 'Tháng sáu', 'Tháng bảy', 'Tháng tám', 'Tháng chín', 'Tháng mười', 'Tháng mười một', 'Tháng mười hai'],

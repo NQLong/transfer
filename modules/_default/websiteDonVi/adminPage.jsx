@@ -6,6 +6,7 @@ import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
+import { AdminPage, renderTable } from 'view/component/AdminPage';
 
 class ItemModal extends React.Component {
     modal = React.createRef();
@@ -83,7 +84,7 @@ class ItemModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class adminPage extends AdminPage {
     state = { searching: false, donViOptions: [] }
     searchBox = React.createRef();
     modal = React.createRef();
@@ -102,58 +103,51 @@ class AdminPage extends React.Component {
     };
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('website:write'),
-            permissionDelete = currentPermissions.includes('website:delete');
-        let table = 'Không có dữ liệu!',
-            { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dvWebsite && this.props.dvWebsite.page ?
+        const permission = this.getUserPermission('website');
+        const permissionWrite = permission.write, permissionDelete = permission.delete;
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dvWebsite && this.props.dvWebsite.page ?
                 this.props.dvWebsite.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-        if (list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
-                            <th style={{ width: '20%', textAlign: 'left' }} nowrap='true'>Tên viết tắt</th>
-                            {/* <th style={{ width: '50%' }} nowrap='true'>Tên đơn vị</th> */}
-                            <th style={{ width: '70%' }} nowrap='true'>Website riêng</th>
-                            <th style={{ width: '10%', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td style={{ textAlign: 'left' }}><Link to={'/user/website/edit/' + item.id}>{item.shortname}</Link></td>
-                                {/* <td><a href={'/user/website/edit/' + item.shortname} style={{ color: 'black' }}>{item.tenDonVi}</a></td> */}
-                                <td><a href={item.website} target='__blank' className='text-success'>{item.website}</a></td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={() => this.changeActive(item, index)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a href={`/${item.shortname}`} target='__blank' className='btn btn-success'>
-                                            <i className='fa fa-lg fa-chrome' style={{ margin: 'unset' }} />
-                                        </a>
-                                        <Link className='btn btn-primary' to={`/user/website/edit/${item.id}`}>
-                                            <i className='fa fa-lg fa-edit' style={{ margin: 'unset' }} />
-                                        </Link>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' style={{ margin: 'unset' }} />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
-        }
+        const table = renderTable({
+            getDataSource: () => list,
+            emptyTable: 'Không có dữ liệu',
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
+                    <th style={{ width: '20%', textAlign: 'left' }} nowrap='true'>Tên viết tắt</th>
+                    {/* <th style={{ width: '50%' }} nowrap='true'>Tên đơn vị</th> */}
+                    <th style={{ width: '70%' }} nowrap='true'>Website riêng</th>
+                    <th style={{ width: '10%', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                </tr>
+            ), renderRow: (item, index) => (
+                <tr key={index}>
+                    <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
+                    <td style={{ textAlign: 'left' }}><Link to={'/user/website/edit/' + item.id}>{item.shortname}</Link></td>
+                    {/* <td><a href={'/user/website/edit/' + item.shortname} style={{ color: 'black' }}>{item.tenDonVi}</a></td> */}
+                    <td><a href={item.website} target='__blank' className='text-success'>{item.website}</a></td>
+                    <td className='toggle' style={{ textAlign: 'center' }}>
+                        <label>
+                            <input type='checkbox' checked={item.kichHoat} onChange={() => this.changeActive(item, index)} />
+                            <span className='button-indecator' />
+                        </label>
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                        <div className='btn-group'>
+                            <a href={`/${item.shortname}`} target='__blank' className='btn btn-success'>
+                                <i className='fa fa-lg fa-chrome' style={{ margin: 'unset' }} />
+                            </a>
+                            <Link className='btn btn-primary' to={`/user/website/edit/${item.id}`}>
+                                <i className='fa fa-lg fa-edit' style={{ margin: 'unset' }} />
+                            </Link>
+                            {permissionDelete &&
+                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+                                <i className='fa fa-trash-o fa-lg' style={{ margin: 'unset' }} />
+                            </a>}
+                        </div>
+                    </td>
+                </tr>
+            )
+        });
 
         return (
             <main className='app-content'>
@@ -187,4 +181,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dvWebsite: state.dvWebsite });
 const mapActionsToProps = { getDvWebsitePage, createDvWebsite, updateDvWebsite, deleteDvWebsite, getDmDonViAll };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(adminPage);
