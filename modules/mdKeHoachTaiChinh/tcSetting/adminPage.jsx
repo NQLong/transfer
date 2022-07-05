@@ -15,12 +15,13 @@ class TcSettingAdminPage extends AdminPage {
                     } else if (item.key == 'hocPhiEmailHoanTraEditorHtml') {
                         this.hocPhiEmailHoanTraEditor.html(item.value);
                     } else {
+                        if (item.key == 'hocPhiNamHoc') this.hocPhiNamHocEnd.value(Number(item.value) + 1);
                         const component = this[item.key];
                         component && component.value && component.value(item.value);
                     }
                 });
             });
-            this.props.getTcThongTin(items => this.setState({ dataThongTin: items }));
+            // this.props.getTcThongTin(items => this.setState({ dataThongTin: items }));
         });
     }
 
@@ -67,9 +68,15 @@ class TcSettingAdminPage extends AdminPage {
                 <div className='row'>
                     <div className='col-md-6'>
                         <div className='tile'>
-                            <h3 className='tile-title'>Cấu hình</h3>
-                            <FormTextBox ref={e => this.hocPhiNamHoc = e} label='Học phí: Năm học' type='year' readOnly={readOnly} />
-                            <FormSelect ref={e => this.hocPhiHocKy = e} label='Học phí: Học kỳ' data={[1, 2, 3]} readOnly={readOnly} />
+                            <h3 className='tile-title'>Cấu hình học phí năm học</h3>
+                            <FormTextBox ref={e => this.hocPhiNamHoc = e} label='Từ năm' type='year' readOnly={readOnly} onChange={e => {
+                                const current = e;
+                                if (current && !isNaN(current)) {
+                                    this.hocPhiNamHocEnd.value(Number(current) + 1);
+                                }
+                            }} />
+                            <FormTextBox ref={e => this.hocPhiNamHocEnd = e} label='Đến năm' type='year' readOnly={true} />
+                            <FormSelect ref={e => this.hocPhiHocKy = e} label='Học kỳ' data={[1, 2, 3]} readOnly={readOnly} />
                             <div style={{ textAlign: 'right' }}>
                                 <button className='btn btn-success' type='button' onClick={() => this.save('hocPhiNamHoc', 'hocPhiHocKy')}>
                                     <i className='fa fa-fw fa-lg fa-save'></i>Lưu

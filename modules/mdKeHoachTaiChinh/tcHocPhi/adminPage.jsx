@@ -6,6 +6,45 @@ import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { SelectAdapter_TcLoaiPhi } from '../tcLoaiPhi/redux';
 import { getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi } from './redux';
+import CountUp from 'view/js/countUp';
+import { Link } from 'react-router-dom';
+
+class NumberIcon extends React.Component {
+    componentDidMount() {
+        setTimeout(() => {
+            const endValue = this.props.value ? parseInt(this.props.value) : 0;
+            new CountUp(this.valueElement, 0, endValue, 0, 2, { separator: '.', decimal: ',' }).start();
+        }, 100);
+    }
+
+    componentDidUpdate(prevProps) {
+        console.log(prevProps.value, this.props.value);
+        if (prevProps.value !== this.props.value)
+            setTimeout(() => {
+                const endValue = this.props.value ? parseInt(this.props.value) : 0;
+                new CountUp(this.valueElement, prevProps.value, endValue, 0, 2, { separator: '.', decimal: ',' }).start();
+            }, 100);
+    }
+
+    render() {
+        let isShow = true;
+        if (this.props.isShowValue != undefined) {
+            if (this.props.isShowValue == false) isShow = false;
+        }
+        const content = (
+            <div className={'widget-small coloured-icon ' + this.props.type}>
+                <i className={'icon fa fa-3x ' + this.props.icon} />
+                <div className='info'>
+                    <h4>
+                        {this.props.title}
+                    </h4>
+                    {isShow && <p style={{ fontWeight: 'bold' }} ref={e => this.valueElement = e} />}
+                </div>
+            </div>
+        );
+        return this.props.link ? <Link to={this.props.link} style={{ textDecoration: 'none' }}>{content}</Link> : content;
+    }
+}
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -157,19 +196,25 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-12' ref={e => this.hocKy = e} type='text' label='Học kỳ' readOnly={true} />
                 <FormTextBox className='col-md-6' ref={e => this.mssv = e} type='text' label='MSSV' readOnly={true} />
                 <FormTextBox className='col-md-6' ref={e => this.hoTenSinhVien = e} type='text' label='Họ và tên' readOnly={true} />
-                <FormTextBox className='col-md-12' ref={e => this.hocPhi = e} type='number' label='Học phí (vnđ)' readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.hocPhi = e} type='number' label='Học phí (VNĐ)' readOnly={readOnly} />
             </div>
         });
     }
 }
 
 class TcHocPhiAdminPage extends AdminPage {
+    state = {
+        totalCurrent: 0,
+        totalPaid: 0
+    }
     componentDidMount() {
         T.ready('/user/finance/hoc-phi', () => {
             this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
-                const { settings: { namHoc, hocKy } } = data;
+                console.log(data.settings);
+                const { settings: { namHoc, hocKy, totalPaid, totalCurrent } } = data;
                 this.year.value(namHoc);
                 this.term.value(hocKy);
+                this.setState({ totalCurrent, totalPaid });
             });
         });
     }
@@ -178,7 +223,6 @@ class TcHocPhiAdminPage extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -189,8 +233,8 @@ class TcHocPhiAdminPage extends AdminPage {
                 <th style={{ width: 'auto', textAlign: 'center' }}>Học kỳ</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>MSSV</th>
                 <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Họ và tên</th>
-                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
-                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Công nợ (vnđ)</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học phí (VNĐ)</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Công nợ (VNĐ)</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (
@@ -199,8 +243,8 @@ class TcHocPhiAdminPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK${item.hocKy}`} />
                     <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
                     <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
+                    <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.hocPhi} />
+                    <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.congNo} />
                     <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}>
                         <Tooltip title='Chi tiết' arrow>
@@ -227,13 +271,24 @@ class TcHocPhiAdminPage extends AdminPage {
                 })
             } /></>,
             breadcrumb: ['Học phí'],
-            content: <div className='tile'>
-                {table}
-                <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getTcHocPhiPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
-                <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
-            </div>,
+            content:
+                <div className='row'>
+                    <div className='col-md-6'>
+                        <NumberIcon type='primary' icon='fa-users' title='Tổng số sinh viên đóng học phí' value={this.state.totalCurrent || 0} />
+                    </div>
+                    <div className='col-md-6'>
+                        <NumberIcon type='info' icon='fa-users' title='Số sinh viên đã đóng đủ' value={this.state.totalPaid || 0} />
+                    </div>
+                    <div className='col-md-12'>
+                        <div className='tile'>
+                            {table}
+                            <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                                getPage={this.props.getTcHocPhiPage} />
+                            <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
+                            <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
+                        </div>
+                    </div>
+                </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null
         });
     }

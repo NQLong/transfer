@@ -85,9 +85,13 @@ app.readyHooks.add('Run tool.sv2022.js', {
                                 let year = data.ngaySinh.split('/')[2];
                                 data.ngaySinh = new Date(year, month - 1, date).getTime();
                             } else data.ngaySinh = data.ngaySinh.getTime();
-                            // console.log(data.ngaySinh);
-                            let newStudent = await app.model.fwUser.create({ studentId: data.mssv, lastName: data.ten, firstName: data.ho, email: data.emailTruong, isStudent: 1 });
-                            if (!newStudent) console.log('Import fail at line ', index);
+                            let student = await app.model.fwStudents.get({ mssv: data.mssv });
+                            if (!student) {
+                                let newStudent = await app.model.fwStudents.create(data);
+                                if (!newStudent) {
+                                    console.log('Import fail at line ', index);
+                                }
+                            }
                             index++;
                         }
                     }
