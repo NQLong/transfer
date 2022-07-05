@@ -27,14 +27,6 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/bidv-md5', async (req, res) => {
-        const { service_id, customer_id, secretCode, trans_id, bill_id, amount } = req.body;
-        res.send({
-            payBill: crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex'),
-            getbill: crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex')
-        });
-    });
-
     const getBill = async (type, req, res) => {
         let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeBidv, secretCodeBidvSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeBidv', 'secretCodeBidvSandbox');
         namHoc = Number(namHoc);
