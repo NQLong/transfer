@@ -46,7 +46,6 @@ module.exports = app => {
 
                     const dataRequest = `${channelId}|${channelRefNumber}|${secretCode}`,
                         mySignatureRequest = crypto.createHash('md5').update(dataRequest).digest('hex');
-                    // console.log(' - Data = ', dataRequest, '\n - My Signature = ', mySignatureRequest, '\n - Signature = ', signature);
 
                     const dataResponse = `${channelId}|${channelRefNumber}|${responseMsgId}|${secretCode}`,
                         signatureResponse = crypto.createHash('md5').update(dataResponse).digest('hex');

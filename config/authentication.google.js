@@ -77,7 +77,7 @@ module.exports = (app) => {
     app.verifyIdToken = async (token) => {
         const ticket = await app.googleO2client.verifyIdToken({
             idToken: token,
-            audience: GoogleStrategyConfig.clientID,  // Specify the CLIENT_ID of the app that accesses the backend
+            audience: GoogleStrategyConfig.clientID  // Specify the CLIENT_ID of the app that accesses the backend
         });
         const payload = ticket.getPayload();
         return payload;
@@ -94,16 +94,16 @@ module.exports = (app) => {
                 userEmail = email;
             }
             if (!userEmail)
-                throw 401;
+                throw 'Tài khoản không hợp lệ';
             else {
                 const user = await app.model.fwUser.get({ email: userEmail });
-                if (!user) throw {};
+                // console.log({ userEmail, user });
+                if (!user) throw 'Tài khoản không tồn tại';
                 app.updateSessionUser(req, user, () => {
                     res.send({ message: 'Đăng nhập thành công', email: user.email });
                 });
             }
-        }
-        catch (error) {
+        } catch (error) {
             res.status(401).send({ message: 'Đăng nhập không thành công', error });
         }
     });

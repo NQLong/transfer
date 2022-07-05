@@ -42,7 +42,6 @@ module.exports = app => {
         const secretCode = type === types.PRODUCTION ? secretCodeBidv : secretCodeBidvSandbox;
         const { customer_id, service_id, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${service_id}|${customer_id}`).digest('hex');
-        console.log('getbill', { customer_id, service_id, checksum });
 
         if (!(customer_id && service_id && checksum)) {
             res.send({ result_code: '145' });
@@ -54,17 +53,22 @@ module.exports = app => {
         } else {
             const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
             const hocPhi = await model.get({ namHoc, hocKy, mssv: customer_id.toString() });
-            if (!hocPhi) res.send({ result_code: '001' });
-            else if (hocPhi.congNo <= 0) res.send({ result_code: '025' });
-            else {
+            if (!hocPhi) {
+                res.send({ result_code: '001' });
+            } else if (hocPhi.congNo <= 0) {
+                res.send({ result_code: '025' });
+            } else {
                 let student = await app.model.fwStudents.get({ mssv: customer_id.toString() });
-                if (!student) res.send({ result_code: '017' });
-                else {
+                if (!student) {
+                    res.send({ result_code: '017' });
+                } else {
+                    let name = `USSH ${student.ho} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
+                    if (name.length > 40) name = `USSH ${student.ho.getFirstLetters()} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
                     res.send({
                         result_code: '000', result_desc: 'success',
                         data: {
                             service_id,
-                            customer_id: customer_id.toString(), customer_name: (student.ho + ' ' + student.ten).toUpperCase(), customer_addr: '',
+                            customer_id: customer_id.toString(), customer_name: name, customer_addr: '',
                             type: 0, matchAmount: hocPhi.congNo,
                         },
                     });
@@ -74,7 +78,7 @@ module.exports = app => {
     };
 
     // production
-    app.post('/api/bidv-nvxhhcm/payBill', async (req, res) => {
+    app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
         try {
             await payBill(types.PRODUCTION, req, res);
         } catch (error) {
@@ -83,7 +87,7 @@ module.exports = app => {
     });
 
     // sandbox
-    app.post('/api/bidv-nvxhhcm/sandbox/payBill', async (req, res) => {
+    app.post('/api/bidv-nvxhhcm/sandbox/paybill', async (req, res) => {
         try {
             await payBill(types.SANDBOX, req, res);
         } catch (error) {
@@ -98,8 +102,6 @@ module.exports = app => {
         const secretCode = type === types.PRODUCTION ? secretCodeBidv : secretCodeBidvSandbox;
         const { trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum } = req.body,
             myChecksum = crypto.createHash('md5').update(`${secretCode}|${trans_id}|${bill_id}|${amount}`).digest('hex');
-        console.log('payBill', { namHoc, hocKy, trans_id, trans_date, customer_id, bill_id, service_id, amount, checksum });
-        console.log('mychecksum', myChecksum);
 
         if (!(trans_id && trans_date && customer_id && bill_id && service_id && amount && checksum)) {
             res.send({ result_code: '145' });
@@ -114,9 +116,9 @@ module.exports = app => {
             if (!hocPhi) {
                 res.send({ result_code: '025' });
             } else {
-                // let student = await app.model.fwStudents.get({ mssv: customer_id });
+                let student = await app.model.fwStudents.get({ mssv: customer_id });
                 await modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum);
-                // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
+                type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
                 res.send({ result_code: '000', result_desc: 'success' });
             }
         }

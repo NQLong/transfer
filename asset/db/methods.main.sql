@@ -4045,9 +4045,50 @@ END;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_GET_FROM(
+    fileId in number) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN my_cursor FOR
+        SELECT hcthcvtk.ID         as "id",
+               hcthcvtk.NGUOI_TAO  as "shccNguoiTao",
+               hcthcvtk.THOI_GIAN  as "thoiGian",
+                (SELECT LISTAGG(
+                    CASE
+                        WHEN cbk.HO IS NULL THEN cbk.TEN
+                        WHEN cbk.TEN IS NULL THEN cbk.HO
+                        ELSE CONCAT(CONCAT(cbk.HO, ' '), cbk.TEN)
+                    END, ',') WITHIN GROUP (
+                             order by hcthcbk.ID
+                             )
+                      FROM HCTH_CAN_BO_KY hcthcbk
+                            LEFT JOIN TCHC_CAN_BO cbk ON cbk.SHCC = hcthcbk.NGUOI_KY
+                      WHERE hcthcbk.CONG_VAN_TRINH_KY = hcthcvtk.ID
+                    )
+                     AS "danhSachTenCanBoKy",
+                (SELECT LISTAGG(hcthcbk.NGUOI_KY, ',') WITHIN GROUP (
+                             order by hcthcbk.ID
+                             )
+                      FROM HCTH_CAN_BO_KY hcthcbk
+                      WHERE hcthcbk.CONG_VAN_TRINH_KY = hcthcvtk.ID
+                    )
+                     AS "danhSachShccCanBoKy"
+--                  LISTAGG(last_name, '; ') WITHIN GROUP (ORDER BY hire_date, last_name)
+--
+        from HCTH_CONG_VAN_TRINH_KY hcthcvtk
+--                 LEFT JOIN TCHC_CAN_BO cbk on hcthcbk.NGUOI_KY = cbk.SHCC
+        where (hcthcvtk.FILE_CONG_VAN = fileId)
+        order by hcthcvtk.id;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE(
     pageNumber IN OUT NUMBER,
     pageSize IN OUT NUMBER,
+    shccCanBo IN STRING,
     filterParam in STRING,
     searchTerm IN STRING,
     totalItem OUT NUMBER,
@@ -4062,7 +4103,7 @@ BEGIN
     INTO totalItem
     FROM HCTH_CONG_VAN_TRINH_KY cvtk
 -- LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
-    where (1 = 1);
+    where (cvtk.NGUOI_TAO = shccCanBo);
     IF pageNumber < 1 THEN
         pageNumber := 1;
     END IF;
@@ -4080,8 +4121,8 @@ BEGIN
                      cvtk.THOI_GIAN    as "thoiGian",
                      cbt.HO            as "hoNguoiTao",
                      cbt.TEN           as "tenNguoiTao",
-
-
+                     hcthcvd.TRICH_YEU  as "trichYeu",
+                     hcthcvd.LOAI_CONG_VAN as "loaiCongVan",
                      (SELECT LISTAGG(
                                      CASE
                                          WHEN cb.HO IS NULL THEN cb.TEN
@@ -4103,10 +4144,11 @@ BEGIN
               FROM HCTH_CONG_VAN_TRINH_KY cvtk
                        LEFT JOIN TCHC_CAN_BO cbt on cbt.SHCC = cvtk.NGUOI_TAO
                        LEFT JOIN HCTH_FILE hcthfile on hcthfile.LOAI='DI' and hcthfile.ID = cvtk.FILE_CONG_VAN
+                        LEFT JOIN HCTH_CONG_VAN_DI hcthcvd on hcthcvd.ID = hcthfile.MA
               WHERE
 -- check if user is related to congVanTrinhKy
 (
-    1 = 1
+    cvtk.NGUOI_TAO = shccCanBo
     ))
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
         ORDER BY 'id' DESC;
@@ -14488,6 +14530,8 @@ AS
     toAge           NUMBER;
     time            NUMBER;
     listChuyenNganh STRING(100);
+    nhanSuDonVi     NUMBER;
+    nhanSuQuyen     STRING(100);
 BEGIN
     SELECT JSON_VALUE(filter, '$.listShcc') INTO listShcc FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listDonVi') INTO listDonVi FROM DUAL;
@@ -14506,6 +14550,8 @@ BEGIN
     SELECT JSON_VALUE(filter, '$.fromAge') INTO fromAge FROM DUAL;
     SELECT JSON_VALUE(filter, '$.toAge') INTO toAge FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listChuyenNganh') INTO listChuyenNganh FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.nhanSuDonVi') INTO nhanSuDonVi FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.nhanSuQuyen') INTO nhanSuQuyen FROM DUAL;
 
     SELECT COUNT(*)
     INTO totalItem
@@ -14516,7 +14562,7 @@ BEGIN
              LEFT JOIN DM_CHUC_DANH_KHOA_HOC CD ON CB.CHUC_DANH = CD.MA
              LEFT JOIN DM_DAN_TOC dmDanToc ON CB.DAN_TOC = dmDanToc.MA
              LEFT JOIN DM_TON_GIAO dmTonGiao ON CB.DAN_TOC = dmTonGiao.MA
-
+--              LEFT JOIN FW_ASSIGN_ROLE fwAssignRole ON CB.SHCC = fwAssignRole.NGUOI_DUOC_GAN
     WHERE (
             ((listShcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
                                                    from dual
@@ -14554,7 +14600,8 @@ BEGIN
                                          EXISTS(
                                                  SELECT regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level)
                                                  from dual
-                                                 connect by regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
+                                                 connect by
+                                                         regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
                                                  INTERSECT
                                                  SELECT regexp_substr(listQuocGia, '[^,]+', 1, level)
                                                  from dual
@@ -14575,6 +14622,22 @@ BEGIN
             (listChuyenNganh IS NULL OR (CB.CHUYEN_NGANH IN (SELECT regexp_substr(listChuyenNganh, '[^,]+', 1, level)
                                                              from dual
                                                              connect by regexp_substr(listChuyenNganh, '[^,]+', 1, level) is not null)))
+            AND (
+                nhanSuDonVi IS NULL OR nhanSuDonVi = CB.MA_DON_VI
+                )
+            AND (
+                        nhanSuQuyen IS NULL OR
+--                         nhanSuQuyen = fwAssignRole.TEN_ROLE
+                        (
+                                    nhanSuQuyen IS NOT NULL AND
+                                    EXISTS(
+                                            SELECT FWA.ID
+                                            FROM FW_ASSIGN_ROLE FWA
+                                            WHERE FWA.NGUOI_DUOC_GAN = CB.SHCC
+                                              AND FWA.TEN_ROLE = nhanSuQuyen
+                                        )
+                            )
+                )
         )
       AND (NGAY_NGHI IS NULL OR NGAY_NGHI < time)
       AND (searchTerm = ''
@@ -14651,6 +14714,11 @@ BEGIN
                           WHEN CB.NGAY_BIEN_CHE IS NULL THEN 'Hợp đồng'
                           ELSE 'Biên chế'
                          END)                                                   AS "loaiCanBo",
+
+                     (SELECT LISTAGG(FAR.NHOM_ROLE, ',') WITHIN GROUP ( ORDER BY FAR.TEN_ROLE)
+                      FROM FW_ASSIGN_ROLE FAR
+                      WHERE FAR.NGUOI_DUOC_GAN = CB.SHCC
+                     )                                                          AS "nhomRole",
                      (select rtrim(xmlagg(xmlelement(e, dmqg.TEN_QUOC_GIA, '-').extract('//text()') order by
                                           null).getclobval(), '-')
                       FROM DM_QUOC_GIA dmqg
@@ -14685,7 +14753,7 @@ BEGIN
                        LEFT JOIN DM_CHUC_DANH_KHOA_HOC CD ON CB.CHUC_DANH = CD.MA
                        LEFT JOIN DM_DAN_TOC dmDanToc ON CB.DAN_TOC = dmDanToc.MA
                        LEFT JOIN DM_TON_GIAO dmTonGiao ON CB.TON_GIAO = dmTonGiao.MA
-
+--                        LEFT JOIN FW_ASSIGN_ROLE fwAssignRole ON CB.SHCC = fwAssignRole.NGUOI_DUOC_GAN
               WHERE (
                       ((listShcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
                                                              from dual
@@ -14727,7 +14795,8 @@ BEGIN
                                                    EXISTS(
                                                            SELECT regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level)
                                                            from dual
-                                                           connect by regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
+                                                           connect by
+                                                                   regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
                                                            INTERSECT
                                                            SELECT regexp_substr(listQuocGia, '[^,]+', 1, level)
                                                            from dual
@@ -14750,6 +14819,22 @@ BEGIN
                            (CB.CHUYEN_NGANH IN (SELECT regexp_substr(listChuyenNganh, '[^,]+', 1, level)
                                                 from dual
                                                 connect by regexp_substr(listChuyenNganh, '[^,]+', 1, level) is not null)))
+                      AND (
+                          nhanSuDonVi IS NULL OR nhanSuDonVi = CB.MA_DON_VI
+                          )
+                      AND (
+                                  nhanSuQuyen IS NULL OR
+--                         nhanSuQuyen = fwAssignRole.TEN_ROLE
+                                  (
+                                              nhanSuQuyen IS NOT NULL AND
+                                              EXISTS(
+                                                      SELECT FWA.ID
+                                                      FROM FW_ASSIGN_ROLE FWA
+                                                      WHERE FWA.NGUOI_DUOC_GAN = CB.SHCC
+                                                        AND FWA.TEN_ROLE = nhanSuQuyen
+                                                  )
+                                      )
+                          )
                   )
                 AND (NGAY_NGHI IS NULL OR NGAY_NGHI < time)
                 AND (searchTerm = ''
@@ -14906,6 +14991,7 @@ BEGIN
                CB_XULY.HO || ' ' || CB_XULY.TEN       as "canBoXuLy",
                CB_YEUCAU.HO || ' ' || CB_YEUCAU.TEN   as "canBoYeuCau",
                CB_PHANHOI.HO || ' ' || CB_PHANHOI.TEN as "canBoPhanHoi",
+               CB_PHANHOI.MA_DON_VI                   AS "donViCanBoPhanHoi",
                RPL.ID                                 as "id",
                RPL.MA_YEU_CAU                         AS "maYeuCau",
                RPL.NOI_DUNG                           AS "noiDung",
@@ -14918,7 +15004,7 @@ BEGIN
                  LEFT JOIN TCHC_CAN_BO CB_PHANHOI ON CB_PHANHOI.SHCC = RPL.NGUOI_PHAN_HOI
                  LEFT JOIN FW_USER USR ON USR.EMAIL = CB_PHANHOI.EMAIL
         WHERE RPL.MA_YEU_CAU = maYeuCau
-    ORDER BY  RPL.THOI_GIAN DESC;
+        ORDER BY RPL.THOI_GIAN DESC;
     RETURN TCCB_SP_REPLY;
 
 end;
@@ -15184,6 +15270,41 @@ end;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_GET_ALL_MSSV(iMssv IN STRING, hocPhiDetailAll OUT SYS_REFCURSOR) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN hocPhiDetailAll FOR
+        SELECT HPD.MSSV     AS "mssv",
+               HPD.LOAI_PHI AS "loaiPhi",
+
+               HPD.HOC_KY   AS "hocKy",
+               HPD.NAM_HOC  AS "namHoc",
+               HPD.SO_TIEN  AS "soTien",
+               LP.TEN       AS "tenLoaiPhi"
+        FROM TC_HOC_PHI_DETAIL HPD
+                 LEFT JOIN FW_STUDENT ST ON HPD.MSSV = ST.MSSV
+                 LEFT JOIN TC_LOAI_PHI LP ON LP.ID = HPD.LOAI_PHI
+                 LEFT JOIN DM_DON_VI DV ON DV.MA = ST.KHOA
+        WHERE HPD.MSSV = iMssv
+        ORDER BY NAM_HOC DESC, HOC_KY DESC;
+
+    OPEN my_cursor FOR
+        SELECT HP.MSSV    AS "mssv",
+               HP.NAM_HOC as "namHoc",
+               HP.HOC_KY  as "hocKy",
+               hp.HOC_PHI as "hocPhi",
+               hp.CONG_NO as "congNo"
+        FROM TC_HOC_PHI HP
+        WHERE HP.MSSV = iMssv
+        ORDER BY NAM_HOC DESC, HOC_KY DESC;
+
+    RETURN my_cursor;
+END ;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION TC_HOC_PHI_SANDBOX_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, imssv IN STRING,
                                        searchTerm IN STRING, filter IN STRING,
                                        totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
@@ -15234,7 +15355,7 @@ END ;
 
 CREATE OR REPLACE FUNCTION TC_HOC_PHI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, imssv IN STRING,
                                        searchTerm IN STRING, filter IN STRING,
-                                       totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+                                       totalItem OUT NUMBER, pageTotal OUT NUMBER, totalCurrent OUT NUMBER, totalPaid OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(502) := '%' || lower(searchTerm) || '%';
@@ -15252,6 +15373,16 @@ BEGIN
           (NAM_HOC = namHoc AND HOC_KY = hocKy)
       AND (searchTerm = ''
         OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT);
+
+    SELECT COUNT(*)
+    INTO totalCurrent
+    FROM TC_HOC_PHI HP
+    WHERE NAM_HOC = namHoc AND HOC_KY = hocKy;
+
+     SELECT COUNT(*)
+    INTO totalPaid
+    FROM TC_HOC_PHI HP
+    WHERE NAM_HOC = namHoc AND HOC_KY = hocKy AND HP.CONG_NO = 0;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;

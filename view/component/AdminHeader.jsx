@@ -12,6 +12,7 @@ import { AdminPage, } from 'view/component/AdminPage';
 
 import { Select } from './Input';
 import AdminContactModal from './AdminContactModal';
+import { SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
 
 class DebugModal extends React.Component {
     modal = React.createRef();
@@ -22,13 +23,15 @@ class DebugModal extends React.Component {
     show = () => {
         this.canBo.current.setVal(null);
         this.user.current.setVal(null);
+        this.sinhVien.current.setVal(null);
         $(this.modal.current).modal('show');
     }
 
     switchUser = () => {
         const email = this.user.current.val();
         const shcc = this.canBo.current.val();
-        this.props.switchUser(email || shcc);
+        const mssv = this.sinhVien.current.val();
+        this.props.switchUser(email || shcc || mssv);
     }
 
     render() {
@@ -50,6 +53,10 @@ class DebugModal extends React.Component {
                             <div className='form-group'>
                                 <label className='control-label'>Select staff</label>
                                 <Select ref={this.canBo} adapter={SelectAdapter_FwCanBo} displayLabel={false} label='Cán bộ' />
+                            </div>
+                            <div className='form-group'>
+                                <label className='control-label'>Select student</label>
+                                <Select ref={this.sinhVien} adapter={SelectAdapter_FwStudent} displayLabel={false} label='Sinh viên' />
                             </div>
                         </div>
                         <div className='modal-footer'>

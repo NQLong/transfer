@@ -449,7 +449,7 @@ module.exports = app => {
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi || [],
+                    phanHoi: phanHoi?.rows || [],
                     donViNhan: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 0).map((item) => item.donViNhan) : []).toString(),
                     donViNhanNgoai: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 1).map((item) => item.donViNhan) : []
                     ).toString(),
@@ -761,7 +761,7 @@ module.exports = app => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_DI_TYPE);
-            res.send({ error: null, item: phanHoi });
+            res.send({ error: null, item: phanHoi?.rows || [] });
         } catch (error) {
             res.send({ error });
         }

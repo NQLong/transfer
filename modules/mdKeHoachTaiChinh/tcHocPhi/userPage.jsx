@@ -3,35 +3,55 @@ import { Tooltip } from '@mui/material';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
-
-import T from 'view/js/common';
-import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi } from './redux';
+import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent } from './redux';
 class ThanhToanModal extends AdminModal {
     render = () => {
+        let styleButton = { width: '90%', margin: 'auto', marginBottom: '20px', height: '50px', display: 'inline-flex', alignItems: 'center' },
+            styleLogo = { maxWidth: 100, marginRight: 30, marginLeft: 20 };
         return this.renderModal({
             title: 'Phương thức thanh toán',
             body: <div className='row' >
-                <Tooltip title='Thanh toán bằng Agribank (thông qua VNPAY)' arrow placement='top'>
-                    <button className='btn' style={{ width: '90%', margin: 'auto', marginBottom: '20px' }} onClick={e => {
+                <Tooltip title='Thanh toán qua Agribank' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
-                        this.props.vnPayGoToTransaction('agribank', link => {
+                        this.props.vnPayGoToTransaction('vnpay-agri', link => {
                             window.location.href = link;
                         });
                     }}>
-                        <img src='/img/logo/agribank.svg' alt='Agribank' style={{ maxWidth: 80, marginRight: 20 }} /> Thanh toán bằng AGRIBANK
+                        <img src={`/img/logo/agribank.png?t=${new Date().getTime()}`} alt='Agribank' style={styleLogo} /><span>Thanh toán qua AGRIBANK</span>
                     </button>
                 </Tooltip>
-                <Tooltip title='Thanh toán bằng VNPAY' arrow>
-                    <button className='btn' style={{ width: '90%', margin: 'auto' }} onClick={e => {
+
+                <Tooltip title='Thanh toán qua Vietcombank' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction('vnpay-vcb', link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src={`/img/logo/vcb.png?t=${new Date().getTime()}`} alt='Vietcombank' style={styleLogo} />Thanh toán qua Vietcombank
+                    </button>
+                </Tooltip>
+                <Tooltip title='Thanh toán qua BIDV' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                    }}>
+                        <img src={`/img/logo/logo_bidv.png?t=${new Date().getTime()}`} alt='BIDV' style={styleLogo} /> Thanh toán qua BIDV
+                    </button>
+                </Tooltip>
+
+                {/* <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('vnpay', link => {
                             window.location.href = link;
                         });
                     }}>
-                        <img src='/img/logo/vnpay.svg' alt='VNPAY' style={{ maxWidth: 80, marginRight: 20 }} /> Thanh toán thông qua VNPAY
+                        <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
                     </button>
 
-                </Tooltip>
+                </Tooltip> */}
+
             </div>
         });
     }
@@ -70,86 +90,101 @@ class UserPage extends AdminPage {
             }
         }
 
-        T.ready('/user', () => {
-            // this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
-            //     const { settings: { namHoc, hocKy } } = data;
-            //     this.year.value(namHoc);
-            //     this.term.value(hocKy);
-            //     this.setState({ namHoc, hocKy });
-            // });
+        T.ready('/user/hoc-phi', () => {
             this.props.getHocPhi();
+            this.props.getAllHocPhiStudent();
             this.props.getTcHocPhiHuongDan();
         });
     }
-
-    render() {
-        const user = this.props.system.user,
-            tcHocPhi = this.props.tcHocPhi || {},
-            { hocPhi, hocPhiDetail } = tcHocPhi.data || {};
-        const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
+    renderTableHocPhi = (data) => {
         const style = (width = 'auto', textAlign = 'left') => ({ width, textAlign, whiteSpace: 'nowrap', backgroundColor: '#1b489f', color: '#fff' });
-        let table = renderTable({
+        return renderTable({
             emptyTable: 'Không có dữ liệu học phí',
             header: 'thead-light',
-            getDataSource: () => hocPhiDetail,
+            getDataSource: () => data,
             renderHead: () => (
                 <tr>
                     <th style={style()}>STT</th>
-                    {/* <th style={style('10%', 'right')}>Chọn thanh toán</th> */}
-                    <th style={style('70%')}>Môn học</th>
-                    <th style={style('10%', 'right')}>Số tín chỉ</th>
-                    <th style={style('20%', 'right')}>Thành tiền</th>
+                    <th style={style('100%')}>Loại phí</th>
+                    <th style={style('auto', 'right')}>Tổng thu</th>
 
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    {/* {item.active ? <TableCell type='checkbox' content={item.active || ''} /> : <TableCell content='Đã thanh toán' style={{ textAlign: 'center' }} />} */}
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc} - ${item.tenMonHoc}`} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.soTinChi} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${(item.soTien?.toString() || '').numberWithCommas()} vnđ`} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${T.numberDisplay(item.soTien ? Number(item.soTien) : '')} VNĐ`} />
                 </tr>
             )
         });
+    }
+
+    renderSection = (namHoc, hocPhiTrongNam) => {
+        const { dataDetailTrongNam, dataTrongNam } = hocPhiTrongNam;
+        const dataHocKy = dataTrongNam.groupBy('hocKy');
+        return (
+            <div className='tile' key={namHoc}>
+                <div className='tile-title'>Năm {namHoc} - {Number(namHoc) + 1}</div>
+                {Object.keys(dataHocKy).sort((a, b) => Number(b) - Number(a)).map(hocKy => {
+                    let current = dataHocKy[hocKy][0];
+                    return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
+                            <i style={{ fontSize: '16px' }}>Học kỳ {hocKy}</i>
+                            {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)}</b> : <b>Đã thanh toán đủ.</b>
+                                // <Tooltip title='Thanh toán' placement='top' arrow>
+                                // <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                //     Thanh toán
+                                // </button>
+                                // </Tooltip>
+                            }
+                        </div>
+                        <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
+                        {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
+                        <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >
+                            <div>
+                                <div>Miễn giảm: <b>{current.mienGiam || 'Không'}</b> </div>
+                                <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div>Tổng học phí: <b>{T.numberDisplay(Number(current.hocPhi))} VNĐ </b></div>
+                                <div>Đã đóng: <b>{T.numberDisplay(Number(current.hocPhi) - Number(current.congNo))} VNĐ </b></div>
+                            </div>
+
+                        </div>
+                        <Modal ref={e => this.modal = e} />
+                        <ThanhToanModal ref={e => this.thanhToanModal = e} vnPayGoToTransaction={this.props.vnPayGoToTransaction} />
+                    </div>);
+                }
+                )}
+            </div>
+        );
+    }
+    render() {
+        const user = this.props.system.user,
+            tcHocPhi = this.props.tcHocPhi || {},
+            { hocPhiAll, hocPhiDetailAll } = tcHocPhi.dataAll || {};
+        const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
+
         return this.renderPage({
             title: 'Học phí',
             subTitle: <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a>,
             icon: 'fa fa-money',
             breadcrumb: ['Học phí'],
             backRoute: '/user',
-            content: hocPhi ? <div className='tile'>
+            content: user && hocPhiAll ? <>
                 <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
-                <div style={{ textAlign: 'left' }}>
-                    <b style={{ fontSize: '18px' }}>{user ? `${user.data.ho} ${user.data.ten}` : ''}</b><br />
-                    MSSV: <span>{user ? user.data.mssv : ''}</span><br />
-                    Khoa/Bộ môn: <span>{user ? user.data.tenKhoa : ''}</span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <span style={{ fontSize: '18px' }}>Học phí học kỳ {hocPhi.hocKy || ''}, năm học {hocPhi.namHoc ? `${hocPhi.namHoc} - ${Number(hocPhi.namHoc) + 1}` : ''} </span>
-                    <Tooltip title='Thanh toán' placement='top' arrow>
-                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
-                            Thanh toán
-                        </button>
-                    </Tooltip>
-                </div>
-
-                <div className='tile-footer' style={{ marginBottom: '0' }} />
-                {table}
-                <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <p>Tổng học phí: <b>{hocPhi.hocPhi.toString().numberWithCommas()} vnđ </b></p>
-                </div>
-
-                <Modal ref={e => this.modal = e} />
-                <ThanhToanModal ref={e => this.thanhToanModal = e} vnPayGoToTransaction={this.props.vnPayGoToTransaction} />
-            </div> : loadSpinner()
+                {Object.keys(hocPhiAll).sort((a, b) => Number(b) - Number(a)).map(namHoc => this.renderSection(namHoc, {
+                    dataTrongNam: hocPhiAll[namHoc],
+                    dataDetailTrongNam: hocPhiDetailAll[namHoc]
+                }))}
+            </> : loadSpinner()
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);

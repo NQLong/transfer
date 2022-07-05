@@ -32,11 +32,11 @@ class ComponentTTCongTac extends AdminPage {
             this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo : '');
 
             this.bacLuong.value(item.bacLuong ? item.bacLuong : '');
-            this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
+            this.heSo.value(item.heSoLuong ? Number(item.heSoLuong).toFixed(2) : '');
             this.ngayHuong.value(item.ngayHuongLuong ? item.ngayHuongLuong : '');
 
-            this.tyLeVuotKhung.value(item.tyLeVuotKhung ? item.tyLeVuotKhung : '');
-            this.tyLePhuCapUuDai.value(item.tyLePhuCapUuDai ? item.tyLePhuCapUuDai : '');
+            this.tyLeVuotKhung.value(item.tyLeVuotKhung ? Number(item.tyLeVuotKhung).toFixed(2) : '');
+            this.tyLePhuCapUuDai.value(item.tyLePhuCapUuDai ? `${item.tyLePhuCapUuDai}%` : '');
 
             this.soBhxh.value(item.soBhxh ? item.soBhxh : '');
             this.ngayBatDauBhxh.value(item.ngayBatDauBhxh ? item.ngayBatDauBhxh : '');
