@@ -43,40 +43,33 @@ module.exports = app => {
         });
     }
 
-    app.post('/api/debug/switch-user', (req, res) => {
-        const personId = req.body.personId,
-            isDebug = app.isDebug || (req.session.user && req.session.user.roles.filter(role => role.name == 'admin').length);
-        if (personId && isDebug) {
-            app.model.canBo.get({ shcc: personId }, (error, canBo) => {
-                if (error) {
-                    res.send({ error: 'System has errors!' });
-                } else if (canBo) {
-                    app.model.fwUser.get({ email: canBo.email }, (error, user) => {
-                        if (error || user == null) {
-                            app.model.fwUser.create({ email: canBo.email, lastName: canBo.ho, firstName: canBo.ten, active: 1, isStudent: 0, isStaff: 1, shcc: personId, studentId: '' }, (error, user) => {
-                                if (error || user == null) {
-                                    res.send({ error: 'System has errors!' });
-                                } else {
-                                    app.updateSessionUser(req, user, () => res.send({ user }));
-                                }
-                            });
-                        } else {
-                            app.updateSessionUser(req, user, () => res.send({ user }));
-                        }
-                    });
+    app.post('/api/debug/switch-user', async (req, res) => {
+        try {
+            const personId = req.body.personId,
+                isDebug = app.isDebug || (req.session.user && req.session.user.roles.filter(role => role.name == 'admin').length);
+            if (personId && isDebug) {
+                const canBo = await app.model.canBo.get({ shcc: personId });
+                if (canBo) {
+                    const user = { email: canBo.email, lastName: canBo.ho, firstName: canBo.ten, active: 1, isStaff: 1, shcc: personId };
+                    app.updateSessionUser(req, user, () => res.send({ user }));
                 } else {
-                    app.model.fwUser.get({ email: personId }, (error, user) => {
-                        if (error) {
-                            res.send({ error: 'System has errors!' });
-                        } else if (user) {
-                            app.updateSessionUser(req, user, () => res.send({ user }));
-                        }
-                    });
+                    const sinhVien = await app.model.fwStudents.get({ mssv: personId });
+                    if (sinhVien) {
+                        const user = { email: sinhVien.emailTruong, lastName: sinhVien.ho, firstName: sinhVien.ten, active: 1, isStudent: 1, studentId: personId };
+                        app.updateSessionUser(req, user, () => res.send({ user }));
+                    } else {
+                        const user = await app.mode.fwUser.get({ personId });
+                        if (user) app.updateSessionUser(req, user, () => res.send({ user }));
+                        else res.send({ error: 'System has errors!' });
+                    }
                 }
-            });
-        } else {
-            res.send({ error: 'Invalid request!' });
+            } else {
+                res.send({ error: 'Invalid request!' });
+            }
+        } catch (error) {
+            res.send({ error: `System has errrors: ${error}` });
         }
+
     });
 
     app.use((req, res) => {
