@@ -105,29 +105,31 @@ module.exports = app => {
                 if (!student || !order) return res.send({ RspCode: '01', Message: 'Order Not Found' });
 
                 //Invalid Amount
-                if (parseInt(order.amount) != vnp_Amount) return res.send({ RspCode: '04', Message: 'Invalid amount' });
+                if (parseInt(order.amount) != vnp_Amount) res.send({ RspCode: '04', Message: 'Invalid amount' });
+                else {
+                    const signData = querystring.stringify(vnp_Params, { encode: false });
+                    const hmac = crypto.createHmac('sha512', vnp_HashSecret),
+                        vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
-                const transaction = await app.model.tcHocPhiTransaction.get({ transId: vnp_TxnRef });
+                    if (secureHash === vnp_SecureHash) {
+                        const transaction = await app.model.tcHocPhiTransaction.get({ transId: vnp_TxnRef });
 
-                // Order already confirmed
-                if (transaction) return res.send({ Message: 'Order already confirmed', RspCode: '02' });
-                const signData = querystring.stringify(vnp_Params, { encode: false });
-                const hmac = crypto.createHmac('sha512', vnp_HashSecret),
-                    vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+                        // Order already confirmed
+                        if (transaction) res.send({ Message: 'Order already confirmed', RspCode: '02' });
+                        else if (vnp_TransactionStatus == '00') {
+                            await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
 
-                if (secureHash === vnp_SecureHash) {
-                    if (vnp_TransactionStatus == '00') {
-                        await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                            await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, vnp_Amount, vnp_PayDate });
 
-                        await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, vnp_Amount, vnp_PayDate });
-
-                        res.send({ RspCode: '00', Message: 'Confirm Success' });
+                            res.send({ RspCode: '00', Message: 'Confirm Success' });
+                        } else {
+                            res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });
+                        }
                     } else {
-                        res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });
+                        res.send({ RspCode: '97', Message: 'Invalid Checksum' });
                     }
-                } else {
-                    res.send({ RspCode: '97', Message: 'Invalid Checksum' });
                 }
+
             }
 
 
