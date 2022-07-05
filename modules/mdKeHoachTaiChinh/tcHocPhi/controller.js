@@ -34,10 +34,10 @@ module.exports = app => {
             if (error || !page) {
                 res.send({ error });
             } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, totalpaid: totalPaid, totalcurrent: totalCurrent } = page;
                 const pageCondition = searchTerm;
                 res.send({
-                    page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, settings: { namHoc, hocKy } }
+                    page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, settings: { namHoc, hocKy, totalPaid, totalCurrent } }
                 });
             }
         });
