@@ -70,20 +70,8 @@ module.exports = app => {
         }
     });
 
-    // const WHITE_LIST_IP = [
-    //     '113.52.45.78', '116.97.245.130', '42.118.107.252', '113.20.97.250', '203.171.19.146', '103.220.87.4', '113.160.92.202'
-    // ];
-
     app.get('/vnpay/ipn', async (req, res) => {
         try {
-            // const ipAddr = req.headers['x-forwarded-for'] ||
-            //     req.connection.remoteAddress ||
-            //     req.socket.remoteAddress ||
-            //     req.connection.socket.remoteAddress;
-
-            //TODO: trust ip
-            // if (!WHITE_LIST_IP.includes(ipAddr)) return res.send({ RspCode: '99', Message: `${ipAddr} is not in trusted IP list!` });
-
             let vnp_Params = req.query;
             let secureHash = vnp_Params['vnp_SecureHash'];
 
@@ -94,22 +82,22 @@ module.exports = app => {
             let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
             const { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb, } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb');
             const bankMapper = {
-                'HCMUSSH2': vnp_TmnCodeAgribank,
-                'HCMUSSH1': vnp_TmnCodeVnpayAgribank,
-                'VCBXHNV1': vnp_TmnCodeVcb,
-                'VCBXHNV2': vnp_TmnCodeVnpayVcb
+                'HCMUSSH1': vnp_TmnCodeAgribank,
+                'HCMUSSH2': vnp_TmnCodeVnpayAgribank,
+                'VCBXHNV2': vnp_TmnCodeVcb,
+                'VCBXHNV1': vnp_TmnCodeVnpayVcb
             }, hashMapper = {
-                'HCMUSSH2': vnp_HashSecretAgribank,
                 'HCMUSSH1': vnp_HashSecretAgribank,
-                'VCBXHNV1': vnp_HashSecretVcb,
-                'VCBXHNV2': vnp_HashSecretVcb
+                'HCMUSSH2': vnp_HashSecretAgribank,
+                'VCBXHNV2': vnp_HashSecretVcb,
+                'VCBXHNV1': vnp_HashSecretVcb
             };
-            let { vnp_Amount, vnp_PayDate, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = vnp_Params;
+            let { vnp_Amount, vnp_PayDate, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef, vnp_TmnCode } = vnp_Params;
             let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
 
-            const vnp_TmnCode = bankMapper[vnp_BankCode], vnp_HashSecret = hashMapper[vnp_BankCode];
-            // Fail Transaction
-            if (vnp_TransactionStatus == 99) res.send({ RspCode: '00', Message: 'Confirm Success' });
+            const myVnp_TmnCode = bankMapper[vnp_BankCode], vnp_HashSecret = hashMapper[vnp_BankCode];
+            if (myVnp_TmnCode != vnp_TmnCode) res.send({ RspCode: '99', Message: 'Merchant Has Been Changed' });
+            else if (vnp_TransactionStatus == 99) res.send({ RspCode: '00', Message: 'Confirm Success' });
             else {
                 vnp_Amount = parseInt(vnp_Amount / 100);
                 const student = await app.model.fwStudents.get({ mssv });
