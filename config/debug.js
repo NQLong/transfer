@@ -58,7 +58,7 @@ module.exports = app => {
                         const user = { email: sinhVien.emailTruong, lastName: sinhVien.ho, firstName: sinhVien.ten, active: 1, isStudent: 1, studentId: personId };
                         app.updateSessionUser(req, user, () => res.send({ user }));
                     } else {
-                        const user = await app.mode.fwUser.get({ personId });
+                        const user = await app.model.fwUser.get({ email: personId });
                         if (user) app.updateSessionUser(req, user, () => res.send({ user }));
                         else res.send({ error: 'System has errors!' });
                     }
