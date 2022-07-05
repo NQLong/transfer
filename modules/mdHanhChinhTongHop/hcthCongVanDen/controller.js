@@ -163,42 +163,38 @@ module.exports = (app) => {
     app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
-            await app.model.hcthCongVanDen.get({ id: req.body.id }, async (error, congVan) => {
-                if (error) throw error;
-                else {
-                    await app.model.hcthCongVanDen.update({ id: req.body.id }, changes, async (errors, item) => {
-                        if (errors)
-                            res.send({ errors, item });
-                        else {
-                            const canBoNhanChiDao = await app.model.hcthCanBoNhan.getAllFrom(req.body.id, CONG_VAN_TYPE);
-                            const listCanBoChiDaoShcc = canBoNhanChiDao?.rows.length > 0 ? canBoNhanChiDao.rows.map(canBo => canBo.shccCanBoNhan) : [];
-                            const newCanBoNhanChiDao = changes.quyenChiDao !== '' ? changes.quyenChiDao.split(',') : [];
-                            if (newCanBoNhanChiDao.length > listCanBoChiDaoShcc.length) {
-                                const listNewCanBoChiDao = newCanBoNhanChiDao.filter(canBo => !listCanBoChiDaoShcc.includes(canBo));
-                                await createCanBoNhanChiDao(listNewCanBoChiDao, req.session.user?.staff?.shcc, req.body.id);
-                            } else {
-                                const listDeleteCanBoNhan = canBoNhanChiDao?.rows.filter(canBo => !newCanBoNhanChiDao.includes(canBo.shccCanBoNhan)) || [];
-                                listDeleteCanBoNhan.forEach(item => {
-                                    app.model.hcthCanBoNhan.delete({ id: item.id }, (error) => {
-                                        if (error) throw error;
-                                    });
-                                });
-                            }
-                        }
-                        createChiDaoFromList(chiDao, req.body.id, () => {
-                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_TYPE }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
-                                updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
-                                    const trangThaiBefore = congVan.trangThai;
-                                    const trangThaiAfter = item.trangThai;
-                                    onStatusChange(item, trangThaiBefore, trangThaiAfter);
-                                    res.send({ error, item });
-                                }));
-                            })
-                            );
+            const congVan = await app.model.hcthCongVanDen.get({ id: req.body.id });
+
+            if (congVan) {
+                const updateItem = await app.model.hcthCongVanDen.update({ id: req.body.id }, changes);
+                const canBoNhanChiDao = await app.model.hcthCanBoNhan.getAllFrom(req.body.id, CONG_VAN_TYPE);
+                const listCanBoChiDaoShcc = canBoNhanChiDao?.rows.length > 0 ? canBoNhanChiDao.rows.map(canBo => canBo.shccCanBoNhan) : [];
+                const newCanBoNhanChiDao = changes.quyenChiDao !== '' ? changes.quyenChiDao.split(',') : [];
+                if (newCanBoNhanChiDao.length > listCanBoChiDaoShcc.length) {
+                    const listNewCanBoChiDao = newCanBoNhanChiDao.filter(canBo => !listCanBoChiDaoShcc.includes(canBo));
+                    await createCanBoNhanChiDao(listNewCanBoChiDao, req.session.user?.staff?.shcc, req.body.id);
+                } else {
+                    const listDeleteCanBoNhan = canBoNhanChiDao?.rows.filter(canBo => !newCanBoNhanChiDao.includes(canBo.shccCanBoNhan)) || [];
+                    await Promise.all(listDeleteCanBoNhan.map(async canBo => {
+                        await app.model.hcthCanBoNhan.delete({ id: canBo.id });
+                    }));
+                }
+                createChiDaoFromList(chiDao, req.body.id, async () => {
+                    await app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_TYPE });
+
+                    createDonViNhanFromList(donViNhan, req.body.id, async () => {
+                        await app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+                        updateListFile(fileList, req.body.id, () => {
+                            const trangThaiBefore = congVan.trangThai;
+                            const trangThaiAfter = updateItem.trangThai;
+                            onStatusChange(updateItem, trangThaiBefore, trangThaiAfter);
+                            res.send({ item: updateItem });
                         });
                     });
-                }
-            });
+                });
+            } else {
+                res.send({ error: 'Không tìm thấy công văn' });
+            }
         } catch (error) {
             res.send({ error });
         }
@@ -677,31 +673,28 @@ module.exports = (app) => {
 
     const sendChiDaoCongVanDenMailToRectors = async (item) => {
         const canBoChiDao = item.quyenChiDao?.split(',') || [];
-        await app.model.canBo.getAll({
+        const canBos = await app.model.canBo.getAll({
             statement: 'shcc IN (:dsCanBo)',
             parameter: {
                 dsCanBo: [...canBoChiDao, ''],
             }
-        }, 'email', 'email', async (error, canBos) => {
-            if (error) throw (error);
-            else {
-                const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
-                const rootUrl = app.rootUrl;
-                let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
-                    mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
-                if (app.isDebug) {
-                    app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
-                        if (error) throw (error);
-                    });
-                } else {
-                    canBos.map(canBo => {
-                        app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => { 
-                            if (error) throw (error); 
-                        }); 
-                    });
-                }
-            }
-        });
+        }, 'email', 'email');
+
+        const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
+        const rootUrl = app.rootUrl;
+        let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
+            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
+        if (app.isDebug) {
+            app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
+                if (error) throw (error);
+            });
+        } else {
+            canBos.map(canBo => {
+                app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                    if (error) throw (error);
+                });
+            });
+        }
     };
 
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
@@ -890,16 +883,16 @@ module.exports = (app) => {
                 const workBook = app.excel.create();
                 const ws = workBook.addWorksheet('Cong_van_den');
                 const defaultColumns = [
-                    { header: 'STT', key: 'stt', width: 10},
+                    { header: 'STT', key: 'stt', width: 10 },
                     { header: 'Số lưu riêng (các ô bên cạnh - số được đánh bên trái của cv đến - dùng để kiếm cv)', key: 'soDen', width: 10 },
-                    { header: 'NGÀY', key: 'ngay', width: 15},
-                    { header: 'ĐƠN VỊ GỬI', key: 'donViGuiCv', width: 30},
-                    { header: 'SỐ CV', key: 'soCV', width: 20},
-                    { header: 'NGÀY CV', key: 'ngayCongVan', width: 15},
-                    { header: 'NỘI DUNG', key: 'trichYeu', width: 50},
-                    { header: 'ĐƠN VỊ, NGƯỜI NHẬN', key: 'donViNguoiNhan', width: 30},
-                    { header: 'NGÀY HẾT HẠN', key: 'ngayHetHan', width: 15},
-                    { header: 'CHỈ ĐẠO CỦA HIỆU TRƯỞNG', key: 'chiDao', width: 30},
+                    { header: 'NGÀY', key: 'ngay', width: 15 },
+                    { header: 'ĐƠN VỊ GỬI', key: 'donViGuiCv', width: 30 },
+                    { header: 'SỐ CV', key: 'soCV', width: 20 },
+                    { header: 'NGÀY CV', key: 'ngayCongVan', width: 15 },
+                    { header: 'NỘI DUNG', key: 'trichYeu', width: 50 },
+                    { header: 'ĐƠN VỊ, NGƯỜI NHẬN', key: 'donViNguoiNhan', width: 30 },
+                    { header: 'NGÀY HẾT HẠN', key: 'ngayHetHan', width: 15 },
+                    { header: 'CHỈ ĐẠO CỦA HIỆU TRƯỞNG', key: 'chiDao', width: 30 },
                 ];
                 ws.columns = defaultColumns;
                 ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center', wrapText: true };
@@ -909,29 +902,29 @@ module.exports = (app) => {
                     family: 4,
                     size: 12,
                     bold: true,
-                    color: { argb: 'FF000000'}
+                    color: { argb: 'FF000000' }
                 };
                 page.rows.forEach((item, index) => {
                     ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center', wrapText: true };
                     ws.getRow(index + 2).font = { name: 'Times New Roman' };
                     ws.getCell('A' + (index + 2)).value = index + 1;
                     ws.getCell('B' + (index + 2)).value = item.soDen;
-                    ws.getCell('B' + (index + 2)).font = { ...ws.getRow(index + 2).font, bold: true }; 
+                    ws.getCell('B' + (index + 2)).font = { ...ws.getRow(index + 2).font, bold: true };
                     ws.getCell('C' + (index + 2)).value = app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy');
                     ws.getCell('D' + (index + 2)).value = item.tenDonViGuiCV;
-                    ws.getCell('D' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('D' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                     ws.getCell('E' + (index + 2)).value = item.soCongVan ? item.soCongVan : '';
                     ws.getCell('F' + (index + 2)).value = item.ngayCongVan ? app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy') : '';
                     ws.getCell('G' + (index + 2)).value = item.trichYeu;
-                    ws.getCell('G' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('G' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                     const donViNhan = item.danhSachDonViNhan?.split(';').map(dv => dv + '\r\n').join('') || '';
                     const canBoNhan = item.danhSachCanBoNhan?.split(';').map(cb => cb + '\r\n').join('') || '';
                     ws.getCell('H' + (index + 2)).value = canBoNhan !== '' || donViNhan !== '' ? canBoNhan + donViNhan : '';
-                    ws.getCell('H' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('H' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                     ws.getCell('I' + (index + 2)).value = item.ngayHetHan !== 0 ? app.date.dateTimeFormat(new Date(item.ngayHetHan), 'dd/mm/yyyy') : '';
-                    ws.getCell('I' + (index + 2)).font = { ...ws.getRow(index + 2).font, color: { argb: 'FFFF0000'}};
+                    ws.getCell('I' + (index + 2)).font = { ...ws.getRow(index + 2).font, color: { argb: 'FFFF0000' } };
                     ws.getCell('J' + (index + 2)).value = item.chiDao?.split('|').map(cd => cd + '\r\n').join('');
-                    ws.getCell('J' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left'};
+                    ws.getCell('J' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
                 });
                 let fileName = `Cong_van_den_${Date.now()}.xlsx`;
                 app.excel.attachment(workBook, res, fileName);
