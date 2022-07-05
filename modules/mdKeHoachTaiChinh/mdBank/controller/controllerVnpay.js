@@ -24,7 +24,7 @@ module.exports = app => {
         try {
             const student = req.session.user;
             const bank = req.params.bank;
-            let { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb');
+            let { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl');
             const bankMapper = {
                 'agri': vnp_TmnCodeAgribank,
                 'vnpay-agri': vnp_TmnCodeVnpayAgribank,
@@ -64,27 +64,14 @@ module.exports = app => {
             params = app.clone(params, { vnp_SecureHash });
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
-
             res.send(urlRequest);
         } catch (error) {
             res.send({ error });
         }
     });
 
-    // const WHITE_LIST_IP = [
-    //     '113.52.45.78', '116.97.245.130', '42.118.107.252', '113.20.97.250', '203.171.19.146', '103.220.87.4', '113.160.92.202'
-    // ];
-
     app.get('/vnpay/ipn', async (req, res) => {
         try {
-            // const ipAddr = req.headers['x-forwarded-for'] ||
-            //     req.connection.remoteAddress ||
-            //     req.socket.remoteAddress ||
-            //     req.connection.socket.remoteAddress;
-
-            //TODO: trust ip
-            // if (!WHITE_LIST_IP.includes(ipAddr)) return res.send({ RspCode: '99', Message: `${ipAddr} is not in trusted IP list!` });
-
             let vnp_Params = req.query;
             let secureHash = vnp_Params['vnp_SecureHash'];
 
@@ -93,43 +80,59 @@ module.exports = app => {
 
             vnp_Params = sortObject(vnp_Params);
             let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
-            const { vnp_TmnCode, vnp_HashSecret } = await app.model.tcSetting.getValue('vnp_TmnCode', 'vnp_HashSecret');
-
-            let { vnp_Amount, vnp_PayDate, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef } = vnp_Params;
+            const { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb, } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb');
+            const bankMapper = {
+                'HCMUSSH1': vnp_TmnCodeAgribank,
+                'HCMUSSH2': vnp_TmnCodeVnpayAgribank,
+                'VCBXHNV2': vnp_TmnCodeVcb,
+                'VCBXHNV1': vnp_TmnCodeVnpayVcb
+            }, hashMapper = {
+                'HCMUSSH1': vnp_HashSecretAgribank,
+                'HCMUSSH2': vnp_HashSecretAgribank,
+                'VCBXHNV2': vnp_HashSecretVcb,
+                'VCBXHNV1': vnp_HashSecretVcb
+            };
+            let { vnp_Amount, vnp_PayDate, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef, vnp_TmnCode } = vnp_Params;
             let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
 
-            // Fail Transaction
-            if (vnp_TransactionStatus == 99) return res.send({ RspCode: '00', Message: 'Confirm Success' });
+            const myVnp_TmnCode = bankMapper[vnp_BankCode], vnp_HashSecret = hashMapper[vnp_BankCode];
+            if (myVnp_TmnCode != vnp_TmnCode) res.send({ RspCode: '99', Message: 'Merchant Has Been Changed' });
+            else if (vnp_TransactionStatus == 99) res.send({ RspCode: '00', Message: 'Confirm Success' });
+            else {
+                vnp_Amount = parseInt(vnp_Amount / 100);
+                const student = await app.model.fwStudents.get({ mssv });
+                const order = await app.model.tcHocPhiOrders.get({ refId: vnp_TxnRef });
+                if (!student || !order) return res.send({ RspCode: '01', Message: 'Order Not Found' });
 
-            vnp_Amount = parseInt(vnp_Amount / 100);
-            const student = await app.model.fwStudents.get({ mssv });
-            const order = await app.model.tcHocPhiOrders.get({ refId: vnp_TxnRef });
-            if (!student || !order) return res.send({ RspCode: '01', Message: 'Order Not Found' });
+                //Invalid Amount
+                if (parseInt(order.amount) != vnp_Amount) res.send({ RspCode: '04', Message: 'Invalid amount' });
+                else {
+                    const signData = querystring.stringify(vnp_Params, { encode: false });
+                    const hmac = crypto.createHmac('sha512', vnp_HashSecret),
+                        vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
-            //Invalid Amount
-            if (parseInt(order.amount) != vnp_Amount) return res.send({ RspCode: '04', Message: 'Invalid amount' });
+                    if (secureHash === vnp_SecureHash) {
+                        const transaction = await app.model.tcHocPhiTransaction.get({ transId: vnp_TxnRef });
 
-            const transaction = await app.model.tcHocPhiTransaction.get({ transId: vnp_TxnRef });
+                        // Order already confirmed
+                        if (transaction) res.send({ Message: 'Order already confirmed', RspCode: '02' });
+                        else if (vnp_TransactionStatus == '00') {
+                            await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
 
-            // Order already confirmed
-            if (transaction) return res.send({ Message: 'Order already confirmed', RspCode: '02' });
-            const signData = querystring.stringify(vnp_Params, { encode: false });
-            const hmac = crypto.createHmac('sha512', vnp_HashSecret),
-                vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+                            await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate });
 
-            if (secureHash === vnp_SecureHash) {
-                if (vnp_TransactionStatus == '00') {
-                    await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
-
-                    await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, vnp_Amount, vnp_PayDate });
-
-                    res.send({ RspCode: '00', Message: 'Confirm Success' });
-                } else {
-                    res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });
+                            res.send({ RspCode: '00', Message: 'Confirm Success' });
+                        } else {
+                            res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });
+                        }
+                    } else {
+                        res.send({ RspCode: '97', Message: 'Invalid Checksum' });
+                    }
                 }
-            } else {
-                res.send({ RspCode: '97', Message: 'Invalid Checksum' });
+
             }
+
+
         }
         catch (error) {
             console.error('Error catch VNPAY: ', error);
