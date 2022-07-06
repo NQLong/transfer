@@ -15355,7 +15355,7 @@ END ;
 
 CREATE OR REPLACE FUNCTION TC_HOC_PHI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, imssv IN STRING,
                                        searchTerm IN STRING, filter IN STRING,
-                                       totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+                                       totalItem OUT NUMBER, pageTotal OUT NUMBER, totalCurrent OUT NUMBER, totalPaid OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(502) := '%' || lower(searchTerm) || '%';
@@ -15373,6 +15373,16 @@ BEGIN
           (NAM_HOC = namHoc AND HOC_KY = hocKy)
       AND (searchTerm = ''
         OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT);
+
+    SELECT COUNT(*)
+    INTO totalCurrent
+    FROM TC_HOC_PHI HP
+    WHERE NAM_HOC = namHoc AND HOC_KY = hocKy;
+
+     SELECT COUNT(*)
+    INTO totalPaid
+    FROM TC_HOC_PHI HP
+    WHERE NAM_HOC = namHoc AND HOC_KY = hocKy AND HP.CONG_NO = 0;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
