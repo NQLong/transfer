@@ -6,6 +6,7 @@ module.exports = {
         CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối' },
         TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)' },
         DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối' },
+        DA_DUYET: {id: 6, text: 'Đã duyệt'}
     },
 
     trangThaiCongVanDi: {
