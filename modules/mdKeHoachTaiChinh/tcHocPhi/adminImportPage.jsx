@@ -147,7 +147,7 @@ class TcHocPhiImportPage extends AdminPage {
                                 </span>)
                             }
                             {item?.curFee && ' -> '}
-                            {T.numberDisplay(item?.soTie9n?.toString() || '')}
+                            {T.numberDisplay(item?.soTien?.toString() || '')}
                         </td>
                         <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ index, item })} onDelete={(e) => this.delete(e, index)}
