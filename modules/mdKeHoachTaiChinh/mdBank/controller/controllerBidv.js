@@ -54,8 +54,8 @@ module.exports = app => {
                 if (!student) {
                     res.send({ result_code: '017' });
                 } else {
-                    let name = `USSH ${student.ho} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
-                    if (name.length > 40) name = `USSH ${student.ho.getFirstLetters()} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
+                    let name = `USSH ${student.ho} ${student.ten} ${hocPhi.congNo.toString().numberDisplay()}`.toUpperCase();
+                    if (name.length > 40) name = `USSH ${student.ho.getFirstLetters()} ${student.ten} ${hocPhi.congNo.toString().numberDisplay()}`.toUpperCase();
                     res.send({
                         result_code: '000', result_desc: 'success',
                         data: {

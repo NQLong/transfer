@@ -16,14 +16,6 @@ module.exports = app => {
         return result.join(' ');
     };
 
-    String.prototype.numberWithCommas = function () {
-        return this.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-    String.prototype.numberWithDots = function () {
-        return this.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    };
-
     String.prototype.numberDisplay = function (replaceValue = '.') {
         const decimalSplitter = replaceValue == '.' ? ',' : '.';
         let [integer, decimal] = this.split('.');

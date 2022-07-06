@@ -143,11 +143,11 @@ class TcHocPhiImportPage extends AdminPage {
                         <td type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
                             {item?.curFee &&
                                 (<span style={{ textDecoration: 'line-through', display: 'inline-block' }}>
-                                    {`${item.curFee.toString().numberWithCommas()}`}
+                                    {`${T.numberDisplay(item.curFee.toString())}`}
                                 </span>)
                             }
                             {item?.curFee && ' -> '}
-                            {(item?.soTien?.toString() || '').numberWithCommas()}
+                            {T.numberDisplay(item?.soTien?.toString() || '')}
                         </td>
                         <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ index, item })} onDelete={(e) => this.delete(e, index)}

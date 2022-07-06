@@ -374,7 +374,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         )}
                         />}
                         {!this.checked &&
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi || '').numberWithCommas()} />
+                            <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.kinhPhi || ''} />
                         }
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro == 'CN' ? 'Chủ nhiệm' : 'Tham gia'} />}
                         {!this.checked &&
