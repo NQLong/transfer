@@ -21,8 +21,7 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/website/page/:pageNumber/:pageSize', app.permission.check('website:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
+        const pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize);
         let user = req.session.user, condition = {};
         if (user.permissions && !user.permissions.includes('website:manage')) {
             condition.maDonVi = user.maDonVi;
