@@ -1,0 +1,67 @@
+module.exports = app => {
+    const menu = {
+        parentMenu: app.parentMenu.category,
+        menus: {
+            4103: { title: 'Ngôn ngữ truyền thông', link: '/user/danh-muc/ngon-ngu-truyen-thong' }
+        }
+    };
+    app.permission.add(
+        { name: 'dmNgonNgu:read', menu },
+        { name: 'dmNgonNgu:write' },
+        { name: 'dmNgonNgu:delete' }
+    );
+
+    app.get('/user/danh-muc/ngon-ngu-truyen-thong', app.permission.check('dmNgonNgu:read'), app.templates.admin);
+
+    app.get('/api/danh-muc/ngon-ngu/all', app.permission.check('user:login'), async (req, res) => {
+        try {
+            let condition = { statement: null };
+            if (req.query.condition) {
+                condition = {
+                    statement: 'lower(maCode) LIKE: searchText OR lower(tenNgonNgu) LIKE: searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+                };
+            }
+            const items = await app.model.dmNgonNguTruyenThong.getAll(condition);
+            res.send({ items });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/danh-muc/ngon-ngu/item/:maCode', app.permission.check('user:login'), async (req, res) => {
+        try {
+            const item = await app.model.dmNgonNguTruyenThong.get({ maCode: req.params.maCode });
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/danh-muc/ngon-ngu', app.permission.check('dmNgonNgu:write'), async (req, res) => {
+        try {
+            const item = await app.model.dmNgonNguTruyenThong.create(req.body.item);
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.put('/api/danh-muc/ngon-ngu', app.permission.check('dmNgonNgu:write'), async (req, res) => {
+        try {
+            const item = await app.model.dmNgonNguTruyenThong.update({ maCode: req.body.maCode }, req.body.changes);
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.delete('/api/danh-muc/ngon-ngu', app.permission.check('dmNgonNgu:delete'), async (req, res) => {
+        try {
+            await app.model.dmNgonNguTruyenThong.delete({ maCode: req.body.maCode });
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+};

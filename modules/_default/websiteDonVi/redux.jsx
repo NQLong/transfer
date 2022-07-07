@@ -126,17 +126,17 @@ export function deleteDvWebsite(shortname) {
     };
 }
 
-export function updateDvWebsite(shortname, changes, done) {
+export function updateDvWebsite(id, changes, done) {
     return dispatch => {
         const url = '/api/website';
-        T.put(url, { shortname, changes }, data => {
+        T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin website đơn vị thành công!', 'success');
-                if (done) done(data.items);
+                if (done) done(data.item);
                 dispatch(getDvWebsitePage());
             }
         }, (error) => T.notify('Cập nhật thông tin website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));

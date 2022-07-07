@@ -921,6 +921,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 4
+                },
+                "HOME_LANGUAGE": {
+                    "value": "homeLanguage",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -3902,7 +3909,8 @@
             "moduleName": "websiteDonVi",
             "modelName": "dvWebsite",
             "methods": {
-                "DV_WEBSITE_SEARCH_PAGE": "searchPage"
+                "DV_WEBSITE_SEARCH_PAGE": "searchPage",
+                "DV_WEBSITE_SEARCH_PAGE_DON_VI": "searchPageDonVi"
             },
             "columns": {
                 "ID": {
@@ -14397,6 +14405,32 @@
                 }
             },
             "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DM_NGON_NGU_TRUYEN_THONG": {
+            "active": true,
+            "moduleName": "dmNgonNguTruyenThong",
+            "modelName": "dmNgonNguTruyenThong",
+            "columns": {
+                "MA_CODE": {
+                    "value": "maCode",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 3
+                },
+                "TEN_NGON_NGU": {
+                    "value": "tenNgonNgu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                }
+            },
+            "primaryKeys": [
+                "MA_CODE"
+            ],
             "foreignKeys": [],
             "type": "table"
         }

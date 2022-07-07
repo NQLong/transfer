@@ -16,15 +16,15 @@ module.exports = app => {
     app.get('/user/danh-muc/don-vi/upload', app.permission.check('dmDonVi:write'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/don-vi/page/:pageNumber/:pageSize', (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.dmDonVi.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
-            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-            const pageCondition = searchTerm;
-            res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-        });
+    app.get('/api/danh-muc/don-vi/page/:pageNumber/:pageSize', async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = await app.model.dmDonVi.searchPage(_pageNumber, _pageSize, searchTerm);
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition: searchTerm, list } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/danh-muc/don-vi/all', app.permission.check('staff:login'), (req, res) => {

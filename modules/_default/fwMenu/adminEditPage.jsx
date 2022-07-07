@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { updateMenu, getMenu, createComponent, updateComponent, updateComponentPriorities, deleteComponent, getComponentViews, homeMenuGet } from './redux';
 // import { Link } from 'react-router-dom';
 import Dropdown from 'view/component/Dropdown';
-import { FormSelect } from 'view/component/AdminPage';
+import { AdminPage, FormTextBox, FormSelect, getValue, FormCheckbox } from 'view/component/AdminPage';
 
 export class ComponentModal extends React.Component {
     constructor(props) {
@@ -227,65 +227,63 @@ export class ComponentModal extends React.Component {
     }
 }
 
-export class MenuEditPage extends React.Component {
-    state = { id: null, priority: 1, title: '', view: 0, items: [], active: false, divisionId: null };
+export class MenuEditPage extends AdminPage {
+    state = { id: null, priority: 1, title: '', view: 0, items: [], active: false, menuLink: 'Link: ', menuId: null, divisionId: null };
     modal = React.createRef();
-    menuLink = React.createRef();
 
     componentDidMount() {
-        this.getData();
-    }
-
-    getData = () => {
         const route = T.routeMatcher('/user/menu/edit/:menuId'),
             route2 = T.routeMatcher('/user/menu/edit/:divisionId/:menuId');
-        let params;
-        if (route2.parse(window.location.pathname)) {
-            params = route2.parse(window.location.pathname);
-        } else params = route.parse(window.location.pathname);
-        this.setState({ divisionId: params.divisionId }, () => {
-            T.ready(this.state.divisionId ? '/user/websites' : '/user/menu');
+        let params = route2.parse(window.location.pathname) || route.parse(window.location.pathname);
+        this.setState({ menuId: params.menuId, divisionId: params.divisionId }, () => {
+            T.ready(this.state.divisionId ? '/user/website' : '/user/truyen-thong', () => {
+                this.getData(true);
+            });
         });
-        this.props.getMenu(params.menuId, data => {
+    }
+
+    getData = (initial = false) => {
+        this.props.getMenu(this.state.menuId, data => {
             if (data.error) {
                 T.notify('Lấy thông tin menu bị lỗi!', 'danger');
                 this.props.history.goBack();
             } else if (data.menu) {
-                const link = data.menu.link ? data.menu.link.toLowerCase() : '/';
-                if (link.startsWith('http://') || link.startsWith('https://')) {
-                    $(this.menuLink.current).html(link).attr('href', link);
-                } else {
-                    $(this.menuLink.current).html(T.rootUrl + link).attr('href', link);
+                if (initial) {
+                    const title = T.language.parse(data.menu.title, true);
+                    this.viTitle.value(title.vi || '');
+                    this.enTitle.value(title.en || '');
+                    this.active.value(data.menu.active);
+                    this.link.value(data.menu.link || '');
+                    this.menuLinkChange(data.menu.link);
                 }
+
                 this.setState(data.menu);
             } else {
                 this.props.history.goBack();
             }
         });
     }
-    changeActive = event => this.setState({ active: event.target.checked });
 
-    menuLinkChange = event => {
-        const link = event.target.value.toLowerCase();
+    menuLinkChange = (link = '') => {
+        link = link.toLowerCase();
+        let menuLink;
         if (link.startsWith('http://') || link.startsWith('https://')) {
-            $(this.menuLink.current).html(event.target.value).attr('href', event.target.value);
+            menuLink = <>Link: <a href={link} style={{ fontWeight: 'bold' }} target='_blank' rel='noreferrer'>{link}</a></>;
         } else {
-            $(this.menuLink.current).html(T.rootUrl + event.target.value)
-                .attr('href', event.target.value);
+            menuLink = <>Link: <a href={link} style={{ fontWeight: 'bold' }} target='_blank' rel='noreferrer'>{T.rootUrl + link}</a></>;
         }
+        this.setState({ menuLink });
     }
 
     save = () => {
         const changes = {
-            title: JSON.stringify({ vi: $('#menuViTitle').val(), en: $('#menuEnTitle').val() }),
-            link: $('#menuLink').val().trim(),
-            active: this.state.active ? 1 : 0,
+            title: JSON.stringify({ vi: getValue(this.viTitle), en: getValue(this.enTitle) }),
+            link: getValue(this.link),
+            active: Number(getValue(this.active)),
         };
 
-        if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.maWebsite}`)
-            && !changes.link.includes('http')
-        ) {
-            T.alert(`Địa chỉ nhập phải bắt đầu bằng /${this.state.maWebsite}  !`, 'error', false, 2000);
+        if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.maWebsite}`) && !changes.link.includes('http')) {
+            T.alert(`Địa chỉ nhập phải bắt đầu bằng /${this.state.maWebsite} !`, 'error', false, 2000);
             return;
         }
         if (changes.link != '#') this.props.homeMenuGet(changes.link, data => {
@@ -402,7 +400,7 @@ export class MenuEditPage extends React.Component {
             } else if (component.viewName == 'all divisions') {
                 // component.viewName = '';
                 mainStyle.backgroundColor = '#66f9b0';
-            } else if (component.viewName == '\'all companies\'') {
+            } else if (component.viewName == 'all companies') {
                 // component.viewName = '';
                 mainStyle.backgroundColor = '#34fa45';
             }
@@ -420,47 +418,23 @@ export class MenuEditPage extends React.Component {
     });
 
     render() {
+        const permission = this.getUserPermission('menu');
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('menu:write');
+            permissionWrite = permission.write;
         const title = T.language.parse(this.state.title, true);
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <div>
-                        <h1><i className='fa fa-edit' /> Menu: Chỉnh sửa</h1>
-                        <p dangerouslySetInnerHTML={{ __html: title.vi != '' ? 'Tiêu đề: <b>' + title.vi + '</b> - ' + T.dateToText(this.state.createdDate) : '' }} />
-                    </div>
-                    {/* <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
-                        <Link to='/user/menu'>Menu</Link>&nbsp;/&nbsp;Chỉnh sửa
-                    </ul> */}
-                </div>
 
+        return this.renderPage({
+            icon: 'fa fa-edit',
+            title: 'Menu: Chỉnh sửa',
+            subTitle: title.vi != '' ? <>Tiêu đề: <b>{title.vi}</b> - {T.dateToText(this.state.createdDate)}</> : '',
+            content: <>
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body row'>
-                        <div className='form-group col-md-6'>
-                            <label className='control-label'>Menu (Tiếng Việt)</label>
-                            <input className='form-control' type='text' placeholder='Menu (Tiếng Việt)' id='menuViTitle' defaultValue={title.vi !== 'Tên menu' ? title.vi : ''} autoFocus={true} readOnly={!permissionWrite} />
-                        </div>
-                        <div className='form-group col-md-6'>
-                            <label className='control-label'>Menu (Tiếng Anh)</label>
-                            <input className='form-control' type='text' placeholder='Menu (Tiếng Anh)' id='menuEnTitle' defaultValue={title.en !== 'Tên menu' ? title.en : ''} readOnly={!permissionWrite} />
-                        </div>
-                        <div className='form-group col-md-6'>
-                            <label className='control-label'>
-                                Link: <a href='#' ref={this.menuLink} style={{ fontWeight: 'bold' }} target='_blank' />
-                            </label>
-                            <input className='form-control' id='menuLink' type='text' placeholder='Link' defaultValue={this.state.link} onChange={this.menuLinkChange} readOnly={!permissionWrite} />
-                        </div>
-                        <div className='form-group col-md-6' style={{ display: 'flex' }}>
-                            <label className='control-label'>Kích hoạt: &nbsp;</label>
-                            <div className='toggle'>
-                                <label>
-                                    <input type='checkbox' checked={this.state.active} onChange={(e) => permissionWrite && this.changeActive(e)} /><span className='button-indecator' />
-                                </label>
-                            </div>
-                        </div>
+                        <FormTextBox ref={e => this.viTitle = e} className='col-md-6' label='Menu (Tiếng Việt)' readOnly={!permission.write} />
+                        <FormTextBox ref={e => this.enTitle = e} className='col-md-6' label='Menu (Tiếng Anh)' readOnly={!permission.write} />
+                        <FormTextBox ref={e => this.link = e} className='col-md-6' label={this.state.menuLink} placeholder='Link' onChange={e => this.menuLinkChange(e.target.value)} readOnly={!permission.write} />
+                        <FormCheckbox ref={e => this.active = e} className='col-md-6' label='Kích hoạt' readOnly={!permission.write} />
                     </div>
                     {permissionWrite ?
                         <div className='tile-footer text-right'>
@@ -477,9 +451,6 @@ export class MenuEditPage extends React.Component {
                     </div>
                 </div>
 
-                {/* <Link to={this.state.divisionId ? '/user/menu/' + this.state.divisionId : '/user/menu'} className='btn btn-secondary btn-circle' style={{ position: 'fixed', lefft: '10px', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link> */}
                 {currentPermissions.includes('component:read') ?
                     <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}
                         onClick={() => this.props.history.push('/user/component')}>
@@ -487,8 +458,8 @@ export class MenuEditPage extends React.Component {
                     </button> : null}
 
                 <ComponentModal onUpdate={this.updateComponent} onCreate={this.createComponent} getComponentViews={this.props.getComponentViews} ref={this.modal} />
-            </main>
-        );
+            </>
+        });
     }
 }
 
