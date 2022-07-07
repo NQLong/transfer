@@ -52,11 +52,11 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
 
 // Actions ----------------------------------------------------------------------------------------------------
 T.initPage('pageTcHocPhi');
-export function getTcHocPhiPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTcHocPhi', pageNumber, pageSize, pageCondition);
+export function getTcHocPhiPage(pageNumber, pageSize, pageCondition, pageFilter, done) {
+    const page = T.updatePage('pageTcHocPhi', pageNumber, pageSize, pageCondition, pageFilter);
     return dispatch => {
         const url = `/api/finance/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm, settings: pageCondition?.settings }, data => {
+        T.get(url, { searchTerm: pageCondition, filter: pageFilter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách học phí bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
