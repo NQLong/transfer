@@ -13,6 +13,7 @@ import T from 'view/js/common';
 import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
+import { SelectAdapter_NamDaoTaoFilter } from '../dtChuongTrinhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -188,18 +189,21 @@ class DtThoiKhoaBieuPage extends AdminPage {
     soLuongDuKien = {}
     sucChua = {}
     check = {}
-    state = { page: null, isEdit: {}, sucChua: {}, filter: {} }
+    loaiMonHoc = {}
+    state = { page: null, isEdit: {}, sucChua: {}, filter: {}, idNamDaoTao: '', hocKy: '' }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.initData(searchText || '');
             T.showSearchBox(() => { });
+            this.setState({idNamDaoTao: '', hocKy: ''});
         });
         this.initData();
     }
 
     initData = (searchText = '', filter = this.state.filter) => {
         this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText, page => {
-            let { nam = null, hocKy = null, maKhoaBoMon = null, maNganh = null } = filter;
+            let { maKhoaBoMon = null, maNganh = null } = filter;
+            const {idNamDaoTao: nam = null, hocKy = null } = this.state;
             page.list = page.list.filter(item => {
                 return (!maNganh || item.maNganh == maNganh)
                     && (!maKhoaBoMon || item.maKhoaBoMon == maKhoaBoMon)
@@ -222,7 +226,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     this.soLuongDuKien[indexOfItem].value(item.soLuongDuKien);
                     this.sucChua[indexOfItem] = item.sucChua;
                     this.check[indexOfItem].value(item.isMo);
-
+                    this.loaiMonHoc[indexOfItem].value(item.loaiMonHoc);
                     if (index == list.length - 1) this.setState({ sucChua: this.sucChua });
                 });
             });
@@ -262,17 +266,21 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 thu: this.thu[index].value(),
                 sucChua: this.state.sucChua[index],
                 soLuongDuKien: this.soLuongDuKien[index].value()
-            }, () => {
-                // let item = data.item;
-                // this.tietBatDau[index].value(item.tietBatDau);
-                // this.thu[index].value(item.thu);
+            }, (data) => {
+                let item = data.item;
+                this.tietBatDau[index].value(item.tietBatDau);
+                this.thu[index].value(item.thu);
                 // this.soTiet[index].value(item.soTiet);
-                location.reload();
+                // location.reload();
             });
     };
 
     handleCheck = (value, item) => {
         this.props.updateDtThoiKhoaBieuCondition(item, { isMo: Number(value) }, data => data.item && this.initData());
+    }
+
+    handleCheckLoaiMonHoc = (value, item) => {
+        this.props.updateDtThoiKhoaBieu(item.id, { loaiMonHoc: Number(value) }, data => data.item && this.initData());
     }
 
     renderThoiGianPhanCong = (data) => {
@@ -320,6 +328,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Ngành</th>
                         <th rowSpan='2' style={{ width: '25%', textAlign: 'center', verticalAlign: 'middle' }}>Mã</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Môn học</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Tự chọn</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Lớp</th>
                         <th rowSpan='2' style={{ width: '25%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Phòng</th>
                         <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
@@ -352,6 +361,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
                             <i> {item.tenKhoaBoMon}</i>
                         </>} />
+                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
+                            <FormCheckbox ref={e => this.loaiMonHoc[indexOfItem] = e} onChange={value => this.handleCheckLoaiMonHoc(value, item)} readOnly={!!item.phong} />
+                        }/>
                         <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.nhom}${item.buoi > 1 ? ` (${item.buoi})` : ''} `} />
                         <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
                             <>
@@ -459,6 +471,20 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Thời khoá biểu'
             ],
+            header: permission.read && <><FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '10px' }} placeholder='Năm học' onChange={value => {
+                T.clearSearchBox();
+                console.log(value);
+                this.setState({ idNamDaoTao: value ? value.id : '' }, () => {
+                    this.initData();
+                });
+            }} data={SelectAdapter_NamDaoTaoFilter} allowClear={true} />
+                <FormSelect style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' onChange={value => {
+                    T.clearSearchBox();
+                    console.log(value);
+                    this.setState({ hocKy: value ? value.id : '' }, () => {
+                        this.initData();
+                    });
+                }} data={[1, 2, 3]} allowClear={true} /></>,
             content: <>
                 {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null}
                 <div className='tile'>{table}</div>

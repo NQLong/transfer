@@ -217,6 +217,7 @@ export const SelectAdapter_CongVanDi = {
     fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
 };
 
+
 // export function createHistory(data, done) {
 //     return () => {
 //         const url = '/api/hcth/cong-van-cac-phong/lich-su';
@@ -284,3 +285,4 @@ export function readCongVanDi(data, done) {
         }, () => T.notify('Đọc công văn lỗi', 'danger'));
     };
 }
+

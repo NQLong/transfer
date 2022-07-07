@@ -1,16 +1,61 @@
+import { Tooltip } from '@mui/material';
+
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
-import Pagination from 'view/component/Pagination';
-import T from 'view/js/common';
-import { getTcHocPhiPage, getTcHocPhiHuongDan } from './redux';
+import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
+import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent } from './redux';
+class ThanhToanModal extends AdminModal {
+    render = () => {
+        let styleButton = { width: '90%', margin: 'auto', marginBottom: '20px', height: '50px', display: 'inline-flex', alignItems: 'center' },
+            styleLogo = { maxWidth: 100, marginRight: 30, marginLeft: 20 };
+        return this.renderModal({
+            title: 'Phương thức thanh toán',
+            body: <div className='row' >
+                <Tooltip title='Thanh toán qua Agribank' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction('vnpay-agri', link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src={`/img/logo/agribank.png?t=${new Date().getTime()}`} alt='Agribank' style={styleLogo} /><span>Thanh toán qua AGRIBANK</span>
+                    </button>
+                </Tooltip>
 
-const yearDatas = () => {
-    return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
-};
+                <Tooltip title='Thanh toán qua Vietcombank' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction('vnpay-vcb', link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src={`/img/logo/vcb.png?t=${new Date().getTime()}`} alt='Vietcombank' style={styleLogo} />Thanh toán qua Vietcombank
+                    </button>
+                </Tooltip>
+                <Tooltip title='Thanh toán qua BIDV' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                    }}>
+                        <img src={`/img/logo/logo_bidv.png?t=${new Date().getTime()}`} alt='BIDV' style={styleLogo} /> Thanh toán qua BIDV
+                    </button>
+                </Tooltip>
 
-const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
+                {/* <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction('vnpay', link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
+                    </button>
 
+                </Tooltip> */}
+
+            </div>
+        });
+    }
+}
 class Modal extends AdminModal {
     state = { hocPhiHuongDan: null }
 
@@ -33,79 +78,113 @@ class Modal extends AdminModal {
     }
 }
 class UserPage extends AdminPage {
-    state = { hocPhiHuongDan: null }
+    state = { hocPhiHuongDan: null, isSuccess: false }
 
     componentDidMount() {
-        T.ready('/user', () => {
-            this.props.getTcHocPhiPage(undefined, undefined, '', (data) => {
-                const { settings: { namHoc, hocKy } } = data;
-                this.year.value(namHoc);
-                this.term.value(hocKy);
-            });
+        const query = new URLSearchParams(this.props.location.search);
+        if (query) {
+            const vnp_TransactionStatus = query.get('vnp_TransactionStatus');
+            if (vnp_TransactionStatus) {
+                vnp_TransactionStatus == '00' ? T.alert('Thanh toán thành công', 'success', false) : T.alert('Thanh toán thất bại', 'error', false);
+                window.history.pushState('', '', '/user/hoc-phi');
+            }
+        }
+
+        T.ready('/user/hoc-phi', () => {
+            this.props.getHocPhi();
+            this.props.getAllHocPhiStudent();
             this.props.getTcHocPhiHuongDan();
         });
     }
-
-    render() {
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
-            pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
-        };
-        const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
-        let table = renderTable({
+    renderTableHocPhi = (data) => {
+        const style = (width = 'auto', textAlign = 'left') => ({ width, textAlign, whiteSpace: 'nowrap', backgroundColor: '#1b489f', color: '#fff' });
+        return renderTable({
             emptyTable: 'Không có dữ liệu học phí',
-            stickyHead: true,
             header: 'thead-light',
-            style: { marginTop: 16 },
-            getDataSource: () => list,
+            getDataSource: () => data,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Học kỳ</th>
-                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>MSSV</th>
-                    <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Họ và tên</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Công nợ (vnđ)</th>
+                    <th style={style()}>STT</th>
+                    <th style={style('100%')}>Loại phí</th>
+                    <th style={style('auto', 'right')}>Tổng thu</th>
+
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK${item.hocKy}`} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.hocPhi?.toString() || '').numberWithCommas()} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.congNo?.toString() || '').numberWithCommas()} />
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${T.numberDisplay(item.soTien ? Number(item.soTien) : '')} VNĐ`} />
                 </tr>
             )
         });
+    }
+
+    renderSection = (namHoc, hocPhiTrongNam) => {
+        const { dataDetailTrongNam, dataTrongNam } = hocPhiTrongNam;
+        const dataHocKy = dataTrongNam.groupBy('hocKy');
+        return (
+            <div className='tile' key={namHoc}>
+                <div className='tile-title'>Năm {namHoc} - {Number(namHoc) + 1}</div>
+                {Object.keys(dataHocKy).sort((a, b) => Number(b) - Number(a)).map(hocKy => {
+                    let current = dataHocKy[hocKy][0];
+                    return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
+                            <i style={{ fontSize: '16px' }}>Học kỳ {hocKy}</i>
+                            {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)}</b> : <b>Đã thanh toán đủ.</b>
+                                // <Tooltip title='Thanh toán' placement='top' arrow>
+                                // <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                //     Thanh toán
+                                // </button>
+                                // </Tooltip>
+                            }
+                        </div>
+                        <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
+                        {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
+                        <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >
+                            <div>
+                                <div>Miễn giảm: <b>{current.mienGiam || 'Không'}</b> </div>
+                                <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div>Tổng học phí: <b>{T.numberDisplay(Number(current.hocPhi))} VNĐ </b></div>
+                                <div>Đã đóng: <b>{T.numberDisplay(Number(current.hocPhi) - Number(current.congNo))} VNĐ </b></div>
+                            </div>
+
+                        </div>
+                        <Modal ref={e => this.modal = e} />
+                        <ThanhToanModal ref={e => this.thanhToanModal = e} vnPayGoToTransaction={this.props.vnPayGoToTransaction} />
+                    </div>);
+                }
+                )}
+            </div>
+        );
+    }
+    render() {
+        const user = this.props.system.user,
+            tcHocPhi = this.props.tcHocPhi || {},
+            { hocPhiAll, hocPhiDetailAll } = tcHocPhi.dataAll || {};
+        const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
+
         return this.renderPage({
             title: 'Học phí',
+            subTitle: <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a>,
             icon: 'fa fa-money',
-            header: <><FormSelect ref={e => this.year = e} style={{ width: '100px', marginBottom: '0', marginRight: 10 }} placeholder='Năm học' data={yearDatas()} onChange={
-                value => this.props.getTcHocPhiPage(undefined, undefined, {
-                    searchTerm: '',
-                    settings: { namHoc: value && value.id, hocKy: this.term.value() }
-                })
-            } /><FormSelect ref={e => this.term = e} style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' data={termDatas} onChange={
-                value => this.props.getTcHocPhiPage(undefined, undefined, {
-                    searchTerm: '',
-                    settings: { namHoc: this.year.value(), hocKy: value && value.id }
-                })
-            } /></>,
             breadcrumb: ['Học phí'],
             backRoute: '/user',
-            content: <div className='tile'>
-                <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a><br />
-                {table}
-                <Pagination getPage={this.props.getTcHocPhiPage} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} style={{ marginLeft: '70px' }} />
-                <Modal ref={e => this.modal = e} />
-            </div>
+            content: user && hocPhiAll ? <>
+                <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
+                {Object.keys(hocPhiAll).sort((a, b) => Number(b) - Number(a)).map(namHoc => this.renderSection(namHoc, {
+                    dataTrongNam: hocPhiAll[namHoc],
+                    dataDetailTrongNam: hocPhiDetailAll[namHoc]
+                }))}
+            </> : loadSpinner()
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);

@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1009: { title: 'Sáng kiến', link: '/user/sang-kien', icon: 'fa fa-lightbulb-o', backgroundColor: '#7554AA', groupIndex: 4 },
+            // 1009: { title: 'Sáng kiến', link: '/user/sang-kien', icon: 'fa fa-lightbulb-o', backgroundColor: '#7554AA', groupIndex: 4 },
         },
     };
 

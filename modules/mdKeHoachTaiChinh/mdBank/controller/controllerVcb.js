@@ -1,13 +1,30 @@
 module.exports = app => {
     const serviceIdVcb = 'EDU';
     const providerIdVcb = 'NVAN';
+    // const dateFormat = require('dateformat');
+
     const crypto = require('crypto');
+    const types = {
+        SANDBOX: 'sandbox',
+        PRODUCTION: 'production'
+    };
 
     // VCB --------------------------------------------------------------------------------------------------------------------------------------
+    // production
     app.post('/api/VCBPayment/Inquiry', async (req, res) => {
-        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb');
+        await getBill(types.PRODUCTION, req, res);
+    });
+
+    // sandbox
+    app.post('/api/VCBPayment/Sandbox/Inquiry', async (req, res) => {
+        await getBill(types.SANDBOX, req, res);
+    });
+
+    const getBill = async (type, req, res) => {
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb, secretCodeVcbSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb', 'secretCodeVcbSandbox');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
+        const secretCode = type === types.PRODUCTION ? secretCodeVcb : secretCodeVcbSandbox;
         let { context, payload, signature } = req.body;
         if (!(context && payload)) {
             res.sendStatus(400);
@@ -29,7 +46,6 @@ module.exports = app => {
 
                     const dataRequest = `${channelId}|${channelRefNumber}|${secretCode}`,
                         mySignatureRequest = crypto.createHash('md5').update(dataRequest).digest('hex');
-                    // console.log(' - Data = ', dataRequest, '\n - My Signature = ', mySignatureRequest, '\n - Signature = ', signature);
 
                     const dataResponse = `${channelId}|${channelRefNumber}|${responseMsgId}|${secretCode}`,
                         signatureResponse = crypto.createHash('md5').update(dataResponse).digest('hex');
@@ -39,7 +55,9 @@ module.exports = app => {
                         context.errorCode = 18;
                         res.send({ context, signature: signatureResponse });
                     } else {
-                        app.model.tcHocPhi.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
+                        const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+
+                        model.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
                             if (error) {
                                 context.status = 'FAILURE';
                                 context.errorCode = 400;
@@ -94,12 +112,23 @@ module.exports = app => {
             }
         }
 
+    };
+
+    // production
+    app.post('/api/VCBPayment/Payment', async (req, res) => {
+        await paybill(types.PRODUCTION, req, res);
     });
 
-    app.post('/api/VCBPayment/Payment', async (req, res) => {
-        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb: secretCode } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb');
+    // sandbox
+    app.post('/api/VCBPayment/Sandbox/Payment', async (req, res) => {
+        await paybill(types.SANDBOX, req, res);
+    });
+
+    const paybill = async (type, req, res) => {
+        let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy, secretCodeVcb, secretCodeVcbSandbox } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'secretCodeVcb', 'secretCodeVcbSandbox');
         namHoc = Number(namHoc);
         hocKy = Number(hocKy);
+        const secretCode = type === types.PRODUCTION ? secretCodeVcb : secretCodeVcbSandbox;
         let { context, payload, signature } = req.body;
         if (!(context && payload)) {
             res.sendStatus(400);
@@ -126,18 +155,18 @@ module.exports = app => {
                             context.errorCode = 18;
                             res.send({ context });
                         } else {
+                            const modelHocPhi = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+                            const modelHocPhiTransaction = type === types.PRODUCTION ? app.model.tcHocPhiTransaction : app.model.tcHocPhiTransactionSandbox;
                             const dataResponse = `${channelId}|${channelRefNumber}|${responseMsgId}|${secretCode}`,
                                 signature = crypto.createHash('md5').update(dataResponse).digest('hex');
-                            app.model.tcHocPhi.get({ namHoc, hocKy, mssv: customerCode }, (error, hocPhi) => {
-                                if (error) {
-                                    context.status = 'FAILURE';
-                                    context.errorCode = 400;
-                                    res.send({ context, signature });
-                                } else if (providerId != providerIdVcb || serviceId != serviceIdVcb) {
-                                    context.status = 'FAILURE';
-                                    context.errorCode = 21;
-                                    res.send({ context, signature });
-                                } else if (!hocPhi) {
+                            if (providerId != providerIdVcb || serviceId != serviceIdVcb) {
+                                context.status = 'FAILURE';
+                                context.errorCode = 21;
+                                res.send({ context, signature });
+                            } else {
+                                const hocPhi = modelHocPhi.get({ namHoc, hocKy, mssv: customerCode });
+                                // student = app.model.fwStudents.get({ mssv: customerCode });
+                                if (!hocPhi) {
                                     context.status = 'FAILURE';
                                     context.errorCode = 17;
                                     res.send({ context, signature });
@@ -147,52 +176,44 @@ module.exports = app => {
                                     res.send({ context, signature });
                                 } else {
                                     const billResult = [];
-                                    const solve = (index = 0) => {
-                                        if (index == bills.length) {
-                                            context.status = 'SUCCESS';
-                                            res.send({
-                                                context,
-                                                payload: {
-                                                    providerId, serviceId, bills: billResult
-                                                }
-                                            });
-                                            return;
+                                    for (const billInfo of bills) {
+                                        if (!(billInfo.billId && billInfo.amount)) {
+                                            context.status = 'FAILURE';
+                                            context.errorCode = 21;
+                                            return res.send({ context, signature });
                                         } else {
-                                            let billInfo = bills[index];
-                                            if (!(billInfo.billId && billInfo.amount)) {
-                                                context.status = 'FAILURE';
-                                                context.errorCode = 21;
-                                                res.send({ context, signature });
-                                                return;
-                                            } else {
-                                                app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, 'VCB', `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, parseInt(billInfo.amount), signature, (error, result) => {
-                                                    if (error || !result || !result.outBinds || !result.outBinds.ret) {
-                                                        billResult.push({
-                                                            billId: billInfo.billId,
-                                                            amount: billInfo.amount,
-                                                            billErrorCode: 1,
-                                                        });
-                                                    } else {
-                                                        billResult.push({
-                                                            billId: billInfo.billId,
-                                                            amount: billInfo.amount,
-                                                            billErrorCode: 0,
-                                                        });
-                                                    }
-                                                    solve(index + 1);
-
+                                            try {
+                                                let transaction = modelHocPhiTransaction.addBill(namHoc, hocKy, 'VCB', `VCB-${internalTransactionRefNo}`, new Date(requestDateTime).getTime(), customerCode, billInfo.billId, serviceId, parseInt(billInfo.amount), signature);
+                                                if (!transaction || !transaction.outBinds || !transaction.outBinds.ret) throw 'Add bill failed';
+                                                else {
+                                                    billResult.push({
+                                                        billId: billInfo.billId,
+                                                        amount: billInfo.amount,
+                                                        billErrorCode: 0,
+                                                    });
+                                                }
+                                            } catch (error) {
+                                                console.error('VCB add transaction: ', error);
+                                                billResult.push({
+                                                    billId: billInfo.billId,
+                                                    amount: billInfo.amount,
+                                                    billErrorCode: 1,
                                                 });
                                             }
                                         }
-                                    };
-                                    if (bills && Array.isArray(bills)) solve();
-                                    else {
-                                        context.status = 'FAILURE';
-                                        context.errorCode = 10;
-                                        res.send({ context, signature });
                                     }
+                                    context.status = 'SUCCESS';
+                                    if (!billResult.length) {
+                                        // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: totalPaymentAmount, payDate: dateFormat(new Date(requestDateTime, 'yyyymmddHHmmss')) });
+                                    }
+                                    return res.send({
+                                        context,
+                                        payload: {
+                                            providerId, serviceId, bills: billResult
+                                        }
+                                    });
                                 }
-                            });
+                            }
                         }
                     }
                 }
@@ -202,7 +223,5 @@ module.exports = app => {
                 res.send({ context, signature });
             }
         }
-
-
-    });
+    };
 };

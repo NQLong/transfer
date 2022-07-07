@@ -181,7 +181,7 @@ export function getCongVanDen(id, context, done) {
                 dispatch({ type: HcthCongVanDenGet, item: data.item });
                 done && done(data.item);
             }
-        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy công văn đến bị lỗi!', 'danger'));
     };
 }
 
@@ -287,5 +287,20 @@ export function updateQuyenChiDao(id, shcc, trangThaiCv, status, done) {
         T.post(url, { id, shcc, trangThaiCv, status }, res => {
             done && done(res);
         }, () => T.notify('Thêm cán bộ chỉ đạo lỗi', 'danger'));
+    };
+}
+
+
+export function duyetCongVan(id, noiDung, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-den/duyet';
+        T.put(url, { id, noiDung }, res => {
+            if (res.error) {
+                T.notify('Duyệt công văn lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + res.error);
+            } else {
+                done && done();
+            }
+        }, () => T.notify('Duyệt công văn lỗi', 'danger'));
     };
 }

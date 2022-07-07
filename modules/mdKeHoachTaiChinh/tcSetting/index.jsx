@@ -11,6 +11,10 @@ export default {
     },
     routes: [
         {
+            path: '/user/finance/admin-setting',
+            component: Loadable({ loading: Loading, loader: () => import('./adminSettingPage') })
+        },
+        {
             path: '/user/finance/setting',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },

@@ -418,7 +418,7 @@ module.exports = (app) => {
         if (!shccCanBo || shccCanBo == creator) return;
         const lichSuDoc = await app.model.hcthHistory.get({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
         if (!lichSuDoc) {
-            return await app.model.hcthHistory.create({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
+            return await app.model.hcthHistory.create({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW, thoiGian: new Date().getTime() });
         }
         return lichSuDoc;
     };
@@ -432,9 +432,29 @@ module.exports = (app) => {
             const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
             if (!await isRelated(congVan, donViNhan, req))
                 throw { status: 401, message: 'permission denied' };
-            else {
+            else if (req.session.user?.shcc) {
                 await viewCongVanDen(id, req.session.user.shcc, congVan.nguoiTao);
             }
+            let danhSachDonViNhan = [];
+            let danhSachCanBoNhan = [];
+            if (donViNhan?.length) {
+                danhSachDonViNhan = await app.model.dmDonVi.getAll({
+                    statement: `MA in (${donViNhan.map(item => item.donViNhan).toString()})`,
+                    parameter: {},
+                }, 'ma, ten', 'ma');
+            }
+            if (congVan?.canBoNhan && congVan?.canBoNhan.length)
+                danhSachCanBoNhan = await app.model.canBo.getAll({
+                    statement: 'SHCC IN (:danhSachShcc)',
+                    parameter: { danhSachShcc: congVan?.canBoNhan.split(',') }
+                }, 'shcc,ten,ho,email', 'ten');
+
+            let donViGuiInfo = {};
+
+            if (congVan?.donViGui) {
+                donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: congVan.donViGui }, 'id, ten', 'id');
+            }
+
             const files = await app.model.hcthFile.getAll({ ma: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
             const history = await app.model.hcthHistory.getAllFrom(id, CONG_VAN_TYPE, req.query.historySortType);
@@ -444,12 +464,15 @@ module.exports = (app) => {
             res.send({
                 item: {
                     ...congVan,
-                    phanHoi: phanHoi || [],
+                    phanHoi: phanHoi?.rows || [],
                     donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(),
                     listFile: files || [],
                     danhSachChiDao: chiDao?.rows || [],
                     history: history?.rows || [],
-                    quyenChiDao
+                    quyenChiDao,
+                    danhSachDonViNhan,
+                    danhSachCanBoNhan,
+                    tenDonViGui: donViGuiInfo?.ten || ''
                 }
             });
         } catch (error) {
@@ -481,8 +504,10 @@ module.exports = (app) => {
             case trangThaiSwitcher.CHO_DUYET.id:
                 return action.UPDATE;
             case trangThaiSwitcher.CHO_PHAN_PHOI.id:
-                if (before == trangThaiSwitcher.TRA_LAI_HCTH)
+                if (before == trangThaiSwitcher.TRA_LAI_HCTH.id)
                     return action.UPDATE;
+                else if (before == trangThaiSwitcher.DA_DUYET.id)
+                    return action.UPDATE_STATUS;
                 else
                     return action.APPROVE;
             case trangThaiSwitcher.TRA_LAI_HCTH.id:
@@ -518,11 +543,96 @@ module.exports = (app) => {
     });
 
 
+    app.put('/api/hcth/cong-van-den/tra-lai', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
+        try {
+            const { id, lyDo } = req.body;
+            let congVan = await app.model.hcthCongVanDen.get({ id });
+            const userShcc = req.session.user?.shcc;
+            const quyenChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE),
+                canBoChiDao = (quyenChiDao?.rows || []).map(item => item.shccCanBoNhan);
+            const userPermission = req.session.user?.permissions || [];
+            if (!congVan) throw 'Công văn không tồn tại';
+            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể trả lại công văn này';
+            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền trả lại công văn này';
+            else if (!lyDo) throw 'Vui lòng nhập lý do trả lại công văn';
+            else {
+                const chiDao = {
+                    canBo: req.session.user?.shcc,
+                    chiDao: lyDo,
+                    thoiGian: new Date().getTime(),
+                    congVan: id,
+                    loai: CONG_VAN_TYPE,
+                    action: action.RETURN,
+                };
+                await app.model.hcthChiDao.create(chiDao);
+                const trangThaiHienTai = congVan.trangThai;
+                congVan = await app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiSwitcher.TRA_LAI_BGH.id });
+                await app.model.hcthHistory.create({
+                    key: id,
+                    loai: CONG_VAN_TYPE,
+                    hanhDong: action.RETURN,
+                    thoiGian: new Date().getTime(),
+                    shcc: req.session?.user?.shcc
+                });
+                await onStatusChange(congVan, trangThaiHienTai, trangThaiSwitcher.TRA_LAI_BGH.id);
+                res.send({ item: congVan });
+            }
+        } catch (error) {
+            if (typeof error == 'string')
+                res.send({ error: { errorMessage: error } });
+            else
+                res.send({ error });
+        }
+    });
+
+    app.put('/api/hcth/cong-van-den/duyet', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
+        try {
+            const { id, noiDung } = req.body;
+            let congVan = await app.model.hcthCongVanDen.get({ id });
+            const userShcc = req.session.user?.shcc;
+            const quyenChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE),
+                canBoChiDao = (quyenChiDao?.rows || []).map(item => item.shccCanBoNhan);
+            const userPermission = req.session.user?.permissions || [];
+            if (!congVan) throw 'Công văn không tồn tại';
+            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể duyệt lại công văn này';
+            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền duyệt công văn này';
+            else if (!noiDung) throw 'Vui lòng nhập chỉ đạo';
+            else {
+                const chiDao = {
+                    canBo: req.session.user?.shcc,
+                    chiDao: noiDung,
+                    thoiGian: new Date().getTime(),
+                    congVan: id,
+                    loai: CONG_VAN_TYPE,
+                    action: action.APPROVE,
+                };
+                await app.model.hcthChiDao.create(chiDao);
+                const trangThaiHienTai = congVan.trangThai;
+                congVan = await app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiSwitcher.DA_DUYET.id });
+                await app.model.hcthHistory.create({
+                    key: id,
+                    loai: CONG_VAN_TYPE,
+                    hanhDong: action.APPROVE,
+                    thoiGian: new Date().getTime(),
+                    shcc: req.session?.user?.shcc
+                });
+                await onStatusChange(congVan, trangThaiHienTai, trangThaiSwitcher.DA_DUYET.id);
+                res.send({ item: congVan });
+            }
+        } catch (error) {
+            if (typeof error == 'string')
+                res.send({ error: { errorMessage: error } });
+            else
+                res.send({ error });
+        }
+    });
+
+
     app.get('/api/hcth/cong-van-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
-            res.send({ error: null, items: phanHoi });
+            res.send({ error: null, items: phanHoi.rows || [] });
         }
         catch (error) {
             res.send({ error });
@@ -601,6 +711,8 @@ module.exports = (app) => {
                 return 'Bạn có công văn chờ phân phối.';
             case trangThaiSwitcher.DA_PHAN_PHOI.id:
                 return 'Bạn có công văn đến mới.';
+            case trangThaiSwitcher.DA_DUYET.id:
+                return 'Công văn của bạn đã được duyệt.';
             default:
                 return '';
 
@@ -647,7 +759,7 @@ module.exports = (app) => {
         });
     });
 
-    const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
+    const createCreatorNotification = (item, status) => new Promise((resolve, reject) => {
         if (item.nguoiTao)
             app.model.fwUser.get({ shcc: item.nguoiTao }, 'email', 'email', (error, staff) => {
                 if (error) reject(error);
@@ -682,8 +794,8 @@ module.exports = (app) => {
             if (after == trangThaiSwitcher.CHO_DUYET.id) {
                 createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
             }
-            else if ([trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(after)) {
-                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+            else if ([trangThaiSwitcher.DA_DUYET.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(after)) {
+                createCreatorNotification(item, after).then(() => resolve()).catch(error => { throw error; });
             }
             else if (after == trangThaiSwitcher.DA_PHAN_PHOI.id) {
                 createRelatedStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
@@ -802,19 +914,110 @@ module.exports = (app) => {
                         quyenChiDao: shcc,
                     });
                 }
-                res.send({ error: null });
             } else {
                 app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiCv }, async (error) => {
                     if (error) throw error;
                     else {
-                        await deleteCanBoNhanChiDao(shcc, id, req.session?.user?.staff.shcc);
-                        res.send({ error: null });
+                        const shccNguoiTao = req.session?.user?.staff?.shcc || req.session?.user?.shcc;
+                        await deleteCanBoNhanChiDao(shcc, id, shccNguoiTao);
                     }
                 });
             }
+            res.send({ error: null });
         }
         catch (error) {
             res.send({ error });
         }
+    });
+
+    // Download Template ---------------------------------------------------------------------------------------------------------------------------------
+
+    app.get('/api/hcth/cong-van-den/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status, sortBy, sortType } = req.params.filter ? JSON.parse(req.params.filter) : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null, sortBy: '', sortType: '' };
+
+        const obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' };
+
+        let donViCanBo = '', canBo = '', tabValue = parseInt(tab);
+
+        const user = req.session.user;
+        const permissions = user.permissions;
+        donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
+        donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || permissions.includes('donViCongVanDen:read') && req.session?.user?.staff?.maDonVi || '';
+        canBo = req.session?.user?.shcc || '';
+        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        if (tabValue == 0) {
+            if (permissions.includes('rectors:login') || permissions.includes('hcth:login') || (!user.isStaff && !user.isStudent)) {
+                donViCanBo = '';
+                canBo = '';
+            }
+        }
+        else if (tabValue == 1) {
+            if (donViCanBo.length) {
+                canBo = '';
+            } else
+                donViCanBo = '';
+        } else donViCanBo = '';
+
+
+
+        if (congVanYear && Number(congVanYear) > 1900) {
+            timeType = 2;
+            fromTime = new Date(`${congVanYear}-01-01`).getTime();
+            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
+        }
+        app.model.hcthCongVanDen.download(donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, permissions.includes('rectors:login') ? 1 : permissions.includes('hcth:login') ? 0 : 2, status, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const workBook = app.excel.create();
+                const ws = workBook.addWorksheet('Cong_van_den');
+                const defaultColumns = [
+                    { header: 'STT', key: 'stt', width: 10 },
+                    { header: 'Số lưu riêng (các ô bên cạnh - số được đánh bên trái của cv đến - dùng để kiếm cv)', key: 'soDen', width: 10 },
+                    { header: 'NGÀY', key: 'ngay', width: 15 },
+                    { header: 'ĐƠN VỊ GỬI', key: 'donViGuiCv', width: 30 },
+                    { header: 'SỐ CV', key: 'soCV', width: 20 },
+                    { header: 'NGÀY CV', key: 'ngayCongVan', width: 15 },
+                    { header: 'NỘI DUNG', key: 'trichYeu', width: 50 },
+                    { header: 'ĐƠN VỊ, NGƯỜI NHẬN', key: 'donViNguoiNhan', width: 30 },
+                    { header: 'NGÀY HẾT HẠN', key: 'ngayHetHan', width: 15 },
+                    { header: 'CHỈ ĐẠO CỦA HIỆU TRƯỞNG', key: 'chiDao', width: 30 },
+                ];
+                ws.columns = defaultColumns;
+                ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center', wrapText: true };
+                ws.getRow(1).height = 40;
+                ws.getRow(1).font = {
+                    name: 'Times New Roman',
+                    family: 4,
+                    size: 12,
+                    bold: true,
+                    color: { argb: 'FF000000' }
+                };
+                page.rows.forEach((item, index) => {
+                    ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center', wrapText: true };
+                    ws.getRow(index + 2).font = { name: 'Times New Roman' };
+                    ws.getCell('A' + (index + 2)).value = index + 1;
+                    ws.getCell('B' + (index + 2)).value = item.soDen;
+                    ws.getCell('B' + (index + 2)).font = { ...ws.getRow(index + 2).font, bold: true };
+                    ws.getCell('C' + (index + 2)).value = app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy');
+                    ws.getCell('D' + (index + 2)).value = item.tenDonViGuiCV;
+                    ws.getCell('D' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
+                    ws.getCell('E' + (index + 2)).value = item.soCongVan ? item.soCongVan : '';
+                    ws.getCell('F' + (index + 2)).value = item.ngayCongVan ? app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy') : '';
+                    ws.getCell('G' + (index + 2)).value = item.trichYeu;
+                    ws.getCell('G' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
+                    const donViNhan = item.danhSachDonViNhan?.split(';').map(dv => dv + '\r\n').join('') || '';
+                    const canBoNhan = item.danhSachCanBoNhan?.split(';').map(cb => cb + '\r\n').join('') || '';
+                    ws.getCell('H' + (index + 2)).value = canBoNhan !== '' || donViNhan !== '' ? canBoNhan + donViNhan : '';
+                    ws.getCell('H' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
+                    ws.getCell('I' + (index + 2)).value = item.ngayHetHan !== 0 ? app.date.dateTimeFormat(new Date(item.ngayHetHan), 'dd/mm/yyyy') : '';
+                    ws.getCell('I' + (index + 2)).font = { ...ws.getRow(index + 2).font, color: { argb: 'FFFF0000' } };
+                    ws.getCell('J' + (index + 2)).value = item.chiDao?.split('|').map(cd => cd + '\r\n').join('');
+                    ws.getCell('J' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'left' };
+                });
+                let fileName = `Cong_van_den_${Date.now()}.xlsx`;
+                app.excel.attachment(workBook, res, fileName);
+            }
+        });
     });
 };

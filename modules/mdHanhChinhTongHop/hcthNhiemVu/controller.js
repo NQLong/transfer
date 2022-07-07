@@ -5,7 +5,7 @@ module.exports = (app) => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1054: { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f', pin: true },
+            // 1054: { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f', pin: true },
         },
     };
 
@@ -457,7 +457,7 @@ module.exports = (app) => {
 
             const nhiemVu = {
                 ...nhiemVuItem,
-                phanHoi: phanHoi || [],
+                phanHoi: phanHoi?.rows || [],
                 listFile: listFile || [],
                 canBoNhan: canBoNhan?.rows || [],
                 lienKet: lienKet?.rows || [],

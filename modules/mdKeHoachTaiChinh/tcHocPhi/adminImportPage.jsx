@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { uploadDsHocPhi } from './redux';
+import { createMultipleHocPhi } from './redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import FileBox from 'view/component/FileBox';
 
@@ -12,12 +12,12 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { mssv, hocPhi, namHoc, hocKy, hoTenSinhVien } = item ? item.item : { mssv: '', hocPhi: '', congNo: '' };
+        const { mssv, soTien, namHoc, hocKy, hoTenSinhVien } = item ? item.item : { mssv: '', soTien: '', congNo: '' };
         const index = item?.index;
 
         this.setState({ index }, () => {
             this.mssv.value(mssv || '');
-            this.hocPhi.value(hocPhi || 0);
+            this.soTien.value(soTien || 0);
             this.namHoc.value(namHoc || 0);
             this.hocKy.value(hocKy || 0);
             this.hoTenSinhVien.value(hoTenSinhVien || 0);
@@ -27,7 +27,7 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const { index } = this.state;
-        const nHocPhi = this.hocPhi.value();
+        const nHocPhi = this.soTien.value();
         this.props.update(index, nHocPhi, this.hide);
     }
 
@@ -41,7 +41,7 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-12' ref={e => this.hocKy = e} type='text' label='Học kỳ' readOnly={true} />
                 <FormTextBox className='col-md-6' ref={e => this.mssv = e} type='text' label='MSSV' readOnly={true} />
                 <FormTextBox className='col-md-6' ref={e => this.hoTenSinhVien = e} type='text' label='Họ và tên' readOnly={true} />
-                <FormTextBox className='col-md-12' ref={e => this.hocPhi = e} type='number' label='Học phí (vnđ)' readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.soTien = e} type='number' label='Học phí (vnđ)' readOnly={readOnly} />
             </div>
         });
     }
@@ -81,7 +81,7 @@ class TcHocPhiImportPage extends AdminPage {
         const { hocPhiAll } = this.state;
         const tmpHocPhi = [...hocPhiAll];
         const currentValue = tmpHocPhi[index];
-        currentValue['hocPhi'] = nHocPhi;
+        currentValue['soTien'] = nHocPhi;
         this.setState({ hocPhiAll: tmpHocPhi }, () => T.notify('Cập nhật dữ liệu thành công', 'success'));
         done && done();
     };
@@ -100,7 +100,7 @@ class TcHocPhiImportPage extends AdminPage {
     save = (e) => {
         const doSave = () => {
             const data = this.state.hocPhiAll;
-            this.props.uploadDsHocPhi(data, (error, data) => {
+            this.props.createMultipleHocPhi(data, (error, data) => {
                 if (error) {
                     T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
                 } else {
@@ -129,7 +129,8 @@ class TcHocPhiImportPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>Học kỳ</th>
                         <th style={{ width: '20%', whiteSpace: 'nowrap' }}>MSSV</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Học phí (vnđ)</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại phí</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap', textAlign: 'right' }}>Tổng phí (vnđ)</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
@@ -138,14 +139,15 @@ class TcHocPhiImportPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK${item.hocKy}`} />
                         <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
                         <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item?.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
+                        <TableCell style={{ whiteSpace: 'nowrap' }} content={item?.tenLoaiPhi} />
                         <td type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
                             {item?.curFee &&
-                                (<p style={{ textDecoration: 'line-through', display: 'inline-block' }}>
-                                    {`${item.curFee.toString().numberWithCommas()}`}
-                                </p>)
+                                (<span style={{ textDecoration: 'line-through', display: 'inline-block' }}>
+                                    {`${T.numberDisplay(item.curFee.toString())}`}
+                                </span>)
                             }
                             {item?.curFee && ' -> '}
-                            {(item?.hocPhi?.toString() || '').numberWithCommas()}
+                            {T.numberDisplay(item?.soTien?.toString() || '')}
                         </td>
                         <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ index, item })} onDelete={(e) => this.delete(e, index)}
@@ -179,5 +181,5 @@ class TcHocPhiImportPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { uploadDsHocPhi };
+const mapActionsToProps = { createMultipleHocPhi };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiImportPage);

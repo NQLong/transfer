@@ -109,7 +109,7 @@ export function deleteDtThoiKhoaBieu(id, done) {
 }
 
 export function updateDtThoiKhoaBieu(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -118,7 +118,7 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
                 done && done(data);
             } else {
                 T.notify('Điều chỉnh thành công!', 'success');
-                dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
+                // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
                 done && done(data);
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));

@@ -12,7 +12,7 @@ class DaoTaoDetail extends AdminPage {
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa quá trình đào tạo, bồi dưỡng', 'Bạn muốn gửi yêu cầu xóa quá trình đào tạo, bồi dưỡng này?', 'warning', false, isConfirm => {
-            isConfirm && this.props.createTccbSupport(item, { qtId: item.id, type: 'delete', qt: 'qtDaoTao' });
+            isConfirm && this.props.createTccbSupport(item, {}, { qtId: item.id, type: 'delete', qt: 'qtDaoTao' });
         });
     }
     render = () => {
@@ -24,7 +24,9 @@ class DaoTaoDetail extends AdminPage {
         }),
             curPermission = this.getUserPermission('staff', ['login', 'write', 'delete']),
             permission = {
-                read: curPermission.login, write: curPermission.login, delete: curPermission.login
+                read: this.props.canEdit && curPermission.login,
+                write: this.props.canEdit && curPermission.login,
+                delete: this.props.canEdit && curPermission.login
             };
 
         if (hocVi) switch (hocVi) {
@@ -83,20 +85,20 @@ class DaoTaoDetail extends AdminPage {
                 </div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <span style={{ display: this.state?.display || 'none' }}>
-                        <Tooltip title={curPermission.write ? 'Thêm' : 'Gửi yêu cầu cho phòng TCCB'} arrow >
-                            <button className={curPermission.write ? 'btn btn-info' : 'btn btn-danger'} onClick={e => {
+                        <Tooltip title={permission.write ? 'Thêm' : 'Gửi yêu cầu cho phòng TCCB'} arrow >
+                            <button className={permission.write ? 'btn btn-info' : 'btn btn-danger'} onClick={e => {
                                 e.preventDefault();
                                 this.modal.show({
                                     item: { shcc: this.props.shcc, loaiBangCap: this.loaiBangCap, trinhDo: this.trinhDo }
                                 });
                             }}>
-                                <i className='fa fa-fw fa-lg fa-plus' />{curPermission.write ? 'Thêm' : 'Gửi yêu cầu'}
+                                <i className='fa fa-fw fa-lg fa-plus' />{permission.write ? 'Thêm' : 'Gửi yêu cầu'}
                             </button>
                         </Tooltip>
                     </span>
                 </div>
-                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={!curPermission.write} shcc={this.props.shcc} update={curPermission ? this.props.updateQtDaoTaoStaff : null}
-                    create={curPermission.write ? this.props.createQtDaoTaoStaff : this.props.createTccbSupport} />
+                <DaoTaoModal ref={e => this.modal = e} title={hocVi || chungChi} isCanBo={!permission.write} shcc={this.props.shcc} update={curPermission ? this.props.updateQtDaoTaoStaff : null}
+                    create={permission.write ? this.props.createQtDaoTaoStaff : this.props.createTccbSupport} />
             </div >
         );
     }

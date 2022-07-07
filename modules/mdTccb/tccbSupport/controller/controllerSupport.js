@@ -94,6 +94,7 @@ module.exports = app => {
         let changes = req.query.data,
             { firstName, lastName, shcc = '' } = req.session.user;
         let fullName = `${lastName || ''} ${firstName || ''}`;
+        fullName = 'Phòng Tổ chức - Cán bộ';
         let data = app.parse(changes.data);
         let { qt, type, qtId, id } = changes;
         const updateApproved = () => {
