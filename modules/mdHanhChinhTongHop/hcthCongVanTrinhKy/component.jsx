@@ -46,7 +46,7 @@ export class CreateModal extends AdminModal {
 export class YeuCauKyModal extends AdminModal {
 
     onShow = (item) => {
-        console.log(item);
+        // console.log(item);
         const { id, ten, nguoiTao, thoiGian, danhSachShccCanBoKy } = item;
         this.ten?.value(ten || '');
         this.nguoiTao?.value(nguoiTao || '');
@@ -70,8 +70,7 @@ export class YeuCauKyModal extends AdminModal {
             this.canBoKy.focus();
         } else {
             if (this.state.canBoKy) {
-                this.props.update(this.state.id, data, () => {
-                    console.log('oke');
+                this.props.update(this.state.id, data, () => {                    
                     this.props.getCongVanDi(this.props.congVanId);
                     this.hide();
                 });

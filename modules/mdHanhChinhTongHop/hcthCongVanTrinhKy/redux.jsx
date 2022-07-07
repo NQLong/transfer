@@ -65,7 +65,7 @@ export function getCongVanTrinhKy(id, done) {
             }
             else {
                 T.notify('Lấy công văn trình ký thành công', 'success');
-                console.log('hello', res.item);
+                // console.log('hello', res.item);
                 dispatch({type: HcthCongVanTrinhKyGet, item: res.item});
                 done && done(res.item);
             }
@@ -82,6 +82,7 @@ export function updateCongVanTrinhKy(id, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
+                // console.log('change: ' + changes);
                 T.notify('Cập nhật công văn trình ký thành công!', 'success');
                 done && done();
             }

@@ -95,6 +95,12 @@ const actionToText = (value) => {
             return 'đọc';
         case action.SEND:
             return 'gửi';
+        case action.ADD_SIGN_REQUEST:
+            return 'thêm 1 yêu cầu trình ký ở';
+        case action.REMOVE_SIGN_REQUEST:
+            return 'xoá 1 yêu cầu trình ký ở';
+        case action.UPDATE_SIGN_REQUEST:
+            return 'cập nhật 1 yêu cầu trình ký ở';
         default:
             return '';
     }
@@ -105,9 +111,13 @@ const actionColor = (value) => {
         case action.CREATE:
         case action.ACCEPT:
         case action.APPROVE:
+        case action.UPDATE_SIGN_REQUEST:
             return '#00a65a';
         case action.RETURN:
+        case action.REMOVE_SIGN_REQUEST:
             return 'red';
+        case action.ADD_SIGN_REQUEST:
+            return '#28a745';
         default:
             return 'blue';
     }

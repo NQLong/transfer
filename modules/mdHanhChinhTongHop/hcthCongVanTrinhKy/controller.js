@@ -20,9 +20,7 @@ module.exports = app => {
 
 
     app.post('/api/hcth/cong-van-trinh-ky', app.permission.check('staff:login'), async (req, res) => {
-        console.log('hello');
         try {
-            console.log('hello');
             const { tenFile, congVanId, fileCongVan, canBoKy = [] } = req.body;
 
             const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan });
@@ -101,7 +99,7 @@ module.exports = app => {
                 app.model.hcthCanBoKy.getList(congVanTrinhKy.id)
             ]);
             canBoKy = canBoKy.rows || [];
-            console.log(congVanKy);
+            // console.log(congVanKy);
             res.send({
                 item: {
                     ...congVanTrinhKy,
@@ -118,7 +116,7 @@ module.exports = app => {
         try {
             const id = parseInt(req.body.id);
 
-            const { tenFile, canBoKy = [] } = req.body.changes;
+            const { tenFile, canBoKy = [], congVanId } = req.body.changes;
             
             const canBoKyAfter = canBoKy;
 
@@ -140,14 +138,16 @@ module.exports = app => {
                 congVanTrinhKy: id
             })));
 
+
             await app.model.hcthHistory.create({
                 loai: 'DI',
-                key: id,
+                key: congVanId,
                 shcc: req.session.user?.staff?.shcc || '',
                 hanhDong: action.UPDATE_SIGN_REQUEST,
                 ghiChu: JSON.stringify({
                     tenFile: tenFile
-                })
+                }),
+                thoiGian: Date.now()
             });
 
             res.send({ error: null });
@@ -172,12 +172,12 @@ module.exports = app => {
                 hanhDong: action.REMOVE_SIGN_REQUEST,
                 ghiChu: JSON.stringify({
                     tenFile: tenFile
-                })
+                }),
+                thoiGian: Date.now()
             });
 
             res.send({ error: null });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
