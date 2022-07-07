@@ -921,6 +921,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 4
+                },
+                "HOME_LANGUAGE": {
+                    "value": "homeLanguage",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -3917,7 +3924,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 10
+                    "size": 20
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -6324,6 +6331,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 50
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -14397,6 +14411,32 @@
                 }
             },
             "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DM_NGON_NGU_TRUYEN_THONG": {
+            "active": true,
+            "moduleName": "dmNgonNguTruyenThong",
+            "modelName": "dmNgonNguTruyenThong",
+            "columns": {
+                "MA_CODE": {
+                    "value": "maCode",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 3
+                },
+                "TEN_NGON_NGU": {
+                    "value": "tenNgonNgu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                }
+            },
+            "primaryKeys": [
+                "MA_CODE"
+            ],
             "foreignKeys": [],
             "type": "table"
         }
