@@ -19,14 +19,14 @@ module.exports = app => {
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
-        let namHoc = req.query?.settings?.namHoc;
-        let hocKy = req.query?.settings?.hocKy;
-        if (!namHoc || !hocKy) {
+        let filter = req.query.filter || {};
+        if (!filter.namHoc || !filter.hocKy) {
             const settings = await getSettings();
-            if (!namHoc) namHoc = settings.hocPhiNamHoc;
-            if (!hocKy) hocKy = settings.hocPhiHocKy;
+            if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
+            if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
         }
-        let filter = app.stringify(app.clone(req.query.filter || {}, { namHoc, hocKy }), '');
+        const { namHoc, hocKy } = filter;
+        filter = app.stringify(filter, '');
         let mssv = '';
         if (!req.session.user.permissions.includes('tcHocPhi:read')) mssv = req.session.user.data.mssv;
 

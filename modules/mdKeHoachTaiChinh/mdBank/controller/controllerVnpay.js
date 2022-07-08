@@ -130,7 +130,7 @@ module.exports = app => {
         }
         catch (error) {
             console.error('Error catch VNPAY: ', error);
-            res.send({ RspCode: '99', Message: 'Node error' });
+            res.send({ RspCode: '99', Message: 'Unknow error' });
         }
     });
 
