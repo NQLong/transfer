@@ -7,6 +7,7 @@ import User from './User';
 import { useTheme } from 'react-native-paper';
 import { Button } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +19,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
 
     return (
         <Tab.Navigator
-            initialRouteName="congVanDenPage"
+            initialRouteName="congVanTrinhKy"
             screenOptions={{
                 tabBarActiveTintColor: colors.primary,
                 headerStyle: { backgroundColor: colors.primary },
@@ -48,6 +49,18 @@ export default DefaultScreenTabs = ({ navigation }) => {
                 options={{
                     headerTitle: 'Trang cá nhân',
                     tabBarLabel: 'Trang cá nhân',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="person-circle-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+
+            <Tab.Screen
+                name="congVanTrinhKy"
+                component={CongVanTrinhKy}
+                options={{
+                    headerTitle: 'Công văn trình ký',
+                    tabBarLabel: 'Công văn trình ký',
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person-circle-outline" color={color} size={size} />
                     ),

@@ -28,12 +28,13 @@ const ReadFile = ({ navigation, route }) => {
                 console.log(`Link pressed: ${uri}`);
             }}
             trustAllCerts={false}
-
+            maxScale={100}
             style={
                 {
                     flex: 1,
-                    width: Dimensions.get('window').width,
+                    width: '100%',
                     height: Dimensions.get('window').height,
+                    backgroundColor:'red'
                 }
             }
         />
