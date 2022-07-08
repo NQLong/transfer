@@ -486,8 +486,7 @@ class AdminEditPage extends AdminPage {
         //     return this.state.trangThai = trangThaiCongVanDi.DA_DUYET.id;
         // }
         const hcthCongVanDiPermission = this.getUserPermission('hcthCongVanDi', ['manage']);
-        if (hcthCongVanDiPermission.manage) return true;
-        return false;
+        return hcthCongVanDiPermission && hcthCongVanDiPermission.manage;
     }
 
     tableListFile = (data, id, permission, canAddFile) => renderTable({
