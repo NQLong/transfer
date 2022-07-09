@@ -7,7 +7,7 @@ import ComponentKienThuc from './componentKienThuc';
 import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
-import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import Loading from 'view/component/Loading';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import T from 'view/js/common';
@@ -225,7 +225,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 
 
                             <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-4' required readOnly={readOnly} />
                             <FormSelect data={[
                                 { id: 4, text: '4 năm' },
                                 { id: 3.5, text: '3,5 năm' }

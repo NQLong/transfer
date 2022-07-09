@@ -110,12 +110,16 @@ class CanBoTheoDonVi extends AdminPage {
     render() {
         const assignRolePermissions = this.getUserPermission('fwAssignRole', ['read', 'write']),
             daoTaoPermission = this.getCurrentPermissions().includes('faculty:login'),
+            quanLyDaoTaoPermission = this.getCurrentPermissions().includes('quanLyDaoTao:manager'),
             managerPermission = this.getUserPermission('manager', ['write']),
             congVanPermission = this.getUserPermission('hcth', ['manage']);
         let nhomRoles = ['ttDoanhNghiep'];
         daoTaoPermission && nhomRoles.push('daoTao');
+        quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
+
         congVanPermission.manage && nhomRoles.push('quanLyCongVanDen', 'hcthQuanLyCongVanDi');
         managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong');
+
         const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};
         let table = renderTable({
             emptyTable: 'Đơn vị chưa có cán bộ',

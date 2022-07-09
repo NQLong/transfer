@@ -7,7 +7,7 @@ class AssignRoleModal extends AdminModal {
     state = { items: [], ngayBatDau: new Date().getTime(), ngayKetThuc: '', rolesList: [], updateRolesList: [], nguoiDuocGan: '', nguoiGan: {}, disableButton: false, tenCanBo: '' }
 
     componentDidMount() {
-        getRolesList(this.props.nhomRole, roles => this.setState({ rolesList: roles }));
+        // getRolesList(this.props.nhomRole, roles => this.setState({ rolesList: roles }));
     }
 
     insert = (e) => {
@@ -44,13 +44,16 @@ class AssignRoleModal extends AdminModal {
     }
 
     onShow = (nguoiDuocGan) => {
-        getAssignRole(nguoiDuocGan.shcc, this.props.nhomRole, items => {
-            let list = items.map(item => item.tenRole);
-            let diff = this.state.rolesList.filter(role => !list.includes(role.id));
-            this.setState({ items, updateRolesList: diff, nguoiDuocGan, disableButton: false, tenCanBo: nguoiDuocGan.lastName + ' ' + nguoiDuocGan.firstName }, () => {
-                this.select.value(null);
+        getRolesList(this.props.nhomRole, roles => this.setState({ rolesList: roles }, () => {
+            getAssignRole(nguoiDuocGan.shcc, this.props.nhomRole, items => {
+                let list = items.map(item => item.tenRole);
+                let diff = this.state.rolesList.filter(role => !list.includes(role.id));
+                this.setState({ items, updateRolesList: diff, nguoiDuocGan, disableButton: false, tenCanBo: nguoiDuocGan.lastName + ' ' + nguoiDuocGan.firstName }, () => {
+                    this.select.value(null);
+                });
             });
-        });
+        }));
+
     };
 
     delete = (e, item) => {

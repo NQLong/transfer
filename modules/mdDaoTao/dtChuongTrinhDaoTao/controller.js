@@ -29,8 +29,12 @@ module.exports = app => {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
+        let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]).toString();
         const namDaoTao = req.query.namDaoTao;
-        app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, donVi, searchTerm, namDaoTao, (error, result) => {
+        if (listLoaiHinhDaoTao == 'manager') listLoaiHinhDaoTao = '';
+        const filter = JSON.stringify({ donVi, namDaoTao, listLoaiHinhDaoTao });
+
+        app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, searchTerm, filter, (error, result) => {
             if (error) res.send({ error });
             else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = result;
@@ -52,7 +56,7 @@ module.exports = app => {
 
     app.get('/api/dao-tao/chuong-trinh-dao-tao/all-nam-dao-tao/', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const { maKhoa } = req.query;
-        const condition = maKhoa ? {maKhoa} : {};
+        const condition = maKhoa ? { maKhoa } : {};
         app.model.dtCauTrucKhungDaoTao.getAllNamDaoTao(condition, 'id, namDaoTao', 'namDaoTao ASC', (error, items) => res.send({ error, items }));
     });
 

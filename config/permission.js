@@ -394,7 +394,11 @@ module.exports = app => {
     const assignRolePermissionHookContainer = {};
     // Hook: Trả về true hoặc false ==> hook trúng, trả về undefined|null => không hook
     app.assignRoleHooks = {
-        addRoles: (name, ...roles) => {
+        addRoles: async (name, ...roles) => {
+            if (typeof roles[0] == 'function') {
+                let list = await roles[0]();
+                roles = list;
+            }
             if (assignListContainer[name]) {
                 const currentId = assignListContainer[name].map(role => role.id);
                 const filteredRoles = roles.filter(role => !currentId.includes(role.id));
