@@ -1,34 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-    getHcthCongVanDiPage,
-    getHcthCongVanDiAll,
-    createHcthCongVanDi,
-    updateHcthCongVanDi,
-    deleteHcthCongVanDi,
-    getHcthCongVanDiSearchPage,
-    deleteFile,
-    getCongVanDi,
-    createPhanHoi,
-    getHistory,
-    updateStatus,
-    getPhanHoi,
-    readCongVanDi
-} from './redux';
+import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, readCongVanDi } from './redux';
 import { Link } from 'react-router-dom';
 import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
-import {
-    AdminPage,
-    FormDatePicker,
-    renderTable,
-    FormRichTextBox,
-    FormSelect,
-    TableCell,
-    FormFileBox,
-    FormTextBox,
-    renderComment,
-    renderTimeline
-} from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormFileBox, FormTextBox, renderComment, renderTimeline } from 'view/component/AdminPage';
 import {
     SelectAdapter_DmDonVi,
     SelectAdapter_DmDonViFilter,
@@ -452,10 +427,10 @@ class AdminEditPage extends AdminPage {
         });
     }
 
-    canCreateSignRequest = () => {
-        const hcthCongVanDiPermission = this.getUserPermission('hcthCongVanDi', ['manage']);
-        return hcthCongVanDiPermission && hcthCongVanDiPermission.manage;
-    }
+    // canCreateSignRequest = () => {
+    //     const hcthCongVanDiPermission = this.getUserPermission('hcthCongVanDi', ['manage']);
+    //     return hcthCongVanDiPermission && hcthCongVanDiPermission.manage;
+    // }
 
     tableListFile = (data, id, permission, canAddFile) => renderTable({
         getDataSource: () => data,
@@ -475,6 +450,7 @@ class AdminEditPage extends AdminPage {
                 timeStamp = item.thoiGian,
                 originalName = item.ten,
                 linkFile = `/api/hcth/cong-van-cac-phong/download/${id || 'new'}/${originalName}`;
+            const canCreateSignRequest = this.getUserPermission('hcthCongVanDi', ['manage']).manage;
             return (
                 <tr key={item.id}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
@@ -488,7 +464,7 @@ class AdminEditPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={
                         canAddFile ? e => this.deleteFile(e, index, item) : null}>
-                        {this.canCreateSignRequest() && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(item); }}>
+                        {canCreateSignRequest && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(item); }}>
                             <i className='fa fa-lg fa-pencil' />
                         </a>}
                         <a className='btn btn-info' href={linkFile} download title='Tải về'>
@@ -692,14 +668,7 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
 
-                <YeuCauKy 
-                    hcthCongVanDi={this.props.hcthCongVanDi} 
-                    deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} 
-                    id={this.state.id}
-                    permission={permission}
-                    {...this.props} 
-                    onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item);}}
-                />
+                <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item);}}/>
 
                 {!isNew &&
                     <div className="tile">
@@ -707,16 +676,8 @@ class AdminEditPage extends AdminPage {
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
                     </div> 
                 }
-                <EditModal ref={e => this.donViGuiNhanModal = e}
-                    permissions={dmDonViGuiCvPermission}
-                    create={this.onCreateDonViNhanNgoai}
-                />
-                <YeuCauKyModal 
-                    ref={e => this.yeuCauKyModal = e} 
-                    create={this.props.createCongVanTrinhKy} 
-                    update={this.props.updateCongVanTrinhKy}
-                    {...this.props} congVanId={this.state.id} 
-                    onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });}}
+                <EditModal ref={e => this.donViGuiNhanModal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonViNhanNgoai} />
+                <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} update={this.props.updateCongVanTrinhKy} {...this.props} congVanId={this.state.id} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });}}
                 />
             </>),
             backRoute,
