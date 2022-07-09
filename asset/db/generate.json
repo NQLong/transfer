@@ -13940,6 +13940,9 @@
             "active": true,
             "moduleName": "hcthCongVanTrinhKy",
             "modelName": "hcthCongVanTrinhKy",
+            "methods": {
+                "HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -13980,6 +13983,9 @@
             "active": true,
             "moduleName": "hcthCanBoKy",
             "modelName": "hcthCanBoKy",
+            "methods": {
+                "HCTH_CAN_BO_KY_GET_LIST": "getList"
+            },
             "columns": {
                 "ID": {
                     "value": "id",

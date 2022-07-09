@@ -415,7 +415,7 @@ module.exports = (app) => {
     };
 
     const viewCongVanDen = async (congVanId, shccCanBo, creator) => {
-        if (shccCanBo == creator) return;
+        if (!shccCanBo || shccCanBo == creator) return;
         const lichSuDoc = await app.model.hcthHistory.get({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW });
         if (!lichSuDoc) {
             return await app.model.hcthHistory.create({ loai: 'DEN', key: congVanId, shcc: shccCanBo, hanhDong: action.VIEW, thoiGian: new Date().getTime() });
