@@ -1,54 +1,35 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
-    // app.model.hcthSetting.foo = () => { };
-    app.model.hcthSetting.getValue = function () {
-        return new Promise(resolve => {
-            const result = {};
-            const solveAnItem = (index) => {
-                if (index < arguments.length) {
-                    const key = arguments[index];
-                    if (typeof key == 'function') {
-                        key(result);
-                        resolve(result);
-                    } else {
-                        app.model.hcthSetting.get({ key }, (error, item) => {
-                            result[key] = (error == null && item) ? item.value : null;
-                            solveAnItem(index + 1);
-                        });
-                    }
-                } else {
-                    resolve(result);
-                }
-            };
-            solveAnItem(0);
-        });
+    app.model.hcthSetting.getValue = async function () {
+        const result = {};
+        for (const key of arguments) {
+            try {
+                const item = await app.model.hcthSetting.get({ key });
+                result[key] = item ? item.value : null;
+            } catch (error) {
+                result[key] = null;
+            }
+        }
+        return result;
     };
 
-    app.model.hcthSetting.setValue = (data, done) => {
-        let keys = Object.keys(data),
-            errorSum = null;
-        const solveAnItem = index => {
-            if (index < keys.length) {
-                let key = keys[index];
-                app.model.hcthSetting.get({ key }, (error, item) => {
-                    if (error) errorSum += error;
-                    if (item) {
-                        app.model.hcthSetting.update({ key }, { value: data[key] }, error => {
-                            if (error) errorSum += error;
-                            solveAnItem(index + 1);
-                        });
-                    } else {
-                        app.model.hcthSetting.create({ key, value: data[key] }, error => {
-                            if (error) errorSum += error;
-                            solveAnItem(index + 1);
-                        });
-                    }
-                });
-            } else if (done) {
-                done(errorSum);
+    app.model.hcthSetting.setValue = async (data, done) => {
+        let keys = Object.keys(data), errorSum = null;
+        for (const key of keys) {
+            try {
+                const item = await app.model.hcthSetting.get({ key });
+                if (item) {
+                    await app.model.hcthSetting.update({ key }, { value: data[key] });
+                } else {
+                    await app.model.hcthSetting.create({ key, value: data[key] });
+                }
+            } catch (error) {
+                errorSum += error;
             }
-        };
-        solveAnItem(0);
+        }
+
+        done && done(errorSum);
+        return errorSum;
     };
 
     app.model.hcthSetting.init = (data, done) => {
