@@ -80,7 +80,7 @@ class DtDangKyMoMonPage extends AdminPage {
                     searchTerm: '', donViFilter: this.state.donViFilter
                 }, totalItem: 0, list: [], thoiGianMoMon: null
             };
-        const { batDau, ketThuc, hocKy, namDaoTao } = thoiGianMoMon ? thoiGianMoMon : {
+        const { batDau, ketThuc, hocKy, namDaoTao, loaiHinhDaoTao } = thoiGianMoMon ? thoiGianMoMon : {
             batDau: '', ketThuc: '', hocKy: '', namDaoTao: ''
         }, today = new Date().getTime();
         let permission = {
@@ -118,7 +118,7 @@ class DtDangKyMoMonPage extends AdminPage {
         return this.renderPage({
             title: 'Danh sách các đợt mở môn học trong học kỳ',
             icon: 'fa fa-paper-plane-o',
-            subTitle: thoiGianMoMon && <h5 style={{ color: 'red', marginTop: '20' }}>Học kỳ <b>{hocKy}</b>, <b>{namDaoTao}</b>: Từ <b>{T.dateToText(batDau, 'dd/mm/yyyy')}</b> đến <b>{T.dateToText(ketThuc, 'dd/mm/yyyy')}</b></h5>,
+            subTitle: thoiGianMoMon && <b style={{ color: 'red', marginTop: '20' }}>[{loaiHinhDaoTao}] Học kỳ <b>{hocKy}</b>, <b>{namDaoTao}</b>: Từ <b>{T.dateToText(batDau, 'dd/mm/yyyy')}</b> đến <b>{T.dateToText(ketThuc, 'dd/mm/yyyy')}</b></b>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Danh sách đợt mở môn học'

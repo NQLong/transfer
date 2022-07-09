@@ -10,13 +10,13 @@ module.exports = app => {
         { name: 'dtDangKyMoMon:manage', menu },
         { name: 'dtDangKyMoMon:write' },
         { name: 'dtDangKyMoMon:delete' },
+        { name: 'quanLyDaoTao:manager' }
     );
 
     app.get('/user/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
     app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
 
     //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
-
     app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -106,12 +106,38 @@ module.exports = app => {
     //Phân quyền cho đơn vị ---------------------------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('daoTao', { id: 'dtDangKyMoMon:manage', text: 'Đào tạo: Quản lý Mở môn học' });
 
+    app.readyHooks.add('Create permission quanLyDaoTao', {
+        ready: () => app.database.oracle && app.database.oracle.connected && app.model.dmSvLoaiHinhDaoTao,
+        run: () => {
+            app.assignRoleHooks.addRoles('quanLyDaoTao', async () => {
+                let listLoaiHinhDaoTao = await app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1 });
+                listLoaiHinhDaoTao = listLoaiHinhDaoTao.map(item => ({ id: `quanLyDaoTao:${item.ma}`, text: `Quản lý đào tạo: ${item.ten}` }));
+                return listLoaiHinhDaoTao;
+            });
+        }
+    });
+
+    app.permissionHooks.add('staff', 'AllPermissionDaoTao', (user, staff) => new Promise((resolve) => {
+        if (staff.maDonVi == 33 && staff.donViQuanLy.length) {
+            app.permissionHooks.pushUserPermission(user, 'quanLyDaoTao:manager');
+        } resolve();
+    }));
+
     app.permissionHooks.add('staff', 'checkRoleDTDangKyMoMon', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
             app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:manage');
+
         }
         resolve();
     }));
+
+    app.assignRoleHooks.addHook('quanLyDaoTao', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'quanLyDaoTao' && userPermissions.includes('quanLyDaoTao:manager')) {
+            const assignRolesList = app.assignRoleHooks.get('quanLyDaoTao').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
 
     //Gán quyền ----------------------------------------------------------------------------
     app.permissionHooks.add('assignRole', 'checkRoleDTDangKyMoMon', (user, assignRoles) => new Promise(resolve => {
@@ -119,6 +145,16 @@ module.exports = app => {
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dtDangKyMoMon:manage') {
                 app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:manage', 'dtMonHoc:manage', 'dtChuongTrinhDaoTao:manage', 'dtNganhDaoTao:manage', 'dtDanhSachChuyenNganh:manage');
+            }
+        });
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyDaoTao', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyDaoTao');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole.includes('quanLyDaoTao') && !role.tenRole.includes('manager')) {
+                app.permissionHooks.pushUserPermission(user, role.tenRole);
             }
         });
         resolve();
