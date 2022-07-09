@@ -2,10 +2,6 @@ import React from 'react';
 import { AdminModal, FormTextBox, FormSelect, FormDatePicker, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_CongVanDi } from 'modules/mdHanhChinhTongHop/hcthCongVanDi/redux';
-export class CanBoKy extends React.Component {
-
-}
-
 
 export class CreateModal extends AdminModal {
     componentDidMount() {
@@ -46,7 +42,6 @@ export class CreateModal extends AdminModal {
 export class YeuCauKyModal extends AdminModal {
 
     onShow = (item) => {
-        // console.log(item);
         const { id, ten, nguoiTao, thoiGian, danhSachShccCanBoKy } = item;
         this.ten?.value(ten || '');
         this.nguoiTao?.value(nguoiTao || '');

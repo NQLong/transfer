@@ -13,7 +13,6 @@ class AdminEditPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const params = T.routeMatcher('/user/cong-van-trinh-ky/:id').parse(window.location.pathname);
-            console.log({ params });
             this.setState({
                 id: params.id === 'new' ? null : params.id,
             }, () => this.getData());
@@ -22,16 +21,11 @@ class AdminEditPage extends AdminPage {
 
     // EditModal
     getData = () => {
-        console.log({ state: this.state });
         if (this.state.id) {
             this.props.getCongVanTrinhKy(Number(this.state.id), (item) => this.setData(item));
         }
         else this.setData();
     }
-
-    // setData = (data = null) => {
-    //     // let { } = data ? data : {};
-    // };
 
     renderContent = () => {
         const item = this.props.hcthCongVanTrinhKy?.item;

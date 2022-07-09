@@ -10,7 +10,6 @@ import {
     deleteFile,
     getCongVanDi,
     createPhanHoi,
-    // createHistory,
     getHistory,
     updateStatus,
     getPhanHoi,
@@ -25,7 +24,6 @@ import {
     FormRichTextBox,
     FormSelect,
     TableCell,
-    // FormCheckbox,
     FormFileBox,
     FormTextBox,
     renderComment,
@@ -212,19 +210,6 @@ class AdminEditPage extends AdminPage {
         }
     }
 
-    // onCreateHistory = (value) => {
-    //     const { shcc } = this.state;
-    //     const newHistory = {
-    //         loai: 'DI',
-    //         key: this.state.id ? this.state.id : null,
-    //         shcc: shcc,
-    //         hanhDong: statusToAction(this.state.trangThai ? this.state.trangThai : '', value),
-    //         thoiGian: new Date().getTime(),
-    //         trangThai: value ? value : ''
-    //     };
-    //     this.props.createHistory(newHistory);
-    // }
-
     renderHistory = (history) => renderTimeline({
         getDataSource: () => history,
         handleItem: (item) => ({
@@ -367,9 +352,6 @@ class AdminEditPage extends AdminPage {
         if (changes) {
             if (!this.state.trangThai) changes.trangThai = trangThaiCongVanDi.MOI.id;
             if (this.state.id) {
-                // if (changes.trangThai == trangThaiCongVanDi.MOI.id || changes.trangThai == trangThaiCongVanDi.TRA_LAI.id) {
-                //     this.onCreateHistory(changes.trangThai);
-                // }
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
                 changes.ngayTao = new Date().getTime();
@@ -387,8 +369,6 @@ class AdminEditPage extends AdminPage {
         e.preventDefault();
         T.confirm('Thông báo', 'Bạn có chắc chắn muốn chấp nhận công văn này không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
-                // this.onCreateHistory('3');
-                // this.setState({ trangThai: '3' }, () => this.save());
                 this.onChangeStatus(trangThaiCongVanDi.CHO_DUYET.id, () => this.getData());
             }
         });
@@ -401,15 +381,11 @@ class AdminEditPage extends AdminPage {
                 const updateData = {
                     id: this.state.id,
                     donViGui: this.donViGui.value(),
-                    // loaiCongVan: this.loaiCongVan.value() ? this.loaiCongVan.value() : '',
                     trangThai: trangThaiCongVanDi.DA_DUYET.id,
                     isSend: true,
                     donViNhan: this.getValue(this.donViNhan) ? this.donViNhan.value() : [],
                     donViNhanNgoai: this.getValue(this.donViNhanNgoai) ? this.donViNhanNgoai.value() : [],
                 };
-                // this.onCreateHistory(trangThaiCongVanDi.DA_DUYET.id);
-                // this.props.updateHcthCongVanDi(this.state.id, updateData, this.getData);
-                // this.setState({ trangThai: trangThaiCongVanDi.DA_DUYET.id }, () => this.props.updateHcthCongVanDi(this.state.id, updateData, this.getData));
                 this.props.updateHcthCongVanDi(this.state.id, updateData, this.getData);
             }
         });
@@ -428,7 +404,6 @@ class AdminEditPage extends AdminPage {
                         key: parseInt(this.props.match.params.id),
                         loai: CONG_VAN_DI_TYPE
                     };
-                    // this.onCreateHistory('4');
                     this.props.createPhanHoi(newPhanHoi, () => this.props.getPhanHoi(this.state.id, () => this.onChangeStatus(trangThaiCongVanDi.TRA_LAI.id, () => this.getData())));
                 } else {
                     T.notify('Bạn cần thêm lý do trả lại', 'danger');
@@ -478,13 +453,6 @@ class AdminEditPage extends AdminPage {
     }
 
     canCreateSignRequest = () => {
-        //return true;
-        // if (!this.state.id) return false;
-        // if (this.state.loaiCongVan == loaiCongVan.DON_VI.id) {
-
-        // } else {
-        //     return this.state.trangThai = trangThaiCongVanDi.DA_DUYET.id;
-        // }
         const hcthCongVanDiPermission = this.getUserPermission('hcthCongVanDi', ['manage']);
         return hcthCongVanDiPermission && hcthCongVanDiPermission.manage;
     }
@@ -604,8 +572,6 @@ class AdminEditPage extends AdminPage {
     render = () => {
         const permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
             isNew = !this.state.id,
-            // rectorsPermission = this.getUserPermission('rectors', ['login']),
-            // hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
             unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
             dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
@@ -771,14 +737,11 @@ const mapActionsToProps = {
     deleteFile,
     getCongVanDi,
     createPhanHoi,
-    // createHistory,
     getHistory,
     updateStatus,
     getPhanHoi,
-    // createHistory,
     createDmDonViGuiCv,
     readCongVanDi,
-    // getHistory,
     createCongVanTrinhKy,
     deleteCongVanTrinhKy,
     updateCongVanTrinhKy

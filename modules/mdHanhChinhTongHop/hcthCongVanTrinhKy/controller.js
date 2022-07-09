@@ -1,11 +1,5 @@
 module.exports = app => {
     const { action } = require('../constant');
-    // const menu = {
-    //     parentMenu: app.parentMenu.hcth,
-    //     menus: {
-    //         505: { title: 'Công văn trình ký', link: '/user/hcth/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00' },
-    //     },
-    // };
     const userMenu = {
         parentMenu: app.parentMenu.user,
         menus: {
@@ -61,7 +55,6 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        // let { } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :{};
         
         const user = req.session.user;
         const permissions = user.permissions;
@@ -99,7 +92,6 @@ module.exports = app => {
                 app.model.hcthCanBoKy.getList(congVanTrinhKy.id)
             ]);
             canBoKy = canBoKy.rows || [];
-            // console.log(congVanKy);
             res.send({
                 item: {
                     ...congVanTrinhKy,
