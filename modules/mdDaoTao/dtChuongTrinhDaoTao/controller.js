@@ -31,7 +31,7 @@ module.exports = app => {
         }
         let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]).toString();
         const namDaoTao = req.query.namDaoTao;
-        if (listLoaiHinhDaoTao == 'manager') listLoaiHinhDaoTao = '';
+        if (listLoaiHinhDaoTao.icludes('manager')) listLoaiHinhDaoTao = '';
         const filter = JSON.stringify({ donVi, namDaoTao, listLoaiHinhDaoTao });
 
         app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, searchTerm, filter, (error, result) => {

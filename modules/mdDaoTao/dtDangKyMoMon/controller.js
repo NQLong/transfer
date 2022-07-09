@@ -106,16 +106,20 @@ module.exports = app => {
     //Phân quyền cho đơn vị ---------------------------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('daoTao', { id: 'dtDangKyMoMon:manage', text: 'Đào tạo: Quản lý Mở môn học' });
 
+    app.readyHooks.add('Create permission quanLyDaoTao', {
+        ready: () => app.database.oracle && app.database.oracle.connected && app.model.dmSvLoaiHinhDaoTao,
+        run: () => {
+            app.assignRoleHooks.addRoles('quanLyDaoTao', async () => {
+                let listLoaiHinhDaoTao = await app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1 });
+                listLoaiHinhDaoTao = listLoaiHinhDaoTao.map(item => ({ id: `quanLyDaoTao:${item.ma}`, text: `Quản lý đào tạo: ${item.ten}` }));
+                return listLoaiHinhDaoTao;
+            });
+        }
+    });
 
     app.permissionHooks.add('staff', 'AllPermissionDaoTao', (user, staff) => new Promise((resolve) => {
         if (staff.maDonVi == 33 && staff.donViQuanLy.length) {
             app.permissionHooks.pushUserPermission(user, 'quanLyDaoTao:manager');
-            app.assignRoleHooks.addRoles('quanLyDaoTao', async () => {
-                let listLoaiHinhDaoTao = await app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1 });
-                listLoaiHinhDaoTao = listLoaiHinhDaoTao.map(item => ({ id: `quanLyDaoTao:${item.ma}`, text: `Quản lý đào tạo: ${item.ten}` }));
-                app.permissionHooks.pushUserPermission(user, ...listLoaiHinhDaoTao.map(item => item.id));
-                return listLoaiHinhDaoTao;
-            });
         } resolve();
     }));
 
