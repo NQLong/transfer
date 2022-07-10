@@ -160,45 +160,41 @@ module.exports = (app) => {
         Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
     };
 
-    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
-            app.model.hcthCongVanDen.get({ id: req.body.id }, (error, congVan) => {
-                if (error) throw error;
-                else {
-                    app.model.hcthCongVanDen.update({ id: req.body.id }, changes, async (errors, item) => {
-                        if (errors)
-                            res.send({ errors, item });
-                        else {
-                            const canBoNhanChiDao = await app.model.hcthCanBoNhan.getAllFrom(req.body.id, CONG_VAN_TYPE);
-                            const listCanBoChiDaoShcc = canBoNhanChiDao?.rows.length > 0 ? canBoNhanChiDao.rows.map(canBo => canBo.shccCanBoNhan) : [];
-                            const newCanBoNhanChiDao = changes.quyenChiDao !== '' ? changes.quyenChiDao.split(',') : [];
-                            if (newCanBoNhanChiDao.length > listCanBoChiDaoShcc.length) {
-                                const listNewCanBoChiDao = newCanBoNhanChiDao.filter(canBo => !listCanBoChiDaoShcc.includes(canBo));
-                                await createCanBoNhanChiDao(listNewCanBoChiDao, req.session.user?.staff?.shcc, req.body.id);
-                            } else {
-                                const listDeleteCanBoNhan = canBoNhanChiDao?.rows.filter(canBo => !newCanBoNhanChiDao.includes(canBo.shccCanBoNhan)) || [];
-                                listDeleteCanBoNhan.forEach(item => {
-                                    app.model.hcthCanBoNhan.delete({ id: item.id }, (error) => {
-                                        if (error) throw error;
-                                    });
-                                });
-                            }
-                        }
-                        createChiDaoFromList(chiDao, req.body.id, () => {
-                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_TYPE }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
-                                updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
-                                    const trangThaiBefore = congVan.trangThai;
-                                    const trangThaiAfter = item.trangThai;
-                                    onStatusChange(item, trangThaiBefore, trangThaiAfter);
-                                    res.send({ error, item });
-                                }));
-                            })
-                            );
+            const congVan = await app.model.hcthCongVanDen.get({ id: req.body.id });
+
+            if (congVan) {
+                const updateItem = await app.model.hcthCongVanDen.update({ id: req.body.id }, changes);
+                const canBoNhanChiDao = await app.model.hcthCanBoNhan.getAllFrom(req.body.id, CONG_VAN_TYPE);
+                const listCanBoChiDaoShcc = canBoNhanChiDao?.rows.length > 0 ? canBoNhanChiDao.rows.map(canBo => canBo.shccCanBoNhan) : [];
+                const newCanBoNhanChiDao = changes.quyenChiDao !== '' ? changes.quyenChiDao.split(',') : [];
+                if (newCanBoNhanChiDao.length > listCanBoChiDaoShcc.length) {
+                    const listNewCanBoChiDao = newCanBoNhanChiDao.filter(canBo => !listCanBoChiDaoShcc.includes(canBo));
+                    await createCanBoNhanChiDao(listNewCanBoChiDao, req.session.user?.staff?.shcc, req.body.id);
+                } else {
+                    const listDeleteCanBoNhan = canBoNhanChiDao?.rows.filter(canBo => !newCanBoNhanChiDao.includes(canBo.shccCanBoNhan)) || [];
+                    await Promise.all(listDeleteCanBoNhan.map(async canBo => {
+                        await app.model.hcthCanBoNhan.delete({ id: canBo.id });
+                    }));
+                }
+                createChiDaoFromList(chiDao, req.body.id, async () => {
+                    await app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_TYPE });
+
+                    createDonViNhanFromList(donViNhan, req.body.id, async () => {
+                        await app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+                        updateListFile(fileList, req.body.id, () => {
+                            const trangThaiBefore = congVan.trangThai;
+                            const trangThaiAfter = updateItem.trangThai;
+                            onStatusChange(updateItem, trangThaiBefore, trangThaiAfter);
+                            res.send({ item: updateItem });
                         });
                     });
-                }
-            });
+                });
+            } else {
+                res.send({ error: 'Không tìm thấy công văn' });
+            }
         } catch (error) {
             res.send({ error });
         }
@@ -787,12 +783,39 @@ module.exports = (app) => {
         });
     });
 
+    const sendChiDaoCongVanDenMailToRectors = async (item) => {
+        const canBoChiDao = item.quyenChiDao?.split(',') || [];
+        const canBos = await app.model.canBo.getAll({
+            statement: 'shcc IN (:dsCanBo)',
+            parameter: {
+                dsCanBo: [...canBoChiDao, ''],
+            }
+        }, 'email', 'email');
+
+        const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
+        const rootUrl = app.rootUrl;
+        let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
+            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
+        if (app.isDebug) {
+            app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
+                if (error) throw (error);
+            });
+        } else {
+            canBos.map(canBo => {
+                app.email.normalSendEmail(fromMail, fromMailPassword, canBo.email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                    if (error) throw (error);
+                });
+            });
+        }
+    };
+
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
         try {
             if (before == after)
                 resolve();
             if (after == trangThaiSwitcher.CHO_DUYET.id) {
                 createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
+                sendChiDaoCongVanDenMailToRectors(item);
             }
             else if ([trangThaiSwitcher.DA_DUYET.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(after)) {
                 createCreatorNotification(item, after).then(() => resolve()).catch(error => { throw error; });
@@ -879,7 +902,6 @@ module.exports = (app) => {
         });
     });
 
-
     const deleteCanBoNhanChiDao = (danhSachCanBo, id, nguoiTao) => {
         const listShccCanBo = danhSachCanBo.split(',');
         const promises = listShccCanBo.map(canBoShcc => new Promise((resolve, reject) => {
@@ -913,6 +935,7 @@ module.exports = (app) => {
                         id,
                         quyenChiDao: shcc,
                     });
+                    sendChiDaoCongVanDenMailToRectors({ id, quyenChiDao: shcc });
                 }
             } else {
                 app.model.hcthCongVanDen.update({ id }, { trangThai: trangThaiCv }, async (error) => {
