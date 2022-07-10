@@ -41,10 +41,15 @@ module.exports = app => {
         app.model.dvWebsite.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/website/item/:id', (req, res) => {
-        app.model.dvWebsite.get({ id: req.params.id }, (error, item) => {
-            res.send({ error, item });
-        });
+    app.get('/api/website/item/:id', async (req, res) => {
+        try {
+            const condition = req.query.condition;
+            const item = await app.model.dvWebsite.get(condition ? condition : { id: req.params.id });
+            if (item.maDonVi) item.donVi = await app.model.dmDonVi.get({ ma: item.maDonVi }, 'ma, ten, tenTiengAnh, tenVietTat, homeLanguage');
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.post('/api/website', app.permission.check('website:read'), async (req, res) => {

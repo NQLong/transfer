@@ -64,4 +64,33 @@ module.exports = app => {
             res.send({ error });
         }
     });
+
+    // Hook upload images
+    app.createFolder(app.path.join(app.publicPath, '/img/flag'));
+    const uploadFlagImage = (fields, files, done) => {
+        if (fields.userData && fields.userData[0].startsWith('nationFlag:') && files.NationFlag && files.NationFlag.length > 0) {
+            console.log('Hook: upload nation flag');
+            const maCode = fields.userData[0].substring('nationFlag:'.length);
+            const srcPath = files.NationFlag[0].path;
+            if (app.path.extname(srcPath) == '.png') {
+                app.jimp.read(srcPath).then(image => {
+                    app.deleteFile(srcPath);
+                    if (image) {
+                        image.resize(200, 120);
+                        const link = `/img/flag/${maCode}.png`;
+                        image.write(app.path.join(app.publicPath, link), error => {
+                            done({ error, image: link });
+                        });
+                    } else {
+                        done({ error: 'Upload has errors!' });
+                    }
+                });
+            } else {
+                app.deleteFile(srcPath);
+                done({ error: 'Yêu cầu định dạng file: .png' });
+            }
+        }
+    };
+    app.uploadHooks.add('uploadNationFlag', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadFlagImage(fields, files, done), done, 'dmNgonNgu:write'));
 };

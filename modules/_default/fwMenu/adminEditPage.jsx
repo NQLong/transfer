@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateMenu, getMenu, createComponent, updateComponent, updateComponentPriorities, deleteComponent, getComponentViews, homeMenuGet } from './redux';
-// import { Link } from 'react-router-dom';
+import { getDvWebsite } from 'modules/_default/websiteDonVi/redux';
 import Dropdown from 'view/component/Dropdown';
 import { AdminPage, FormTextBox, FormSelect, getValue, FormCheckbox } from 'view/component/AdminPage';
+import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
 
 export class ComponentModal extends React.Component {
     constructor(props) {
@@ -60,7 +61,7 @@ export class ComponentModal extends React.Component {
             '<empty>',
             'last news', 'last jobs', 'contact',
             'subscribe', 'contact', 'all staffs',
-            'all jobs', 'notification', 'admission',
+            'all jobs', 'notification', 'admission'
         ];
         if (selectedType == 'tin tức chung') {
             this.viewTypeDisplay.setItems(['Template 1', 'Template 2', 'Template 3', 'Template 4']);
@@ -121,9 +122,9 @@ export class ComponentModal extends React.Component {
                     }
                 }
                 if (!found) $(this.btnSave.current).data('viewId', '');
-                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: item.text ? item.text.viText() : item, })), placeholder: 'Chọn danh mục' })
+                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: item.text ? item.text.viText() : item })), placeholder: 'Chọn danh mục' })
                     .val(viewItemId).trigger('change');
-                this.setState({ viewType: selectedType, viewItemText, });
+                this.setState({ viewType: selectedType, viewItemText });
             });
         }
     }
@@ -139,7 +140,7 @@ export class ComponentModal extends React.Component {
                 // viewType: this.viewType.current.getSelectedItem(),
                 viewType: this.itemViewTyle.value(),
                 className: $('#comClassname').val().trim(),
-                style: $('#comStyle').val().trim(),
+                style: $('#comStyle').val().trim()
             };
         if (viewTypeDisplay || linkSeeAll || valueTitleCom.length > -1)
             data.detail = JSON.stringify({
@@ -154,18 +155,19 @@ export class ComponentModal extends React.Component {
             this.props.onCreate(parentId, data, () => $(this.modal.current).modal('hide'));
         }
     }
+
     onChangeTypeDisplay = (value) => {
         if (value == 'Giới thiệu sách') {
             $('#itemViewItem').empty();
             this.props.getComponentViews('gallery', items => {
-                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: T.language.parse(item.text ? item.text : item), })), placeholder: 'Chọn danh mục' })
+                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: T.language.parse(item.text ? item.text : item) })), placeholder: 'Chọn danh mục' })
                     .trigger('change');
                 $('#comView').css('display', 'inline-flex');
             });
         } else if (value == 'CSDL') {
             $('#itemViewItem').empty();
             this.props.getComponentViews('feature', items => {
-                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: T.language.parse(item.text ? item.text : item), })), placeholder: 'Chọn danh mục' })
+                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: T.language.parse(item.text ? item.text : item) })), placeholder: 'Chọn danh mục' })
                     .trigger('change');
                 $('#comView').css('display', 'inline-flex');
             });
@@ -228,12 +230,10 @@ export class ComponentModal extends React.Component {
 }
 
 export class MenuEditPage extends AdminPage {
-    state = { id: null, priority: 1, title: '', view: 0, items: [], active: false, menuLink: 'Link: ', menuId: null, divisionId: null };
-    modal = React.createRef();
+    state = { id: null, priority: 1, title: '', view: 0, items: [], active: false, menuLink: 'Link: ', menuId: null, divisionId: null, languages: ['vi', 'en'] };
 
     componentDidMount() {
-        const route = T.routeMatcher('/user/menu/edit/:menuId'),
-            route2 = T.routeMatcher('/user/menu/edit/:divisionId/:menuId');
+        const route = T.routeMatcher('/user/menu/edit/:menuId'), route2 = T.routeMatcher('/user/menu/edit/:divisionId/:menuId');
         let params = route2.parse(window.location.pathname) || route.parse(window.location.pathname);
         this.setState({ menuId: params.menuId, divisionId: params.divisionId }, () => {
             T.ready(this.state.divisionId ? '/user/website' : '/user/truyen-thong', () => {
@@ -249,12 +249,22 @@ export class MenuEditPage extends AdminPage {
                 this.props.history.goBack();
             } else if (data.menu) {
                 if (initial) {
-                    const title = T.language.parse(data.menu.title, true);
-                    this.viTitle.value(title.vi || '');
-                    this.enTitle.value(title.en || '');
-                    this.active.value(data.menu.active);
-                    this.link.value(data.menu.link || '');
-                    this.menuLinkChange(data.menu.link);
+                    const setValue = () => {
+                        this.title.value(data.menu.title);
+                        this.active.value(data.menu.active);
+                        this.link.value(data.menu.link || '');
+                        this.menuLinkChange(data.menu.link);
+                    };
+
+                    if (this.state.divisionId) {
+                        this.props.getDvWebsite(this.state.divisionId, item => {
+                            if (item && item.donVi && item.donVi.homeLanguage) {
+                                this.setState({ languages: item.donVi.homeLanguage.split(',') }, setValue);
+                            } else setValue();
+                        });
+                    } else {
+                        setValue();
+                    }
                 }
 
                 this.setState(data.menu);
@@ -277,9 +287,9 @@ export class MenuEditPage extends AdminPage {
 
     save = () => {
         const changes = {
-            title: JSON.stringify({ vi: getValue(this.viTitle), en: getValue(this.enTitle) }),
+            title: this.title.value(),
             link: getValue(this.link),
-            active: Number(getValue(this.active)),
+            active: Number(getValue(this.active))
         };
 
         if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.maWebsite}`) && !changes.link.includes('http')) {
@@ -290,16 +300,16 @@ export class MenuEditPage extends AdminPage {
             if (data.menu && data.menu.id != this.state.id) {
                 T.alert('Địa chỉ bạn nhập bị trùng, vui lòng nhập lại', 'error', false, 2000);
             } else {
-                this.props.updateMenu(this.state.id, changes, () => $('#menuLink').val(changes.link));
+                this.props.updateMenu(this.state.id, changes);
             }
         });
         else {
-            this.props.updateMenu(this.state.id, changes, () => $('#menuLink').val(changes.link));
+            this.props.updateMenu(this.state.id, changes);
         }
     }
 
     showComponent = (e, parentId, component) => {
-        this.modal.current.show(parentId, component);
+        this.modal.show(parentId, component);
         e.preventDefault();
     }
     createComponent = (parentId, data, done) => {
@@ -317,12 +327,12 @@ export class MenuEditPage extends AdminPage {
     swapComponent = (e, component, index1, isMoveUp) => {
         e.preventDefault();
         let length = component.components.length,
-            index2 = index1 + (isMoveUp ? - 1 : +1);
+            index2 = index1 + (isMoveUp ? -1 : +1);
         if (0 <= index1 && index1 < length && 0 <= index2 && index2 < length) {
             const child1 = component.components[index1], child2 = component.components[index2];
             this.props.updateComponentPriorities([
                 { id: child1.id, priority: child2.priority },
-                { id: child2.id, priority: child1.priority },
+                { id: child2.id, priority: child1.priority }
             ], () => this.getData());
         }
     }
@@ -419,27 +429,28 @@ export class MenuEditPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('menu');
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = permission.write;
-        const title = T.language.parse(this.state.title, true);
+        const currentPermissions = this.getCurrentPermissions();
+        const languages = this.state.languages;
+        const title = T.language.parse(this.state.title, languages[0], languages);
 
         return this.renderPage({
             icon: 'fa fa-edit',
             title: 'Menu: Chỉnh sửa',
-            subTitle: title.vi != '' ? <>Tiêu đề: <b>{title.vi}</b> - {T.dateToText(this.state.createdDate)}</> : '',
+            subTitle: title != '' ? <>Tiêu đề: <b>{title}</b> - {T.dateToText(this.state.createdDate)}</> : '',
             content: <>
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin chung</h3>
-                    <div className='tile-body row'>
-                        <FormTextBox ref={e => this.viTitle = e} className='col-md-6' label='Menu (Tiếng Việt)' readOnly={!permission.write} />
-                        <FormTextBox ref={e => this.enTitle = e} className='col-md-6' label='Menu (Tiếng Anh)' readOnly={!permission.write} />
-                        <FormTextBox ref={e => this.link = e} className='col-md-6' label={this.state.menuLink} placeholder='Link' onChange={e => this.menuLinkChange(e.target.value)} readOnly={!permission.write} />
-                        <FormCheckbox ref={e => this.active = e} className='col-md-6' label='Kích hoạt' readOnly={!permission.write} />
+                    <div className='tile-body'>
+                        <FormMultipleLanguage gridClassName='col-md-6' ref={e => this.title = e} languages={languages} title='Tiêu đề menu' FormElement={FormTextBox} readOnly={!permission.write} />
+                        <div className='row'>
+                            <FormTextBox ref={e => this.link = e} className='col-md-6' label={this.state.menuLink} placeholder='Link' onChange={e => this.menuLinkChange(e.target.value)} readOnly={!permission.write} />
+                            <FormCheckbox ref={e => this.active = e} className='col-md-6' label='Kích hoạt' readOnly={!permission.write} />
+                        </div>
                     </div>
-                    {permissionWrite ?
+                    {permission.write ?
                         <div className='tile-footer text-right'>
                             <button className='btn btn-success' type='button' onClick={this.save}>
-                                <i className='fa fa-fw fa-lg fa-save'></i> Lưu
+                                <i className='fa fa-fw fa-lg fa-save' /> Lưu
                             </button>
                         </div> : null}
                 </div>
@@ -447,22 +458,21 @@ export class MenuEditPage extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>Cấu trúc trang web</h3>
                     <div className='tile-body'>
-                        {this.state.component ? this.renderComponents(permissionWrite, 0, { components: [this.state.component] }) : null}
+                        {this.state.component ? this.renderComponents(permission.write, 0, { components: [this.state.component] }) : null}
                     </div>
                 </div>
 
                 {currentPermissions.includes('component:read') ?
-                    <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}
-                        onClick={() => this.props.history.push('/user/component')}>
+                    <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={() => this.props.history.push('/user/component')}>
                         <i className='fa fa-lg fa-cogs' />
                     </button> : null}
 
-                <ComponentModal onUpdate={this.updateComponent} onCreate={this.createComponent} getComponentViews={this.props.getComponentViews} ref={this.modal} />
+                <ComponentModal onUpdate={this.updateComponent} onCreate={this.createComponent} getComponentViews={this.props.getComponentViews} ref={e => this.modal = e} />
             </>
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { updateMenu, getMenu, createComponent, updateComponent, updateComponentPriorities, deleteComponent, getComponentViews, homeMenuGet };
+const mapActionsToProps = { updateMenu, getMenu, createComponent, updateComponent, updateComponentPriorities, deleteComponent, getComponentViews, homeMenuGet, getDvWebsite };
 export default connect(mapStateToProps, mapActionsToProps)(MenuEditPage);

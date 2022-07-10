@@ -460,13 +460,13 @@ T.language.switch = () => {
     T.cookie('language', language);
     return { language };
 };
-T.language.parse = (text, getAll) => {
+T.language.parse = (text, getAll, parseLanguages) => {
     let obj = {};
     try { obj = JSON.parse(text); } catch (e) { obj = {}; }
-    languages.forEach(language => {
+    (parseLanguages && Array.isArray(parseLanguages) ? parseLanguages : languages).forEach(language => {
         if (obj[language] == null && !Object.keys(obj).length) obj[language] = text;
     });
-    if (typeof getAll == 'string' && languages.includes(getAll)) {
+    if (typeof getAll == 'string' && (parseLanguages && Array.isArray(parseLanguages) ? parseLanguages : languages).includes(getAll)) {
         return obj[getAll];
     } else {
         return getAll ? obj : obj[T.language()];

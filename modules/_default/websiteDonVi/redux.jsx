@@ -83,8 +83,8 @@ export function getDvWebsiteAll(condition, done) {
 
 export function getDvWebsite(id, done) {
     return () => {
-        const url = `/api/website/item/${id}`;
-        T.get(url, data => {
+        const url = typeof id == 'string' ? `/api/website/item/${id}` : '/api/website/item/null';
+        T.get(url, { condition: typeof id == 'string' ? null : id }, data => {
             if (data.error) {
                 T.notify('Lấy thông tin website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
