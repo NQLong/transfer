@@ -75,12 +75,15 @@ module.exports = app => {
         try {
             await payBill(types.PRODUCTION, req, res);
         } catch (error) {
-            res.send({ result_code: '096' });
-            if (trans_id) {
-                const item = await app.model.tcHocPhiTransaction.update({ transId: trans_id }, { status: 0 });
-                const { namHoc, hocKy, customerId } = item;
-                const hocPhi = await app.model.tcHocPhi.get({ mssv: customerId, namHoc, hocKy });
-                await app.model.tcHocPhi.update({ mssv: customerId, namHoc, hocKy }, { congNo: parseInt(hocPhi.congNo) + parseInt(item.amount) });
+            try {
+                if (trans_id) {
+                    const item = await app.model.tcHocPhiTransaction.update({ transId: trans_id }, { status: 0 });
+                    const { namHoc, hocKy, customerId } = item;
+                    const hocPhi = await app.model.tcHocPhi.get({ mssv: customerId, namHoc, hocKy });
+                    await app.model.tcHocPhi.update({ mssv: customerId, namHoc, hocKy }, { congNo: parseInt(hocPhi.congNo) + parseInt(item.amount) });
+                } else res.send({ result_code: '145' });
+            } catch (error) {
+                res.send({ result_code: '096' });
             }
         }
     });
