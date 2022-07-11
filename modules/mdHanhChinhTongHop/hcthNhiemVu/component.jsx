@@ -14,7 +14,7 @@ export class RefreshStatusModal extends AdminModal {
     }
 
     onShow = (item) => {
-        this.setState({ item });
+        this.setState({ item});
         this.phanHoi.value('');
     }
 

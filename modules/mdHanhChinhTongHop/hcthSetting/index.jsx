@@ -1,16 +1,17 @@
 //TEMPLATES: admin
+
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import dmLoaiHinhDaoTao from './redux';
+import HcthSetting from './redux';
 
 export default {
     redux: {
-        parent: 'danhMuc',
-        reducers: { dmLoaiHinhDaoTao, }
+        parent: 'hcth',
+        reducers: { HcthSetting }
     },
     routes: [
         {
-            path: '/user/danh-muc/comment/loai-hinh-dao-tao',
+            path: '/user/hcth/setting',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
