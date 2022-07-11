@@ -12013,6 +12013,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "LOAI_HINH_DAO_TAO": {
+                    "value": "loaiHinhDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -14586,32 +14600,6 @@
                 }
             },
             "primaryKeys": [],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "DM_NGON_NGU_TRUYEN_THONG": {
-            "active": true,
-            "moduleName": "dmNgonNguTruyenThong",
-            "modelName": "dmNgonNguTruyenThong",
-            "columns": {
-                "MA_CODE": {
-                    "value": "maCode",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 3
-                },
-                "TEN_NGON_NGU": {
-                    "value": "tenNgonNgu",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                }
-            },
-            "primaryKeys": [
-                "MA_CODE"
-            ],
             "foreignKeys": [],
             "type": "table"
         }
