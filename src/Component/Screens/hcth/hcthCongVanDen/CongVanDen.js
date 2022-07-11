@@ -16,6 +16,7 @@ const trangThai = {
     CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107' },
     TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545' },
     DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
+    DA_DUYET: { id: 6, text: 'Đã duyệt', color: '#007bff' },
 };
 
 const action = {
@@ -452,6 +453,8 @@ const CongVanDen = (props) => {
     const { navigation, route } = props;
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanDen?.item);
+    const user = useSelector(state => state?.settings);
+    console.log(user.user.permissions);
     const userPermissions = useSelector(state => state?.settings?.user?.permissions);
     const isPresident = userPermissions.includes('rectors:login');
     const [context, setContext] = useState({});
@@ -484,15 +487,18 @@ const CongVanDen = (props) => {
     }, []);
 
     const onChangeNeedConduct = (value) => {
+        setQuyenChiDao(value);
         if (value) {
             const presiendents = banGiamHieu.filter(item => item.maChucVuChinh === '001').map(item => item.shcc);
             const congVanId = route.params.congVanDenId;
             dispatch(updateQuyenChiDao(congVanId, presiendents.join(','), item.trangThai, true, (res) => {
                 if (!res.error) {
                     T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công')
-                    setQuyenChiDao(value);
                 }
-                else T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
+                else {
+                    T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
+                    setQuyenChiDao(!value);
+                }
             }));
         } else {
             let newTrangThai = item.trangThai;
@@ -500,10 +506,12 @@ const CongVanDen = (props) => {
             const congVanId = route.params.congVanDenId;
 
             dispatch(updateQuyenChiDao(congVanId, item.quyenChiDao, newTrangThai, false, (res) => {
-                if (res.error) T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
+                if (res.error) {
+                    T.alert('Lỗi', 'Xoá quyền chỉ đạo lỗi');
+                    setQuyenChiDao(!value);
+                }
                 else {
                     T.alert('Công văn đến', 'Xoá quyền chỉ đạo thành công');
-                    setQuyenChiDao(value);
                 }
             }));
         }

@@ -113,7 +113,8 @@ export class AdminModal extends React.Component {
         this.setState({ visible: false });
     }
 
-    show = () => {
+    show = (item = null) => {
+        if (item) this.onShow(item);
         this.setState({ visible: true });
     }
 

@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CongVanDenPage from './hcth/hcthCongVanDen/CongVanDenPage';
 import User from './User';
-import { useTheme } from 'react-native-paper';
-import { Button } from 'react-native';
+import Notification from './notification/Notification';
+import { useTheme, Badge } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { addNotification } from './notification/redux';
 
 const Tab = createBottomTabNavigator();
 
 export default DefaultScreenTabs = ({ navigation }) => {
     const settings = useSelector(state => state?.settings);
+    const unreadNotification = useSelector(state => state?.notification);
+
+    const notificationLength = unreadNotification?.page?.totalItem || 0;
+
     const dispatch = useDispatch();
-    useEffect(() => { if (!settings) navigation.navigate('Home') }, [settings]);
+
+    useEffect(() => { 
+        if (!settings) navigation.navigate('');
+
+        T.socket.on('receive-notification', (email, notifyItem) => {
+            const user = settings?.user || {};
+            if (user.email && user.email == email) {
+                dispatch(addNotification(notifyItem));
+            }
+        });   
+    }, [settings]);
+
     const { colors } = useTheme();
 
     return (
@@ -50,6 +67,22 @@ export default DefaultScreenTabs = ({ navigation }) => {
                     tabBarLabel: 'Trang cá nhân',
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person-circle-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="notification"
+                component={Notification}
+                options={{
+                    headerTitle: 'Thông báo',
+                    tabBarLabel: 'Thông báo',
+                    tabBarIcon: ({ color, size }) => (
+                        <>
+                            <Badge style={{ position: 'absolute', left: '50%', zIndex: 2, top: 0}}>
+                                {notificationLength > 99 ? '99+' : notificationLength}
+                            </Badge>
+                            <Ionicons name="notifications-outline" color={color} size={size} />
+                        </>
                     ),
                 }}
             />

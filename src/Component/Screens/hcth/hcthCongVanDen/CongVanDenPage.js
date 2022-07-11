@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import T from '@/Utils/common';
 import { renderScrollView } from '@/Utils/component';
-import { ActivityIndicator, RefreshControl, StyleSheet, ScrollView, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
 import { Chip, Text, useTheme, Card, Badge } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getHcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
@@ -16,6 +16,7 @@ const statusList = {
     CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107' },
     TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545' },
     DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
+    DA_DUYET: { id: 6, text: 'Đã duyệt', color: '#007bff' },
 };
 
 const CongVanDenPage = (props) => {
@@ -23,6 +24,8 @@ const CongVanDenPage = (props) => {
     const hcthCongVanDen = useSelector(state => state?.hcthCongVanDen);
     const dispatch = useDispatch();
     const search = useSelector(state => state.hcthCongVanDen?.search);
+    const user = useSelector(state => state?.settings?.user);
+
     const filter = search || {};
     const [refreshing, setRefreshing] = useState(false);
     const { colors } = useTheme();
@@ -35,7 +38,7 @@ const CongVanDenPage = (props) => {
      */
     useEffect(() => {
         onRefresh();
-    }, [search]);
+    }, [search, user]);
 
     /** 
      * handle function
@@ -49,7 +52,10 @@ const CongVanDenPage = (props) => {
 
     const onRefresh = () => {
         setRefreshing(true);
-        getData(initPageNumber, initPageSize, () => setRefreshing(false));
+        getData(initPageNumber, initPageSize, () => {
+            setRefreshing(false);
+            setIsLoading(false);
+        });
     }
 
     onLoadMore = () => {
@@ -72,6 +78,7 @@ const CongVanDenPage = (props) => {
             donViGuiCongVan: filter.donViGuiCongVan || '',
             tab: 0,
         };
+        setIsLoading(true);
         dispatch(getHcthCongVanDenSearchPage(pageNumber, pageSize, filter.searchTerm || '', dataFilter, done));
     };
 
@@ -85,13 +92,13 @@ const CongVanDenPage = (props) => {
     const renderCongVanDenItem = (item, index) => {
         let statusObj = Object.values(statusList).reduce((acc, ele) => ({ ...acc, [ele.id]: ele }), {});
         return (
-            <Card elevation={4} key={item.id} style={{ ...styles.cardItem, borderLeftColor: statusObj[item.trangThai].color }} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
+            <Card elevation={4} key={item.id} style={{ ...styles.cardItem, borderLeftColor: statusObj[item.trangThai]?.color || 'black'}} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
                 <Card.Title title={item.soCongVan || 'Chưa có'} titleStyle={styles.cardTitle} subtitle={item.trichYeu}
                     right={(props) => <Text {...props} style={styles.dateLabel}>{T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</Text>}
                     rightStyle={styles.rightSide}
                     subtitleNumberOfLines={2} />
                 <Card.Content>
-                    <Badge style={{ ...styles.statusLabel, backgroundColor: statusObj[item.trangThai].color }}>{statusObj[item.trangThai].text}</Badge>
+                    <Badge style={{ ...styles.statusLabel, backgroundColor: statusObj[item.trangThai]?.color || 'black'}}>{statusObj[item.trangThai]?.text || 'Chưa có'}</Badge>
                 </Card.Content>
             </Card>
         )
