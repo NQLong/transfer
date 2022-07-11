@@ -285,11 +285,15 @@ class TcHocPhiAdminPage extends AdminPage {
                 <th style={{ width: 'auto', textAlign: 'center' }}>Học kỳ</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>MSSV</th>
                 <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Họ và tên</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Điện thoại</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email cá nhân</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học phí (VNĐ)</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Công nợ (VNĐ)</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian đóng</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoa/Bộ môn</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (
@@ -298,11 +302,15 @@ class TcHocPhiAdminPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK${item.hocKy}`} />
                     <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.mssv} url={`/user/finance/hoc-phi/${item.mssv}`} />
                     <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.hoTenSinhVien} url={`/user/finance/hoc-phi/${item.mssv}`} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} cotent={item.soDienThoai} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} cotent={item.emailCaNhan} />
                     <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.hocPhi} />
                     <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.congNo} />
                     <TableCell type={item.lastTransaction ? 'date' : 'text'} dateFormat='HH:MM:ss dd/mm/yyyy' style={{ whiteSpace: 'nowrap' }} content={item.lastTransaction ? Number(item.lastTransaction) : ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maNganh}: ${item.tenNganh}`} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenBacDaoTao} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiHinhDaoTao} />
 
                     <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}>

@@ -71,10 +71,17 @@ module.exports = app => {
 
     // production
     app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
+        const trans_id = req.body.trans_id;
         try {
             await payBill(types.PRODUCTION, req, res);
         } catch (error) {
             res.send({ result_code: '096' });
+            if (trans_id) {
+                const item = await app.model.tcHocPhiTransaction.update({ transId: trans_id }, { status: 0 });
+                const { namHoc, hocKy, customerId } = item;
+                const hocPhi = await app.model.tcHocPhi.get({ mssv: customerId, namHoc, hocKy });
+                await app.model.tcHocPhi.update({ mssv: customerId, namHoc, hocKy }, { congNo: parseInt(hocPhi.congNo) + parseInt(item.amount) });
+            }
         }
     });
 
