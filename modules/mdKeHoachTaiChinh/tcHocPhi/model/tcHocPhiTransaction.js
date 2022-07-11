@@ -14,7 +14,6 @@ module.exports = app => {
             .replaceAll('{tc_email}', tcEmail)
             .replaceAll('{amount}', amount.toString().numberDisplay())
             .replaceAll('{support_phone}', tcSupportPhone) || '');
-        student.emailTruong = 'tien.trantan@hcmut.edu.vn';
         app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
         // await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
     };
