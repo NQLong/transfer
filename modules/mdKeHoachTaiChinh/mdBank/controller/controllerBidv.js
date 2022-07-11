@@ -78,6 +78,7 @@ module.exports = app => {
             try {
                 if (trans_id) {
                     const item = await app.model.tcHocPhiTransaction.update({ transId: trans_id }, { status: 0 });
+                    if (!item) throw 'No transaction!';
                     const { namHoc, hocKy, customerId } = item;
                     const hocPhi = await app.model.tcHocPhi.get({ mssv: customerId, namHoc, hocKy });
                     await app.model.tcHocPhi.update({ mssv: customerId, namHoc, hocKy }, { congNo: parseInt(hocPhi.congNo) + parseInt(item.amount) });
