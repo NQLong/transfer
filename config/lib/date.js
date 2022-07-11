@@ -23,6 +23,7 @@ module.exports = app => {
             if (format == 'yyyy') return date.getFullYear();
             else if (format == 'mm/yyyy') return get2(date.getMonth() + 1) + '/' + date.getFullYear();
             else if (format == 'dd/mm/yyyy') return get2(date.getDate()) + '/' + get2(date.getMonth() + 1) + '/' + date.getFullYear();
+            else if (format == 'HH:MM:ss dd/mm/yyyy') return get2(date.getHours()) + ':' + get2(date.getMinutes()) + ':' + get2(date.getSeconds()) + ' ' + get2(date.getDate()) + '/' + get2(date.getMonth() + 1) + '/' + date.getFullYear();
             else return '';
         },
 

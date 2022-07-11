@@ -358,7 +358,8 @@ class TcHocPhiAdminPage extends AdminPage {
                         </div>
                     </div>
                 </div>,
-            onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null
+            onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
+            onExport: permission.write ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
         });
     }
 }
