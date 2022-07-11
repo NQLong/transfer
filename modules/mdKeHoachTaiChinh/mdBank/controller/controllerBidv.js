@@ -121,8 +121,8 @@ module.exports = app => {
             } else {
                 let student = await app.model.fwStudents.get({ mssv: customer_id });
                 await modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum);
-                type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), payDate: trans_date.toString() });
                 res.send({ result_code: '000', result_desc: 'success' });
+                type == types.PRODUCTION && app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), payDate: trans_date.toString() });
             }
         }
     };
