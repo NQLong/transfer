@@ -62,6 +62,10 @@ const Notification = (props) => {
     const { navigation } = props;
 
     useEffect(() => {
+        scrollView.current?.scrollTo({
+            y: 0,
+            animated: true,
+        });
         setAll(true);
         setRead(true);
         setUnread(true);
