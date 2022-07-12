@@ -4,15 +4,13 @@ module.exports = app => {
 
     app.model.dtThoiGianMoMon.getActive = async () => {
         let allActive = await app.model.dtThoiGianMoMon.getAll({ kichHoat: 1 });
-        allActive = allActive.map(async (item) => {
+        for (let item of allActive) {
             const ctkdt = await app.model.dtCauTrucKhungDaoTao.get({ id: item.nam });
             if (ctkdt) {
                 item.namDaoTao = ctkdt.namDaoTao;
                 item.khoa = ctkdt.khoa;
             }
-            return item;
-        });
-        const result = await Promise.all(allActive);
-        return result;
+        }
+        return allActive;
     };
 };

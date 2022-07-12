@@ -7,8 +7,10 @@ module.exports = app => {
     app.get('/api/dao-tao/page/thoi-gian-mo-mon/:pageNumber/:pageSize', app.permission.orCheck('dtThoiGianMoMon:read', 'dtChuongTrinhDaoTao:manage', 'dtChuongTrinhDaoTao:read'), async (req, res) => {
         let permissions = req.session.user.permissions;
         let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
-        let page = await app.model.dtThoiGianMoMon.getPage(1, 4);
-        page.list = !listLoaiHinhDaoTao.includes('manager') ? page.list.filter(item => listLoaiHinhDaoTao.includes(item.loaiHinhDaoTao)) : page.list;
+        let page = await app.model.dtThoiGianMoMon.getPage(1, 4, {
+            statement: '(:listLoaiHinhDaoTao) IS NULL OR loaiHinhDaoTao IN (:listLoaiHinhDaoTao)',
+            parameter: { listLoaiHinhDaoTao: listLoaiHinhDaoTao.includes('manager') ? null : listLoaiHinhDaoTao }
+        });
         for (let item of page.list) {
             let ctkdt = await app.model.dtCauTrucKhungDaoTao.get({ id: item.nam });
             item.namDaoTao = ctkdt.namDaoTao;
