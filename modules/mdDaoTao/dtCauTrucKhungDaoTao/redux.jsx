@@ -81,7 +81,7 @@ export function getDtCauTrucKhungDaoTaoPage(pageNumber, pageSize, pageCondition,
 export function getDtCauTrucKhungDaoTao(id, done) {
     return () => {
         const url = `/api/dao-tao/cau-truc-khung-dao-tao/${id}`;
-        T.get(url, { condition: { id } }, data => {
+        T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy cấu trúc khung đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -181,5 +181,5 @@ export const SelectAdapter_DtCauTrucKhungDaoTao = {
     url: '/api/dao-tao/cau-truc-khung-dao-tao/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })) : [] }),
-    fetchOne: (ma, done) => (getDtCauTrucKhungDaoTao(ma, item => done && done({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })))()
+    fetchOne: (id, done) => (getDtCauTrucKhungDaoTao(id, item => done && done({ id: item.id, text: item.namDaoTao, data: { mucCha: item.mucCha, mucCon: item.mucCon } })))()
 };

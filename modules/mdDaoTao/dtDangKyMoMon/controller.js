@@ -17,23 +17,36 @@ module.exports = app => {
     app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
 
     //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), (req, res) => {
-        let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
+    app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
+        let _pageNumber = parseInt(req.params.pageNumber),
+            _pageSize = parseInt(req.params.pageSize),
+            user = req.session.user,
+            permissions = user.permissions,
             searchTerm = typeof req.query.searchTerm === 'string' ? req.query.searchTerm : '';
         let donViFilter = req.query.donViFilter,
-            donVi = req.session.user.staff ? req.session.user.staff.maDonVi : null;
-        if (req.session.user.permissions.exists(['dtDangKyMoMon:read'])) donVi = donViFilter || null;
-        app.model.dtDangKyMoMon.searchPage(pageNumber, pageSize, donVi, searchTerm, async (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianMoMon: thoiGianMoMon || {} } });
+            donVi = user.staff ? user.staff.maDonVi : null;
+        if (permissions.includes('dtDangKyMoMon:read')) donVi = donViFilter || null;
+        let page = await app.model.dtDangKyMoMon.searchPage(_pageNumber, _pageSize, donVi, searchTerm);
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+        let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
+        if (!listLoaiHinhDaoTao.includes('manager') && permissions.includes('dtDangKyMoMon:read')) {
+            //Nếu là người phòng đào tạo
+            list = list.filter(item => listLoaiHinhDaoTao.includes(item.loaiHinhDaoTao));
+        }
+        list?.forEach(item => {
+            item.permissionWrite = true;
+            if (!permissions.includes('dtDangKyMoMon:write')) {
+                const today = Date.now();
+                let data = thoiGianMoMon.find(tgmm => tgmm.loaiHinhDaoTao == item.loaiHinhDaoTao && tgmm.bacDaoTao == item.bacDaoTao);
+                let { batDau, ketThuc } = data;
+                if (batDau < today || ketThuc >= today) {
+                    item.permissionWrite = false;
+                }
             }
         });
+        const pageCondition = searchTerm;
+        res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianMoMon } });
     });
 
     app.post('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {

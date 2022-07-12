@@ -4,13 +4,18 @@ module.exports = app => {
         'dtThoiGianMoMon:read', 'dtThoiGianMoMon:write', 'dtThoiGianMoMon:delete'
     );
 
-    app.get('/api/dao-tao/page/thoi-gian-mo-mon/:pageNumber/:pageSize', app.permission.orCheck('dtThoiGianMoMon:read', 'dtChuongTrinhDaoTao:manage', 'dtChuongTrinhDaoTao:read'), (req, res) => {
+    app.get('/api/dao-tao/page/thoi-gian-mo-mon/:pageNumber/:pageSize', app.permission.orCheck('dtThoiGianMoMon:read', 'dtChuongTrinhDaoTao:manage', 'dtChuongTrinhDaoTao:read'), async (req, res) => {
         let permissions = req.session.user.permissions;
         let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
-        app.model.dtThoiGianMoMon.getPage(1, 4, (error, page) => {
-            page.list = listLoaiHinhDaoTao.length ? page.list.filter(item => listLoaiHinhDaoTao.includes(item.loaiHinhDaoTao)) : page.list;
-            res.send({ error, page });
+        let page = await app.model.dtThoiGianMoMon.getPage(1, 4, {
+            statement: '(:listLoaiHinhDaoTao) IS NULL OR loaiHinhDaoTao IN (:listLoaiHinhDaoTao)',
+            parameter: { listLoaiHinhDaoTao: listLoaiHinhDaoTao.includes('manager') ? null : listLoaiHinhDaoTao }
         });
+        for (let item of page.list) {
+            let ctkdt = await app.model.dtCauTrucKhungDaoTao.get({ id: item.nam });
+            item.namDaoTao = ctkdt.namDaoTao;
+        }
+        res.send({ page });
     });
 
     app.post('/api/dao-tao/thoi-gian-mo-mon', app.permission.check('dtThoiGianMoMon:write'), async (req, res) => {
@@ -20,6 +25,8 @@ module.exports = app => {
             const thoiGianMoMon = await app.model.dtThoiGianMoMon.get({ nam, hocKy, loaiHinhDaoTao, bacDaoTao });
             if (thoiGianMoMon) throw 'Đã tồn tại thời gian mở môn học kỳ cho loại hình này';
             const item = await app.model.dtThoiGianMoMon.create(data);
+            let ctkdt = await app.model.dtCauTrucKhungDaoTao.get({ id: item.nam });
+            item.namDaoTao = ctkdt.namDaoTao;
             res.send({ item });
         } catch (error) {
             res.send({ error });
@@ -34,7 +41,6 @@ module.exports = app => {
 
     app.put('/api/dao-tao/thoi-gian-mo-mon', app.permission.check('dtThoiGianMoMon:write'), (req, res) => {
         let id = req.body.id, changes = req.body.changes;
-        console.log(changes);
         if (changes.kichHoat) {
             app.model.dtThoiGianMoMon.update({
                 statement: 'id != :id AND loaiHinhDaoTao = :loaiHinhDaoTao AND bacDaoTao = :bacDaoTao',
