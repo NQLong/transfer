@@ -11,9 +11,9 @@ import Tooltip from '@mui/material/Tooltip';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
-        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '', onClick = null } = this.props;
+        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '', onClick = null, nowrap = false } = this.props;
         if (style == null) style = {};
-
+        if (nowrap) style = { whiteSpace: 'nowrap' };
         if (display != true) {
             return null;
         } else if (type == 'number') {

@@ -31,13 +31,28 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            idDangKyMoMon = req.query.id;
-        const condition = { ...thoiGianMoMon, idDangKyMoMon };
-        app.model.dtDanhSachMonMo.getCurrent(app.stringify(condition), (error, item) => {
-            // res.send({ error, item });
-            res.send({ error, danhSachMonMo: item.rows, chuongTrinhDaoTao: item.chuongTrinhDaoTao, thoiGianMoMon, thongTinKhoaNganh: item.thongTin[0] });
-        });
+        try {
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
+                idDangKyMoMon = req.query.id,
+                user = req.session.user,
+                permissions = user.permissions;
+            const dangKyMoMon = await app.model.dtDangKyMoMon.get({ id: idDangKyMoMon });
+            let { loaiHinhDaoTao, bacDaoTao } = dangKyMoMon;
+            let currentThoiGianMoMon = thoiGianMoMon.filter(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao)[0];
+            let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
+
+            if (!listLoaiHinhDaoTao.includes('manager') && permissions.includes('dtDangKyMoMon:read')) {
+                if (!listLoaiHinhDaoTao.includes(loaiHinhDaoTao)) throw 'No permission!';
+            }
+            if (!currentThoiGianMoMon || currentThoiGianMoMon.loaiHinhDaoTao != loaiHinhDaoTao) throw 'Hệ đào tạo không có thời gian đăng ký mở môn';
+
+            const condition = { ...currentThoiGianMoMon, idDangKyMoMon };
+            app.model.dtDanhSachMonMo.getCurrent(app.stringify(condition), (error, item) => {
+                res.send({ error, danhSachMonMo: item.rows, chuongTrinhDaoTao: item.chuongTrinhDaoTao, thoiGianMoMon: currentThoiGianMoMon, thongTinKhoaNganh: item.thongTin[0] });
+            });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.post('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
