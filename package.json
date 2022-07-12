@@ -161,5 +161,11 @@
             "eslint ",
             "git add"
         ]
-    }
+    },
+    "developers": [
+        "long.nguyen0709@hcmut.edu.vn",
+        "thanhtung@hcmut.edu.vn",
+        "quangsang@hcmut.edu.vn",
+        "tien.trantan@hcmut.edu.vn"
+    ]
 }

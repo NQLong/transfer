@@ -210,6 +210,7 @@ module.exports = app => {
 
                 // Add login permission => user.active == 1 => user:login
                 if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
+                if (app.developers.includes(user.email)) app.permissionHooks.pushUserPermission(user, ...app.permission.all());
                 new Promise(resolve => {
                     //Check if user if a staff
                     user.isStaff && app.permissionHooks.pushUserPermission(user, 'staff:login');
