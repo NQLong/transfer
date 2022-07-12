@@ -38,7 +38,7 @@ module.exports = app => {
             item.permissionWrite = true;
             if (!permissions.includes('dtDangKyMoMon:write')) {
                 const today = Date.now();
-                let data = thoiGianMoMon.filter(tgmm => tgmm.loaiHinhDaoTao == item.loaiHinhDaoTao && tgmm.bacDaoTao == item.bacDaoTao)[0];
+                let data = thoiGianMoMon.find(tgmm => tgmm.loaiHinhDaoTao == item.loaiHinhDaoTao && tgmm.bacDaoTao == item.bacDaoTao);
                 let { batDau, ketThuc } = data;
                 if (batDau < today || ketThuc >= today) {
                     item.permissionWrite = false;

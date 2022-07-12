@@ -38,7 +38,7 @@ module.exports = app => {
                 permissions = user.permissions;
             const dangKyMoMon = await app.model.dtDangKyMoMon.get({ id: idDangKyMoMon });
             let { loaiHinhDaoTao, bacDaoTao } = dangKyMoMon;
-            let currentThoiGianMoMon = thoiGianMoMon.filter(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao)[0];
+            let currentThoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
             let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
 
             if (!listLoaiHinhDaoTao.includes('manager') && permissions.includes('dtDangKyMoMon:read')) {
