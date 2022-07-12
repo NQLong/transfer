@@ -786,7 +786,7 @@ BEGIN
     SELECT COUNT(*)
     INTO totalItem
     FROM DT_DANG_KY_MO_MON dtDangKyMoMon
-            LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CT ON CT.ID = dtDangKyMoMon.NAM
+             LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CT ON CT.ID = dtDangKyMoMon.NAM
              LEFT JOIN DM_DON_VI dmDv ON dmDv.MA = dtDangKyMoMon.KHOA
 
     WHERE (donVi IS NULL OR donVi = dmDv.MA);
@@ -798,24 +798,28 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (
-                 SELECT dtDangKyMoMon.KHOA      as            "khoa",
-                        dtDangKyMoMon.HOC_KY    as            "hocKy",
-                        CT.NAM_DAO_TAO       as            "namHoc",
-                        dtDangKyMoMon.THOI_GIAN as            "thoiGian",
-                        dtDangKyMoMon.GHI_CHU   as            "ghiChu",
-                        dtDangKyMoMon.ID        as            "id",
-                        dtDangKyMoMon.IS_DUYET  as            "isDuyet",
-                        dmDv.TEN                as            "tenKhoaBoMon",
-                        dtDangKyMoMon.MA_NGANH  as            "maNganh",
-                        ds.TEN_NGANH            as            "tenNganh",
-                        ROW_NUMBER() OVER (ORDER BY dmDv.TEN) R
-                 FROM DT_DANG_KY_MO_MON dtDangKyMoMon
-            LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CT ON CT.ID = dtDangKyMoMon.NAM
-                          LEFT JOIN DM_DON_VI dmDv ON dmDv.MA = dtDangKyMoMon.KHOA
-                          LEFT JOIN DT_NGANH_DAO_TAO ds ON ds.MA_NGANH = dtDangKyMoMon.MA_NGANH
-                 WHERE (donVi IS NULL OR donVi = dmDv.MA)
-             )
+        FROM (SELECT dtDangKyMoMon.KHOA      as            "khoa",
+                     dtDangKyMoMon.HOC_KY    as            "hocKy",
+                     CT.NAM_DAO_TAO          as            "namHoc",
+                     dtDangKyMoMon.THOI_GIAN as            "thoiGian",
+                     dtDangKyMoMon.GHI_CHU   as            "ghiChu",
+                     dtDangKyMoMon.ID        as            "id",
+                     dtDangKyMoMon.IS_DUYET  as            "isDuyet",
+                     dmDv.TEN                as            "tenKhoaBoMon",
+                     dtDangKyMoMon.MA_NGANH  as            "maNganh",
+                     ds.TEN_NGANH            as            "tenNganh",
+                     bdt.MA_BAC              as            "bacDaoTao",
+                     bdt.TEN_BAC             as            "tenBacDaoTao",
+                     lhdt.MA                 as            "loaiHinhDaoTao",
+                     lhdt.TEN                as            "tenLoaiHinhDaoTao",
+                     ROW_NUMBER() OVER (ORDER BY dmDv.TEN) R
+              FROM DT_DANG_KY_MO_MON dtDangKyMoMon
+                       LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CT ON CT.ID = dtDangKyMoMon.NAM
+                       LEFT JOIN DM_DON_VI dmDv ON dmDv.MA = dtDangKyMoMon.KHOA
+                       LEFT JOIN DM_SV_BAC_DAO_TAO bdt ON bdt.MA_BAC = dtDangKyMoMon.BAC_DAO_TAO
+                       LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO lhdt ON lhdt.MA = dtDangKyMoMon.LOAI_HINH_DAO_TAO
+                       LEFT JOIN DT_NGANH_DAO_TAO ds ON ds.MA_NGANH = dtDangKyMoMon.MA_NGANH
+              WHERE (donVi IS NULL OR donVi = dmDv.MA))
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 END;
@@ -15482,56 +15486,109 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT HP.MSSV                             AS "mssv",
-                     HP.NAM_HOC                          AS "namHoc",
-                     HP.HOC_KY                           AS "hocKy",
-                     HP.CONG_NO                          AS "congNo",
-                     HP.HOC_PHI                          AS "hocPhi",
-                     (FS.HO || ' ' || FS.TEN)            AS "hoTenSinhVien",
-                     FS.DIEN_THOAI_CA_NHAN               AS "soDienThoai",
-                     FS.EMAIL_CA_NHAN                    AS "emailCaNhan",
-                     FS.MA_NGANH                         AS "maNganh",
-                     NDT.TEN_NGANH                       AS "tenNganh",
-                     DV.TEN                              AS "tenKhoa",
-                     LHDT.TEN                            AS "tenLoaiHinhDaoTao",
-                     BDT.TEN_BAC                         AS "tenBac",
-                     (SELECT MAX(TRANS_DATE)
-                      FROM TC_HOC_PHI_TRANSACTION TRANS
-                      WHERE HP.HOC_KY = TRANS.HOC_KY
-                        AND HP.NAM_HOC = TRANS.NAM_HOC
-                        AND HP.MSSV = TRANS.CUSTOMER_ID) AS "lastTransaction",
-                     ROW_NUMBER() OVER (ORDER BY FS.TEN)    R
+        FROM (SELECT HP.MSSV                                                  AS "mssv",
+                     HP.NAM_HOC                                               AS "namHoc",
+                     HP.HOC_KY                                                AS "hocKy",
+                     HP.CONG_NO                                               AS "congNo",
+                     HP.HOC_PHI                                               AS "hocPhi",
+                     FS.HO                                                    as "ho",
+                     FS.TEN                                                   AS "ten",
+                     FS.GIOI_TINH                                             AS "gioiTinh",
+                     FS.NGAY_SINH                                             AS "ngaySinh",
+                     (FS.HO || ' ' || FS.TEN)                                 AS "hoTenSinhVien",
+                     FS.DIEN_THOAI_CA_NHAN                                    AS "soDienThoai",
+                     FS.EMAIL_CA_NHAN                                         AS "emailCaNhan",
+                     FS.MA_NGANH                                              AS "maNganh",
+                     NDT.TEN_NGANH                                            AS "tenNganh",
+                     DV.TEN                                                   AS "tenKhoa",
+                     LHDT.TEN                                                 AS "tenLoaiHinhDaoTao",
+                     BDT.TEN_BAC                                              AS "tenBacDaoTao",
+                     (SELECT TRANS_DATE
+                      FROM TC_HOC_PHI_TRANSACTION
+                      WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                          FROM TC_HOC_PHI_TRANSACTION TRANS
+                                          WHERE HP.HOC_KY = TRANS.HOC_KY
+                                            AND HP.NAM_HOC = TRANS.NAM_HOC
+                                            AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransaction",
+
+                     (SELECT TRANS_ID
+                      FROM TC_HOC_PHI_TRANSACTION
+                      WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                          FROM TC_HOC_PHI_TRANSACTION TRANS
+                                          WHERE HP.HOC_KY = TRANS.HOC_KY
+                                            AND HP.NAM_HOC = TRANS.NAM_HOC
+                                            AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransactionId",
+                     ROW_NUMBER() OVER (ORDER BY FS.TEN)                         R
               FROM TC_HOC_PHI HP
-                       LEFT JOIN FW_STUDENT FS on HP.MSSV = FS.MSSV
+                       LEFT JOIN FW_STUDENT FS
+                                 on HP.MSSV = FS.MSSV
                        LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
                        LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                        LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
-              WHERE (imssv IS NULL OR imssv = '' OR imssv = HP.MSSV)
+              WHERE (imssv IS NULL
+                  OR imssv = ''
+                  OR imssv = HP.MSSV)
                 AND (
-                      daDong IS NULL OR daDong = ''
-                      OR daDong = 1 AND HP.CONG_NO = 0
-                      OR daDong = 0 AND HP.CONG_NO != 0
+                      daDong IS NULL
+                      OR daDong = ''
+                      OR daDong = 1
+                          AND HP.CONG_NO = 0
+                      OR daDong = 0
+                          AND HP.CONG_NO != 0
                   )
-                AND (listNganh IS NULL OR
-                     listNganh IS NOT NULL AND FS.MA_NGANH IN (SELECT regexp_substr(listNganh, '[^,]+', 1, level)
-                                                               from dual
-                                                               connect by regexp_substr(listNganh, '[^,]+', 1, level) is not null))
-                AND (listKhoa IS NULL OR
-                     listKhoa IS NOT NULL AND FS.KHOA IN (SELECT regexp_substr(listKhoa, '[^,]+', 1, level)
-                                                          from dual
-                                                          connect by regexp_substr(listKhoa, '[^,]+', 1, level) is not null))
-                AND (listBacDaoTao IS NULL OR
-                     listBacDaoTao IS NOT NULL AND
-                     FS.BAC_DAO_TAO IN (SELECT regexp_substr(listBacDaoTao, '[^,]+', 1, level)
+                AND (listNganh IS NULL
+                  OR
+                     listNganh IS NOT NULL
+                         AND FS.MA_NGANH IN (SELECT regexp_substr(listNganh
+                                                        , '[^,]+'
+                                                        , 1
+                                                        , level)
+                                             from dual
+                                             connect by regexp_substr(listNganh
+                                                            , '[^,]+'
+                                                            , 1
+                                                            , level) is not null))
+                AND (listKhoa IS NULL
+                  OR
+                     listKhoa IS NOT NULL
+                         AND FS.KHOA IN (SELECT regexp_substr(listKhoa
+                                                    , '[^,]+'
+                                                    , 1
+                                                    , level)
+                                         from dual
+                                         connect by regexp_substr(listKhoa
+                                                        , '[^,]+'
+                                                        , 1
+                                                        , level) is not null))
+                AND (listBacDaoTao IS NULL
+                  OR
+                     listBacDaoTao IS NOT NULL
+                         AND
+                     FS.BAC_DAO_TAO IN (SELECT regexp_substr(listBacDaoTao
+                                                   , '[^,]+'
+                                                   , 1
+                                                   , level)
                                         from dual
-                                        connect by regexp_substr(listBacDaoTao, '[^,]+', 1, level) is not null))
-                AND (listLoaiHinhDaoTao IS NULL OR
-                     listLoaiHinhDaoTao IS NOT NULL AND
-                     FS.LOAI_HINH_DAO_TAO IN (SELECT regexp_substr(listLoaiHinhDaoTao, '[^,]+', 1, level)
+                                        connect by regexp_substr(listBacDaoTao
+                                                       , '[^,]+'
+                                                       , 1
+                                                       , level) is not null))
+                AND (listLoaiHinhDaoTao IS NULL
+                  OR
+                     listLoaiHinhDaoTao IS NOT NULL
+                         AND
+                     FS.LOAI_HINH_DAO_TAO IN (SELECT regexp_substr(listLoaiHinhDaoTao
+                                                         , '[^,]+'
+                                                         , 1
+                                                         , level)
                                               from dual
-                                              connect by regexp_substr(listLoaiHinhDaoTao, '[^,]+', 1, level) is not null))
-                AND (NAM_HOC = namHoc AND HOC_KY = hocKy)
+                                              connect by regexp_substr(listLoaiHinhDaoTao
+                                                             , '[^,]+'
+                                                             , 1
+                                                             , level) is not null))
+                AND (NAM_HOC = namHoc
+                  AND HOC_KY = hocKy)
                 AND (searchTerm = ''
                   OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT
                   OR FS.MSSV LIKE ST))
