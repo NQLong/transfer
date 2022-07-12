@@ -46,7 +46,7 @@ module.exports = app => {
     app.post('/api/debug/switch-user', async (req, res) => {
         try {
             const personId = req.body.personId,
-                isDebug = app.isDebug || (req.session.user && req.session.user.roles.filter(role => role.name == 'admin').length);
+                isDebug = app.isDebug || (req.session.user?.permissions?.length && req.session.user.permissions.includes('developer:login'));
             if (personId && isDebug) {
                 const canBo = await app.model.canBo.get({ shcc: personId });
                 if (canBo) {
