@@ -6,6 +6,9 @@ import { useTheme, Card, List, Text, Dialog, TextInput } from 'react-native-pape
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
+import commonStyles from '../../../Asset/Styles/styles'; 
+import styles from './styles';
+
 const User = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -47,17 +50,17 @@ const User = () => {
     return (
         <>
             <ScrollView>
-                <Card style={{ margin: 5 }} elevation={4}>
-                    <List.Item title={'Họ và tên'} right={() => <Text style={{ alignSelf: 'center' }} variant='bodyMedium'>{`${user?.lastName || ''} ${user?.firstName || ''}`.trim().normalizedName()}</Text>} />
-                    <List.Item title={'Email'} right={() => <Text style={{ alignSelf: 'center' }} variant='bodyMedium'>{user?.email}</Text>} />
-                    <View style={{ alignItems: 'center', marginTop: 20, flex: 1, marginBottom: 20 }}>
+                <Card style={commonStyles.m5} elevation={4}>
+                    <List.Item title={'Họ và tên'} right={() => <Text style={commonStyles.alignSelfCenter} variant='bodyMedium'>{`${user?.lastName || ''} ${user?.firstName || ''}`.trim().normalizedName()}</Text>} />
+                    <List.Item title={'Email'} right={() => <Text style={commonStyles.alignSelfCenter} variant='bodyMedium'>{user?.email}</Text>} />
+                    <View style={styles.buttonView}>
                         <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={() => setShowUserModal(true)} disabled={disableLogout}>
-                            <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Switch user</Text>
+                            <Text style={{ ...styles.buttonText, color: colors.background}} >Switch user</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ alignItems: 'center', marginTop: 20, flex: 1, marginBottom: 20 }}>
+                    <View style={styles.buttonView}>
                         <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={onSignOut} disabled={disableLogout}>
-                            <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Đăng xuất</Text>
+                            <Text style={{ ...styles.buttonText, color: colors.background}} >Đăng xuất</Text>
                         </TouchableOpacity>
                     </View>
                 </Card>
@@ -85,49 +88,4 @@ const User = () => {
 export default User;
 
 
-const styles = StyleSheet.create({
-    mainArea: {
-        flex: 1,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingHorizontal: 20,
-        paddingVertical: 40
-    },
-    label: {
-        fontFamily: 'Work Sans',
-        color: '#999999',
-        fontSize: 15
-    },
-    formInput: {
-        flexDirection: 'row',
-        marginTop: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#CCC',
-        padding: 10,
-        paddingBottom: Platform.OS === 'ios' ? 10 : 0
-    },
-    textInput: {
-        flex: 1,
-        marginTop: Platform.OS === 'ios' ? 0 : -12,
-        paddingLeft: 10,
-        color: '#333333',
-        fontSize: 20
-    },
-    errorMsg: {
-        color: '#FF0000',
-        fontSize: 14,
-        marginBottom: 10
-    },
-    signIn: {
-        height: 50,
-        width: '70%',
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    logo: {
-        width: 1000,
-        heith: 300
-    }
-});
+

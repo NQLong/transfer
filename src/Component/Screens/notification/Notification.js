@@ -6,6 +6,8 @@ import { renderScrollView, AdminModal } from '@/Utils/component';
 import { useSelector, useDispatch} from 'react-redux';
 import { getMoreNotificationInPage, readNotification , getNotificationInPage, deleteNotification } from './redux';
 
+import styles from './style';
+
 import T from '@/Utils/common';
 
 const initPageNumber = 1;
@@ -128,18 +130,14 @@ const Notification = (props) => {
             <Card elevation={4} key={index} style={{ ...styles.cardItem, backgroundColor: item.read == 1 ? 'rgba(0, 0, 0, 0.05)' : 'white' }} onPress={() => { item.read == 0 && readNotify(item.id) ; navigation.navigate('CongVanDen', { congVanDenId : congVanId}) }}>
                 <Card.Content>
                     <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}
+                        style={styles.cardItemWrapper}
                     >
-                        <View style={{ flex: 0.2 }}>
+                        <View style={styles.cardItemIcon}>
                             <Avatar.Icon size={42} {...props} icon={listAlternativeIcon[item.icon] || 'book'} style={{ backgroundColor: item.iconColor ? item.iconColor : 'black'}} color="white"/>
                         </View>
-                        <View style={{ flex: 0.8 }}> 
-                            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', marginRight: 0}}>
-                                <Title style={{ fontSize: 16, fontWeight: 'bold'}}>{item.title.length > 25 ? `${item.title.slice(0, 25)}...` : item.title}</Title>
+                        <View style={styles.cardItemContent}> 
+                            <View style={styles.cardItemTitleWrapper}>
+                                <Title style={styles.cardItemTitle}>{item.title.length > 25 ? `${item.title.slice(0, 25)}...` : item.title}</Title>
                                 <IconButton
                                     icon="delete"
                                     iconColor="red"
@@ -147,8 +145,8 @@ const Notification = (props) => {
                                     onPress={() => confirmModal.current?.show(item)}
                                 />
                             </View>
-                            <Paragraph numberOfLines={3} style={{ marginBottom: 10}}>{item.subTitle}</Paragraph>
-                            <Text style={{ fontSize: 12, color: '#696969' }}>{T.dateToText(item.sendTime, 'dd/mm/yyyy HH:MM:ss')}</Text>
+                            <Paragraph numberOfLines={3} style={styles.cardItemSubTitle}>{item.subTitle}</Paragraph>
+                            <Text style={styles.cardItemCreatedDate}>{T.dateToText(item.sendTime, 'dd/mm/yyyy HH:MM:ss')}</Text>
                         </View>
                     </View>
                 </Card.Content>
@@ -160,7 +158,7 @@ const Notification = (props) => {
         if (!allNotification)
             return refreshing ? null : <ActivityIndicator size="large" color={colors.primary} />;
         else if (allNotification.length === 0)
-            return <Text style={{ margin: 12 }}>Chưa có thông báo nào</Text>
+            return <Text style={styles.emptyDataText}>Chưa có thông báo nào</Text>
         else
             return allNotification.map((item, index) => renderNotificationItem(item, index));
     }
@@ -182,9 +180,9 @@ const Notification = (props) => {
     const onDeleteNotification = (data, done) => dispatch(deleteNotification(data, () => getData(initPageNumber, initPageSize, true, done)));
 
     const searchNotification = () => {
-        return <View style={{ flex: 1, flexDirection: 'row', padding: 10}} >
-        <Chip onPress={() => onSelectAll()} mode="flat" style={{ marginRight: 10 }} selected={all}> Tất cả</Chip>
-        <Chip onPress={() => onSelect(true)} mode="flat" style={{ marginRight: 10 }} selected={unread}>Chưa đọc</Chip>
+        return <View style={styles.searchContainer} >
+        <Chip onPress={() => onSelectAll()} mode="flat" style={styles.searchItem} selected={all}> Tất cả</Chip>
+        <Chip onPress={() => onSelect(true)} mode="flat" style={styles.searchItem} selected={unread}>Chưa đọc</Chip>
         <Chip onPress={() => onSelect(false)} mode="flat" selected={read}>Đã đọc</Chip>
       </View>
     }
@@ -208,52 +206,8 @@ const Notification = (props) => {
     });
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f8f8f8',
-        alignItems: 'center',
-        padding: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    cardItem: {
-        borderRadius: 10,
-        margin: 10,
-    },
-    cardTitle: {
-        fontSize: 14,
-        color: 'black',
-        textTransform: 'uppercase'
-    },
-    cardContent: {
-        display: 'flex',
-        justifyContent: 'space-between'
-    },
-    statusLabel: {
-        fontSize: 12,
-        paddingLeft: 15,
-        paddingRight: 15
-    },
-    rightSide: {
-        fontSize: 14,
-        marginRight: 10
-    },
-    dateLabel: {
-        marginTop: 0,
-        fontSize: 12,
-    },
-    checkbox: {
-        alignSelf: "center",
-    },
-    label: {
-        margin: 8,
-    },
-    box: {
-        flex: 1,
-        width: 50,
-        height: 50,
-    }
-});
+// const styles = StyleSheet.create({
+    
+// });
   
 export default Notification;

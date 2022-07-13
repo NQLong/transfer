@@ -13,6 +13,10 @@ import * as Animatable from 'react-native-animatable';
 import { useTheme } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 
+import commonStyles from '../../../Asset/Styles/styles';
+
+import styles from './styles';
+
 GoogleSignin.configure({
     webClientId: '318805336792-3g9b03uc6tk8b6ra1v49otm7ajddb8oi.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
     offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
@@ -91,18 +95,18 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
     }
 
     return (
-        <View style={{ height: '100%', backgroundColor: colors.primary }}>
+        <View style={{ ...styles.container, backgroundColor: colors.primary }}>
             <View style={{ ...style.container, backgroundColor: colors.primary, marginTop: 0 }}>
-                <View style={{ height: 50 }} />
+                <View style={commonStyles.height50} />
                 <Animatable.View animation='fadeInUpBig' style={{ ...styles.mainArea, backgroundColor: colors.background }}>
 
-                    <View style={{ backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-                        <Image source={require('../../Asset/Img/hcmussh.png')} style={{ width: '100%', height: undefined, aspectRatio: 255 / 177, backgroundColor: 'transparent' }} />
+                    <View style={styles.imageView}>
+                        <Image source={require('../../../Asset/Img/hcmussh.png')} style={styles.image} />
                     </View>
 
-                    <View style={{ alignItems: 'center', marginTop: 50 }}>
+                    <View style={styles.buttonView}>
                         <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={signin} disabled={loginDisable}>
-                            <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Đăng nhập</Text>
+                            <Text style={{...styles.loginText ,color: colors.background}} >Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -115,49 +119,3 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({
-    mainArea: {
-        flex: 1,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingHorizontal: 20,
-        paddingVertical: 40
-    },
-    label: {
-        fontFamily: 'Work Sans',
-        color: '#999999',
-        fontSize: 15
-    },
-    formInput: {
-        flexDirection: 'row',
-        marginTop: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#CCC',
-        padding: 10,
-        paddingBottom: Platform.OS === 'ios' ? 10 : 0
-    },
-    textInput: {
-        flex: 1,
-        marginTop: Platform.OS === 'ios' ? 0 : -12,
-        paddingLeft: 10,
-        color: '#333333',
-        fontSize: 20
-    },
-    errorMsg: {
-        color: '#FF0000',
-        fontSize: 14,
-        marginBottom: 10
-    },
-    signIn: {
-        height: 50,
-        width: '70%',
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    logo: {
-        width: 1000,
-        heith: 300
-    }
-});

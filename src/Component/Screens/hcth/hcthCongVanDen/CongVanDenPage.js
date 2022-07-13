@@ -6,6 +6,9 @@ import { Chip, Text, useTheme, Card, Badge } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getHcthCongVanDenSearchPage, getMoreCongVanDenPage, HcthCongVanDenSearch } from './redux';
 
+import commonStyles from '../../../../Asset/Styles/styles';
+import styles from './styles';
+
 const initPageNumber = 1;
 const initPageSize = 20;
 
@@ -122,9 +125,9 @@ const CongVanDenPage = (props) => {
                 filterData.push({ key, label: filterLabel[key], value: textValue[key].toString() });
         });
         return <ScrollView horizontal style={{ flex: 1, padding: 10 }}>
-            {filterData.map(item => <Chip key={item.key} style={{ flex: 1, maxWidth: 300, padding: 5, justifyContent: 'center', marginRight: 10 }} onClose={() => onRemoveSearchItem(item.key)} mode='outlined'>
+            {filterData.map(item => <Chip key={item.key} style={commonStyles.chipItem} onClose={() => onRemoveSearchItem(item.key)} mode='outlined'>
                 {/* <View style={{ maxWidth: 300, justifyContent: 'center' }}> */}
-                    <Text style={{ fontSize: 12 }} numberOfLines={1} ellipsizeMode='tail'>{`${item.label}: ${item.value}`}</Text>
+                    <Text style={commonStyles.fs12} numberOfLines={1} ellipsizeMode='tail'>{`${item.label}: ${item.value}`}</Text>
                 {/* </View> */}
             </Chip>)}
         </ScrollView>
@@ -135,7 +138,7 @@ const CongVanDenPage = (props) => {
         content: <>
             {renderFilter()}
             {renderCongVanList()}
-            {isLoading && <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: 20, marginTop: 20 }} />}
+            {isLoading && <ActivityIndicator size="large" color={colors.primary} style={{ ...commonStyles.activityIndicator, marginTop: 20 }} />}
         </>,
         style: {},
         refreshControl: <RefreshControl colors={["#9Bd35A", "#689F38"]} refreshing={refreshing} onRefresh={onRefresh} />,
@@ -148,43 +151,7 @@ const CongVanDenPage = (props) => {
     });
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f8f8f8',
-        alignItems: 'center',
-        padding: 10
-    },
-    cardItem: {
-        borderRadius: 10,
-        margin: 10,
-        borderLeftWidth: 3
-    },
-    cardTitle: {
-        fontSize: 14,
-        color: 'black',
-        textTransform: 'uppercase'
-    },
-    cardContent: {
-        display: 'flex',
-        justifyContent: 'space-between'
-    },
-    statusLabel: {
-        fontSize: 12,
-        paddingLeft: 15,
-        paddingRight: 15
-    },
-    rightSide: {
-        display: 'flex',
-        marginTop: -25,
-        marginRight: 20,
-        alignItems: 'flex-start',
-    },
-    dateLabel: {
-        marginTop: 0,
-        fontSize: 12,
-    }
-});
+
 
 export default CongVanDenPage;
 
