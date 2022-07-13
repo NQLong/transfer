@@ -485,7 +485,8 @@ class AdminEditPage extends AdminPage {
     }
 
     canAddComment = () => {
-        return ![trangThaiCongVanDi.DA_DUYET.id, trangThaiCongVanDi.DA_DOC.id].includes(this.state.trangThai);
+        const hcthCongVanDiPermission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
+        return hcthCongVanDiPermission.write && ![trangThaiCongVanDi.DA_DUYET.id, trangThaiCongVanDi.DA_DOC.id].includes(this.state.trangThai);
     }
 
     canSend = () => {
