@@ -21,7 +21,7 @@ module.exports = app => {
     app.get('/user/dao-tao/loai-hinh-dao-tao', app.permission.check('dtSvLoaiHinhDaoTao:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/loai-hinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dmSvLoaiHinhDaoTao:read', 'dtSvLoaiHinhDaoTao:read'), (req, res) => {
+    app.get('/api/danh-muc/loai-hinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmSvLoaiHinhDaoTao.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));

@@ -50,28 +50,33 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            hocKy = thoiGianMoMon.hocKy,
-            nam = thoiGianMoMon.nam;
-        let data = req.body.data;
-        if (data.nam != nam || data.hocKy != hocKy) {
-            res.send({ error: 'Không thuộc thời gian đăng ký hiện tại' });
-            return;
-        } else {
-            app.model.dtDangKyMoMon.get({
-                nam, hocKy, maNganh: data.maNganh
-            }, (error, item) => {
-                if (!error && item) res.send({ error: `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}` });
-                else app.model.dtDangKyMoMon.create(data, (error, item) => {
-                    res.send({ error, item });
+        try {
+            const now = Date.now();
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+            let data = req.body.data;
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == data.loaiHinhDaoTao && item.bacDaoTao == data.bacDaoTao);
+            if (now > thoiGianMoMon.ketThuc) throw 'Đã hết hạn đăng ký!';
+            const hocKy = thoiGianMoMon.hocKy,
+                nam = thoiGianMoMon.nam;
+            if (data.nam != nam || data.hocKy != hocKy || now <= thoiGianMoMon.batDau) {
+                throw 'Không thuộc thời gian đăng ký hiện tại';
+            } else {
+                let item = await app.model.dtDangKyMoMon.get({
+                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: data.loaiHinhDaoTao, bacDaoTao: data.bacDaoTao
                 });
-            });
+                if (item) throw `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}`;
+                item = await app.model.dtDangKyMoMon.create(data);
+                res.send({ item });
+            }
+        } catch (error) {
+            res.send({ error });
         }
     });
 
     app.put('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            hocKy = thoiGianMoMon.hocKy,
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == data.loaiHinhDaoTao && item.bacDaoTao == data.bacDaoTao);
+        const hocKy = thoiGianMoMon.hocKy,
             nam = thoiGianMoMon.nam;
         let { data, id, isDuyet } = req.body,
             thoiGian = new Date().getTime(),

@@ -38,6 +38,8 @@ class NganhModal extends AdminModal {
             ketThuc: this.props.thoiGianMoMon.ketThuc,
             khoa: this.state.khoa,
             maNganh: this.nganh.value(),
+            bacDaoTao: this.bacDaoTao.value(),
+            loaiHinhDaoTao: this.loaiHinhDaoTao.value()
         };
         this.props.create(data, item => {
             this.hide();
