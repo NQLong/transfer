@@ -48,7 +48,7 @@ module.exports = app => {
             const personId = req.body.personId,
                 isDeveloper = req.session.user?.permissions?.length && req.session.user.permissions.includes('developer:login'),
                 isSwitchable = app.isDebug || isDeveloper;
-            const originalEmail = req.session.user?.originalEmail || req.session.user.email;
+            const originalEmail = req.session.user?.originalEmail || req.session.user?.email;
             const done = (user) => {
                 if (!app.isDebug) {
                     req.session.user.originalEmail = originalEmail;
