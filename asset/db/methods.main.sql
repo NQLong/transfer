@@ -982,10 +982,12 @@ AS
     donVi              STRING(10);
     namDaoTao          NUMBER(4);
     listLoaiHinhDaoTao STRING(50);
+    heDaoTaoFilter     STRING(10);
 BEGIN
     SELECT JSON_VALUE(filter, '$.donVi') INTO donVi FROM DUAL;
     SELECT JSON_VALUE(filter, '$.namDaoTao') INTO namDaoTao FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listLoaiHinhDaoTao') INTO listLoaiHinhDaoTao FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.heDaoTaoFilter') INTO heDaoTaoFilter FROM DUAL;
 
     SELECT COUNT(*)
     INTO totalItem
@@ -1006,6 +1008,7 @@ BEGIN
         OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
         OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
         OR LOWER(TRIM(DV.TEN)) LIKE sT)
+      AND (heDaoTaoFilter IS NULL OR heDaoTaoFilter = '' OR heDaoTaoFilter = KDT.LOAI_HINH_DAO_TAO)
       AND (namDaoTao IS NULL OR namDaoTao = '' OR TO_NUMBER(namDaoTao) = KDT.NAM_DAO_TAO);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
@@ -1046,6 +1049,7 @@ BEGIN
                   OR LOWER(TRIM(DNDT.TEN_NGANH)) LIKE sT
                   OR LOWER(TRIM(KDT.NAM_DAO_TAO)) LIKE sT
                   OR LOWER(TRIM(DV.TEN)) LIKE sT)
+                AND (heDaoTaoFilter IS NULL OR heDaoTaoFilter = '' OR heDaoTaoFilter = KDT.LOAI_HINH_DAO_TAO)
                 AND (namDaoTao IS NULL OR namDaoTao = '' OR TO_NUMBER(namDaoTao) = KDT.NAM_DAO_TAO)
               ORDER BY KDT.NAM_DAO_TAO DESC)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
@@ -4164,7 +4168,11 @@ BEGIN
     INTO totalItem
     FROM HCTH_CONG_VAN_TRINH_KY cvtk
 -- LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
-    where (cvtk.NGUOI_TAO = shccCanBo);
+             LEFT JOIN HCTH_CAN_BO_KY cbk on cvtk.ID = cbk.CONG_VAN_TRINH_KY
+    where (
+                      cvtk.NGUOI_TAO = shccCanBo
+                  OR cbk.NGUOI_KY = shccCanBo
+              );
     IF pageNumber < 1 THEN
         pageNumber := 1;
     END IF;
@@ -4176,13 +4184,13 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT cvtk.ID           as "id",
-                     cvtk.FILE_CONG_VAN     as "congVanId",
-                     cvtk.NGUOI_TAO    as "nguoiTao",
-                     cvtk.THOI_GIAN    as "thoiGian",
-                     cbt.HO            as "hoNguoiTao",
-                     cbt.TEN           as "tenNguoiTao",
-                     hcthcvd.TRICH_YEU  as "trichYeu",
+        FROM (SELECT cvtk.ID               as "id",
+                     cvtk.FILE_CONG_VAN    as "congVanId",
+                     cvtk.NGUOI_TAO        as "nguoiTao",
+                     cvtk.THOI_GIAN        as "thoiGian",
+                     cbt.HO                as "hoNguoiTao",
+                     cbt.TEN               as "tenNguoiTao",
+                     hcthcvd.TRICH_YEU     as "trichYeu",
                      hcthcvd.LOAI_CONG_VAN as "loaiCongVan",
                      (SELECT LISTAGG(
                                      CASE
@@ -4197,19 +4205,21 @@ BEGIN
                       FROM HCTH_CAN_BO_KY cbk
                                LEFT JOIN TCHC_CAN_BO cb on cbk.NGUOI_KY = cb.SHCC
                       where cbk.CONG_VAN_TRINH_KY = cvtk.id
-                     )                 as "danhSachCanBoKy",
+                     )                     as "danhSachCanBoKy",
 
                      ROW_NUMBER() OVER (
                          ORDER BY cvtk.ID DESC
-                         )                R
+                         )                    R
               FROM HCTH_CONG_VAN_TRINH_KY cvtk
                        LEFT JOIN TCHC_CAN_BO cbt on cbt.SHCC = cvtk.NGUOI_TAO
-                       LEFT JOIN HCTH_FILE hcthfile on hcthfile.LOAI='DI' and hcthfile.ID = cvtk.FILE_CONG_VAN
-                        LEFT JOIN HCTH_CONG_VAN_DI hcthcvd on hcthcvd.ID = hcthfile.MA
+                       LEFT JOIN HCTH_FILE hcthfile on hcthfile.LOAI = 'DI' and hcthfile.ID = cvtk.FILE_CONG_VAN
+                       LEFT JOIN HCTH_CONG_VAN_DI hcthcvd on hcthcvd.ID = hcthfile.MA
+                       LEFT JOIN HCTH_CAN_BO_KY cbk on cvtk.ID = cbk.CONG_VAN_TRINH_KY
               WHERE
 -- check if user is related to congVanTrinhKy
 (
-    cvtk.NGUOI_TAO = shccCanBo
+            cvtk.NGUOI_TAO = shccCanBo
+        OR cbk.NGUOI_KY = shccCanBo
     ))
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
         ORDER BY 'id' DESC;
@@ -15327,6 +15337,79 @@ BEGIN
     RETURN my_cursor;
 
 end;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_DOWNLOAD_PSC(filter IN STRING) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    namHoc    NUMBER(4);
+    hocKy     NUMBER(1);
+BEGIN
+    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
+
+
+    OPEN my_cursor FOR
+        SELECT HP.MSSV                                                  AS                            "mssv",
+               HP.NAM_HOC                                               AS                            "namHoc",
+               HP.HOC_KY                                                AS                            "hocKy",
+               HP.CONG_NO                                               AS                            "congNo",
+               HP.HOC_PHI                                               AS                            "hocPhi",
+               FS.HO                                                    as                            "ho",
+               FS.TEN                                                   AS                            "ten",
+               FS.GIOI_TINH                                             AS                            "gioiTinh",
+               FS.NGAY_SINH                                             AS                            "ngaySinh",
+               (FS.HO || ' ' || FS.TEN)                                 AS                            "hoTenSinhVien",
+               FS.DIEN_THOAI_CA_NHAN                                    AS                            "soDienThoai",
+               FS.EMAIL_CA_NHAN                                         AS                            "emailCaNhan",
+               FS.MA_NGANH                                              AS                            "maNganh",
+               NDT.TEN_NGANH                                            AS                            "tenNganh",
+               DV.TEN                                                   AS                            "tenKhoa",
+               LHDT.TEN                                                 AS                            "tenLoaiHinhDaoTao",
+               BDT.TEN_BAC                                              AS                            "tenBacDaoTao",
+               (SELECT TRANS_DATE
+                FROM TC_HOC_PHI_TRANSACTION
+                WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                    FROM TC_HOC_PHI_TRANSACTION TRANS
+                                    WHERE HP.HOC_KY = TRANS.HOC_KY
+                                      AND HP.NAM_HOC = TRANS.NAM_HOC
+                                      AND HP.MSSV = TRANS.CUSTOMER_ID)) AS                            "lastTransaction",
+
+               (SELECT TRANS_ID
+                FROM TC_HOC_PHI_TRANSACTION
+                WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                    FROM TC_HOC_PHI_TRANSACTION TRANS
+                                    WHERE HP.HOC_KY = TRANS.HOC_KY
+                                      AND HP.NAM_HOC = TRANS.NAM_HOC
+                                      AND HP.MSSV = TRANS.CUSTOMER_ID)) AS                            "lastTransactionId",
+               ROW_NUMBER() OVER (ORDER BY (SELECT TRANS_DATE
+                                            FROM TC_HOC_PHI_TRANSACTION
+                                            WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                                                FROM TC_HOC_PHI_TRANSACTION TRANS
+                                                                WHERE HP.HOC_KY = TRANS.HOC_KY
+                                                                  AND HP.NAM_HOC = TRANS.NAM_HOC
+                                                                  AND HP.MSSV = TRANS.CUSTOMER_ID)) ) R
+        FROM TC_HOC_PHI HP
+                 LEFT JOIN FW_STUDENT FS
+                           on HP.MSSV = FS.MSSV
+                 LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
+                 LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
+                 LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
+                 LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
+        WHERE (NAM_HOC = namHoc
+            AND HOC_KY = hocKy
+            AND EXISTS(SELECT TRANS_ID
+                       FROM TC_HOC_PHI_TRANSACTION TRANS
+                       WHERE HP.HOC_KY = TRANS.HOC_KY
+                         AND HP.NAM_HOC = TRANS.NAM_HOC
+                         AND HP.MSSV = TRANS.CUSTOMER_ID
+                         AND TRANS.STATUS = 1
+                   )
+                  );
+    RETURN my_cursor;
+END ;
 
 /
 --EndMethod--
