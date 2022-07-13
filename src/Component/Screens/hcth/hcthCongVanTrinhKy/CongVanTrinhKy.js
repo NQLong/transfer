@@ -8,7 +8,7 @@ import fs from 'react-native-fs';
 import forge from 'node-forge';
 import signer from "node-signpdf";
 import { Buffer } from 'buffer';
-import SignPDF from '@/Utils/SignPdf';
+import SignPDF from '@/Utils/signPdf/SignPdf';
 
 const CongVanTrinhKy = () => {
     console.log(signer);
