@@ -309,7 +309,7 @@ class EditModal extends AdminModal {
                         <div className='form-group col-md-7'>
                             {this.tableListFile(this.state.listFile, permission)}
                         </div>
-                        {this.state.shcc && <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
+                        {this.state.shcc && <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} readOnly={readOnly} />}
                     </div>
                 </div>
                 <FormCheckbox label={'Bấm vào đây nếu báo cáo không hợp lệ'} onChange={this.handleBaoCao} className='form-group col-md-6' ref={e => this.baoCaoCheck = e} readOnly={readOnly} />
@@ -643,7 +643,7 @@ class QtDiNuocNgoai extends AdminPage {
         value ? this.setState({ visibleTime: true }) : this.setState({ visibleTime: false });
     }
     render() {
-        const permission = this.getUserPermission('qtDiNuocNgoai');
+        const permission = this.getUserPermission('qtDiNuocNgoai', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.pageGr ?
                 this.props.qtDiNuocNgoai.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -758,9 +758,9 @@ class QtDiNuocNgoai extends AdminPage {
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex', marginTop: '10px' }}>
-                        <button className='btn btn-info' type='button' style={{ marginRight: '10px' }} onClick={e => e.preventDefault() || this.thongKeMucDich.show()}>
+                        {permission.export ? <button className='btn btn-info' type='button' style={{ marginRight: '10px' }} onClick={e => e.preventDefault() || this.thongKeMucDich.show()}>
                             <i className='fa fa-fw fa-lg fa-th-list' />Thống kê mục đích
-                        </button>
+                        </button> : null}
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                         </button>
@@ -790,7 +790,7 @@ class QtDiNuocNgoai extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showCreateModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 let { pageCondition } = this.props && this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.page ? this.props.qtDiNuocNgoai.page : { pageCondition: {} };
                 pageCondition = typeof pageCondition === 'string' ? pageCondition : '';

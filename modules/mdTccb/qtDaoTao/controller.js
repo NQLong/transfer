@@ -20,11 +20,20 @@ module.exports = app => {
         { name: 'qtDaoTao:read', menu },
         { name: 'qtDaoTao:write' },
         { name: 'qtDaoTao:delete' },
+        { name: 'qtDaoTao:export' },
     );
     app.get('/user/tccb/qua-trinh/dao-tao/:stt', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao/:ma', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/qua-trinh-dao-tao-boi-duong', app.permission.check('staff:login'), app.templates.admin);
+
+    // app.permissionHooks.add('staff', 'addRoleQtDaoTao', (user, staff) => new Promise(resolve => {
+    //     if (staff.maDonVi && staff.maDonVi == '30') {
+    //         app.permissionHooks.pushUserPermission(user, 'qtDaoTao:read', 'qtDaoTao:write', 'qtDaoTao:delete', 'qtDaoTao:export');
+    //         resolve();
+    //     }
+    // }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -88,7 +97,7 @@ module.exports = app => {
         app.model.qtDaoTao.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.get('/api/qua-trinh/dao-tao/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listLoaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
+    app.get('/api/qua-trinh/dao-tao/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listLoaiBang', app.permission.check('qtDaoTao:export'), (req, res) => {
         let { listShcc, listDv, fromYear, toYear, listLoaiBang } = req.params ? req.params : { listShcc: null, listDv: null, fromYear: null, toYear: null, listLoaiBang: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;
