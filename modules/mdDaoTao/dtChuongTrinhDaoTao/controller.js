@@ -28,7 +28,7 @@ module.exports = app => {
         if (!permissions.includes('dtChuongTrinhDaoTao:read')) {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
-        } else donVi = '';
+        }
         let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]).toString();
         const { namDaoTao, heDaoTaoFilter } = req.query;
         if (listLoaiHinhDaoTao.includes('manager')) listLoaiHinhDaoTao = '';

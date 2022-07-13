@@ -291,7 +291,11 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
-            this.setState({ donViFilter: this.props.system.user.staff?.maDonVi, idNamDaoTao: '', heDaoTaoFilter: '' });
+            let permission = this.getUserPermission('dtChuongTrinhDaoTao'),
+                user = this.props.system.user,
+                donViFilter = user.staff?.maDonVi;
+            if (permission.read) donViFilter = '';
+            this.setState({ donViFilter, idNamDaoTao: '', heDaoTaoFilter: '' });
             T.onSearch = (searchText) => this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, {
                 searchTerm: searchText || '',
             });
