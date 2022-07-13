@@ -68,7 +68,7 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
     const page = T.updatePage('pageDtChuongTrinhDaoTao', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dao-tao/chuong-trinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter, namDaoTao: pageCondition?.namDaoTao }, data => {
+        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter, namDaoTao: pageCondition?.namDaoTao, heDaoTaoFilter: pageCondition?.heDaoTaoFilter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);

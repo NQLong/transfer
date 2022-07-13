@@ -30,10 +30,9 @@ module.exports = app => {
             else return res.send({ error: 'Permission denied!' });
         }
         let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]).toString();
-        const namDaoTao = req.query.namDaoTao;
+        const { namDaoTao, heDaoTaoFilter } = req.query;
         if (listLoaiHinhDaoTao.includes('manager')) listLoaiHinhDaoTao = '';
-        const filter = JSON.stringify({ donVi, namDaoTao, listLoaiHinhDaoTao });
-
+        const filter = JSON.stringify({ donVi, namDaoTao, listLoaiHinhDaoTao, heDaoTaoFilter });
         app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, searchTerm, filter, (error, result) => {
             if (error) res.send({ error });
             else {
@@ -43,7 +42,7 @@ module.exports = app => {
                     donViFilter: donVi
                 };
                 if (namDaoTao) {
-                    pageCondition = { ...pageCondition, namDaoTao: namDaoTao };
+                    pageCondition = { ...pageCondition, namDaoTao, heDaoTaoFilter };
                 }
                 res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list, pageCondition } });
             }
