@@ -125,6 +125,7 @@ module.exports = app => {
             app.assignRoleHooks.addRoles('quanLyDaoTao', async () => {
                 let listLoaiHinhDaoTao = await app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1 });
                 listLoaiHinhDaoTao = listLoaiHinhDaoTao.map(item => ({ id: `quanLyDaoTao:${item.ma}`, text: `Quản lý đào tạo: ${item.ten}` }));
+                listLoaiHinhDaoTao.push({ id: 'quanLyDaoTao:manager', text: 'Quản lý đào tạo: Admin' });
                 return listLoaiHinhDaoTao;
             });
         }
@@ -166,7 +167,7 @@ module.exports = app => {
     app.permissionHooks.add('assignRole', 'checkRoleQuanLyDaoTao', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyDaoTao');
         inScopeRoles.forEach(role => {
-            if (role.tenRole.includes('quanLyDaoTao') && !role.tenRole.includes('manager')) {
+            if (role.tenRole.includes('quanLyDaoTao')) {
                 app.permissionHooks.pushUserPermission(user, role.tenRole);
             }
         });
