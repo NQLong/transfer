@@ -203,7 +203,6 @@ module.exports = app => {
                     let role = user.roles[i];
                     if (role.name == 'admin') {
                         user.permissions = app.permission.all().filter(permission => permission.endsWith(':login') || permission.endsWith(':read'));
-                        break;
                     }
                     (role.permission ? role.permission.split(',') : []).forEach(permission => app.permissionHooks.pushUserPermission(user, permission.trim()));
                 }
