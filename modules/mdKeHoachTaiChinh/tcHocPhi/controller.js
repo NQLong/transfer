@@ -370,18 +370,17 @@ module.exports = app => {
             }
 
             let tuNgay = null, denNgay = null;
-            if (Number.isInteger(filter.tuNgay)) {
+            if (Number.isInteger(parseInt(filter.tuNgay))) {
                 tuNgay = new Date(filter.tuNgay);
                 tuNgay.setHours(0, 0, 0, 0);
                 tuNgay = tuNgay.getTime();
             }
-            if (Number.isInteger(filter.denNgay)) {
+            if (Number.isInteger(parseInt(filter.denNgay))) {
                 denNgay = new Date(filter.denNgay);
                 denNgay.setHours(23, 59, 59, 999);
                 denNgay = denNgay.getTime();
             }
 
-            // console.log(tuNgay)
             filter = app.stringify(filter, '');
             let data = await app.model.tcHocPhi.downloadPSC(filter);
             const list = data.rows;
@@ -390,25 +389,14 @@ module.exports = app => {
             ws.columns = [
                 { header: 'STT', key: 'stt', width: 10 },
                 { header: 'MSSV', key: 'mssv', width: 15 },
-                { header: 'HỌ VÀ TÊN LÓT', key: 'ho', width: 30 },
-                { header: 'TÊN', key: 'ten', width: 10 },
-                { header: 'GIỚI TÍNH', key: 'gioiTinh', width: 10 },
-                { header: 'NGÀY SINH', key: 'ngaySinh', width: 10 },
-                { header: 'BẬC ĐÀO TẠO', key: 'bacDaoTao', width: 10 },
-                { header: 'HỆ ĐÀO TẠO', key: 'heDaoTao', width: 10 },
-                { header: 'KHOA/BỘ MÔN', key: 'donVi', width: 20 },
-                { header: 'MÃ NGÀNH', key: 'maNganh', width: 10 },
-                { header: 'TÊN NGÀNH HỌC', key: 'tenNganh', width: 20 },
-                { header: 'HỌC KỲ', key: 'term', width: 10 },
-                { header: 'NĂM HỌC', key: 'year', width: 20 },
-                { header: 'SỐ TIỀN THU (VND)', key: 'hocPhi', width: 15 },
-                { header: 'ĐÃ THU (VND)', key: 'congNo', width: 15 },
-                { header: 'THỜI GIAN ĐÓNG', key: 'thoiGian', width: 20 },
-                { header: 'MÃ HOÁ ĐƠN (NH)', key: 'idTrans', width: 20 },
-                { header: 'Định danh', key: 'dinhDanh', width: 20 },
-                { header: 'Ngày đóng', key: 'ngayDong', width: 20 },
-                { header: 'Mã PSC', key: 'psc', width: 20 },
-                { header: 'Nội dung thu', key: 'psc', width: 20 },
+                { header: 'HỌ TÊN', key: 'ho', width: 30 },
+                { header: 'Ngày hóa đơn', key: 'ngatHoaDon', width: 30 },
+                { header: 'Số tiền', key: 'soTien', width: 30 },
+                { header: 'Số series', key: 'soSeries', width: 30 },
+                { header: 'Số hóa đơn', key: 'soHoaDon', width: 30 },
+                { header: 'Học kỳ', key: 'hocKy', width: 30 },
+                { header: 'Năm học', key: 'namHoc', width: 30 },
+                { header: 'Nội dung thu', key: 'noiDungThu', width: 30 },
             ];
             ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
             // ws.getRow(1).height = 0;
@@ -420,36 +408,19 @@ module.exports = app => {
                 color: { argb: 'FF000000' }
             };
             list.filter(item => (!tuNgay || item.lastTransaction > tuNgay) && (!denNgay || item.lastTransaction <= denNgay)).forEach((item, index) => {
+                const ngayDong = item.lastTransaction ? new Date(Number(item.lastTransaction)) : null;
                 ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
                 ws.getRow(index + 2).font = { name: 'Times New Roman' };
                 ws.getCell('A' + (index + 2)).value = index + 1;
                 ws.getCell('B' + (index + 2)).value = item.mssv;
-                ws.getCell('C' + (index + 2)).value = item.ho.toUpperCase();
-                ws.getCell('D' + (index + 2)).value = item.ten.toUpperCase();
-                ws.getCell('E' + (index + 2)).value = item.gioiTinh == 1 ? 'Nam' : 'Nữ';
-                ws.getCell('F' + (index + 2)).value = app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy');
-                ws.getCell('G' + (index + 2)).value = item.tenBacDaoTao;
-                ws.getCell('H' + (index + 2)).value = item.tenLoaiHinhDaoTao;
-                ws.getCell('I' + (index + 2)).value = item.tenKhoa;
-                ws.getCell('J' + (index + 2)).value = item.maNganh;
-                ws.getCell('K' + (index + 2)).value = item.tenNganh;
-                ws.getCell('L' + (index + 2)).value = 'HK0' + settings.hocPhiHocKy;
-                ws.getCell('M' + (index + 2)).value = `${settings.hocPhiNamHoc} - ${parseInt(settings.hocPhiNamHoc) + 1}`;
-                ws.getCell('N' + (index + 2)).value = item.hocPhi.toString().numberDisplay();
-                ws.getCell('O' + (index + 2)).value = (parseInt(item.hocPhi) - parseInt(item.congNo)).toString().numberDisplay();
-                ws.getCell('P' + (index + 2)).value = item.lastTransaction ? app.date.dateTimeFormat(new Date(Number(item.lastTransaction)), 'HH:MM:ss dd/mm/yyyy') : '';
-                ws.getCell('Q' + (index + 2)).value = item.lastTransactionId;
-                ws.getCell('R' + (index + 2)).value = `${item.dinhDanh}/${item.lastTransaction ? app.date.dateTimeFormat(new Date(Number(item.lastTransaction)), 'HH:MM:ss dd/mm/yyyy') : ''}`;
-                ws.getCell('S' + (index + 2)).value = item.lastTransaction ? app.date.dateTimeFormat(new Date(Number(item.lastTransaction)), 'dd/mm/yyyy') : '';
-                ws.getCell('T' + (index + 2)).value = ('0000000' + item.R).slice(-7);
-                ws.getCell('U' + (index + 2)).value = `Tạm thu học phí học kỳ 1 NH${settings.hocPhiNamHoc}-${parseInt(settings.hocPhiNamHoc) + 1}`;
-                ws.getCell('L' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
-                ws.getCell('M' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
-                ws.getCell('N' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
-                ws.getCell('O' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
-                ws.getCell('P' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
-                ws.getCell('E' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
-                ws.getCell('F' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+                ws.getCell('C' + (index + 2)).value = `${item.ho.toUpperCase()} ${item.ten.toUpperCase()}`.trim();
+                ws.getCell('D' + (index + 2)).value = item.lastTransaction ? app.date.dateTimeFormat(new Date(Number(item.lastTransaction)), 'dd/mm/yyyy') : '';
+                ws.getCell('E' + (index + 2)).value = item.hocPhi.toString().numberDisplay();
+                ws.getCell('F' + (index + 2)).value = `${item.dinhDanh}/${item.lastTransaction ? `${('0' + (ngayDong.getMonth() + 1)).slice(-2)}${ngayDong.getFullYear().toString().slice(-2)}` : ''}`;
+                ws.getCell('G' + (index + 2)).value = ('0000000' + item.R).slice(-6);
+                ws.getCell('H' + (index + 2)).value = 'HK0' + settings.hocPhiHocKy;
+                ws.getCell('I' + (index + 2)).value = `${settings.hocPhiNamHoc} - ${parseInt(settings.hocPhiNamHoc) + 1}`;
+                ws.getCell('J' + (index + 2)).value = `Tạm thu học phí học kỳ 1 NH${settings.hocPhiNamHoc}-${parseInt(settings.hocPhiNamHoc) + 1}`;
 
             });
             let fileName = `HOC_PHI_NH_${settings.hocPhiNamHoc}_${parseInt(settings.hocPhiNamHoc) + 1}_HK${settings.hocPhiHocKy}.xlsx`;
