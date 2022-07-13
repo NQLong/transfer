@@ -13652,7 +13652,8 @@
             "modelName": "tcHocPhi",
             "methods": {
                 "TC_HOC_PHI_SEARCH_PAGE": "searchPage",
-                "TC_HOC_PHI_GET_ALL_MSSV": "getAllFeeOfStudent"
+                "TC_HOC_PHI_GET_ALL_MSSV": "getAllFeeOfStudent",
+                "TC_HOC_PHI_DOWNLOAD_PSC": "downloadPSC"
             },
             "columns": {
                 "MSSV": {
