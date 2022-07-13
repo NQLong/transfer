@@ -33,7 +33,6 @@ module.exports = app => {
         const { namDaoTao, heDaoTaoFilter } = req.query;
         if (listLoaiHinhDaoTao.includes('manager')) listLoaiHinhDaoTao = '';
         const filter = JSON.stringify({ donVi, namDaoTao, listLoaiHinhDaoTao, heDaoTaoFilter });
-        console.log(filter);
         app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, searchTerm, filter, (error, result) => {
             if (error) res.send({ error });
             else {
