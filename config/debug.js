@@ -46,20 +46,29 @@ module.exports = app => {
     app.post('/api/debug/switch-user', async (req, res) => {
         try {
             const personId = req.body.personId,
-                isDebug = app.isDebug || (req.session.user?.permissions?.length && req.session.user.permissions.includes('developer:login'));
-            if (personId && isDebug) {
+                isDeveloper = req.session.user?.permissions?.length && req.session.user.permissions.includes('developer:login'),
+                isSwitchable = app.isDebug || isDeveloper;
+            const originalEmail = req.session.user?.originalEmail || req.session.user.email;
+            const done = (user) => {
+                if (!app.isDebug) {
+                    req.session.user.originalEmail = originalEmail;
+                    req.session.save();
+                }
+                res.send({ user });
+            };
+            if (personId && isSwitchable) {
                 const canBo = await app.model.canBo.get({ shcc: personId });
                 if (canBo) {
                     const user = { email: canBo.email, lastName: canBo.ho, firstName: canBo.ten, active: 1, isStaff: 1, shcc: personId };
-                    app.updateSessionUser(req, user, () => res.send({ user }));
+                    app.updateSessionUser(req, user, () => done(user));
                 } else {
                     const sinhVien = await app.model.fwStudents.get({ mssv: personId });
                     if (sinhVien) {
                         const user = { email: sinhVien.emailTruong, lastName: sinhVien.ho, firstName: sinhVien.ten, active: 1, isStudent: 1, studentId: personId };
-                        app.updateSessionUser(req, user, () => res.send({ user }));
+                        app.updateSessionUser(req, user, () => done(user));
                     } else {
                         const user = await app.model.fwUser.get({ email: personId });
-                        if (user) app.updateSessionUser(req, user, () => res.send({ user }));
+                        if (user) app.updateSessionUser(req, user, () => done(user));
                         else res.send({ error: 'System has errors!' });
                     }
                 }

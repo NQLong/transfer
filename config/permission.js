@@ -438,4 +438,25 @@ module.exports = app => {
         ready: () => app.database.oracle.connected && app.model.fwRole != null,
         run: () => app.isDebug && app.permission.getTreeMenuText(),
     });
+
+    const trackUser = async (req) => {
+        const data = {
+            reqMethod: req.method,
+            originalUserEmail: req.session.user.originalEmail,
+            userEmail: req.session.user.email,
+            url: req.url,
+            reqBody: app.stringify(req.body)
+        };
+        try {
+            await app.model.fwTrackingLog.create(data);
+        } catch {
+            return;
+        }
+    };
+    app.use((req, res, next) => {
+        if (req.session && req.session.user && ['POST', 'PUT', 'DELETE'].includes(req.method) && req.url.startsWith('/api') && (req.session.user.originalEmail || req.session.user.permissions?.includes('developer:login') || req.session.user.roles?.some(role => role.name == 'admin'))) {
+            trackUser(req);
+        }
+        next();
+    });
 };
