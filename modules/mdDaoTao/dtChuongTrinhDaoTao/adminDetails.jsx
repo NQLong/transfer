@@ -63,7 +63,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     }
 
     getData = (id, isClone = false, khoaDt) => {
-        this.props.getDtKhungDaoTao(id, (data) => {
+        id && this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
             this.maNganh.value(data.maNganh);
             this.chuyenNganh.value(data.chuyenNganh);
