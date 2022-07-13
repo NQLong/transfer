@@ -344,8 +344,8 @@ class TcHocPhiAdminPage extends AdminPage {
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
                 <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
                 <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
-                <FormDatePicker type='date' className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
-                <FormDatePicker type='date' className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
             </div>,
             breadcrumb: ['Học phí'],
             content:
