@@ -210,7 +210,7 @@ module.exports = app => {
 
                 // Add login permission => user.active == 1 => user:login
                 if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
-                if (app.developers.includes(user.email)) app.permissionHooks.pushUserPermission(user, ...app.permission.all());
+                if (app.developers.includes(user.email)) app.permissionHooks.pushUserPermission(user, 'developer:login', ...app.permission.all());
                 new Promise(resolve => {
                     //Check if user if a staff
                     user.isStaff && app.permissionHooks.pushUserPermission(user, 'staff:login');
@@ -437,5 +437,26 @@ module.exports = app => {
     app.readyHooks.add('permissionInit', {
         ready: () => app.database.oracle.connected && app.model.fwRole != null,
         run: () => app.isDebug && app.permission.getTreeMenuText(),
+    });
+
+    const trackUser = async (req) => {
+        const data = {
+            reqMethod: req.method,
+            originalUserEmail: req.session.user.originalEmail,
+            userEmail: req.session.user.email,
+            url: req.url,
+            reqBody: app.stringify(req.body)
+        };
+        try {
+            await app.model.fwTrackingLog.create(data);
+        } catch {
+            return;
+        }
+    };
+    app.use((req, res, next) => {
+        if (req.session && req.session.user && ['POST', 'PUT', 'DELETE'].includes(req.method) && req.url.startsWith('/api') && (req.session.user.originalEmail || req.session.user.permissions?.includes('developer:login') || req.session.user.roles?.some(role => role.name == 'admin'))) {
+            trackUser(req);
+        }
+        next();
     });
 };

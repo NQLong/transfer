@@ -14602,6 +14602,60 @@
             "primaryKeys": [],
             "foreignKeys": [],
             "type": "table"
+        },
+        "FW_TRACKING_LOG": {
+            "active": true,
+            "moduleName": "fwTrackingLog",
+            "modelName": "fwTrackingLog",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_145246\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "URL": {
+                    "value": "url",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 256
+                },
+                "REQ_BODY": {
+                    "value": "reqBody",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "USER_EMAIL": {
+                    "value": "userEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "ORIGINAL_USER_EMAIL": {
+                    "value": "originalUserEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "REQ_METHOD": {
+                    "value": "reqMethod",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
