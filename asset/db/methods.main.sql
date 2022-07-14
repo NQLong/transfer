@@ -906,11 +906,13 @@ BEGIN
     SELECT JSON_VALUE(TG_MO_MON, '$.idDangKyMoMon') INTO ID_DANG_KY_MO_MON FROM DUAL;
 
     OPEN THONG_TIN FOR
-        SELECT DKMM.KHOA     AS "khoaDangKy",
-               DKMM.MA_NGANH AS "maNganh",
-               NDT.TEN_NGANH AS "tenNganh",
-               DV.TEN        AS "tenKhoaDangKy",
-               DKMM.IS_DUYET AS "isDuyet"
+        SELECT DKMM.KHOA              AS "khoaDangKy",
+               DKMM.MA_NGANH          AS "maNganh",
+               NDT.TEN_NGANH          AS "tenNganh",
+               DV.TEN                 AS "tenKhoaDangKy",
+               DKMM.IS_DUYET          AS "isDuyet",
+               DKMM.LOAI_HINH_DAO_TAO AS "loaiHinhDaoTao",
+               DKMM.BAC_DAO_TAO       AS "bacDaoTao"
         FROM DT_DANG_KY_MO_MON DKMM
                  LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = DKMM.MA_NGANH
                  LEFT JOIN DM_DON_VI DV ON DV.MA = DKMM.KHOA
@@ -965,7 +967,7 @@ BEGIN
                DS.MA_DANG_KY        AS "maDangKy"
         FROM DT_DANH_SACH_MON_MO DS
                  LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CN ON CN.ID = DS.CHUYEN_NGANH
-    WHERE DS.MA_DANG_KY = ID_DANG_KY_MO_MON;
+        WHERE DS.MA_DANG_KY = ID_DANG_KY_MO_MON;
 
     return DANH_SACH_MON_MO;
 END;
@@ -14603,6 +14605,7 @@ AS
     listChuyenNganh STRING(100);
     nhanSuDonVi     NUMBER;
     nhanSuQuyen     STRING(100);
+    lastModified    NUMBER;
 BEGIN
     SELECT JSON_VALUE(filter, '$.listShcc') INTO listShcc FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listDonVi') INTO listDonVi FROM DUAL;
@@ -14623,6 +14626,7 @@ BEGIN
     SELECT JSON_VALUE(filter, '$.listChuyenNganh') INTO listChuyenNganh FROM DUAL;
     SELECT JSON_VALUE(filter, '$.nhanSuDonVi') INTO nhanSuDonVi FROM DUAL;
     SELECT JSON_VALUE(filter, '$.nhanSuQuyen') INTO nhanSuQuyen FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.lastModified') INTO lastModified FROM DUAL;
 
     SELECT COUNT(*)
     INTO totalItem
@@ -14709,6 +14713,7 @@ BEGIN
                                         )
                             )
                 )
+            AND (lastModified IS NULL OR (CB.LAST_MODIFIED IS NOT NULL AND CB.LAST_MODIFIED >= lastModified))
         )
       AND (NGAY_NGHI IS NULL OR NGAY_NGHI < time)
       AND (searchTerm = ''
@@ -14732,6 +14737,7 @@ BEGIN
                      CB.PHAI                                                    AS "phai",
                      CB.MA_DON_VI                                               AS "maDonVi",
                      DV.TEN                                                     AS "tenDonVi",
+                     DV.MA_PL                                                   AS "loaiDonVi",
                      NG.MA                                                      AS "ngach",
                      NG.TEN                                                     AS "tenChucDanhNgheNghiep",
                      TRINH_DO.TEN                                               AS "hocVi",
@@ -14906,6 +14912,7 @@ BEGIN
                                                   )
                                       )
                           )
+                     AND (lastModified IS NULL OR (CB.LAST_MODIFIED IS NOT NULL AND CB.LAST_MODIFIED >= lastModified))
                   )
                 AND (NGAY_NGHI IS NULL OR NGAY_NGHI < time)
                 AND (searchTerm = ''
@@ -15384,6 +15391,15 @@ BEGIN
                                     WHERE HP.HOC_KY = TRANS.HOC_KY
                                       AND HP.NAM_HOC = TRANS.NAM_HOC
                                       AND HP.MSSV = TRANS.CUSTOMER_ID)) AS                            "lastTransactionId",
+
+               (SELECT BANK
+                FROM TC_HOC_PHI_TRANSACTION
+                WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                    FROM TC_HOC_PHI_TRANSACTION TRANS
+                                    WHERE HP.HOC_KY = TRANS.HOC_KY
+                                      AND HP.NAM_HOC = TRANS.NAM_HOC
+                                      AND HP.MSSV = TRANS.CUSTOMER_ID)) AS                            "dinhDanh",
+
                ROW_NUMBER() OVER (ORDER BY (SELECT TRANS_DATE
                                             FROM TC_HOC_PHI_TRANSACTION
                                             WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
@@ -15400,6 +15416,7 @@ BEGIN
                  LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
         WHERE (NAM_HOC = namHoc
             AND HOC_KY = hocKy
+            AND CONG_NO = 0
             AND EXISTS(SELECT TRANS_ID
                        FROM TC_HOC_PHI_TRANSACTION TRANS
                        WHERE HP.HOC_KY = TRANS.HOC_KY
@@ -15498,9 +15515,9 @@ END ;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION TC_HOC_PHI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, imssv IN STRING,
-                                       searchTerm IN STRING, filter IN STRING,
-                                       totalItem OUT NUMBER, pageTotal OUT NUMBER, totalCurrent OUT NUMBER,
-                                       totalPaid OUT NUMBER) RETURN SYS_REFCURSOR
+                                                  searchTerm IN STRING, filter IN STRING,
+                                                  totalItem OUT NUMBER, pageTotal OUT NUMBER, totalCurrent OUT NUMBER,
+                                                  totalPaid OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(502) := '%' || lower(searchTerm) || '%';
@@ -15569,39 +15586,42 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT HP.MSSV                                                  AS "mssv",
-                     HP.NAM_HOC                                               AS "namHoc",
-                     HP.HOC_KY                                                AS "hocKy",
-                     HP.CONG_NO                                               AS "congNo",
-                     HP.HOC_PHI                                               AS "hocPhi",
-                     FS.HO                                                    as "ho",
-                     FS.TEN                                                   AS "ten",
-                     FS.GIOI_TINH                                             AS "gioiTinh",
-                     FS.NGAY_SINH                                             AS "ngaySinh",
-                     (FS.HO || ' ' || FS.TEN)                                 AS "hoTenSinhVien",
-                     FS.DIEN_THOAI_CA_NHAN                                    AS "soDienThoai",
-                     FS.EMAIL_CA_NHAN                                         AS "emailCaNhan",
-                     FS.MA_NGANH                                              AS "maNganh",
-                     NDT.TEN_NGANH                                            AS "tenNganh",
-                     DV.TEN                                                   AS "tenKhoa",
-                     LHDT.TEN                                                 AS "tenLoaiHinhDaoTao",
-                     BDT.TEN_BAC                                              AS "tenBacDaoTao",
-                     (SELECT TRANS_DATE
-                      FROM TC_HOC_PHI_TRANSACTION
-                      WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
-                                          FROM TC_HOC_PHI_TRANSACTION TRANS
-                                          WHERE HP.HOC_KY = TRANS.HOC_KY
-                                            AND HP.NAM_HOC = TRANS.NAM_HOC
-                                            AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransaction",
+        FROM (SELECT HP.MSSV                  AS         "mssv",
+                     HP.NAM_HOC               AS         "namHoc",
+                     HP.HOC_KY                AS         "hocKy",
+                     HP.CONG_NO               AS         "congNo",
+                     HP.HOC_PHI               AS         "hocPhi",
+                     FS.HO                    as         "ho",
+                     FS.TEN                   AS         "ten",
+                     FS.GIOI_TINH             AS         "gioiTinh",
+                     FS.NGAY_SINH             AS         "ngaySinh",
+                     (FS.HO || ' ' || FS.TEN) AS         "hoTenSinhVien",
+                     FS.DIEN_THOAI_CA_NHAN    AS         "soDienThoai",
+                     FS.EMAIL_CA_NHAN         AS         "emailCaNhan",
+                     FS.MA_NGANH              AS         "maNganh",
+                     NDT.TEN_NGANH            AS         "tenNganh",
+                     DV.TEN                   AS         "tenKhoa",
+                     LHDT.TEN                 AS         "tenLoaiHinhDaoTao",
+                     BDT.TEN_BAC              AS         "tenBacDaoTao",
+                     THPT.TRANS_ID            AS         "lastTransactionId",
+                     THPT.TRANS_DATE          AS         "lastTransaction",
 
-                     (SELECT TRANS_ID
-                      FROM TC_HOC_PHI_TRANSACTION
-                      WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
-                                          FROM TC_HOC_PHI_TRANSACTION TRANS
-                                          WHERE HP.HOC_KY = TRANS.HOC_KY
-                                            AND HP.NAM_HOC = TRANS.NAM_HOC
-                                            AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransactionId",
-                     ROW_NUMBER() OVER (ORDER BY FS.TEN)                         R
+--                      (SELECT TRANS_DATE
+--                       FROM TC_HOC_PHI_TRANSACTION
+--                       WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+--                                           FROM TC_HOC_PHI_TRANSACTION TRANS
+--                                           WHERE HP.HOC_KY = TRANS.HOC_KY
+--                                             AND HP.NAM_HOC = TRANS.NAM_HOC
+--                                             AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransaction",
+--
+--                      (SELECT TRANS_ID
+--                       FROM TC_HOC_PHI_TRANSACTION
+--                       WHERE TRANS_DATE = (SELECT MAX(TRANS_DATE)
+--                                           FROM TC_HOC_PHI_TRANSACTION TRANS
+--                                           WHERE HP.HOC_KY = TRANS.HOC_KY
+--                                             AND HP.NAM_HOC = TRANS.NAM_HOC
+--                                             AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransactionId",
+                     ROW_NUMBER() OVER (ORDER BY FS.TEN) R
               FROM TC_HOC_PHI HP
                        LEFT JOIN FW_STUDENT FS
                                  on HP.MSSV = FS.MSSV
@@ -15609,6 +15629,14 @@ BEGIN
                        LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                        LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
+                       LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
+                  AND HP.NAM_HOC = THPT.NAM_HOC
+                  AND HP.MSSV = THPT.CUSTOMER_ID
+                  AND THPT.TRANS_DATE = (SELECT MAX(TRANS_DATE)
+                                         FROM TC_HOC_PHI_TRANSACTION TRANS
+                                         WHERE HP.HOC_KY = TRANS.HOC_KY
+                                           AND HP.NAM_HOC = TRANS.NAM_HOC
+                                           AND HP.MSSV = TRANS.CUSTOMER_ID)
               WHERE (imssv IS NULL
                   OR imssv = ''
                   OR imssv = HP.MSSV)
@@ -15670,8 +15698,8 @@ BEGIN
                                                              , '[^,]+'
                                                              , 1
                                                              , level) is not null))
-                AND (NAM_HOC = namHoc
-                  AND HOC_KY = hocKy)
+                AND (HP.NAM_HOC = namHoc
+                  AND HP.HOC_KY = hocKy)
                 AND (searchTerm = ''
                   OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT
                   OR FS.MSSV LIKE ST))
@@ -15724,6 +15752,57 @@ BEGIN
         return 1;
     END IF;
 END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                              imssv IN STRING,
+                                                              searchTerm IN STRING, filter IN STRING,
+                                                              totalItem OUT NUMBER, pageTotal OUT NUMBER,
+                                                              totalCurrent OUT NUMBER,
+                                                              totalPaid OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(502) := '%' || lower(searchTerm) || '%';
+    namHoc    NUMBER(4); listBacDaoTao NVARCHAR2(200);
+    hocKy     NUMBER(1); listLoaiHinhDaoTao NVARCHAR2(200);
+    daDong    NUMBER(1); listKhoa NVARCHAR2(500);
+    listNganh NVARCHAR2(500);
+BEGIN
+    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.daDong') INTO daDong FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listBacDaoTao') INTO listBacDaoTao FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listLoaiHinhDaoTao') INTO listLoaiHinhDaoTao FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listNganh') INTO listNganh FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listKhoa') INTO listKhoa FROM DUAL;
+
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM TC_HOC_PHI_TRANSACTION THPT;
+
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT ROW_NUMBER() OVER (ORDER BY FS.TEN) R
+              FROM TC_HOC_PHI_TRANSACTION THPT
+                       LEFT JOIN FW_STUDENT FS
+                                 on THPT.CUSTOMER_ID = FS.MSSV
+                       LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
+                       LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
+                       LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
+                       LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO)
+
+
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+END ;
 
 /
 --EndMethod--
