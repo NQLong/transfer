@@ -13970,7 +13970,8 @@
             "moduleName": "hcthCongVanTrinhKy",
             "modelName": "hcthCongVanTrinhKy",
             "methods": {
-                "HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE": "searchPage"
+                "HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE": "searchPage",
+                "HCTH_CONG_VAN_TRINH_KY_GET_FROM": "getAllFrom"
             },
             "columns": {
                 "ID": {
