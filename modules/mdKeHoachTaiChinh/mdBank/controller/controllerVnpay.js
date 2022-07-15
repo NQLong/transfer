@@ -81,12 +81,7 @@ module.exports = app => {
             vnp_Params = sortObject(vnp_Params);
             let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
             const { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb, } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb');
-            const bankMapper = {
-                'HCMUSSH1': vnp_TmnCodeAgribank,
-                'HCMUSSH2': vnp_TmnCodeVnpayAgribank,
-                'VCBXHNV2': vnp_TmnCodeVcb,
-                'VCBXHNV1': vnp_TmnCodeVnpayVcb
-            }, hashMapper = {
+            const hashMapper = {
                 'HCMUSSH1': vnp_HashSecretAgribank,
                 'HCMUSSH2': vnp_HashSecretAgribank,
                 'VCBXHNV2': vnp_HashSecretVcb,
@@ -94,9 +89,8 @@ module.exports = app => {
             };
             let { vnp_Amount, vnp_PayDate, vnp_BankCode, vnp_TransactionNo, vnp_TransactionStatus, vnp_TxnRef, vnp_TmnCode } = vnp_Params;
             let mssv = vnp_TxnRef.substring(0, vnp_TxnRef.indexOf('_'));
-
-            const myVnp_TmnCode = bankMapper[vnp_BankCode], vnp_HashSecret = hashMapper[vnp_BankCode];
-            if (myVnp_TmnCode != vnp_TmnCode) res.send({ RspCode: '99', Message: 'Merchant Has Been Changed' });
+            const vnp_HashSecret = hashMapper[vnp_TmnCode];
+            if (![vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb].includes(vnp_TmnCode)) res.send({ RspCode: '99', Message: 'Merchant Code Has Been Changed' });
             else if (vnp_TransactionStatus == 99) res.send({ RspCode: '00', Message: 'Confirm Success' });
             else {
                 vnp_Amount = parseInt(vnp_Amount / 100);
@@ -119,7 +113,7 @@ module.exports = app => {
                         else if (vnp_TransactionStatus == '00') {
                             await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
 
-                            await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate });
+                            // await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate });
 
                             res.send({ RspCode: '00', Message: 'Confirm Success' });
                         } else {
@@ -136,7 +130,7 @@ module.exports = app => {
         }
         catch (error) {
             console.error('Error catch VNPAY: ', error);
-            res.send({ RspCode: '99', Message: 'Node error' });
+            res.send({ RspCode: '99', Message: 'Unknow error' });
         }
     });
 

@@ -250,8 +250,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             header: <>
                 <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />
                 {(currentPermissions.includes('rectors:login') || currentPermissions.includes('hcth:login')) && <FormSelect style={{ width: '150px', marginBottom: '0', marginLeft: '5px' }} allowClear={true} ref={e => this.status = e} placeholder='Tình trạng' onChange={() => this.changeAdvancedSearch()} data={statusSelector} />}
-            </>
-            ,
+            </>,
             advanceSearch: <>
                 <div className='row'>
                     <div className='col-12 col-md-12 row'>

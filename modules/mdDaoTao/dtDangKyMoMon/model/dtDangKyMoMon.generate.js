@@ -1,6 +1,6 @@
-// Table name: DT_DANG_KY_MO_MON { id, khoa, thoiGian, hocKy, nam, ghiChu, isDuyet, maNganh }
+// Table name: DT_DANG_KY_MO_MON { id, khoa, thoiGian, hocKy, nam, ghiChu, isDuyet, maNganh, loaiHinhDaoTao, bacDaoTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'khoa': 'KHOA', 'thoiGian': 'THOI_GIAN', 'hocKy': 'HOC_KY', 'nam': 'NAM', 'ghiChu': 'GHI_CHU', 'isDuyet': 'IS_DUYET', 'maNganh': 'MA_NGANH' };
+const obj2Db = { 'id': 'ID', 'khoa': 'KHOA', 'thoiGian': 'THOI_GIAN', 'hocKy': 'HOC_KY', 'nam': 'NAM', 'ghiChu': 'GHI_CHU', 'isDuyet': 'IS_DUYET', 'maNganh': 'MA_NGANH', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO' };
 
 module.exports = app => {
     app.model.dtDangKyMoMon = {

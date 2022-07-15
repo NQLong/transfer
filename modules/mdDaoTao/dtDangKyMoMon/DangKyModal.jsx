@@ -8,9 +8,9 @@ class MonHocCtdtModal extends AdminModal {
     state = { listMonHocChonChung: [], listMonHocChonChuyenNganh: [] }
     onShow = (item) => {
         let { khoaSv, thongTinKhoaNganh, maDangKy } = item;
-        let { maNganh, khoaDangKy } = thongTinKhoaNganh;
+        let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
 
-        this.props.getDanhSachMonChuongTrinhDaoTao(khoaSv, maNganh, value => {
+        this.props.getDanhSachMonChuongTrinhDaoTao({ maNganh, khoaSv, loaiHinhDaoTao, bacDaoTao }, value => {
             this.setState({ ...value, khoaSv, maNganh, khoaDangKy, maDangKy }, () => {
                 this.state.listMonHocChung.forEach(item => {
                     if (item.isMo) {

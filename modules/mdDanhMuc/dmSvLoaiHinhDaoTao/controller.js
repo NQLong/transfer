@@ -21,10 +21,23 @@ module.exports = app => {
     app.get('/user/dao-tao/loai-hinh-dao-tao', app.permission.check('dtSvLoaiHinhDaoTao:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/loai-hinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dmSvLoaiHinhDaoTao:read', 'dtSvLoaiHinhDaoTao:read'), (req, res) => {
+    app.get('/api/danh-muc/loai-hinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmSvLoaiHinhDaoTao.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
+    });
+
+    app.get('/api/danh-muc/loai-hinh-dao-tao/filter', app.permission.orCheck('dmSvLoaiHinhDaoTao:read', 'dtSvLoaiHinhDaoTao:read'), async (req, res) => {
+        let permissions = req.session.user.permissions;
+        let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
+        let items = [];
+        if (permissions.includes('quanLyDaoTao:manager')) {
+            items = await app.model.dmSvLoaiHinhDaoTao.getAll();
+        } else items = await app.model.dmSvLoaiHinhDaoTao.getAll({
+            statement: 'ma IN (:listLoaiHinhDaoTao)',
+            parameter: { listLoaiHinhDaoTao }
+        });
+        res.send({ items });
     });
 
     app.get('/api/danh-muc/loai-hinh-dao-tao/item/:ma', app.permission.check('user:login'), (req, res) => {

@@ -65,8 +65,6 @@ module.exports = app => {
             toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
         }
 
-        // console.log({ congVanYear, timeType, fromTime, toTime });
-        // console.log(congVanYear + 1);
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -445,6 +443,14 @@ module.exports = app => {
             const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
+            const vanBanTrinhKy = [];
+            
+            if (files.length > 0) {
+                await Promise.all(files.map(async (file) => {
+                    const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(file.id);
+                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({...item, ten: file.ten })));
+                }));
+            }
 
             res.send({
                 item: {
@@ -453,6 +459,7 @@ module.exports = app => {
                     donViNhan: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 0).map((item) => item.donViNhan) : []).toString(),
                     donViNhanNgoai: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 1).map((item) => item.donViNhan) : []
                     ).toString(),
+                    yeuCauKy: vanBanTrinhKy,
                     listFile: files || [],
                     history: history?.rows || [],
                 },
@@ -737,13 +744,10 @@ module.exports = app => {
         // check permission
         const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
 
-        // console.log(check);
-        // console.log(shcc);
         try {
             if (check) {
                 throw 400;
             }
-            // console.log(id);
             await app.model.hcthHistory.create({
                 key: id,
                 loai: CONG_VAN_DI_TYPE,
@@ -808,12 +812,10 @@ module.exports = app => {
             toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
         }
 
-        // console.log({ canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status, timeType, fromTime, toTime, searchTerm });
         app.model.hcthCongVanDi.downloadExcel(canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, result) => {
             if (error || !result) {
                 res.send({ error });
             } else {
-                // console.log(result);
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('congvancacphong');
                 const cells = [
@@ -930,8 +932,6 @@ module.exports = app => {
                     worksheet.getCell('G' + (index + 2)).value = donViNhan != '' || donViNhanNgoai != '' || canBoNhan != '' ? donViNhan + donViNhanNgoai + canBoNhan : '';
                     worksheet.getCell('G' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
                 });
-                // console.log(cells);
-                // resolve(cells);
                 let fileName = 'congvancacphong.xlsx';
                 app.excel.attachment(workbook, res, fileName);
             }

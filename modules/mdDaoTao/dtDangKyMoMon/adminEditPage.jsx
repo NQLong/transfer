@@ -212,22 +212,23 @@ class DtDsMonMoEditPage extends AdminPage {
 
     render() {
         let { danhSachMonMo, thoiGianMoMon, thongTinKhoaNganh } = this.props.dtDanhSachMonMo || {},
-            { khoa, hocKy, namDaoTao, batDau, ketThuc } = thoiGianMoMon || {}, //khoa: Khóa sinh viên (e.g 2021)
+            { khoa, hocKy, namDaoTao, batDau, ketThuc, bacDaoTao, loaiHinhDaoTao } = thoiGianMoMon || {}, //khoa: Khóa sinh viên (e.g 2021)
             { tenKhoaDangKy, tenNganh, maNganh, isDuyet } = thongTinKhoaNganh || {};
         this.khoa = khoa;
         this.isDuyet = isDuyet;
         let permission = this.getUserPermission('dtDangKyMoMon', ['read', 'write', 'delete', 'manage']);
         return this.renderPage({
-            title: <>Mở môn học</>,
+            title: 'Kế hoạch mở môn học',
             icon: 'fa fa-paper-plane-o',
             subTitle: <>
+                Bậc: {bacDaoTao || ''}. Hệ: {loaiHinhDaoTao || ''} <br />
                 Năm: {namDaoTao || ''}. Học kỳ: {hocKy || ''} <br />
                 Ngành: {tenNganh || ''} ({maNganh || ''}) - {tenKhoaDangKy || ''}
             </>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 <Link key={1} to='/user/dao-tao/dang-ky-mo-mon'>Danh sách</Link>,
-                'Danh sách các môn mở'
+                'Kế hoạch mở môn học'
             ],
             header: <>
                 Từ: {T.dateToText(batDau)}<br />

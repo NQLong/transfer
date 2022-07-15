@@ -296,13 +296,15 @@ class AdminHeader extends AdminPage {
 
     render() {
         const isDebug = this.props.system && this.props.system.isDebug,
-            isAdmin = this.props.system && this.props.system.user && this.props.system.user.roles.some(role => role.name == 'admin');
+            // isAdmin = this.props.system && this.props.system.user && this.props.system.user.roles.some(role => role.name == 'admin'),
+            isDeveloper = this.props.system?.user?.permissions?.length && this.props.system.user.permissions.includes('developer:login');
+
         return [
             <header key={0} className='app-header'>
                 <Link className='app-header__logo' to='/user'>HCMUSSH</Link>
                 <a className='app-sidebar__toggle' href='#' data-toggle='sidebar' aria-label='Hide Sidebar' />
                 <ul className='app-nav'>
-                    {isAdmin || isDebug ?
+                    {isDeveloper || isDebug ?
                         <li className='app-nav__item'>
                             <a href='#' style={{ color: 'white' }} onClick={this.showDebugModal}>Switch user</a>
                         </li> : null}

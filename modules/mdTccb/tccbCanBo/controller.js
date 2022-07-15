@@ -571,7 +571,7 @@ module.exports = app => {
                         maNgach: canBo.maNgach || '',
                         tenNgach: canBo.tenNgach || '',
                         bacLuong: canBo.bacLuong || '',
-                        heSoLuong: canBo.heSoLuong || '',
+                        heSoLuong: canBo.heSoLuong ? Number(canBo.heSoLuong).toFixed(2) : '',
                         ngayHuongLuong: canBo.ngayHuongLuong ? app.date.viDateFormat(new Date(canBo.ngayHuongLuong)) : '',
                         danToc: canBo.danToc || '',
                         tonGiao: canBo.tonGiao || '',

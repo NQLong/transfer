@@ -35,10 +35,8 @@ module.exports = app => {
         app.model.dtCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        const condition = req.query.condition || {};
-        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
-        app.model.dtCauTrucKhungDaoTao.get(condition, '*', 'id ASC', (error, item) => res.send({ error, item }));
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:id', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
+        app.model.dtCauTrucKhungDaoTao.get({ id: req.params.id }, '*', 'id ASC', (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:write'), (req, res) => {

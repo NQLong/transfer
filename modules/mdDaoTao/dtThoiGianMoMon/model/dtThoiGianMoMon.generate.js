@@ -1,6 +1,6 @@
-// Table name: DT_THOI_GIAN_MO_MON { id, batDau, ketThuc, hocKy, nam, ghiChu, kichHoat }
+// Table name: DT_THOI_GIAN_MO_MON { id, batDau, ketThuc, hocKy, nam, ghiChu, kichHoat, loaiHinhDaoTao, bacDaoTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'hocKy': 'HOC_KY', 'nam': 'NAM', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT' };
+const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'hocKy': 'HOC_KY', 'nam': 'NAM', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO' };
 
 module.exports = app => {
     app.model.dtThoiGianMoMon = {

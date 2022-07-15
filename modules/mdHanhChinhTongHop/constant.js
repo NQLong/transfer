@@ -6,6 +6,7 @@ module.exports = {
         CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối' },
         TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)' },
         DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối' },
+        DA_DUYET: {id: 6, text: 'Đã duyệt'}
     },
 
     trangThaiCongVanDi: {
@@ -35,7 +36,10 @@ module.exports = {
         CLOSE: 'CLOSE',
         REOPEN: 'REOPEN',
         RESET: 'RESET',
-        VIEW: 'VIEW'
+        VIEW: 'VIEW',
+        ADD_SIGN_REQUEST: 'ADD_SIGN_REQUEST',
+        REMOVE_SIGN_REQUEST: 'REMOVE_SIGN_REQUEST',
+        UPDATE_SIGN_REQUEST: 'UPDATE_SIGN_REQUEST',
     },
 
     CONG_VAN_TYPE: 'DEN',

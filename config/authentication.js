@@ -53,6 +53,7 @@ module.exports = app => {
     app.isHCMUSSH = email => email.endsWith('@hcmussh.edu.vn') ||
         email == app.defaultAdminEmail;
 
+    app.isDeveloper = email => app.developers.includes(email);
 
     app.isAdmin = (email) => new Promise(resolve =>
         app.model.fwRole.get({ name: 'admin' }, (error, item) => {

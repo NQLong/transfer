@@ -2,7 +2,7 @@ import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ajaxSelectTinhThanhPho } from 'modules/mdDanhMuc/dmDiaDiem/reduxTinhThanhPho';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
-import { SelectAdapter_DmLoaiHinhDaoTaoV2 } from 'modules/mdDanhMuc/dmLoaiHinhDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
@@ -150,7 +150,7 @@ class AdminStudentsPage extends AdminPage {
                     <FormSelect multiple ref={e => this.listEthnic = e} data={SelectAdapter_DmDanTocV2} label='Lọc theo dân tộc' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect multiple ref={e => this.listReligion = e} data={SelectAdapter_DmTonGiaoV2} label='Lọc theo tôn giáo' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect multiple ref={e => this.listFromCity = e} data={ajaxSelectTinhThanhPho} label='Lọc theo tỉnh/thành thường trú' className='col-md-6' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listLoaiHinhDaoTao = e} data={SelectAdapter_DmLoaiHinhDaoTaoV2} label='Lọc theo loại hình đào tạo' className='col-md-6' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple ref={e => this.listLoaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Lọc theo loại hình đào tạo' className='col-md-6' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>

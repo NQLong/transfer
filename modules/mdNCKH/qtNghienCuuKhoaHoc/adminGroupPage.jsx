@@ -168,7 +168,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
                 <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
                 <FormTextBox className='col-md-6' ref={e => this.maSoCapQuanLy = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
-                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly}/>
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly} />
 
                 <div className='form-group col-md-4'>Các mốc thời gian: </div>
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Chưa kết thúc' onChange={this.handleKetThuc} className='form-group col-md-4' readOnly={readOnly} />
@@ -299,7 +299,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -319,7 +319,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi || '').numberWithCommas()} />
+                        <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.kinhPhi} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro == 'CN' ? 'Chủ nhiệm' : 'Tham gia'} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                             item.ngayNghiemThu ?

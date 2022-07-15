@@ -68,7 +68,7 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
     const page = T.updatePage('pageDtChuongTrinhDaoTao', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dao-tao/chuong-trinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter, namDaoTao: pageCondition?.namDaoTao }, data => {
+        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter, namDaoTao: pageCondition?.namDaoTao, heDaoTaoFilter: pageCondition?.heDaoTaoFilter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -212,11 +212,11 @@ export function changeDtChuongTrinhDaoTao(item) {
 }
 
 
-export function getDanhSachMonChuongTrinhDaoTao(khoa, maNganh, done) {
+export function getDanhSachMonChuongTrinhDaoTao(condition, done) {
     return () => {
-        T.get(`/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc/${khoa}/${maNganh}`, result => {
+        T.get('/api/dao-tao/chuong-trinh-dao-tao/all-mon-hoc', { condition }, result => {
             if (result.error) {
-                T.notify('Lấy danh sách môn CTDT lỗi', 'danger');
+                T.notify(result.error?.message || 'Lấy danh sách môn CTDT lỗi', 'danger');
                 console.error(result.error);
             } else {
                 done(result);

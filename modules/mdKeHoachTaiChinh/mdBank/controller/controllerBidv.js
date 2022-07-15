@@ -54,8 +54,8 @@ module.exports = app => {
                 if (!student) {
                     res.send({ result_code: '017' });
                 } else {
-                    let name = `USSH ${student.ho} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
-                    if (name.length > 40) name = `USSH ${student.ho.getFirstLetters()} ${student.ten} ${hocPhi.congNo.toString().numberWithDots()}`.toUpperCase();
+                    let name = `USSH ${student.ho} ${student.ten} ${hocPhi.congNo.toString().numberDisplay()}`.toUpperCase();
+                    if (name.length > 40) name = `USSH ${student.ho.getFirstLetters()} ${student.ten} ${hocPhi.congNo.toString().numberDisplay()}`.toUpperCase();
                     res.send({
                         result_code: '000', result_desc: 'success',
                         data: {
@@ -71,10 +71,21 @@ module.exports = app => {
 
     // production
     app.post('/api/bidv-nvxhhcm/paybill', async (req, res) => {
+        const trans_id = req.body.trans_id;
         try {
             await payBill(types.PRODUCTION, req, res);
         } catch (error) {
-            res.send({ result_code: '096' });
+            try {
+                if (trans_id) {
+                    const item = await app.model.tcHocPhiTransaction.update({ transId: trans_id }, { status: 0 });
+                    if (!item) throw 'No transaction!';
+                    const { namHoc, hocKy, customerId } = item;
+                    const hocPhi = await app.model.tcHocPhi.get({ mssv: customerId, namHoc, hocKy });
+                    await app.model.tcHocPhi.update({ mssv: customerId, namHoc, hocKy }, { congNo: parseInt(hocPhi.congNo) + parseInt(item.amount) });
+                } else res.send({ result_code: '145' });
+            } catch (error) {
+                res.send({ result_code: '096' });
+            }
         }
     });
 
@@ -110,8 +121,8 @@ module.exports = app => {
             } else {
                 let student = await app.model.fwStudents.get({ mssv: customer_id });
                 await modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum);
-                type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
                 res.send({ result_code: '000', result_desc: 'success' });
+                type == types.PRODUCTION && app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), payDate: trans_date.toString() });
             }
         }
     };

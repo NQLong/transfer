@@ -3925,7 +3925,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 10
+                    "size": 20
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -6332,6 +6332,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 50
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -11776,6 +11783,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "LOAI_HINH_DAO_TAO": {
+                    "value": "loaiHinhDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -12007,6 +12028,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "LOAI_HINH_DAO_TAO": {
+                    "value": "loaiHinhDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -12674,6 +12709,20 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "LOAI_HINH_DAO_TAO": {
+                    "value": "loaiHinhDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -13618,7 +13667,8 @@
             "modelName": "tcHocPhi",
             "methods": {
                 "TC_HOC_PHI_SEARCH_PAGE": "searchPage",
-                "TC_HOC_PHI_GET_ALL_MSSV": "getAllFeeOfStudent"
+                "TC_HOC_PHI_GET_ALL_MSSV": "getAllFeeOfStudent",
+                "TC_HOC_PHI_DOWNLOAD_PSC": "downloadPSC"
             },
             "columns": {
                 "MSSV": {
@@ -13677,7 +13727,9 @@
             "moduleName": "tcHocPhi",
             "modelName": "tcHocPhiTransaction",
             "methods": {
-                "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill"
+                "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill",
+                "TC_HOC_PHI_TRANSACTION_SEARCH_PAGE": "searchPage",
+                "TC_HOC_PHI_TRANSACTION_DOWNLOAD_PSC": "downloadPsc"
             },
             "columns": {
                 "TRANS_ID": {
@@ -13920,6 +13972,10 @@
             "active": true,
             "moduleName": "hcthCongVanTrinhKy",
             "modelName": "hcthCongVanTrinhKy",
+            "methods": {
+                "HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE": "searchPage",
+                "HCTH_CONG_VAN_TRINH_KY_GET_FROM": "getAllFrom"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -13960,6 +14016,9 @@
             "active": true,
             "moduleName": "hcthCanBoKy",
             "modelName": "hcthCanBoKy",
+            "methods": {
+                "HCTH_CAN_BO_KY_GET_LIST": "getList"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -14356,6 +14415,161 @@
             "foreignKeys": [],
             "type": "table"
         },
+        "DM_NGON_NGU_TRUYEN_THONG": {
+            "active": true,
+            "moduleName": "dmNgonNguTruyenThong",
+            "modelName": "dmNgonNguTruyenThong",
+            "columns": {
+                "MA_CODE": {
+                    "value": "maCode",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 3
+                },
+                "TEN_NGON_NGU": {
+                    "value": "tenNgonNgu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                }
+            },
+            "primaryKeys": [
+                "MA_CODE"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_SMS_TEMPLATE": {
+            "active": true,
+            "moduleName": "fwSmsTemplate",
+            "modelName": "fwSmsTemplate",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_143157\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "DON_VI": {
+                    "value": "donVi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "CONTENT": {
+                    "value": "content",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "TIME_APPROVED": {
+                    "value": "timeApproved",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "APPROVER": {
+                    "value": "approver",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "PURPOSE": {
+                    "value": "purpose",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_SMS_TEMPLATE_DRAFT": {
+            "active": true,
+            "moduleName": "fwSmsTemplateDraft",
+            "modelName": "fwSmsTemplateDraft",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_143154\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "DON_VI": {
+                    "value": "donVi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "CONTENT": {
+                    "value": "content",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "LAST_MODIFIED": {
+                    "value": "lastModified",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "APPROVED": {
+                    "value": "approved",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "REPLY": {
+                    "value": "reply",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "REPLY_TIME": {
+                    "value": "replyTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
         "TC_THONG_TIN": {
             "active": true,
             "moduleName": "tcThongTin",
@@ -14408,28 +14622,56 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "DM_NGON_NGU_TRUYEN_THONG": {
+        "FW_TRACKING_LOG": {
             "active": true,
-            "moduleName": "dmNgonNguTruyenThong",
-            "modelName": "dmNgonNguTruyenThong",
+            "moduleName": "fwTrackingLog",
+            "modelName": "fwTrackingLog",
             "columns": {
-                "MA_CODE": {
-                    "value": "maCode",
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_145246\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "URL": {
+                    "value": "url",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 3
+                    "size": 256
                 },
-                "TEN_NGON_NGU": {
-                    "value": "tenNgonNgu",
+                "REQ_BODY": {
+                    "value": "reqBody",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "USER_EMAIL": {
+                    "value": "userEmail",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "ORIGINAL_USER_EMAIL": {
+                    "value": "originalUserEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "REQ_METHOD": {
+                    "value": "reqMethod",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [
-                "MA_CODE"
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"

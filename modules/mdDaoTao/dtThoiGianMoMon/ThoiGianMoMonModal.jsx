@@ -1,4 +1,6 @@
 import { Tooltip } from '@mui/material';
+import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, FormDatePicker, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
@@ -8,7 +10,6 @@ import { getPageDtThoiGianMoMon, createDtThoiGianMoMon, deleteDtThoiGianMoMon, u
 export class TaoThoiGianMoMon extends AdminModal {
     batDau = [];
     ketThuc = [];
-    nam = {};
     state = { edit: {} }
     renderData = (list, pageSize, pageNumber, permission) => renderTable({
         getDataSource: () => list,
@@ -19,6 +20,7 @@ export class TaoThoiGianMoMon extends AdminModal {
             <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>#</th>
             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm học</th>
             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Học kỳ</th>
+            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Loại hình ĐT</th>
             <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mở ngày</th>
             <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Đóng ngày</th>
             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Kích hoạt</th>
@@ -28,10 +30,9 @@ export class TaoThoiGianMoMon extends AdminModal {
         renderRow: (item, index) => (
             <tr key={index}>
                 <TableCell style={{ textAlign: 'right', whiteSpace: 'nowrap' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={
-                    <FormSelect style={{ marginBottom: '0' }} ref={e => this.nam[index] = e} data={SelectAdapter_DtCauTrucKhungDaoTao} readOnly />
-                } />
+                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namDaoTao} />
                 <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.hocKy} />
+                <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.loaiHinhDaoTao} />
                 <TableCell style={{ textAlign: 'center' }} content={
                     <FormDatePicker style={{ marginBottom: '0' }} ref={e => this.batDau[index] = e} type='date-mask' readOnly={!item.edit} />
                 } />
@@ -40,16 +41,18 @@ export class TaoThoiGianMoMon extends AdminModal {
                 } />
                 <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={() => {
                     T.confirm('Xác nhận kích hoạt', 'Bạn có chắc bạn muốn kích hoạt thời gian mở môn này?', true, isConfirm =>
-                        isConfirm && this.props.updateDtThoiGianMoMon(item.id, { kichHoat: Number(!item.kichHoat) }, data => {
+                        isConfirm && this.props.updateDtThoiGianMoMon(item.id, { kichHoat: Number(!item.kichHoat), loaiHinhDaoTao: item.loaiHinhDaoTao, bacDaoTao: item.bacDaoTao }, data => {
                             this.setState({
                                 list: this.state.list.map(item => {
-                                    if (data.kichHoat) {
-                                        if (item.id == data.id) {
-                                            item.kichHoat = 1;
-                                        } else item.kichHoat = 0;
-                                    } else {
-                                        if (item.id == data.id) {
-                                            item.kichHoat = 0;
+                                    if (data.loaiHinhDaoTao == item.loaiHinhDaoTao) {
+                                        if (data.kichHoat) {
+                                            if (item.id == data.id) {
+                                                item.kichHoat = 1;
+                                            } else item.kichHoat = 0;
+                                        } else {
+                                            if (item.id == data.id) {
+                                                item.kichHoat = 0;
+                                            }
                                         }
                                     }
                                     return item;
@@ -112,11 +115,9 @@ export class TaoThoiGianMoMon extends AdminModal {
             const list = (page.list || []).map(item => ({ ...item, edit: false }));
             this.setState({ list, pageNumber: page.pageNumber, pageSize: page.pageSize, pageTotal: page.pageTotal, totalItem: page.totalItem }, () => {
                 list.forEach((item, index) => {
-                    this.nam[index] && this.nam[index].value(item.nam);
                     this.batDau[index] && this.batDau[index].value(item.batDau);
                     this.ketThuc[index] && this.ketThuc[index].value(item.ketThuc);
                 });
-                this.year.value(new Date().getFullYear());
                 this.batDauMoMon.value(new Date().getTime());
             });
 
@@ -138,7 +139,9 @@ export class TaoThoiGianMoMon extends AdminModal {
                 nam: this.validate(this.year),
                 hocKy: this.validate(this.semester),
                 batDau: this.validate(this.batDauMoMon).getTime(),
-                ketThuc: this.validate(this.ketThucMoMon, 'sethours').getTime()
+                ketThuc: this.validate(this.ketThucMoMon, 'sethours').getTime(),
+                loaiHinhDaoTao: this.validate(this.loaiHinhDaoTao),
+                bacDaoTao: this.validate(this.bacDaoTao)
             };
             return data;
         } catch (selector) {
@@ -165,13 +168,16 @@ export class TaoThoiGianMoMon extends AdminModal {
     }
     render = () => {
         let { list = [], pageNumber = 1, pageSize = 25 } = this.state;
+
         let permission = this.props.permission || { write: false, delete: false }, readOnly = !permission.write;
         return this.renderModal({
             title: 'Mở thời gian đăng ký môn mới',
             size: 'elarge',
             body: <div className='row'>
-                <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.year = e} label='Năm học' className='col-md-6' readOnly={readOnly} />
-                <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-6' data={[1, 2, 3]} readOnly={readOnly} />
+                <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.year = e} label='Năm học' className='col-md-3' readOnly={readOnly} />
+                <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-3' data={[1, 2, 3]} readOnly={readOnly} />
+                <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' className='col-md-3' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} readOnly={readOnly} onChange={value => this.setState({ loaiHinhDaoTao: value.id })} />
+                <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' className='col-md-3' data={SelectAdapter_DmSvBacDaoTao} readOnly={readOnly} onChange={value => this.setState({ bacDaoTao: value.id })} />
                 <FormDatePicker type='date-mask' ref={e => this.batDauMoMon = e} label='Ngày mở' className='col-md-6' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' ref={e => this.ketThucMoMon = e} label='Ngày đóng' className='col-md-5' readOnly={readOnly} />
                 {permission.write && <div className='form-group col-md-1 d-flex align-items-end justify-content-end' style={{ paddingLeft: 0 }}>

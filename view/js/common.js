@@ -625,9 +625,7 @@ String.prototype.normalizedName = function () {
     });
     return result.join(' ');
 }
-String.prototype.numberWithCommas = function () {
-    return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+
 String.prototype.getFirstLetters = function () {
     const firstLetters = this
         .toUpperCase()
