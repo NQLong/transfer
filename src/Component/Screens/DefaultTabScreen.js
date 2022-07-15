@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CongVanDenPage from './hcth/hcthCongVanDen/CongVanDenPage';
+import CongVanTrinhKyPage from './hcth/hcthCongVanTrinhKy/CongVanTrinhKyPage';
 import User from './User';
 import { useTheme } from 'react-native-paper';
 import { Button } from 'react-native';
@@ -42,6 +43,19 @@ export default DefaultScreenTabs = ({ navigation }) => {
 
                 }}
             />
+
+            <Tab.Screen
+                name="congVanTrinhKyPage"
+                component={CongVanTrinhKyPage}
+                options={{
+                    headerTitle: 'Công văn trình ký',
+                    tabBarLabel: 'Công văn trình ký',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="reader-outline" color={color} size={size} />
+                    )
+                }}
+            />
+
             <Tab.Screen
                 name="user"
                 component={User}
