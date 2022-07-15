@@ -74,48 +74,32 @@ module.exports = app => {
     });
 
     app.put('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
-        let { data, id, isDuyet, settings } = req.body,
-            thoiGian = new Date().getTime(),
-            changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
-            isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
-        const hocKy = thoiGianMoMon.hocKy,
-            nam = thoiGianMoMon.nam;
-        if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
-            res.send({ error: 'Không thuộc thời gian đăng ký hiện tại' });
-            return;
-        } else {
-            const updateDanhSachMonMo = (list) => new Promise((resolve, reject) => {
-                const newDanhSach = [];
-                const update = (index = 0) => {
-                    if (index == list.length) {
-                        resolve();
-                    } else {
-                        let monHoc = list[index];
+        try {
+            let { data, id, isDuyet, settings } = req.body,
+                thoiGian = new Date().getTime(),
+                changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
+                isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
+            const hocKy = thoiGianMoMon.hocKy,
+                nam = thoiGianMoMon.nam;
+            if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
+                throw 'Không thuộc thời gian đăng ký hiện tại';
+            } else {
+                if (data && data.length) {
+                    await app.model.dtDanhSachMonMo.delete({ maDangKy: id });
+                    const newDanhSach = [];
+                    for (let monHoc of data) {
                         delete monHoc.id;
-                        app.model.dtDanhSachMonMo.create(monHoc, (error, item) => {
-                            if (error || !item) reject(error);
-                            else {
-                                newDanhSach.push(item);
-                                update(index + 1);
-                            }
-                        });
+                        const item = await app.model.dtDanhSachMonMo.create(monHoc);
+                        newDanhSach.push(item);
                     }
-                };
-                app.model.dtDanhSachMonMo.delete({ maDangKy: id }, (error) => {
-                    if (error) reject(error);
-                    else {
-                        update();
-                    }
-                });
-            });
-            try {
-                data && data.length ? await updateDanhSachMonMo(data) : [];
-                app.model.dtDangKyMoMon.update({ id }, changes, (error, item) => res.send({ error, item }));
-            } catch (error) {
-                res.send({ error });
+                }
+                const item = await app.model.dtDangKyMoMon.update({ id }, changes);
+                res.send({ item });
             }
+        } catch (error) {
+            res.send({ error });
         }
     });
 
