@@ -26,7 +26,6 @@ module.exports = app => {
                 page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, filter, settings: { namHoc, hocKy } }
             });
         } catch (error) {
-            console.error(error);
             res.send({ error });
         }
     });
