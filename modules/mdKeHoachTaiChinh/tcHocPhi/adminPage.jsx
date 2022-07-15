@@ -73,7 +73,6 @@ class Detail extends AdminModal {
                 T.notify('Cập nhật học phí hiện tại thành công', 'success');
                 this.hide();
             });
-
         }
     }
 

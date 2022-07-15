@@ -4,7 +4,10 @@ import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell } from 'v
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { getTongGiaoDichPage } from './redux';
-
+import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
 /**
  * TODO
  * filter time
@@ -28,10 +31,7 @@ class DanhSachGiaoDich extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/danh-sach-giao-dich', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '', page => this.setFilter(page));
-            T.showSearchBox(() => {
-                this.tuNgay?.value('');
-                this.denNgay?.value('');
-            });
+            T.showSearchBox(() => { });
             this.changeAdvancedSearch(true);
         });
     }
@@ -56,9 +56,13 @@ class DanhSachGiaoDich extends AdminPage {
         let
             namHoc = this.year.value(),
             hocKy = this.term.value(),
+            listBacDaoTao = this.bacDaoTao.value().toString(),
+            listLoaiHinhDaoTao = this.loaiHinhDaoTao.value().toString(),
+            listNganh = this.nganh.value().toString(),
+            listKhoa = this.khoa.value().toString(),
             { tuNgay, denNgay } = this.getTimeFilter();
 
-        const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, tuNgay, denNgay };
+        const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, tuNgay, denNgay, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 this.setFilter(page, isInitial);
@@ -77,8 +81,9 @@ class DanhSachGiaoDich extends AdminPage {
 
     onClearSearch = (e) => {
         e.preventDefault();
-        this.tuNgay.value('');
-        this.denNgay.value('');
+        ['tuNgay', 'denNgay', 'bacDaoTao', 'loaiHinhDaoTao', 'khoa', 'nganh'].forEach(key => this[key]?.value(''));
+        // this.tuNgay.value('');
+        // this.denNgay.value('');
         this.changeAdvancedSearch();
     }
 
@@ -145,6 +150,10 @@ class DanhSachGiaoDich extends AdminPage {
                 <FormSelect ref={e => this.term = e} style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' data={termDatas} onChange={() => this.changeAdvancedSearch()} />
             </>,
             advanceSearch: <div className='row'>
+                <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' allowClear multiple />
+                <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-6' allowClear multiple />
+                <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' allowClear multiple />
+                <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' allowClear multiple />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear />
                 <div className='col-md-12 d-flex justify-content-end' style={{ gap: 10 }}>
@@ -159,7 +168,7 @@ class DanhSachGiaoDich extends AdminPage {
                         <div className='tile'>
                             {table}
                             <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                                getPage={this.props.getTcHocPhiPage} />
+                                getPage={this.getPage} />
                         </div>
                     </div>
                 </div>,

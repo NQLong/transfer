@@ -18,14 +18,15 @@ module.exports = app => {
             const hocKy = filter.hocKy || settings.hocPhiHocKy;
             filter.tuNgay = filter.tuNgay || '';
             filter.denNgay = filter.denNgay || '';
-            filter = app.stringify({ ...filter, namHoc, hocKy });
+            const filterData = app.stringify({ ...filter, namHoc, hocKy });
             const pageCondition = req.query.searchTerm;
-            const page = await app.model.tcHocPhiTransaction.searchPage(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), pageCondition, filter);
+            const page = await app.model.tcHocPhiTransaction.searchPage(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), pageCondition, filterData);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
             res.send({
-                page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, settings: { namHoc, hocKy } }
+                page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, filter, settings: { namHoc, hocKy } }
             });
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
@@ -68,7 +69,7 @@ module.exports = app => {
                 bold: true,
                 color: { argb: 'FF000000' }
             };
-            list.filter(item => (!Number.isInteger(tuNgay) || item.lastTransaction > tuNgay) && (!Number.isInteger(denNgay) || item.lastTransaction <= denNgay)).forEach((item, index) => {
+            list.filter(item => (!Number.isInteger(tuNgay) || parseInt(item.ngayDong) >= tuNgay) && (!Number.isInteger(denNgay) || parseInt(item.ngayDong) <= denNgay)).forEach((item, index) => {
                 const ngayDong = item.ngayDong ? new Date(Number(item.ngayDong)) : null;
                 ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
                 ws.getRow(index + 2).font = { name: 'Times New Roman' };
