@@ -68,8 +68,9 @@ class DtDsMonMoEditPage extends AdminPage {
         this.id = route.id;
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
-                let { danhSachMonMo } = data,
+                let { danhSachMonMo, thoiGianMoMon } = data,
                     danhSachTheoKhoaSV = danhSachMonMo.groupBy('khoaSv');
+                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao } });
                 [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach(khoaSv => {
                     let list = danhSachTheoKhoaSV[khoaSv];
                     list?.forEach((item, index) => {
@@ -105,12 +106,14 @@ class DtDsMonMoEditPage extends AdminPage {
     onSave = () => {
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        this.props.saveDangKyMoMon(this.id, data);
+        this.props.saveDangKyMoMon(this.id, this.state.settings, data);
     }
 
     create = (khoaSv) => {
         let currentDanhSachCuaKhoa = this.props.dtDanhSachMonMo.danhSachMonMo.groupBy('khoaSv')[khoaSv];
         currentDanhSachCuaKhoa?.map((item, index) => {
+            item.loaiHinhDaoTao = this.state.loaiHinhDaoTao;
+            item.bacDaoTao = this.state.bacDaoTao;
             item.soLop = this.soLop[khoaSv][index].value() || 0;
             item.soBuoiTuan = this.soBuoi[khoaSv][index].value() || 0;
             item.soTietBuoi = this.soTiet[khoaSv][index].value() || 0;
@@ -123,8 +126,8 @@ class DtDsMonMoEditPage extends AdminPage {
         e.preventDefault();
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        this.props.saveDangKyMoMon(this.id, { isDuyet: 1, data }, () => {
-            this.props.createDtThoiKhoaBieu(data, () => {
+        this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
+            this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
                 // location.reload();
             });
         });

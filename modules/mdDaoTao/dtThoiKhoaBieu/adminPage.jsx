@@ -14,6 +14,8 @@ import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_NamDaoTaoFilter } from '../dtChuongTrinhDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
+import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -53,7 +55,7 @@ class ThoiGianPhanCongGiangDay extends AdminModal {
 }
 class AddingModal extends AdminModal {
     onShow = () => {
-        // this.khoaDangKy.value(maPhongDaoTao);
+        this.bacDaoTao.value('DH');
         this.soLop.value(1);
         this.soTiet.value(1);
         this.soBuoi.value(1);
@@ -70,7 +72,9 @@ class AddingModal extends AdminModal {
             khoaDangKy: this.khoaDangKy.value(),
             maNganh: this.maNganh.value(),
             soLuongDuKien: this.soLuongDuKien.value(),
-            loaiMonHoc: Number(this.loaiMonHoc.value())
+            loaiMonHoc: Number(this.loaiMonHoc.value()),
+            bacDaoTao: this.bacDaoTao.value(),
+            loaiHinhDaoTao: this.loaiHinhDaoTao.value()
         };
 
         if (!data.maMonHoc) {
@@ -110,6 +114,8 @@ class AddingModal extends AdminModal {
             size: 'large',
             submitText: 'Mở môn học',
             body: <div className='row'>
+                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' label='Bậc đào tạo' />
+                <FormSelect ref={e => this.loaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-6' label='Hệ đào tạo' />
                 <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-6' label='Năm' />
                 <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-6' />
                 <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' label='Khoa mở' onChange={this.handleDonVi} />
@@ -195,7 +201,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.initData(searchText || '');
             T.showSearchBox(() => { });
-            this.setState({idNamDaoTao: '', hocKy: ''});
+            this.setState({ idNamDaoTao: '', hocKy: '' });
         });
         this.initData();
     }
@@ -203,7 +209,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
     initData = (searchText = '', filter = this.state.filter) => {
         this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText, page => {
             let { maKhoaBoMon = null, maNganh = null } = filter;
-            const {idNamDaoTao: nam = null, hocKy = null } = this.state;
+            const { idNamDaoTao: nam = null, hocKy = null } = this.state;
             page.list = page.list.filter(item => {
                 return (!maNganh || item.maNganh == maNganh)
                     && (!maKhoaBoMon || item.maKhoaBoMon == maKhoaBoMon)
@@ -363,7 +369,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         </>} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
                             <FormCheckbox ref={e => this.loaiMonHoc[indexOfItem] = e} onChange={value => this.handleCheckLoaiMonHoc(value, item)} readOnly={!!item.phong} />
-                        }/>
+                        } />
                         <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.nhom}${item.buoi > 1 ? ` (${item.buoi})` : ''} `} />
                         <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
                             <>

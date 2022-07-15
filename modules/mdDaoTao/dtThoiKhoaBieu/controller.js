@@ -25,6 +25,7 @@ module.exports = app => {
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const user = req.session.user, permissions = user.permissions;
         let donVi = '';
+        console.log(app.date.dateTimeFormat(new Date(app.date.fullFormatToDate('20220714180300').getTime()), 'HH:MM:ss dd/mm/yyyy'));
         if (!permissions.includes('dtThoiKhoaBieu:read')) {
             if (user.staff?.maDonVi) donVi = user.maDonVi;
             else return res.send({ error: 'Permission denied!' });
@@ -51,22 +52,26 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
-        let item = req.body.item || [];
-        const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let item = req.body.item || [],
+            settings = req.body.settings;
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
+            { loaiHinhDaoTao, bacDaoTao } = settings;
+        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
         let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
+
         const onCreate = (index, monHoc) => new Promise((resolve, reject) => {
             const save = (i, m) => {
                 if (i > parseInt(m.soLop)) {
                     resolve(m);
                     return;
                 }
-                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet }, (error, tkb) => {
+                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet, loaiHinhDaoTao, bacDaoTao }, (error, tkb) => {
                     if (error) reject(error);
                     else if (!tkb) {
                         m.nhom = i;
                         delete m.id;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i }, (error, item) => {
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i, loaiHinhDaoTao, bacDaoTao }, (error, item) => {
                                 if (error || !item) reject(error);
                             });
                         }

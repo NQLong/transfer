@@ -78,10 +78,10 @@ export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done)
     };
 }
 
-export function createDtThoiKhoaBieu(item, done) {
+export function createDtThoiKhoaBieu(item, settings, done) {
     return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
-        T.post(url, { item }, data => {
+        T.post(url, { item, settings }, data => {
             if (data.error) {
                 T.notify('Tạo thời khoá biểu bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error.message}`);

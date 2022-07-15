@@ -52,9 +52,9 @@ module.exports = app => {
     app.post('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
         try {
             const now = Date.now();
+            let { data, settings } = req.body;
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-            let data = req.body.data;
-            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == data.loaiHinhDaoTao && item.bacDaoTao == data.bacDaoTao);
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             if (now > thoiGianMoMon.ketThuc) throw 'Đã hết hạn đăng ký!';
             const hocKy = thoiGianMoMon.hocKy,
                 nam = thoiGianMoMon.nam;
@@ -62,7 +62,7 @@ module.exports = app => {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {
                 let item = await app.model.dtDangKyMoMon.get({
-                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: data.loaiHinhDaoTao, bacDaoTao: data.bacDaoTao
+                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: settings.loaiHinhDaoTao, bacDaoTao: settings.bacDaoTao
                 });
                 if (item) throw `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}`;
                 item = await app.model.dtDangKyMoMon.create(data);
@@ -74,15 +74,14 @@ module.exports = app => {
     });
 
     app.put('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == data.loaiHinhDaoTao && item.bacDaoTao == data.bacDaoTao);
-        const hocKy = thoiGianMoMon.hocKy,
-            nam = thoiGianMoMon.nam;
-        let { data, id, isDuyet } = req.body,
+        let { data, id, isDuyet, settings } = req.body,
             thoiGian = new Date().getTime(),
             changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
             isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
-
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
+        const hocKy = thoiGianMoMon.hocKy,
+            nam = thoiGianMoMon.nam;
         if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
             res.send({ error: 'Không thuộc thời gian đăng ký hiện tại' });
             return;
