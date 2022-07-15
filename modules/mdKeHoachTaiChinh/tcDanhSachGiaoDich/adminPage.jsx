@@ -31,7 +31,7 @@ class DanhSachGiaoDich extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/danh-sach-giao-dich', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '', page => this.setFilter(page));
-            T.showSearchBox(() => { });
+            T.showSearchBox(true);
             this.changeAdvancedSearch(true);
         });
     }
