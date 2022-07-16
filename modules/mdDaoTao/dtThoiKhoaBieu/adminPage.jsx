@@ -286,7 +286,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
         });
     }
 
-    elementEdit = (
+    elementEdit = () => (
         <>
             <TableCell style={{ whiteSpace: 'nowrap' }} content={
                 <FormSelect ref={e => this.phong = e} style={{ marginBottom: '0', width: '120px' }} data={SelectAdapter_DmPhong} placeholder='Phòng' />
@@ -376,7 +376,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.nhom}${item.buoi > 1 ? ` (${item.buoi})` : ''} `} />
                         <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tongTiet} />
                         {
-                            this.state.editId == item.id ? this.elementEdit : <>
+                            this.state.editId == item.id ? this.elementEdit() : <>
                                 <TableCell content={item.phong} />
                                 <TableCell content={item.thu} />
                                 <TableCell content={item.tietBatDau} />
