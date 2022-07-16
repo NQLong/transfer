@@ -88,11 +88,9 @@ module.exports = app => {
             } else {
                 if (data && data.length) {
                     await app.model.dtDanhSachMonMo.delete({ maDangKy: id });
-                    const newDanhSach = [];
                     for (let monHoc of data) {
                         delete monHoc.id;
-                        const item = await app.model.dtDanhSachMonMo.create(monHoc);
-                        newDanhSach.push(item);
+                        await app.model.dtDanhSachMonMo.create(monHoc);
                     }
                 }
                 const item = await app.model.dtDangKyMoMon.update({ id }, changes);
