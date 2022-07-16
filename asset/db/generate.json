@@ -13728,7 +13728,8 @@
             "methods": {
                 "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill",
                 "TC_HOC_PHI_TRANSACTION_SEARCH_PAGE": "searchPage",
-                "TC_HOC_PHI_TRANSACTION_DOWNLOAD_PSC": "downloadPsc"
+                "TC_HOC_PHI_TRANSACTION_DOWNLOAD_PSC": "downloadPsc",
+                "TC_HOC_PHI_TRANSACTION_LIST_BANK": "listBank"
             },
             "columns": {
                 "TRANS_ID": {
@@ -14002,6 +14003,13 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "NOI_DUNG_HASH": {
+                    "value": "noiDungHash",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
                 }
             },
             "primaryKeys": [
@@ -14670,6 +14678,172 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_SINH_VIEN_SĐH": {
+            "active": true,
+            "moduleName": "fwSinhVienSđh",
+            "modelName": "fwSinhVienSđh",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "HO": {
+                    "value": "ho",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 40
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "VARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "GIOI_TINH": {
+                    "value": "gioiTinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "NGAY_SINH": {
+                    "value": "ngaySinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DAN_TOC": {
+                    "value": "danToc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TON_GIAO": {
+                    "value": "tonGiao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "QUOC_TICH": {
+                    "value": "quocTich",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGUYEN_QUAN_SO_NHA": {
+                    "value": "nguyenQuanSoNha",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NGUYEN_QUAN_MA_XA": {
+                    "value": "nguyenQuanMaXa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "NGUYEN_QUAN_MA_HUYEN": {
+                    "value": "nguyenQuanMaHuyen",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                },
+                "NGUYEN_QUAN_MA_TINH": {
+                    "value": "nguyenQuanMaTinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "HIEN_TAI_SO_NHA": {
+                    "value": "hienTaiSoNha",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "HIEN_TAI_MA_XA": {
+                    "value": "hienTaiMaXa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "HIEN_TAI_MA_HUYEN": {
+                    "value": "hienTaiMaHuyen",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                },
+                "HIEN_TAI_MA_TINH": {
+                    "value": "hienTaiMaTinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "NOI_SINH_SO_NHA": {
+                    "value": "noiSinhSoNha",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NOI_SINH_MA_XA": {
+                    "value": "noiSinhMaXa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "NOI_SINH_MA_HUYEN": {
+                    "value": "noiSinhMaHuyen",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                },
+                "NOI_SINH_MA_TINH": {
+                    "value": "noiSinhMaTinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "MA_KHOA": {
+                    "value": "maKhoa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                }
+            },
+            "primaryKeys": [
+                "MA"
             ],
             "foreignKeys": [],
             "type": "table"

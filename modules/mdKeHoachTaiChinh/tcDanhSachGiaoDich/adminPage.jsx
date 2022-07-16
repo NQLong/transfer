@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getTongGiaoDichPage } from './redux';
+import { getTongGiaoDichPage, getListNganHang } from './redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -24,6 +24,17 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
+// class EditModal extends AdminModal {
+//     render = () => {
+//         return this.renderModal({
+//             title: 'Thêm giao dịch',
+//             body: <div className='col-md-12'>
+
+//             </div>
+//         })
+//     }
+// }
+
 class DanhSachGiaoDich extends AdminPage {
     state = {
         filter: {},
@@ -33,6 +44,7 @@ class DanhSachGiaoDich extends AdminPage {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '', page => this.setFilter(page));
             T.showSearchBox(() => { });
             this.changeAdvancedSearch(true);
+            this.props.getListNganHang();
         });
     }
 
@@ -60,9 +72,10 @@ class DanhSachGiaoDich extends AdminPage {
             listLoaiHinhDaoTao = this.loaiHinhDaoTao.value().toString(),
             listNganh = this.nganh.value().toString(),
             listKhoa = this.khoa.value().toString(),
+            nganHang = this.nganHang?.value().toString(),
             { tuNgay, denNgay } = this.getTimeFilter();
 
-        const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, tuNgay, denNgay, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa };
+        const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, tuNgay, denNgay, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, nganHang };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 this.setFilter(page, isInitial);
@@ -81,9 +94,7 @@ class DanhSachGiaoDich extends AdminPage {
 
     onClearSearch = (e) => {
         e.preventDefault();
-        ['tuNgay', 'denNgay', 'bacDaoTao', 'loaiHinhDaoTao', 'khoa', 'nganh'].forEach(key => this[key]?.value(''));
-        // this.tuNgay.value('');
-        // this.denNgay.value('');
+        ['tuNgay', 'denNgay', 'bacDaoTao', 'loaiHinhDaoTao', 'khoa', 'nganh', 'nganHang'].forEach(key => this[key]?.value(''));
         this.changeAdvancedSearch();
     }
 
@@ -150,8 +161,9 @@ class DanhSachGiaoDich extends AdminPage {
                 <FormSelect ref={e => this.term = e} style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' data={termDatas} onChange={() => this.changeAdvancedSearch()} />
             </>,
             advanceSearch: <div className='row'>
-                <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' allowClear multiple />
-                <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-6' allowClear multiple />
+                <FormSelect ref={e => this.nganHang = e} label='Ngân hàng' data={this.props.tcGiaoDich?.nganHang || []} className='col-md-4' allowClear multiple />
+                <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' allowClear multiple />
+                <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' allowClear multiple />
                 <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' allowClear multiple />
                 <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' allowClear multiple />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
@@ -178,5 +190,5 @@ class DanhSachGiaoDich extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage };
+const mapActionsToProps = { getTongGiaoDichPage, getListNganHang };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);

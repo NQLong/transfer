@@ -30,6 +30,16 @@ module.exports = app => {
         }
     });
 
+    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+        try {
+            const searchTerm = req.query.condition;
+            const list = await app.model.tcHocPhiTransaction.listBank(searchTerm || '');
+            res.send({ items: list.rows.map(item => item.bank) });
+        } catch (error) {
+            res.send({error});
+        }
+    });
+
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
     app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:read'), async (req, res) => {
         try {
