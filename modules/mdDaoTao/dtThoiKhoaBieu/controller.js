@@ -24,13 +24,14 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const user = req.session.user, permissions = user.permissions;
-        let donVi = '';
-        console.log(app.date.dateTimeFormat(new Date(app.date.fullFormatToDate('20220714180300').getTime()), 'HH:MM:ss dd/mm/yyyy'));
+        let filter = req.query.filter || {},
+            donVi = filter.donVi;
         if (!permissions.includes('dtThoiKhoaBieu:read')) {
             if (user.staff?.maDonVi) donVi = user.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
-        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, donVi, searchTerm, (error, page) => {
+        filter = app.stringify(app.clone(filter, { donVi }));
+        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -127,8 +128,10 @@ module.exports = app => {
         let { condition, changes } = req.body;
         if (typeof condition == 'number') app.model.dtThoiKhoaBieu.update(condition, changes, (error, item) => res.send({ error, item }));
         else if (typeof condition == 'object') {
-            let { nam, hocKy, maMonHoc, maNganh } = condition;
-            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, maNganh }, changes, (error, item) => res.send({ error, item }));
+            let { nam, hocKy, maMonHoc, loaiHinhDaoTao, bacDaoTao } = condition;
+            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, loaiHinhDaoTao, bacDaoTao }, changes, (error, item) => {
+                res.send({ error, item });
+            });
         }
         else app.model.dtThoiKhoaBieu.update({ id: condition }, changes, (error, item) => res.send({ error, item }));
     });

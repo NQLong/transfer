@@ -180,7 +180,7 @@ class DtDsMonMoEditPage extends AdminPage {
                             <FormTextBox type='number' ref={e => this.soLop[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
+                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} min={1} max={5} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
                             <FormTextBox type='number' ref={e => this.soBuoi[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
