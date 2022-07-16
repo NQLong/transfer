@@ -42,8 +42,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox className='col-md-6' ref={e => this.maCode = e} label='Mã ngôn ngữ' readOnly={this.state.maCode ? true : readOnly} required />
                 <FormTextBox className='col-md-12' ref={e => this.tenNgonNgu = e} label='Tên ngôn ngữ' readOnly={readOnly} />
-                {/*<FormImageBox ref={e => this.imageBox = e} className='col-md-12' readOnly={readOnly} style={{ display: maCode ? '' : 'none' }} uploadType='NationFlag' onSuccess={() => this.props.getAll('')} />*/}
-                <FormImageBox ref={e => this.imageBox = e} className='col-md-12' readOnly={readOnly} style={{ display: maCode ? '' : 'none' }} uploadType='NationFlag' />
+                <FormImageBox ref={e => this.imageBox = e} className='col-md-12' readOnly={readOnly} style={{ display: maCode ? '' : 'none' }} uploadType='NationFlag' onSuccess={() => this.props.getAll('')} />
             </div>
         });
     }

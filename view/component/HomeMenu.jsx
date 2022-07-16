@@ -26,7 +26,7 @@ class HomeMenu extends React.Component {
         super(props);
         this.state = {
             width: 0, divisionMenu: null, headerTitle: '', searchValue: '',
-            headerMobile: '/img/logo-ussh.png?t=3', otherWebAddress: ''
+            headerMobile: '/img/logo-ussh.png?t=3', otherWebAddress: '', homeLanguage: ['vi', 'en']
         };
         this.nav = React.createRef();
     }
@@ -73,7 +73,6 @@ class HomeMenu extends React.Component {
                 if (data.menu && data.menu.maWebsite) condition.shortname = data.menu.maWebsite;
                 this.props.getDvWebsite(condition, website => {
                     if (website) {
-                        console.log('website', website);
                         this.setState({
                             header: website.header,
                             headerLink: website.headerLink,
@@ -81,7 +80,7 @@ class HomeMenu extends React.Component {
                             showHeaderTitle: website.showHeaderTitle,
                             headerMobile: website.headerMobile ? website.headerMobile : '/img/logo-ussh.png',
                             otherWebAddress: website.otherWebAddress,
-                            homeLanguage: website.donVi && website.donVi.homeLanguage ? website.donVi.homeLanguage : ['vi', 'en']
+                            homeLanguage: website.donVi && website.donVi.homeLanguage ? website.donVi.homeLanguage.split(',') : ['vi', 'en']
                         });
                     }
                 });
@@ -106,7 +105,6 @@ class HomeMenu extends React.Component {
 
     render() {
         const language = T.language(texts);
-        console.log(this.state);
         let menusView, menus = this.props.system && this.props.system.menus ? [...this.props.system.menus].map(item => {
             delete item.submenus;
             return item;
@@ -114,9 +112,8 @@ class HomeMenu extends React.Component {
         if (this.props.isDonVi) {
             menus = this.state.divisionMenu;
         }
-        let submenus = [], header = '', languageToggle = <div />;
+        let submenus = [], header = '', languageToggle = <div className='ml-2'><LanguageSwitch address={this.state.otherWebAddress} languages={this.state.homeLanguage} /></div>;
         const { user } = this.props.system || {};
-        languageToggle = <div className='ml-2'><LanguageSwitch address={this.state.otherWebAddress} /></div>;
         if (this.props.system && menus) {
             menus.filter(item => item.parentId).forEach(element => {
                 menus.map(item => {

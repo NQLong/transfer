@@ -441,7 +441,10 @@ T.language = texts => {
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
 
-T.language.setLanguages = _languages => languages = _languages && Array.isArray(_languages) && _languages.length ? _languages : ['vi', 'en'];
+T.language.setLanguages = _languages => {
+    languages = _languages && Array.isArray(_languages) && _languages.length ? _languages : ['vi', 'en'];
+};
+
 T.language.next = () => {
     const cookieLg = T.cookie('language');
     if (!cookieLg) return languages[0];
