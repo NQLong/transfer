@@ -4,11 +4,6 @@ import { Link } from 'react-router-dom';
 
 class AdminMenu extends React.Component {
     handleToggle = () => {
-        // Toggle Sidebar
-        $('[data-toggle=\'sidebar\']').click(function (event) {
-            $('.app').toggleClass('sidenav-toggled');
-            event.preventDefault();
-        });
         // Activate sidebar treeview toggle
         $('[data-toggle=\'treeview\']').click(function (event) {
             if (!$(this).parent().hasClass('is-expanded')) {
@@ -26,6 +21,11 @@ class AdminMenu extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             this.handleToggle();
+            // Toggle Sidebar
+            $('[data-toggle=\'sidebar\']').click(function (event) {
+                $('.app').toggleClass('sidenav-toggled');
+                event.preventDefault();
+            });
         });
     }
 

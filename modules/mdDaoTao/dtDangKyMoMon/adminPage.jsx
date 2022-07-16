@@ -98,11 +98,15 @@ class DtDangKyMoMonPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
-            this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
+            let permission = this.getUserPermission('dtChuongTrinhDaoTao'),
+                user = this.props.system.user,
+                donViFilter = user.staff?.maDonVi;
+            if (permission.read) donViFilter = '';
+            this.setState({ donViFilter });
             T.showSearchBox();
             this.props.getDtDangKyMoMonPage(undefined, undefined, {
                 searchTerm: '',
-                donViFilter: this.props.system.user.staff?.maDonVi
+                donViFilter
             });
         });
     }
