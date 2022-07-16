@@ -43,9 +43,9 @@ class DanhSachGiaoDich extends AdminPage {
         T.ready('/user/finance/danh-sach-giao-dich', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '', page => this.setFilter(page));
             T.showSearchBox(true);
-            this.changeAdvancedSearch(true);
             this.props.getListNganHang();
         });
+        this.changeAdvancedSearch(true);
     }
 
     setFilter = (page, isInitial = false) => {
@@ -61,7 +61,6 @@ class DanhSachGiaoDich extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.tcGiaoDich && this.props.tcGiaoDich.page ? this.props.tcGiaoDich.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
-        this.setState({}, () => this.getPage(pageNumber, pageSize, pageCondition));
         if (pageCondition && (typeof pageCondition == 'string')) {
             T.setTextSearchBox(pageCondition);
         }
