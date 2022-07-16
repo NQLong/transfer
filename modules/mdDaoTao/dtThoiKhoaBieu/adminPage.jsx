@@ -387,30 +387,14 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
                             {!item.phong && <>
                                 {this.state.editId != item.id && <Tooltip title='Điều chỉnh' arrow>
-                                    <button className='btn btn-primary' onClick={e => e.preventDefault() || this.setState({ editId: item.id }, () => {
-                                        this.phong.value(item.phong);
-                                        this.thu.value(item.thu);
-                                        this.tietBatDau.value(item.tietBatDau);
-                                        this.soTiet.value(item.soTiet);
-                                        this.soLuongDuKien.value(item.soLuongDuKien);
-                                    })}>
+                                    <button className='btn btn-primary' onClick={e => e.preventDefault() || this.handleEdit(item)}>
                                         <i className='fa fa-lg fa-edit' />
                                     </button>
                                 </Tooltip>}
                                 {this.state.editId == item.id && <Tooltip title='Lưu' arrow>
                                     <button className='btn btn-success' onClick={e => {
                                         e.preventDefault();
-                                        let curData = {
-                                            phong: this.phong.value(),
-                                            thu: this.thu.value(),
-                                            tietBatDau: this.tietBatDau.value(),
-                                            soTietBuoi: this.soTiet.value(),
-                                            soLuongDuKien: this.soLuongDuKien.value()
-                                        };
-                                        this.props.updateDtThoiKhoaBieu(item.id, curData, () => {
-                                            T.notify('Thay đổi thành công!', 'success');
-                                            this.setState({ editId: null });
-                                        });
+                                        this.handleUpdate(item);
                                     }}>
                                         <i className='fa fa-lg fa-check' />
                                     </button>
