@@ -10,8 +10,9 @@ import settings from './settings';
 import hcthCongVanDen from '@/Component/Screens/hcth/hcthCongVanDen/redux';
 // import hcthCongVanCacPhong from '@/Component/Screens/hcth/hcthCongVanCacPhong/redux';
 import hcthCongVanTrinhKy from '@/Component/Screens/hcth/hcthCongVanTrinhKy/redux';
+import notification from '@/Component/Screens/notification/redux';
 
-const reducers = combineReducers({ settings, hcthCongVanDen, hcthCongVanTrinhKy });
+const reducers = combineReducers({ settings, hcthCongVanDen, hcthCongVanTrinhKy, notification });
 
 const persistConfig = {
     key: 'root',

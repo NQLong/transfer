@@ -4,7 +4,10 @@ import { FormSelect, renderScrollView } from '@/Utils/component';
 import { TouchableOpacity, View } from 'react-native';
 import { Card, Text, TextInput, useTheme } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { HcthCongVanDenSearch, SelectAdapter_DmDonViGuiCongVan } from './redux'
+import { HcthCongVanDenSearch, SelectAdapter_DmDonViGuiCongVan } from './redux';
+import filterStyles from './filterStyles';
+import commonStyles from '../../../../Asset/Styles/styles';
+
 const
     start = new Date().getFullYear(),
     end = 1900,
@@ -70,15 +73,15 @@ const CongVanDenFilter = ({ navigation }) => {
 
     return renderScrollView({
         nestedScrollEnabled: true,
-        content: <Card style={{ margin: 5, padding: 5 }} elevation={4}>
-            <TextInput outlineColor='#868FA0' style={{ outlineColor: 'red' }} mode='outlined' label='Tìm kiếm' theme={{ roundness: 20 }} value={searchTerm} onChangeText={(text) => setSearchTerm(text)} />
-            <FormSelect ref={trangThaiRef} data={Object.values(trangThai)} label='Trạng thái công văn' style={{ marginTop: 10 }} />
-            <FormSelect ref={yearRef} data={yearSelector} label='Năm' style={{ marginTop: 10 }} />
-            <FormSelect ref={donViGuiRef} data={SelectAdapter_DmDonViGuiCongVan} label='Đơn vị gửi' style={{ marginTop: 10 }} />
-            <FormSelect ref={donViNhanRef} data={SelectAdapter_DmDonVi} label='Đơn vị nhận' style={{ marginTop: 10 }} />
-            <View style={{ alignItems: 'center', marginTop: 20, flex: 1, marginBottom: 20 }}>
-                <TouchableOpacity style={{ height: 50, width: '70%', borderRadius: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.primary }} onPress={onSearch} disabled={false}>
-                    <Text style={{ fontFamily: 'Work Sans', color: colors.background, fontSize: 19, fontWeight: 'bold' }} >Tìm kiếm</Text>
+        content: <Card style={filterStyles.container} elevation={4}>
+            <TextInput outlineColor='#868FA0' style={filterStyles.textInput} mode='outlined' label='Tìm kiếm' theme={{ roundness: 20 }} value={searchTerm} onChangeText={(text) => setSearchTerm(text)} />
+            <FormSelect ref={trangThaiRef} data={Object.values(trangThai)} label='Trạng thái công văn' style={commonStyles.mt10} />
+            <FormSelect ref={yearRef} data={yearSelector} label='Năm' style={commonStyles.mt10} />
+            <FormSelect ref={donViGuiRef} data={SelectAdapter_DmDonViGuiCongVan} label='Đơn vị gửi' style={commonStyles.mt10} />
+            <FormSelect ref={donViNhanRef} data={SelectAdapter_DmDonVi} label='Đơn vị nhận' style={commonStyles.mt10} />
+            <View style={filterStyles.searchView}>
+                <TouchableOpacity style={{...filterStyles.searchTouchable, backgroundColor: colors.primary }} onPress={onSearch} disabled={false}>
+                    <Text style={{ ...filterStyles.searchText, color: colors.background}} >Tìm kiếm</Text>
                 </TouchableOpacity>
             </View>
         </Card >
