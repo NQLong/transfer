@@ -14,28 +14,28 @@ const initPageNumber = 1;
 const initPageSize = 20;
 
 // class SignModal
-// class SignModal extends AdminModal {
-//     onShow = (item) => {
-//         this.setState({ item });
-//     }
+class SignModal extends AdminModal {
+    onShow = (item) => {
+        this.setState({ item });
+    }
 
-//     signDocument = () => {
-//         // TODO: upload file
-//         this.hide();
-//     }
+    signDocument = () => {
+        // TODO: upload file
+        this.hide();
+    }
 
-//     // sign = ()
-//     render = () => {
-//         return this.renderModal({
-//             title: 'Ký công văn',
-//             content: <>
-//                 <Text>Bạn có muốn ký công văn này không?</Text>
-//             </>,
-//             button: [<Button key={1} onPress={this.signDocument}>Ký</Button>]
-//         });
-//     }
+    // sign = ()
+    render = () => {
+        return this.renderModal({
+            title: 'Ký công văn',
+            content: <>
+                <Text>Bạn có muốn ký công văn này không?</Text>
+            </>,
+            button: [<Button key={1} onPress={this.signDocument}>Ký</Button>]
+        });
+    }
 
-// }
+}
 
 
 const CongVanTrinhKyPage = (props) => {
@@ -86,7 +86,7 @@ const CongVanTrinhKyPage = (props) => {
     const renderItem = (item, index) => {
         // console.log(item.nguoiTao);
         return (
-            <Card elevation={4} key={index} style={{ ...styles.cardItem, backgroundColor: 'white' }}>
+            <Card elevation={4} key={index} style={{ ...styles.cardItem, backgroundColor: 'white' }} onPress={() => navigation.push('CongVanTrinhKy', {congVanTrinhKyId: item.id})}>
                 <Card.Title title={item.trichYeu || 'Chưa có'} titleStyle={styles.cardTitle} subtitle={item.tenFileCongVan || 'Chưa có'}
                 subtitleNumberOfLines={3}
                 right={(props) => <Text {...props} style={styles.dateLabel}>{T.dateToText(item.thoiGian, 'dd/mm/yyyy')}</Text>}
