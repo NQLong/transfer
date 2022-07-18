@@ -79,8 +79,12 @@ export default StyleSheet.create({
     },
 
     replyInput: {
-        flex: 1, 
-        marginRight: 10
+        // flex: 1, 
+        marginLeft: 20,
+        marginRight: 20,
+        marginTop: 30,
+        // width: '50%',
+        // alignItems: 'center'
     },
 
     //** Conduct Styles */
@@ -101,5 +105,32 @@ export default StyleSheet.create({
     },
     conductInput: {
         flex: 1, marginRight: 10
+    },
+    buttonView: {
+        alignItems: 'center',
+        marginTop: 20, 
+        flex: 1, 
+        marginBottom: 20
+    },
+
+    buttonText: {
+        fontFamily: 'Work Sans',
+        fontSize: 19, 
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
+    selectKey: {
+        height: 50,
+        width: '50%',
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    sign: {
+        height: 50,
+        width: '60%',
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });

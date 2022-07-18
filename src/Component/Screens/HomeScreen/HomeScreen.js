@@ -40,11 +40,11 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
 
     const init = async () => {
         if (T.isDebug) {
-            if (!await T.verifyToken() || !await T.hasCookie()) {
-                dispatch(signOut());
-                alert('debugEmail khôn hợp lệ');
-            } else
-                return getSystemState();
+            // if (!await T.verifyToken() || !await T.hasCookie()) {
+            //     dispatch(signOut());
+            //     alert('debugEmail khôn hợp lệ');
+            // } else
+            return getSystemState();
         } else {
             let currentUser;
             try {
@@ -106,7 +106,7 @@ const HomeScreen: () => Node = ({ navigation, route }) => {
 
                     <View style={styles.buttonView}>
                         <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={signin} disabled={loginDisable}>
-                            <Text style={{...styles.loginText ,color: colors.background}} >Đăng nhập</Text>
+                            <Text style={{ ...styles.loginText, color: colors.background }} >Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
 

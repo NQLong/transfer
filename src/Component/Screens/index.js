@@ -16,6 +16,7 @@ import CongVanDen from './hcth/hcthCongVanDen/CongVanDen';
 import ReadFile from './ReadFile/ReadFile';
 import CongVanDenFilter from './hcth/hcthCongVanDen/CongVanDenFilter';
 import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
+import CongVanTrinhKySign from './hcth/hcthCongVanTrinhKy/CongVanTrinhKySign';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,7 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerTitle: '' }} name='ReadFile' component={ReadFile} />
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='FilterCongVanDen' component={CongVanDenFilter} />
             <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKy' component={CongVanTrinhKy} />
+            <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKySign' component={CongVanTrinhKySign} />
 
         </Stack.Navigator>
     )
