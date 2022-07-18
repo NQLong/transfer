@@ -66,7 +66,7 @@ module.exports = app => {
                     resolve(m);
                     return;
                 }
-                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet, loaiHinhDaoTao, bacDaoTao }, (error, tkb) => {
+                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet, loaiHinhDaoTao, bacDaoTao, khoaSinhVien: m.khoaSinhVien }, (error, tkb) => {
                     if (error) reject(error);
                     else if (!tkb) {
                         m.nhom = i;

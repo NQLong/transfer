@@ -11727,13 +11727,6 @@
                     "nullable": true,
                     "size": "2,0"
                 },
-                "HOC_KY_SINH_VIEN": {
-                    "value": "hocKySinhVien",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "MA_NGANH": {
                     "value": "maNganh",
                     "dataType": "NVARCHAR2",
@@ -11796,6 +11789,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 5
+                },
+                "KHOA_SINH_VIEN": {
+                    "value": "khoaSinhVien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
                 }
             },
             "primaryKeys": [
@@ -14845,6 +14845,140 @@
             },
             "primaryKeys": [
                 "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_USER_PUBLIC_KEY": {
+            "active": true,
+            "moduleName": "hcthUserPublicKey",
+            "modelName": "hcthUserPublicKey",
+            "columns": {
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "PUBLIC_KEY": {
+                    "value": "publicKey",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 1048
+                },
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_147641\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_YEU_CAU_TAO_KHOA": {
+            "active": true,
+            "moduleName": "hcthYeuCauTaoKhoa",
+            "modelName": "hcthYeuCauTaoKhoa",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_146753\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                },
+                "NGAY_DUYET": {
+                    "value": "ngayDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "LY_DO": {
+                    "value": "lyDo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "SHCC_NGUOI_DUYET": {
+                    "value": "shccNguoiDuyet",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TC_HOC_PHI_TRANSACTION_INVOICE": {
+            "active": true,
+            "moduleName": "tcHocPhiTransactionInvoice",
+            "modelName": "tcHocPhiTransactionInvoice",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_147676\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TRANSACTION_ID": {
+                    "value": "transactionId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 64
+                },
+                "INVOICE_TRANSACTION_ID": {
+                    "value": "invoiceTransactionId",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 16
+                },
+                "INVOICE_NUMBER": {
+                    "value": "invoiceNumber",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 16
+                }
+            },
+            "primaryKeys": [
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"

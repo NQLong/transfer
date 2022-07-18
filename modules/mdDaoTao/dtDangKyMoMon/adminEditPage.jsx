@@ -118,6 +118,7 @@ class DtDsMonMoEditPage extends AdminPage {
             item.soBuoiTuan = this.soBuoi[khoaSv][index].value() || 0;
             item.soTietBuoi = this.soTiet[khoaSv][index].value() || 0;
             item.soLuongDuKien = this.soLuongDuKien[khoaSv][index].value() || 0;
+            item.khoaSinhVien = khoaSv;
         });
         return currentDanhSachCuaKhoa || [];
     }
