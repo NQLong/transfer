@@ -11,30 +11,22 @@ class AutoGenModal extends AdminModal {
     }
 
     onSubmit = () => {
-        try {
-            let now = Date.now();
-            let data = {
-                bacDaoTao: getValue(this.bacDaoTao),
-                loaiHinhDaoTao: getValue(this.loaiHinhDaoTao),
-                ngayBatDau: getValue(this.ngayBatDau).getTime(),
-                listPhongKhongSuDung: getValue(this.listPhongKhongSuDung),
-            };
-            if (data.ngayBatDau < now) T.notify('Ngày bắt đầu không hợp lệ', 'danger');
-            else this.setState({ isLoading: true }, () => {
-                this.props.initSchedule(data, (result) => {
-                    result && this.setState({ isLoading: false });
-                    if (result.error) T.notify(result.error, 'danger');
-                    else T.notify(result.success, 'success');
-                    this.hide();
-                });
+        let now = Date.now();
+        let data = {
+            bacDaoTao: getValue(this.bacDaoTao),
+            loaiHinhDaoTao: getValue(this.loaiHinhDaoTao),
+            ngayBatDau: getValue(this.ngayBatDau).getTime(),
+            listPhongKhongSuDung: getValue(this.listPhongKhongSuDung),
+        };
+        if (data.ngayBatDau < now) T.notify('Ngày bắt đầu không hợp lệ', 'danger');
+        else this.setState({ isLoading: true }, () => {
+            this.props.initSchedule(data, (result) => {
+                result && this.setState({ isLoading: false });
+                if (result.error) T.notify(result.error, 'danger');
+                else T.notify(result.success, 'success');
+                this.hide();
             });
-
-        }
-        catch (form) {
-            T.notify(`${form.props.label} bị trống`, 'danger');
-            form.focus();
-        }
-
+        });
     }
     render = () => {
         return this.renderModal({

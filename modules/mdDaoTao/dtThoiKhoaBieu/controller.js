@@ -72,7 +72,6 @@ module.exports = app => {
                         m.nhom = i;
                         delete m.id;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            console.log(m);
                             app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i, loaiHinhDaoTao, bacDaoTao }, (error, item) => {
                                 if (error || !item) reject(error);
                             });
