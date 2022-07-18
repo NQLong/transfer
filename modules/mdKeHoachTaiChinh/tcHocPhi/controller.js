@@ -280,4 +280,84 @@ module.exports = app => {
         app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
     });
 
+
+
+    app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:read'), async (req, res) => {
+        try {
+            let filter = app.parse(req.query.filter, {});
+            const settings = await getSettings();
+
+            if (!filter.namHoc || !filter.hocKy) {
+                if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
+                if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
+            }
+            filter = app.stringify(filter, '');
+            let data = await app.model.tcHocPhi.searchPage(1, 1000000, '', '', filter);
+            const list = data.rows;
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet(`${settings.hocPhiNamHoc}_${settings.hocPhiHocKy}`);
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 10 },
+                { header: 'MSSV', key: 'mssv', width: 15 },
+                { header: 'HỌ VÀ TÊN LÓT', key: 'ho', width: 30 },
+                { header: 'TÊN', key: 'ten', width: 10 },
+                { header: 'GIỚI TÍNH', key: 'gioiTinh', width: 10 },
+                { header: 'NGÀY SINH', key: 'ngaySinh', width: 10 },
+                { header: 'BẬC ĐÀO TẠO', key: 'bacDaoTao', width: 10 },
+                { header: 'HỆ ĐÀO TẠO', key: 'heDaoTao', width: 10 },
+                { header: 'KHOA/BỘ MÔN', key: 'donVi', width: 20 },
+                { header: 'MÃ NGÀNH', key: 'maNganh', width: 10 },
+                { header: 'TÊN NGÀNH HỌC', key: 'tenNganh', width: 20 },
+                { header: 'HỌC KỲ', key: 'term', width: 10 },
+                { header: 'NĂM HỌC', key: 'year', width: 20 },
+                { header: 'SỐ TIỀN THU (VND)', key: 'hocPhi', width: 15 },
+                { header: 'ĐÃ THU (VND)', key: 'congNo', width: 15 },
+                { header: 'THỜI GIAN ĐÓNG', key: 'thoiGian', width: 20 },
+                { header: 'MÃ HOÁ ĐƠN', key: 'idTrans', width: 20 },
+            ];
+            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+            // ws.getRow(1).height = 0;
+            ws.getRow(1).font = {
+                name: 'Times New Roman',
+                family: 4,
+                size: 12,
+                bold: true,
+                color: { argb: 'FF000000' }
+            };
+            list.forEach((item, index) => {
+                ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+                ws.getRow(index + 2).font = { name: 'Times New Roman' };
+                ws.getCell('A' + (index + 2)).value = index + 1;
+                ws.getCell('B' + (index + 2)).value = item.mssv;
+                ws.getCell('C' + (index + 2)).value = item.ho.toUpperCase();
+                ws.getCell('D' + (index + 2)).value = item.ten.toUpperCase();
+                ws.getCell('E' + (index + 2)).value = item.gioiTinh == 1 ? 'Nam' : 'Nữ';
+                ws.getCell('F' + (index + 2)).value = app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy');
+                ws.getCell('G' + (index + 2)).value = item.tenBacDaoTao;
+                ws.getCell('H' + (index + 2)).value = item.tenLoaiHinhDaoTao;
+                ws.getCell('I' + (index + 2)).value = item.tenKhoa;
+                ws.getCell('J' + (index + 2)).value = item.maNganh;
+                ws.getCell('K' + (index + 2)).value = item.tenNganh;
+                ws.getCell('L' + (index + 2)).value = settings.hocPhiHocKy;
+                ws.getCell('M' + (index + 2)).value = `${settings.hocPhiNamHoc} - ${parseInt(settings.hocPhiNamHoc) + 1}`;
+                ws.getCell('N' + (index + 2)).value = item.hocPhi.toString().numberDisplay();
+                ws.getCell('O' + (index + 2)).value = (parseInt(item.hocPhi) - parseInt(item.congNo)).toString().numberDisplay();
+                ws.getCell('P' + (index + 2)).value = item.lastTransaction ? app.date.dateTimeFormat(new Date(Number(item.lastTransaction)), 'HH:MM:ss dd/mm/yyyy') : '';
+                ws.getCell('Q' + (index + 2)).value = item.lastTransactionId;
+                ws.getCell('L' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('M' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('N' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('O' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('P' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+                ws.getCell('E' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+                ws.getCell('F' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+
+            });
+            let fileName = `HOC_PHI_NH_${settings.hocPhiNamHoc}_${parseInt(settings.hocPhiNamHoc) + 1}_HK${settings.hocPhiHocKy}.xlsx`;
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
 };
