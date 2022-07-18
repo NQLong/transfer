@@ -83,6 +83,7 @@ module.exports = app => {
             thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             const hocKy = thoiGianMoMon.hocKy,
                 nam = thoiGianMoMon.nam;
+
             if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {
