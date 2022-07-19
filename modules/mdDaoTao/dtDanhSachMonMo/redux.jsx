@@ -70,10 +70,10 @@ export function getDtDanhSachMonMoCurrent(id, done) {
     };
 }
 
-export function createDtDanhSachMonMo(maNganh, data, done) {
+export function createDtDanhSachMonMo(maNganh, data, settings, done) {
     return () => {
         const url = '/api/dao-tao/danh-sach-mon-mo';
-        T.post(url, { data, maNganh }, result => {
+        T.post(url, { data, maNganh, ...settings }, result => {
             if (result.error) {
                 T.notify(`Lỗi: ${result.error.message}`, 'danger');
                 console.error(result.error.message);

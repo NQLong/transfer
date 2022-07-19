@@ -11,7 +11,7 @@ class MonHocCtdtModal extends AdminModal {
         let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
 
         this.props.getDanhSachMonChuongTrinhDaoTao({ maNganh, khoaSv, loaiHinhDaoTao, bacDaoTao }, value => {
-            this.setState({ ...value, khoaSv, maNganh, khoaDangKy, maDangKy }, () => {
+            this.setState({ ...value, khoaSv, maNganh, khoaDangKy, maDangKy, loaiHinhDaoTao, bacDaoTao }, () => {
                 this.state.listMonHocChung.forEach(item => {
                     if (item.isMo) {
                         let listMonHocChonChung = this.state.listMonHocChonChung;
@@ -195,8 +195,9 @@ class MonHocCtdtModal extends AdminModal {
     }
     onSubmit = (e) => {
         e.preventDefault();
+        let { loaiHinhDaoTao, bacDaoTao } = this.state;
         let data = this.getData();
-        data && data.length && this.props.createDtDanhSachMonMo(this.state.maNganh, data, () => {
+        data && data.length && this.props.createDtDanhSachMonMo(this.state.maNganh, data, { loaiHinhDaoTao, bacDaoTao }, () => {
             this.props.reinit();
             this.hide();
         });

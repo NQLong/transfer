@@ -73,7 +73,6 @@ class Detail extends AdminModal {
                 T.notify('Cập nhật học phí hiện tại thành công', 'success');
                 this.hide();
             });
-
         }
     }
 
@@ -240,8 +239,7 @@ class TcHocPhiAdminPage extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
             hocKy = this.term.value(),
-            tuNgay = this.tuNgay.value() || null,
-            denNgay = this.denNgay.value() || null;
+            {tuNgay, denNgay} = this.getTimeFilter();
         const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
@@ -270,6 +268,20 @@ class TcHocPhiAdminPage extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getTcHocPhiPage(pageN, pageS, pageC, this.state.filter, done);
+    }
+
+    getTimeFilter = () => {
+        let tuNgay = this.tuNgay.value() || null,
+            denNgay = this.denNgay.value() || null;
+        if (tuNgay) {
+            tuNgay.setHours(0, 0, 0, 0);
+            tuNgay = tuNgay.getTime();
+        }
+        if (denNgay) {
+            denNgay.setHours(23, 59, 59, 999);
+            denNgay = denNgay.getTime();
+        }
+        return { tuNgay, denNgay };
     }
 
     onDownloadPsc = (e) => {
@@ -368,7 +380,6 @@ class TcHocPhiAdminPage extends AdminPage {
                 </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
             onExport: permission.write ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
-            buttons: [{ className: 'btn-danger', icon: 'fa-table', onClick: this.onDownloadPsc }]
         });
     }
 }

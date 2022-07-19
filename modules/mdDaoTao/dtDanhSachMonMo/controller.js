@@ -1,8 +1,10 @@
 
 module.exports = app => {
     app.post('/api/dao-tao/danh-sach-mon-mo', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            { hocKy, nam, batDau, ketThuc } = thoiGianMoMon,
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let { loaiHinhDaoTao, bacDaoTao } = req.body;
+        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+        const { hocKy, nam, batDau, ketThuc } = thoiGianMoMon,
             now = new Date().getTime();
         let { data, maNganh } = req.body;
         if (now < batDau || now > ketThuc) {
