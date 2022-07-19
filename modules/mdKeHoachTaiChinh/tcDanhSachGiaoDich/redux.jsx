@@ -47,3 +47,21 @@ export function getListNganHang(done) {
         }, () => T.notify('Lấy danh sách ngân hàng lỗi', 'danger'));
     };
 }
+
+export function createInvoice(transactionId, done, onError) {
+    return dispatch => {
+        const url = '/api/finance/invoice';
+        T.post(url, { transactionId }, res => {
+            if (res.error) {
+                T.notify('Tạo hóa đơn lỗi', 'danger');
+                console.error(`GET: ${url}.`, res.error);
+                onError && onError();
+            }
+            else {
+                T.notify('Tạo hóa đơn thành công', 'success');
+                dispatch(getTongGiaoDichPage());
+                done && done(res.item);
+            }
+        }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
+    };
+}
