@@ -1,6 +1,6 @@
-// Table name: DM_DON_VI { ma, ten, tenTiengAnh, tenVietTat, kichHoat, qdThanhLap, maPl, qdXoaTen, ghiChu, image, duongDan, imageDisplay, imageDisplayTa, preShcc }
+// Table name: DM_DON_VI { ma, ten, tenTiengAnh, tenVietTat, kichHoat, qdThanhLap, maPl, qdXoaTen, ghiChu, image, duongDan, imageDisplay, imageDisplayTa, preShcc, homeLanguage }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'tenVietTat': 'TEN_VIET_TAT', 'kichHoat': 'KICH_HOAT', 'qdThanhLap': 'QD_THANH_LAP', 'maPl': 'MA_PL', 'qdXoaTen': 'QD_XOA_TEN', 'ghiChu': 'GHI_CHU', 'image': 'IMAGE', 'duongDan': 'DUONG_DAN', 'imageDisplay': 'IMAGE_DISPLAY', 'imageDisplayTa': 'IMAGE_DISPLAY_TA', 'preShcc': 'PRE_SHCC' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'tenVietTat': 'TEN_VIET_TAT', 'kichHoat': 'KICH_HOAT', 'qdThanhLap': 'QD_THANH_LAP', 'maPl': 'MA_PL', 'qdXoaTen': 'QD_XOA_TEN', 'ghiChu': 'GHI_CHU', 'image': 'IMAGE', 'duongDan': 'DUONG_DAN', 'imageDisplay': 'IMAGE_DISPLAY', 'imageDisplayTa': 'IMAGE_DISPLAY_TA', 'preShcc': 'PRE_SHCC', 'homeLanguage': 'HOME_LANGUAGE' };
 
 module.exports = app => {
     app.model.dmDonVi = {

@@ -170,7 +170,12 @@ const T = {
     validateEmail: email => (/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i).test(String(email).toLowerCase()),
 
     dateToText: (date, format) => dateformat(date, format ? format : 'dd/mm/yyyy HH:MM:ss'),
-    numberDisplay: number => number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
+    numberDisplay: (number, replaceValue = '.') => {
+        const decimalSplitter = replaceValue == '.' ? ',' : '.';
+        let [integer, decimal] = number.toString().split('.');
+        if (!decimal) [integer, decimal] = number.toString().split(',');
+        return `${integer.toString().replace(/\B(?=(\d{3})+(?!\d))/g, replaceValue)}${decimal ? decimalSplitter : ''}${decimal || ''}`
+    },
 
     // Libraries ----------------------------------------------------------------------------------
     routeMatcher: routeMatcherLib.routeMatcher,
@@ -600,9 +605,7 @@ String.prototype.normalizedName = function () {
     });
     return result.join(' ');
 }
-String.prototype.numberWithCommas = function () {
-    return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+
 String.prototype.getFirstLetters = function () {
     const firstLetters = this
         .toUpperCase()

@@ -7,7 +7,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, renderTimeline, TableCell } from 'view/component/AdminPage';
-import { createChiDao, createHcthCongVanDen, createPhanHoi, deleteFile, getChiDao, getCongVanDen, getHistory, getPhanHoi, updateHcthCongVanDen, updateStatus, updateQuyenChiDao } from './redux';
+import { duyetCongVan, createChiDao, createHcthCongVanDen, createPhanHoi, deleteFile, getChiDao, getCongVanDen, getHistory, getPhanHoi, updateHcthCongVanDen, updateStatus, updateQuyenChiDao } from './redux';
 
 const { action, MA_BAN_GIAM_HIEU, MA_CHUC_VU_HIEU_TRUONG, trangThaiSwitcher } = require('../constant.js');
 
@@ -564,18 +564,8 @@ class StaffEditPage extends AdminPage {
         }
         else
             T.confirm('Duyệt công văn', 'Bạn có chắc bạn muốn duyệt công văn này?', true,
-                isConfirm => isConfirm &&
-                    this.props.createChiDao({
-                        canBo: this.state.shcc,
-                        chiDao: chiDao,
-                        thoiGian: new Date().getTime(),
-                        congVan: this.state.id,
-                    }, () => this.props.getChiDao(this.state.id, () => this.onChangeStatus(trangThaiSwitcher.CHO_PHAN_PHOI.id))
-                    )
+                isConfirm => isConfirm && this.props.duyetCongVan(this.state.id, chiDao, this.getData)
             );
-        // e.preventDefault();
-        // T.confirm('Duyệt công văn', 'Bạn có chắc bạn muốn duyệt công văn này?', true,
-        //     isConfirm => isConfirm && this.onChangeStatus(trangThaiSwitcher.CHO_PHAN_PHOI.id));
     }
 
     onPublish = (e) => {
@@ -689,12 +679,19 @@ class StaffEditPage extends AdminPage {
         this.setState({ historySortType: next }, () => this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }));
     }
 
+    onReady = (e) => {
+        e.preventDefault();
+        T.confirm('Cập nhật trạng thái công văn', 'Công văn sẻ được chuyển lên chờ phân phối! Hãy đảm bảo các trường thông tin đã được nhập đúng', true, isConfirm => {
+            if (isConfirm) this.onChangeStatus(trangThaiSwitcher.CHO_PHAN_PHOI.id);
+        });
+    }
+
     render() {
         const permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']),
             dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
             readOnly = !permission.write || [trangThaiSwitcher.CHO_DUYET.id, trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.DA_PHAN_PHOI.id].includes(this.state.trangThai),
             presidentPermission = this.getUserPermission('president', ['login']),
-            readChiDao = !presidentPermission.login && (!permission.write || [trangThaiSwitcher.CHO_DUYET.id, trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.DA_PHAN_PHOI.id].includes(this.state.trangThai)),
+            readChiDao = !presidentPermission.login && (!permission.write || [trangThaiSwitcher.CHO_DUYET.id, trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.DA_PHAN_PHOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(this.state.trangThai)),
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),
             criticalStatus = [trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id],
             item = this.state.id ? this.getItem() : {},
@@ -717,6 +714,9 @@ class StaffEditPage extends AdminPage {
 
         const quyenChiDao = this.renderQuyenChiDao(this.state.quyenChiDao || [], { write: hcthStaffPermission.login || presidentPermission.login }, readChiDao);
 
+        const buttons = [];
+        this.canFinish() && hcthStaffPermission.login && buttons.push({ className: 'btn-success', icon: 'fa-check', onClick: this.onFinish });
+        this.state.trangThai == trangThaiSwitcher.DA_DUYET.id && hcthStaffPermission.login && buttons.push({ className: 'btn-success', icon: 'fa-envelope', onClick: this.onReady });
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
@@ -776,11 +776,11 @@ class StaffEditPage extends AdminPage {
             </>),
             backRoute,
             onSave: !readOnly && (!this.state.id || hcthStaffPermission.login) ? this.save : null,
-            buttons: this.canFinish() && hcthStaffPermission.login && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onFinish }],
+            buttons,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDen: state.hcth.hcthCongVanDen });
-const mapActionsToProps = { createHcthCongVanDen, updateHcthCongVanDen, getCongVanDen, deleteFile, createDmDonViGuiCv, getStaffPage, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao, updateQuyenChiDao };
+const mapActionsToProps = { duyetCongVan, createHcthCongVanDen, updateHcthCongVanDen, getCongVanDen, deleteFile, createDmDonViGuiCv, getStaffPage, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao, updateQuyenChiDao };
 export default connect(mapStateToProps, mapActionsToProps)(StaffEditPage);

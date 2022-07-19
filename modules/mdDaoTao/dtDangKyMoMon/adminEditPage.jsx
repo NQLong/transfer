@@ -68,8 +68,9 @@ class DtDsMonMoEditPage extends AdminPage {
         this.id = route.id;
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
-                let { danhSachMonMo } = data,
+                let { danhSachMonMo, thoiGianMoMon } = data,
                     danhSachTheoKhoaSV = danhSachMonMo.groupBy('khoaSv');
+                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao } });
                 [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach(khoaSv => {
                     let list = danhSachTheoKhoaSV[khoaSv];
                     list?.forEach((item, index) => {
@@ -105,16 +106,19 @@ class DtDsMonMoEditPage extends AdminPage {
     onSave = () => {
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        this.props.saveDangKyMoMon(this.id, data);
+        this.props.saveDangKyMoMon(this.id, this.state.settings, data);
     }
 
     create = (khoaSv) => {
         let currentDanhSachCuaKhoa = this.props.dtDanhSachMonMo.danhSachMonMo.groupBy('khoaSv')[khoaSv];
         currentDanhSachCuaKhoa?.map((item, index) => {
+            item.loaiHinhDaoTao = this.state.loaiHinhDaoTao;
+            item.bacDaoTao = this.state.bacDaoTao;
             item.soLop = this.soLop[khoaSv][index].value() || 0;
             item.soBuoiTuan = this.soBuoi[khoaSv][index].value() || 0;
             item.soTietBuoi = this.soTiet[khoaSv][index].value() || 0;
             item.soLuongDuKien = this.soLuongDuKien[khoaSv][index].value() || 0;
+            item.khoaSinhVien = khoaSv;
         });
         return currentDanhSachCuaKhoa || [];
     }
@@ -123,8 +127,8 @@ class DtDsMonMoEditPage extends AdminPage {
         e.preventDefault();
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        this.props.saveDangKyMoMon(this.id, { isDuyet: 1, data }, () => {
-            this.props.createDtThoiKhoaBieu(data, () => {
+        this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
+            this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
                 // location.reload();
             });
         });
@@ -177,7 +181,7 @@ class DtDsMonMoEditPage extends AdminPage {
                             <FormTextBox type='number' ref={e => this.soLop[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
+                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} min={1} max={5} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
                             <FormTextBox type='number' ref={e => this.soBuoi[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
@@ -212,22 +216,23 @@ class DtDsMonMoEditPage extends AdminPage {
 
     render() {
         let { danhSachMonMo, thoiGianMoMon, thongTinKhoaNganh } = this.props.dtDanhSachMonMo || {},
-            { khoa, hocKy, namDaoTao, batDau, ketThuc } = thoiGianMoMon || {}, //khoa: Khóa sinh viên (e.g 2021)
+            { khoa, hocKy, namDaoTao, batDau, ketThuc, bacDaoTao, loaiHinhDaoTao } = thoiGianMoMon || {}, //khoa: Khóa sinh viên (e.g 2021)
             { tenKhoaDangKy, tenNganh, maNganh, isDuyet } = thongTinKhoaNganh || {};
         this.khoa = khoa;
         this.isDuyet = isDuyet;
         let permission = this.getUserPermission('dtDangKyMoMon', ['read', 'write', 'delete', 'manage']);
         return this.renderPage({
-            title: <>Mở môn học</>,
+            title: 'Kế hoạch mở môn học',
             icon: 'fa fa-paper-plane-o',
             subTitle: <>
+                Bậc: {bacDaoTao || ''}. Hệ: {loaiHinhDaoTao || ''} <br />
                 Năm: {namDaoTao || ''}. Học kỳ: {hocKy || ''} <br />
                 Ngành: {tenNganh || ''} ({maNganh || ''}) - {tenKhoaDangKy || ''}
             </>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 <Link key={1} to='/user/dao-tao/dang-ky-mo-mon'>Danh sách</Link>,
-                'Danh sách các môn mở'
+                'Kế hoạch mở môn học'
             ],
             header: <>
                 Từ: {T.dateToText(batDau)}<br />

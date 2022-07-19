@@ -16,21 +16,15 @@ module.exports = app => {
         return result.join(' ');
     };
 
-    String.prototype.numberWithCommas = function () {
-        return this.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-    String.prototype.numberWithDots = function () {
-        return this.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    String.prototype.numberDisplay = function (replaceValue = '.') {
+        const decimalSplitter = replaceValue == '.' ? ',' : '.';
+        let [integer, decimal] = this.split('.');
+        if (!decimal) [integer, decimal] = this.split(',');
+        return `${integer.toString().replace(/\B(?=(\d{3})+(?!\d))/g, replaceValue)}${decimal ? decimalSplitter : ''}${decimal || ''}`;
     };
 
     String.prototype.getFirstLetters = function () {
-        const firstLetters = this
-            .toUpperCase()
-            .split(' ')
-            .map(word => word[0])
-            .join('');
-        return firstLetters;
+        return this.toUpperCase().split(' ').map(word => word[0]).join('');
     };
 
     app.randomPassword = (length) => Math.random().toString(36).slice(-length);

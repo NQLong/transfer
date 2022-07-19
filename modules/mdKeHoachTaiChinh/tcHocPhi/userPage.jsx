@@ -40,17 +40,17 @@ class ThanhToanModal extends AdminModal {
                     </button>
                 </Tooltip>
 
-                {/* <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
+                <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
-                        this.props.vnPayGoToTransaction('vnpay', link => {
+                        this.props.vnPayGoToTransaction('vcb', link => {
                             window.location.href = link;
                         });
                     }}>
                         <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
                     </button>
 
-                </Tooltip> */}
+                </Tooltip>
 
             </div>
         });
@@ -114,7 +114,7 @@ class UserPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={`${T.numberDisplay(item.soTien ? Number(item.soTien) : '')} VNĐ`} />
+                    <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.soTien || ''} />
                 </tr>
             )
         });
@@ -131,14 +131,14 @@ class UserPage extends AdminPage {
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
                             <i style={{ fontSize: '16px' }}>Học kỳ {hocKy}</i>
-                            {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)}</b> : <b>Đã thanh toán đủ.</b>
-                                // <Tooltip title='Thanh toán' placement='top' arrow>
-                                // <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
-                                //     Thanh toán
-                                // </button>
-                                // </Tooltip>
+                            {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b> : <b>Đã thanh toán đủ.</b>
                             }
                         </div>
+                        {/* <Tooltip title='Thanh toán' placement='top' arrow>
+                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                Thanh toán
+                            </button>
+                        </Tooltip> */}
                         <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
                         {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
                         <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >

@@ -16,6 +16,7 @@ import T from 'view/js/common';
 import { Tooltip } from '@mui/material';
 import { NghiViecModal } from '../qtNghiViec/adminPage';
 import { createQtNghiViecStaff, updateQtNghiViecStaff } from '../qtNghiViec/redux';
+
 class StaffPage extends AdminPage {
     state = { filter: {}, visibleCVDT: false, visibleHDTN: false };
     componentDidMount() {
@@ -23,9 +24,9 @@ class StaffPage extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                // listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia
+                // listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, lastModified
                 let filterCookie = T.getCookiePage(PageName, 'F'),
-                    { listShcc = '', listDonVi = '', gender = '', listNgach = '', listHocVi = '', listChucDanh = '', isBienChe = '', fromYear = '', toYear = '', listDanToc = '', listTonGiao = '', loaiHopDong = '', loaiChuyenVien = '', listQuocGia = '', fromAge = '', toAge = '' } = filterCookie;
+                    { listShcc = '', listDonVi = '', gender = '', listNgach = '', listHocVi = '', listChucDanh = '', isBienChe = '', fromYear = '', toYear = '', listDanToc = '', listTonGiao = '', loaiHopDong = '', loaiChuyenVien = '', listQuocGia = '', fromAge = '', toAge = '', lastModified = '' } = filterCookie;
                 this.listShcc.value(listShcc);
                 this.listDonVi.value(listDonVi);
                 this.gender.value(gender);
@@ -42,6 +43,7 @@ class StaffPage extends AdminPage {
                 this.listQuocGia.value(listQuocGia);
                 this.fromAge.value(fromAge);
                 this.toAge.value(toAge);
+                this.lastModified.value(lastModified);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
@@ -50,7 +52,7 @@ class StaffPage extends AdminPage {
 
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
-        //listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien
+        //listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, lastModified
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.staff && this.props.staff.page ? this.props.staff.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
 
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
@@ -67,6 +69,11 @@ class StaffPage extends AdminPage {
             toYear.setHours(23, 59, 59, 999);
             toYear = toYear.getTime();
         }
+        let lastModified = null;
+        if (this.lastModified.value()) {
+            lastModified = this.lastModified.value();
+            lastModified = lastModified.getTime();
+        }
         const listDonVi = this.listDonVi.value().toString() || '',
             listShcc = this.listShcc.value().toString() || '',
             listChucDanh = this.listChucDanh.value().toString() || '',
@@ -82,13 +89,13 @@ class StaffPage extends AdminPage {
             fromAge = this.fromAge.value() ? Number(this.fromAge.value()) : '',
             toAge = this.toAge.value() ? Number(this.toAge.value()) : '',
             listChuyenNganh = this.listChuyenNganh.value().toString() || '';
-        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh };
+        const pageFilter = (isInitial || isReset) ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh, lastModified };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     const filterCookie = T.getCookiePage(PageName, 'F');
-                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh } = filter;
+                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge, listChuyenNganh, lastModified } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
                     this.listShcc.value(listShcc || filterCookie.listShcc || '');
@@ -108,6 +115,7 @@ class StaffPage extends AdminPage {
                     this.fromAge.value(fromAge || filter.fromAge || '');
                     this.toAge.value(toAge || filter.toAge || '');
                     this.listChuyenNganh.value(listChuyenNganh || filter.listChuyenNganh || '');
+                    this.lastModified.value(lastModified || filterCookie.lastModified);
                 } else if (isReset) {
                     this.listShcc.value('');
                     this.listDonVi.value('');
@@ -126,6 +134,7 @@ class StaffPage extends AdminPage {
                     this.fromAge.value('');
                     this.toAge.value('');
                     this.listChuyenNganh.value('');
+                    this.lastModified.value('');
                     this.hideAdvanceSearch();
                 } else {
                     this.hideAdvanceSearch();
@@ -233,7 +242,7 @@ class StaffPage extends AdminPage {
                     <TableCell content={item.tenChucDanhNgheNghiep + ((item.ngach == '01.003' && item.isCvdt) ? ' (CVPVĐT & NCKH)' : '')} contentClassName='multiple-lines-2' />
                     <TableCell content={<>
                         {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh}<br /></span>}
-                        {item.tenDonVi && item.tenDonVi.normalizedName()}
+                        {item.tenDonVi ? (item.loaiDonVi == 1 ? ['16','18'].includes(item.maDonVi) ? 'Bộ môn ' : 'Khoa ' : '') + item.tenDonVi.normalizedName() : ''}
                     </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.email} />
                     <TableCell type='date' style={{ color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayBatDauCongTac} />
@@ -291,6 +300,7 @@ class StaffPage extends AdminPage {
                     <FormSelect className='col-md-3' ref={e => this.listTonGiao = e} data={SelectAdapter_DmTonGiaoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo tôn giáo' />
                     <FormTextBox className='col-md-3' type='number' ref={e => this.fromAge = e} label='Từ độ tuổi' />
                     <FormTextBox className='col-md-3' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
+                    <FormDatePicker type='time-mask' ref={e => this.lastModified = e} className='col-md-6' label='Lần cập nhật cuối' />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc

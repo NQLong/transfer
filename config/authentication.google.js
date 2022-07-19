@@ -20,7 +20,9 @@ module.exports = (app) => {
 
         const isAdmin = await app.isAdmin(email);
 
-        if (!(isAdmin || app.isHCMUSSH(email) || (app.isDebug && email.endsWith('@gmail.com')))) {
+        const isDeveloper = app.isDeveloper(email);
+
+        if (!(isAdmin || app.isHCMUSSH(email) || isDeveloper || (app.isDebug && email.endsWith('@gmail.com')))) {
             return done(null, false, { 'loginMessage': 'Fail to login!' });
         }
 

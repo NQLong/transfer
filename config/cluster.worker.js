@@ -18,6 +18,7 @@ module.exports = (cluster, isDebug) => {
 
     // Variables ------------------------------------------------------------------------------------------------------
     app.port = appConfig.port;
+    app.developers = appConfig.developers;
     app.rootUrl = appConfig.rootUrl;
     app.debugUrl = `http://localhost:${app.port}`;
     app.email = appConfig.email;

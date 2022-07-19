@@ -212,8 +212,8 @@ export const SelectAdapter_FwCanBoGiangVien = {
     ajax: true,
     url: '/api/staff/get-giang-vien',
     data: params => ({ searchTerm: params.term }),
-    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.shcc, text: `${item.tenDonVi.getFirstLetters().toUpperCase()}: ${item.trinhDo + ' ' || ''}${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })) : [] }),
-    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.tenDonVi.getFirstLetters().toUpperCase()}: ${item.trinhDo + ' ' || ''}${(item.ho + ' ' + item.ten).normalizedName()}` })))(),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.shcc, text: `${(item.tenDonVi || '').getFirstLetters().toUpperCase()}: ${item.trinhDo + ' ' || ''}${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })) : [] }),
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${(item.tenDonVi || '').getFirstLetters().toUpperCase()}: ${item.trinhDo + ' ' || ''}${(item.ho + ' ' + item.ten).normalizedName()}` })))(),
 };
 
 export const SelectAdapter_FwCanBoFemale = {

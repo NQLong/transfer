@@ -11,83 +11,60 @@ module.exports = app => {
      * 
      * Condition: 
      */
-    app.model.dtThoiKhoaBieu.init = async (ngayBatDau, done) => {
-        const listDays = [2, 3, 4, 5, 6, 7];
-        const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        let { hocKy, nam } = thoiGianMoMon;
-        app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, isMo: 1 }, '*', 'soLuongDuKien DESC', (error, lisSubjectsOfSemester) => {
-            if (error) {
-                return error;
-            } else {
-                app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten', (error, listPeriods) => {
-                    if (error) {
-                        return error;
-                    } else {
-                        app.model.dmPhong.getAll({ kichHoat: 1 }, 'ten,sucChua', 'sucChua DESC', async (error, listRooms) => {
-                            if (error) {
-                                return error;
-                            } else {
-                                try {
-                                    let data = await getDataGenerateSchedule(lisSubjectsOfSemester.filter(item => item.isMo), listDays, listPeriods, listRooms);
-                                    if (data.error) done(data);
-                                    else {
-                                        app.model.dmNgayLe.getAll({
-                                            statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
-                                            parameter: {
-                                                startDateOfYear: new Date(nam, 0, 1).setHours(0, 0, 0, 1),
-                                                endDateOfYear: new Date(nam, 11, 31).setHours(23, 59, 59, 999)
-                                            }
-                                        }, (error, listNgayLe) => {
-                                            if (!error) {
-                                                listNgayLe = listNgayLe.map(item => {
-                                                    item.ngay = new Date(item.ngay).setHours(0, 0, 0);
-                                                    return item;
-                                                });
-                                                let dataArray = Object.keys(data.data);
-                                                const update = async (index = 0) => {
-                                                    if (index == dataArray.length) {
-                                                        done({ success: 'Tạo thời khóa biểu thành công' });
-                                                    } else {
-                                                        let id = dataArray[index],
-                                                            changes = data.data[id];
-                                                        let startDate = new Date(ngayBatDau),
-                                                            currentDay = startDate.getDay() + 1,
-                                                            distance = changes.thu - currentDay;
-                                                        if (distance < 0) distance += 7;
-                                                        changes.ngayBatDau = new Date(startDate.getTime() + distance * DATE_UNIX).setHours(0, 0, 0);
-                                                        if (listNgayLe.some(item => item.ngay == changes.ngayBatDau)) {
-                                                            changes.ngayBatDau = changes.ngayBatDau + 7 * DATE_UNIX;
-                                                        }
-                                                        changes.ngayKetThuc = await app.model.dtThoiKhoaBieu.calculateEndDate(changes, listNgayLe);
-                                                        app.model.dtThoiKhoaBieu.update({ id }, changes, (error, item) => {
-                                                            if (error || !item) done({ error: 'Lỗi khi tạo thời khóa biểu' });
-                                                            else update(index + 1);
-                                                        });
-                                                    }
-                                                };
-                                                update();
-                                            }
-                                        });
-
-                                    }
-                                } catch (error) {
-                                    done({ error });
-                                }
-                            }
-                        });
+    app.model.dtThoiKhoaBieu.init = async (config, done) => {
+        try {
+            const listDays = [2, 3, 4, 5, 6, 7];
+            let { bacDaoTao, loaiHinhDaoTao, ngayBatDau, listPhongKhongSuDung } = config,
+                thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+            thoiGianMoMon = thoiGianMoMon.find(item => item.bacDaoTao == bacDaoTao && item.loaiHinhDaoTao == loaiHinhDaoTao);
+            let { hocKy, nam } = thoiGianMoMon;
+            const listSubjects = await app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, bacDaoTao, loaiHinhDaoTao, isMo: 1 }, '*', 'soLuongDuKien DESC');
+            const listPeriods = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+            let listRooms = await app.model.dmPhong.getAll({ kichHoat: 1 }, 'ten,sucChua', 'sucChua DESC');
+            listRooms = listPhongKhongSuDung && listPhongKhongSuDung.length ? listRooms.filter(item => !listPhongKhongSuDung.includes(item.ten)) : listRooms;
+            let data = await getDataGenerateSchedule(listSubjects.filter(item => item.isMo), listDays, listPeriods, listRooms);
+            if (data.error) done(data);
+            else {
+                let listNgayLe = await app.model.dmNgayLe.getAll({
+                    statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
+                    parameter: {
+                        startDateOfYear: new Date(nam, 0, 1).setHours(0, 0, 0, 1),
+                        endDateOfYear: new Date(nam, 11, 31).setHours(23, 59, 59, 999)
                     }
                 });
+                listNgayLe = listNgayLe.map(item => {
+                    item.ngay = new Date(item.ngay).setHours(0, 0, 0);
+                    return item;
+                });
+                let dataArray = Object.keys(data.data);
+                for (let index = 0; index < dataArray.length; index++) {
+                    let id = dataArray[index],
+                        changes = data.data[id];
+                    let startDate = new Date(ngayBatDau),
+                        currentDay = startDate.getDay() + 1,
+                        distance = changes.thu - currentDay;
+                    if (distance < 0) distance += 7;
+                    changes.ngayBatDau = new Date(startDate.getTime() + distance * DATE_UNIX).setHours(0, 0, 0);
+                    if (listNgayLe.some(item => item.ngay == changes.ngayBatDau)) {
+                        changes.ngayBatDau = changes.ngayBatDau + 7 * DATE_UNIX;
+                    }
+                    changes.ngayKetThuc = await app.model.dtThoiKhoaBieu.calculateEndDate(changes, listNgayLe);
+                    await app.model.dtThoiKhoaBieu.update({ id }, changes);
+                }
+                done({ success: 'Sinh thời khóa biểu thành công!' });
             }
-        });
+        } catch (error) {
+            done({ error: 'Sinh thời khoá biểu thất bại!' });
+        }
     };
 
-    const getDataGenerateSchedule = (lisSubjectsOfSemester, listDays, listPeriods, listRooms) => new Promise(resolve => {
+    const getDataGenerateSchedule = (listSubjects, listDays, listPeriods, listRooms) => new Promise(resolve => {
         let data = {}, dataNganh = {};
         // Tạo ra một object với key là mã ngành, value là 1 object nữa (key là mã môn, value là danh sách lịch của môn đó)
         // để kiểm tra nguyên tắc: số môn bắt buộc trong cùng 1 ngành có số lịch trùng nhau là ít nhất.
-        Object.keys(lisSubjectsOfSemester.groupBy('maNganh')).forEach(maNganh => {
+        Object.keys(listSubjects.groupBy('maNganh')).forEach(maNganh => {
             dataNganh[maNganh] = {};
-            lisSubjectsOfSemester.groupBy('maNganh')[maNganh]
+            listSubjects.groupBy('maNganh')[maNganh]
                 .filter(subject => subject.loaiMonHoc == 0)
                 .map(item => item.maMonHoc)
                 .sort()
@@ -114,7 +91,7 @@ module.exports = app => {
                 else {
                     let day = parseInt(listDays.sample());      // Lấy 1 ngày bất kỳ
                     if (subject.loaiMonHoc == 0) {      // Nếu môn học là bắt buộc
-                        /**
+                        /**x
                          * Check lịch cho sinh viên có thể đăng ký được tất cả các môn bắt buộc
                          *    - Nếu ngành mở hơn 1 môn bắt buộc:
                          */
@@ -136,7 +113,7 @@ module.exports = app => {
                                 if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi != currentTime.buoi && item.nhom == currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
 
                                 // Cùng môn, cùng buổi, khác nhóm mà cùng giờ thì continue
-                                //To-do: Nếu như hết xếp được thì quay lại từ đầu.
+                                //TODO: Nếu như hết xếp được thì quay lại từ đầu.
                                 else if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi == currentTime.buoi && item.nhom != currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
                             }
                             let nganhBoxExceptCurrentSubject = Object.keys(nganhBox).filter(maMonHoc => maMonHoc != subject.maMonHoc);
@@ -151,7 +128,7 @@ module.exports = app => {
                     }
                     let listRoomsAvailable = [];
                     for (let room of listRooms) {
-                        if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, lisSubjectsOfSemester, {
+                        if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, listSubjects, {
                             tietBatDau: subject.tietBatDau || startedPeriod, soTiet: parseInt(subject.soTiet), day: subject.thu || day
                         })) listRoomsAvailable.push(room);
                     }
@@ -164,7 +141,7 @@ module.exports = app => {
                             tietKetThuc: startedPeriod + parseInt(subject.soTiet) - 1,
                             nhom: subject.nhom, buoi: subject.buoi
                         });
-                        let newList = lisSubjectsOfSemester.map(item => {
+                        let newList = listSubjects.map(item => {
                             if (item.id == subject.id) {
                                 item.tietBatDau = startedPeriod;
                                 item.thu = day;
@@ -180,13 +157,13 @@ module.exports = app => {
             }
             setRoomForSubject(index + 1, list);
         };
-        setRoomForSubject(0, lisSubjectsOfSemester);
+        setRoomForSubject(0, listSubjects);
     });
 
-    app.model.dtThoiKhoaBieu.isAvailabledRoom = (room, lisSubjectsOfSemester, condition) => {
+    app.model.dtThoiKhoaBieu.isAvailabledRoom = (room, listSubjects, condition) => {
         let { tietBatDau, soTiet, day } = condition, tietKetThuc = tietBatDau + soTiet - 1;
 
-        let listPresentStatus = lisSubjectsOfSemester.filter(subject => subject.phong == room && subject.thu == day).map(subject => subject = { tietBatDau: subject.tietBatDau, tietKetThuc: subject.tietBatDau + subject.soTiet - 1 });
+        let listPresentStatus = listSubjects.filter(subject => subject.phong == room && subject.thu == day).map(subject => subject = { tietBatDau: subject.tietBatDau, tietKetThuc: subject.tietBatDau + subject.soTiet - 1 });
 
         if (listPresentStatus.length == 0) return true;
         else {
