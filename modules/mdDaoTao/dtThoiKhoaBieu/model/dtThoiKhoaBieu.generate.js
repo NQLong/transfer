@@ -1,6 +1,6 @@
-// Table name: DT_THOI_KHOA_BIEU { id, maMonHoc, nhom, hocKy, thu, phong, ngayBatDau, giangVien, nam, tietBatDau, soTietBuoi, chuyenNganh, khoaDangKy, soLuongDuKien, sucChua, buoi, hocKySinhVien, maNganh, loaiMonHoc, isMo, soBuoiTuan, soTietLyThuyet, soTietThucHanh, ngayKetThuc }
+// Table name: DT_THOI_KHOA_BIEU { id, maMonHoc, nhom, hocKy, thu, phong, ngayBatDau, giangVien, nam, tietBatDau, soTietBuoi, chuyenNganh, khoaDangKy, soLuongDuKien, sucChua, buoi, maNganh, loaiMonHoc, isMo, soBuoiTuan, soTietLyThuyet, soTietThucHanh, ngayKetThuc, loaiHinhDaoTao, bacDaoTao, khoaSinhVien }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'nhom': 'NHOM', 'hocKy': 'HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'giangVien': 'GIANG_VIEN', 'nam': 'NAM', 'tietBatDau': 'TIET_BAT_DAU', 'soTietBuoi': 'SO_TIET_BUOI', 'chuyenNganh': 'CHUYEN_NGANH', 'khoaDangKy': 'KHOA_DANG_KY', 'soLuongDuKien': 'SO_LUONG_DU_KIEN', 'sucChua': 'SUC_CHUA', 'buoi': 'BUOI', 'hocKySinhVien': 'HOC_KY_SINH_VIEN', 'maNganh': 'MA_NGANH', 'loaiMonHoc': 'LOAI_MON_HOC', 'isMo': 'IS_MO', 'soBuoiTuan': 'SO_BUOI_TUAN', 'soTietLyThuyet': 'SO_TIET_LY_THUYET', 'soTietThucHanh': 'SO_TIET_THUC_HANH', 'ngayKetThuc': 'NGAY_KET_THUC' };
+const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'nhom': 'NHOM', 'hocKy': 'HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'giangVien': 'GIANG_VIEN', 'nam': 'NAM', 'tietBatDau': 'TIET_BAT_DAU', 'soTietBuoi': 'SO_TIET_BUOI', 'chuyenNganh': 'CHUYEN_NGANH', 'khoaDangKy': 'KHOA_DANG_KY', 'soLuongDuKien': 'SO_LUONG_DU_KIEN', 'sucChua': 'SUC_CHUA', 'buoi': 'BUOI', 'maNganh': 'MA_NGANH', 'loaiMonHoc': 'LOAI_MON_HOC', 'isMo': 'IS_MO', 'soBuoiTuan': 'SO_BUOI_TUAN', 'soTietLyThuyet': 'SO_TIET_LY_THUYET', 'soTietThucHanh': 'SO_TIET_THUC_HANH', 'ngayKetThuc': 'NGAY_KET_THUC', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO', 'khoaSinhVien': 'KHOA_SINH_VIEN' };
 
 module.exports = app => {
     app.model.dtThoiKhoaBieu = {
@@ -216,9 +216,9 @@ module.exports = app => {
             });
         }),
 
-        searchPage: (pagenumber, pagesize, donvi, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_search_page(:pagenumber, :pagesize, :donvi, :searchterm, :totalitem, :pagetotal, :thoigianphancong); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, donvi, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, thoigianphancong: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        searchPage: (pagenumber, pagesize, filter, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal, :thoigianphancong); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, thoigianphancong: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);
