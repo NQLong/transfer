@@ -171,3 +171,20 @@ export function vnPayGoToTransaction(bank, done) {
         });
     };
 }
+
+export function createInvoice(mssv, hocKy, namHoc, done) {
+    return dispatch => {
+        const url = '/api/finance/invoice';
+        T.post(url, { mssv, hocKy, namHoc }, res => {
+            if (res.error) {
+                T.notify('Tạo hóa đơn lỗi', 'danger');
+                console.error(`GET: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Tạo hóa đơn thành công', 'success');
+                // dispatch(getTongGiaoDichPage());
+                done && done(res.item);
+            }
+        }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
+    };
+}

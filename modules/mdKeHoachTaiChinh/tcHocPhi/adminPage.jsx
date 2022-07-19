@@ -5,7 +5,7 @@ import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, 
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { SelectAdapter_TcLoaiPhi } from '../tcLoaiPhi/redux';
-import { getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi } from './redux';
+import { getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice } from './redux';
 import CountUp from 'view/js/countUp';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
@@ -239,7 +239,7 @@ class TcHocPhiAdminPage extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
             hocKy = this.term.value(),
-            {tuNgay, denNgay} = this.getTimeFilter();
+            { tuNgay, denNgay } = this.getTimeFilter();
         const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
@@ -338,6 +338,18 @@ class TcHocPhiAdminPage extends AdminPage {
                                 <i className='fa fa-lg fa-eye' />
                             </button>
                         </Tooltip>
+                        {item.invoiceId ? <Tooltip title='Xem hóa đơn' arrow>
+                            <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.invoiceId}`}>
+                                <i className='fa fa-lg fa-credit-card' />
+                            </a>
+                        </Tooltip> :
+                            <Tooltip title='Tạo hóa đơn' arrow>
+                                <button className='btn btn-info' onClick={e => e.preventDefault() || this.props.createInvoice(item.mssv, item.hocKy, item.namHoc, () => {
+                                    this.getPage();
+                                })}>
+                                    <i className='fa fa-lg fa-print' />
+                                </button>
+                            </Tooltip>}
                     </TableCell>
                 </tr>
             ),
@@ -386,6 +398,6 @@ class TcHocPhiAdminPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi
+    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice
 };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiAdminPage);

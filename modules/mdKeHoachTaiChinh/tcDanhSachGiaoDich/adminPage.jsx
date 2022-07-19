@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getTongGiaoDichPage, getListNganHang } from './redux';
+import { getTongGiaoDichPage, getListNganHang, createInvoice } from './redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -133,6 +133,7 @@ class DanhSachGiaoDich extends AdminPage {
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trạng thái</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (<tr key={index}>
                 <TableCell style={{ textAlign: 'right' }} content={item.R} />
@@ -149,6 +150,15 @@ class DanhSachGiaoDich extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={
                     item.trangThai ? <div style={{ color: 'green' }}><i className='fa fa-lg fa-check-square-o' /> Thành công</div> : <div style={{ color: 'red' }}><i className='fa fa-lg fa-times' /> Thất bại</div>
                 } />
+                <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
+                    {
+                        item.invoiceID ? <a className='btn btn-success' title='Xem hóa đơn' href={`/api/finance/invoice/${item.invoiceID}`}>
+                            <i style={{ color: 'white' }} className='fa fa-lg fa-print' />
+                        </a> : <a className='btn btn-info' title='Tạo hóa đơn' onClick={() => { this.props.createInvoice(item.transactionId) }}>
+                            <i style={{ color: 'white' }} className='fa fa-lg fa-credit-card' />
+                        </a>
+                    }
+                </TableCell>
             </tr>),
 
         });
@@ -189,5 +199,5 @@ class DanhSachGiaoDich extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage, getListNganHang };
+const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createInvoice };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);
