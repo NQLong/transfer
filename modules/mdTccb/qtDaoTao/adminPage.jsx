@@ -22,17 +22,13 @@ class QtDaoTao extends AdminPage {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.maDonVi?.value('');
-                this.mulCanBo?.value('');
-                this.loaiBang?.value('');
+                
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
                 // this.props.getQtDaoTaoGroupPage();
             }
-            this.changeAdvancedSearch(true);
+            this.changeAdvancedSearch(false, true);
         });
     }
 
@@ -49,7 +45,7 @@ class QtDaoTao extends AdminPage {
         const listShcc = this.mulCanBo?.value().toString() || '';
         const listLoaiBang = this.loaiBang?.value().toString() || '';
         const filterCookie = T.storage('pageQtDaoTao').F;
-        const pageFilter = isInitial ? filterCookie : { listDv, fromYear, toYear, listShcc, listLoaiBang };
+        const pageFilter = (isInitial || isReset) ? filterCookie : { listDv, fromYear, toYear, listShcc, listLoaiBang };
         this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', () => {
                 if (isInitial) {
@@ -60,9 +56,8 @@ class QtDaoTao extends AdminPage {
                     this.maDonVi?.value(filter.listDv);
                     this.mulCanBo?.value(filter.listShcc);
                     this.loaiBang?.value(filter.listLoaiBang);
-                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && this.showAdvanceSearch();
+                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && typeof(filterCookie) !== 'string' && this.showAdvanceSearch();
                 } else {
-                    this.hideAdvanceSearch();
                     if (isReset) {
                         this.fromYear?.value('');
                         this.toYear?.value('');
@@ -70,6 +65,8 @@ class QtDaoTao extends AdminPage {
                         this.mulCanBo.value('');
                         this.loaiBang.value('');
                     }
+                    this.hideAdvanceSearch();
+
                 }
             });
         });
@@ -155,7 +152,7 @@ class QtDaoTao extends AdminPage {
                         {item.trinhDo && <span>Kết quả, trình độ: <span style={{ color: 'red' }}>{item.tenTrinhDo ? item.tenTrinhDo : item.trinhDo}<br /></span></span>}
                     </>} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
-                        item.minhChung && T.parse(item.minhChung).length ? <span className='text-success'>Đã nộp</span> : <span className='text-danger'>Chưa có</span>
+                        item.minhChung && T.parse(item.minhChung).length ? <a href={`/api/qua-trinh/dao-tao/download${T.parse(item.minhChung)[0]}?t=${new Date().getTime()}`} target='blank'>{item.tenLoaiBangCap}</a> : <span className='text-danger'>Chưa có</span>
                     } />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                         onEdit={() => this.modal.show({ item, shcc: item.shcc })} onDelete={e => this.delete(e, item)} > </TableCell>
