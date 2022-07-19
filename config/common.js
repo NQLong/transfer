@@ -1,4 +1,4 @@
-module.exports = (app) => {
+module.exports = (app, appConfig) => {
     const fse = require('fs-extra');
     app.adminRole = {};
     app.clone = function () {
@@ -135,7 +135,6 @@ module.exports = (app) => {
             index: 500, title: 'Hành chính tổng hợp', link: '/user/hcth', icon: 'fa-book',
             subMenusRender: false,
         }
-
     };
 
     // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------
@@ -211,7 +210,7 @@ module.exports = (app) => {
             });
         });
         modelPaths.forEach(path => require(path)(app));
-        if (loadController) controllerPaths.forEach(path => require(path)(app));
+        if (loadController) controllerPaths.forEach(path => require(path)(app, appConfig));
     };
 
     //Utils-----------------------------------------------------------------------------------------------------------------------

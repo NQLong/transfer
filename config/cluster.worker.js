@@ -38,7 +38,7 @@ module.exports = (cluster, isDebug) => {
     app.model = {};
 
     // Configure ------------------------------------------------------------------------------------------------------
-    require('./common')(app, appConfig.name);
+    require('./common')(app, appConfig);
     require('./view')(app, express);
     require('./database.redisDB')(app, appConfig);
     require('./database.oracleDB')(app, appConfig);
