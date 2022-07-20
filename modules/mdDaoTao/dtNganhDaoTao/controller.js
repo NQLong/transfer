@@ -35,6 +35,13 @@ module.exports = app => {
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
+    app.get('/api/dao-tao/nganh-dao-tao-student', app.permission.check('student:login'), (req, res) => {
+        app.model.dtNganhDaoTao.getAll({
+            statement: '(lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText) AND kichHoat = 1',
+            parameter: { searchText: `%${(req.query.condition || '').toLowerCase()}%` }
+        }, '*', 'khoa', (error, items) => res.send({ error, items }));
+    });
+
     app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'student:login'), (req, res) => {
         app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
     });
