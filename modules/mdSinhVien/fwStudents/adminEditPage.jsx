@@ -215,11 +215,12 @@ class SinhVienPage extends AdminPage {
                                     <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' readOnly={readOnly} data={SelectAdapter_DmGioiTinhV2} />
                                     <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmDonViFaculty_V2} />
                                     <FormTextBox type='year' ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' className='col-md-2' readOnly={readOnly} />
-                                    <FormDatePicker type='date-mask' ref={e => this.ngayNhapHoc = e} label='Nhập học' className='col-md-3' readOnly={readOnly} />
                                     <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly={readOnly} />
                                     <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly={readOnly} />
                                     <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-3' readOnly={readOnly} />
                                     <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly={readOnly} />
+                                    <FormDatePicker type='date-mask' ref={e => this.ngayNhapHoc = e} label='Nhập học' className='col-md-3' readOnly={readOnly} />
+
                                 </div>
                             </div>
 
@@ -244,9 +245,9 @@ class SinhVienPage extends AdminPage {
                             <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' />
                             <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' />
                             <FormTextBox ref={e => this.tenCha = e} label='Họ tên cha' className='form-group col-md-3' />
-                            <FormTextBox ref={e => this.sdtCha = e} label='Số  điện thoại cha' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.sdtCha = e} label='Số điện thoại cha' className='form-group col-md-3' />
                             <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh cha' type='date-mask' className='form-group col-md-3' />
-                            <FormTextBox ref={e => this.ngheNghiepCha = e} label='Nghề  nghiệp cha' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.ngheNghiepCha = e} label='Nghề nghiệp cha' className='form-group col-md-3' />
                             <FormTextBox ref={e => this.tenMe = e} label='Họ tên mẹ' className='form-group col-md-3' />
                             <FormTextBox ref={e => this.sdtMe = e} label='Số điện thoại mẹ' className='form-group col-md-3' />
                             <FormDatePicker ref={e => this.ngaySinhMe = e} label='Ngày sinh mẹ' type='date-mask' className='form-group col-md-3' />

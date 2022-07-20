@@ -19,7 +19,7 @@ module.exports = app => {
     app.get('/user/dao-tao/nganh-dao-tao', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/dao-tao/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'student:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         const user = req.session.user, permissions = user.permissions;
@@ -35,7 +35,7 @@ module.exports = app => {
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'student:login'), (req, res) => {
         app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
     });
 
