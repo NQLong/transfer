@@ -155,31 +155,40 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/news-donvi/page/:pageNumber/:pageSize', app.permission.check('website:read'), (req, res) => {
-        let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            condition = req.query.condition;
-        if (condition) {
-            condition = {
-                statement: 'title LIKE :searchText',
-                parameter: { searchText: `%${condition}%` }
-            };
-        } else if (req.session.user && req.session.user.maDonVi) {
-            condition = { maDonVi: req.session.user.maDonVi };
-        }
-        app.model.fwNews.getPage(pageNumber, pageSize, condition, '*', 'pinned DESC, priority DESC', (error, page) => {
-            const response = {};
-            if (error || page == null) {
-                response.error = 'Danh sách bài viết không sẵn sàng!';
-            } else {
-                let list = page.list.map(item => app.clone(item, { content: null }));
-                response.page = app.clone(page, { list });
+    app.get('/api/news-donvi/page/:pageNumber/:pageSize', app.permission.check('website:read'), async (req, res) => {
+        try {
+            let pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize), condition = req.query.condition;
+            const pageCondition = { statement: '', parameter: {} }, permissions = req.session.user.permissions;
+            let donViConditionText = '', maDonVi = '';
+            if (condition) {
+                if (condition.searchText) {
+                    pageCondition.statement += 'lower(title) LIKE :searchText';
+                    pageCondition.parameter.searchText = `%${condition.searchText.toLowerCase()}%`;
+                }
+                if (condition.maDonVi && permissions.includes('website:manage')) {
+                    donViConditionText = 'maDonVi LIKE :maDonVi';
+                    maDonVi = condition.maDonVi;
+                }
             }
-            res.send(response);
-        });
+
+            if (!permissions.includes('website:manage')) {
+                donViConditionText = 'maDonVi LIKE :maDonVi';
+                maDonVi = req.session.user.maDonVi;
+            }
+
+            if (donViConditionText) {
+                pageCondition.statement += (pageCondition.statement .length ? ' AND ' : '') + donViConditionText;
+                pageCondition.parameter.maDonVi = maDonVi;
+            }
+
+            const page = await app.model.fwNews.getPage(pageNumber, pageSize, pageCondition, 'id, priority, title, image, link, active, isInternal, createdDate, startPost, maDonVi, pinned', 'pinned DESC, priority DESC');
+            res.send({ page });
+        } catch (error) {
+            res.send({ error: 'Danh sách bài viết không sẵn sàng!' });
+        }
     });
 
-    app.get('/api/news-category/page/:pageNumber/:pageSize', (req, res) => {//TODO permissions
+    app.get('/api/news-category/page/:pageNumber/:pageSize', (req, res) => { //TODO permissions
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             categoryType = req.query.category;

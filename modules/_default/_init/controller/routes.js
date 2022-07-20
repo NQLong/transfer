@@ -20,30 +20,30 @@ module.exports = app => {
     ['/index.htm(l)?', '/404.htm(l)?', '/request-permissions(/:roleId?)', '/request-login'].forEach(route => app.get(route, app.templates.home));
 
     // API ------------------------------------------------------------------------------------------------------------------------------------------
-    app.put('/api/system', app.permission.check('system:settings'), (req, res) => {
-        const { password, address, address2, email, mobile, fax, facebook, youtube, twitter, instagram, linkMap } = req.body;
+    app.put('/api/system', app.permission.check('system:settings'), async (req, res) => {
+        try {
+            const { password, address, address2, email, mobile, fax, facebook, youtube, twitter, instagram, linkMap } = req.body;
+            if (req.body.password) {
+                await app.state.set('emailPassword', password);
+            } else {
+                const changes = [];
+                if (address || address == '') changes.push('address', address.trim());
+                if (address2 || address2 == '') changes.push('address2', address2.trim());
+                if (email) changes.push('email', email.trim());
+                if (mobile || mobile == '') changes.push('mobile', mobile.trim());
+                if (fax || fax == '') changes.push('fax', fax.trim());
+                if (facebook || facebook == '') changes.push('facebook', facebook.trim());
+                if (youtube || youtube == '') changes.push('youtube', youtube.trim());
+                if (twitter || twitter == '') changes.push('twitter', twitter.trim());
+                if (instagram || instagram == '') changes.push('instagram', instagram.trim());
+                if (linkMap || linkMap == '') changes.push('linkMap', linkMap.trim());
+                await app.state.set(...changes);
+            }
 
-        if (req.body.password) {
-            app.state.set('emailPassword', password, error => {
-                res.send(error ? { error: 'Lỗi khi cập nhật mật khẩu email!' } : app.state.data);
-            });
-        } else {
-            const changes = [];
-            if (address || address == '') changes.push('address', address.trim());
-            if (address2 || address2 == '') changes.push('address2', address2.trim());
-            if (email) changes.push('email', email.trim());
-            if (mobile || mobile == '') changes.push('mobile', mobile.trim());
-            if (fax || fax == '') changes.push('fax', fax.trim());
-            if (facebook || facebook == '') changes.push('facebook', facebook.trim());
-            if (youtube || youtube == '') changes.push('youtube', youtube.trim());
-            if (twitter || twitter == '') changes.push('twitter', twitter.trim());
-            if (instagram || instagram == '') changes.push('instagram', instagram.trim());
-            if (linkMap || linkMap == '') changes.push('linkMap', linkMap.trim());
-
-            app.state.set(...changes, error => {
-                error && console.log('Error (/api/system):', error);
-                app.state.get((error, data) => res.send(error ? { error } : data));
-            });
+            const data = await app.state.get();
+            res.send(data);
+        } catch (error) {
+            res.send({ error });
         }
     });
 
@@ -59,10 +59,12 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => { next(); }, (req, res) => {
-        app.state.get((error, data) => {
-            if (error || data == null) {
-                res.send({ error: error || 'System has error!' });
+    app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => next(), async (req, res) => {
+        try {
+            const template = req.query.template;
+            const data = await app.state.get();
+            if (data == null) {
+                res.send({ error: 'System has error!' });
             } else {
                 Object.keys(data).forEach(key => {
                     if (key.toLowerCase().indexOf('password') != -1) delete data[key]; // delete data.emailPassword, data.tchcEmailPassword
@@ -70,68 +72,69 @@ module.exports = app => {
 
                 if (app.isDebug) data.isDebug = true;
                 if (req.session.user) data.user = req.session.user;
-                const ready = () => {
-                    if (app.database.oracle.connected && app.model && app.model.fwMenu && app.model.fwSubmenu) {
-                        app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
-                            if (menus) {
-                                data.menus = [];
-                                data.divisionMenus = [];
-                                menus.forEach(menu => {
-                                    menu.content = '';
-                                    if (menu.submenus) {
-                                        menu.submenus.forEach(submenu => submenu.content = '');
-                                    }
-                                    if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
-                                });
-                            }
-                            app.model.fwSubmenu.getAll({ active: 1 }, '*', 'priority ASC', (error, submenus) => {
-                                if (submenus) {
-                                    data.submenus = submenus.slice();
-                                }
-                                app.model.setting.getValue(['header', 'address', 'headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
-                                    // data.header = result.header;
-                                    // data.address = result.address;
-                                    data.headerTitle = result.headerTitle;
-                                    data.headerLink = result.headerLink;
-                                    data.address2 = result.address2;
-                                    data.isShowHeaderTitle = result.isShowHeaderTitle;
-                                    data.mapLink = result.mapLink;
-                                    if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
-                                        !data.user.permissions.includes('menu:write')
-                                    ) {
-                                        delete data.user.menu['2000'];
-                                        delete data.user.menu['5100'];
-                                    }
-                                    if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
-                                        delete data.user.menu['6000'].menus['6004'];
-                                        delete data.user.menu['6000'].menus['6005'];
-                                        delete data.user.menu['6000'].menus['6006'];
-                                        delete data.user.menu['6000'].menus['6008'];
+                while (!(app.database.oracle.connected && app.model && app.model.fwMenu && app.model.fwSubmenu)) {
+                    await app.waiting(500);
+                }
 
-                                    }
-                                    // else if (data.user && data.user.permissions
-                                    //     && data.user.permissions.includes('unit:write')
-                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['6000']) {
-                                    //     delete data.user.menu['6000'].menus['6001'];
-                                    //     delete data.user.menu['6000'].menus['6002'];
-                                    //     delete data.user.menu['6000'].menus['6003'];
-                                    // }
-                                    if (data.user && data.user.permissions
-                                        && data.user.permissions.includes('website:write')
-                                        && !data.user.permissions.includes('news:write')) {
-                                        if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
-                                    }
-                                    res.send(data);
-                                });
+                if (template == 'home' || template == 'unit') {
+                    if (template == 'home') {
+                        const menus = await app.model.fwMenu.homeGetDivisionMenuTree('00');
+                        if (menus) {
+                            data.menus = [];
+                            data.divisionMenus = [];
+                            menus.forEach(menu => {
+                                menu.content = '';
+                                if (menu.submenus) {
+                                    menu.submenus.forEach(submenu => submenu.content = '');
+                                }
+                                if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
                             });
-                        });
-                    } else {
-                        setTimeout(ready, 500);
+                        }
                     }
-                };
-                ready();
+
+                    const submenus = await app.model.fwSubmenu.getAll({ active: 1 }, '*', 'priority ASC');
+                    if (submenus) {
+                        data.submenus = submenus.slice();
+                    }
+                }
+
+                app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                    data.headerTitle = result.headerTitle;
+                    data.headerLink = result.headerLink;
+                    data.address2 = result.address2;
+                    data.isShowHeaderTitle = result.isShowHeaderTitle;
+                    data.mapLink = result.mapLink;
+                    if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
+                        !data.user.permissions.includes('menu:write')
+                    ) {
+                        delete data.user.menu['2000'];
+                        delete data.user.menu['5100'];
+                    }
+                    if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
+                        delete data.user.menu['6000'].menus['6004'];
+                        delete data.user.menu['6000'].menus['6005'];
+                        delete data.user.menu['6000'].menus['6006'];
+                        delete data.user.menu['6000'].menus['6008'];
+
+                    }
+                    // else if (data.user && data.user.permissions
+                    //     && data.user.permissions.includes('unit:write')
+                    //     && !data.user.permissions.includes('news:write') && data.user.menu['6000']) {
+                    //     delete data.user.menu['6000'].menus['6001'];
+                    //     delete data.user.menu['6000'].menus['6002'];
+                    //     delete data.user.menu['6000'].menus['6003'];
+                    // }
+                    if (data.user && data.user.permissions
+                        && data.user.permissions.includes('website:write')
+                        && !data.user.permissions.includes('news:write')) {
+                        if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
+                    }
+                    res.send(data);
+                });
             }
-        });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     const getComponent = (index, componentIds, components, done) => {
@@ -244,39 +247,51 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    const uploadSettingImage = (req, fields, files, params, done) => {
+    const uploadSettingImage = async (req, fields, files, params, done) => {
         if (files.SettingImage && files.SettingImage.length > 0) {
             console.log('Hook: uploadSettingImage => ' + fields.userData);
             const srcPath = files.SettingImage[0].path;
 
-            if (fields.userData == 'logo') {
-                app.state.get(fields.userData, (_, oldImage) => {
+            try {
+                if (fields.userData == 'logo') {
+                    const oldImage = await app.state.get(fields.userData);
                     oldImage && app.deleteImage(oldImage);
                     let destPath = `/img/favicon${app.path.extname(srcPath)}`;
-                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), async error => {
                         if (error == null) {
                             destPath += '?t=' + new Date().getTime().toString().slice(-8);
-                            app.state.set(fields.userData, destPath, (error) => done({ image: destPath, error }));
+                            try {
+                                await app.state.set(fields.userData, destPath);
+                                done({ image: destPath });
+                            } catch (error) {
+                                done({ error });
+                            }
                         } else {
                             done({ error });
                         }
                     });
-                });
-            } else if (['footer', 'map', 'header'].includes(fields.userData.toString())) {
-                app.state.get(fields.userData, (_, oldImage) => {
+                } else if (['footer', 'map', 'header'].includes(fields.userData.toString())) {
+                    const oldImage = await app.state.get(fields.userData);
                     oldImage && app.deleteImage(oldImage);
                     let destPath = `/img/${fields.userData}${app.path.extname(srcPath)}`;
-                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), async error => {
                         if (error == null) {
                             destPath += '?t=' + new Date().getTime().toString().slice(-8);
-                            app.state.set(fields.userData, destPath, (error) => done({ image: destPath, error }));
+                            try {
+                                await app.state.set(fields.userData, destPath);
+                                done({ image: destPath });
+                            } catch (error) {
+                                done({ error });
+                            }
                         } else {
                             done({ error });
                         }
                     });
-                });
-            } else {
-                app.deleteImage(srcPath);
+                } else {
+                    app.deleteImage(srcPath);
+                }
+            } catch (error) {
+                done({ error });
             }
         }
     };

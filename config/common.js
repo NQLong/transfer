@@ -1,6 +1,7 @@
 module.exports = (app) => {
     const fse = require('fs-extra');
     app.adminRole = {};
+    app.waiting = (timer = 1000) => new Promise(resolve => setTimeout(() => resolve(), timer));
     app.clone = function () {
         const length = arguments.length;
         let result = null;

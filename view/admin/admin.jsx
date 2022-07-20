@@ -39,6 +39,7 @@ Object.keys(reducerContainer).forEach(key => reducers[key] = combineReducers(red
 
 const store = createStore(combineReducers(reducers), {}, composeWithDevTools(applyMiddleware(thunk)));
 // store.dispatch(getSystemState());
+T.template = 'admin';
 window.T = T;
 
 // Main DOM render ----------------------------------------------------------------------------------------------------------------------------------

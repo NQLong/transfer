@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import T from 'view/js/common';
 import { getTongGiaoDichPage } from './redux';
 
 /**

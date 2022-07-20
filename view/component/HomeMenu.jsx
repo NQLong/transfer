@@ -105,25 +105,13 @@ class HomeMenu extends React.Component {
 
     render() {
         const language = T.language(texts);
-        let menusView, menus = this.props.system && this.props.system.menus ? [...this.props.system.menus].map(item => {
-            delete item.submenus;
-            return item;
-        }) : [];
+        let menusView, menus = this.props.system && this.props.system.menus ? [...this.props.system.menus] : [];
         if (this.props.isDonVi) {
             menus = this.state.divisionMenu;
         }
         let submenus = [], header = '', languageToggle = <div className='ml-2'><LanguageSwitch address={this.state.otherWebAddress} languages={this.state.homeLanguage} /></div>;
         const { user } = this.props.system || {};
         if (this.props.system && menus) {
-            menus.filter(item => item.parentId).forEach(element => {
-                menus.map(item => {
-                    if (item.id === element.parentId) {
-                        if (item.submenus) item.submenus.push(element);
-                        else item.submenus = [element];
-                    }
-                    return item;
-                });
-            });
             menusView = menus.map((item, index) => {
                 if (!item.active) return null;
                 let link = item.link ? item.link.trim() : '/',
