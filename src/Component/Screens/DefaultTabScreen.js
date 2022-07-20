@@ -1,20 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CongVanDenPage from './hcth/hcthCongVanDen/CongVanDenPage';
-import User from './User';
-import { useTheme } from 'react-native-paper';
-import { Button } from 'react-native';
+import CongVanTrinhKyPage from './hcth/hcthCongVanTrinhKy/CongVanTrinhKyPage';
+import User from './User/User';
+import Notification from './notification/Notification';
+import { useTheme, Badge } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
+import { addNotification } from './notification/redux';
+import commonStyles from '../../Asset/Styles/styles';
 
 const Tab = createBottomTabNavigator();
 
 export default DefaultScreenTabs = ({ navigation }) => {
     const settings = useSelector(state => state?.settings);
+    const unreadNotification = useSelector(state => state?.notification);
+
+    const notificationLength = unreadNotification?.page?.totalItem || 0;
+
     const dispatch = useDispatch();
-    useEffect(() => { if (!settings) navigation.navigate('Home') }, [settings]);
+
+    useEffect(() => { 
+        if (!settings) navigation.navigate('');
+
+        T.socket.on('receive-notification', (email, notifyItem) => {
+            const user = settings?.user || {};
+            if (user.email && user.email == email) {
+                dispatch(addNotification(notifyItem));
+            }
+        });   
+    }, [settings]);
+
     const { colors } = useTheme();
 
     return (
@@ -40,9 +59,21 @@ export default DefaultScreenTabs = ({ navigation }) => {
                             <Ionicons name='search-outline' color='white' style={{ fontSize: 25 }} />
                         </TouchableOpacity>
                     ),
-
                 }}
             />
+
+            <Tab.Screen
+                name="congVanTrinhKyPage"
+                component={CongVanTrinhKyPage}
+                options={{
+                    headerTitle: 'Công văn trình ký',
+                    tabBarLabel: 'Công văn trình ký',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="reader-outline" color={color} size={size} />
+                    )
+                }}
+            />
+
             <Tab.Screen
                 name="user"
                 component={User}
@@ -54,15 +85,20 @@ export default DefaultScreenTabs = ({ navigation }) => {
                     ),
                 }}
             />
-
+            
             <Tab.Screen
-                name="congVanTrinhKy"
-                component={CongVanTrinhKy}
+                name="notification"
+                component={Notification}
                 options={{
-                    headerTitle: 'Công văn trình ký',
-                    tabBarLabel: 'Công văn trình ký',
+                    headerTitle: 'Thông báo',
+                    tabBarLabel: 'Thông báo',
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="person-circle-outline" color={color} size={size} />
+                        <>
+                            <Badge style={commonStyles.badgeBottomBar}>
+                                {notificationLength > 99 ? '99+' : notificationLength}
+                            </Badge>
+                            <Ionicons name="notifications-outline" color={color} size={size} />
+                        </>
                     ),
                 }}
             />

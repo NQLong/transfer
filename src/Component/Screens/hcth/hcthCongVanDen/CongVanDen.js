@@ -9,6 +9,9 @@ import T from '@/Utils/common';
 import { AdminModal, Comment, FormTextBox, renderScrollView } from '@/Utils/component';
 import Timeline from 'react-native-timeline-flatlist';
 
+import styles from './styles';
+import commonStyles from '../../../../Asset/Styles/styles';
+
 const trangThai = {
     MOI: { id: 0, text: 'Nháp', color: '#17a2b8' },
     CHO_DUYET: { id: 1, text: 'Chờ duyệt', color: '#007bff' },
@@ -16,6 +19,7 @@ const trangThai = {
     CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối', color: '#ffc107' },
     TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)', color: '#dc3545' },
     DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối', color: '#28a745' },
+    DA_DUYET: { id: 6, text: 'Đã duyệt', color: '#007bff' },
 };
 
 const action = {
@@ -44,7 +48,7 @@ const DonViNhan = () => {
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else if (!list.length)
             return <List.Item title={'Chưa có đơn vị nhận'} />
 
@@ -58,11 +62,11 @@ const DonViNhan = () => {
 
 
     return (
-        <Card style={{ margin: 5 }} elevation={4}>
+        <Card style={commonStyles.m5} elevation={4}>
             <List.Accordion id='donViNhan'
                 title='Đơn vị nhận'
                 left={props => {
-                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='business' />
+                    return <Ionicons {...props} size={20} style={commonStyles.m5} name='business' />
                 }}
                 expanded={isExpand}
                 onPress={() => setIsExpand(!isExpand)}>
@@ -78,12 +82,12 @@ const CanBoNhan = () => {
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else if (!list.length)
             return <List.Item title={'Chưa có cán bộ nhận'} />
         else {
             const items = list.map((item, key) => {
-                return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()} right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item.shcc}</Text>} />
+                return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()} right={() => <Text variant='bodyMedium' style={commonStyles.alignSelfCenter}>{item.shcc}</Text>} />
             });
             return items;
         };
@@ -91,11 +95,11 @@ const CanBoNhan = () => {
 
 
     return (
-        <Card style={{ margin: 5 }} elevation={4}>
+        <Card style={commonStyles.m5} elevation={4}>
             <List.Accordion id='canBoNhan'
                 title='Cán bộ nhận'
                 left={props => {
-                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
+                    return <Ionicons {...props} size={20} style={commonStyles.m5} name='people-outline' />
                 }}
                 expanded={isExpand}
                 onPress={() => setIsExpand(!isExpand)}>
@@ -140,7 +144,7 @@ const CanBoChiDao = (props) => {
 
     const renderContent = () => {
         if (!canBoChiDao)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else if (canBoChiDao.length <= 0)
             return <List.Item title={'Chưa có cán bộ chỉ đạo'} />
         else {
@@ -148,11 +152,11 @@ const CanBoChiDao = (props) => {
                 return <List.Item key={key} title={`${item.ho} ${item.ten}`.normalizedName()}
                     left={() => user.permissions.includes('rectors:login') ? <Switch
                         color="#007bff"
-                        // style={{ transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
+                        style={commonStyles.switchButton}
                         value={canBoChiDao.includes(item.shcc)}
                         onValueChange={(value) => onChangeCanBoChiDao(item.shcc, value)}
                     /> : null}
-                    right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item.shcc}</Text>} />
+                    right={() => <Text variant='bodyMedium' style={commonStyles.alignSelfCenter}>{item.shcc}</Text>} />
             });
             return items;
         };
@@ -160,11 +164,11 @@ const CanBoChiDao = (props) => {
 
 
     return (
-        <Card style={{ margin: 5 }} elevation={4}>
+        <Card style={commonStyles.m5} elevation={4}>
             <List.Accordion id='canBoNhan'
                 title='Cán bộ chỉ đạo'
                 left={props => {
-                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
+                    return <Ionicons {...props} size={20} style={commonStyles.m5} name='people-outline' />
                 }}
                 expanded={isExpand}
                 onPress={() => setIsExpand(!isExpand)}>
@@ -184,14 +188,14 @@ const PhanHoi = () => {
     const [phanHoi, setPhanHoi] = useState('');
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else {
             const content = [];
             if (!list.length)
                 content.push(<List.Item key='empty-phan-hoi' title={'Chưa có phản hồi'} />)
             else {
                 list.forEach((item, key) => {
-                    content.push(<List.Item key={key} style={{ flex: 1, paddingBottom: 0, paddingTop: 0 }} left={() => null} title={() => (<Comment style={{ flex: 1 }} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.ngayTao} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.noiDung} />)} />);
+                    content.push(<List.Item key={key} style={styles.replyItem} left={() => null} title={() => (<Comment style={commonStyles.flex1} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.ngayTao} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.noiDung} />)} />);
                 });
             }
             content.push(phanHoiBox);
@@ -210,8 +214,8 @@ const PhanHoi = () => {
         dispatch(createPhanHoi(data, () => dispatch(getPhanHoi(id, () => setPhanHoi('')))));
     }
 
-    const phanHoiBox = shcc ? <List.Item key='phanHoiBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-        <FormTextBox style={{ flex: 1, marginRight: 10 }} value={phanHoi} onChangeText={text => setPhanHoi(text)} placeholder='Nhập phản hồi' />
+    const phanHoiBox = shcc ? <List.Item key='phanHoiBox' left={() => null} style={styles.replyTitleWrapper} title={() => (<View style={styles.replyTitleText}>
+        <FormTextBox style={styles.replyInput} value={phanHoi} onChangeText={text => setPhanHoi(text)} placeholder='Nhập phản hồi' />
         <TouchableOpacity onPress={onSubmit}>
             <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
         </TouchableOpacity>
@@ -219,12 +223,12 @@ const PhanHoi = () => {
 
 
     return (
-        <Card style={{ margin: 5 }} elevation={4}>
+        <Card style={commonStyles.m5} elevation={4}>
 
             <List.Accordion id='phanHoi'
                 title='Phản hồi'
                 left={props => {
-                    return <Ionicons {...props} size={20} style={{ margin: 5 }} name='chatbox-ellipses-outline' />
+                    return <Ionicons {...props} size={20} style={commonStyles.m5} name='chatbox-ellipses-outline' />
                 }}
                 expanded={isExpand}
                 onPress={() => setIsExpand(!isExpand)}>
@@ -246,14 +250,14 @@ const ChiDao = () => {
 
     const renderContent = () => {
         if (!list)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else {
             const content = [];
             if (!list.length)
                 content.push(<List.Item key='emptyChiDao' title={'Chưa có chỉ đạo'} />)
             else {
                 list.forEach((item, key) => {
-                    content.push(<List.Item key={key} style={{ flex: 1, paddingBottom: 0, paddingTop: 0 }} left={() => null} title={() => (<Comment style={{ marginLeft: 5, }} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.thoiGian} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.chiDao} />)} />);
+                    content.push(<List.Item key={key} style={styles.conductItem} left={() => null} title={() => (<Comment style={commonStyles.m5} name={`${item.ho} ${item.ten}`.trim().normalizedName()} timestamp={item.thoiGian} image={T.config.API_URL + (item.image ? item.image.substring(1) : 'img/avatar.png')} content={item.chiDao} />)} />);
                 });
             }
             content.push(chiDaoBox);
@@ -271,19 +275,19 @@ const ChiDao = () => {
         dispatch(createChiDao(data, () => dispatch(getChiDao(id, () => setChiDao('')))));
     }
 
-    const chiDaoBox = shcc ? <List.Item key='chiDaoTextBox' left={() => null} style={{ marginTop: 0, paddingTop: 0 }} title={() => (<View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-        <FormTextBox style={{ flex: 1, marginRight: 10 }} value={chiDao} onChangeText={text => setChiDao(text)} placeholder='Nhập chỉ đạo' />
+    const chiDaoBox = shcc ? <List.Item key='chiDaoTextBox' left={() => null} style={styles.conductTitleWrapper} title={() => (<View style={styles.conductTitleText}>
+        <FormTextBox style={styles.conductInput} value={chiDao} onChangeText={text => setChiDao(text)} placeholder='Nhập chỉ đạo' />
         <TouchableOpacity onPress={onSubmit}>
             <Ionicons name='paper-plane-outline' size={30} style={{ color: colors.primary }} />
         </TouchableOpacity>
     </View>)} /> : null;
 
 
-    return <Card elevation={4} style={{ margin: 5 }}>
+    return <Card elevation={4} style={commonStyles.m5}>
         <List.Accordion id='chiDao'
             title='Chỉ đạo'
             left={props => {
-                return <Ionicons {...props} size={20} style={{ margin: 5 }} name='alert-circle-outline' />
+                return <Ionicons {...props} size={20} style={commonStyles.m5} name='alert-circle-outline' />
             }}
             expanded={isExpand}
             onPress={() => setIsExpand(!isExpand)}>
@@ -323,7 +327,7 @@ const FileList = ({ navigation }) => {
     const renderContent = () => {
 
         if (!listFile)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else if (!listFile.length)
             return <List.Item title={'Chưa có tập tin công văn'} />
         else {
@@ -341,12 +345,12 @@ const FileList = ({ navigation }) => {
     }
 
 
-    return <Card style={{ margin: 5 }} elevation={4}>
+    return <Card style={commonStyles.m5} elevation={4}>
 
         <List.Accordion id='files'
             title='Danh sách tập tin công văn'
             left={props => {
-                return <Ionicons {...props} size={20} style={{ margin: 5 }} name='document-text-outline' />
+                return <Ionicons {...props} size={20} style={commonStyles.m5} name='document-text-outline' />
             }}
             expanded={isExpand}
             onPress={() => setIsExpand(!isExpand)}>
@@ -365,7 +369,7 @@ const History = () => {
     const renderContent = () => {
 
         if (!history)
-            return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
         else if (!history.length)
             return <List.Item left={() => null} title={'Chưa có lịch sử'} />
         else {
@@ -385,17 +389,17 @@ const History = () => {
                     ...style
                 }
             });
-            return (<List.Item style={{ flex: 1 }} left={() => null} title={() => (<Timeline data={data} isUsingFlatlist={false} showTime={false} separator={true} />)} />);
+            return (<List.Item style={commonStyles.flex1} left={() => null} title={() => (<Timeline data={data} isUsingFlatlist={false} showTime={false} separator={true} />)} />);
 
         };
     }
 
 
-    return <Card style={{ margin: 5 }} elevation={4}>
+    return <Card style={commonStyles.m5} elevation={4}>
         <List.Accordion id='history'
             title='Lịch sử'
             left={props => {
-                return <Ionicons {...props} size={20} style={{ margin: 5 }} name='people-outline' />
+                return <Ionicons {...props} size={20} style={commonStyles.m5} name='people-outline' />
             }}
             expanded={isExpand}
             onPress={() => setIsExpand(!isExpand)}>
@@ -452,6 +456,8 @@ const CongVanDen = (props) => {
     const { navigation, route } = props;
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanDen?.item);
+    const user = useSelector(state => state?.settings);
+    console.log(user.user.permissions);
     const userPermissions = useSelector(state => state?.settings?.user?.permissions);
     const isPresident = userPermissions.includes('rectors:login');
     const [context, setContext] = useState({});
@@ -491,7 +497,6 @@ const CongVanDen = (props) => {
             dispatch(updateQuyenChiDao(congVanId, presiendents.join(','), item.trangThai, true, (res) => {
                 if (!res.error) {
                     T.alert('Công văn đến', 'Thêm quyền chỉ đạo thành công')
-                    // setQuyenChiDao(value);
                 }
                 else {
                     T.alert('Lỗi', 'Thêm quyền chỉ đạo lỗi');
@@ -516,15 +521,15 @@ const CongVanDen = (props) => {
     }
 
     const genneralInfo = () => {
-        return <Card style={{ margin: 5, borderRadius: 20 }} elevation={4}>
+        return <Card style={styles.generalInfoWrapper} elevation={4}>
             <Card.Title title={`Công văn đến #${item.id}`} right={headerRightButton} />
             <Card.Content>
-                <List.Item title='Số công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soCongVan || 'Chưa có'}</Text>} />
-                <List.Item title='Số đến' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.soDen || 'Chưa có'}</Text>} />
-                <List.Item title='Ngày công văn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'}</Text>} />
-                <List.Item title='Ngày nhận' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayNhan ? T.dateToText(item.ngayNhan) : 'Chưa có'}</Text>} />
-                <List.Item title='Ngày hết hạn' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center' }}>{item?.ngayHetHan ? T.dateToText(item.ngayHetHan) : 'Chưa có'}</Text>} />
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ alignSelf: 'center', color: Object.values(trangThai)[item.trangThai]?.color, fontWeight: 'bold' }}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
+                <List.Item title='Số công văn' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.soCongVan || 'Chưa có'}</Text>} />
+                <List.Item title='Số đến' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.soDen || 'Chưa có'}</Text>} />
+                <List.Item title='Ngày công văn' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayCongVan ? T.dateToText(item.ngayCongVan) : 'Chưa có'}</Text>} />
+                <List.Item title='Ngày nhận' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayNhan ? T.dateToText(item.ngayNhan) : 'Chưa có'}</Text>} />
+                <List.Item title='Ngày hết hạn' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayHetHan ? T.dateToText(item.ngayHetHan) : 'Chưa có'}</Text>} />
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: Object.values(trangThai)[item.trangThai]?.color, fontWeight: 'bold' }}>{Object.values(trangThai)[item.trangThai]?.text}</Text>} />
                 <List.Item title='Đơn vị gửi'
                     description={item?.tenDonViGui}
                     descriptionNumberOfLines={null}
@@ -537,7 +542,7 @@ const CongVanDen = (props) => {
                     right={() =>
                         <Switch
                             color="#007bff"
-                            // style={{ transform: [{ scaleX: 1 }, { scaleY: .8 }] }}
+                            style={commonStyles.switchButton}
                             value={quyenChiDao}
                             onValueChange={onChangeNeedConduct}
                             disabled={!isPresident}
@@ -548,7 +553,7 @@ const CongVanDen = (props) => {
     }
 
     if (!item)
-        return <ActivityIndicator size='large' color={colors.primary} style={{ marginBottom: 20 }} />
+        return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.activityIndicator} />
 
 
     const openMenu = () => setIsMenuVisible(true);
@@ -565,7 +570,7 @@ const CongVanDen = (props) => {
     const headerRightButton = () => menuItems.length ? <Menu
         visible={isMenuVisible}
         onDismiss={closeMenu}
-        anchor={<TouchableOpacity onPress={openMenu}><Ionicons name={'ellipsis-vertical'} color='black' size={20} style={{ margin: 10 }} /></TouchableOpacity>}>
+        anchor={<TouchableOpacity onPress={openMenu}><Ionicons name={'ellipsis-vertical'} color='black' size={20} style={commonStyles.m10} /></TouchableOpacity>}>
         {menuItems}
     </Menu> : null;
 
@@ -582,8 +587,7 @@ const CongVanDen = (props) => {
             <History />
             <TraLaiCongVanModal ref={traLaiModal} id={item.id} onTraLaiCongVan={onTraLaiCongVan} />
             <DuyetCongVanModal ref={duyetModal} id={item.id} onDuyetCongVan={onDuyetCongVan} />
-            <View style={{ marginBottom: 50 }} />
-
+            <View style={commonStyles.mb50} />
         </>,
         // scrollEnabled: !isModalShown,
         // headerRightButton: headerRightButton,

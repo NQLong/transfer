@@ -62,6 +62,12 @@ export const FormTextBox = ({ placeholder, onChangeText, value, icon, style }) =
         <TextInput placeholder={placeholder} placeholderTextColor='#999999' style={styles.textInput} autoCapitalize='none' value={value} onChangeText={onChangeText} />
     </View>);
 };
+export const FormPasswordTextBox = ({ placeholder, onChangeText, value, icon, style }) => {
+    return (<View style={{ ...styles.formInput, ...style }}>
+        {icon ? icon : null}
+        <TextInput secureTextEntry={true} placeholder={placeholder} placeholderTextColor='#999999' style={styles.textInput} autoCapitalize='none' value={value} onChangeText={onChangeText} />
+    </View>);
+};
 
 const styles = StyleSheet.create({
     menuTitle: {
@@ -113,7 +119,8 @@ export class AdminModal extends React.Component {
         this.setState({ visible: false });
     }
 
-    show = () => {
+    show = (item = null) => {
+        if (item) this.onShow(item);
         this.setState({ visible: true });
     }
 

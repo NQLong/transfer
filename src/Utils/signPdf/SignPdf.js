@@ -19,9 +19,9 @@ export default class SignPDF {
     /**
      * @return Promise<Buffer>
      */
-    async signPDF() {
+    async signPDF(passphrase) {
         let newPDF = await this._addPlaceholder();
-        newPDF = signer.sign(newPDF, this.certificate, { passphrase: 'benn1904', });
+        newPDF = signer.sign(newPDF, this.certificate, { passphrase: passphrase, });
 
         return newPDF;
     }

@@ -1,117 +1,202 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 global.Buffer = global.Buffer || require('buffer').Buffer
-import { Button } from 'react-native-paper';
-import DocumentPicker, { types } from 'react-native-document-picker';
+import { ActivityIndicator, RefreshControl, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+// import { RefreshControl } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import { Button, Card, List, Menu, Switch, Text, useTheme, TextInput } from 'react-native-paper';
+import { getCongVanTrinhKy, HcthCongVanTrinhKyGet } from './redux';
+
+import { renderScrollView } from '@/Utils/component';
+
 import T from '@/Utils/common';
+
+import styles from './styles';
+import commonStyles from '../../../../Asset/Styles/styles';
+import style from '../../notification/style';
+import DocumentPicker, { types } from 'react-native-document-picker';
 import axios from 'axios';
 import fs from 'react-native-fs';
 import forge from 'node-forge';
 import signer from "node-signpdf";
 import { Buffer } from 'buffer';
 import SignPDF from '@/Utils/signPdf/SignPdf';
+import { PDFDocument } from 'pdf-lib';
 
-const CongVanTrinhKy = () => {
-    console.log(signer);
+const CanBoNhan = () => {
+    const list = useSelector(state => state?.hcthCongVanTrinhKy?.item?.canBoKy);
+    const { colors } = useTheme();
+    const [isExpand, setIsExpand] = useState(true);
+    const renderContent = () => {
+        if (!list)
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
+        else if (!list.length)
+            return <List.Item title={'Chưa có cán bộ ký'} />
+        else {
+            const items = list.map((item, key) => {
+                return <List.Item key={key} title={`${item.hoCanBoNhan} ${item.tenCanBoNhan}`.normalizedName()} right={() => <Text variant='bodyMedium' style={commonStyles.alignSelfCenter}>{item.nguoiKy}</Text>} />
+            });
+            return items;
+        };
+    }
+
+
+    return (
+        <Card style={commonStyles.m5} elevation={4}>
+            <List.Accordion id='canBoNhan'
+                title='Cán bộ ký'
+                left={props => {
+                    return <Ionicons {...props} size={20} style={commonStyles.m5} name='people-outline' />
+                }}
+                expanded={isExpand}
+                onPress={() => setIsExpand(!isExpand)}>
+                {renderContent()}
+            </List.Accordion>
+        </Card>
+    );
+}
+
+const CanBoTao = () => {
+    const list = useSelector(state => state?.hcthCongVanTrinhKy?.item?.canBoKy);
+    const { colors } = useTheme();
+    const [isExpand, setIsExpand] = useState(true);
+    const renderContent = () => {
+        if (!list)
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
+        else if (!list.length)
+            return <List.Item title={'Chưa có cán bộ ký'} />
+        else {
+            const item = list[0];
+            return <List.Item key={0} title={`${item.hoNguoiTao} ${item.tenNguoiTao}`.normalizedName()} right={() => <Text variant='bodyMedium' style={commonStyles.alignSelfCenter}>{item.shccNguoiTao}</Text>} />
+
+        };
+    }
+
+
+    return (
+        <Card style={commonStyles.m5} elevation={4}>
+            <List.Accordion id='canBoTao'
+                title='Cán bộ tạo'
+                left={props => {
+                    return <Ionicons {...props} size={20} style={commonStyles.m5} name='people-outline' />
+                }}
+                expanded={isExpand}
+                onPress={() => setIsExpand(!isExpand)}>
+                {renderContent()}
+            </List.Accordion>
+        </Card>
+    );
+}
+
+const FileList = ({ navigation }) => {
+    const fileKy = useSelector(state => state.hcthCongVanTrinhKy?.item?.fileKy);
+    const id = useSelector(state => state.hcthCongVanTrinhKy?.item?.congVanKy?.id);
+    const { colors } = useTheme();
+    const [isExpand, setIsExpand] = useState(true);
+    const renderContent = () => {
+        console.log(Array.isArray(fileKy));
+        if (!fileKy) {
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20}></ActivityIndicator>
+        } else {
+            const items = fileKy.map((item, key) => {
+                const
+                    originalName = item.ten,
+                    linkFile = `${T.config.API_URL}api/hcth/cong-van-cac-phong/download/${id}/${originalName}`,
+                    style = {};
+                if (key == 0) {
+                    style.borderTopWidth = 0;
+                }
+                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.ten}</Text></TouchableOpacity>} />
+            });
+            return items;
+        }
+    }
+
+    return <Card style={commonStyles.m5} elevation={4}>
+        <List.Accordion id='files'
+            title='Tệp tin'
+            left={props => {
+                return <Ionicons {...props} size={20} style={commonStyles.m5} name='document-text-outline' />
+            }}
+            expanded={isExpand}
+            onPress={() => setIsExpand(!isExpand)}
+        >
+            {renderContent()}
+        </List.Accordion>
+    </Card>
+
+}
+
+const CongVanTrinhKy = (props) => {
+    const { navigation, route } = props;
+    const dispatch = useDispatch();
+    const item = useSelector(state => state?.hcthCongVanTrinhKy?.item);
+    const id = useSelector(state => state.hcthCongVanTrinhKy?.item?.congVanKy?.id);
+    const fileKy = useSelector(state => state.hcthCongVanTrinhKy?.item?.fileKy);
+
+    const [context, setContext] = useState({});
+    const [refreshing, setRefreshing] = useState(false);
+    const { colors } = useTheme();
+
+
+    useEffect(() => {
+        dispatch({ type: HcthCongVanTrinhKyGet, item: null });
+        getData();
+    }, []);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        getData(() => setRefreshing(false));
+    }
+
+    const getData = (done) => {
+        const congVanId = route?.params?.congVanTrinhKyId;
+        dispatch(getCongVanTrinhKy(congVanId, context, done));
+    }
+
     const onPickKey = async () => {
         const keyFile = await DocumentPicker.pick({
-            // types: 'application/x-pkcs12',
             presentationStyle: 'fullScreen',
             allowMultiSelection: false,
         });
+
         console.log(keyFile);
-        // if (keyFile?.length && keyFile[0].type !== 'application/x-pkcs12')
-        //     T.alert('Lỗi', 'Định dạng khóa không hợp lệ');
-        // else
         return fs.readFile(keyFile[0].uri, 'base64');
     }
 
-
-    const getFile = async () => {
+    const confirmSign = async () => {
         try {
-            return await T.get('api/hcth/cong-van-den/download/1741/report_3.pdf')
-            // return await axios({
-            //     url: url, //your url
-            //     method: 'GET',
-            //     // responseType: 'blob', // important
-            // }).then((response) => {
-            //     console.log({data:response.data});
-            //     return Buffer.from(response.data, 'binary');
-            // });
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
-    const trySign = async () => {
-        try {
+            const congVanId = route?.params?.congVanTrinhKyId;
+            console.log(congVanId);
             const key = await onPickKey();
-            const file = await onPickKey();
-            const signPdf = new SignPDF(Buffer.from(file, 'base64'), Buffer.from(key, 'base64'));
-            const pdfBuffer = await signPdf.signPDF();
-            var path = fs.DocumentDirectoryPath + '/test.pdf';
-            const uploadUrl = T.config.API_URL + 'user/upload';
-
-            fs.writeFile(path, pdfBuffer.toString('base64'), 'base64')
-                .then((success) => {
-                    console.log('FILE WRITTEN!');
-                    var files = [
-                        {
-                            name: 'test',
-                            filename: 'test.pdf',
-                            filepath: path,
-                            filetype: 'application/pdf'
-                        },
-                    ];
-                    var upload = (response) => {
-                        var jobId = response.jobId;
-                        console.log('UPLOAD HAS BEGUN! JobId: ' + jobId);
-                    };
-
-                    var uploadProgress = (response) => {
-                        var percentage = Math.floor((response.totalBytesSent / response.totalBytesExpectedToSend) * 100);
-                        console.log('UPLOAD IS ' + percentage + '% DONE!');
-                    };
-
-                    fs.uploadFiles({
-                        toUrl: uploadUrl,
-                        files: files,
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                        },
-                        fields: {
-                            'hello': 'world',
-                        },
-                        begin: upload,
-                        progress: uploadProgress
-                    }).promise.then((response) => {
-                        if (response.statusCode == 200) {
-                            console.log('FILES UPLOADED!'); // response.statusCode, response.headers, response.body
-                        } else {
-                            console.log('SERVER ERROR');
-                        }
-                    })
-                        .catch((err) => {
-                            if (err.description === "cancelled") {
-                                // cancelled by user
-                            }
-                            console.log(err);
-                        });
-
-
-                })
-        }
-        catch (error) {
-            // console.log(response);
+            const file = fileKy[0],
+                linkFile = `${T.config.API_URL}api/hcth/cong-van-cac-phong/download/${id}/${file.ten}`;
+            navigation.push('ReadFile', { id: congVanId, key, file, source: { uri: linkFile, cache: true } });
+            
+        } catch (error) {
             console.error(error);
         }
     }
-    const url = T.config.API_URL + 'api/hcth/cong-van-cac-phong/download/1741/report_3.pdf';
-    return <>
-        <Button onPress={onPickKey}>Chon khoa</Button>
-        <Button onPress={trySign}>Test sign</Button>
-    </>
-}
 
+    return renderScrollView({
+        ...props,
+        content: <>
+            <CanBoTao />
+            <CanBoNhan />
+            <FileList navigation={navigation} />
+            {
+            
+                <View style={styles.buttonView}>
+                    <TouchableOpacity style={{ ...styles.selectKey, backgroundColor: colors.primary }} onPress={confirmSign}>
+                        <Text style={{ ...styles.buttonText, color: colors.background }} >Ký</Text>
+                    </TouchableOpacity>
+                </View>
+            }
+        </>,
+        style: {},
+        refreshControl: <RefreshControl colors={['#9Bd35A', '#689F38']} refreshing={refreshing} onRefresh={onRefresh} />
+    });
+}
 
 export default CongVanTrinhKy;

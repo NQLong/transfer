@@ -10,11 +10,13 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from 'react-native-paper';
 import Scan from './Scan';
-import HomeScreen from './HomeScreen';
+import HomeScreen from './HomeScreen/HomeScreen'
 import DefaultTabScreen from './DefaultTabScreen';
 import CongVanDen from './hcth/hcthCongVanDen/CongVanDen';
-import ReadFile from './ReadFile';
+import ReadFile from './ReadFile/ReadFile';
 import CongVanDenFilter from './hcth/hcthCongVanDen/CongVanDenFilter';
+import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
+import CongVanTrinhKySign from './hcth/hcthCongVanTrinhKy/CongVanTrinhKySign';
 
 const Stack = createStackNavigator();
 
@@ -33,6 +35,9 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='CongVanDen' component={CongVanDen} />
             <Stack.Screen options={{ headerTitle: '' }} name='ReadFile' component={ReadFile} />
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='FilterCongVanDen' component={CongVanDenFilter} />
+            <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKy' component={CongVanTrinhKy} />
+            <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKySign' component={CongVanTrinhKySign} />
+
         </Stack.Navigator>
     )
 }
