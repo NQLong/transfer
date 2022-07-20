@@ -42,24 +42,16 @@ class EditModal extends AdminModal {
         }
     };
 
-    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+    changeKichHoat = value => this.kichHoat.value(value);
 
     render = () => {
         const readOnly = !!this.state.ma;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật phương thức' : 'Tạo mới loại sinh viên',
+            title: this.state.ma ? 'Cập nhật phương thức' : 'Tạo mới phương thức',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã phương thức' readOnly={readOnly} required />
-                <FormTextBox
-                    type='text'
-                    className='col-md-12'
-                    ref={e => this.ten = e}
-                    label='Tên phương thức'
-                    placeholder='Tên phương thức'
-                    required
-                />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên phương thức' placeholder='Tên phương thức' required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} onChange={value => this.changeKichHoat(value)} />
             </div>
         }
         );
