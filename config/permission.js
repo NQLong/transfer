@@ -308,8 +308,10 @@ module.exports = app => {
                             user.isStudent = 1;
                             user.active = 1;
                             user.data = student;
+                            user.studentId = student.mssv;
                             user.lastName = student.ho;
                             user.firstName = student.ten;
+                            user.image = student.image || user.image;
                             resolve();
                         } else resolve();
                     });
