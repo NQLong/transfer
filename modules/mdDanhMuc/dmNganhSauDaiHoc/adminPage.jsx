@@ -87,7 +87,7 @@ class DmNganhSdhPage extends AdminPage {
         this.modal.show();
     }
 
-    changeActive = item => this.props.updateDmNganhSdh(item.ma, { kichHoat: item.kichHoat ? 0 : 1 });
+    changeActive = item => this.props.updateDmNganhSdh(item.ma, { kichHoat: item.kichHoat });
  
     delete = (e, item) => {
         e.preventDefault();
