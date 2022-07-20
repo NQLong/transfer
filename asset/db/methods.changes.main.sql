@@ -36,13 +36,15 @@ BEGIN
              LEFT JOIN DM_NGACH_CDNN NGACH on CB.NGACH = NGACH.MA
              LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
              LEFT JOIN DT_NGANH_DAO_TAO NDT on TKB.MA_NGANH = NDT.MA_NGANH
-             LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
+             LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID AND TGMM.BAC_DAO_TAO = TKB.BAC_DAO_TAO AND
+                                    TGMM.LOAI_HINH_DAO_TAO = TKB.LOAI_HINH_DAO_TAO
     WHERE (TGMM.KICH_HOAT = 1)
       AND (donVi IS NULL OR donVi = '' OR donVi = TKB.KHOA_DANG_KY)
       AND (idNamDaoTao IS NULL OR idNamDaoTao = '' OR idNamDaoTao = TKB.NAM)
       AND (hocKy IS NULL OR hocKy = '' OR hocKy = TKB.HOC_KY)
       AND (bacDaoTaoFilter IS NULL OR bacDaoTaoFilter = '' OR bacDaoTaoFilter = TKB.BAC_DAO_TAO)
-      AND (loaiHinhDaoTaoFilter IS NULL OR loaiHinhDaoTaoFilter = '' OR loaiHinhDaoTaoFilter = TKB.LOAI_HINH_DAO_TAO)
+      AND (loaiHinhDaoTaoFilter IS NULL OR loaiHinhDaoTaoFilter = '' OR
+           loaiHinhDaoTaoFilter = TKB.LOAI_HINH_DAO_TAO)
       AND (phongFilter IS NULL OR phongFilter = '' OR phongFilter = TKB.PHONG)
       AND (thuFilter IS NULL OR thuFilter = '' OR thuFilter = TKB.THU)
       AND (giangVienFilter IS NULL OR giangVienFilter = '' OR giangVienFilter = TKB.GIANG_VIEN)
@@ -209,6 +211,7 @@ BEGIN
                      hcthcvd.TRICH_YEU     as "trichYeu",
                      hcthcvd.LOAI_CONG_VAN as "loaiCongVan",
                      hcthfile.TEN          as "tenFileCongVan",
+                     cbk.TRANG_THAI         as "trangThai",
 
                      (SELECT LISTAGG(
                                      CASE
@@ -360,6 +363,7 @@ BEGIN
                      BDT.TEN_BAC              AS         "tenBacDaoTao",
                      THPT.TRANS_ID            AS         "lastTransactionId",
                      THPT.TRANS_DATE          AS         "lastTransaction",
+                     HPI.ID                   AS         "invoiceId",
 
 --                      (SELECT TRANS_DATE
 --                       FROM TC_HOC_PHI_TRANSACTION
@@ -384,6 +388,8 @@ BEGIN
                        LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                        LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
+                       LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE HPI
+                                 on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY
                        LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
                   AND HP.NAM_HOC = THPT.NAM_HOC
                   AND HP.MSSV = THPT.CUSTOMER_ID
@@ -557,28 +563,33 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT FS.MSSV         AS                  "mssv",
-                     FS.HO           AS                  "ho",
-                     FS.TEN          AS                  "ten",
-                     THPT.HOC_KY     AS                  "hocKy",
-                     THPT.BANK       as                  "nganHang",
-                     THPT.NAM_HOC    AS                  "namHoc",
-                     THPT.AMOUNT     AS                  "khoanDong",
-                     FS.MA_NGANH     AS                  "maNganh",
-                     NDT.TEN_NGANH   AS                  "tenNganh",
-                     DV.TEN          AS                  "tenKhoa",
-                     LHDT.TEN        AS                  "tenLoaiHinhDaoTao",
-                     BDT.TEN_BAC     AS                  "tenBacDaoTao",
-                     THPT.TRANS_DATE AS                  "ngayDong",
-                     THPT.STATUS     AS                  "trangThai",
+        FROM (SELECT FS.MSSV                      AS              "mssv",
+                     FS.HO                        AS              "ho",
+                     FS.TEN                       AS              "ten",
+                     THPT.HOC_KY                  AS              "hocKy",
+                     THPT.BANK                    as              "nganHang",
+                     THPT.NAM_HOC                 AS              "namHoc",
+                     THPT.AMOUNT                  AS              "khoanDong",
+                     FS.MA_NGANH                  AS              "maNganh",
+                     NDT.TEN_NGANH                AS              "tenNganh",
+                     DV.TEN                       AS              "tenKhoa",
+                     LHDT.TEN                     AS              "tenLoaiHinhDaoTao",
+                     BDT.TEN_BAC                  AS              "tenBacDaoTao",
+                     THPT.TRANS_DATE              AS              "ngayDong",
+                     THPT.STATUS                  AS              "trangThai",
+                     THPTI.INVOICE_TRANSACTION_ID AS              "invoiceTransactonId",
+                     THPTI.INVOICE_NUMBER         AS              "invoiceNumber",
+                     THPTI.ID                     AS              "invoiceID",
+                     THPT.TRANS_ID                AS              "transactionId",
 
-                     ROW_NUMBER() OVER (ORDER BY FS.TEN) R
+                     ROW_NUMBER() OVER (ORDER BY THPT.TRANS_DATE) R
               FROM TC_HOC_PHI_TRANSACTION THPT
                        LEFT JOIN FW_STUDENT FS on THPT.CUSTOMER_ID = FS.MSSV
                        LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
                        LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                        LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
+                       LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE THPTI on THPT.TRANS_ID = THPTI.TRANSACTION_ID
               where THPT.NAM_HOC = namHoc
                 and THPT.HOC_KY = hocKy
                 and ((tuNgay is null and denNgay is null) or
@@ -620,64 +631,207 @@ BEGIN
                           LOWER(FS.MSSV) like sT or
                           LOWER(FS.TEN) like sT
                   )
-              ORDER BY THPT.TRANS_DATE
              )
 
 
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY R;
     RETURN my_cursor;
 END ;
 
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION DV_WEBSITE_SEARCH_PAGE_DON_VI(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, maDonVi IN STRING,
+CREATE OR REPLACE FUNCTION FW_STUDENT_GET_DATA(iMssv IN STRING) RETURN SYS_REFCURSOR
+AS
+    STUDENT_INFO SYS_REFCURSOR;
+
+BEGIN
+    OPEN STUDENT_INFO FOR
+        SELECT STU.MSSV                                               AS "mssv",
+               (STU.HO || ' ' || STU.TEN)                             AS "hoTen",
+               STU.EMAIL_CA_NHAN                                      AS "emailCaNhan",
+               STU.NGAY_SINH                                          AS "ngaySinh",
+               (CASE WHEN STU.GIOI_TINH = 2 THEN 'Nữ' ELSE 'Nam' end) as "gioiTinh",
+               TTSV.TEN                                               AS "noiSinh",
+               NDT.TEN_NGANH                                          AS "tenNganh",
+               STU.DIEN_THOAI_CA_NHAN                                 AS "sdt",
+               TONGIAO.TEN                                            AS "tonGiao",
+               QG.TEN_QUOC_GIA                                        AS "quocTich",
+               DANTOC.TEN                                             AS "danToc",
+               STU.DOI_TUONG_TUYEN_SINH                               AS "doiTuongTuyenSinh",
+               STU.DOI_TUONG_CHINH_SACH                               AS "doiTuongChinhSach",
+               STU.KHU_VUC_TUYEN_SINH                                 AS "khuVucTuyenSinh",
+               PTTS.TEN                                               AS "phuongThucTuyenSinh",
+               STU.DIEM_THI                                           AS "diemThi",
+               STU.CMND                                               AS "cmnd",
+               STU.CMND_NGAY_CAP                                      AS "cmndNgayCap",
+               STU.CMND_NOI_CAP                                       AS "cmndNoiCap",
+               STU.TEN_CHA                                            AS "tenCha",
+               STU.NGAY_SINH_CHA                                      AS "ngaySinhCha",
+               STU.NGHE_NGHIEP_CHA                                    AS "ngheNghiepCha",
+               STU.SDT_CHA                                            AS "sdtCha",
+
+               STU.TEN_ME                                             AS "tenMe",
+               STU.NGAY_SINH_ME                                       AS "ngaySinhMe",
+               STU.NGHE_NGHIEP_ME                                     AS "ngheNghiepMe",
+               STU.SDT_ME                                             AS "sdtMe",
+               STU.IMAGE                                              AS "image",
+               STU.LAST_MODIFIED                                      AS "lastModified",
+               xaThuongTru.TEN_PHUONG_XA                              as "xaThuongTru",
+               huyenThuongTru.TEN_QUAN_HUYEN                          as "huyenThuongTru",
+               tinhThuongTru.ten                                      as "tinhThuongTru",
+               STU.THUONG_TRU_SO_NHA                                  AS "soNhaThuongTru",
+
+               xaThuongTruCha.TEN_PHUONG_XA                           as "xaThuongTruCha",
+               huyenThuongTruCha.TEN_QUAN_HUYEN                       as "huyenThuongTruCha",
+               tinhThuongTruCha.ten                                   as "tinhThuongTruCha",
+               STU.THUONG_TRU_SO_NHA_CHA                              AS "soNhaThuongTruCha",
+
+               xaThuongTruMe.TEN_PHUONG_XA                            as "xaThuongTruMe",
+               huyenThuongTruMe.TEN_QUAN_HUYEN                        as "huyenThuongTruMe",
+               tinhThuongTruMe.ten                                    as "tinhThuongTruMe",
+               STU.THUONG_TRU_SO_NHA_ME                               AS "soNhaThuongTruMe",
+
+               tinhLienLac.TEN                                        AS "tinhLienLac",
+               huyenLienLac.TEN_QUAN_HUYEN                            AS "huyenLienLac",
+               xaLienLac.TEN_PHUONG_XA                                AS "xaLienLac",
+               STU.LIEN_LAC_SO_NHA                                    AS "soNhaLienLac",
+
+               STU.HO_TEN_NGUOI_LIEN_LAC                              AS "hoTenNguoiLienLac",
+               STU.SDT_NGUOI_LIEN_LAC                                 AS "sdtNguoiLienLac",
+               STU.NGAY_VAO_DOAN                                      as "ngayVaoDoan",
+               STU.NGAY_VAO_DANG                                      AS "ngayVaoDang"
+
+        FROM FW_STUDENT STU
+                 LEFT JOIN DM_QUOC_GIA QG ON QG.MA_CODE = STU.QUOC_GIA
+                 LEFT JOIN DM_DAN_TOC DANTOC ON DANTOC.MA = STU.DAN_TOC
+                 LEFT JOIN DM_TON_GIAO TONGIAO ON TONGIAO.MA = STU.TON_GIAO
+                 LEFT JOIN DM_TINH_THANH_PHO TTSV ON TTSV.MA = STU.NOI_SINH_MA_TINH
+                 LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = STU.MA_NGANH
+                 LEFT JOIN DM_PHUONG_THUC_TUYEN_SINH PTTS ON PTTS.MA = STU.PHUONG_THUC_TUYEN_SINH
+                 LEFT JOIN DM_PHUONG_XA xaThuongTru ON STU.THUONG_TRU_MA_XA = xaThuongTru.MA_PHUONG_XA
+                 LEFT JOIN DM_QUAN_HUYEN huyenThuongTru ON STU.THUONG_TRU_MA_HUYEN = huyenThuongTru.MA_QUAN_HUYEN
+                 LEFT JOIN DM_TINH_THANH_PHO tinhThuongTru ON STU.THUONG_TRU_MA_TINH = tinhThuongTru.MA
+
+
+                 LEFT JOIN DM_PHUONG_XA xaThuongTruCha ON STU.THUONG_TRU_MA_XA_CHA = xaThuongTruCha.MA_PHUONG_XA
+                 LEFT JOIN DM_QUAN_HUYEN huyenThuongTruCha
+                           ON STU.THUONG_TRU_MA_HUYEN_CHA = huyenThuongTruCha.MA_QUAN_HUYEN
+                 LEFT JOIN DM_TINH_THANH_PHO tinhThuongTruCha ON STU.THUONG_TRU_MA_TINH_CHA = tinhThuongTruCha.MA
+
+                 LEFT JOIN DM_PHUONG_XA xaThuongTruMe ON STU.THUONG_TRU_MA_XA_ME = xaThuongTruMe.MA_PHUONG_XA
+                 LEFT JOIN DM_QUAN_HUYEN huyenThuongTruMe ON STU.THUONG_TRU_MA_HUYEN_ME = huyenThuongTruMe.MA_QUAN_HUYEN
+                 LEFT JOIN DM_TINH_THANH_PHO tinhThuongTruMe ON STU.THUONG_TRU_MA_TINH_ME = tinhThuongTruMe.MA
+
+                 LEFT JOIN DM_PHUONG_XA xaLienLac ON STU.LIEN_LAC_MA_TINH = xaLienLac.MA_PHUONG_XA
+                 LEFT JOIN DM_QUAN_HUYEN huyenLienLac ON STU.LIEN_LAC_MA_HUYEN = huyenLienLac.MA_QUAN_HUYEN
+                 LEFT JOIN DM_TINH_THANH_PHO tinhLienLac ON STU.LIEN_LAC_MA_XA = tinhLienLac.MA
+        WHERE STU.MSSV = iMssv;
+    RETURN STUDENT_INFO;
+end ;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION FW_SV_SDH_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                       listFaculty IN STRING, listFromCity IN STRING, listEthnic IN STRING,
+                                       listNationality IN STRING, listReligion IN STRING, listTinhTrangSinhVien IN STRING,
+                                       gender IN STRING, searchTerm IN STRING,
                                        totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
-    my_cursor SYS_REFCURSOR;
+    STUDENT_INFO SYS_REFCURSOR;
+    ST           STRING(500) := '%' || lower(searchTerm) || '%';
+
 BEGIN
     SELECT COUNT(*)
     INTO totalItem
-    FROM DV_WEBSITE WS
-    WHERE maDonVi = '' OR maDonVi IS NULL
-       OR maDonVi LIKE WS.MA_DON_VI;
+
+    FROM FW_SINH_VIEN_SDH STU
+             LEFT JOIN DM_GIOI_TINH GT ON GT.MA = STU.GIOI_TINH
+             LEFT JOIN DM_QUOC_GIA QG ON QG.MA_CODE = STU.QUOC_TICH
+             LEFT JOIN DM_DAN_TOC DANTOC ON DANTOC.MA = STU.DAN_TOC
+             LEFT JOIN DM_TON_GIAO TONGIAO ON TONGIAO.MA = STU.TON_GIAO
+             LEFT JOIN DM_TINH_THANH_PHO TINHTHANH ON TINHTHANH.MA = STU.THUONG_TRU_MA_TINH
+             LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.MA_KHOA
+             LEFT JOIN DM_TINH_TRANG_SINH_VIEN TTSV ON TTSV.MA = STU.TINH_TRANG
+    WHERE (
+                  (listFaculty IS NOT NULL AND STU.MA_KHOA IN (SELECT regexp_substr(listFaculty, '[^,]+', 1, level)
+                                                            from dual
+                                                            connect by regexp_substr(listFaculty, '[^,]+', 1, level) is not null) OR
+                   listFaculty IS NULL)
+                  AND (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0 OR
+                       listFromCity IS NULL)
+                  AND (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0 OR listEthnic IS NULL)
+                  AND
+                  (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_TICH) != 0 OR listNationality IS NULL)
+                  AND (listReligion IS NOT NULL AND INSTR(listReligion, STU.DAN_TOC) != 0 OR listReligion IS NULL)
+
+                  AND (listTinhTrangSinhVien IS NOT NULL AND INSTR(listTinhTrangSinhVien, STU.TINH_TRANG) != 0 OR
+                       listTinhTrangSinhVien IS NULL)
+                  AND (gender IS NOT NULL AND ('0' + STU.GIOI_TINH) = gender OR gender IS NULL));
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
     pageTotal := CEIL(totalItem / pageSize);
     pageNumber := LEAST(pageNumber, pageTotal);
 
-    OPEN my_cursor FOR
+    OPEN STUDENT_INFO FOR
         SELECT *
         FROM (
-                 SELECT WS.ID        AS                    "id",
-                        WS.SHORTNAME AS                    "shortname",
-                        WS.KICH_HOAT AS                    "kichHoat",
-                        WS.MA_DON_VI AS                    "maDonVi",
-                        DDV.TEN      AS                    "tenDonVi",
-                        WS.WEBSITE   AS                    "website",
-                        ROW_NUMBER() OVER (ORDER BY WS.ID) R
-                 FROM DV_WEBSITE WS
-                          LEFT JOIN DM_DON_VI DDV on WS.MA_DON_VI = DDV.MA
-                 WHERE maDonVi = '' OR maDonVi IS NULL
-                    OR maDonVi LIKE WS.MA_DON_VI
+                 SELECT STU.MA           AS                                                       "mssv",
+                        STU.HO             AS                                                     "ho",
+                        STU.TEN            AS                                                     "ten",
+                        STU.EMAIL  AS                                                             "emailCaNhan",
+                        STU.NGAY_SINH      AS                                                     "ngaySinh",
+                        STU.GIOI_TINH      AS                                                     "gioiTinh",
+                        STU.DAN_TOC        AS                                                     "maDanToc",
+                        STU.QUOC_TICH       AS                                                     "maQuocGia",
+                        TTSV.TEN           AS                                                     "tinhTrangSinhVien",
+                        STU.MA_KHOA           AS                                                     "khoa",
+                        TINHTHANH.TEN      AS                                                     "tinhThanhThuongTru",
+                        KHOA.TEN           AS                                                     "tenKhoa",
+                        STU.MA_NGANH       AS                                                     "maNganh",
+                        TONGIAO.TEN        AS                                                     "tonGiao",
+                        QG.TEN_QUOC_GIA    AS                                                     "quocTich",
+                        DANTOC.TEN         AS                                                     "danToc",
+                        STU.NAM_TUYEN_SINH AS                                                     "namTuyenSinh",
+                        ROW_NUMBER() OVER (ORDER BY STU.NAM_TUYEN_SINH DESC NULLS LAST, STU.TEN ) R
+                 FROM FW_SINH_VIEN_SDH STU
+                          LEFT JOIN DM_GIOI_TINH GT ON GT.MA = STU.GIOI_TINH
+                          LEFT JOIN DM_QUOC_GIA QG ON QG.MA_CODE = STU.QUOC_TICH
+                          LEFT JOIN DM_DAN_TOC DANTOC ON DANTOC.MA = STU.DAN_TOC
+                          LEFT JOIN DM_TON_GIAO TONGIAO ON TONGIAO.MA = STU.TON_GIAO
+                          LEFT JOIN DM_TINH_THANH_PHO TINHTHANH ON TINHTHANH.MA = STU.THUONG_TRU_MA_TINH
+                          LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.MA_KHOA
+                          LEFT JOIN DM_TINH_TRANG_SINH_VIEN TTSV ON TTSV.MA = STU.TINH_TRANG
+                 WHERE (
+                         (listFaculty IS NOT NULL AND STU.MA_KHOA IN (SELECT regexp_substr(listFaculty, '[^,]+', 1, level)
+                                                            from dual
+                                                            connect by regexp_substr(listFaculty, '[^,]+', 1, level) is not null) OR
+                           listFaculty IS NULL)
+                          AND (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0 OR
+                               listFromCity IS NULL)
+                          AND (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0 OR listEthnic IS NULL)
+                          AND
+                          (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_TICH) != 0 OR listNationality IS NULL)
+                          AND (listReligion IS NOT NULL AND INSTR(listReligion, STU.DAN_TOC) != 0 OR listReligion IS NULL)
+
+                          AND (listTinhTrangSinhVien IS NOT NULL AND INSTR(listTinhTrangSinhVien, STU.TINH_TRANG) != 0 OR
+                               listTinhTrangSinhVien IS NULL)
+                          AND (gender IS NOT NULL AND ('0' + STU.GIOI_TINH) = gender OR gender IS NULL))
+                   AND (searchTerm = ''
+                     OR LOWER(STU.MA) LIKE sT
+                     OR LOWER(TRIM(STU.HO || ' ' || STU.TEN)) LIKE sT
+                     OR LOWER(STU.MA_NGANH) LIKE sT
+                     OR LOWER(STU.SDT_CA_NHAN) LIKE sT
+                     OR LOWER(STU.SDT_LIEN_HE) LIKE sT
+                     OR LOWER(STU.EMAIL) LIKE sT)
+                 ORDER BY STU.NAM_TUYEN_SINH DESC NULLS LAST, STU.TEN
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-END;
+    RETURN STUDENT_INFO;
+end;
 
 /
 --EndMethod--
-
-CREATE OR REPLACE function TC_HOC_PHI_TRANSACTION_LIST_BANK(searchTerm in NVARCHAR2) RETURN SYS_REFCURSOR
-AS my_cursor          SYS_REFCURSOR;
-    sT                 STRING(502) := '%' || lower(searchTerm) || '%';
-BEGIN
-    OPEN my_cursor FOR
-        SELECT DISTINCT BANK as "bank" from TC_HOC_PHI_TRANSACTION where BANK is not null and (searchTerm = '' or LOWER(BANK) like sT);
-    RETURN my_cursor;
-END;
-
-/
---EndMethod--
-
