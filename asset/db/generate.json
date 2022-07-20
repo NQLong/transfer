@@ -14984,7 +14984,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 20
+                    "size": 100
                 },
                 "SDT_CA_NHAN": {
                     "value": "sdtCaNhan",
@@ -15067,7 +15067,7 @@
                     "value": "sdtCha",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 20
                 },
                 "HO_TEN_ME": {
