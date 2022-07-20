@@ -12,7 +12,7 @@ import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 // import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
-import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
+import { SelectAdapter_DtNganhDaoTaoStudent } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
 import { ajaxSelectTinhThanhPho } from 'modules/mdDanhMuc/dmDiaDiem/reduxTinhThanhPho';
 import { SelectAdapter_DmSvDoiTuongTs } from 'modules/mdDanhMuc/dmSvDoiTuongTs/redux';
 import { SelectAdapter_DmPhuongThucTuyenSinh } from 'modules/mdDanhMuc/dmPhuongThucTuyenSinh/redux';
@@ -247,7 +247,7 @@ class SinhVienPage extends AdminPage {
                                     <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly={readOnly} onChange={e => this.ten.value(e.target.value.toUpperCase())} required />
                                     <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} required />
                                     <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-6' readOnly={readOnly} required />
-                                    <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTao} readOnly={readOnly} required />
+                                    <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly={readOnly} required />
                                     <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-5' required readOnly={readOnly} />
                                     <FormSelect className='col-md-7' ref={e => this.noiSinhMaTinh = e} data={ajaxSelectTinhThanhPho} readOnly={readOnly} label='Nơi sinh' required />
                                     {/* <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-5' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnly} /> */}
