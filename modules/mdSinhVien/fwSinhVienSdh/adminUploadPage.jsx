@@ -143,9 +143,9 @@ class AdminSvSdhUploadPage extends AdminPage {
                     </div>,
                     <div key={1} className='tile'>{table}</div>]
                 }
-                <a type='button' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} href={'/api/oisp-tuyen-sinh/import/get-sample-file'} >
+                {/* <a type='button' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} href={'/api/oisp-tuyen-sinh/import/get-sample-file'} >
                     <i className='fa fa-download' />
-                </a>
+                </a> */}
 
                 {readOnly ? '' :
                     <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
