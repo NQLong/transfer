@@ -35,10 +35,10 @@ class EditModal extends AdminModal {
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
         if (changes.ma == '') {
-            T.notify('Mã đơn vị bị trống!', 'danger');
+            T.notify('Mã khoa sau đại học bị trống!', 'danger');
             this.ma.focus();
         } else if (changes.ten == '') {
-            T.notify('Tên đơn vị bị trống!', 'danger');
+            T.notify('Tên khoa sau đại học bị trống!', 'danger');
             this.ten.focus();
         } else {
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
@@ -87,7 +87,7 @@ class DmDonViPage extends AdminPage {
  
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa danh mục đơn vị', 'Bạn có chắc bạn muốn xóa đơn vị này?', true, isConfirm =>
+        T.confirm('Xóa danh mục khoa sau đại học', 'Bạn có chắc bạn muốn xóa khoa sau đại học này?', true, isConfirm =>
             isConfirm && this.props.deleteDmKhoaSdh(item.ma));
     }
 
@@ -102,7 +102,7 @@ class DmDonViPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '50%' }}>Tên đơn vị</th>
+                        <th style={{ width: '50%' }}>Tên khoa</th>
                         <th style={{ width: '50%' }}>Tên tiếng Anh</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>

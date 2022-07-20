@@ -115,7 +115,7 @@ export function deleteDmKhoaSdh(ma) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Danh mục đơn vị đã xóa thành công!', 'success', false, 800);
+                T.alert('Danh mục khoa sau đại học đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmKhoaSdhPage());
             }
         }, (error) => T.notify('Xóa khoa sau đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));

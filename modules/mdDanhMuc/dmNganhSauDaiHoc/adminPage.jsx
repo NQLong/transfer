@@ -34,10 +34,10 @@ class EditModal extends AdminModal {
             maKhoa: this.khoaSdh.value(),
         };
         if (changes.ma == '') {
-            T.notify('Mã đơn vị bị trống!', 'danger');
+            T.notify('Mã ngành sau đại học bị trống!', 'danger');
             this.ma.focus();
         } else if (changes.ten == '') {
-            T.notify('Tên đơn vị bị trống!', 'danger');
+            T.notify('Tên ngành sau đại học bị trống!', 'danger');
             this.ten.focus();
         } else {
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
