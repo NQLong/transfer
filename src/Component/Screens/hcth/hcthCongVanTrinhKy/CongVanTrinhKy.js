@@ -59,6 +59,7 @@ const CanBoNhan = () => {
 
 const CanBoTao = () => {
     const list = useSelector(state => state?.hcthCongVanTrinhKy?.item?.canBoKy);
+
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
@@ -95,7 +96,6 @@ const FileList = ({ navigation }) => {
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
-        console.log(Array.isArray(fileKy));
         if (!fileKy) {
             return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20}></ActivityIndicator>
         } else {
@@ -132,6 +132,7 @@ const CongVanTrinhKy = (props) => {
     const { navigation, route } = props;
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanTrinhKy?.item);
+    const userInfo = useSelector(state => state?.settings.user);
     const id = useSelector(state => state.hcthCongVanTrinhKy?.item?.congVanKy?.id);
     const fileKy = useSelector(state => state.hcthCongVanTrinhKy?.item?.fileKy);
 
@@ -161,14 +162,12 @@ const CongVanTrinhKy = (props) => {
             allowMultiSelection: false,
         });
 
-        console.log(keyFile);
         return fs.readFile(keyFile[0].uri, 'base64');
     }
 
     const confirmSign = async () => {
         try {
             const congVanId = route?.params?.congVanTrinhKyId;
-            console.log(congVanId);
             const key = await onPickKey();
             const file = fileKy[0],
                 linkFile = `${T.config.API_URL}api/hcth/cong-van-cac-phong/download/${id}/${file.ten}`;
@@ -186,12 +185,13 @@ const CongVanTrinhKy = (props) => {
             <CanBoNhan />
             <FileList navigation={navigation} />
             {
-            
+                
+                (item && item.canBoKy.length > 0 && (item.canBoKy.some(canBo => canBo.nguoiKy === userInfo.shcc && (!canBo.trangThai || canBo.trangThai === 'CHO_KY')))) &&
                 <View style={styles.buttonView}>
                     <TouchableOpacity style={{ ...styles.selectKey, backgroundColor: colors.primary }} onPress={confirmSign}>
                         <Text style={{ ...styles.buttonText, color: colors.background }} >Ký</Text>
                     </TouchableOpacity>
-                </View>
+                </View> 
             }
         </>,
         style: {},
