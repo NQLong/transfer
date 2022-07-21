@@ -437,18 +437,18 @@ module.exports = app => {
             }
             const congVan = await app.model.hcthCongVanDi.get({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
-            if (!(await isRelated(congVan, donViNhan, req))) {
+            if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
             const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
             const vanBanTrinhKy = [];
-            
+
             if (files.length > 0) {
                 await Promise.all(files.map(async (file) => {
                     const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(file.id);
-                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({...item, ten: file.ten })));
+                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({ ...item, ten: file.ten })));
                 }));
             }
 
