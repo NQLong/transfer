@@ -312,7 +312,6 @@ class QtChucVu extends AdminPage {
 				</tr>
 			)
 		});
-
 		let groupTable = renderTable({
 			getDataSource: () => list, stickyHead: true,
 			renderHead: () => (

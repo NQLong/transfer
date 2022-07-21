@@ -37,7 +37,6 @@ export default function DmSvKhuVucTuyenSinhReducer(state = null, data) {
 			return state;
 	}
 }
-
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmSvKhuVucTuyenSinh');
 export function getDmSvKhuVucTuyenSinhPage(pageNumber, pageSize, pageCondition, done) {

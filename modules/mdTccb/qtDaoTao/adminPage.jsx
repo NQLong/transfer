@@ -172,7 +172,6 @@ class QtDaoTao extends AdminPage {
 					<th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
 					<th style={{ width: '80%', whiteSpace: 'nowrap' }}>Danh sách</th>
 					<th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
-
 				</tr>),
 			renderRow: (item, index) => (
 				<tr key={index}>

@@ -105,7 +105,6 @@ class DmSvKhuVucTuyenSinhPage extends AdminPage {
 
 		});
 
-
 		return this.renderPage({
 			icon: this.menu == 'dao-tao' ? 'fa fa-user-circle-o' : 'fa fa-list-alt',
 			title: 'Khu vực tuyển sinh',
