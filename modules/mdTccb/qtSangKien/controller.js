@@ -22,12 +22,15 @@ module.exports = app => {
     app.get('/user/sang-kien', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/sang-kien/upload', app.permission.check('qtSangKien:write'), app.templates.admin);
 
-    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-
-    // End APIS -------------------------------------------------------------------------------------------------------------------------------------
+    app.permissionHooks.add('staff', 'addRoleQtSangKien', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtSangKien:read', 'qtSangKien:write', 'qtSangKien:delete');
+            resolve();
+        } else resolve();
+    }));
 
     // TCCB APIs ------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('qtSangKien:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',

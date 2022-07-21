@@ -17,15 +17,22 @@ module.exports = app => {
         { name: 'qtNghiThaiSan:read', menu },
         { name: 'qtNghiThaiSan:write' },
         { name: 'qtNghiThaiSan:delete' },
+        { name: 'qtNghiThaiSan:export' },
     );
     app.get('/user/tccb/qua-trinh/nghi-thai-san/group/:shcc', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
     app.get('/user/nghi-thai-san', app.permission.check('staff:female'), app.templates.admin);
 
-    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
+    app.permissionHooks.add('staff', 'addRoleQtNghiThaiSan', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtNghiThaiSan:read', 'qtNghiThaiSan:write', 'qtNghiThaiSan:delete', 'qtNghiThaiSan:export');
+            resolve();
+        } else resolve();
+    }));
 
-    app.get('/api/qua-trinh/nghi-thai-san/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+
+    app.get('/api/qua-trinh/nghi-thai-san/page/:pageNumber/:pageSize', app.permission.check('qtNghiThaiSan:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -57,7 +64,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/nghi-thai-san/all', checkGetStaffPermission, (req, res) => {
+    app.get('/api/qua-trinh/nghi-thai-san/all', app.permission.check('qtNghiThaiSan:read'), (req, res) => {
         app.model.qtNghiThaiSan.getAll((error, items) => res.send({ error, items }));
     });
 
@@ -144,7 +151,7 @@ module.exports = app => {
         });
     });
     ///END USER ACTIONS
-    app.get('/api/qua-trinh/nghi-thai-san/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtNghiThaiSan:read'), (req, res) => {
+    app.get('/api/qua-trinh/nghi-thai-san/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtNghiThaiSan:export'), (req, res) => {
         let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: null, tinhTrang: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;
