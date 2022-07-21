@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
+import { getTcSettingAll, updateTcSetting, deleteTcSetting } from './redux';
 import { AdminPage, FormTextBox } from 'view/component/AdminPage';
 
 class AdminSettingsPage extends AdminPage {
@@ -110,5 +110,5 @@ class AdminSettingsPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, TcSetting: state.finance.TcSetting });
-const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting };
+const mapActionsToProps = { getTcSettingAll, updateTcSetting, deleteTcSetting };
 export default connect(mapStateToProps, mapActionsToProps)(AdminSettingsPage);

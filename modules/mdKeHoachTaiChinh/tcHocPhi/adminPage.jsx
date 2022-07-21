@@ -239,7 +239,7 @@ class TcHocPhiAdminPage extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
             hocKy = this.term.value(),
-            {tuNgay, denNgay} = this.getTimeFilter();
+            { tuNgay, denNgay } = this.getTimeFilter();
         const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
@@ -356,8 +356,8 @@ class TcHocPhiAdminPage extends AdminPage {
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
                 <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
                 <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
-                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
-                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
+                <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
+                <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
             </div>,
             breadcrumb: ['Học phí'],
             content:
@@ -372,7 +372,7 @@ class TcHocPhiAdminPage extends AdminPage {
                         <div className='tile'>
                             {table}
                             <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                                getPage={this.props.getTcHocPhiPage} />
+                                getPage={this.getPage} />
                             <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
                             <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
                         </div>

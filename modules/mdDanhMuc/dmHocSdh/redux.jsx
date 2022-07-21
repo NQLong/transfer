@@ -168,3 +168,11 @@ export const SelectAdapter_DmHocSdh = {
     processResultOne: (response) => response && { value: response.ma, text: response.ma + ': ' + response.ten },
 };
 
+export const SelectAdapter_DmHocSdhVer2 = {
+    ajax: true,
+    url: '/api/danh-muc/hoc-sdh/page/1/20',
+    data: params => ({ condition: params.term}),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDmHocSdh(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
+};
+
