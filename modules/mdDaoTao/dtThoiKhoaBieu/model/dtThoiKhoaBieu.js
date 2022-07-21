@@ -11,6 +11,23 @@ module.exports = app => {
      * 
      * Condition: 
      */
+
+    const range = (start, stop, step = 1) => Array(stop - start).fill(start).map((x, y) => x + y * step);
+
+    app.model.dtThoiKhoaBieu.getCurrentStatusRooms = async () => {
+        let currentTKB = await app.model.dtThoiKhoaBieu.getAll({
+            statement: 'ngayBatDau <= :now AND ngayKetThuc > :now',
+            parameter: { now: Date.now() }
+        }, 'phong,thu,tietBatDau,soTietBuoi', 'phong');
+        let data = {};
+        currentTKB.forEach(item => {
+            data[item.phong] = data[item.phong] || {};
+            data[item.phong][item.thu] = data[item.phong][item.thu] || [];
+            data[item.phong][item.thu].push(...range(Number(item.tietBatDau), Number(item.tietBatDau) + Number(item.soTietBuoi)));
+        });
+        return data;
+    };
+
     app.model.dtThoiKhoaBieu.init = async (config, done) => {
         try {
             const listDays = [2, 3, 4, 5, 6, 7];
