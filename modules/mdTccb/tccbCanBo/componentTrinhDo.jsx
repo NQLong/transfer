@@ -82,7 +82,7 @@ class ComponentTrinhDo extends AdminPage {
                     <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-12' readOnly={readOnly} />
                     <DaoTaoDetail hocVi='Thạc sĩ' shcc={this.props.shcc} style={{ display: this.state.thacSi ? 'block' : 'none' }} permission={permission} canEdit={canEdit} />
 
-                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' />
+                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' readOnly={readOnly} />
                     <DaoTaoDetail hocVi='Tiến sĩ' shcc={this.props.shcc} style={{ display: this.state.tienSi ? 'block' : 'none' }} permission={permission} />
 
                     <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '02', text: 'Phó giáo sư' }, { id: '01', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear readOnly={readOnly} />

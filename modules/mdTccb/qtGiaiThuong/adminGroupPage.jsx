@@ -135,8 +135,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtGiaiThuong', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtGiaiThuong', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtGiaiThuong && this.props.qtGiaiThuong.pageMa ? this.props.qtGiaiThuong.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -148,7 +147,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt giải</th>
@@ -173,7 +172,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                                 {(item.tenDonVi || '')}
                             </>
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soQuyetDinh}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soQuyetDinh} />
                         <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenGiaiThuong}</b></span> <br />
@@ -181,7 +180,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                             </>
 
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue'}} content={(item.namCap)}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={(item.namCap)} />
                         <TableCell type='text' content={(<i>{item.noiCap}</i>)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -210,8 +209,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.shcc}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} shcc={this.shcc}
                     create={this.props.createQtGiaiThuongGroupPageMa} update={this.props.updateQtGiaiThuongGroupPageMa}
                 />
             </>,

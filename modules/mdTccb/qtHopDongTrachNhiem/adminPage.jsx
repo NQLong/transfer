@@ -93,7 +93,7 @@ class QtHopDongTrachNhiemPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtHopDongTrachNhiem', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtHopDongTrachNhiem', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
             (this.props.qtHopDongTrachNhiem && this.props.qtHopDongTrachNhiem.pageGr ?
                 this.props.qtHopDongTrachNhiem.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
@@ -122,9 +122,10 @@ class QtHopDongTrachNhiemPage extends AdminPage {
                         <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href={'/user/tccb/qua-trinh/hop-dong-trach-nhiem/' + item.ma}>
+                                <a href={permission.write ? '/user/tccb/qua-trinh/hop-dong-trach-nhiem/' + item.ma : ''}>
                                     <span>{(item.ho ? item.ho : '') + ' ' + (item.ten ? item.ten : '')}</span><br />
-                                    <span>{item.shcc}</span></a>
+                                    <span>{item.shcc}</span>
+                                </a>
                             </>
                         )}
                         />
@@ -163,10 +164,10 @@ class QtHopDongTrachNhiemPage extends AdminPage {
                         }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={`/user/tccb/qua-trinh/hop-dong-trach-nhiem/${item.ma}`} onDelete={this.delete} >
-                                <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
+                                onEdit={() => permission.write ? () => this.props.history.push(`/user/tccb/qua-trinh/hop-dong-trach-nhiem/${item.ma}`) : T.notify('Vui lòng liên hệ phòng Tổ chức - cán bộ', 'warning')} onDelete={this.delete} >
+                                {permission.export && <a href='#' className='btn btn-primary' style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                     <i className='fa fa-lg fa-file-word-o' />
-                                </a>
+                                </a>}
                             </TableCell>
                         }
                         {
@@ -204,11 +205,11 @@ class QtHopDongTrachNhiemPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                {permission.read &&
+                {/* {permission.read &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
                         <i className='fa fa-lg fa-print' />
                     </button>
-                }
+                } */}
             </>,
             backRoute: '/user/tccb',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-trach-nhiem/new') : null

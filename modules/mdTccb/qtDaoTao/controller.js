@@ -27,12 +27,12 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/dao-tao/:ma', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/qua-trinh-dao-tao-boi-duong', app.permission.check('staff:login'), app.templates.admin);
 
-    // app.permissionHooks.add('staff', 'addRoleQtDaoTao', (user, staff) => new Promise(resolve => {
-    //     if (staff.maDonVi && staff.maDonVi == '30') {
-    //         app.permissionHooks.pushUserPermission(user, 'qtDaoTao:read', 'qtDaoTao:write', 'qtDaoTao:delete', 'qtDaoTao:export');
-    //         resolve();
-    //     }
-    // }));
+    app.permissionHooks.add('staff', 'addRoleQtDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtDaoTao:read', 'qtDaoTao:write', 'qtDaoTao:delete', 'qtDaoTao:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);

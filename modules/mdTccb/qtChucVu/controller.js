@@ -15,12 +15,12 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
 
-    // app.permissionHooks.add('staff', 'addRoleQtChucVu', (user, staff) => new Promise(resolve => {
-    //     if (staff.maDonVi && staff.maDonVi == '30') {
-    //         app.permissionHooks.pushUserPermission(user, 'qtChucVu:read', 'qtChucVu:write', 'qtChucVu:delete', 'qtChucVu:export');
-    //         resolve();
-    //     }
-    // }));
+    app.permissionHooks.add('staff', 'addRoleQtChucVu', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtChucVu:read', 'qtChucVu:write', 'qtChucVu:delete', 'qtChucVu:export');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     /// TCCB Apis -----------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {

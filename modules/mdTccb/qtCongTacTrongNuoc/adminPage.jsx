@@ -398,7 +398,7 @@ class QtCongTacTrongNuoc extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
                     create={this.props.createQtCongTacTrongNuocMultiple} update={this.props.updateQtCongTacTrongNuoc}
                 />
             </>,

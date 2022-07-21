@@ -23,12 +23,12 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/cong-tac-trong-nuoc/group/:shcc', app.permission.check('qtCongTacTrongNuoc:read'), app.templates.admin);
     app.get('/user/cong-tac-trong-nuoc', app.permission.check('staff:login'), app.templates.admin);
 
-    // app.permissionHooks.add('staff', 'addRoleQtCongTacTrongNuoc', (user, staff) => new Promise(resolve => {
-    //     if (staff.maDonVi && staff.maDonVi == '30') {
-    //         app.permissionHooks.pushUserPermission(user, 'qtCongTacTrongNuoc:read', 'qtCongTacTrongNuoc:write', 'qtCongTacTrongNuoc:delete', 'qtCongTacTrongNuoc:export');
-    //         resolve();
-    //     }
-    // }));
+    app.permissionHooks.add('staff', 'addRoleQtCongTacTrongNuoc', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtCongTacTrongNuoc:read', 'qtCongTacTrongNuoc:write', 'qtCongTacTrongNuoc:delete', 'qtCongTacTrongNuoc:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:

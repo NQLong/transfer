@@ -309,7 +309,7 @@ class EditModal extends AdminModal {
                         <div className='form-group col-md-7'>
                             {this.tableListFile(this.state.listFile, permission)}
                         </div>
-                        {this.state.shcc && <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} readOnly={readOnly} />}
+                        {this.state.shcc && !readOnly && <FormFileBox className='col-md-5' ref={e => this.fileBox = e} label={'Tải lên tập tin báo cáo (định dạng .xls, .xlsx, .doc, .docx, .pdf, .png, .jpg)'} postUrl='/user/upload' uploadType='baoCaoDiNuocNgoaiStaffFile' userData='baoCaoDiNuocNgoaiStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} readOnly={readOnly} />}
                     </div>
                 </div>
                 <FormCheckbox label={'Bấm vào đây nếu báo cáo không hợp lệ'} onChange={this.handleBaoCao} className='form-group col-md-6' ref={e => this.baoCaoCheck = e} readOnly={readOnly} />

@@ -38,13 +38,11 @@ module.exports = app => {
 
 
     //Hook staff-------------------------------------------------------------------------------------------------
-
-
     app.permissionHooks.add('staff', 'checkKhoaBoMon', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi) {
-            // if (staff.maDonVi == '30') {
-            //     app.permissionHooks.pushUserPermission(user, 'staff:read', 'staff:write', 'staff:delete');
-            // }
+            if (staff.maDonVi == '30') {
+                app.permissionHooks.pushUserPermission(user, 'staff:read', 'staff:write', 'staff:delete');
+            }
             let permissionLoaiDonVi = {
                 1: 'faculty:login',
                 2: 'department:login',

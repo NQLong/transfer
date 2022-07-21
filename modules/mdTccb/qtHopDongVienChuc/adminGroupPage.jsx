@@ -64,7 +64,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
                     <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
-                            <a href={'/user/tccb/qua-trinh/hop-dong-lam-viec/' + item.ma}>
+                            <a href={permission.write ? '/user/tccb/qua-trinh/hop-dong-lam-viec/' + item.ma : ''}>
                                 <span>{(item.hoBenB ? item.hoBenB : '') + ' ' + (item.tenBenB ? item.tenBenB : '')}</span><br />
                                 <span>{item.shcc}</span></a>
                         </>
@@ -95,7 +95,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
                             {item.shccNguoiKy ? <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link> : null}
                         </>
                     )} />
-                    <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lam-viec/${item.ma}`} onDelete={this.delete} permission={permission} >
+                    <TableCell type='buttons' content={item} onEdit={permission.write ? `/user/tccb/qua-trinh/hop-dong-lam-viec/${item.ma}` : ''} onDelete={this.delete} permission={permission} >
                         {/* <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                             <i className='fa fa-lg fa-file-word-o' />
                         </a> */}

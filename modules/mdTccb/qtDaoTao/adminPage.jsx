@@ -241,7 +241,7 @@ class QtDaoTao extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.checked ? this.props.getQtDaoTaoGroupPage : this.props.getQtDaoTaoPage} />
-                <DaoTaoModal ref={e => this.modal = e} isCanBo={false}
+                <DaoTaoModal ref={e => this.modal = e} isCanBo={false} readOnly={!permission.write}
                     create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao}
                 />
             </>,

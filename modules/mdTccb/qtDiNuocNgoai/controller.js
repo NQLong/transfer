@@ -23,12 +23,12 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/di-nuoc-ngoai/group/:shcc', app.permission.check('qtDiNuocNgoai:read'), app.templates.admin);
     app.get('/user/di-nuoc-ngoai', app.permission.check('staff:login'), app.templates.admin);
 
-    // app.permissionHooks.add('staff', 'addRoleQtDiNuocNgoai', (user, staff) => new Promise(resolve => {
-    //     if (staff.maDonVi && staff.maDonVi == '30') {
-    //         app.permissionHooks.pushUserPermission(user, 'qtDiNuocNgoai:read', 'qtDiNuocNgoai:write', 'qtDiNuocNgoai:delete', 'qtDiNuocNgoai:export');
-    //         resolve();
-    //     }
-    // }));
+    app.permissionHooks.add('staff', 'addRoleQtDiNuocNgoai', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtDiNuocNgoai:read', 'qtDiNuocNgoai:write', 'qtDiNuocNgoai:delete', 'qtDiNuocNgoai:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
