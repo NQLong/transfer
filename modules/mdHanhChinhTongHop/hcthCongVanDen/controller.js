@@ -1,7 +1,7 @@
 module.exports = (app) => {
     const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, canBoType } = require('../constant');
 
-    const  dateformat = require('dateformat');
+    const dateformat = require('dateformat');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -786,15 +786,15 @@ module.exports = (app) => {
     });
 
     const sendMailToRelatedStaff = async (item) => {
-            const listRelatedStaff = await app.model.hcthCongVanDen.getRelatedStaff(item.id);
-            const emails = listRelatedStaff.rows.map(item => item.email);
+        const listRelatedStaff = await app.model.hcthCongVanDen.getRelatedStaff(item.id);
+        const emails = listRelatedStaff.rows.map(item => item.email);
 
-            const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui});
+        const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui});
             
-            const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, nhanCongVanDenEmailTitle, nhanCongVanDenEmailEditorText, nhanCongVanDenEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'nhanCongVanDenEmailTitle', 'nhanCongVanDenEmailEditorText', 'nhanCongVanDenEmailEditorHtml');
+        const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, nhanCongVanDenEmailTitle, nhanCongVanDenEmailEditorText, nhanCongVanDenEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'nhanCongVanDenEmailTitle', 'nhanCongVanDenEmailEditorText', 'nhanCongVanDenEmailEditorHtml');
 
-            const rootUrl = app.rootUrl;
-            let mailTitle = nhanCongVanDenEmailTitle.replaceAll('{id}', item.id).toUpperCase(), 
+        const rootUrl = app.rootUrl;
+        let mailTitle = nhanCongVanDenEmailTitle.replaceAll('{id}', item.id).toUpperCase(), 
             mailText = nhanCongVanDenEmailEditorText.replaceAll('{id}', item.id)
                         .replaceAll('{soDen}', item.soDen || 'Chưa có')
                         .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
@@ -810,17 +810,17 @@ module.exports = (app) => {
                         .replaceAll('{ngayNhan}', dateformat(item.ngayNhan, 'dd/mm/yyyy'))
                         .replaceAll('{trichYeu}', item.trichYeu);   
 
-            if (app.isDebug) {
-                app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
+        if (app.isDebug) {
+            app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
+                if (error) throw error;
+            });
+        } else {
+            emails.map(email => {
+                app.email.normalSendEmail(fromMail, fromMailPassword, email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
                     if (error) throw error;
                 });
-            } else {
-                emails.map(email => {
-                    app.email.normalSendEmail(fromMail, fromMailPassword, email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
-                        if (error) throw error;
-                    });
-                });
-            }
+            });
+        }
     };
 
     const sendChiDaoCongVanDenMailToRectors = async (item) => {
