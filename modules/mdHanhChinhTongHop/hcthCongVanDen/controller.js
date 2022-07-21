@@ -1,8 +1,6 @@
 module.exports = (app) => {
     const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, canBoType } = require('../constant');
 
-    const dateformat = require('dateformat');
-
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
@@ -799,15 +797,15 @@ module.exports = (app) => {
                         .replaceAll('{soDen}', item.soDen || 'Chưa có')
                         .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
                         .replaceAll('{donViGui}', donViGuiInfo.ten)
-                        .replaceAll('{ngayCongVan}', dateformat(item.ngayCongVan, 'dd/mm/yyyy'))
-                        .replaceAll('{ngayNhan}', dateformat(item.ngayNhan, 'dd/mm/yyyy'))
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
                         .replaceAll('{trichYeu}', item.trichYeu),
             mailHtml = nhanCongVanDenEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`)
                         .replaceAll('{soDen}', item.soDen || 'Chưa có')
                         .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
                         .replaceAll('{donViGui}', donViGuiInfo.ten)
-                        .replaceAll('{ngayCongVan}', dateformat(item.ngayCongVan, 'dd/mm/yyyy'))
-                        .replaceAll('{ngayNhan}', dateformat(item.ngayNhan, 'dd/mm/yyyy'))
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
                         .replaceAll('{trichYeu}', item.trichYeu);   
 
         if (app.isDebug) {
