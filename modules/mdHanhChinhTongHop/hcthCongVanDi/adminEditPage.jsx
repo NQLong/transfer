@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, readCongVanDi } from './redux';
 import { Link } from 'react-router-dom';
 import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
-import { AdminPage, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormFileBox, FormTextBox, renderComment, renderTimeline } from 'view/component/AdminPage';
+import { FormCheckbox, AdminPage, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormFileBox, FormTextBox, renderComment, renderTimeline } from 'view/component/AdminPage';
 import {
     SelectAdapter_DmDonVi,
     SelectAdapter_DmDonViFilter,
@@ -108,6 +108,7 @@ class AdminEditPage extends AdminPage {
         maDonVi: [],
         isLoading: true,
         historySortType: 'DESC',
+        laySoTuDong: false
     };
 
     componentDidMount() {
@@ -209,7 +210,7 @@ class AdminEditPage extends AdminPage {
     }
 
     setData = (data = null) => {
-        let { trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi } = data ? data :
+        let { trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi, laySoTuDong } = data ? data :
             { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai: '', trangThai: '', loaiVanBan: '', loaiCongVan: 'TRUONG', soDi: '' };
 
         this.trichYeu.value(trichYeu);
@@ -227,6 +228,7 @@ class AdminEditPage extends AdminPage {
             donViNhan,
             loaiCongVan,
             history,
+            laySoTuDong,
             checkDonViGui: this.state.listDonViQuanLy.includes(donViGui),
             listFile, phanHoi: danhSachPhanHoi
         }, () => {
@@ -234,6 +236,11 @@ class AdminEditPage extends AdminPage {
             this.trangThai?.value(trangThai || '');
             this.fileBox?.setData('hcthCongVanDiFile:' + (this.state.id ? this.state.id : 'new'));
             listFile.map((item, index) => this.listFileRefs[index]?.value(item.viTri) || '');
+            if (this.state.id) {
+                this.laySoTuDong.value(true);
+            } else {
+                this.laySoTuDong.value(laySoTuDong);
+            }
         });
 
         if (donViNhan) {
@@ -602,10 +609,14 @@ class AdminEditPage extends AdminPage {
 
                     </div>
                     <div className='tile-body row'>
-                        {
-                            this.canSeeNumber() && soCongVan &&
-                            <FormTextBox type='text' className='col-md-12' readOnlyEmptyText={soCongVan} label='Số công văn' readOnly={true} />
-                        }
+                        <div className='col-md-12 d-flex'>
+                            <FormCheckbox className='col-md-2 d-flex align-items-center' style={{backgroundColor: 'red'}} label='Lấy số tự động' ref={e => this.laySoTuDong = e} onChange={value => this.setState({ laySoTuDong: value })} />
+                            {
+                                this.canSeeNumber() && soCongVan &&
+                                <FormTextBox type='text' className='col-md-10' readOnlyEmptyText={soCongVan} label='Số công văn' readOnly={true} />
+                            }
+                            {this.state.laySoTuDong && <FormTextBox label='Số công văn' ref={e => this.soCongVan = e} className='col-md-10' />}
+                        </div>
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngày gửi' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngày ký' />
                         <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi' readOnly={this.canReadOnly()} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} placeholder="Chọn đơn vị gửi" required readOnlyEmptyText='Chưa có đơn vị gửi' />
@@ -660,7 +671,7 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
 
-                {!isNew && <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item);}}/>}
+                {!isNew && <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item); }} />}
 
                 {!isNew &&
                     <div className="tile">
@@ -669,7 +680,7 @@ class AdminEditPage extends AdminPage {
                     </div>
                 }
                 <EditModal ref={e => this.donViGuiNhanModal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonViNhanNgoai} />
-                <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} update={this.props.updateCongVanTrinhKy} {...this.props} congVanId={this.state.id} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });}}
+                <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} update={this.props.updateCongVanTrinhKy} {...this.props} congVanId={this.state.id} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }); }}
                 />
             </>),
             backRoute,
@@ -681,22 +692,6 @@ class AdminEditPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi, phanHoi: state.hcth.hcthPhanHoi });
 const mapActionsToProps = {
-    getHcthCongVanDiAll,
-    getHcthCongVanDiPage,
-    createHcthCongVanDi,
-    updateHcthCongVanDi,
-    deleteHcthCongVanDi,
-    getHcthCongVanDiSearchPage,
-    deleteFile,
-    getCongVanDi,
-    createPhanHoi,
-    getHistory,
-    updateStatus,
-    getPhanHoi,
-    createDmDonViGuiCv,
-    readCongVanDi,
-    createCongVanTrinhKy,
-    deleteCongVanTrinhKy,
-    updateCongVanTrinhKy
+    getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, createDmDonViGuiCv, readCongVanDi, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
