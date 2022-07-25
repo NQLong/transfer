@@ -1,6 +1,6 @@
-// Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, userModified, lastModified, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh, donViTuyenDung, noiVaoCongDoan, isCvdt, isHdtn, hocViNoiTotNghiep, mocBacLuongCuoiCung, noiSinhNuocNgoai }
+// Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, userModified, lastModified, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh, donViTuyenDung, noiVaoCongDoan, isCvdt, isHdtn, hocViNoiTotNghiep, mocBacLuongCuoiCung, noiSinhNuocNgoai, lastLogin }
 const keys = ['SHCC'];
-const obj2Db = { 'ten': 'TEN', 'ho': 'HO', 'phai': 'PHAI', 'dienThoaiCaNhan': 'DIEN_THOAI_CA_NHAN', 'email': 'EMAIL', 'ngaySinh': 'NGAY_SINH', 'ngayBatDauCongTac': 'NGAY_BAT_DAU_CONG_TAC', 'ngayCbgd': 'NGAY_CBGD', 'ngayBienChe': 'NGAY_BIEN_CHE', 'ngayNghi': 'NGAY_NGHI', 'ngach': 'NGACH', 'heSoLuong': 'HE_SO_LUONG', 'bacLuong': 'BAC_LUONG', 'mocNangLuong': 'MOC_NANG_LUONG', 'ngayHuongLuong': 'NGAY_HUONG_LUONG', 'tyLeVuotKhung': 'TY_LE_VUOT_KHUNG', 'maChucVu': 'MA_CHUC_VU', 'danToc': 'DAN_TOC', 'tonGiao': 'TON_GIAO', 'dangVien': 'DANG_VIEN', 'maDonVi': 'MA_DON_VI', 'phucLoi': 'PHUC_LOI', 'nhaGiaoNhanDan': 'NHA_GIAO_NHAN_DAN', 'nhaGiaoUuTu': 'NHA_GIAO_UU_TU', 'ghiChu': 'GHI_CHU', 'shcc': 'SHCC', 'emailCaNhan': 'EMAIL_CA_NHAN', 'biDanh': 'BI_DANH', 'dienThoaiBaoTin': 'DIEN_THOAI_BAO_TIN', 'ngheNghiepCu': 'NGHE_NGHIEP_CU', 'cmnd': 'CMND', 'cmndNgayCap': 'CMND_NGAY_CAP', 'cmndNoiCap': 'CMND_NOI_CAP', 'chucVuKhac': 'CHUC_VU_KHAC', 'quocGia': 'QUOC_GIA', 'chucDanh': 'CHUC_DANH', 'trinhDoPhoThong': 'TRINH_DO_PHO_THONG', 'hocVi': 'HOC_VI', 'chuyenNganh': 'CHUYEN_NGANH', 'sucKhoe': 'SUC_KHOE', 'canNang': 'CAN_NANG', 'chieuCao': 'CHIEU_CAO', 'ngayNhapNgu': 'NGAY_NHAP_NGU', 'ngayXuatNgu': 'NGAY_XUAT_NGU', 'quanHamCaoNhat': 'QUAN_HAM_CAO_NHAT', 'hangThuongBinh': 'HANG_THUONG_BINH', 'giaDinhChinhSach': 'GIA_DINH_CHINH_SACH', 'danhHieu': 'DANH_HIEU', 'maXaNoiSinh': 'MA_XA_NOI_SINH', 'maHuyenNoiSinh': 'MA_HUYEN_NOI_SINH', 'maTinhNoiSinh': 'MA_TINH_NOI_SINH', 'maXaNguyenQuan': 'MA_XA_NGUYEN_QUAN', 'maHuyenNguyenQuan': 'MA_HUYEN_NGUYEN_QUAN', 'maTinhNguyenQuan': 'MA_TINH_NGUYEN_QUAN', 'ngayVaoDang': 'NGAY_VAO_DANG', 'ngayVaoDangChinhThuc': 'NGAY_VAO_DANG_CHINH_THUC', 'noiDangDb': 'NOI_DANG_DB', 'noiDangCt': 'NOI_DANG_CT', 'ngayVaoDoan': 'NGAY_VAO_DOAN', 'noiVaoDoan': 'NOI_VAO_DOAN', 'soTheDang': 'SO_THE_DANG', 'soTruong': 'SO_TRUONG', 'nhomMau': 'NHOM_MAU', 'soBhxh': 'SO_BHXH', 'doanVien': 'DOAN_VIEN', 'namChucDanh': 'NAM_CHUC_DANH', 'namHocVi': 'NAM_HOC_VI', 'noiSinh': 'NOI_SINH', 'queQuan': 'QUE_QUAN', 'thuongTruMaHuyen': 'THUONG_TRU_MA_HUYEN', 'thuongTruMaTinh': 'THUONG_TRU_MA_TINH', 'thuongTruMaXa': 'THUONG_TRU_MA_XA', 'thuongTruSoNha': 'THUONG_TRU_SO_NHA', 'hienTaiMaHuyen': 'HIEN_TAI_MA_HUYEN', 'hienTaiMaTinh': 'HIEN_TAI_MA_TINH', 'hienTaiMaXa': 'HIEN_TAI_MA_XA', 'hienTaiSoNha': 'HIEN_TAI_SO_NHA', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'congDoan': 'CONG_DOAN', 'ngayVaoCongDoan': 'NGAY_VAO_CONG_DOAN', 'maTheBhyt': 'MA_THE_BHYT', 'noiKhamChuaBenhBanDau': 'NOI_KHAM_CHUA_BENH_BAN_DAU', 'quyenLoiKhamChuaBenh': 'QUYEN_LOI_KHAM_CHUA_BENH', 'doiTuongBoiDuongKienThucQpan': 'DOI_TUONG_BOI_DUONG_KIEN_THUC_QPAN', 'ngayBatDauBhxh': 'NGAY_BAT_DAU_BHXH', 'ngayKetThucBhxh': 'NGAY_KET_THUC_BHXH', 'tuNhanXet': 'TU_NHAN_XET', 'tinhTrangBoiDuong': 'TINH_TRANG_BOI_DUONG', 'namBoiDuong': 'NAM_BOI_DUONG', 'khoaBoiDuong': 'KHOA_BOI_DUONG', 'trinhDoChuyenMon': 'TRINH_DO_CHUYEN_MON', 'namTotNghiep': 'NAM_TOT_NGHIEP', 'tyLePhuCapThamNien': 'TY_LE_PHU_CAP_THAM_NIEN', 'tyLePhuCapUuDai': 'TY_LE_PHU_CAP_UU_DAI', 'loaiDoiTuongBoiDuong': 'LOAI_DOI_TUONG_BOI_DUONG', 'cuNhan': 'CU_NHAN', 'thacSi': 'THAC_SI', 'tienSi': 'TIEN_SI', 'chuyenNganhChucDanh': 'CHUYEN_NGANH_CHUC_DANH', 'coSoChucDanh': 'CO_SO_CHUC_DANH', 'donViTuyenDung': 'DON_VI_TUYEN_DUNG', 'noiVaoCongDoan': 'NOI_VAO_CONG_DOAN', 'isCvdt': 'IS_CVDT', 'isHdtn': 'IS_HDTN', 'hocViNoiTotNghiep': 'HOC_VI_NOI_TOT_NGHIEP', 'mocBacLuongCuoiCung': 'MOC_BAC_LUONG_CUOI_CUNG', 'noiSinhNuocNgoai': 'NOI_SINH_NUOC_NGOAI' };
+const obj2Db = { 'ten': 'TEN', 'ho': 'HO', 'phai': 'PHAI', 'dienThoaiCaNhan': 'DIEN_THOAI_CA_NHAN', 'email': 'EMAIL', 'ngaySinh': 'NGAY_SINH', 'ngayBatDauCongTac': 'NGAY_BAT_DAU_CONG_TAC', 'ngayCbgd': 'NGAY_CBGD', 'ngayBienChe': 'NGAY_BIEN_CHE', 'ngayNghi': 'NGAY_NGHI', 'ngach': 'NGACH', 'heSoLuong': 'HE_SO_LUONG', 'bacLuong': 'BAC_LUONG', 'mocNangLuong': 'MOC_NANG_LUONG', 'ngayHuongLuong': 'NGAY_HUONG_LUONG', 'tyLeVuotKhung': 'TY_LE_VUOT_KHUNG', 'maChucVu': 'MA_CHUC_VU', 'danToc': 'DAN_TOC', 'tonGiao': 'TON_GIAO', 'dangVien': 'DANG_VIEN', 'maDonVi': 'MA_DON_VI', 'phucLoi': 'PHUC_LOI', 'nhaGiaoNhanDan': 'NHA_GIAO_NHAN_DAN', 'nhaGiaoUuTu': 'NHA_GIAO_UU_TU', 'ghiChu': 'GHI_CHU', 'shcc': 'SHCC', 'emailCaNhan': 'EMAIL_CA_NHAN', 'biDanh': 'BI_DANH', 'dienThoaiBaoTin': 'DIEN_THOAI_BAO_TIN', 'ngheNghiepCu': 'NGHE_NGHIEP_CU', 'cmnd': 'CMND', 'cmndNgayCap': 'CMND_NGAY_CAP', 'cmndNoiCap': 'CMND_NOI_CAP', 'chucVuKhac': 'CHUC_VU_KHAC', 'quocGia': 'QUOC_GIA', 'chucDanh': 'CHUC_DANH', 'trinhDoPhoThong': 'TRINH_DO_PHO_THONG', 'hocVi': 'HOC_VI', 'chuyenNganh': 'CHUYEN_NGANH', 'sucKhoe': 'SUC_KHOE', 'canNang': 'CAN_NANG', 'chieuCao': 'CHIEU_CAO', 'ngayNhapNgu': 'NGAY_NHAP_NGU', 'ngayXuatNgu': 'NGAY_XUAT_NGU', 'quanHamCaoNhat': 'QUAN_HAM_CAO_NHAT', 'hangThuongBinh': 'HANG_THUONG_BINH', 'giaDinhChinhSach': 'GIA_DINH_CHINH_SACH', 'danhHieu': 'DANH_HIEU', 'maXaNoiSinh': 'MA_XA_NOI_SINH', 'maHuyenNoiSinh': 'MA_HUYEN_NOI_SINH', 'maTinhNoiSinh': 'MA_TINH_NOI_SINH', 'maXaNguyenQuan': 'MA_XA_NGUYEN_QUAN', 'maHuyenNguyenQuan': 'MA_HUYEN_NGUYEN_QUAN', 'maTinhNguyenQuan': 'MA_TINH_NGUYEN_QUAN', 'ngayVaoDang': 'NGAY_VAO_DANG', 'ngayVaoDangChinhThuc': 'NGAY_VAO_DANG_CHINH_THUC', 'noiDangDb': 'NOI_DANG_DB', 'noiDangCt': 'NOI_DANG_CT', 'ngayVaoDoan': 'NGAY_VAO_DOAN', 'noiVaoDoan': 'NOI_VAO_DOAN', 'soTheDang': 'SO_THE_DANG', 'soTruong': 'SO_TRUONG', 'nhomMau': 'NHOM_MAU', 'soBhxh': 'SO_BHXH', 'doanVien': 'DOAN_VIEN', 'namChucDanh': 'NAM_CHUC_DANH', 'namHocVi': 'NAM_HOC_VI', 'noiSinh': 'NOI_SINH', 'queQuan': 'QUE_QUAN', 'thuongTruMaHuyen': 'THUONG_TRU_MA_HUYEN', 'thuongTruMaTinh': 'THUONG_TRU_MA_TINH', 'thuongTruMaXa': 'THUONG_TRU_MA_XA', 'thuongTruSoNha': 'THUONG_TRU_SO_NHA', 'hienTaiMaHuyen': 'HIEN_TAI_MA_HUYEN', 'hienTaiMaTinh': 'HIEN_TAI_MA_TINH', 'hienTaiMaXa': 'HIEN_TAI_MA_XA', 'hienTaiSoNha': 'HIEN_TAI_SO_NHA', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'congDoan': 'CONG_DOAN', 'ngayVaoCongDoan': 'NGAY_VAO_CONG_DOAN', 'maTheBhyt': 'MA_THE_BHYT', 'noiKhamChuaBenhBanDau': 'NOI_KHAM_CHUA_BENH_BAN_DAU', 'quyenLoiKhamChuaBenh': 'QUYEN_LOI_KHAM_CHUA_BENH', 'doiTuongBoiDuongKienThucQpan': 'DOI_TUONG_BOI_DUONG_KIEN_THUC_QPAN', 'ngayBatDauBhxh': 'NGAY_BAT_DAU_BHXH', 'ngayKetThucBhxh': 'NGAY_KET_THUC_BHXH', 'tuNhanXet': 'TU_NHAN_XET', 'tinhTrangBoiDuong': 'TINH_TRANG_BOI_DUONG', 'namBoiDuong': 'NAM_BOI_DUONG', 'khoaBoiDuong': 'KHOA_BOI_DUONG', 'trinhDoChuyenMon': 'TRINH_DO_CHUYEN_MON', 'namTotNghiep': 'NAM_TOT_NGHIEP', 'tyLePhuCapThamNien': 'TY_LE_PHU_CAP_THAM_NIEN', 'tyLePhuCapUuDai': 'TY_LE_PHU_CAP_UU_DAI', 'loaiDoiTuongBoiDuong': 'LOAI_DOI_TUONG_BOI_DUONG', 'cuNhan': 'CU_NHAN', 'thacSi': 'THAC_SI', 'tienSi': 'TIEN_SI', 'chuyenNganhChucDanh': 'CHUYEN_NGANH_CHUC_DANH', 'coSoChucDanh': 'CO_SO_CHUC_DANH', 'donViTuyenDung': 'DON_VI_TUYEN_DUNG', 'noiVaoCongDoan': 'NOI_VAO_CONG_DOAN', 'isCvdt': 'IS_CVDT', 'isHdtn': 'IS_HDTN', 'hocViNoiTotNghiep': 'HOC_VI_NOI_TOT_NGHIEP', 'mocBacLuongCuoiCung': 'MOC_BAC_LUONG_CUOI_CUNG', 'noiSinhNuocNgoai': 'NOI_SINH_NUOC_NGOAI', 'lastLogin': 'LAST_LOGIN' };
 
 module.exports = app => {
     app.model.canBo = {
@@ -214,71 +214,6 @@ module.exports = app => {
                     resolve(result);
                 }
             });
-        }),
-
-        searchPage: (pagenumber, pagesize, filter, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_can_bo_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                }));
-        }),
-
-        download: (filter, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_can_bo_download_excel(:filter, :searchterm); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                }));
-        }),
-
-        getGiangVien: (searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tchc_can_bo_get_giang_vien(:searchterm); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                }));
-        }),
-
-        getLyLich: (mtcb, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tchc_can_bo_get_data_all(:mtcb, :qtChucVu, :qtDaoTao, :qtHocTapCongTac, :toChucKhac, :quanHeGiaDinh); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, mtcb, qtChucVu: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtDaoTao: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtHocTapCongTac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, toChucKhac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, quanHeGiaDinh: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                }));
-        }),
-
-        getDashboardData: (time, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_data(:time, :nhanSuDonVi, :qtDiNuocNgoai, :qtCongTacTrongNuoc, :qtNghiPhep, :qtNghiThaiSan, :nhanSuCongTac); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, time, nhanSuDonVi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtDiNuocNgoai: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtCongTacTrongNuoc: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtNghiPhep: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtNghiThaiSan: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhanSuCongTac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                }));
         }),
     };
 };

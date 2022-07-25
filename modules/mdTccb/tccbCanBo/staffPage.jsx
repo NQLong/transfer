@@ -29,6 +29,7 @@ class StaffUserPage extends AdminPage {
                 } else {
                     this.shcc = staff.shcc;
                     this.email = staff.email;
+                    this.props.updateStaff(this.shcc, { lastLogin: Date.now() });
                 }
                 this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
