@@ -14649,10 +14649,10 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "LAST_LOGIN": {
+        "TCHC_CAN_BO": {
             "active": true,
-            "moduleName": "lastLogin",
-            "modelName": "lastLogin",
+            "moduleName": "tchcCanBo",
+            "modelName": "tchcCanBo",
             "columns": {
                 "TEN": {
                     "value": "ten",
@@ -14790,7 +14790,7 @@
                 "DANG_VIEN": {
                     "value": "dangVien",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -15210,7 +15210,7 @@
                 "CONG_DOAN": {
                     "value": "congDoan",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -15245,7 +15245,7 @@
                 "DOI_TUONG_BOI_DUONG_KIEN_THUC_QPAN": {
                     "value": "doiTuongBoiDuongKienThucQpan",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -15273,7 +15273,7 @@
                 "TINH_TRANG_BOI_DUONG": {
                     "value": "tinhTrangBoiDuong",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -15314,10 +15314,10 @@
                 },
                 "TY_LE_PHU_CAP_UU_DAI": {
                     "value": "tyLePhuCapUuDai",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 5
                 },
                 "LOAI_DOI_TUONG_BOI_DUONG": {
                     "value": "loaiDoiTuongBoiDuong",
@@ -15378,14 +15378,14 @@
                 "IS_CVDT": {
                     "value": "isCvdt",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
                 "IS_HDTN": {
                     "value": "isHdtn",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -15408,17 +15408,20 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 3
+                    "size": 5
+                },
+                "LAST_LOGIN": {
+                    "value": "lastLogin",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
                 "SHCC"
             ],
-            "foreignKeys": [
-                "DAN_TOC",
-                "HOC_VI",
-                "TON_GIAO"
-            ],
+            "foreignKeys": [],
             "type": "table"
         }
     }
