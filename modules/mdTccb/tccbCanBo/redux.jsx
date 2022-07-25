@@ -312,18 +312,15 @@ export function userStaff(email, done) {
 }
 
 export function updateStaffUser(email, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/user/staff';
-        T.put(url, { changes }, data => {
+        T.put(url, { email, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật dữ liệu cán bộ bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
-                T.notify('Cập nhật thông tin cán bộ thành công!', 'success');
                 done && done(data.item);
-                dispatch(userStaff(email));
             }
-        }, () => T.notify('Cập nhật dữ liệu cán bộ bị lỗi', 'danger'));
+        });
     };
 }
 
