@@ -155,8 +155,8 @@ module.exports = app => {
     const updateListFile = (listFile, congVanId, done) => {
         if (listFile && listFile.length > 0) {
             const [{ id, ...changes }] = listFile.splice(0, 1),
-                sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.ten}`),
-                destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.ten}`);
+                sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.tenFile}`),
+                destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.tenFile}`);
             if (!changes.ma)
                 app.fs.rename(sourcePath, destPath, error => {
                     if (error) done && done({ error });
@@ -314,6 +314,9 @@ module.exports = app => {
     app.uploadHooks.add('hcthCongVanDiFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
 
+    app.uploadHooks.add('hcthCongVanDiUpdateFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthCongVanDiUpdateFile(req, fields, files, params, done), done, 'staff:login'));
+
     const hcthCongVanDiFile = (req, fields, files, params, done) => {
         if (
             fields.userData &&
@@ -323,13 +326,15 @@ module.exports = app => {
             files.hcthCongVanDiFile.length > 0) {
             const
                 srcPath = files.hcthCongVanDiFile[0].path,
+                generatedFileName = srcPath.substring(srcPath.lastIndexOf('/') + 1, srcPath.length),
                 isNew = fields.userData[0].substring(18) == 'new',
                 id = fields.userData[0].substring(18),
                 originalFilename = files.hcthCongVanDiFile[0].originalFilename,
-                filePath = (isNew ? '/new/' : `/${id}/`) + originalFilename,
+                filePath = (isNew ? '/new/' : `/${id}/`) + generatedFileName,
                 destPath = app.assetPath + '/congVanDi' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
                 baseNamePath = app.path.extname(srcPath);
+
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done && done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.deleteFile(srcPath);
@@ -341,12 +346,54 @@ module.exports = app => {
                     if (error) {
                         done && done({ error });
                     } else {
-                        app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
+                        app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id, tenFile: generatedFileName, nguoiTao: req.session.user.shcc }, (error, item) => done && done({ error, item }));
                     }
                 });
             }
         }
     };
+
+    const hcthCongVanDiUpdateFile = async (req, fields, files, params, done) => {
+        if (
+            fields.userData &&
+            fields.userData[0] &&
+            fields.userData[0].startsWith('hcthCongVanDiUpdateFile') &&
+            files.hcthCongVanDiUpdateFile &&
+            files.hcthCongVanDiUpdateFile.length > 0) {
+
+            const userDataArr = fields.userData[0].split(':');
+            const
+                srcPath = files.hcthCongVanDiUpdateFile[0].path,
+                generatedFileName = srcPath.substring(srcPath.lastIndexOf('/') + 1, srcPath.length),
+                id = userDataArr[1],
+                originalFilename = files.hcthCongVanDiUpdateFile[0].originalFilename,
+                filePath = `/${id}/${generatedFileName}`,
+                destPath = app.assetPath + '/congVanDi' + filePath,
+                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                baseNamePath = app.path.extname(srcPath);
+
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done && done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, `/congVanDi/${id}`)
+                );
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error) {
+                        done && done({ error });
+                    } else {
+                        app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id, tenFile: generatedFileName, capNhatFileId: userDataArr[2], nguoiTao: req.session.user.shcc }, async (error, item) => {
+                            const canBo = await app.model.canBo.get({ shcc: req.session.user.shcc });
+                            done && done({ error, item: { ...item, hoNguoiTao: canBo.ho, tenNguoiTao: canBo.ten } });
+                        });
+                    }
+                });
+            }
+        }
+    };
+
+
 
     //Delete file
     app.put('/api/hcth/cong-van-cac-phong/delete-file', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
@@ -368,7 +415,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), async (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -382,7 +429,8 @@ module.exports = app => {
                     for (const serverFileName of serverFileNames) {
                         const clientFileIndex = serverFileName.indexOf(fileName);
                         if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
-                            return res.sendFile(app.path.join(dir, serverFileName));
+                            const fileCongVan = await app.model.hcthFile.get({ ma: id, tenFile: serverFileName });
+                            return res.download(app.path.join(dir, serverFileName), app.path.join(dir, fileCongVan.ten));
                         }
                     }
                 }
@@ -440,15 +488,18 @@ module.exports = app => {
             if (!(await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
+            let files = await app.model.hcthFile.getAllFrom(id, 'DI');
+
+            files = files.rows;
+
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
             const vanBanTrinhKy = [];
-            
+
             if (files.length > 0) {
                 await Promise.all(files.map(async (file) => {
                     const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(file.id);
-                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({...item, ten: file.ten })));
+                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({ ...item, ten: file.ten })));
                 }));
             }
 
