@@ -10339,6 +10339,7 @@
         "TCHC_CAN_BO": {
             "active": true,
             "moduleName": "tccbCanBo",
+            "modelName": "canBo",
             "methods": {
                 "TCCB_CAN_BO_SEARCH_PAGE": "searchPage",
                 "TCCB_CAN_BO_DOWNLOAD_EXCEL": "download",
@@ -10350,7 +10351,6 @@
                 "TCHC_CAN_BO_GET_DATA_ALL": "getLyLich",
                 "TCCB_DASHBOARD_GET_DATA": "getDashboardData"
             },
-            "modelName": "canBo",
             "columns": {
                 "TEN": {
                     "value": "ten",

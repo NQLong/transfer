@@ -1624,6 +1624,10 @@ module.exports = app => {
         app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
     });
 
+    app.put('/api/user/staff', app.permission.check('staff:read'), (req, res) => {
+        app.model.canBo.put({ email: req.body.email }, req.body.changes, (error, item) => res.send({ error, item }));
+    });
+
     app.post('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
         let shcc = app.model.canBo.validShcc(req, req.body.shcc);
         if (shcc) {
