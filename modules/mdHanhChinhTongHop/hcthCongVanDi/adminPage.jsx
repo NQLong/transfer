@@ -102,7 +102,7 @@ class HcthCongVanDi extends AdminPage {
                 readyUrl: '/user/hcth',
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
-                    'Danh sách công văn các phòng',
+                    'Danh sách công văn đi',
                 ],
                 backRoute: '/user/hcth',
                 baseUrl: '/user/hcth/cong-van-cac-phong',
@@ -112,7 +112,7 @@ class HcthCongVanDi extends AdminPage {
                 readyUrl: '/user',
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                    'Danh sách công văn các phòng',
+                    'Danh sách công văn đi',
                 ],
                 backRoute: '/user',
                 baseUrl: '/user/cong-van-cac-phong',
@@ -185,7 +185,7 @@ class HcthCongVanDi extends AdminPage {
         }));
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let table = renderTable({
-            emptyTable: 'Chưa có dữ liệu công văn các phòng',
+            emptyTable: 'Chưa có dữ liệu công văn đi',
             getDataSource: () => list,
             stickyHead: false,
             renderHead: () => (
@@ -266,7 +266,7 @@ class HcthCongVanDi extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn các phòng',
+            title: 'Công văn đi',
             breadcrumb: breadcrumb,
             onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>

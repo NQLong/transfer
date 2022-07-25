@@ -792,7 +792,7 @@ module.exports = (app) => {
         const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, nhanCongVanDenEmailTitle, nhanCongVanDenEmailEditorText, nhanCongVanDenEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'nhanCongVanDenEmailTitle', 'nhanCongVanDenEmailEditorText', 'nhanCongVanDenEmailEditorHtml');
 
         const rootUrl = app.rootUrl;
-        let mailTitle = nhanCongVanDenEmailTitle.replaceAll('{id}', item.id).toUpperCase(), 
+        let mailTitle = nhanCongVanDenEmailTitle.toUpperCase(), 
             mailText = nhanCongVanDenEmailEditorText.replaceAll('{id}', item.id)
                         .replaceAll('{soDen}', item.soDen || 'Chưa có')
                         .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
@@ -831,9 +831,27 @@ module.exports = (app) => {
         }, 'email', 'email');
 
         const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
+
+        const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui});
+
         const rootUrl = app.rootUrl;
-        let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
-            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
+        
+        let mailTitle = chiDaoEmailTitle.toUpperCase(), 
+            mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id)
+                        .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                        .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                        .replaceAll('{donViGui}', donViGuiInfo.ten)
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                        .replaceAll('{trichYeu}', item.trichYeu),
+            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id)
+                        .replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`)
+                        .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                        .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                        .replaceAll('{donViGui}', donViGuiInfo.ten)
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                        .replaceAll('{trichYeu}', item.trichYeu); 
         if (app.isDebug) {
             app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
                 if (error) throw (error);

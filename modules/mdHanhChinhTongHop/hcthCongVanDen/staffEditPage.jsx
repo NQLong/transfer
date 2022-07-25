@@ -591,6 +591,7 @@ class StaffEditPage extends AdminPage {
     }
 
     onChangeStatus = (status, done) => {
+        console.log(status);
         this.props.updateStatus({ id: this.state.id, trangThai: status }, () => this.setState({ trangThai: status }, () => this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }, () => done && done())));
     }
 
