@@ -160,17 +160,12 @@ class QtChucVu extends AdminPage {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.timeType?.value(0);
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.maDonVi?.value('');
-                this.mulCanBo?.value('');
-                this.gioiTinh?.value('');
+
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
             }
-            this.changeAdvancedSearch(true);
+            this.changeAdvancedSearch(false, true);
         });
     }
 
@@ -187,7 +182,7 @@ class QtChucVu extends AdminPage {
         const fromAge = this.fromAge?.value();
         const toAge = this.toAge?.value();
         const filterCookie = T.storage('pageQtChucVu').F;
-        const pageFilter = isInitial ? filterCookie : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
+        const pageFilter = (isInitial || isReset) ? filterCookie : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
         this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -203,21 +198,24 @@ class QtChucVu extends AdminPage {
                     this.mulMaChucDanh?.value(filter.listChucDanh || filterCookie.listChucDanh);
                     this.fromAge?.value(filter.fromAge || filterCookie.fromAge);
                     this.toAge?.value(filter.toAge || filterCookie.toAge);
-                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && this.showAdvanceSearch();
-                } else {
+                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && typeof (filterCookie) !== 'string' && this.showAdvanceSearch();
+
+                } else if (isReset) {
+                    this.fromYear?.value('');
+                    this.toYear?.value('');
+                    this.maDonVi.value('');
+                    this.mulCanBo.value('');
+                    this.timeType.value('');
+                    this.mulMaChucVu.value('');
+                    this.gioiTinh.value('');
+                    this.mulMaChucDanh.value('');
+                    this.fromAge.value('');
+                    this.toAge.value('');
                     this.hideAdvanceSearch();
-                    if (isReset) {
-                        this.fromYear?.value('');
-                        this.toYear?.value('');
-                        this.maDonVi.value('');
-                        this.mulCanBo.value('');
-                        this.timeType.value('');
-                        this.mulMaChucVu.value('');
-                        this.gioiTinh.value('');
-                        this.mulMaChucDanh.value('');
-                        this.fromAge.value('');
-                        this.toAge.value('');
-                    }
+
+                }
+                else {
+                    this.hideAdvanceSearch();
                 }
             });
         });
@@ -314,7 +312,6 @@ class QtChucVu extends AdminPage {
                 </tr>
             )
         });
-
         let groupTable = renderTable({
             getDataSource: () => list, stickyHead: true,
             renderHead: () => (
@@ -412,7 +409,6 @@ class QtChucVu extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
-    getQtChucVuPage, deleteQtChucVuStaff, createQtChucVuStaff,
-    updateQtChucVuStaff, getQtChucVuGroupPage, getQtChucVuAll, getDmChucVu
+    getQtChucVuPage, deleteQtChucVuStaff, createQtChucVuStaff, updateQtChucVuStaff, getQtChucVuGroupPage, getQtChucVuAll, getDmChucVu
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);
