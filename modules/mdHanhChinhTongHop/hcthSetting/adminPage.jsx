@@ -11,6 +11,8 @@ class HcthSettingAdminPage extends AdminPage {
                 (items || []).forEach(item => {
                     if (item.key == 'chiDaoEmailEditorHtml') {
                         this.chiDaoEmailEditor.html(item.value);
+                    } else if (item.key == 'nhanCongVanDenEmailEditorHtml') {
+                        this.nhanCongVanDenEmailEditor.html(item.value);
                     } else {
                         const component = this[item.key];
                         component && component.value && component.value(item.value);
@@ -91,6 +93,9 @@ class HcthSettingAdminPage extends AdminPage {
                         <li className='nav-item'>
                             <a className='nav-link active show' data-toggle='tab' href='#chiDaoEmail'>Email chỉ đạo</a>
                         </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' data-toggle='tab' href='#nhanCongVanDenEmail'>Email nhận công văn đến</a>
+                        </li>
                     </ul>
 
                     <div className='tab-content tile'>
@@ -101,6 +106,17 @@ class HcthSettingAdminPage extends AdminPage {
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('chiDaoEmailTitle', 'chiDaoEmailEditor')}>
+                                    <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                </button>
+                            </div>
+                        </div>
+                        <div className='tab-pane fade' id='nhanCongVanDenEmail'>
+                            <div className='tile-body'>
+                                <FormTextBox ref={e => this.nhanCongVanDenEmailTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                <FormEditor ref={e => this.nhanCongVanDenEmailEditor = e} label='Nội dung email' smallText='Tham số: {id, soDen, soCongVan, donViGui, ngayCongVan, ngayNhan, trichYeu}' height={400} />
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('nhanCongVanDenEmailTitle', 'nhanCongVanDenEmailEditor')}>
                                     <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                 </button>
                             </div>

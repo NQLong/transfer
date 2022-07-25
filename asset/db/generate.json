@@ -6895,6 +6895,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "LAY_SO_TU_DONG": {
+                    "value": "laySoTuDong",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -10194,6 +10208,9 @@
             "active": true,
             "moduleName": "hcthFile",
             "modelName": "hcthFile",
+            "methods": {
+                "HCTH_FILE_GET_ALL_FROM": "getAllFrom"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -10257,6 +10274,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "CAP_NHAT_FILE_ID": {
+                    "value": "capNhatFileId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -10464,7 +10488,7 @@
                 "DANG_VIEN": {
                     "value": "dangVien",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -10884,7 +10908,7 @@
                 "CONG_DOAN": {
                     "value": "congDoan",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -10919,7 +10943,7 @@
                 "DOI_TUONG_BOI_DUONG_KIEN_THUC_QPAN": {
                     "value": "doiTuongBoiDuongKienThucQpan",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -10947,7 +10971,7 @@
                 "TINH_TRANG_BOI_DUONG": {
                     "value": "tinhTrangBoiDuong",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -10988,10 +11012,10 @@
                 },
                 "TY_LE_PHU_CAP_UU_DAI": {
                     "value": "tyLePhuCapUuDai",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 5
                 },
                 "LOAI_DOI_TUONG_BOI_DUONG": {
                     "value": "loaiDoiTuongBoiDuong",
@@ -11052,14 +11076,14 @@
                 "IS_CVDT": {
                     "value": "isCvdt",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
                 "IS_HDTN": {
                     "value": "isHdtn",
                     "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
                 },
@@ -11076,16 +11100,26 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "NOI_SINH_NUOC_NGOAI": {
+                    "value": "noiSinhNuocNgoai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                },
+                "LAST_LOGIN": {
+                    "value": "lastLogin",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
                 "SHCC"
             ],
-            "foreignKeys": [
-                "DAN_TOC",
-                "HOC_VI",
-                "TON_GIAO"
-            ],
+            "foreignKeys": [],
             "type": "table"
         },
         "TRINH_DO_NGOAI_NGU": {
