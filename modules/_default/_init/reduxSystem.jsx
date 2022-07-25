@@ -130,7 +130,8 @@ export function deleteFooterItem(id, done) {
 export function getSystemState(done) {
     return dispatch => {
         const url = '/api/state';
-        T.get(url, { template: T.template }, data => {
+        const path = window.location.pathname, link = path.endsWith('/') && path.length > 1 ? path.substring(0, path.length - 1) : path;
+        T.get(url, { template: T.template, link }, data => {
             data && dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
             done && done(data);
         }, () => {

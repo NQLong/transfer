@@ -61,7 +61,7 @@ module.exports = app => {
 
     app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => next(), async (req, res) => {
         try {
-            const template = req.query.template;
+            const template = req.query.template, link = req.query.link;
             const data = await app.state.get();
             if (data == null) {
                 res.send({ error: 'System has error!' });
@@ -80,15 +80,17 @@ module.exports = app => {
                     if (template == 'home') {
                         const menus = await app.model.fwMenu.homeGetDivisionMenuTree('00');
                         if (menus) {
-                            data.menus = [];
-                            data.divisionMenus = [];
-                            menus.forEach(menu => {
-                                menu.content = '';
-                                if (menu.submenus) {
-                                    menu.submenus.forEach(submenu => submenu.content = '');
-                                }
-                                if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
-                            });
+                            data.menus = menus;
+                        }
+                    }
+
+                    if (template == 'unit') {
+                        data.divisionMenus = [];
+                        if (link) {
+                            const checkMenu = await app.model.fwMenu.get({ link });
+                            if (checkMenu && checkMenu.maDonVi) {
+                                data.divisionMenus = await app.model.fwMenu.homeGetDivisionMenuTree(checkMenu.maDonVi);
+                            }
                         }
                     }
 
