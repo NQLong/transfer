@@ -3718,38 +3718,40 @@ BEGIN
                                   )
                       )
                   AND (
-                          (donViXem IS NULL AND canBoXem IS NULL)
-                          OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
-                                                       (
-                                                           SELECT regexp_substr(donViXem, '[^,]+', 1, level)
-                                                           from dual
-                                                           connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
-                                                       )
-                              )
-                          OR (donViXem IS NOT NULL AND EXISTS(
-                              SELECT hcthDVN.ID
-                              FROM HCTH_DON_VI_NHAN hcthDVN
-                              WHERE hcthDVN.MA = hcthCVD.ID
-                                AND hcthDVN.LOAI = 'DI'
-                                AND hcthDVN.DON_VI_NHAN IN
-                                    (
-                                        select regexp_substr(donViXem, '[^,]+', 1, level)
-                                        from dual
-                                        connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
-                                    )
-                          )
-                          AND hcthCVD.TRANG_THAI != '1'
-                          AND hcthCVD.TRANG_THAI != '4'
-                              )
+                          (loaiCanBo = 4 OR loaiCanBo = 5)
                           OR
-                          (canBoXem IS NOT NULL AND canBoXem IN
-                                                    (
-                                                        SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                                        from dual
-                                                        connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                    )
-                              AND hcthCVD.TRANG_THAI != '1'
-                              )
+                          ((donViXem IS NULL AND canBoXem IS NULL)
+                              OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
+                                                           (
+                                                               SELECT regexp_substr(donViXem, '[^,]+', 1, level)
+                                                               from dual
+                                                               connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
+                                                           )
+                               )
+                              OR (donViXem IS NOT NULL AND EXISTS(
+                                      SELECT hcthDVN.ID
+                                      FROM HCTH_DON_VI_NHAN hcthDVN
+                                      WHERE hcthDVN.MA = hcthCVD.ID
+                                        AND hcthDVN.LOAI = 'DI'
+                                        AND hcthDVN.DON_VI_NHAN IN
+                                            (
+                                                select regexp_substr(donViXem, '[^,]+', 1, level)
+                                                from dual
+                                                connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
+                                            )
+                                  )
+                                  AND hcthCVD.TRANG_THAI != '1'
+                                  AND hcthCVD.TRANG_THAI != '4'
+                               )
+                              OR
+                           (loaiCanBo != 5 AND canBoXem IS NOT NULL AND canBoXem IN
+                                                                        (
+                                                                            SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                                            from dual
+                                                                            connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                                        )
+                               AND hcthCVD.TRANG_THAI != '1'
+                               ))
                       )
                   AND (
                               loaiCanBo = 0 -- staff
@@ -3761,7 +3763,7 @@ BEGIN
                                               )
                                   )
                           OR (
-                                          loaiCanBo = 2 -- hcth
+                                          loaiCanBo = 2 -- hcth: manage
                                       AND (
                                                   (hcthCVD.TRANG_THAI != '1'
                                                       AND hcthCVD.TRANG_THAI != '4')
@@ -3771,6 +3773,41 @@ BEGIN
                                                           AND hcthCVD.DON_VI_GUI = '29'
                                                       )
                                                   OR hcthCVD.TRANG_THAI IS NULL
+                                              )
+                                  )
+                          OR (
+                                          loaiCanBo = 3 -- hcth: login
+                                      AND (
+                                                  (hcthCVD.TRANG_THAI != '1'
+                                                      AND hcthCVD.TRANG_THAI != '4')
+                                                  OR hcthCVD.TRANG_THAI IS NULL
+                                              )
+                                  )
+                          OR (
+                                          loaiCanBo = 4 -- admin
+                                      AND (
+                                                  (hcthCVD.TRANG_THAI != '1'
+                                                      AND hcthCVD.TRANG_THAI != '4')
+                                                  OR (
+                                                          (hcthCVD.TRANG_THAI = '1'
+                                                              OR hcthCVD.TRANG_THAI = '4')
+                                                          AND hcthCVD.DON_VI_GUI = donViXem
+                                                      )
+                                              )
+                                  )
+                          OR (
+                                          loaiCanBo = 5 -- chuyên viên soạn thảo
+                                      AND (
+                                                  (hcthCVD.TRANG_THAI = '1' AND hcthCVD.NGUOI_TAO = canBoXem)
+                                                  OR (
+                                                              canBoXem IS NOT NULL AND canBoXem IN
+                                                                                       (
+                                                                                           SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                                                           from dual
+                                                                                           connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                                                       )
+                                                          AND hcthCVD.TRANG_THAI != '1'
+                                                      )
                                               )
                                   )
                       )
@@ -3989,38 +4026,40 @@ BEGIN
                                                )
                                    )
                                AND (
-                                       (donViXem IS NULL AND canBoXem IS NULL)
-                                       OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
-                                                                    (
-                                                                        SELECT regexp_substr(donViXem, '[^,]+', 1, level)
-                                                                        from dual
-                                                                        connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
-                                                                    )
-                                           )
-                                       OR (donViXem IS NOT NULL AND EXISTS(
-                                           SELECT hcthDVN.ID
-                                           FROM HCTH_DON_VI_NHAN hcthDVN
-                                           WHERE hcthDVN.MA = hcthCVD.ID
-                                             AND hcthDVN.LOAI = 'DI'
-                                             AND hcthDVN.DON_VI_NHAN IN
-                                                 (
-                                                     select regexp_substr(donViXem, '[^,]+', 1, level)
-                                                     from dual
-                                                     connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
-                                                 )
-                                       )
-                                       AND hcthCVD.TRANG_THAI != '1'
-                                       AND hcthCVD.TRANG_THAI != '4'
-                                           )
+                                       (loaiCanBo = 4 OR loaiCanBo = 5)
                                        OR
-                                       (canBoXem IS NOT NULL AND canBoXem IN
-                                                                 (
-                                                                     SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                                                     from dual
-                                                                     connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                                 )
-                                           AND hcthCVD.TRANG_THAI != '1'
-                                           )
+                                       ((donViXem IS NULL AND canBoXem IS NULL)
+                                           OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
+                                                                        (
+                                                                            SELECT regexp_substr(donViXem, '[^,]+', 1, level)
+                                                                            from dual
+                                                                            connect by regexp_substr(donViXem, '[^,]+', 1, level) is NOT NULL
+                                                                        )
+                                            )
+                                           OR (donViXem IS NOT NULL AND EXISTS(
+                                                   SELECT hcthDVN.ID
+                                                   FROM HCTH_DON_VI_NHAN hcthDVN
+                                                   WHERE hcthDVN.MA = hcthCVD.ID
+                                                     AND hcthDVN.LOAI = 'DI'
+                                                     AND hcthDVN.DON_VI_NHAN IN
+                                                         (
+                                                             select regexp_substr(donViXem, '[^,]+', 1, level)
+                                                             from dual
+                                                             connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
+                                                         )
+                                               )
+                                               AND hcthCVD.TRANG_THAI != '1'
+                                               AND hcthCVD.TRANG_THAI != '4'
+                                            )
+                                           OR
+                                        (loaiCanBo != 5 AND canBoXem IS NOT NULL AND canBoXem IN
+                                                                                     (
+                                                                                         SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                                                         from dual
+                                                                                         connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                                                     )
+                                            AND hcthCVD.TRANG_THAI != '1'
+                                            ))
                                    )
                                AND (
                                            loaiCanBo = 0 -- staff
@@ -4032,7 +4071,7 @@ BEGIN
                                                            )
                                                )
                                        OR (
-                                                       loaiCanBo = 2 -- hcth
+                                                       loaiCanBo = 2 -- hcth: manage
                                                    AND (
                                                                (hcthCVD.TRANG_THAI != '1'
                                                                    AND hcthCVD.TRANG_THAI != '4')
@@ -4042,6 +4081,41 @@ BEGIN
                                                                        AND hcthCVD.DON_VI_GUI = '29'
                                                                    )
                                                                OR hcthCVD.TRANG_THAI IS NULL
+                                                           )
+                                               )
+                                       OR (
+                                                       loaiCanBo = 3 -- hcth: login
+                                                   AND (
+                                                               (hcthCVD.TRANG_THAI != '1'
+                                                                   AND hcthCVD.TRANG_THAI != '4')
+                                                               OR hcthCVD.TRANG_THAI IS NULL
+                                                           )
+                                               )
+                                       OR (
+                                                       loaiCanBo = 4 -- admin
+                                                   AND (
+                                                               (hcthCVD.TRANG_THAI != '1'
+                                                                   AND hcthCVD.TRANG_THAI != '4')
+                                                               OR (
+                                                                       (hcthCVD.TRANG_THAI = '1'
+                                                                           OR hcthCVD.TRANG_THAI = '4')
+                                                                       AND hcthCVD.DON_VI_GUI = donViXem
+                                                                   )
+                                                           )
+                                               )
+                                       OR (
+                                                       loaiCanBo = 5 -- chuyên viên soạn thảo
+                                                   AND (
+                                                               (hcthCVD.TRANG_THAI = '1' AND hcthCVD.NGUOI_TAO = canBoXem)
+                                                               OR (
+                                                                           canBoXem IS NOT NULL AND canBoXem IN
+                                                                                                    (
+                                                                                                        SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                                                                        from dual
+                                                                                                        connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                                                                    )
+                                                                       AND hcthCVD.TRANG_THAI != '1'
+                                                                   )
                                                            )
                                                )
                                    )
@@ -4464,6 +4538,38 @@ BEGIN
     ))
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
         ORDER BY 'id' DESC;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_FILE_GET_ALL_FROM(
+    target IN NUMBER,
+    targetType in STRING
+) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+
+    OPEN my_cursor FOR
+        SELECT distinct hcthFile.ID as "id",
+                        hcthFile.NGUOI_TAO as "nguoiTao",
+                        hcthFile.TEN as "ten",
+                        hcthFile.TEN_FILE as "tenFile",
+                        hcthFile.MA as "ma",
+                        hcthFile.THOI_GIAN as "thoiGian",
+                        hcthFile.CAP_NHAT_FILE_ID as "capNhatFileId",
+                        hcthFile.VI_TRI as "viTri",
+                        cb.HO        as "hoNguoiTao",
+                        cb.TEN       as "tenNguoiTao"
+
+
+        FROM HCTH_FILE hcthFile
+                 LEFT JOIN TCHC_CAN_BO cb on hcthFile.NGUOI_TAO = cb.SHCC
+
+
+        WHERE (target is not null and hcthFile.MA= target and targetType = hcthFile.LOAI)
+        ORDER BY hcthFile.THOI_GIAN ASC ;
     RETURN my_cursor;
 END;
 
