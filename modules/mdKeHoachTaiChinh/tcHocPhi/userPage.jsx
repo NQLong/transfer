@@ -134,11 +134,11 @@ class UserPage extends AdminPage {
                             {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b> : <b>Đã thanh toán đủ.</b>
                             }
                         </div>
-                        {/* <Tooltip title='Thanh toán' placement='top' arrow>
+                        <Tooltip title='Thanh toán' placement='top' arrow>
                             <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                 Thanh toán
                             </button>
-                        </Tooltip> */}
+                        </Tooltip>
                         <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
                         {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
                         <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >

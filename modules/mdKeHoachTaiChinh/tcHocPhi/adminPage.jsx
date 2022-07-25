@@ -1,7 +1,7 @@
 import { Tooltip } from '@mui/material';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { SelectAdapter_TcLoaiPhi } from '../tcLoaiPhi/redux';
@@ -73,7 +73,6 @@ class Detail extends AdminModal {
                 T.notify('Cập nhật học phí hiện tại thành công', 'success');
                 this.hide();
             });
-
         }
     }
 
@@ -239,8 +238,9 @@ class TcHocPhiAdminPage extends AdminPage {
             listNganh = this.nganh.value().toString(),
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
-            hocKy = this.term.value();
-        const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy };
+            hocKy = this.term.value(),
+            { tuNgay, denNgay } = this.getTimeFilter();
+        const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
@@ -268,6 +268,25 @@ class TcHocPhiAdminPage extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getTcHocPhiPage(pageN, pageS, pageC, this.state.filter, done);
+    }
+
+    getTimeFilter = () => {
+        let tuNgay = this.tuNgay.value() || null,
+            denNgay = this.denNgay.value() || null;
+        if (tuNgay) {
+            tuNgay.setHours(0, 0, 0, 0);
+            tuNgay = tuNgay.getTime();
+        }
+        if (denNgay) {
+            denNgay.setHours(23, 59, 59, 999);
+            denNgay = denNgay.getTime();
+        }
+        return { tuNgay, denNgay };
+    }
+
+    onDownloadPsc = (e) => {
+        e.preventDefault();
+        T.download(`/api/finance/hoc-phi/download-psc?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx');
     }
 
     render() {
@@ -337,7 +356,8 @@ class TcHocPhiAdminPage extends AdminPage {
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
                 <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
                 <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' onChange={() => this.changeAdvancedSearch()} allowClear multiple />
-
+                <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
+                <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} allowClear />
             </div>,
             breadcrumb: ['Học phí'],
             content:
@@ -352,7 +372,7 @@ class TcHocPhiAdminPage extends AdminPage {
                         <div className='tile'>
                             {table}
                             <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                                getPage={this.props.getTcHocPhiPage} />
+                                getPage={this.getPage} />
                             <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
                             <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
                         </div>

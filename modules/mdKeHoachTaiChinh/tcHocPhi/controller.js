@@ -280,6 +280,8 @@ module.exports = app => {
         app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
     });
 
+
+
     app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:read'), async (req, res) => {
         try {
             let filter = app.parse(req.query.filter, {});

@@ -397,7 +397,7 @@ module.exports = app => {
     const isRelated = async (congVan, donViNhan, req) => {
         try {
             const permissions = req.session.user.permissions;
-            const maDonVi = req.session.user.staff.maDonVi;
+            const maDonVi = req.session.user.staff?.maDonVi;
             if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
                 return true;
             }

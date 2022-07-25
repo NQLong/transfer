@@ -7,6 +7,7 @@ import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/
 import Pagination from 'view/component/Pagination';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { Tooltip } from '@mui/material';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 class TreeModal extends AdminModal {
     state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [], isSemesterMode: false, mucConSwitch: {}, hocKySwitch: {} }
@@ -286,15 +287,19 @@ class CloneModal extends AdminModal {
     }
 }
 class DtChuongTrinhDaoTaoPage extends AdminPage {
-    state = { donViFilter: '', idNamDaoTao: '' }
+    state = { donViFilter: '', idNamDaoTao: '', heDaoTaoFilter: '' }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
-            this.setState({ donViFilter: this.props.system.user.staff?.maDonVi, idNamDaoTao: '' });
+            let permission = this.getUserPermission('dtChuongTrinhDaoTao'),
+                user = this.props.system.user,
+                donViFilter = user.staff?.maDonVi;
+            if (permission.read) donViFilter = '';
+            this.setState({ donViFilter, idNamDaoTao: '', heDaoTaoFilter: '' });
             T.onSearch = (searchText) => this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, {
                 searchTerm: searchText || '',
             });
-            T.showSearchBox();
+            T.showSearchBox(() => { });
             this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
 
         });
@@ -312,10 +317,11 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
             write: permissionDaoTao.write || permissionDaoTao.manage,
             delete: permissionDaoTao.delete || permissionDaoTao.manage
         };
+        const permissionQuanLyDaoTao = this.getUserPermission('quanLyDaoTao', ['manager']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtChuongTrinhDaoTao && this.props.dtChuongTrinhDaoTao.page ?
             this.props.dtChuongTrinhDaoTao.page : {
                 pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, list: [], pageCondition: {
-                    searchTerm: '', donViFilter: this.state.donViFilter, idNamDaoTao: this.state.idNamDaoTao
+                    searchTerm: '', donViFilter: this.state.donViFilter, idNamDaoTao: this.state.idNamDaoTao, heDaoTaoFilter: this.state.heDaoTaoFilter
                 }
             };
 
@@ -370,26 +376,38 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Chương trình đào tạo'
             ],
-            header: permissionDaoTao.read && <><FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '10px' }} placeholder='Năm đào tạo' onChange={value => {
-                T.clearSearchBox();
-                console.log(value);
-                this.setState({ idNamDaoTao: value ? value.id : '' });
-                this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, {
-                    searchTerm: '',
-                    donViFilter: this.state.donViFilter,
-                    namDaoTao: value && value.id
-                });
-            }} data={SelectAdapter_NamDaoTaoFilter} allowClear={true} />
-                <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
+            advanceSearch: permissionDaoTao.read && <div className='row'>
+                <FormSelect className='col-md-4' placeholder='Năm đào tạo' onChange={value => {
+                    T.clearSearchBox();
+                    this.setState({ idNamDaoTao: value ? value.id : '' });
+                    this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, {
+                        searchTerm: '',
+                        donViFilter: this.state.donViFilter,
+                        heDaoTaoFilter: this.state.heDaoTaoFilter,
+                        namDaoTao: value && value.id
+                    });
+                }} data={SelectAdapter_NamDaoTaoFilter} allowClear={true} />
+                <FormSelect className='col-md-4' placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
                     T.clearSearchBox();
                     this.setState({ donViFilter: value ? value.id : '' });
                     this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, {
                         searchTerm: '',
                         donViFilter: value && value.id,
-                        namDaoTao: this.state.idNamDaoTao
+                        namDaoTao: this.state.idNamDaoTao,
+                        heDaoTaoFilter: this.state.heDaoTaoFilter
                     });
                 }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
-            </>,
+                {permissionQuanLyDaoTao.manager ? < FormSelect className='col-md-4' placeholder='Hệ đào tạo' ref={e => this.heDaoTao = e} onChange={value => {
+                    T.clearSearchBox();
+                    this.setState({ heDaoTaoFilter: value ? value.id : '' });
+                    this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, {
+                        searchTerm: '',
+                        donViFilter: this.state.donViFilter,
+                        namDaoTao: this.state.idNamDaoTao,
+                        heDaoTaoFilter: value && value.id,
+                    });
+                }} data={SelectAdapter_DmSvLoaiHinhDaoTao} allowClear={true} /> : null}
+            </div>,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}

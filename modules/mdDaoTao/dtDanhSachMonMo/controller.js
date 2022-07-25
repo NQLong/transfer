@@ -1,8 +1,10 @@
 
 module.exports = app => {
     app.post('/api/dao-tao/danh-sach-mon-mo', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            { hocKy, nam, batDau, ketThuc } = thoiGianMoMon,
+        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        let { loaiHinhDaoTao, bacDaoTao } = req.body;
+        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+        const { hocKy, nam, batDau, ketThuc } = thoiGianMoMon,
             now = new Date().getTime();
         let { data, maNganh } = req.body;
         if (now < batDau || now > ketThuc) {
@@ -31,13 +33,28 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-            idDangKyMoMon = req.query.id;
-        const condition = { ...thoiGianMoMon, idDangKyMoMon };
-        app.model.dtDanhSachMonMo.getCurrent(app.stringify(condition), (error, item) => {
-            // res.send({ error, item });
-            res.send({ error, danhSachMonMo: item.rows, chuongTrinhDaoTao: item.chuongTrinhDaoTao, thoiGianMoMon, thongTinKhoaNganh: item.thongTin[0] });
-        });
+        try {
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
+                idDangKyMoMon = req.query.id,
+                user = req.session.user,
+                permissions = user.permissions;
+            const dangKyMoMon = await app.model.dtDangKyMoMon.get({ id: idDangKyMoMon });
+            let { loaiHinhDaoTao, bacDaoTao } = dangKyMoMon;
+            let currentThoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+            let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
+
+            if (!listLoaiHinhDaoTao.includes('manager') && permissions.includes('dtDangKyMoMon:read')) {
+                if (!listLoaiHinhDaoTao.includes(loaiHinhDaoTao)) throw 'No permission!';
+            }
+            if (!currentThoiGianMoMon || currentThoiGianMoMon.loaiHinhDaoTao != loaiHinhDaoTao) throw 'Hệ đào tạo không có thời gian đăng ký mở môn';
+
+            const condition = { ...currentThoiGianMoMon, idDangKyMoMon };
+            app.model.dtDanhSachMonMo.getCurrent(app.stringify(condition), (error, item) => {
+                res.send({ error, danhSachMonMo: item.rows, chuongTrinhDaoTao: item.chuongTrinhDaoTao, thoiGianMoMon: currentThoiGianMoMon, thongTinKhoaNganh: item.thongTin[0] });
+            });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.post('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {

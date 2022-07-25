@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_TRINH_KY { id, nguoiTao, thoiGian, fileCongVan }
+// Table name: HCTH_CONG_VAN_TRINH_KY { id, nguoiTao, thoiGian, fileCongVan, noiDungHash }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'thoiGian': 'THOI_GIAN', 'fileCongVan': 'FILE_CONG_VAN' };
+const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'thoiGian': 'THOI_GIAN', 'fileCongVan': 'FILE_CONG_VAN', 'noiDungHash': 'NOI_DUNG_HASH' };
 
 module.exports = app => {
     app.model.hcthCongVanTrinhKy = {
@@ -219,6 +219,19 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, shcccanbo, filterparam, searchterm, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_trinh_ky_search_page(:pagenumber, :pagesize, :shcccanbo, :filterparam, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, shcccanbo, filterparam, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        getAllFrom: (fileid, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_trinh_ky_get_from(:fileid); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, fileid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

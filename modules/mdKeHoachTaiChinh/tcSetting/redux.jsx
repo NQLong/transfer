@@ -47,20 +47,35 @@ export function getTcSettingAll(done) {
     };
 }
 
-export function getTcSetting(key, done) {
+export function getTcSettingKeys(keys, done) {
     return dispatch => {
-        const url = '/api/finance/setting';
-        T.get(url, { key }, result => {
+        const url = '/api/finance/setting/keys';
+        T.get(url, { keys: keys.join(',') }, result => {
             if (result.error) {
                 T.notify('Lấy thống tin cấu hình bị lỗi', 'danger');
                 console.error(result.error);
             } else {
-                dispatch({ type: TcSettingUpdate, item: result.item });
-                done && done(result.item);
+                dispatch({ type: TcSettingAll, item: result.items });
+                done && done(result.items);
             }
         }, () => T.notify('Lấy thông tin cấu hình bị lỗi!', 'danger'));
     };
 }
+
+// export function getTcSetting(key, done) {
+//     return dispatch => {
+//         const url = '/api/finance/setting';
+//         T.get(url, { key }, result => {
+//             if (result.error) {
+//                 T.notify('Lấy thống tin cấu hình bị lỗi', 'danger');
+//                 console.error(result.error);
+//             } else {
+//                 dispatch({ type: TcSettingUpdate, item: result.item });
+//                 done && done(result.item);
+//             }
+//         }, () => T.notify('Lấy thông tin cấu hình bị lỗi!', 'danger'));
+//     };
+// }
 
 export function updateTcSetting(changes, done) {
     return dispatch => {

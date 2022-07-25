@@ -95,7 +95,7 @@ export function changeThoiGianDangKyMoMon(item) {
     return { type: DtThoiGianDangKyMoMon, item };
 }
 
-export function saveDangKyMoMon(id, items, done) {
+export function saveDangKyMoMon(id, settings, items, done) {
     let data, isDuyet = 0;
     if (!Array.isArray(items)) {
         data = items.data;
@@ -103,7 +103,7 @@ export function saveDangKyMoMon(id, items, done) {
     } else data = items;
     return () => {
         const url = '/api/dao-tao/dang-ky-mo-mon';
-        T.put(url, { id, data, isDuyet }, result => {
+        T.put(url, { id, data, settings, isDuyet }, result => {
             if (result.error) {
                 T.notify(`Lỗi: ${result.error.message}`, 'danger');
                 console.error(result.error.message);

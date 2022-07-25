@@ -1,26 +1,29 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
+import { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys } from './redux';
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 // import { getTcThongTin } from '../tcThongTin/redux';
+
+const listKeys = ['hocPhiNamHoc', 'hocPhiHocKy', 'email', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditorText', 'hocPhiEmailPhatSinhEditorHtml', 'hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditorText', 'hocPhiEmailHoanTraEditorHtml', 'hocPhiSmsDong', 'hocPhiSmsPhatSinh', 'hocPhiSmsHoanTra'];
 class TcSettingAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/setting', () => {
-            this.props.getTcSettingAll(items => {
-                (items || []).forEach(item => {
-                    if (item.key == 'hocPhiEmailDongEditorHtml') {
-                        this.hocPhiEmailDongEditor.html(item.value);
-                    } else if (item.key == 'hocPhiEmailPhatSinhEditorHtml') {
-                        this.hocPhiEmailPhatSinhEditor.html(item.value);
-                    } else if (item.key == 'hocPhiEmailHoanTraEditorHtml') {
-                        this.hocPhiEmailHoanTraEditor.html(item.value);
-                    } else {
-                        if (item.key == 'hocPhiNamHoc') this.hocPhiNamHocEnd.value(Number(item.value) + 1);
-                        const component = this[item.key];
-                        component && component.value && component.value(item.value);
-                    }
+            this.props.getTcSettingKeys(listKeys,
+                items => {
+                    (items || []).forEach(item => {
+                        if (item.key == 'hocPhiEmailDongEditorHtml') {
+                            this.hocPhiEmailDongEditor.html(item.value);
+                        } else if (item.key == 'hocPhiEmailPhatSinhEditorHtml') {
+                            this.hocPhiEmailPhatSinhEditor.html(item.value);
+                        } else if (item.key == 'hocPhiEmailHoanTraEditorHtml') {
+                            this.hocPhiEmailHoanTraEditor.html(item.value);
+                        } else {
+                            if (item.key == 'hocPhiNamHoc') this.hocPhiNamHocEnd.value(Number(item.value) + 1);
+                            const component = this[item.key];
+                            component && component.value && component.value(item.value);
+                        }
+                    });
                 });
-            });
             // this.props.getTcThongTin(items => this.setState({ dataThongTin: items }));
         });
     }
@@ -229,5 +232,5 @@ class TcSettingAdminPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, TcSetting: state.finance.TcSetting });
-const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting, };
+const mapActionsToProps = { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys };
 export default connect(mapStateToProps, mapActionsToProps)(TcSettingAdminPage);
