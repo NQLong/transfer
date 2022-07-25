@@ -215,5 +215,70 @@ module.exports = app => {
                 }
             });
         }),
+
+        searchPage: (pagenumber, pagesize, filter, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_can_bo_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        download: (filter, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_can_bo_download_excel(:filter, :searchterm); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        getGiangVien: (searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tchc_can_bo_get_giang_vien(:searchterm); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        getLyLich: (mtcb, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tchc_can_bo_get_data_all(:mtcb, :qtChucVu, :qtDaoTao, :qtHocTapCongTac, :toChucKhac, :quanHeGiaDinh); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, mtcb, qtChucVu: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtDaoTao: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtHocTapCongTac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, toChucKhac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, quanHeGiaDinh: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        getDashboardData: (time, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_data(:time, :nhanSuDonVi, :qtDiNuocNgoai, :qtCongTacTrongNuoc, :qtNghiPhep, :qtNghiThaiSan, :nhanSuCongTac); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, time, nhanSuDonVi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtDiNuocNgoai: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtCongTacTrongNuoc: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtNghiPhep: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, qtNghiThaiSan: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhanSuCongTac: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
     };
 };
