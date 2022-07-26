@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, readCongVanDi } from './redux';
+import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, readCongVanDi, getYeuCauKy } from './redux';
 import { Link } from 'react-router-dom';
 import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
 import { AdminPage, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormFileBox, FormTextBox, renderComment, renderTimeline } from 'view/component/AdminPage';
@@ -271,19 +271,18 @@ class AdminEditPage extends AdminPage {
                 T.notify(exception, 'danger');
                 return;
             }
-            this.state.id && this.props.updateHcthCongVanDi(this.state.id, { linkCongVan });
+            this.state.id && this.props.updateHcthCongVanDi(this.state.id, { linkCongVan }, () => response.item.capNhatFileId && this.props.getYeuCauKy(this.state.id));
             this.setState({ listFile });
         }
     }
 
-    deleteFile = (e, index, item) => {
+    deleteFile = (e, item, updateItem) => {
         e.preventDefault();
         const { id: fileId, ten: file } = item;
         T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteFile(this.state.id ? this.state.id : null, fileId, file, () => {
-                let listFile = [...this.state.listFile];
-                listFile.splice(index, 1);
-                this.setState({ listFile });
+            isConfirm && this.props.deleteFile(this.state.id ? this.state.id : null, fileId, updateItem.id, file, () => {
+                let newListFile = this.state.listFile.filter(file => file.id !== fileId && file.capNhatFileId !== fileId);
+                this.setState({ listFile: newListFile.slice(0) }, () => this.props.getYeuCauKy(this.state.id) );
             })
         );
     }
@@ -439,17 +438,18 @@ class AdminEditPage extends AdminPage {
     //     return hcthCongVanDiPermission && hcthCongVanDiPermission.manage;
     // }
 
-    onUpdateFile = (e, id) => {
+    onUpdateFile = (e, id, currentId) => {
         e.preventDefault();
         this.setState({
-            updateFileId: id
+            originFileId: id,
+            updateFileId: currentId
         }, () => {
             this.updateFileRef.current.uploadInput.click();
         });
     }
 
 
-    tableListFile = (data, id, permission, canAddFile) => renderTable({
+    tableListFile = (data, id, permission, canAddFile, listYeuCauKi = []) => renderTable({
         getDataSource: () => data,
         stickyHead: false,
         emptyTable: 'Chưa có file công văn nào!',
@@ -458,7 +458,7 @@ class AdminEditPage extends AdminPage {
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
                 <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Tên tập tin</th>
                 <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Vị trí</th>
-                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Cập nhật lúc</th>
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>
         ),
@@ -480,9 +480,9 @@ class AdminEditPage extends AdminPage {
                         permission.write && canAddFile ? <FormTextBox type='text' placeholder='Nhập vị trí' style={{ marginBottom: 0 }} ref={e => this.listFileRefs[index] = e} onChange={e => this.onViTriChange(e, index)} /> : item.viTri
                     )} />
                     <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={
-                        canAddFile ? e => this.deleteFile(e, index, item) : null}>
-                        {canCreateSignRequest && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(item); }}>
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={itemDetail} permission={permission} onDelete={
+                        canAddFile ? e => this.deleteFile(e, item, itemDetail) : null}>
+                        {canCreateSignRequest && !listYeuCauKi.some(yeuCauKi => yeuCauKi.fileCongVan === itemDetail.id) && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(itemDetail); }}>
                             <i className='fa fa-lg fa-pencil' />
                         </a>}
                         <a className='btn btn-info' href={linkFile} download title='Tải về'>
@@ -491,11 +491,11 @@ class AdminEditPage extends AdminPage {
                         {
                             this.state.id &&
                             <>
-                                <a className='btn btn-primary' title='Cập nhật' onClick={e => this.onUpdateFile(e, item.id)}>
-                                    <i className='fa fa-lg fa-retweet' />
+                                <a className='btn btn-primary' title='Cập nhật' onClick={e => this.onUpdateFile(e, item.id, itemDetail.id)}>
+                                    <i className='fa fa-lg fa-upload' style={{ color: '#ffffff'}}/>
                                 </a>
                                 <a className='btn btn-warning' title='Lịch sử' onClick={() => this.historyFileMoal.show(item)}>
-                                    <i className='fa fa-lg fa-history' />
+                                    <i className='fa fa-lg fa-history' style={{ color: '#ffffff'}} />
                                 </a>
                             </>
                         }
@@ -630,6 +630,8 @@ class AdminEditPage extends AdminPage {
 
         });
 
+        const yeuCauKy = this.props.hcthCongVanDi?.item?.yeuCauKy || [];
+
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
             title: 'Công văn đi',
@@ -700,14 +702,14 @@ class AdminEditPage extends AdminPage {
                         <h3 className='tile-title'>Danh sách công văn</h3>
                         <div className='tile-body row'>
                             <div className={'form-group ' + (this.canAddFile() ? 'col-md-8' : 'col-md-12')}>
-                                {this.tableListFile(groupListFile, this.state.id, permission, this.canAddFile())}
+                                {this.tableListFile(groupListFile, this.state.id, permission, this.canAddFile(), yeuCauKy)}
                             </div>
                             {this.canAddFile() && <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin công văn' postUrl='/user/upload' uploadType='hcthCongVanDiFile' userData='hcthCongVanDiFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />}
                         </div>
                     </div>
                 </div>
 
-                {!isNew && <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item); }} />}
+                {!isNew && <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item); }} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }); }} />}
 
                 {!isNew &&
                     <div className="tile">
@@ -715,11 +717,12 @@ class AdminEditPage extends AdminPage {
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
                     </div>
                 }
+
                 <EditModal ref={e => this.donViGuiNhanModal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonViNhanNgoai} />
                 <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} update={this.props.updateCongVanTrinhKy} {...this.props} congVanId={this.state.id} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }); }} />
                 <FileBox ref={this.updateFileRef} postUrl='/user/upload'
                     uploadType='hcthCongVanDiUpdateFile'
-                    userData={`hcthCongVanDiUpdateFile:${this.state.id}:${this.state.updateFileId}`} style={{ display: 'none' }}
+                    userData={`hcthCongVanDiUpdateFile:${this.state.id}:${this.state.originFileId}:${this.state.updateFileId}`} style={{ display: 'none' }}
                     success={this.onSuccess} ajax={true} />
                 <FileHistoryModal ref={e => this.historyFileMoal = e} data={groupListFile} fileId={this.state.updateFileId} isShowSubmit={false} />
             </>),
@@ -748,6 +751,7 @@ const mapActionsToProps = {
     readCongVanDi,
     createCongVanTrinhKy,
     deleteCongVanTrinhKy,
-    updateCongVanTrinhKy
+    updateCongVanTrinhKy,
+    getYeuCauKy
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
