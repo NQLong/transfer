@@ -69,7 +69,7 @@ const listTrangThai = {
         color: 'green'
     },
     '11': {
-        status: 'Trả lại (Phòng)',
+        status: 'Trả lại (Đơn vị)',
         color: 'red'
     },
     '12': {

@@ -20,7 +20,7 @@ module.exports = {
         CHO_PHAN_PHOI: {id: '8', text: 'Chờ phân phối'},
         CHO_KY: {id: '9', text: 'Chờ ký'},
         DA_PHAN_PHOI: {id:'10', text: 'Đã phân phối'},
-        TRA_LAI_PHONG: {id: '11', text: 'Trả lại (Phòng)'},
+        TRA_LAI_PHONG: {id: '11', text: 'Trả lại (Đơn vị)'},
         TRA_LAI_HCTH: {id: '12', text: 'Trả lại (HCTH)'}
     },
 

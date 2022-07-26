@@ -49,10 +49,6 @@ module.exports = app => {
         const permissions = user.permissions;
         const roles = req.session.user.roles,
             admin = roles && roles.find(o => o.name == 'admin');
-        // console.log(admin);
-        // chuyên viên soạn thảo
-
-        // const unitEditPermission = this.getUserPermission('donViCongVanDi', ['edit']);
 
         donViXem = req.session?.user?.staff?.donViQuanLy || [];
         donViXem = donViXem.map(item => item.maDonVi).toString() || 
@@ -63,24 +59,17 @@ module.exports = app => {
 
         let loaiCanBo = admin ? 4 : 
                         rectorsPermission.login ? 1 : 
-                        hcthManagePermission.manage ? 2: 
-                        (hcthPermission.login && !hcthManagePermission.manage) ? 3 :
-                        permissions.includes('donViCongVanDi:edit') ? 5 : 0; // chuyên viên soạn thảo
-        // console.log(hcth);
-        // if (admin) console.log(donViXem);
+                        (hcthManagePermission.manage || (permissions.includes('donViCongVanDi:manage') && hcthPermission.login))? 2: // chuyên viên quản lý thuộc phòng hcth
+                        (permissions.includes('donViCongVanDi:edit') && hcthPermission.login) ? 6 : //chuyên viên soạn thảo thuộc phòng hcth
+    
+                        permissions.includes('donViCongVanDi:edit') ? 5 :  // chuyên viên soạn thảo
+                        (hcthPermission.login && !hcthManagePermission.manage) ? 3 : 0; // nhân viên phòng hcth
 
-
-        if (!admin && (rectorsPermission.login || hcthPermission.manage|| (hcthPermission.login && !hcthManagePermission.manage) || (!user.isStaff && !user.isStudent) || hcthManagePermission.manage)) {
+        if (!admin && (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent))) {
             donViXem = '';
             canBoXem = '';
-        }
+        } 
 
-        if (!admin && permissions.includes('donViCongVanDi:edit')) {
-            donViXem = '';
-        }
-
-        // if (admin) console.log('2' + donViXem);
-        // console.log('3 ' + loaiCanBo);
         if (congVanYear && Number(congVanYear) > 1900) {
             timeType = 1;
             fromTime = new Date(`${congVanYear}-01-01`).getTime();
