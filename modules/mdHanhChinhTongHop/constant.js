@@ -97,7 +97,7 @@ module.exports = {
 
         'CONG_VAN_DI': {
             id: 'CONG_VAN_DI',
-            text: 'Công văn các phòng',
+            text: 'Công văn đi',
         }
     },
 
