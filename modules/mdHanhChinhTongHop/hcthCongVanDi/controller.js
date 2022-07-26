@@ -51,10 +51,10 @@ module.exports = app => {
             admin = roles && roles.find(o => o.name == 'admin');
 
         donViXem = req.session?.user?.staff?.donViQuanLy || [];
-        donViXem = donViXem.map(item => item.maDonVi).toString() || 
-        // chuyên viên quản lý và chuyên viên soạn thảo
-                    ((permissions.includes('donViCongVanDi:manage') || permissions.includes('donViCongVanDi:edit')) && req.session?.user?.staff?.maDonVi) 
-                    || '';
+        donViXem = donViXem.map(item => item.maDonVi).toString() ||
+            // chuyên viên quản lý và chuyên viên soạn thảo
+            ((permissions.includes('donViCongVanDi:manage') || permissions.includes('donViCongVanDi:edit')) && req.session?.user?.staff?.maDonVi)
+            || '';
         canBoXem = req.session?.user?.shcc || '';
 
         let loaiCanBo = admin ? 4 : 
@@ -76,7 +76,7 @@ module.exports = app => {
             toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
         }
 
-        const dataFilter = {canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status};
+        const dataFilter = { canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status };
         console.log(dataFilter);
 
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, page) => {
@@ -475,7 +475,7 @@ module.exports = app => {
             if (!(await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            else if(congVan?.trangThai == '5' && req.session.user?.shcc) {
+            else if (congVan?.trangThai == '5' && req.session.user?.shcc) {
                 await viewCongVan(id, req.session.user.shcc, congVan.nguoiTao);
             }
 
@@ -484,7 +484,7 @@ module.exports = app => {
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
             const vanBanTrinhKy = [];
-            
+
             // if (files.length > 0) {
             //     await Promise.all(files.map(async (file) => {
             //         const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(file.id);
@@ -553,81 +553,79 @@ module.exports = app => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
-    const createNotification = (emails, notification, done) => {
-        const promises = [];
-        emails.forEach(email => {
-            promises.push(app.notification.send({
+    const createNotification = async (emails, notification) => {
+        return await Promise.all(emails.map(async email => {
+            await app.notification.send({
                 toEmail: email,
                 ...notification
-            }));
-        });
-        Promise.all(promises).then(() => done(null)).catch((error) => done(error));
+            });
+        }));
     };
 
-    const createStaffNotification = (item, status) => new Promise((resolve, reject) => {
-        app.model.hcthCongVanDi.getAllStaff(item.id, (error, staffs) => {
-            if (error) return reject(error);
-            else {
-                const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` }, error => {
-                    error ? reject(error) : resolve();
-                });
-            }
-        });
-    });
+    const createStaffNotification = async(item, status) => {
+        const staff = await app.model.hcthCongVanDi.getAllStaff(item.id);
+
+        const emails = staff.rows.map(item => item.email);
+
+        await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+    }
 
     // Đang gửi cho phòng Hcth
-    const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
-        app.model.hcthCongVanDi.getHcthStaff((error, staffs) => {
-            if (error) reject(error);
-            else {
-                const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` }, error => {
-                    if (error) reject(error);
-                    else resolve();
+    const createHcthStaffNotification = async (item, status) => {
+        const hcthStaff = await app.model.hcthCongVanDi.getHcthStaff();
+        const emails = hcthStaff.rows.map(item => item.email);
+        await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` });
+
+    };
+
+    // Đang gửi cho phòng chuyên viên quản lý hoặc trưởng phòng
+    const createCanBoQuanLyNotification = async (item, status) => {
+        let listEmail = [];
+
+        const manageStaff = await app.model.canBo.get({ maDonVi: item.donViGui, chucVu: '003' }, 'shcc, email');
+        if (manageStaff && manageStaff.shcc !== item.nguoiTao) listEmail.push(manageStaff.email);
+
+        const manageCongVanDiStaff = await app.model.fwAssignRole.getAll({ nguoiGan: manageStaff.shcc, tenRole: 'donViCongVanDi:manage' }, 'nguoiDuocGan');
+
+        if (manageCongVanDiStaff.length > 0) {
+            const listShcc = manageCongVanDiStaff.map(staff => staff.nguoiDuocGan).filter(shcc => shcc !== item.nguoiTao);
+
+            const canBos = await app.model.canBo.getAll({
+                statement: 'shcc IN (:dsCanBo)',
+                parameter: {
+                    dsCanBo: [...listShcc, ''],
                 }
-                );
-            }
-        });
-    });
+            }, 'email, shcc', 'email');
 
-    // Đang gửi cho cô Lan
-    const createSchoolAdministratorNotification = (item, status) => new Promise((resolve, reject) => {
-        app.model.canBo.get({ shcc: '001.0068' }, 'email', '', (error, staff) => {
-            if (error) reject(error);
-            else {
-                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
-                resolve();
-            }
-        });
-    });
+            const listStaffEmail = canBos.map(canBo => canBo.email);
+            listEmail = [...listEmail, ...listStaffEmail];
+        }
 
-    // Đang gửi trả lại
-    const createAuthorNotification = (id, shcc, status) => new Promise((resolve, reject) => {
-        app.model.canBo.get({ shcc: shcc }, 'email', '', (error, staff) => {
-            if (error) reject(error);
-            else {
-                console.log('author notification');
-                app.notification.send({ toEmail: staff.email, title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
-                resolve();
-            }
-        });
-    });
+        await createNotification(listEmail, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần xem xét', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
 
-    // Gửi email cho cán bộ ký
-    const createSignNotification = (item, status) => new Promise((resolve, reject) => {
-        app.model.hcthCongVanDi.getSignStaff(item.id, (error, staffs) => {
-            if (error) reject(error);
-            else {
-                const emails = staffs.rows.map(item => item.email);
-                // console.log(item);
-                // console.log(staffs);
-                createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}`}, error => {
-                    error ? reject(error) : resolve();
-                });
-            }
-        });
-    });
+    };
+
+    // Đang gửi cho hiệu trưởng
+    const createSchoolAdministratorNotification = async(item, status) => {
+        const principal = await app.model.canBo.get({ shcc: '001.0068' }, 'shcc, email');
+        await createNotification([principal.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+    };
+
+    // Gửi cho người tạo
+    const createAuthorNotification = async (id, shcc, status) => {
+        const staff = await app.model.canBo.get({ shcc: shcc }, 'email');
+
+        await createNotification([staff.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}`});
+    }
+
+    // Gửi cho cán bộ ký
+    const createSignNotification = async (item, status) => {
+        const signStaff = await app.model.hcthCongVanDi.getSignStaff(item.id);
+        
+        const emails = signStaff.rows.map(item => item.email);
+
+        await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+    }
 
     // Phân quyền Quản lý công văn đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
@@ -698,7 +696,7 @@ module.exports = app => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
         if (req.query.nhomRole && req.query.nhomRole === soanThaoCongVanDiRole && userPermissions.includes('manager:write')) {
             const assignRolesList = app.assignRoleHooks.get(soanThaoCongVanDiRole).map(item => item.id);
-            return roles && roles.length && assignRolesList.contains(roles); 
+            return roles && roles.length && assignRolesList.contains(roles);
         }
     });
 
@@ -781,8 +779,8 @@ module.exports = app => {
                 else return action.APPROVE;
             case trangThaiCongVanDi.DA_XEM_XET.id:
             case trangThaiCongVanDi.DA_DUYET.id:
-                return action.WAIT_SIGN; 
-                //Từ chờ phân phối -> chờ ký hoặc đã phân phối
+                return action.WAIT_SIGN;
+            //Từ chờ phân phối -> chờ ký hoặc đã phân phối
             case trangThaiCongVanDi.CHO_PHAN_PHOI.id:
                 if (after == trangThaiCongVanDi.CHO_KY.id) return action.WAIT_SIGN;
                 else if (after == trangThaiCongVanDi.TRA_LAI_HCTH.id) return action.RETURN; 
@@ -1046,41 +1044,20 @@ module.exports = app => {
         });
     });
 
-    const onStatusChange = (item, before, after, shcc) =>
-        new Promise((resolve) => {
-            try {
-                if (before == after) resolve();
-                else if ([trangThaiCongVanDi.CHO_KIEM_TRA.id, trangThaiCongVanDi.CHO_PHAN_PHOI.id].includes(after)) {
-                    createHcthStaffNotification(item, after).then(() => resolve()).catch((error) => {
-                        throw error;
-                    });
-                } else if (after == trangThaiCongVanDi.CHO_DUYET.id) {
-                    createSchoolAdministratorNotification(item, after).then(() => resolve()).catch((error) => {
-                        throw error;
-                    });
-                } else if (after == trangThaiCongVanDi.DA_XEM_XET.id) {
-                    createStaffNotification(item, after).then(() => resolve()).catch((error) => {
-                        throw error;
-                    });
-                } else if (after == trangThaiCongVanDi.TRA_LAI.id) {
-                    createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch((error) => {
-                        throw error;
-                    });
-                } else if ([trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.TRA_LAI_HCTH.id].includes(after)) {
-                    console.log('da tra lai phong');
-                    createAuthorNotification(item.id, shcc, after).then(() => resolve()).catch((error) => {
-                        throw error;
-                    });
-                } else if (after == trangThaiCongVanDi.CHO_KY.id) {
-                    console.log('đang chờ ký');
-                    createSignNotification(item, after).then(() => resolve()).catch((error) => {
-                        throw error;
-                    });
-                }
-                resolve();
-            } catch (error) {
-                console.error(error);
-                resolve();
-            }
-        });
+    const onStatusChange = async (item, before, after, shcc) => {
+        if (trangThaiCongVanDi.XEM_XET.id == after) {
+            await createCanBoQuanLyNotification(item, after);
+        }
+        else if ([trangThaiCongVanDi.CHO_KIEM_TRA.id, trangThaiCongVanDi.CHO_PHAN_PHOI.id].includes(after)) {
+            await createHcthStaffNotification(item, after);
+        } else if (after == trangThaiCongVanDi.CHO_DUYET.id) {
+            await createSchoolAdministratorNotification(item, after);
+        } else if (after == trangThaiCongVanDi.DA_PHAN_PHOI.id) {
+            await createStaffNotification(item, after);
+        } else if ([trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.TRA_LAI_HCTH.id, trangThaiCongVanDi.TRA_LAI.id].includes(after)) {
+            await createAuthorNotification(item.id, shcc, after);
+        } else if (after == trangThaiCongVanDi.CHO_KY.id) {
+            await createSignNotification(item, after);
+        }
+    };
 };
