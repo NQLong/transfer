@@ -42,7 +42,7 @@ const listTrangThai = {
         color: 'red'
     },
     '5': {
-        status: 'Đã gửi',
+        status: 'Đã xem xét',
         color: 'green'
     },
     '7': {
@@ -107,6 +107,8 @@ const actionToText = (value) => {
             return 'cập nhật 1 yêu cầu trình ký ở';
         case action.WAIT_SIGN:
             return 'chuyển trạng thái sang chờ ký tại';
+        case action.DISTRIBUTE:
+            return 'đã phân phối';
         default:
             return '';
     }
@@ -409,7 +411,7 @@ class AdminEditPage extends AdminPage {
     //     });
     // }
 
-    onDestribute = (e) => {
+    onDistribute = (e) => {
         e.preventDefault();
         T.confirm('Thông báo', 'Bạn có chắc chắn muốn bắt đầu ký công văn này không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
@@ -464,14 +466,14 @@ class AdminEditPage extends AdminPage {
                     newTrangThai = trangThaiCongVanDi.CHO_KIEM_TRA.id;
                     this.onChangeStatus(newTrangThai, () => this.getData());
                 } else {
-                    newTrangThai = trangThaiCongVanDi.DA_GUI.id;
+                    newTrangThai = trangThaiCongVanDi.DA_XEM_XET.id;
                     this.onChangeStatus(newTrangThai, () => this.getData());
                 }
             }
         });
     }
 
-    onSendDestribute = (e) => {
+    onSendDistribute = (e) => {
         e.preventDefault();
         const data = this.getValidatedData();
         if (data) {
@@ -580,7 +582,7 @@ class AdminEditPage extends AdminPage {
         return this.state.id && this.state.trangThai == '3' && this.getUserPermission('rectors', ['login']).login;
     }
 
-    canDestribute = () => {
+    canDistribute = () => {
         let checkStatus = (this.state.trangThai == trangThaiCongVanDi.CHO_PHAN_PHOI.id),
         hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
         checkPermission = hcthManagePermission.manage;
@@ -597,7 +599,7 @@ class AdminEditPage extends AdminPage {
     }
 
     canSeeNumber = () => {
-        return this.state.id && [trangThaiCongVanDi.DA_DUYET.id, trangThaiCongVanDi.DA_GUI.id].includes(this.state.trangThai);
+        return this.state.id && [trangThaiCongVanDi.DA_DUYET.id, trangThaiCongVanDi.DA_XEM_XET.id].includes(this.state.trangThai);
     }
 
     canReadOnly = () => {
@@ -609,7 +611,7 @@ class AdminEditPage extends AdminPage {
 
     canCheckRead = () => {
         let checkRead = true;
-        if (this.state.trangThai == trangThaiCongVanDi.DA_GUI.id) {
+        if (this.state.trangThai == trangThaiCongVanDi.DA_XEM_XET.id) {
             if (this.getUserPermission('hcth', ['login', 'manage']).login && !this.state.donViNhan.includes('29')) {
                 checkRead = false;
             } else if (this.getUserPermission('rectors', ['login']).login && !this.state.donViNhan.includes('68')) {
@@ -695,8 +697,8 @@ class AdminEditPage extends AdminPage {
 
         this.canInspect() && buttons.push({ className: 'btn-success', icon: 'fa-solid fa-bug', onClick: this.onInspect });
         this.canSend() && buttons.push({ className: 'btn-success', icon: 'fa-solid fa-paper-plane', onClick: this.onSend });
-        this.canDestribute() && buttons.push({ className: 'btn-warning', icon: 'fa-solid fa-duck', onClick: this.onDestribute });
-        this.canSendDistribute() && buttons.push({ className: 'btn-primary', icon: 'fa-check', onClick: this.onSendDestribute });
+        this.canDistribute() && buttons.push({ className: 'btn-warning', icon: 'fa-solid fa-duck', onClick: this.onDistribute });
+        this.canSendDistribute() && buttons.push({ className: 'btn-primary', icon: 'fa-check', onClick: this.onSendDistribute });
 
         if (this.state.trangThai == '5') {
             buttons.push({ className: 'btn-success', icon: 'fa-solid fa-eye', onClick: this.onReadCvDi });

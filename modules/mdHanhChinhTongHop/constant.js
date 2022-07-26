@@ -15,7 +15,7 @@ module.exports = {
         CHO_KIEM_TRA: { id: '2', text: 'Chờ kiểm tra' },
         CHO_DUYET: { id: '3', text: 'Chờ duyệt' },
         TRA_LAI: { id: '4', text: 'Trả lại' },
-        DA_GUI: { id: '5', text: 'Đã gửi' },
+        DA_XEM_XET: { id: '5', text: 'Đã xem xét' },
         DA_DUYET: { id: '7', text: 'Đã duyệt' },
         CHO_PHAN_PHOI: {id: '8', text: 'Chờ phân phối'},
         CHO_KY: {id: '9', text: 'Chờ ký'},
@@ -46,7 +46,7 @@ module.exports = {
         REMOVE_SIGN_REQUEST: 'REMOVE_SIGN_REQUEST',
         UPDATE_SIGN_REQUEST: 'UPDATE_SIGN_REQUEST',
         WAIT_SIGN: 'WAIT_SIGN',
-        DESTRIBUTE: 'DESTRIBUTE'
+        DISTRIBUTE: 'DISTRIBUTE'
     },
 
     CONG_VAN_TYPE: 'DEN',
