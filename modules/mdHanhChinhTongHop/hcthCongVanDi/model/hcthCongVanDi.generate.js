@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao, laySoTuDong, nguoiTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO', 'laySoTuDong': 'LAY_SO_TU_DONG', 'nguoiTao': 'NGUOI_TAO' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
@@ -297,6 +297,19 @@ module.exports = app => {
         downloadExcel: (macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_download_excel(:macanbo, :donvigui, :donvi, :loaicongvan, :loaivanban, :donvinhanngoai, :donvixem, :canboxem, :loaicanbo, :status, :timetype, :fromtime, :totime, :searchterm, :totalitem); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        getSignStaff: (congvanid, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_sign_staff(:congvanid); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

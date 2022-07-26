@@ -217,29 +217,17 @@ export const SelectAdapter_CongVanDi = {
     fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
 };
 
-
-// export function createHistory(data, done) {
-//     return () => {
-//         const url = '/api/hcth/cong-van-cac-phong/lich-su';
-//         T.put(url, { data: data }, res => {
-//             if (res.error) {
-//                 T.notify('Thêm lịch sử bị lỗi', 'danger');
-//                 console.error('PUT: ' + url + '. ' + res.error);
-//             } else {
-//                 done && done(data);
-//             }
-//         }, () => T.notify('Thêm lịch sử bị lỗi', 'danger'));
-//     };
-// }
-
 export function updateStatus(data, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/status';
+        // console.log('hello');
         T.put(url, { data }, res => {
             if (res.error) {
+                console.log('hello1');
                 T.notify('Cập nhật trạng thái công văn bị lỗi,1', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
             } else {
+                console.log('hello2');
                 T.notify('Cập nhật trạng thái công văn thành công', 'success');
                 done && done(data);
             }

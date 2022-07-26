@@ -6895,6 +6895,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "LAY_SO_TU_DONG": {
+                    "value": "laySoTuDong",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NGUOI_TAO": {
+                    "value": "nguoiTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
