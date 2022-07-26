@@ -631,8 +631,8 @@ module.exports = app => {
             if (error) reject(error);
             else {
                 const emails = staffs.rows.map(item => item.email);
-                console.log(item);
-                console.log(staffs);
+                // console.log(item);
+                // console.log(staffs);
                 createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}`}, error => {
                     error ? reject(error) : resolve();
                 });
@@ -790,14 +790,14 @@ module.exports = app => {
             case trangThaiCongVanDi.CHO_DUYET.id:
                 if (after == trangThaiCongVanDi.TRA_LAI.id) return action.RETURN;
                 else return action.APPROVE;
-            case trangThaiCongVanDi.DA_GUI.id:
+            case trangThaiCongVanDi.DA_XEM_XET.id:
             case trangThaiCongVanDi.DA_DUYET.id:
                 return action.WAIT_SIGN; 
                 //Từ chờ phân phối -> chờ ký hoặc đã phân phối
             case trangThaiCongVanDi.CHO_PHAN_PHOI.id:
                 if (after == trangThaiCongVanDi.CHO_KY.id) return action.WAIT_SIGN;
                 else if (after == trangThaiCongVanDi.TRA_LAI_HCTH.id) return action.RETURN; 
-                else return action.DESTRIBUTE;
+                else return action.DISTRIBUTE;
             case trangThaiCongVanDi.TRA_LAI_HCTH.id:
                 return action.SEND;
             default:
@@ -825,13 +825,14 @@ module.exports = app => {
             if (congVan.trangThai == trangThai || !trangThai) {
                 res.send({ error: null, item: congVan });
             } else {
-                if (trangThai == trangThaiCongVanDi.DA_GUI.id) {
+                if (trangThai == trangThaiCongVanDi.DA_XEM_XET.id) {
                     await createSoCongVan(id, donViGui);
                 }
-                if (trangThai == trangThaiCongVanDi.CHO_PHAN_PHOI.id) {
+                if (trangThai == trangThaiCongVanDi.CHO_KY.id) {
                     const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ congVan: id });
-                    // console.log()
-                    if (congVanTrinhKy?.rows.length == 0) {
+                    console.log(congVanTrinhKy);
+                    if (!congVanTrinhKy) {
+                        console.log('ok');
                         trangThai = trangThaiCongVanDi.DA_PHAN_PHOI.id;
                     }
                 }
@@ -845,11 +846,11 @@ module.exports = app => {
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
                 const canBoTao = congVan.nguoiTao;
+                const newCongVan = await updateCongVanDi(id, { trangThai });
                 if (canBoTao){
                     await onStatusChange(congVan, congVan.trangThai, trangThai, canBoTao);
                 }
                 console.log(trangThai);
-                const newCongVan = await updateCongVanDi(id, { trangThai });
                 res.send({ newCongVan });
             }
         } catch (error) {
@@ -1068,7 +1069,7 @@ module.exports = app => {
                     createSchoolAdministratorNotification(item, after).then(() => resolve()).catch((error) => {
                         throw error;
                     });
-                } else if (after == trangThaiCongVanDi.DA_GUI.id) {
+                } else if (after == trangThaiCongVanDi.DA_XEM_XET.id) {
                     createStaffNotification(item, after).then(() => resolve()).catch((error) => {
                         throw error;
                     });
@@ -1087,6 +1088,7 @@ module.exports = app => {
                         throw error;
                     });
                 }
+                resolve();
             } catch (error) {
                 console.error(error);
                 resolve();

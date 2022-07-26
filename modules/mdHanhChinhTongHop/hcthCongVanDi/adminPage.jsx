@@ -49,7 +49,7 @@ const listTrangThai = {
         color: 'red'
     },
     '5': {
-        status: 'Đã gửi',
+        status: 'Đã xem xét',
         color: 'green'
     },
     '7': {
