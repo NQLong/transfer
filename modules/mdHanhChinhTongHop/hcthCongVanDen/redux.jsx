@@ -220,7 +220,6 @@ export function updateStatus(data, done) {
     return () => {
         const url = '/api/hcth/cong-van-den/status';
         T.put(url, { data }, res => {
-            console.log(res);
             if (res.error) {
                 T.notify('Cập nhật công văn đến bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
