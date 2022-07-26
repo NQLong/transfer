@@ -6802,7 +6802,8 @@
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
                 "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
                 "hcth_cong_van_di_search_selector": "searchSelector",
-                "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel"
+                "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel",
+                "HCTH_CONG_VAN_DI_GET_SIGN_STAFF": "getSignStaff"
             },
             "columns": {
                 "ID": {
@@ -14172,6 +14173,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
+                },
+                "CONG_VAN": {
+                    "value": "congVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
