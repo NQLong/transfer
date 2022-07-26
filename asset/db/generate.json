@@ -14135,7 +14135,7 @@
             "modelName": "hcthCongVanTrinhKy",
             "methods": {
                 "HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE": "searchPage",
-                "HCTH_CONG_VAN_TRINH_KY_GET_FROM": "getAllFrom"
+                "HCTH_CONG_VAN_TRINH_KY_GET_ALL_FROM": "getAllFrom"
             },
             "columns": {
                 "ID": {
@@ -14172,6 +14172,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
+                },
+                "CONG_VAN": {
+                    "value": "congVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
