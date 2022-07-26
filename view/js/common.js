@@ -427,15 +427,11 @@ let languages = ['vi', 'en'];
 T.language = texts => {
     let lg = 'vi', pathname = window.location.pathname, query = new URLSearchParams(window.location.search);
     const lang = query.get('lang');
-    const cookieLg = T.cookie('language');
 
     if (pathname.endsWith('/en') || pathname.startsWith('/news-en') || pathname.startsWith('/article')) {
         lg = 'en';
     } else if (lang && languages.includes(lang.toLowerCase())) {
         lg = lang.toLowerCase();
-        T.cookie('language', lang.toLowerCase());
-    } else if (cookieLg && languages.includes(cookieLg.toLowerCase())) {
-        lg = cookieLg.toLowerCase();
     }
 
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
@@ -446,23 +442,25 @@ T.language.setLanguages = _languages => {
 };
 
 T.language.next = () => {
-    const cookieLg = T.cookie('language');
-    if (!cookieLg) return languages[0];
-    let index = languages.indexOf(cookieLg);
+    const lg = T.language();
+    if (!lg) return languages[0];
+    let index = languages.indexOf(lg);
     if (index == -1) index = 0; // No language
     else index++; // Next language
     if (index >= languages.length) index -= languages.length; // If larger than length, reset
     return languages[index];
 };
+
 T.language.current = () => {
-    const cookieLg = T.cookie('language');
-    return cookieLg ? cookieLg : languages[0];
+    const lg = T.language();
+    return lg ? lg : languages[0];
 };
+
 T.language.switch = () => {
     const language = T.language.next();
-    T.cookie('language', language);
     return { language };
 };
+
 T.language.parse = (text, getAll, parseLanguages) => {
     let obj = {};
     try { obj = JSON.parse(text); } catch (e) { obj = {}; }
@@ -475,6 +473,7 @@ T.language.parse = (text, getAll, parseLanguages) => {
         return getAll ? obj : obj[T.language()];
     }
 };
+
 T.language.getMonth = () => ({
     vi: ['Tháng một', 'Tháng hai', 'Tháng ba', 'Tháng tư', 'Tháng năm', 'Tháng sáu', 'Tháng bảy', 'Tháng tám', 'Tháng chín', 'Tháng mười', 'Tháng mười một', 'Tháng mười hai'],
     en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']

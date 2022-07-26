@@ -7,8 +7,7 @@ module.exports = app => {
         { name: 'menu:read', },
         { name: 'menu:write', },
         { name: 'menu:delete', },
-        { name: 'menu:manage', menu },
-
+        { name: 'menu:manage', menu }
     );
 
     app.get('/user/menu/edit/:id', app.permission.check('system:settings'), app.templates.admin);
