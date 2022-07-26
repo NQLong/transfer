@@ -847,11 +847,20 @@ module.exports = (app) => {
         }
     };
 
+    const createDistributingNotification = async (item) => {
+        const canBos = await app.model.hcthCongVanDen.getAuthorizedStaff();
+        const emails = canBos.rows.map(canBo => canBo.email);
+
+        const notificationPromise = new Promise((resolve, reject) => createNotification(emails, { title: 'Công văn đến cần phân phối', icon: 'fa-book', subTitle: 'Bạn có một công văn đến cần kiểm tra và phân phối.', iconColor: 'info', link: `/user/hcth/cong-van-den/${item.id}` }, (error) => error ? reject(error) : resolve()
+        ));
+        return await notificationPromise;
+    };
+
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
         try {
             if (before == after)
                 resolve();
-            if (after == trangThaiSwitcher.CHO_DUYET.id) {
+            else if (after == trangThaiSwitcher.CHO_DUYET.id) {
                 createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
                 sendChiDaoCongVanDenMailToRectors(item);
             }
@@ -862,6 +871,11 @@ module.exports = (app) => {
                 createRelatedStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
                 sendMailToRelatedStaff(item);
             }
+            else if (after == trangThaiSwitcher.CHO_PHAN_PHOI.id) {
+                createDistributingNotification(item).then(() => resolve()).catch(error => { throw error; });
+            }
+            else
+                resolve();
         } catch (error) {
             console.error('fail to send notification', error);
             resolve();

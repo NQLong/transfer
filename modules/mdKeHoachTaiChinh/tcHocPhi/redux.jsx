@@ -68,6 +68,19 @@ export function getTcHocPhiPage(pageNumber, pageSize, pageCondition, pageFilter,
     };
 }
 
+export function getStatisticTcHocPhi(filter, done) {
+    const url = '/api/finance/statistic';
+    T.get(url, { filter }, result => {
+        if (result.error) {
+            T.notify('Thống kê bị lỗi', 'danger');
+            console.error(result.error);
+        }
+        else {
+            done && done(result);
+        }
+    });
+}
+
 export function getTcHocPhiTransactionByMssv(mssv, done) {
     return () => {
         const url = `/api/finance/hoc-phi-transactions/${mssv}`;
@@ -144,6 +157,7 @@ export function getAllHocPhiStudent(mssv, done) {
         });
     };
 }
+
 export function getHocPhi(mssv, done) {
     return dispatch => {
         const url = '/api/finance/user/hoc-phi';
