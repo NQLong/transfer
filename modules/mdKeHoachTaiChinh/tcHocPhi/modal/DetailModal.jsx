@@ -39,10 +39,9 @@ export default class Detail extends AdminModal {
                 T.confirm('Đã tồn tại loại phí này', 'Bạn có muốn ghi đè số tiền hiện tại không?', 'warning', true, isConfirm => {
                     if (isConfirm) {
                         T.notify('Ghi đè thành công!', 'success');
-                        hocPhiDetail.map(item => {
+                        hocPhiDetail.forEach(item => {
                             if (item.loaiPhi == data.loaiPhi) item.soTien = parseInt(data.soTien);
                             item.ngayTao = data.ngayTao;
-                            return item;
                         });
                         this.setState({ hocPhiDetail, isChanged: true });
                         this.loaiPhi.clear();
@@ -67,7 +66,6 @@ export default class Detail extends AdminModal {
         let table = renderTable({
             emptyTable: 'Không có dữ liệu học phí',
             header: 'thead-light',
-            size: 'medium',
             getDataSource: () => hocPhiDetail,
             renderHead: () => (
                 <tr>
@@ -78,9 +76,9 @@ export default class Detail extends AdminModal {
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell type='number' content={index + 1} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiPhi} />
-                    <TableCell type='number' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={item.soTien || ''} />
+                    <TableCell type='number' style={{ whiteSpace: 'nowrap' }} content={item.soTien || ''} />
                 </tr>
             )
         });
