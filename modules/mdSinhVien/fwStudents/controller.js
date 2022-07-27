@@ -118,6 +118,8 @@ module.exports = app => {
 
             let data = await app.model.fwStudents.getData(user.studentId);
             data = data.rows[0];
+            data.ngaySinh = app.date.viDateFormat(new Date(data.ngaySinh));
+            data.cmndNgayCap = app.date.viDateFormat(new Date(data.cmndNgayCap));
             if (data.ngayVaoDang) {
                 data.dav = 'X';
                 data.ngayVaoDang = app.date.viDateFormat(new Date(data.ngayVaoDang));
