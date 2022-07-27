@@ -214,7 +214,7 @@ class HcthCongVanDi extends AdminPage {
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu công văn đi',
             getDataSource: () => list,
-            stickyHead: false,
+            stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>

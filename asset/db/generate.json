@@ -6803,7 +6803,8 @@
                 "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
                 "hcth_cong_van_di_search_selector": "searchSelector",
                 "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel",
-                "HCTH_CONG_VAN_DI_GET_SIGN_STAFF": "getSignStaff"
+                "HCTH_CONG_VAN_DI_GET_SIGN_STAFF": "getSignStaff",
+                "HCTH_CONG_VAN_DI_VALIDATE_SO_CONG_VAN": "validateSoCongVan"
             },
             "columns": {
                 "ID": {

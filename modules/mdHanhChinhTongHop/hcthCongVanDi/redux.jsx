@@ -75,7 +75,7 @@ export function createHcthCongVanDi(data, done) {
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Thêm công văn đi bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('POST: ' + url + '. ', res.error);
             } else {
                 T.notify('Thêm công văn đi thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
@@ -272,5 +272,21 @@ export function readCongVanDi(data, done) {
             }
         }, () => T.notify('Đọc công văn lỗi', 'danger'));
     };
+}
+
+export function publishingCongVanDi(id, done) {
+    return () => {
+        const url = `/api/hcth/cong-van-cac-phong/publishing/${id}`
+        T.put(url, {}, res => {
+            if (res.error) {
+                T.notify('Câp nhật công văn thất bại. ' + (res.error.message || ''), 'danger');
+                console.error(`PUT: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Câp nhật công văn thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Câp nhật công văn thất bại', 'danger'))
+    }
 }
 

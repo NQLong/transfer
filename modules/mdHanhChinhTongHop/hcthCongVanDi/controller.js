@@ -1,7 +1,7 @@
 module.exports = app => {
     const FILE_TYPE = 'DI';
 
-    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, } = require('../constant');
+    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, loaiCongVan } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -783,7 +783,7 @@ module.exports = app => {
             //Từ chờ phân phối -> chờ ký hoặc đã phân phối
             case trangThaiCongVanDi.CHO_PHAN_PHOI.id:
                 if (after == trangThaiCongVanDi.CHO_KY.id) return action.WAIT_SIGN;
-                else if (after == trangThaiCongVanDi.TRA_LAI_HCTH.id) return action.RETURN; 
+                else if (after == trangThaiCongVanDi.TRA_LAI_HCTH.id) return action.RETURN;
                 else return action.DISTRIBUTE;
             case trangThaiCongVanDi.TRA_LAI_HCTH.id:
                 return action.SEND;
@@ -834,7 +834,7 @@ module.exports = app => {
                 });
                 const canBoTao = congVan.nguoiTao;
                 const newCongVan = await updateCongVanDi(id, { trangThai });
-                if (canBoTao){
+                if (canBoTao) {
                     await onStatusChange(congVan, congVan.trangThai, trangThai, canBoTao);
                 }
                 console.log(trangThai);
@@ -1060,4 +1060,39 @@ module.exports = app => {
             await createSignNotification(item, after);
         }
     };
+
+
+    //api chuyển từ giai đoạn soạn thảo sang phát hành
+    app.put('/api/hcth/cong-van-cac-phong/publishing/:id', app.permission.check('staff:login'), async (req, res) => {
+        // TODO: viết cho trường hợp có cán bộ ký
+        try {
+            const id = Number(req.params.id);
+            const congVan = await app.model.hcthCongVanDi.get({ id });
+            if (!congVan) throw 'Công văn không tồn tại';
+            if (congVan.loaiCongVan == loaiCongVan.DON_VI.id) {
+                // TODO: check quyền throw '...'
+                if (congVan.trangThai != trangThaiCongVanDi.DA_XEM_XET.id) throw 'Trạng thái công văn không hợp lệ';
+                const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAll({ congVan: id });
+                const trangThaiMoi = congVanTrinhKy.length ? trangThaiCongVanDi.CHO_KY.id : trangThaiCongVanDi.DA_PHAN_PHOI.id;
+                if (!congVan.laySoTuDong) {
+                    const currentYear = new Date().getFullYear();
+                    const firstDayOfYear = new Date(currentYear, 0, 1);
+                    const nam = Date.parse(firstDayOfYear);
+                    try {
+                        await app.model.hcthCongVanDi.validateSoCongVan(Number(id), congVan.donViGui, nam, trangThaiMoi);
+                    } catch {
+                        throw { message: 'Số công văn không hợp lệ' };
+                    }
+                } else await app.model.hcthCongVanDi.update({ id }, { trangThai: trangThaiMoi });
+                // TODO: gửi thông báo nếu có công văn trình ký
+                return res.send({});
+            }
+            else {
+                //
+            }
+        } catch (error) {
+            console.error(error);
+            return res.send({ error });
+        }
+    });
 };
