@@ -475,7 +475,7 @@ module.exports = app => {
             if (!(await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            else if (congVan?.trangThai == '5' && req.session.user?.shcc) {
+            else if (congVan?.trangThai == trangThaiCongVanDi.DA_PHAN_PHOI.id && req.session.user?.shcc) {
                 await viewCongVan(id, req.session.user.shcc, congVan.nguoiTao);
             }
 
@@ -568,7 +568,7 @@ module.exports = app => {
         const emails = staff.rows.map(item => item.email);
 
         await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
-    }
+    };
 
     // Đang gửi cho phòng Hcth
     const createHcthStaffNotification = async (item, status) => {
@@ -616,7 +616,7 @@ module.exports = app => {
         const staff = await app.model.canBo.get({ shcc: shcc }, 'email');
 
         await createNotification([staff.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}`});
-    }
+    };
 
     // Gửi cho cán bộ ký
     const createSignNotification = async (item, status) => {
@@ -625,7 +625,7 @@ module.exports = app => {
         const emails = signStaff.rows.map(item => item.email);
 
         await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
-    }
+    };
 
     // Phân quyền Quản lý công văn đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
