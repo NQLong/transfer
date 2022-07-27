@@ -2,6 +2,7 @@ import React from 'react';
 import { FormTabs } from 'view/component/AdminPage';
 
 export class FormMultipleLanguage extends React.Component {
+    static defaultProps = { languages: ['vi', 'en'] }
     randomId = T.randomPassword();
     state = { elements: [] };
     element = {};
@@ -14,7 +15,7 @@ export class FormMultipleLanguage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.languages && prevProps.languages.length && this.props.languages && this.props.languages.length && prevProps.languages.toString() != this.props.languages.toString()) {
+        if (prevProps.languages && this.props.languages && this.props.languages.length && prevProps.languages.toString() != this.props.languages.toString()) {
             this.init(() => this.value(this._text));
         }
     }
@@ -61,7 +62,7 @@ export class FormMultipleLanguage extends React.Component {
                 const jsonText = T.language.parse(text, true, languages);
                 languages.forEach(code => {
                     if (this.element[code] && this.element[code].value) {
-                        this.element[code].value(jsonText[code]);
+                        this.element[code].value(jsonText[code] || '');
                     }
                 });
             }

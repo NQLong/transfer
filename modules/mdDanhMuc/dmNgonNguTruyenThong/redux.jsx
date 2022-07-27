@@ -21,8 +21,8 @@ export function getDmNgonNguAll(condition, done) {
                 T.notify('Lấy danh sách ngôn ngữ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.items);
                 dispatch({ type: DmNgonNguGetAll, items: data.items ? data.items : [] });
+                if (done) done(data.items);
             }
         }, () => T.notify('Lấy danh sách ngôn ngữ bị lỗi!', 'danger'));
     };

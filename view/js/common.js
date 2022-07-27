@@ -464,8 +464,9 @@ T.language.switch = () => {
 T.language.parse = (text, getAll, parseLanguages) => {
     let obj = {};
     try { obj = JSON.parse(text); } catch (e) { obj = {}; }
+    const objLength = Object.keys(obj).length;
     (parseLanguages && Array.isArray(parseLanguages) ? parseLanguages : languages).forEach(language => {
-        if (obj[language] == null && !Object.keys(obj).length) obj[language] = text;
+        if (obj[language] == null && !objLength) obj[language] = text;
     });
     if (typeof getAll == 'string' && (parseLanguages && Array.isArray(parseLanguages) ? parseLanguages : languages).includes(getAll)) {
         return obj[getAll];

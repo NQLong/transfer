@@ -3,17 +3,23 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getAll, createMenu, updateMenuPriorities, updateMenu, deleteMenu, buildMenu } from './redux';
 import { getAllSubMenu, createSubMenu, updateSubMenu, deleteSubMenu, swapSubMenu } from './reduxSubMenu';
+import { getDmNgonNguAll } from 'modules/mdDanhMuc/dmNgonNguTruyenThong/redux';
 import { getHeader, updateHeader } from './reduxHeader';
 import { AdminModal, AdminPage, FormCheckbox, FormImageBox, FormTextBox } from 'view/component/AdminPage';
+import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
 
 class EditModal extends AdminModal {
-    state = { menu: null };
+    state = { menu: null, languages: [] };
+
+    componentDidMount() {
+        this.props.getDmNgonNguAll({}, languages => {
+            this.setState({ languages: languages.map(item => item.maCode) });
+        });
+    }
 
     onShow = menu => {
         let { title, link, active, highlight } = menu || { title: '{ "vi": "", "en": "" }', link: '', active: false, highlight: false, id: '' };
-        title = T.language.parse(title, true);
-        this.submenuViTitle.value(title.vi || '');
-        this.submenuEnTitle.value(title.en || '');
+        this.submenuTitle.value(title);
         this.submenuLink.value(link);
         this.submenuActive.value(active);
         this.submenuHighlight.value(highlight);
@@ -22,7 +28,7 @@ class EditModal extends AdminModal {
 
     onSubmit = () => {
         const changes = {
-            title: JSON.stringify({ vi: this.submenuViTitle.value(), en: this.submenuEnTitle.value() }),
+            title: this.submenuTitle.value(),
             link: this.submenuLink.value(),
             active: Number(this.submenuActive.value()),
             highlight: Number(this.submenuHighlight.value())
@@ -39,13 +45,18 @@ class EditModal extends AdminModal {
     render = () => {
         return this.renderModal({
             title: this.state.menu ? 'Cập nhật menu phụ' : 'Tạo mới menu phụ',
+            size: 'large',
             body: <>
+                <FormMultipleLanguage ref={e => this.submenuTitle = e} gridClassName='col-6' languages={this.state.languages} FormElement={FormTextBox} title='Tiêu đề' />
                 <div className='row'>
-                    <FormTextBox ref={e => this.submenuViTitle = e} className='col-12' label='Tiêu đề (VI)' />
-                    <FormTextBox ref={e => this.submenuEnTitle = e} className='col-12' label='Tiêu đề (EN)' />
-                    <FormTextBox ref={e => this.submenuLink = e} className='col-12' label='Link' />
-                    <FormCheckbox ref={e => this.submenuActive = e} className='col-6' label='Kích hoạt' />
-                    <FormCheckbox ref={e => this.submenuHighlight = e} className='col-6' label='Nổi bật' />
+                    <FormTextBox ref={e => this.submenuLink = e} className='col-6' label='Link' />
+                    <div className='col-6'>
+                        <label>&nbsp;</label>
+                        <div className='row'>
+                            <FormCheckbox ref={e => this.submenuActive = e} className='col-6' label='Kích hoạt' />
+                            <FormCheckbox ref={e => this.submenuHighlight = e} className='col-6' label='Nổi bật' />
+                        </div>
+                    </div>
                 </div>
             </>
         });
@@ -302,12 +313,12 @@ class MenuPage extends AdminPage {
                     <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: 10, bottom: 10 }} onClick={() => this.props.history.push('/user/component')}>
                         <i className='fa fa-lg fa-cogs' />
                     </button> : null}
-                <EditModal ref={e => this.modal = e} create={this.createSubMenu} update={this.props.updateSubMenu} delete={this.props.deleteSubMenu} hasCreate={permission.write} hasUpdate={permission.write} hasDelete={permission.delete} />
+                <EditModal ref={e => this.modal = e} create={this.createSubMenu} update={this.props.updateSubMenu} delete={this.props.deleteSubMenu} hasCreate={permission.write} hasUpdate={permission.write} hasDelete={permission.delete} getDmNgonNguAll={this.props.getDmNgonNguAll} />
             </>
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, menu: state.menu, submenu: state.submenu });
-const mapActionsToProps = { getAll, createMenu, updateMenuPriorities, updateMenu, deleteMenu, buildMenu, getAllSubMenu, createSubMenu, updateSubMenu, deleteSubMenu, getHeader, updateHeader, swapSubMenu };
+const mapActionsToProps = { getAll, createMenu, updateMenuPriorities, updateMenu, deleteMenu, buildMenu, getAllSubMenu, createSubMenu, updateSubMenu, deleteSubMenu, getHeader, updateHeader, swapSubMenu, getDmNgonNguAll };
 export default connect(mapStateToProps, mapActionsToProps)(MenuPage);
