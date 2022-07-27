@@ -57,19 +57,35 @@ class EditModal extends AdminModal {
 }
 
 class DtDanhSachChuyenNganhPage extends AdminPage {
-    state = { filter: {} }
+    state = { page: null, filter: {}, idNamDaoTao: '', donVi: '' }
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
+            T.showSearchBox(true);
+        });
+        this.changeAdvancedSearch(true);
+    }
 
-            this.getPage();
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.dtDanhSachChuyenNganh && this.props.dtDanhSachChuyenNganh.page ? this.props.dtDanhSachChuyenNganh.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
+        const donVi = this.donViFilter.value(),
+            nam = this.nam.value();
+        const pageFilter = (isInitial) ? {} : { nam, donVi };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, pageCondition, () => {
+                if (isInitial) {
+                    ['nam', 'donViFilter'].forEach(e => {
+                        this[e].value('');
+                    });
+                    this.hideAdvanceSearch();
+                }
+            });
         });
     }
 
-    getPage = (pageS, pageN, pageC) => {
-        this.props.getDtDanhSachChuyenNganhPage(pageS, pageN, pageC, this.state.filter);
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getDtDanhSachChuyenNganhPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     delete = (e, item) => {
@@ -90,7 +106,6 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
             this.props.dtDanhSachChuyenNganh.page : {
                 pageNumber: 1, pageSize: 200, pageTotal: 1, pageCondition: '', totalItem: 0, list: null
             };
-
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -124,31 +139,23 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
                 'Danh sách chuyên ngành'
             ],
             content: <>
-                {permissionDaoTao.read &&
-                    <div className='tile'>
-                        <div className='tile-title'><h3>Tra cứu</h3></div>
-                        <div className='row'>
-                            <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id || '' } })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
-                            <FormSelect type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value?.id || '' } })} data={SelectAdapter_DtCauTrucKhungDaoTao} />
-                            <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
-                                <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => {
-                                    e.preventDefault();
-                                    this.getPage();
-                                    T.notify('Đã xóa bộ lọc', 'info');
-                                }}>
-                                    <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
-                                </button>
-                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.getPage()}>
-                                    <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
-                                </button>
-                            </div>
-                        </div>
-                    </div>}
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDtDanhSachChuyenNganhPage} />
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write} readOnlyKhoa={!permissionDaoTao.write} update={this.props.updateDtDanhSachChuyenNganh} create={this.props.createDtDanhSachChuyenNganh} khoa={this.state.donVi} />
             </>,
             backRoute: '/user/dao-tao',
+            advanceSearch: <div className='row'>
+                <FormSelect ref={e => this.nam = e} className='col-md-4' placeholder='Năm đào tạo' data={SelectAdapter_DtCauTrucKhungDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value?.id } })} allowClear />
+                <FormSelect ref={e => this.donViFilter = e} className='col-md-4' placeholder='Danh sách Khoa, bộ môn' data={SelectAdapter_DmDonViFaculty_V2} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id } })} allowClear />
+                <div style={{ display: 'flex', justifyContent: 'end' }} className='form-group col-md-12'>
+                    <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.changeAdvancedSearch(true)} style={{ marginRight: '15px' }}>
+                        <i className='fa fa-lg fa-times' /> Reset
+                    </button>
+                    <button className='btn btn-success' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                        <i className='fa fa-lg fa-search-plus' /> Tìm
+                    </button>
+                </div>
+            </div>,
             onCreate: permission.write ? (e) => e.preventDefault() || this.modal.show() : null
         });
     }

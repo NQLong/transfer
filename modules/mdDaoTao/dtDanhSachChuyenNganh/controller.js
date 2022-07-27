@@ -23,15 +23,26 @@ module.exports = app => {
 
     //APIs -------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/page/:pageNumber/:pageSize', checkDaoTaoPermission, (req, res) => {
-        let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let filter = app.stringify({ ...req.query.filter, maNganh: req.query.maNganh, nam: req.query.namHoc }),
-            searchTerm = req.query.searchTerm || '';
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+
+        let filter = req.query.filter || {},
+            donVi = filter.donVi,
+            idNamDaoTao = filter.idNamDaoTao;
+
+        filter = app.stringify(app.clone(filter, { donVi, idNamDaoTao }));
+
         app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
-            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-            const pageCondition = searchTerm;
-            res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
         });
+
     });
 
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/item/:id', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
