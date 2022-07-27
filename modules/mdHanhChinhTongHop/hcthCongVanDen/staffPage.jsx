@@ -160,7 +160,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             style: { marginTop: '5px' },
             getDataSource: () => this.state.loading ? null : list,
             emptyTable: 'Không có dữ liệu công văn đến',
-            stickyHead: false,
+            stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>

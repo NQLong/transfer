@@ -78,7 +78,7 @@ export function createHcthCongVanDi(data, done) {
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Thêm công văn đi bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                console.error('POST: ' + url + '. ', res.error);
             } else {
                 T.notify('Thêm công văn đi thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
@@ -220,29 +220,17 @@ export const SelectAdapter_CongVanDi = {
     fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
 };
 
-
-// export function createHistory(data, done) {
-//     return () => {
-//         const url = '/api/hcth/cong-van-cac-phong/lich-su';
-//         T.put(url, { data: data }, res => {
-//             if (res.error) {
-//                 T.notify('Thêm lịch sử bị lỗi', 'danger');
-//                 console.error('PUT: ' + url + '. ' + res.error);
-//             } else {
-//                 done && done(data);
-//             }
-//         }, () => T.notify('Thêm lịch sử bị lỗi', 'danger'));
-//     };
-// }
-
 export function updateStatus(data, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/status';
+        // console.log('hello');
         T.put(url, { data }, res => {
             if (res.error) {
+                console.log('hello1');
                 T.notify('Cập nhật trạng thái công văn bị lỗi,1', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
             } else {
+                console.log('hello2');
                 T.notify('Cập nhật trạng thái công văn thành công', 'success');
                 done && done(data);
             }
@@ -301,6 +289,22 @@ export function readCongVanDi(data, done) {
                 done && done();
             }
         }, () => T.notify('Đọc công văn lỗi', 'danger'));
+    };
+}
+
+export function publishingCongVanDi(id, done) {
+    return () => {
+        const url = `/api/hcth/cong-van-cac-phong/publishing/${id}`;
+        T.put(url, {}, res => {
+            if (res.error) {
+                T.notify('Câp nhật công văn thất bại. ' + (res.error.message || ''), 'danger');
+                console.error(`PUT: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Câp nhật công văn thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Câp nhật công văn thất bại', 'danger'));
     };
 }
 
