@@ -418,11 +418,21 @@ module.exports = app => {
                 path = app.assetPath + '/congVanDi/' + (id ? id + '/' : 'new/'),
                 filePath = path + file;
 
+            // xoa file goc
+
             await app.model.hcthFile.delete({ id: fileId, ma: congVan });
+
+            const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan: fileId, congVan });
+
+            if (congVanTrinhKy) {
+                await app.model.hcthCongVanTrinhKy.delete({ fileCongVan: fileId, congVan });
+                await app.model.hcthCanBoKy.delete({ congVanTrinhKy: congVanTrinhKy.id });
+            }
 
             if (app.fs.existsSync(filePath))
                 await app.deleteFile(filePath);
 
+            // xoa cac file cap nhat
             const checkUpdateFile = await app.model.hcthFile.get({ ma: congVan, capNhatFileId: fileId });
 
             if (checkUpdateFile) {
@@ -431,7 +441,12 @@ module.exports = app => {
                 listUpdateFile.forEach(file => {
                     if (app.fs.existsSync(path + file)) app.deleteFile(path + file);
                 });
-                await app.model.hcthCongVanTrinhKy.delete({ fileCongVan: updateFileId, congVan });
+
+                const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan: updateFileId, congVan });
+                if (congVanTrinhKy) {
+                    await app.model.hcthCongVanTrinhKy.delete({ fileCongVan: updateFileId, congVan });
+                    await app.model.hcthCanBoKy.delete({ congVanTrinhKy: congVanTrinhKy.id });
+                }
             }
 
             res.send({ error: null });

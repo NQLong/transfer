@@ -5,13 +5,13 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 export class YeuCauKyModal extends AdminModal {
 
     onShow = (item) => {
-        const { id, tenFile, shccNguoiTao, thoiGian, danhSachShccCanBoKy } = item;
-        this.ten?.value(tenFile || '');
-        this.nguoiTao?.value(shccNguoiTao || '');
+        const { id, ten, nguoiTao, thoiGian, danhSachShccCanBoKy } = item;
+        this.ten?.value(ten || '');
+        this.nguoiTao?.value(nguoiTao || '');
         this.thoiGian?.value(thoiGian ? new Date(thoiGian) : '');
         const canBoKy = danhSachShccCanBoKy?.split(',') || '';
         this.canBoKy?.value(canBoKy);
-        this.setState({ id, ten: tenFile, canBoKy });
+        this.setState({ id, ten, canBoKy });
     }
 
 
@@ -62,7 +62,7 @@ export class YeuCauKy extends React.Component {
     deleteFile = (e, item) => {
         e.preventDefault();
         const { id: fileId, congVanId } = item;
-        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa văn bản trình ký này, văn bản sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
+        T.confirm('Yêu cầu ký', 'Bạn có chắc muốn xóa yêu cầu ký này, yêu cầu ý sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
             isConfirm && this.props.deleteCongVanTrinhKy(fileId, congVanId, () => {
                 this.props.getYeuCauKy(congVanId, () => this.props.onSubmitCallback());
             })
@@ -92,7 +92,7 @@ export class YeuCauKy extends React.Component {
                 const danhSachCanBoKy = item.danhSachTenCanBoKy.split(',');
                 return <tr key={item.id}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={item.tenFile} />
+                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={item.ten} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                         <>
                             <span>{danhSachCanBoKy && danhSachCanBoKy.length > 0 ? danhSachCanBoKy.map((canBo, index) => (

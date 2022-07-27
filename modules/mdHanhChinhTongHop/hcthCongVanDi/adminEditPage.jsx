@@ -482,7 +482,7 @@ class AdminEditPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={itemDetail} permission={permission} onDelete={
                         canAddFile ? e => this.deleteFile(e, item, itemDetail) : null}>
-                        {canCreateSignRequest && !listYeuCauKi.some(yeuCauKi => yeuCauKi.fileCongVan === itemDetail.id) && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(itemDetail); }}>
+                        {this.state.id && canCreateSignRequest && !listYeuCauKi.some(yeuCauKi => yeuCauKi.fileCongVan === itemDetail.id) && <a className='btn btn-success' title='Tạo yêu cầu ký' style={{ color: 'white' }} onClick={e => { e.preventDefault(); this.yeuCauKyModal.show(itemDetail); }}>
                             <i className='fa fa-lg fa-pencil' />
                         </a>}
                         <a className='btn btn-info' href={linkFile} download title='Tải về'>
