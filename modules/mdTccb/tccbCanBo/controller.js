@@ -20,6 +20,8 @@ module.exports = app => {
         { name: 'staff:delete' }
     );
 
+
+
     app.get('/user/profile', app.permission.check('staff:login'), app.templates.admin);
 
     app.get('/user/tccb/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
@@ -38,6 +40,9 @@ module.exports = app => {
     //Hook staff-------------------------------------------------------------------------------------------------
     app.permissionHooks.add('staff', 'checkKhoaBoMon', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi) {
+            if (staff.maDonVi == '30') {
+                app.permissionHooks.pushUserPermission(user, 'staff:read', 'staff:write', 'staff:delete');
+            }
             let permissionLoaiDonVi = {
                 1: 'faculty:login',
                 2: 'department:login',
@@ -1622,6 +1627,10 @@ module.exports = app => {
 
     app.get('/api/staff/by-email/:email', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
+    });
+
+    app.put('/api/user/staff', app.permission.check('staff:read'), (req, res) => {
+        app.model.canBo.put({ email: req.body.email }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/staff/quan-he', app.permission.check('staff:login'), (req, res) => {

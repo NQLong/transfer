@@ -66,7 +66,7 @@ class EditModal extends AdminModal {
         });
     };
 
-    
+
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
@@ -119,7 +119,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-6' ref={e => this.vietTat = e} label='Mục đích' data={SelectAdapter_DmMucDichTrongNuoc} readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.lyDo = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác trong nước (tối đa 500 ký tự)' required maxLength={500} />
                 <FormSelect className='col-md-12' multiple={true} ref={e => this.noiDen = e} label='Nơi đến' data={SelectAdapter_DmTinhThanhPhoV2} required readOnly={readOnly} />
-                <FormRichTextBox className='col-md-12' ref={e => this.kinhPhi = e} rows={2} type='text' label='Kinh phí' readOnly={readOnly} placeholder='Nhập kinh phí (tối đa 200 ký tự)' maxLength={200}/>
+                <FormRichTextBox className='col-md-12' ref={e => this.kinhPhi = e} rows={2} type='text' label='Kinh phí' readOnly={readOnly} placeholder='Nhập kinh phí (tối đa 200 ký tự)' maxLength={200} />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Ngày đi'
                     label={
@@ -187,7 +187,7 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                     this.timeType?.value(filter.timeType);
                     this.tinhTrang?.value(filter.tinhTrang);
                     this.mucDich?.value(filter.mucDich);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang || filter.mucDich )) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang || filter.mucDich)) this.showAdvanceSearch();
                 }
             });
         });
@@ -215,10 +215,9 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
     handleTime = (value) => {
         value ? this.setState({ visibleTime: true }) : this.setState({ visibleTime: false });
     }
-    
+
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtCongTacTrongNuoc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtCongTacTrongNuoc', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtCongTacTrongNuoc && this.props.qtCongTacTrongNuoc.pageMa ? this.props.qtCongTacTrongNuoc.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -230,7 +229,7 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số công văn</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
@@ -258,9 +257,9 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                                 {(item.tenDonVi || '')}
                             </>
                         )} />
-                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
+                        <TableCell type='text' style={{ color: 'blue' }} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
                         <TableCell type='text' content={(<b> {item.soCv || ''} </b>)} />
-                        <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachTinh || '')} />
+                        <TableCell type='text' style={{ color: 'blue' }} content={(item.danhSachTinh || '')} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />
                         <TableCell type='text' contentClassName='multiple-lines-5' content={(item.lyDo || '')} />
                         <TableCell type='text' content={(
@@ -301,7 +300,7 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                         </>}
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
-                            { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }, { id: 3, text: 'Chưa diễn ra'},
+                            { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }, { id: 3, text: 'Chưa diễn ra' },
                         ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichTrongNuoc} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
@@ -312,19 +311,19 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.shcc}
+                <EditModal ref={e => this.modal = e}
+                    readOnly={!permission.write} shcc={this.shcc}
                     create={this.props.createQtCongTacTrongNuocGroupPageMa} update={this.props.updateQtCongTacTrongNuocGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/cong-tac-trong-nuoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
+            onExport: permission && permission.export ? (e) => {
                 e.preventDefault();
                 const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang, loaiHocVi, mucDich } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
 
                 T.download(T.url(`/api/qua-trinh/cong-tac-trong-nuoc/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}/${mucDich ? mucDich : null}`), 'congtactrongnuoc.xlsx');
-            }
+            } : null
         });
     }
 }

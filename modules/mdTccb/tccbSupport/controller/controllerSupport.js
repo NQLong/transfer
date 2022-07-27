@@ -20,22 +20,22 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'tccbSupport:read', menu },
+        { name: 'tccbSupport:manage', menu },
         { name: 'staff:login', menu: menuStaff },
         { name: 'tccbSupport:write' },
         { name: 'tccbSupport:delete' },
     );
 
-    app.get('/user/tccb/support', app.permission.check('tccbSupport:read'), app.templates.admin);
+    app.get('/user/tccb/support', app.permission.check('tccbSupport:manage'), app.templates.admin);
     app.get('/user/support', app.permission.check('staff:login'), app.templates.admin);
 
     //APIs-------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/support/page/:pageNumber/:pageSize', app.permission.orCheck('tccbSupport:read', 'staff:login'), (req, res) => {
+    app.get('/api/tccb/support/page/:pageNumber/:pageSize', app.permission.orCheck('tccbSupport:manage', 'staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             permissions = req.session.user.permissions;
         let shcc = req.session.user?.staff?.shcc;
-        if (permissions.includes('tccbSupport:read')) shcc = '';
+        if (permissions.includes('tccbSupport:manage')) shcc = '';
         let condition = { shcc };
         app.model.tccbSupport.searchPage(pageNumber, pageSize, app.stringify(condition), '', (error, page) => {
             if (error || page == null) {

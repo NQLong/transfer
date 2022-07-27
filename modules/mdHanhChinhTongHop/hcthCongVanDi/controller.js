@@ -6,14 +6,14 @@ module.exports = app => {
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            502: { title: 'Công văn các phòng', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
+            502: { title: 'Công văn đi', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
 
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1053: { title: 'Công văn các phòng', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
+            1053: { title: 'Công văn đi', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
         },
     };
     app.permission.add(
@@ -437,18 +437,18 @@ module.exports = app => {
             }
             const congVan = await app.model.hcthCongVanDi.get({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
-            if (!(await isRelated(congVan, donViNhan, req))) {
+            if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
             const files = await app.model.hcthFile.getAll({ ma: id, loai: 'DI' }, '*', 'thoiGian');
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
             const vanBanTrinhKy = [];
-            
+
             if (files.length > 0) {
                 await Promise.all(files.map(async (file) => {
                     const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(file.id);
-                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({...item, ten: file.ten })));
+                    vanBanTrinhKy.push(...congVanTrinhKy?.rows.map(item => ({ ...item, ten: file.ten })));
                 }));
             }
 
@@ -575,7 +575,7 @@ module.exports = app => {
     // Phân quyền Quản lý công văn đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
 
-    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý công văn các phòng trong đơn vị' });
+    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý công văn đi trong đơn vị' });
 
     app.assignRoleHooks.addHook(quanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -605,7 +605,7 @@ module.exports = app => {
     // Phân quyền hành chính tổng hợp - Quản lí công văn đi
 
     const hcthQuanLyCongVanDiRole = 'hcthQuanLyCongVanDi';
-    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn các phòng' });
+    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đi' });
 
     app.assignRoleHooks.addHook(hcthQuanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];

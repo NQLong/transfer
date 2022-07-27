@@ -52,12 +52,19 @@ module.exports = app => {
         { name: 'qtKhenThuongAll:read', menu },
         { name: 'qtKhenThuongAll:write' },
         { name: 'qtKhenThuongAll:delete' },
-        { name: 'qtKhenThuongAll:upload' }
+        { name: 'qtKhenThuongAll:export' }
     );
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all/upload', app.permission.check('qtKhenThuongAll:write'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all/groupDt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/khen-thuong-all', app.permission.check('staff:login'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRoleQtKhenThuongAll', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtKhenThuongAll:read', 'qtKhenThuongAll:write', 'qtKhenThuongAll:delete', 'qtKhenThuongAll:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
@@ -218,14 +225,14 @@ module.exports = app => {
         });
     });
 
-    app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
+    app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:delete'), (req, res) => {
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Khen thưởng');
             res.send({ error });
         });
     });
 
-    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:filter', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:filter', app.permission.check('qtKhenThuongAll:export'), (req, res) => {
         app.model.qtKhenThuongAll.download(req.params.filter, (error, page) => {
             if (error) {
                 res.send({ error });
@@ -471,7 +478,7 @@ module.exports = app => {
     app.uploadHooks.add('KhenThuongAllDataFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => khenThuongImportData(fields, files, done), done, 'qtKhenThuongAll:write'));
 
-    app.get('/api/qua-trinh/khen-thuong-all/download-template', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
+    app.get('/api/qua-trinh/khen-thuong-all/download-template', app.permission.check('qtKhenThuongAll:export'), (req, res) => {
         const workBook = app.excel.create();
         const ws = workBook.addWorksheet('Khen_thuong_Template');
         const defaultColumns = [

@@ -202,10 +202,9 @@ module.exports = app => {
                 for (let i = 0; i < user.roles.length; i++) {
                     let role = user.roles[i];
                     if (role.name == 'admin') {
-                        user.permissions = app.permission.all().filter(item => !item.endsWith(':classify'));
-                        break;
-                    }
-                    else (role.permission ? role.permission.split(',') : []).forEach(permission => app.permissionHooks.pushUserPermission(user, permission.trim()));
+                        user.permissions = app.permission.all().filter(permission => !permission.endsWith(':classify') && (permission.endsWith(':login') || permission.endsWith(':read')));
+                    } else
+                        (role.permission ? role.permission.split(',') : []).forEach(permission => app.permissionHooks.pushUserPermission(user, permission.trim()));
                 }
 
                 // Add login permission => user.active == 1 => user:login
@@ -231,7 +230,7 @@ module.exports = app => {
                                 listChucVu: [],
                                 maDonVi: item.maDonVi,
                             };
-                            if (item.tienSi || item.chucDanh || item.hocVi == '02' || item.hocVi == '01') app.permissionHooks.pushUserPermission(user, 'doctor:login'); //Tiến sĩ trở lên
+                            if (item.tienSi || item.chucDanh || item.hocVi == '02' || item.hocVi == '01') app.permissionHooks.pushUserPermission(user, 'staff:doctor'); //Tiến sĩ trở lên
                             const condition = {
                                 statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
                                 parameter: {

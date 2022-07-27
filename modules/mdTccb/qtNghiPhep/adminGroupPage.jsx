@@ -54,7 +54,7 @@ class EditModal extends AdminModal {
             }
             this.props.getAll(shcc, items => {
                 const solve = (idx = 0) => {
-                    if (idx == items.length)  {
+                    if (idx == items.length) {
                         resolve(result);
                         return;
                     }
@@ -247,10 +247,10 @@ class EditModal extends AdminModal {
                         soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                     });
                 }
-                
+
             });
         } else {
-            this.setState({ lyDoKhac: false, ngayPhepLyDo: value.soNgayPhep}, () => {
+            this.setState({ lyDoKhac: false, ngayPhepLyDo: value.soNgayPhep }, () => {
                 $('#lyDoKhac').hide();
                 let { batDau, ketThuc, ngayPhepLyDo } = this.state;
                 if (batDau && ketThuc) {
@@ -274,13 +274,13 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} required readOnly />
-                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
-                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
+                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue' }}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br /></span>}
+                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue' }}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br /></span>}
                 <FormSelect className='col-md-8' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
                 <FormTextBox className='col-md-4' type='number' ref={e => this.ngayDiDuong = e} label='Ngày đi đường' readOnly={readOnly} onChange={this.handleNgayDiDuong} />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
-            
+
                 <div className='form-group col-md-5'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -295,8 +295,8 @@ class EditModal extends AdminModal {
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <span className='form-group col-md-5' style={{ color: 'blue'}}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>  }</span>
-                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-7' style={{ color: 'blue'}}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep} ngày </b></>}</span> }
+                <span className='form-group col-md-5' style={{ color: 'blue' }}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>}</span>
+                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-7' style={{ color: 'blue' }}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep} ngày </b></>}</span>}
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Ghi chú (tối đa 200 ký tự)' />
             </div>
         });
@@ -304,7 +304,7 @@ class EditModal extends AdminModal {
 }
 
 class QtNghiPhepGroupPage extends AdminPage {
-    state = { filter: {}, danhSachNgayLe: [], ngayBatDauCongTac: 0};
+    state = { filter: {}, danhSachNgayLe: [], ngayBatDauCongTac: 0 };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -318,7 +318,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                         let danhSachNgay = (items || []).map(item => item.ngay);
                         let ngay = 0;
                         if (item && item.item) ngay = item.item.ngayBatDauCongTac;
-                        this.setState({ 
+                        this.setState({
                             danhSachNgayLe: danhSachNgay,
                             ngayBatDauCongTac: ngay
                         });
@@ -357,7 +357,7 @@ class QtNghiPhepGroupPage extends AdminPage {
             toYear.setHours(23, 59, 59, 999);
             toYear = toYear.getTime();
         }
-        
+
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
         const tinhTrang = this.tinhTrang.value() == '' ? null : this.tinhTrang.value();
@@ -405,7 +405,7 @@ class QtNghiPhepGroupPage extends AdminPage {
 
 
     render() {
-        const permission = this.getUserPermission('qtNghiPhep');
+        const permission = this.getUserPermission('qtNghiPhep', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiPhep && this.props.qtNghiPhep.pageMa ? this.props.qtNghiPhep.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -419,9 +419,9 @@ class QtNghiPhepGroupPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do nghỉ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br/>xin nghỉ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đi<br/>đường</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br/>tính phép</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br />xin nghỉ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đi<br />đường</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số ngày<br />tính phép</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -462,7 +462,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                         <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />
                         <TableCell type='text' content={(
                             <>
-                                <span>{(item.batDau <= item.today && item.ketThuc >= item.today) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : (item.ketThuc < item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br/>thúc nghỉ</span> : <span style={{ color: 'black', whiteSpace: 'nowrap' }}>Chưa diễn ra</span>}</span>
+                                <span>{(item.batDau <= item.today && item.ketThuc >= item.today) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : (item.ketThuc < item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br />thúc nghỉ</span> : <span style={{ color: 'black', whiteSpace: 'nowrap' }}>Chưa diễn ra</span>}</span>
                             </>
                         )}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -483,12 +483,12 @@ class QtNghiPhepGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian (bắt đầu)'  />
-                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian (bắt đầu)'  />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.lyDo = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiPhepV2}  allowClear={true} minimumResultsForSearch={-1} />
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian (bắt đầu)' />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian (bắt đầu)' />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.lyDo = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiPhepV2} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-2' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
-                            { id: 1, text: 'Đã kết thúc nghỉ' }, { id: 2, text: 'Đang nghỉ' }, { id : 3, text: 'Chưa diễn ra'}
+                            { id: 1, text: 'Đã kết thúc nghỉ' }, { id: 2, text: 'Đang nghỉ' }, { id: 3, text: 'Chưa diễn ra' }
                         ]} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
@@ -514,12 +514,12 @@ class QtNghiPhepGroupPage extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/nghi-phep',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
+            onExport: permission && permission.export ? (e) => {
                 e.preventDefault();
                 const filter = T.stringify(this.state.filter);
 
                 T.download(T.url(`/api/qua-trinh/nghi-phep/download-excel/${filter}`), 'nghiphep.xlsx');
-            }
+            } : null,
         });
     }
 }

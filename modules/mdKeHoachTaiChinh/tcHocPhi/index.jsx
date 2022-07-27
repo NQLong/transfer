@@ -19,6 +19,10 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         },
         {
+            path: '/user/finance/statistic',
+            component: Loadable({ loading: Loading, loader: () => import('./statisticPage') })
+        },
+        {
             path: '/user/finance/hoc-phi',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },

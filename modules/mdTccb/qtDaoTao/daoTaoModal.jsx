@@ -98,7 +98,7 @@ export class DaoTaoModal extends AdminModal {
             this.batDau.focus();
         }
         else {
-            if (!this.props.readOnly && this.props.isCanBo) {
+            if (!(this.props.readOnly || this.props.canEdit)) {
                 this.props.create(this.state.dataBanDau, changes, tccbSupport, this.hide);
             }
             else {
@@ -207,7 +207,7 @@ export class DaoTaoModal extends AdminModal {
             title: <>Thông tin quá trình đào tạo {this.props.title || ''}</>,
             size: 'large',
             buttons: this.props.isSupport && this.state.type == 'update' && <FormCheckbox ref={e => this.origindata = e} label='Xem dữ liệu ban đầu&nbsp;' onChange={value => this.onChangeViewMode(value)} isSwitch={true} />,
-            submitText: this.props.isCanBo ? 'Gửi yêu cầu' : 'Lưu',
+            submitText: !this.props.canEdit ? 'Gửi yêu cầu' : 'Lưu',
             body: <div className='row'>
 
                 <FormSelect className='form-group col-md-12' ref={e => this.canBo = e} label='Cán bộ' readOnly={readOnly || this.state.shcc} data={SelectAdapter_FwCanBo} />

@@ -9,9 +9,17 @@ module.exports = app => {
         { name: 'qtHopDongDvtl:read', menu },
         { name: 'qtHopDongDvtl:write' },
         { name: 'qtHopDongDvtl:delete' },
+        { name: 'qtHopDongDvtl:export' },
     );
     app.get('/user/tccb/qua-trinh/hop-dong-dvtl/:id', app.permission.check('qtHopDongDvtl:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-dvtl', app.permission.check('qtHopDongDvtl:read'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRoleQtHdDvtl', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtHopDongDvtl:read', 'qtHopDongDvtl:write', 'qtHopDongDvtl:delete', 'qtHopDongDvtl:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/hop-dong-dvtl/page/:pageNumber/:pageSize', app.permission.check('qtHopDongDvtl:read'), (req, res) => {

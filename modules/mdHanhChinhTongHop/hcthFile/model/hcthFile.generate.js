@@ -1,6 +1,6 @@
-// Table name: HCTH_FILE { id, ten, viTri, thoiGian, loai, ma, nguoiTao, tenFile, kichThuoc }
+// Table name: HCTH_FILE { id, ten, viTri, thoiGian, loai, ma, nguoiTao, tenFile, kichThuoc, capNhatFileId }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'viTri': 'VI_TRI', 'thoiGian': 'THOI_GIAN', 'loai': 'LOAI', 'ma': 'MA', 'nguoiTao': 'NGUOI_TAO', 'tenFile': 'TEN_FILE', 'kichThuoc': 'KICH_THUOC' };
+const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'viTri': 'VI_TRI', 'thoiGian': 'THOI_GIAN', 'loai': 'LOAI', 'ma': 'MA', 'nguoiTao': 'NGUOI_TAO', 'tenFile': 'TEN_FILE', 'kichThuoc': 'KICH_THUOC', 'capNhatFileId': 'CAP_NHAT_FILE_ID' };
 
 module.exports = app => {
     app.model.hcthFile = {
@@ -214,6 +214,19 @@ module.exports = app => {
                     resolve(result);
                 }
             });
+        }),
+
+        getAllFrom: (target, targettype, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_file_get_all_from(:target, :targettype); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, target, targettype }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
         }),
     };
 };
