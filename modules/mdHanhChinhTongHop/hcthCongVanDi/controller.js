@@ -286,14 +286,13 @@ module.exports = app => {
                                             if (trangThaiBefore == trangThaiAfter) {
                                                 hanhDong = action.UPDATE;
                                             }
-                                            if (trangThaiBefore == trangThaiCongVanDi.TRA_LAI_HCTH.id) {
+                                            if (trangThaiBefore == trangThaiCongVanDi.TRA_LAI_HCTH.id && trangThaiAfter == trangThaiCongVanDi.CHO_PHAN_PHOI.id) {
                                                 hanhDong = action.SEND;
                                             }
+                                            console.log('1' + trangThaiBefore);
+                                            console.log('2' + trangThaiAfter);
 
-                                            // if (trangThaiBefore == trangThaiCongVanDi.NHAP.id && [trangThaiCongVanDi.CHO_KIEM_TRA.id, trangThaiCongVanDi.DA_GUI.id, trangThaiCongVanDi.XEM_XET].includes(trangThaiAfter)) {
-                                            //     hanhDong = action.SEND;
-                                            // } else
-                                            //     hanhDong = action.UPDATE;
+                                            
                                             app.model.hcthHistory.create({
                                                 key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: hanhDong, thoiGian: new Date().getTime(),
                                                 shcc: req.session?.user?.shcc,
@@ -475,7 +474,7 @@ module.exports = app => {
             if (!(await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            else if (congVan?.trangThai == '5' && req.session.user?.shcc) {
+            else if (congVan?.trangThai == trangThaiCongVanDi.DA_PHAN_PHOI.id && req.session.user?.shcc) {
                 await viewCongVan(id, req.session.user.shcc, congVan.nguoiTao);
             }
 
@@ -568,7 +567,7 @@ module.exports = app => {
         const emails = staff.rows.map(item => item.email);
 
         await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
-    }
+    };
 
     // Đang gửi cho phòng Hcth
     const createHcthStaffNotification = async (item, status) => {
@@ -616,7 +615,7 @@ module.exports = app => {
         const staff = await app.model.canBo.get({ shcc: shcc }, 'email');
 
         await createNotification([staff.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}`});
-    }
+    };
 
     // Gửi cho cán bộ ký
     const createSignNotification = async (item, status) => {
@@ -625,7 +624,7 @@ module.exports = app => {
         const emails = signStaff.rows.map(item => item.email);
 
         await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
-    }
+    };
 
     // Phân quyền Quản lý công văn đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
@@ -786,7 +785,8 @@ module.exports = app => {
                 else if (after == trangThaiCongVanDi.TRA_LAI_HCTH.id) return action.RETURN;
                 else return action.DISTRIBUTE;
             case trangThaiCongVanDi.TRA_LAI_HCTH.id:
-                return action.SEND;
+                if (before == after) return action.UPDATE;
+                else return action.SEND;
             default:
                 return '';
         }
@@ -1089,6 +1089,13 @@ module.exports = app => {
             }
             else {
                 //
+                if (congVan.trangThai != trangThaiCongVanDi.DA_DUYET.id) {
+                    throw 'Trạng thái công văn không hợp lệ';
+                }
+                // const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAll({ congVan: id });
+                const trangThaiMoi = trangThaiCongVanDi.CHO_PHAN_PHOI.id;
+                await app.model.hcthCongVanDi.update({ id }, { trangThai: trangThaiMoi });
+                return res.send({});
             }
         } catch (error) {
             console.error(error);

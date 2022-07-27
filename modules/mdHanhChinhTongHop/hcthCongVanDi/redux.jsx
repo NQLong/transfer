@@ -276,7 +276,7 @@ export function readCongVanDi(data, done) {
 
 export function publishingCongVanDi(id, done) {
     return () => {
-        const url = `/api/hcth/cong-van-cac-phong/publishing/${id}`
+        const url = `/api/hcth/cong-van-cac-phong/publishing/${id}`;
         T.put(url, {}, res => {
             if (res.error) {
                 T.notify('Câp nhật công văn thất bại. ' + (res.error.message || ''), 'danger');
@@ -286,7 +286,7 @@ export function publishingCongVanDi(id, done) {
                 T.notify('Câp nhật công văn thành công', 'success');
                 done && done();
             }
-        }, () => T.notify('Câp nhật công văn thất bại', 'danger'))
-    }
+        }, () => T.notify('Câp nhật công văn thất bại', 'danger'));
+    };
 }
 

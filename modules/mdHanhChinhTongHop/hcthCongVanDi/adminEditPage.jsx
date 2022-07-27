@@ -415,18 +415,9 @@ class AdminEditPage extends AdminPage {
         });
     }
 
-    // onCheckSign = (e) => {
-    //     e.preventDefault();
-    //     T.confirm('Thông báo', 'Bạn có chắc chắn muốn bắt đầu ký công văn này không ?', 'warning', true, isConfirm => {
-    //         if (isConfirm) {
-    //             this.onChangeStatus(trangThaiCongVanDi.CHO_KY.id, () => this.getData());
-    //         }
-    //     });
-    // }
-
     onDistribute = (e) => {
         e.preventDefault();
-        T.confirm('Thông báo', 'Bạn có chắc chắn muốn bắt đầu ký công văn này không ?', 'warning', true, isConfirm => {
+        T.confirm('Thông báo', 'Bạn có chắc chắn muốn bắt đầu ký và phân phối công văn này không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
                 this.onChangeStatus(trangThaiCongVanDi.CHO_KY.id, () => this.getData());
             }
@@ -588,11 +579,11 @@ class AdminEditPage extends AdminPage {
     }
 
     canAccept = () => {
-        return this.state.id && this.state.trangThai == '2' && this.getUserPermission('hcthCongVanDi', ['manage']).manage && this.state.user.maDonVi == '29';
+        return this.state.id && this.state.trangThai == trangThaiCongVanDi.CHO_KIEM_TRA.id && this.getUserPermission('hcthCongVanDi', ['manage']).manage && this.state.user.maDonVi == '29';
     }
 
     canApprove = () => {
-        return this.state.id && this.state.trangThai == '3' && this.getUserPermission('rectors', ['login']).login;
+        return this.state.id && this.state.trangThai == trangThaiCongVanDi.CHO_DUYET.id && this.getUserPermission('rectors', ['login']).login;
     }
 
     canDistribute = () => {
@@ -602,13 +593,8 @@ class AdminEditPage extends AdminPage {
         return this.state.id && checkStatus && checkPermission && this.state.user.maDonVi == '29';
     }
 
-    canCheckSign = () => {
-        if (this.state.id && (this.state.trangThai == '7' || this.state.trangThai == '5') && this.getUserPermission('hcthCongVanDi', ['manage']).manage && this.state.user.maDonVi == '29') return true;
-        else return false;
-    }
-
     canAddFile = () => {
-        return (!this.state.id || [trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.TRA_LAI_HCTH.id].includes(this.state.trangThai)) && !this.checkNotDonVi();
+        return (!this.state.id || [trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.TRA_LAI_HCTH.id, trangThaiCongVanDi.CHO_PHAN_PHOI.id].includes(this.state.trangThai)) && !this.checkNotDonVi();
     }
 
     canSeeNumber = () => {
@@ -624,12 +610,15 @@ class AdminEditPage extends AdminPage {
 
     canCheckRead = () => {
         let checkRead = true;
-        if (this.state.trangThai == trangThaiCongVanDi.DA_XEM_XET.id) {
+        if (this.state.trangThai == trangThaiCongVanDi.DA_PHAN_PHOI.id) {
             if (this.getUserPermission('hcth', ['login', 'manage']).login && !this.state.donViNhan.includes('29')) {
                 checkRead = false;
             } else if (this.getUserPermission('rectors', ['login']).login && !this.state.donViNhan.includes('68')) {
                 checkRead = false;
             } else if (this.state.checkDonViGui) {
+                checkRead = false;
+            }
+            if (this.state.history.some(o => ((o.shcc == this.state.shcc) && (o.hanhDong == 'READ')))) {
                 checkRead = false;
             }
         } else {
@@ -643,7 +632,7 @@ class AdminEditPage extends AdminPage {
             permissionReturnChoPhanPhoi = this.getUserPermission('hcthCongVanDi', ['manage']).manage;
         if (this.state.id && permissionReturnXemXet && !this.checkNotDonVi() && (this.state.trangThai == trangThaiCongVanDi.XEM_XET.id)) return true;
 
-        if (this.state.id && permissionReturnChoPhanPhoi && this.state.trangThai == trangThaiCongVanDi.CHO_PHAN_PHOI.id) return true;
+        if (this.state.id && permissionReturnChoPhanPhoi && this.state.trangThai == trangThaiCongVanDi.CHO_PHAN_PHOI.id && this.state.user.maDonVi == '29') return true;
         return ((this.state.trangThai == trangThaiCongVanDi.CHO_KIEM_TRA.id) && this.getUserPermission('hcthCongVanDi', ['manage']).manage && this.state.user.maDonVi == '29') || ((this.state.trangThai == trangThaiCongVanDi.CHO_DUYET.id) && this.getUserPermission('rectors', ['login']).login);
     }
 
@@ -669,24 +658,26 @@ class AdminEditPage extends AdminPage {
 
     canPublish = () => {
         const congVan = this.props.hcthCongVanDi?.item || {};
+        let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage) || (this.getUserPermission('donViCongVanDi', ['edit']).edit);
         if (congVan.loaiCongVan == loaiCongVan.DON_VI.id) {
             return (
                 this.state.id && this.state.trangThai == trangThaiCongVanDi.DA_XEM_XET.id && (
-                    //TODO: check quyền ở đây
-                    true
-                ))
+                    permission && !this.checkNotDonVi()
+                ));
         } else {
             // công văn trường
             return this.state.id && this.state.trangThai == trangThaiCongVanDi.DA_DUYET.id && (
                 //TODO: check quyền ở đây
-                true
+                permission && !this.checkNotDonVi()
             );
         }
     }
 
     onPublishing = () => {
+        // let newTrangThai;
         T.confirm('Cập nhật công văn đi', 'Công văn sẽ được cập nhật trạng thái, vui lòng xác nhận lại các trường dữ liệu và số công văn được nhập trong file công văn?', 'warning', true, isConfirm => {
             if (isConfirm) {
+                // if (this.state.trangThai == trangThaiCongVanDi.DA_DUYET)
                 this.props.publishingCongVanDi(this.state.id, () => this.props.getHistory(this.state.id, () => this.getData()));
             }
         });
@@ -715,7 +706,6 @@ class AdminEditPage extends AdminPage {
         //     id: item,
         //     text: listTrangThai[item].status
         // }));
-        // console.log(listTrangThaiCv);
 
         const lengthDv = this.state.listDonViQuanLy.length;
 
@@ -732,21 +722,21 @@ class AdminEditPage extends AdminPage {
                 <h4 className='l-text'>Đang tải...</h4>
             </div>);
 
-        // chỉnh lại
         if (this.canAccept()) {
             buttons.push({ className: 'btn-success', icon: 'fa-check', onClick: this.onAcceptCvDi });
         } else if (this.canApprove()) {
             buttons.push({ className: 'btn-success', icon: 'fa-check', onClick: this.onApproveCvDi });
-        } else if (this.canPublish()) {
+        } 
+        if (this.canPublish()) {
             buttons.push({ className: 'btn-success', icon: 'fa-envelope', onClick: this.onPublishing });
         }
 
-        this.canInspect() && buttons.push({ className: 'btn-success', icon: 'fa-solid fa-bug', onClick: this.onInspect });
+        this.canInspect() && buttons.push({ className: 'btn-success', icon: 'fa-solid fa-paper-plane', onClick: this.onInspect });
         this.canSend() && buttons.push({ className: 'btn-success', icon: 'fa-solid fa-paper-plane', onClick: this.onSend });
-        this.canDistribute() && buttons.push({ className: 'btn-warning', icon: 'fa-solid fa-duck', onClick: this.onDistribute });
+        this.canDistribute() && buttons.push({ className: 'btn-primary', icon: 'fa-solid fa-paper-plane', onClick: this.onDistribute });
         this.canSendDistribute() && buttons.push({ className: 'btn-primary', icon: 'fa-check', onClick: this.onSendDistribute });
 
-        if (this.state.trangThai == '5') {
+        if (this.canCheckRead()) {
             buttons.push({ className: 'btn-success', icon: 'fa-solid fa-eye', onClick: this.onReadCvDi });
         }
         console.log(this.state);
@@ -764,19 +754,18 @@ class AdminEditPage extends AdminPage {
 
                     </div>
                     <div className='tile-body row'>
-                        {this.state.loaiCongVan != loaiCongVan.TRUONG.id && <FormCheckbox isSwitch readOnly={this.canReadOnly()} className={'col-md-12'} label='Lấy số tự động' ref={e => this.laySoTuDong = e} onChange={value => this.setState({ laySoTuDong: value })} />}
+                        {this.state.loaiCongVan != loaiCongVan.TRUONG.id && <FormCheckbox isSwitch readOnly={this.canReadOnly() || (this.state.trangThai == trangThaiCongVanDi.DA_XEM_XET.id)} className={'col-md-12'} label='Lấy số tự động' ref={e => this.laySoTuDong = e} onChange={value => this.setState({ laySoTuDong: value })} />}
                         {
                             (!this.state.laySoTuDong || (this.canSeeNumber() && soCongVan)) &&
-                            <FormTextBox readOnly={this.canReadOnly()} type='text' className='col-md-12' ref={e => this.soCongVan = e} label='Số công văn' required={!this.state.laySoTuDong} />
+                            <FormTextBox readOnly={this.canReadOnly() || this.state.laySoTuDong} type='text' className='col-md-12' ref={e => this.soCongVan = e} label='Số công văn' required={!this.state.laySoTuDong} />
                         }
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngày gửi' />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngày ký' />
-
-                        {/* {!isNew && <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái' readOnly={true} data={listTrangThaiCv} required />} */}
-                        {this.state.id && <span className='form-group col-md-12'>Trạng thái: <b style={{ color: this.state.trangThai ? listTrangThai[this.state.trangThai].color : '' }}>{getTrangThaiText(this.state.trangThai)}</b></span>}
+                        
+                        {this.state.id && <span className='form-group col-md-12'>Trạng thái: <b style={{ color: this.state.trangThai ? listTrangThai[this.state.trangThai].color : ''}}>{getTrangThaiText(this.state.trangThai)}</b></span>}
 
                         <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi' readOnly={this.canReadOnly()} data={SelectAdapter_DmDonViFilter(lengthDv != 0 ? this.state.listDonViQuanLy : this.state.maDonVi)} placeholder="Chọn đơn vị gửi" required readOnlyEmptyText='Chưa có đơn vị gửi' />
-                        <FormSelect className='col-md-6' label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={loaiCongVanArr} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại công văn' onChange={value => this.onChangeLoaiCongVan(value)} required />
+                        <FormSelect className='col-md-6' disabled={this.canReadOnly() || this.state.trangThai == trangThaiCongVanDi.DA_XEM_XET.id} label='Loại công văn' placeholder='Chọn loại công văn' ref={e => this.loaiCongVan = e} data={loaiCongVanArr} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại công văn' onChange={value => this.onChangeLoaiCongVan(value)} required />
                         <FormSelect className='col-md-6' allowClear={true} label='Loại văn bản' placeholder='Chọn loại văn bản' ref={e => this.loaiVanBan = e} data={SelectAdapter_DmLoaiCongVan} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có loại văn bản' />
                         <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Chọn đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có đơn vị nhận' />
                         <FormSelect multiple={true} className='col-md-12' label={(<span onClick={(e) => e.stopPropagation()}>
@@ -840,7 +829,7 @@ class AdminEditPage extends AdminPage {
                 />
             </>),
             backRoute,
-            onSave: (this.state.trangThai == '' || this.state.trangThai == '1' || this.state.trangThai == '4' || this.state.trangThai == '11' || this.state.trangThai == trangThaiCongVanDi.DA_XEM_XET.id) && (((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) || (unitEditPermission && unitEditPermission.edit)) && !this.checkNotDonVi()) ? this.save : null,
+            onSave: ([trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_HCTH.id, trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.DA_XEM_XET.id, ''].includes(this.state.trangThai)) && (((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) || (unitEditPermission && unitEditPermission.edit)) && !this.checkNotDonVi()) ? this.save : null,
             buttons
         });
     }
