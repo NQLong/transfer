@@ -25,6 +25,7 @@ module.exports = app => {
             data[item.phong][item.thu] = data[item.phong][item.thu] || [];
             data[item.phong][item.thu].push(...range(Number(item.tietBatDau), Number(item.tietBatDau) + Number(item.soTietBuoi)));
         });
+        //Môn A thứ 2 từ tiết 1-4, thứ 3 từ tiết 6-8 --> data = { A: { 2: [1,2,3,4], 3: [6,7,8] } }
         return data;
     };
 
@@ -35,11 +36,16 @@ module.exports = app => {
                 thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
             thoiGianMoMon = thoiGianMoMon.find(item => item.bacDaoTao == bacDaoTao && item.loaiHinhDaoTao == loaiHinhDaoTao);
             let { hocKy, nam } = thoiGianMoMon;
-            const listSubjects = await app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, bacDaoTao, loaiHinhDaoTao, isMo: 1 }, '*', 'soLuongDuKien DESC');
-            const listPeriods = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+            const danhSachCanGen = await app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, bacDaoTao, loaiHinhDaoTao, isMo: 1 }, '*', 'soLuongDuKien DESC');
+
+            let listPeriods = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+            listPeriods = listPeriods.map(item => parseInt(item.ten));
+
             let listRooms = await app.model.dmPhong.getAll({ kichHoat: 1 }, 'ten,sucChua', 'sucChua DESC');
+            // Lọc phòng không sử dụng
             listRooms = listPhongKhongSuDung && listPhongKhongSuDung.length ? listRooms.filter(item => !listPhongKhongSuDung.includes(item.ten)) : listRooms;
-            let data = await getDataGenerateSchedule(listSubjects.filter(item => item.isMo), listDays, listPeriods, listRooms);
+
+            let data = await getDataGenerateSchedule(danhSachCanGen.filter(item => item.isMo), listDays, listPeriods, listRooms);
             if (data.error) done(data);
             else {
                 let listNgayLe = await app.model.dmNgayLe.getAll({

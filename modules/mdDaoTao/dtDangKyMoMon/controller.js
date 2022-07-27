@@ -53,6 +53,7 @@ module.exports = app => {
         try {
             const now = Date.now();
             let { data, settings } = req.body;
+            console.log(data, settings);
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
             thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             if (now > thoiGianMoMon.ketThuc) throw 'Đã hết hạn đăng ký!';
@@ -62,13 +63,14 @@ module.exports = app => {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {
                 let item = await app.model.dtDangKyMoMon.get({
-                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: settings.loaiHinhDaoTao, bacDaoTao: settings.bacDaoTao
+                    nam, hocKy, maNganh: data.maNganh, ...settings
                 });
                 if (item) throw `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}`;
-                item = await app.model.dtDangKyMoMon.create(data);
+                item = await app.model.dtDangKyMoMon.create({ ...data, ...settings });
                 res.send({ item });
             }
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });
