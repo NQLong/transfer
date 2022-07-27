@@ -18,7 +18,7 @@ module.exports = (app) => {
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
     app.permission.add({ name: 'hcthCongVanDen:manage' });
-    app.permission.add({ name: 'donViCongVanDen:read' });
+    app.permission.add({ name: 'donViCongVanDen:test' });
     app.permission.add({ name: 'hcth:login' });
     app.permission.add({ name: 'hcth:manage' });
 
@@ -250,7 +250,7 @@ module.exports = (app) => {
             const user = req.session.user;
             const permissions = user.permissions;
             donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
-            donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || permissions.includes('donViCongVanDen:read') && req.session?.user?.staff?.maDonVi || '';
+            donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || permissions.includes('donViCongVanDen:test') && req.session?.user?.staff?.maDonVi || '';
             canBo = req.session?.user?.shcc || '';
 
             if (tabValue == 0) {
@@ -403,7 +403,7 @@ module.exports = (app) => {
             else {
                 let maDonViNhan = donViNhan.map((item) => item.donViNhan);
                 let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
-                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDen:read') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
+                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDen:test') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
             }
         } catch {
             return false;
@@ -642,7 +642,7 @@ module.exports = (app) => {
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
 
     const docCongVanPhongRole = 'quanLyCongVanPhong';
-    app.assignRoleHooks.addRoles(docCongVanPhongRole, { id: 'donViCongVanDen:read', text: 'Quản lý công văn đến đơn vị' });
+    app.assignRoleHooks.addRoles(docCongVanPhongRole, { id: 'donViCongVanDen:test', text: 'Quản lý công văn đến đơn vị' });
 
     app.assignRoleHooks.addHook(docCongVanPhongRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -654,7 +654,7 @@ module.exports = (app) => {
 
     app.permissionHooks.add('staff', 'checkRoleDocCongVanDenPhong', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length) {
-            app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:read');
+            app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
         }
         resolve();
     }));
@@ -663,8 +663,8 @@ module.exports = (app) => {
     app.permissionHooks.add('assignRole', 'checkRoleDocCongVanDenPhong', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == docCongVanPhongRole);
         inScopeRoles.forEach(role => {
-            if (role.tenRole == 'donViCongVanDen:read') {
-                app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:read');
+            if (role.tenRole == 'donViCongVanDen:test') {
+                app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
             }
         });
         resolve();
@@ -952,7 +952,7 @@ module.exports = (app) => {
         const { status = '', ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
         const data = {
             staffType: userPermissions.includes('hcth:login') ? canBoType.HCTH : userPermissions.includes('rectors:login') ? canBoType.RECTOR : null,
-            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDen:read') ? req.session.user?.staff?.maDonVi : '') || '',
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDen:test') ? req.session.user?.staff?.maDonVi : '') || '',
             shccCanBo: req.session.user?.shcc,
             fromTime, toTime, status, ids, hasIds, excludeIds
         };
@@ -1036,7 +1036,7 @@ module.exports = (app) => {
         const user = req.session.user;
         const permissions = user.permissions;
         donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
-        donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || permissions.includes('donViCongVanDen:read') && req.session?.user?.staff?.maDonVi || '';
+        donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || permissions.includes('donViCongVanDen:test') && req.session?.user?.staff?.maDonVi || '';
         canBo = req.session?.user?.shcc || '';
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         if (tabValue == 0) {
