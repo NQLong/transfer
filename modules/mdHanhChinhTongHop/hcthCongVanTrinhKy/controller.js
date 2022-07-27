@@ -87,16 +87,19 @@ module.exports = app => {
         try {
             const id = req.params.id;
             const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ id });
+            const files = await app.model.hcthFile.get({ id: congVanTrinhKy.fileCongVan });
             let [congVanKy, canBoKy] = await Promise.all([
-                app.model.hcthCongVanDi.get({ id: congVanTrinhKy.congVan }),
+                app.model.hcthCongVanDi.get({ id: files.ma }),
                 app.model.hcthCanBoKy.getList(congVanTrinhKy.id)
             ]);
+
             canBoKy = canBoKy.rows || [];
             res.send({
                 item: {
                     ...congVanTrinhKy,
                     congVanKy,
-                    canBoKy
+                    canBoKy,
+                    fileKy: [files] || []
                 }
             });
         } catch (error) {

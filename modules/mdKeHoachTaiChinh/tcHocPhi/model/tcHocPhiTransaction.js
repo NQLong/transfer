@@ -15,7 +15,7 @@ module.exports = app => {
                 .replaceAll('{tc_email}', tcEmail)
                 .replaceAll('{amount}', amount.toString().numberDisplay())
                 .replaceAll('{support_phone}', tcSupportPhone) || '');
-            app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
+            app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', [], hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
             // await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
         } catch (error) {
             console.error('Send email and sms tcHocPhi fail!');

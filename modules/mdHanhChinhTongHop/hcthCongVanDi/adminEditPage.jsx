@@ -138,7 +138,7 @@ class AdminEditPage extends AdminPage {
                 routeMatcherUrl: '/user/hcth/cong-van-cac-phong/:id',
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
-                    <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn đi</Link>,
                     this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/hcth/cong-van-cac-phong'
@@ -149,7 +149,7 @@ class AdminEditPage extends AdminPage {
                 readyUrl: '/user',
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                    <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn đi</Link>,
                     this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/cong-van-cac-phong'
@@ -484,10 +484,6 @@ class AdminEditPage extends AdminPage {
         return this.state.id && (this.state.trangThai != trangThaiCongVanDi.MOI.id);
     }
 
-    canAddComment = () => {
-        return ![trangThaiCongVanDi.DA_DUYET.id, trangThaiCongVanDi.DA_DOC.id].includes(this.state.trangThai);
-    }
-
     canSend = () => {
         let canEditTrangThai = [trangThaiCongVanDi.MOI.id, trangThaiCongVanDi.TRA_LAI.id].includes(this.state.trangThai);
         let permission = this.getUserPermission('hcthCongVanDi', ['manage']).manage || (this.getUserPermission('donViCongVanDi', ['manage']).manage);
@@ -589,7 +585,7 @@ class AdminEditPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
-            title: 'Công văn các phòng',
+            title: 'Công văn đi',
             breadcrumb,
             content: this.state.isLoading ? loading : (<>
                 <div className='tile'>
@@ -639,19 +635,15 @@ class AdminEditPage extends AdminPage {
                                         this.renderPhanHoi(this.props.hcthCongVanDi?.item?.phanHoi)
                                     }
                                 </div>
-                                {this.canAddComment() &&
-                                    <>
-                                        <FormRichTextBox type='text' className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
-                                        <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                            <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
-                                                Thêm
-                                            </button>
-                                            {this.canReturn() && <button type='submit' className='btn btn-danger' onClick={this.onReturnCvDi}>
-                                                Trả lại
-                                            </button>}
-                                        </div>
-                                    </>
-                                }
+                                <FormRichTextBox type='text' className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
+                                <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                    <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
+                                        Thêm
+                                    </button>
+                                    {this.canReturn() && <button type='submit' className='btn btn-danger' onClick={this.onReturnCvDi}>
+                                        Trả lại
+                                    </button>}
+                                </div>
                             </div>
                         </div>
                     </div>}
@@ -668,13 +660,13 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
 
-                <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item);}}/>
+                {!isNew && <YeuCauKy hcthCongVanDi={this.props.hcthCongVanDi} deleteCongVanTrinhKy={this.props.deleteCongVanTrinhKy} id={this.state.id} permission={permission} {...this.props} onEditVanBanTrinhKy={(e, item) => { e.preventDefault(); this.yeuCauKyModal.show(item);}}/>}
 
                 {!isNew &&
                     <div className="tile">
                         <h3 className='tile-title'><i className={`btn fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
                         {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
-                    </div> 
+                    </div>
                 }
                 <EditModal ref={e => this.donViGuiNhanModal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonViNhanNgoai} />
                 <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} update={this.props.updateCongVanTrinhKy} {...this.props} congVanId={this.state.id} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType });}}
