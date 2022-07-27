@@ -764,8 +764,10 @@ BEGIN
                      cauTrucKhungDt.MUC_CHA          as                      "mucCha",
                      cauTrucKhungDt.MUC_CON          as                      "mucCon",
                      cauTrucKhungDt.NAM_DAO_TAO      as                      "namDaoTao",
+                     BDT.TEN_BAC                     AS                      "tenBacDaoTao",
                      ROW_NUMBER() OVER (ORDER BY cauTrucKhungDt.NAM_DAO_TAO) R
               FROM DT_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
+                       LEFT JOIN DM_SV_BAC_DAO_TAO BDT ON BDT.MA_BAC = cauTrucKhungDt.BAC_DAO_TAO
               WHERE searchTerm = ''
                  OR cauTrucKhungDt.NAM_DAO_TAO LIKE st)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
@@ -3627,7 +3629,7 @@ AS
     CVD_INFO SYS_REFCURSOR;
 BEGIN
     OPEN CVD_INFO FOR
-        select UNIQUE cb.EMAIL
+        select UNIQUE cb.email AS "email"
         FROM TCHC_CAN_BO cb
         WHERE cb.SHCC IN (
             SELECT cbk.NGUOI_KY
@@ -3740,7 +3742,13 @@ BEGIN
                                   )
                       )
                   AND (
-                          (loaiCanBo = 4 OR loaiCanBo = 5)
+                          (
+                                      loaiCanBo = 2
+                                  OR loaiCanBo = 3
+                                  OR loaiCanBo = 4
+                                  OR loaiCanBo = 5
+                                  OR loaiCanBo = 6
+                              )
                           OR
                           ((donViXem IS NULL AND canBoXem IS NULL)
                               OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
@@ -3765,17 +3773,17 @@ BEGIN
                                                 connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
                                             )
                                   )
-                                  AND hcthCVD.TRANG_THAI != '1'
-                                  AND hcthCVD.TRANG_THAI != '4'
+                                  AND hcthCVD.TRANG_THAI = '10'
                                )
                               OR
-                           (loaiCanBo != 5 AND canBoXem IS NOT NULL AND canBoXem IN
-                                                                        (
-                                                                            SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                                                            from dual
-                                                                            connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                                        )
+                           (canBoXem IS NOT NULL AND canBoXem IN
+                                                     (
+                                                         SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                         from dual
+                                                         connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                     )
                                AND hcthCVD.TRANG_THAI != '1'
+                               AND hcthCVD.TRANG_THAI = '10'
                                ))
                       )
                   AND (
@@ -3788,23 +3796,26 @@ BEGIN
                                               )
                                   )
                           OR (
-                                          loaiCanBo = 2 -- hcth: manage
+                                          loaiCanBo = 2 -- hcthCongVanDi:manage - chuyên viên quản lý tổng phòng hcth
                                       AND (
                                                   (hcthCVD.TRANG_THAI != '1'
-                                                      AND hcthCVD.TRANG_THAI != '4')
+                                                      AND hcthCVD.TRANG_THAI != '6'
+                                                      AND hcthCVD.TRANG_THAI != '11')
                                                   OR (
-                                                          (hcthCVD.TRANG_THAI = '1'
-                                                              OR hcthCVD.TRANG_THAI = '4')
+                                                          ((hcthCVD.TRANG_THAI = '1' AND hcthCVD.NGUOI_TAO = canBoXem)
+                                                              OR hcthCVD.TRANG_THAI = '6'
+                                                              OR hcthCVD.TRANG_THAI = '11')
                                                           AND hcthCVD.DON_VI_GUI = '29'
                                                       )
                                                   OR hcthCVD.TRANG_THAI IS NULL
                                               )
                                   )
                           OR (
-                                          loaiCanBo = 3 -- hcth: login
+                                          loaiCanBo = 3 -- hcth:login
                                       AND (
                                                   (hcthCVD.TRANG_THAI != '1'
-                                                      AND hcthCVD.TRANG_THAI != '4')
+                                                      AND hcthCVD.TRANG_THAI != '6'
+                                                      AND hcthCVD.TRANG_THAI != '11')
                                                   OR hcthCVD.TRANG_THAI IS NULL
                                               )
                                   )
@@ -3812,10 +3823,12 @@ BEGIN
                                           loaiCanBo = 4 -- admin
                                       AND (
                                                   (hcthCVD.TRANG_THAI != '1'
-                                                      AND hcthCVD.TRANG_THAI != '4')
+                                                      AND hcthCVD.TRANG_THAI != '6'
+                                                      AND hcthCVD.TRANG_THAI != '11')
                                                   OR (
                                                           (hcthCVD.TRANG_THAI = '1'
-                                                              OR hcthCVD.TRANG_THAI = '4')
+                                                              OR hcthCVD.TRANG_THAI = '6'
+                                                              OR hcthCVD.TRANG_THAI = '11')
                                                           AND hcthCVD.DON_VI_GUI = donViXem
                                                       )
                                               )
@@ -3831,8 +3844,18 @@ BEGIN
                                                                                            from dual
                                                                                            connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
                                                                                        )
-                                                          AND hcthCVD.TRANG_THAI != '1'
+                                                          AND hcthCVD.TRANG_THAI = '11'
                                                       )
+                                              )
+                                  )
+                          OR (
+                                          loaiCanBo = 6 -- chuyên viên soạn thảo thuộc phòng hcth
+                                      AND (
+                                                  (hcthCVD.NGUOI_TAO = canBoXem AND hcthCVD.DON_VI_GUI = '29')
+                                                  OR (
+                                                              hcthCVD.TRANG_THAI != '1'
+                                                          AND hcthCVD.TRANG_THAI != '6'
+                                                          AND hcthCVD.TRANG_THAI != '11')
                                               )
                                   )
                       )
@@ -4051,7 +4074,13 @@ BEGIN
                                                )
                                    )
                                AND (
-                                       (loaiCanBo = 4 OR loaiCanBo = 5)
+                                       (
+                                                   loaiCanBo = 2
+                                               OR loaiCanBo = 3
+                                               OR loaiCanBo = 4
+                                               OR loaiCanBo = 5
+                                               OR loaiCanBo = 6
+                                           )
                                        OR
                                        ((donViXem IS NULL AND canBoXem IS NULL)
                                            OR (donViXem IS NOT NULL AND hcthCVD.DON_VI_GUI IN
@@ -4076,17 +4105,16 @@ BEGIN
                                                              connect by regexp_substr(donViXem, '[^,]+', 1, level) is not null
                                                          )
                                                )
-                                               AND hcthCVD.TRANG_THAI != '1'
-                                               AND hcthCVD.TRANG_THAI != '4'
+                                               AND hcthCVD.TRANG_THAI = '10'
                                             )
                                            OR
-                                        (loaiCanBo != 5 AND canBoXem IS NOT NULL AND canBoXem IN
-                                                                                     (
-                                                                                         SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
-                                                                                         from dual
-                                                                                         connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
-                                                                                     )
-                                            AND hcthCVD.TRANG_THAI != '1'
+                                        (canBoXem IS NOT NULL AND canBoXem IN
+                                                                  (
+                                                                      SELECT regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level)
+                                                                      from dual
+                                                                      connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
+                                                                  )
+                                            AND hcthCVD.TRANG_THAI = '10'
                                             ))
                                    )
                                AND (
@@ -4099,13 +4127,15 @@ BEGIN
                                                            )
                                                )
                                        OR (
-                                                       loaiCanBo = 2 -- hcth: manage
+                                                       loaiCanBo = 2 -- hcthCongVanDi:manage
                                                    AND (
                                                                (hcthCVD.TRANG_THAI != '1'
-                                                                   AND hcthCVD.TRANG_THAI != '4')
+                                                                   AND hcthCVD.TRANG_THAI != '6'
+                                                                   AND hcthCVD.TRANG_THAI != '11')
                                                                OR (
-                                                                       (hcthCVD.TRANG_THAI = '1'
-                                                                           OR hcthCVD.TRANG_THAI = '4')
+                                                                       ((hcthCVD.TRANG_THAI = '1' AND hcthCVD.NGUOI_TAO = canBoXem)
+                                                                           OR hcthCVD.TRANG_THAI = '6'
+                                                                           OR hcthCVD.TRANG_THAI = '11')
                                                                        AND hcthCVD.DON_VI_GUI = '29'
                                                                    )
                                                                OR hcthCVD.TRANG_THAI IS NULL
@@ -4115,7 +4145,8 @@ BEGIN
                                                        loaiCanBo = 3 -- hcth: login
                                                    AND (
                                                                (hcthCVD.TRANG_THAI != '1'
-                                                                   AND hcthCVD.TRANG_THAI != '4')
+                                                                   AND hcthCVD.TRANG_THAI != '6'
+                                                                   AND hcthCVD.TRANG_THAI != '11')
                                                                OR hcthCVD.TRANG_THAI IS NULL
                                                            )
                                                )
@@ -4123,10 +4154,12 @@ BEGIN
                                                        loaiCanBo = 4 -- admin
                                                    AND (
                                                                (hcthCVD.TRANG_THAI != '1'
-                                                                   AND hcthCVD.TRANG_THAI != '4')
+                                                                   AND hcthCVD.TRANG_THAI != '6'
+                                                                   AND hcthCVD.TRANG_THAI != '11')
                                                                OR (
                                                                        (hcthCVD.TRANG_THAI = '1'
-                                                                           OR hcthCVD.TRANG_THAI = '4')
+                                                                           OR hcthCVD.TRANG_THAI = '6'
+                                                                           OR hcthCVD.TRANG_THAI = '11')
                                                                        AND hcthCVD.DON_VI_GUI = donViXem
                                                                    )
                                                            )
@@ -4142,8 +4175,18 @@ BEGIN
                                                                                                         from dual
                                                                                                         connect by regexp_substr(hcthCVD.CAN_BO_NHAN, '[^,]+', 1, level) is NOT NULL
                                                                                                     )
-                                                                       AND hcthCVD.TRANG_THAI != '1'
+                                                                       AND hcthCVD.TRANG_THAI = '11'
                                                                    )
+                                                           )
+                                               )
+                                       OR (
+                                                       loaiCanBo = 6 -- chuyên viên soạn thảo thuộc phòng hcth
+                                                   AND (
+                                                               (hcthCVD.NGUOI_TAO = canBoXem AND hcthCVD.DON_VI_GUI = '29')
+                                                               OR (
+                                                                           hcthCVD.TRANG_THAI != '1'
+                                                                       AND hcthCVD.TRANG_THAI != '6'
+                                                                       AND hcthCVD.TRANG_THAI != '11')
                                                            )
                                                )
                                    )
@@ -4392,82 +4435,86 @@ CREATE OR REPLACE procedure hcth_cong_van_di_update_so_cong_van(
     maxThuTu           number;
     tenVietTatDonViGui STRING(100);
     loaiVanBan         STRING(10);
-    loaiCongVan        STRING(10);
+    loaiCongVan        STRING(20);
     postfix            STRING(200);
     counter            NUMBER(10);
     isExists           NUMBER(10);
+    laySoTuDong        NUMBER(1);
 BEGIN
     commit;
     set transaction isolation level SERIALIZABLE name 'update_so_cong_van_di';
-    begin
-        SELECT hcthCVD.LOAI_CONG_VAN into loaiCongVan from HCTH_CONG_VAN_DI hcthCVD WHERE hcthCVD.ID = ma;
+    SELECT dvg.TEN_VIET_TAT
+    into tenVietTatDonViGui
+    FROM DM_DON_VI dvg
+    WHERE dvg.MA = donViGui;
 
-        select MAX(SO_DI)
-        into maxThuTu
-        from HCTH_CONG_VAN_DI
-        WHERE donViGui = DON_VI_GUI
-          and (NGAY_TAO > nam)
-          AND LOAI_CONG_VAN = loaiCongVan;
+    SELECT lcv.TEN_VIET_TAT
+    into loaiVanBan
+    FROM HCTH_CONG_VAN_DI hcthCVD
+             LEFT JOIN DM_LOAI_CONG_VAN lcv ON lcv.ID = hcthCVD.LOAI_VAN_BAN
+    WHERE hcthCVD.ID = ma;
 
-        SELECT dvg.TEN_VIET_TAT
-        into tenVietTatDonViGui
-        FROM DM_DON_VI dvg
-        WHERE dvg.MA = donViGui;
+    select LAY_SO_TU_DONG into laySoTuDong from HCTH_CONG_VAN_DI where id = ma;
 
-        SELECT lcv.TEN_VIET_TAT
-        into loaiVanBan
-        FROM HCTH_CONG_VAN_DI hcthCVD
-                 LEFT JOIN DM_LOAI_CONG_VAN lcv ON lcv.ID = hcthCVD.LOAI_VAN_BAN
-        WHERE hcthCVD.ID = ma;
-    exception
-        when NO_DATA_FOUND then
-            maxThuTu := 0;
-    end;
+    if laySoTuDong = 1 then
+        begin
+            SELECT hcthCVD.LOAI_CONG_VAN into loaiCongVan from HCTH_CONG_VAN_DI hcthCVD WHERE hcthCVD.ID = ma;
 
-    if maxThuTu is null then
-        maxThuTu := 0;
-    end if;
-    maxThuTu := maxThuTu + 1;
-
-    postfix := '/';
-    IF loaiVanBan IS NOT NULL THEN
-        postfix := postfix || loaiVanBan || '-';
-    end if;
-
-    postfix := postfix || 'XHNV';
-    IF tenVietTatDonViGui IS NOT NULL THEN
-        postfix := postfix || '-' || tenVietTatDonViGui;
-    end if;
-    counter := 2000;
-    select count(*)
-    into isExists
-    from HCTH_CONG_VAN_DI
-    WHERE donViGui = DON_VI_GUI
-      and (NGAY_TAO > nam)
-      AND LOAI_CONG_VAN = loaiCongVan
-      AND SO_CONG_VAN = TO_CHAR(maxThuTu) || postfix;
-    WHILE isExists > 0
-        LOOP
-            if counter = 0 then
-                RAISE invalid_number;
-            end if;
-            select count(*)
-            into isExists
+            select MAX(SO_DI)
+            into maxThuTu
             from HCTH_CONG_VAN_DI
             WHERE donViGui = DON_VI_GUI
               and (NGAY_TAO > nam)
-              AND LOAI_CONG_VAN = loaiCongVan
-              AND SO_CONG_VAN = TO_CHAR(maxThuTu) || postfix;
+              AND LOAI_CONG_VAN = loaiCongVan;
+        exception
+            when NO_DATA_FOUND then
+                maxThuTu := 0;
+        end;
 
-            maxThuTu := maxThuTu + 1;
-            counter := counter - 1;
-        END LOOP;
+        if maxThuTu is null then
+            maxThuTu := 0;
+        end if;
+        maxThuTu := maxThuTu + 1;
 
-    update HCTH_CONG_VAN_DI hcthCVD
-    set hcthCVD.SO_DI                   = maxThuTu,
-        hcthCVD.TEN_VIET_TAT_DON_VI_GUI = tenVietTatDonViGui,
-        hcthCVD.SO_CONG_VAN             = TO_CHAR(maxThuTu) || postfix
-    WHERE hcthCVD.ID = ma;
+        postfix := '/';
+        IF loaiVanBan IS NOT NULL THEN
+            postfix := postfix || loaiVanBan || '-';
+        end if;
+
+        postfix := postfix || 'XHNV';
+        IF tenVietTatDonViGui IS NOT NULL THEN
+            postfix := postfix || '-' || tenVietTatDonViGui;
+        end if;
+        counter := 2000;
+        select count(*)
+        into isExists
+        from HCTH_CONG_VAN_DI
+        WHERE donViGui = DON_VI_GUI
+          and (NGAY_TAO > nam)
+          AND LOAI_CONG_VAN = loaiCongVan
+          AND SO_CONG_VAN = TO_CHAR(maxThuTu) || postfix;
+        WHILE isExists > 0
+            LOOP
+                if counter = 0 then
+                    RAISE invalid_number;
+                end if;
+                maxThuTu := maxThuTu + 1;
+                counter := counter - 1;
+                select count(*)
+                into isExists
+                from HCTH_CONG_VAN_DI
+                WHERE donViGui = DON_VI_GUI
+                  and (NGAY_TAO > nam)
+                  AND LOAI_CONG_VAN = loaiCongVan
+                  AND SO_CONG_VAN = TO_CHAR(maxThuTu) || postfix;
+            END LOOP;
+
+        update HCTH_CONG_VAN_DI hcthCVD
+        set hcthCVD.SO_DI                   = maxThuTu,
+            hcthCVD.TEN_VIET_TAT_DON_VI_GUI = tenVietTatDonViGui,
+            hcthCVD.SO_CONG_VAN             = TO_CHAR(maxThuTu) || postfix
+        WHERE hcthCVD.ID = ma;
+    end if;
     commit;
 END;
 
@@ -4477,24 +4524,32 @@ END;
 CREATE OR REPLACE procedure HCTH_CONG_VAN_DI_VALIDATE_SO_CONG_VAN(
     ma in number,
     donViGui in NUMBER,
-    nam in NUMBER
+    nam in NUMBER,
+    trangThaiMoi in String
 )
 AS
-    loaiCongVan        STRING(10);
-    soCongVan          STRING(200);
-        counter NUMBER(10);
+    loaiCongVan STRING(20);
+    soCongVan   STRING(200);
+    counter     NUMBER(10);
 BEGIN
     commit;
     set transaction isolation level SERIALIZABLE name 'HCTH_CONG_VAN_DI_VALIDATE_SO_CONG_VAN';
     begin
-        select cvd.SO_CONG_VAN into soCongVan from HCTH_CONG_VAN_DI cvd where cvd.id =ma;
+        select cvd.SO_CONG_VAN into soCongVan from HCTH_CONG_VAN_DI cvd where cvd.id = ma;
         SELECT hcthCVD.LOAI_CONG_VAN into loaiCongVan from HCTH_CONG_VAN_DI hcthCVD WHERE hcthCVD.ID = ma;
-        select count(*) into counter from HCTH_CONG_VAN_DI cvd where cvd.SO_CONG_VAN = soCongVan and donViGui = DON_VI_GUI and (NGAY_TAO > nam) AND LOAI_CONG_VAN = loaiCongVan;
+        select count(*)
+        into counter
+        from HCTH_CONG_VAN_DI cvd
+        where cvd.SO_CONG_VAN = soCongVan
+          and donViGui = cvd.DON_VI_GUI
+          and cvd.NGAY_TAO > nam
+          AND cvd.LOAI_CONG_VAN = loaiCongVan
+          and ((cvd.LAY_SO_TU_DONG = 0 and cvd.TRANG_THAI in ('9', '10')) or cvd.LAY_SO_TU_DONG = 1);
 
         if counter > 0 then
             RAISE invalid_number;
         ELSE
-            update HCTH_CONG_VAN_DI set TRANG_THAI = '6' where ID = ma;
+            update HCTH_CONG_VAN_DI set TRANG_THAI = trangThaiMoi where ID = ma;
         end if;
     end;
     commit;
@@ -4503,15 +4558,18 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_GET_FROM(
-    fileId in number) RETURN SYS_REFCURSOR AS
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_GET_ALL_FROM(
+    congVanId in number) RETURN SYS_REFCURSOR AS
     my_cursor SYS_REFCURSOR;
 BEGIN
     OPEN my_cursor FOR
         SELECT hcthcvtk.ID         as "id",
-               hcthcvtk.NGUOI_TAO  as "shccNguoiTao",
+               hcthcvtk.NGUOI_TAO  as "nguoiTao",
                hcthcvtk.THOI_GIAN  as "thoiGian",
                hcthcvtk.FILE_CONG_VAN as "fileCongVan",
+               cbk.HO as "hoNguoiTao",
+               cbk.TEN as "tenNguoiTao",
+               hcthFile.TEN as "ten",
                 (SELECT LISTAGG(
                     CASE
                         WHEN cbk.HO IS NULL THEN cbk.TEN
@@ -4535,8 +4593,9 @@ BEGIN
 --                  LISTAGG(last_name, '; ') WITHIN GROUP (ORDER BY hire_date, last_name)
 --
         from HCTH_CONG_VAN_TRINH_KY hcthcvtk
---                 LEFT JOIN TCHC_CAN_BO cbk on hcthcbk.NGUOI_KY = cbk.SHCC
-        where (hcthcvtk.FILE_CONG_VAN = fileId)
+            LEFT JOIN HCTH_FILE hcthFile on hcthcvtk.FILE_CONG_VAN = hcthFile.ID
+            LEFT JOIN TCHC_CAN_BO cbk on hcthcvtk.NGUOI_TAO = cbk.SHCC
+        where (hcthcvtk.CONG_VAN = congVanId)
         order by hcthcvtk.id;
     RETURN my_cursor;
 END;

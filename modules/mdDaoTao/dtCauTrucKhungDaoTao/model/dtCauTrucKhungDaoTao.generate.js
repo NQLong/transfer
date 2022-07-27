@@ -1,6 +1,6 @@
-// Table name: DT_CAU_TRUC_KHUNG_DAO_TAO { id, mucCon, namDaoTao, mucCha, batDauDangKy, ketThucDangKy, khoa }
+// Table name: DT_CAU_TRUC_KHUNG_DAO_TAO { id, mucCon, namDaoTao, mucCha, batDauDangKy, ketThucDangKy, khoa, bacDaoTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'mucCon': 'MUC_CON', 'namDaoTao': 'NAM_DAO_TAO', 'mucCha': 'MUC_CHA', 'batDauDangKy': 'BAT_DAU_DANG_KY', 'ketThucDangKy': 'KET_THUC_DANG_KY', 'khoa': 'KHOA' };
+const obj2Db = { 'id': 'ID', 'mucCon': 'MUC_CON', 'namDaoTao': 'NAM_DAO_TAO', 'mucCha': 'MUC_CHA', 'batDauDangKy': 'BAT_DAU_DANG_KY', 'ketThucDangKy': 'KET_THUC_DANG_KY', 'khoa': 'KHOA', 'bacDaoTao': 'BAC_DAO_TAO' };
 
 module.exports = app => {
     app.model.dtCauTrucKhungDaoTao = {
