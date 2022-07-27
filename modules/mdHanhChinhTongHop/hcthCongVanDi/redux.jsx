@@ -8,6 +8,7 @@ const hcthCongVanDiGet = 'hcthCongVanDi:Get';
 const hcthCongVanDiGetHistory = 'hcthCongVanDi:GetHistory';
 const hcthCongVanDiGetError = 'hcthCongVanDi:GetError';
 const hcthCongVanDiGetPhanHoi = 'hcthCongVanDi:GetPhanHoi';
+const hcthCongVanDiGetCongVanTrinhKy = 'hcthCongVanDi:GetCongVanTrinhKy';
 
 export default function hcthCongVanDiReducer(state = null, data) {
     switch (data.type) {
@@ -25,6 +26,8 @@ export default function hcthCongVanDiReducer(state = null, data) {
             return Object.assign({}, state, { item: { ...(state?.item || {}), error: data.error } });
         case hcthCongVanDiGetPhanHoi:
             return Object.assign({}, state, { item: { ...(state?.item || {}), phanHoi: data.phanHoi } });
+        case hcthCongVanDiGetCongVanTrinhKy:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), yeuCauKy: data.yeuCauKy } });
         default:
             return state;
     }
@@ -139,10 +142,10 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
     };
 }
 
-export function deleteFile(id, fileId, file, done) {
+export function deleteFile(id, fileId, updateFileId, file, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/delete-file';
-        T.put(url, { id, fileId, file }, data => {
+        T.put(url, { id, fileId, updateFileId, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
                 T.notify('Xóa file đính kèm lỗi!', 'danger');
@@ -248,6 +251,21 @@ export function getHistory(id, context, done) {
                 console.error('GET: ' + url + '. ' + res.error);
             } else {
                 dispatch({ type: hcthCongVanDiGetHistory, history: res.item });
+                done && done(res.item);
+            }
+        }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
+    };
+}
+
+export function getYeuCauKy(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-cac-phong/yeu-cau-ky/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy yêu cầu ký lỗi', 'danger');
+                console.error('GET: ' + url + '. ' + res.error);
+            } else {
+                dispatch({ type: hcthCongVanDiGetCongVanTrinhKy, yeuCauKy: res.item });
                 done && done(res.item);
             }
         }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
