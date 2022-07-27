@@ -62,18 +62,18 @@ class DashboardIcon extends React.Component {
     }
 }
 
-class ChartArea extends React.Component {
+export class ChartArea extends React.Component {
     state = {}
     render() {
         let { className, title, chartType, data, aspectRatio = null, renderFilter = null } = this.props;
         return (
             <div className={className}>
                 <div className='tile'>
-                    <h5 className='tile-title' style={{ position: 'relative' }}>{title.toUpperCase()}</h5>
+                    <h5 className='tile-title' style={{ position: 'relative' }}>{title}</h5>
                     <span style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                        <Tooltip title={this.state[title] ? 'Hiện' : 'Ẩn'} arrow>
+                        {!this.props.hideMinimize && <Tooltip title={this.state[title] ? 'Hiện' : 'Ẩn'} arrow>
                             <button className='btn btn-white' onClick={e => e.preventDefault() || this.setState({ [title]: !this.state[title] })} ><i className='fa fa-lg fa-minus' /></button>
-                        </Tooltip>
+                        </Tooltip>}
                     </span>
                     {renderFilter}
                     <div style={{ display: this.state[title] ? 'none' : 'block' }} >

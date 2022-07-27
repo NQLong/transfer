@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
-    getStaffEdit, updateStaff, downloadWord
+    getStaffEdit, updateStaff, downloadWord, updateStaffUser
 } from './redux';
 import { createTccbSupport } from '../tccbSupport/redux';
 // import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
@@ -29,6 +29,7 @@ class StaffUserPage extends AdminPage {
                 } else {
                     this.shcc = staff.shcc;
                     this.email = staff.email;
+                    this.props.updateStaffUser(this.email, { lastLogin: Date.now() });
                 }
                 this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
@@ -111,6 +112,6 @@ class StaffUserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
-    getStaffEdit, updateStaff, downloadWord, createTccbSupport
+    getStaffEdit, updateStaff, downloadWord, createTccbSupport, updateStaffUser
 };
 export default connect(mapStateToProps, mapActionsToProps)(StaffUserPage);

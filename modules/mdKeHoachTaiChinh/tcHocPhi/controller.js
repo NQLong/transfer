@@ -6,13 +6,23 @@ module.exports = app => {
         },
     };
 
+    const menuStatistic = {
+        parentMenu: app.parentMenu.finance,
+        menus: {
+            5006: { title: 'Thống kê', link: '/user/finance/statistic' },
+        },
+    };
+
     app.permission.add(
-        { name: 'tcHocPhi:read', menu }, 'tcHocPhi:write', 'tcHocPhi:delete',
+        { name: 'tcHocPhi:read', menu },
+        { name: 'tcHocPhi:read', menu: menuStatistic },
+        'tcHocPhi:write', 'tcHocPhi:delete',
     );
 
     app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/finance/statistic', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
 
     //APIs ------------------------------------------------------------------------------------------------------------------------------------------
@@ -191,7 +201,6 @@ module.exports = app => {
         res.send({ hocPhiHuongDan });
     });
 
-
     const tcHocPhiImportData = async (fields, files, done) => {
         let worksheet = null;
         if (fields.userData && fields.userData[0] && fields.userData[0] == 'TcHocPhiData' && files.TcHocPhiData && files.TcHocPhiData.length) {
@@ -255,6 +264,7 @@ module.exports = app => {
 
     const termDatas = ['HK1', 'HK2', 'HK3'];
 
+    //Export xlsx
     app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:write'), async (req, res) => {
         let loaiPhiData = await app.model.tcLoaiPhi.getAll({ kichHoat: 1 });
         loaiPhiData = loaiPhiData.map(item => item.ten);
@@ -279,8 +289,6 @@ module.exports = app => {
         });
         app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
     });
-
-
 
     app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:read'), async (req, res) => {
         try {
@@ -360,4 +368,87 @@ module.exports = app => {
             res.send({ error });
         }
     });
+
+    // //Email notify -------------------------------------------------------------------------------------------------------------------------
+    // app.get('/api/finance/email-nhac-nho', app.permission.check('tcHocPhi:write'), async (req, res) => {
+    //     try {
+    //         const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'email', 'emailPassword', 'hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditorHtml', 'hocPhiEmailNhacNhoEditorText'),
+    //             { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = config;
+    //         let data = await app.model.tcHocPhi.getAll({
+    //             statement: 'namHoc = :namHoc AND hocKy = :hocKy AND congNo > 0',
+    //             parameter: { namHoc, hocKy }
+    //         });
+    //         if (!data || !data.length) throw 'Không tìm thấy dữ liệu sinh viên nợ';
+    //         data = data.map(item => ({ ...item, email: `${item.mssv}@hcmussh.edu.vn` }));
+    //         let listEmail = data.map(item => item.email);
+
+    //         let i = 0;
+    //         while (data.length) {
+    //             const item = data[i];
+    //             let mailTitle = config.hocPhiEmailNhacNhoTitle.replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
+    //                 .replaceAll('{hoc_ky}', hocKy)
+    //                 .replaceAll('{ho_ten}', item.hoTen)
+    //                 .replaceAll('{mssv}', item.mssv)
+    //                 .replaceAll('{cong_no}', item.congNo)
+    //                 ,
+    //                 mailText = config.hocPhiEmailNhacNhoEditorText.replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
+    //                     .replaceAll('{hoc_ky}', hocKy)
+    //                     .replaceAll('{ho_ten}', item.hoTen)
+    //                     .replaceAll('{mssv}', item.mssv)
+    //                     .replaceAll('{cong_no}', item.congNo),
+    //                 mailHtml = config.hocPhiEmailNhacNhoEditorHtml.replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
+    //                     .replaceAll('{hoc_ky}', hocKy)
+    //                     .replaceAll('{ho_ten}', item.hoTen)
+    //                     .replaceAll('{mssv}', item.mssv)
+    //                     .replaceAll('{cong_no}', item.congNo);
+    //             await app.email.normalSendEmail(config.email, config.emailPassword, '', '', listEmail.splice(0, 50), mailTitle, mailText, mailHtml);
+    //         }
+    //         res.send({ data });
+    //     } catch (error) {
+    //         res.send({ error });
+    //     }
+    // });
+
+    const countGroupBy = (array, key) => {
+        let data = array.groupBy(key);
+        Object.keys(data).forEach(item => {
+            data[item] = data[item].length;
+        });
+        return data;
+    };
+    //Statistic -------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/finance/statistic', app.permission.check('tcHocPhi:write'), async (req, res) => {
+        try {
+            let filter = app.parse(req.query.filter, {});
+            const settings = await getSettings();
+
+            if (!filter.namHoc || !filter.hocKy) {
+                if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
+                if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
+            }
+            filter = app.stringify(filter);
+            const data = await app.model.tcHocPhi.getStatistic(filter);
+
+            let dataByStudents = data.rows,
+                dataTransactions = data.transactions;
+            let dataByDate = dataTransactions.map(item => ({ ...item, 'date': app.date.viDateFormat(new Date(Number(item.ngayDong))) }));
+            let totalStudents = dataByStudents.length,
+                totalByDate = countGroupBy(dataByDate, 'date'),
+                totalTransactions = dataTransactions.length,
+                totalCurrentMoney = dataTransactions.reduce((sum, item) => sum + parseInt(item.khoanDong), 0),
+                amountByDepartment = countGroupBy(dataTransactions, 'tenNganh'),
+                amountByBank = countGroupBy(dataTransactions, 'nganHang'),
+                amountByEduLevel = countGroupBy(dataByStudents, 'tenBacDaoTao'),
+                amountByEduMethod = countGroupBy(dataByStudents, 'loaiHinhDaoTao'),
+                amountPaid = dataByStudents.filter(item => item.congNo == 0).length,
+                amountNotPaid = totalStudents - amountPaid;
+            const statistic = { totalStudents, totalTransactions, amountByBank, amountByEduLevel, amountByEduMethod, amountPaid, amountNotPaid, totalCurrentMoney, amountByDepartment, totalByDate };
+            res.send({ statistic, settings });
+        } catch (error) {
+            res.send({ error });
+        }
+
+
+    });
+
 };

@@ -51,7 +51,7 @@ class ComponentTrinhDo extends AdminPage {
                 hocVi,
                 namChucDanh: this.getValue(this.namChucDanh),
                 coSoChucDanh: this.getValue(this.coSoChucDanh),
-                chuyenNganhChucDanh: this.getValue(this.chuyenNganh),
+                chuyenNganhChucDanh: this.getValue(this.chuyenNganhChucDanh),
             };
             return data;
         }

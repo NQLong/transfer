@@ -138,7 +138,7 @@ class AdminEditPage extends AdminPage {
                 routeMatcherUrl: '/user/hcth/cong-van-cac-phong/:id',
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
-                    <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    <Link key={1} to='/user/hcth/cong-van-cac-phong'>Danh sách công văn đi</Link>,
                     this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/hcth/cong-van-cac-phong'
@@ -149,7 +149,7 @@ class AdminEditPage extends AdminPage {
                 readyUrl: '/user',
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                    <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn các phòng</Link>,
+                    <Link key={1} to='/user/cong-van-cac-phong'>Danh sách công văn đi</Link>,
                     this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],
                 backRoute: '/user/cong-van-cac-phong'
@@ -585,7 +585,7 @@ class AdminEditPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
-            title: 'Công văn các phòng',
+            title: 'Công văn đi',
             breadcrumb,
             content: this.state.isLoading ? loading : (<>
                 <div className='tile'>
