@@ -124,7 +124,7 @@ class EditModal extends AdminModal {
 
 class QtKhenThuongAll extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoDoiTuong')) == 1;
-    state = { filter: { loaiDoiTuong: '-1' }};
+    state = { filter: { loaiDoiTuong: '-1' } };
     stateTable = [{ 'id': '-1', 'text': 'Tất cả' }];
 
     componentDidMount() {
@@ -163,7 +163,7 @@ class QtKhenThuongAll extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
-        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageCondition: {}};
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
 
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
 
@@ -245,11 +245,10 @@ class QtKhenThuongAll extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-                this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageGr ?
-                    this.props.qtKhenThuongAll.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+            this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageGr ?
+                this.props.qtKhenThuongAll.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách';
         if (list && list.length > 0) {
@@ -324,10 +323,10 @@ class QtKhenThuongAll extends AdminPage {
                     <FormTextBox className='col-md-2' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' />
                     <FormSelect className='col-12 col-md-8' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
                     {(this.loaiDoiTuong && this.loaiDoiTuong.value() == '02') &&
-                    <>
-                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear minimumResultsForSearch={-1} />
-                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear minimumResultsForSearch={-1} />
-                    </>}
+                        <>
+                            <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear minimumResultsForSearch={-1} />
+                            <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear minimumResultsForSearch={-1} />
+                        </>}
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -348,12 +347,12 @@ class QtKhenThuongAll extends AdminPage {
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} create={this.props.createQtKhenThuongAllMultiple} update={this.props.updateQtKhenThuongAll} permissions={currentPermissions} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} create={this.props.createQtKhenThuongAllMultiple} update={this.props.updateQtKhenThuongAll} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/khen-thuong-all/upload') : null,
-            onExport: !this.checked ? (e) => {
+            onImport: !this.checked && permission.export ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/khen-thuong-all/upload') : null,
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 const filter = T.stringify(this.state.filter);
 

@@ -9,11 +9,18 @@ module.exports = app => {
         { name: 'qtChucVu:read', menu },
         { name: 'qtChucVu:write' },
         { name: 'qtChucVu:delete' },
+        { name: 'qtChucVu:export' },
     );
     app.get('/user/tccb/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtChucVu', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtChucVu:read', 'qtChucVu:write', 'qtChucVu:delete', 'qtChucVu:export');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     /// TCCB Apis -----------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
@@ -84,7 +91,7 @@ module.exports = app => {
     /// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
 
     /// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:export'), (req, res) => {
         let { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;

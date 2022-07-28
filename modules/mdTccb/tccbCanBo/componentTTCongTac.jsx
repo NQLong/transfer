@@ -117,7 +117,9 @@ class ComponentTTCongTac extends AdminPage {
     }
 
     render() {
-        const { create = false, readOnly = true, shcc } = this.props;
+        const { create = false, permission, shcc } = this.props;
+        let readOnly = true;
+        if (permission.write) readOnly = false;
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin công tác</h3>
@@ -143,16 +145,16 @@ class ComponentTTCongTac extends AdminPage {
                     <FormTextBox ref={e => this.soBhxh = e} className='col-md-6' label='Mã số Bảo hiểm xã hội' readOnly={readOnly} />
                     <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-3' label='Tháng bắt đầu' type='month-mask' readOnly={readOnly} />
                     <FormDatePicker ref={e => this.ngayKetThucBhxh = e} className='col-md-3' label='Tháng kết thúc' type='month-mask' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.soBhyt = e} className='col-md-6' label='Mã thẻ Bảo hiểm y tế' />
-                    <FormSelect ref={e => this.noiKhamBenhBanDau = e} className='col-md-6' label='Nơi khám chữa bệnh ban đầu' data={SelectAdapter_DmBenhVienV2} />
+                    <FormTextBox ref={e => this.soBhyt = e} className='col-md-6' label='Mã thẻ Bảo hiểm y tế' readOnly={!permission.login && !permission.write} />
+                    <FormSelect ref={e => this.noiKhamBenhBanDau = e} className='col-md-6' label='Nơi khám chữa bệnh ban đầu' data={SelectAdapter_DmBenhVienV2} readOnly={!(permission.login || permission.write)} />
 
                     <div className='form-group col-md-12'></div>
 
-                    <FormCheckbox ref={e => this.doiTuongBoiDuong = e} label='Đối tượng bồi dưỡng kiến thức Quốc phòng và An ninh' onChange={value => this.setState({ doiTuongBoiDuong: value })} className='col-md-12' />
-                    {this.state.doiTuongBoiDuong ? <FormSelect ref={e => this.loaiDoiTuongBoiDuong = e} label='Loại đối tượng' data={[{ id: 2, text: 'Loại 2' }, { id: 3, text: 'Loại 3' }, { id: 4, text: 'Loại 4' }]} className='col-md-3' required={this.state.doiTuongBoiDuong} /> : null}
-                    {this.state.doiTuongBoiDuong ? <FormCheckbox ref={e => this.tinhTrangBoiDuong = e} label='Đã tham gia bồi dưỡng' onChange={value => this.setState({ tinhTrangBoiDuong: value })} className='col-md-3' /> : null}
-                    {this.state.tinhTrangBoiDuong ? <FormTextBox type='year' ref={e => this.namBoiDuong = e} label='Năm bồi dưỡng' className='col-md-2' required={this.state.tinhTrangBoiDuong} /> : null}
-                    {this.state.tinhTrangBoiDuong ? <FormTextBox ref={e => this.khoaBoiDuong = e} label='Khóa bồi dưỡng' placeholder='Ghi rõ khóa mấy, dành cho đối tượng nào' className='col-md-4' required={this.state.tinhTrangBoiDuong} /> : null}
+                    <FormCheckbox ref={e => this.doiTuongBoiDuong = e} label='Đối tượng bồi dưỡng kiến thức Quốc phòng và An ninh' onChange={value => this.setState({ doiTuongBoiDuong: value })} className='col-md-12' readOnly={!(permission.login || permission.write)} />
+                    {this.state.doiTuongBoiDuong ? <FormSelect ref={e => this.loaiDoiTuongBoiDuong = e} label='Loại đối tượng' data={[{ id: 2, text: 'Loại 2' }, { id: 3, text: 'Loại 3' }, { id: 4, text: 'Loại 4' }]} className='col-md-3' required={this.state.doiTuongBoiDuong} readOnly={!(permission.login || permission.write)} /> : null}
+                    {this.state.doiTuongBoiDuong ? <FormCheckbox ref={e => this.tinhTrangBoiDuong = e} label='Đã tham gia bồi dưỡng' onChange={value => this.setState({ tinhTrangBoiDuong: value })} className='col-md-3' readOnly={!(permission.login || permission.write)} /> : null}
+                    {this.state.tinhTrangBoiDuong ? <FormTextBox type='year' ref={e => this.namBoiDuong = e} label='Năm bồi dưỡng' className='col-md-2' required={this.state.tinhTrangBoiDuong} readOnly={!(permission.login || permission.write)} /> : null}
+                    {this.state.tinhTrangBoiDuong ? <FormTextBox ref={e => this.khoaBoiDuong = e} label='Khóa bồi dưỡng' placeholder='Ghi rõ khóa mấy, dành cho đối tượng nào' className='col-md-4' required={this.state.tinhTrangBoiDuong} readOnly={!(permission.login || permission.write)} /> : null}
 
                     {!create && <>
                         <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-12' readOnly />

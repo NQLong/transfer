@@ -164,8 +164,7 @@ class QtNghiViec extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtNghiViec', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtNghiViec', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiViec && this.props.qtNghiViec.page ? this.props.qtNghiViec.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: null };
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu',
@@ -218,8 +217,6 @@ class QtNghiViec extends AdminPage {
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                     </TableCell>
-
-
                 </tr>
             )
         });
@@ -258,24 +255,22 @@ class QtNghiViec extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <NghiViecModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
+                <NghiViecModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtNghiViecStaff} update={this.props.updateQtNghiViecStaff}
                 />
-                <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tạo danh sách nghỉ hưu dự kiến' customIcon='fa-list-ol' onClick={e => {
+                {permission.write && <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tạo danh sách nghỉ hưu dự kiến' customIcon='fa-list-ol' onClick={e => {
                     e.preventDefault();
                     this.props.history.push('/user/tccb/qua-trinh/nghi-viec/create-list');
-                }} />
+                }} />}
             </>,
             backRoute: '/user/tccb',
-            onCreate: (e) => this.showModal(e),
-            onExport: (e) => {
+            onCreate: permission.write ? (e) => this.showModal(e) : null,
+            onExport: permission.export ? (e) => {
                 e.preventDefault();
                 let filter = T.stringify(this.state.filter);
                 if (filter.includes('%')) filter = '{}';
-
                 T.download(T.url(`/api/qua-trinh/nghi-viec/download-excel/${filter}`), 'NGHIVIEC.xlsx');
-            }
+            } : null
         });
     }
 }

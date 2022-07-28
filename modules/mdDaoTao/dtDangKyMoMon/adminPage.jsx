@@ -121,8 +121,8 @@ class DtDangKyMoMonPage extends AdminPage {
                 }, totalItem: 0, list: null, thoiGianMoMon: null
             };
         let permission = {
-            write: permissionDaoTao.write,
-            delete: permissionDaoTao.delete
+            write: permissionDaoTao.write || permissionDaoTao.manage,
+            delete: permissionDaoTao.delete || permissionDaoTao.manage
         };
         let table = renderTable({
             getDataSource: () => list,
@@ -153,8 +153,8 @@ class DtDangKyMoMonPage extends AdminPage {
                     <TableCell content={'HK' + item.hocKy} />
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namHoc} />
                     <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.thoiGian} />
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ write: item.permissionWrite }} onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`)} />
-                    <TableCell contentClassName='multiple-lines-4' content={item.isDuyet ? 'Phòng Đào tạo đã xác nhận' : 'Phòng Đào tạo chưa xác nhận'} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ write: item.permissionWrite }} onEdit={() => permission.write ? this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`) : T.notify('Vui lòng liên hệ người quản lý đào tạo!', 'danger')} />
+                    <TableCell contentClassName='multiple-lines-4' content={item.isDuyet ? 'Đã xác nhận' : 'Chưa xác nhận'} />
 
                 </tr>)
         });

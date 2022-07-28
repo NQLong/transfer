@@ -16,6 +16,13 @@ module.exports = app => {
 
     app.get('/user/dao-tao/khoi-kien-thuc', app.permission.orCheck('dmKhoiKienThuc:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRolesDtKhoiKienThuc', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dmKhoiKienThuc:read', 'dmKhoiKienThuc:write', 'dmKhoiKienThuc:delete');
+            resolve();
+        } else resolve();
+    }));
+
     //APIs----------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/khoi-kien-thuc/page/:pageNumber/:pageSize', app.permission.orCheck('dmKhoiKienThuc:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),

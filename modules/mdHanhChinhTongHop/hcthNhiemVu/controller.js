@@ -24,8 +24,6 @@ module.exports = (app) => {
         { name: 'staff:login', menu },
     );
 
-
-
     app.get('/user/hcth/nhiem-vu', app.permission.check('hcth:login'), app.templates.admin);
     app.get('/user/hcth/nhiem-vu/:id', app.permission.check('hcth:login'), app.templates.admin);
 
@@ -59,6 +57,7 @@ module.exports = (app) => {
                 nhiemVu.donViNhan = donViNhan || [];
             }
             return (
+                permissions.includes('hcthGiaoNhiemVu:read') ||
                 permissions.includes('rectors:login') ||
                 permissions.includes('hcth:manage') ||
                 req.session.user?.staff.shcc == nhiemVu.nguoiTao ||
