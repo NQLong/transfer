@@ -290,7 +290,6 @@ module.exports = app => {
                     } else resolve();
                 })).then(() => new Promise(resolve => {
                     // AssignRole hooks
-                    console.log(user.staff);
                     if (user.isStaff) {
                         app.model.fwAssignRole.getAll({ nguoiDuocGan: user.shcc }, (error, roles) => {
                             if (!error || roles != []) {
