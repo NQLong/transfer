@@ -17,6 +17,13 @@ module.exports = app => {
     });
 
     // Clear sessions ----------------------------------------------------------------------------------------------------------------------------------
+    const refreshSessionUser = (key, session) => new Promise((resolve) => app.updateSessionUser(null, session.user, newUser => {
+        if (newUser) {
+            session.user = newUser;
+            app.database.redis.set(key, JSON.stringify(session), () => resolve());
+        } else resolve();
+    }));
+
     app.readyHooks.add('clearSessionSchedule', {
         ready: () => app.database.redis,
         run: () => {
@@ -26,9 +33,9 @@ module.exports = app => {
                 app.database.redis.keys(sessionPrefix + '*', async (error, keys) => {
                     // Tính toán hôm nay và 7 ngày trước
                     const today = new Date().yyyymmdd();
-                    let last7Day = new Date();
-                    last7Day.setDate(last7Day.getDate() - 7);
-                    last7Day = last7Day.yyyymmdd();
+                    let last3Day = new Date();
+                    last3Day.setDate(last3Day.getDate() - 3);
+                    last3Day = last3Day.yyyymmdd();
 
                     if (!error) {
                         // Lấy sessionUser
@@ -37,7 +44,7 @@ module.exports = app => {
                         });
 
                         try {
-                            let deleteCounter = 0;
+                            let deleteCounter = 0, refreshCounter = 0;
                             console.log('Total sessions: ', keys.length); // Tổng cộng sessions
                             for (const key of keys) {
                                 const sessionUser = await getKey(key);
@@ -45,10 +52,13 @@ module.exports = app => {
                                     await app.database.redis.del(key);
                                     deleteCounter++;
                                 } else if (sessionUser.user) { // Có login
-                                    // Nếu ko có today hoặc session lâu hơn 7 ngày => Xóa session
-                                    if (!sessionUser.today || parseInt(sessionUser.today) < parseInt(last7Day)) {
+                                    // Nếu ko có today hoặc session lâu hơn 3 ngày => Xóa session
+                                    if (!sessionUser.today || parseInt(sessionUser.today) < parseInt(last3Day)) {
                                         await app.database.redis.del(key);
                                         deleteCounter++;
+                                    } else {
+                                        await refreshSessionUser(key, sessionUser);
+                                        refreshCounter++;
                                     }
                                 } else {
                                     // Không login
@@ -59,6 +69,7 @@ module.exports = app => {
                                 }
                             }
                             console.log(' - Number of deleted sessions: ', deleteCounter);
+                            console.log(' - Number of refreshed sessions: ', refreshCounter);
                             console.log(' - Schedule: Clear session user done!');
                         } catch (e) {
                             console.error(e);

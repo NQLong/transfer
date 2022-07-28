@@ -160,7 +160,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             style: { marginTop: '5px' },
             getDataSource: () => this.state.loading ? null : list,
             emptyTable: 'Không có dữ liệu công văn đến',
-            stickyHead: false,
+            stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
@@ -239,7 +239,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         };
 
         const tabs = !(user.isStaff || user.isStudent) ? [tabList.all] :
-            donViQuanLy.length || currentPermissions.includes('president:login') || currentPermissions.includes('donViCongVanDen:read') ? [tabList.all, tabList.donVi, tabList.self]
+            donViQuanLy.length || currentPermissions.includes('president:login') || currentPermissions.includes('donViCongVanDen:test') ? [tabList.all, tabList.donVi, tabList.self]
                 : currentPermissions.includes('rectors:login') || (currentPermissions.includes('hcth:login')) ? [tabList.all, tabList.self]
                     : [tabList.self];
 
