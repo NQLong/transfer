@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.finance,
         menus: {
-            5003: { title: 'Học phí', link: '/user/finance/hoc-phi' },
+            5003: { title: 'Quản lý học phí', link: '/user/finance/hoc-phi' },
         },
     };
 
@@ -14,27 +14,28 @@ module.exports = app => {
     };
 
     app.permission.add(
+        { name: 'tcHocPhi:read', menu },
         { name: 'tcHocPhi:manage', menu },
         { name: 'tcHocPhi:manage', menu: menuStatistic },
-        'tcHocPhi:write', 'tcHocPhi:delete',
+        'tcHocPhi:write', 'tcHocPhi:delete', 'tcHocPhi:export'
     );
 
     app.permissionHooks.add('staff', 'addRolesTcHocPhi', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcHocPhi:manage', 'tcHocPhi:write', 'tcHocPhi:delete');
+            app.permissionHooks.pushUserPermission(user, 'tcHocPhi:manage', 'tcHocPhi:write', 'tcHocPhi:delete', 'tcHocPhi:read');
             resolve();
         } else resolve();
     }));
 
 
-    app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:manage'), app.templates.admin);
+    app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:manage'), app.templates.admin);
-    app.get('/user/finance/statistic', app.permission.check('tcHocPhi:manage'), app.templates.admin);
+    app.get('/user/finance/statistic', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:manage'), app.templates.admin);
 
     //APIs ------------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:manage', 'student:login'), async (req, res) => {
+    app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
         let filter = req.query.filter || {};
@@ -46,7 +47,7 @@ module.exports = app => {
         const { namHoc, hocKy } = filter;
         filter = app.stringify(filter, '');
         let mssv = '';
-        if (!req.session.user.permissions.includes('tcHocPhi:manage')) mssv = req.session.user.data.mssv;
+        if (!req.session.user.permissions.includes('tcHocPhi:read')) mssv = req.session.user.data.mssv;
 
         app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), mssv, searchTerm, filter, (error, page) => {
             if (error || !page) {
@@ -78,12 +79,12 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/user/hoc-phi', app.permission.orCheck('tcHocPhi:manage', 'student:login'), async (req, res) => {
+    app.get('/api/finance/user/hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
         try {
             const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings();
             const user = req.session.user, permissions = user.permissions;
             let mssv = '';
-            if (!permissions.includes('tcHocPhi:manage')) {
+            if (!permissions.includes('tcHocPhi:read')) {
                 mssv = user.data.mssv;
                 const khoa = await app.model.dmDonVi.get({ ma: user.data.khoa }, 'ten');
                 user.data.tenKhoa = khoa.ten;
@@ -102,11 +103,11 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/user/get-all-hoc-phi', app.permission.orCheck('student:login', 'tcHocPhi:manage'), async (req, res) => {
+    app.get('/api/finance/user/get-all-hoc-phi', app.permission.orCheck('student:login', 'tcHocPhi:read'), async (req, res) => {
         try {
             const user = req.session.user, permissions = user.permissions;
             let mssv = '';
-            if (!permissions.includes('tcHocPhi:manage')) {
+            if (!permissions.includes('tcHocPhi:read')) {
                 mssv = user.data.mssv;
             } else mssv = req.query.mssv;
             const data = await app.model.tcHocPhi.getAllFeeOfStudent(mssv);
@@ -273,7 +274,7 @@ module.exports = app => {
     const termDatas = ['HK1', 'HK2', 'HK3'];
 
     //Export xlsx
-    app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:write'), async (req, res) => {
+    app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:export'), async (req, res) => {
         let loaiPhiData = await app.model.tcLoaiPhi.getAll({ kichHoat: 1 });
         loaiPhiData = loaiPhiData.map(item => item.ten);
         const workBook = app.excel.create();
