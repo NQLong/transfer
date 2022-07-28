@@ -22,6 +22,17 @@ class ThanhToanModal extends AdminModal {
                     </button>
                 </Tooltip>
 
+                <Tooltip title='Thanh toán qua VNPAY (ngoài Agribank)' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                        this.props.vnPayGoToTransaction('agri', link => {
+                            window.location.href = link;
+                        });
+                    }}>
+                        <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY (không Agribank)
+                    </button>
+                </Tooltip>
+
                 <Tooltip title='Thanh toán qua Vietcombank' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
@@ -32,15 +43,8 @@ class ThanhToanModal extends AdminModal {
                         <img src={`/img/logo/vcb.png?t=${new Date().getTime()}`} alt='Vietcombank' style={styleLogo} />Thanh toán qua Vietcombank
                     </button>
                 </Tooltip>
-                <Tooltip title='Thanh toán qua BIDV' arrow placement='top'>
-                    <button className='btn' style={styleButton} onClick={e => {
-                        e.preventDefault();
-                    }}>
-                        <img src={`/img/logo/logo_bidv.png?t=${new Date().getTime()}`} alt='BIDV' style={styleLogo} /> Thanh toán qua BIDV
-                    </button>
-                </Tooltip>
 
-                <Tooltip title='Thanh toán qua VNPAY' arrow placement='top'>
+                <Tooltip title='Thanh toán qua VNPAY (ngoài VCB)' arrow placement='top'>
                     <button className='btn' style={styleButton} onClick={e => {
                         e.preventDefault();
                         this.props.vnPayGoToTransaction('vcb', link => {
@@ -49,7 +53,14 @@ class ThanhToanModal extends AdminModal {
                     }}>
                         <img src={`/img/logo/vnpay.png?t=${new Date().getTime()}`} alt='VNPAY' style={styleLogo} /> Thanh toán qua VNPAY
                     </button>
+                </Tooltip>
 
+                <Tooltip title='Thanh toán qua BIDV' arrow placement='top'>
+                    <button className='btn' style={styleButton} onClick={e => {
+                        e.preventDefault();
+                    }}>
+                        <img src={`/img/logo/logo_bidv.png?t=${new Date().getTime()}`} alt='BIDV' style={styleLogo} /> Thanh toán qua BIDV
+                    </button>
                 </Tooltip>
 
             </div>
@@ -131,20 +142,21 @@ class UserPage extends AdminPage {
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
                             <i style={{ fontSize: '16px' }}>Học kỳ {hocKy}</i>
-                            {current.congNo ? <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b> : <b>Đã thanh toán đủ.</b>
+                            {
+                                current.congNo ?
+                                    (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
+                                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                            Thanh toán
+                                        </button>
+                                    </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
                             }
                         </div>
-                        {/* <Tooltip title='Thanh toán' placement='top' arrow>
-                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
-                                Thanh toán
-                            </button>
-                        </Tooltip> */}
                         <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
                         {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
                         <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >
                             <div>
                                 <div>Miễn giảm: <b>{current.mienGiam || 'Không'}</b> </div>
-                                <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div>
+                                {/* <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div> */}
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <div>Tổng học phí: <b>{T.numberDisplay(Number(current.hocPhi))} VNĐ </b></div>

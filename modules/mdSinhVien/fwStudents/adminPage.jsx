@@ -82,7 +82,7 @@ class AdminStudentsPage extends AdminPage {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
-            this.props.sinhVien.page : { pageNumber: 1, pageSize: 500, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
+            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu sinh viên',

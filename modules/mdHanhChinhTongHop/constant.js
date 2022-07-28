@@ -10,13 +10,18 @@ module.exports = {
     },
 
     trangThaiCongVanDi: {
-        MOI: { id: '1', text: 'Mới' },
+        NHAP: { id: '1', text: 'Nháp' },
+        XEM_XET: { id: '6', text: 'Xem xét' },
         CHO_KIEM_TRA: { id: '2', text: 'Chờ kiểm tra' },
         CHO_DUYET: { id: '3', text: 'Chờ duyệt' },
         TRA_LAI: { id: '4', text: 'Trả lại' },
-        DA_GUI: { id: '5', text: 'Đã gửi' },
-        DA_DOC: { id: '6', text: 'Đã đọc' },
+        DA_XEM_XET: { id: '5', text: 'Đã xem xét' },
         DA_DUYET: { id: '7', text: 'Đã duyệt' },
+        CHO_PHAN_PHOI: {id: '8', text: 'Chờ phân phối'},
+        CHO_KY: {id: '9', text: 'Chờ ký'},
+        DA_PHAN_PHOI: {id:'10', text: 'Đã phân phối'},
+        TRA_LAI_PHONG: {id: '11', text: 'Trả lại (Đơn vị)'},
+        TRA_LAI_HCTH: {id: '12', text: 'Trả lại (HCTH)'}
     },
 
     action: {
@@ -40,6 +45,8 @@ module.exports = {
         ADD_SIGN_REQUEST: 'ADD_SIGN_REQUEST',
         REMOVE_SIGN_REQUEST: 'REMOVE_SIGN_REQUEST',
         UPDATE_SIGN_REQUEST: 'UPDATE_SIGN_REQUEST',
+        WAIT_SIGN: 'WAIT_SIGN',
+        DISTRIBUTE: 'DISTRIBUTE'
     },
 
     CONG_VAN_TYPE: 'DEN',
@@ -90,7 +97,7 @@ module.exports = {
 
         'CONG_VAN_DI': {
             id: 'CONG_VAN_DI',
-            text: 'Công văn các phòng',
+            text: 'Công văn đi',
         }
     },
 

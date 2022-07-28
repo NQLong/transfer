@@ -609,7 +609,7 @@ class StaffEditPage extends AdminPage {
         return (
             currentPermission.includes('rectors:login') ||
             currentPermission.includes('hcth:login') ||
-            (currentPermission.includes('donViCongVanDen:read') && maDonViNhan.includes(maDonViCanBo)) ||
+            (currentPermission.includes('donViCongVanDen:test') && maDonViNhan.includes(maDonViCanBo)) ||
             this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) ||
             maCanBoNhan.includes(this.state.shcc)
         );

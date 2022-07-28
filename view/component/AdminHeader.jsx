@@ -179,7 +179,7 @@ class NotificationItem extends AdminPage {
                         </span>
                         <div>
                             <p className='app-notification__message' style={{ fontWeight: 'bold' }}>{item.title}</p>
-                            <p className='app-notification__meta'>{T.dateToText(item.sendTime, 'dd/mm/yy HH:mm')}</p>
+                            <p className='app-notification__meta'>{T.dateToText(item.sendTime, 'dd/mm/yy HH:MM')}</p>
                             <p className='app-notification__meta' style={{ color: !item.read ? 'blue' : 'black' }}>{item.subTitle}</p>
                             {buttons.length ? (
                                 <div className='row'>

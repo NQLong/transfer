@@ -29,8 +29,12 @@ const { loaiCongVan } = require('../constant');
 
 const listTrangThai = {
     '1': {
-        status: 'Mới',
+        status: 'Nháp',
         color: 'red'
+    },
+    '6': {
+        status: 'Xem xét',
+        color: 'green'
     },
     '2': {
         status: 'Chờ kiểm tra',
@@ -45,12 +49,32 @@ const listTrangThai = {
         color: 'red'
     },
     '5': {
-        status: 'Đã gửi',
+        status: 'Đã xem xét',
         color: 'green'
     },
     '7': {
         status: 'Đã duyệt',
         color: 'green'
+    },
+    '8': {
+        status: 'Chờ phân phối',
+        color: 'green'
+    },
+    '9': {
+        status: 'Chờ ký',
+        color: 'green'
+    },
+    '10': {
+        status: 'Đã phân phối',
+        color: 'green'
+    },
+    '11': {
+        status: 'Trả lại (Đơn vị)',
+        color: 'red'
+    },
+    '12': {
+        status: 'Trả lại (HCTH)',
+        color: 'red'
     }
 };
 
@@ -78,7 +102,7 @@ class HcthCongVanDi extends AdminPage {
         T.ready(this.getSiteSetting().readyUrl, () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-            T.showSearchBox(() => {
+            T.showSearchBox(() => { 
                 this.congVanYear?.value(0);
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
@@ -102,7 +126,7 @@ class HcthCongVanDi extends AdminPage {
                 readyUrl: '/user/hcth',
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
-                    'Danh sách công văn các phòng',
+                    'Danh sách công văn đi',
                 ],
                 backRoute: '/user/hcth',
                 baseUrl: '/user/hcth/cong-van-cac-phong',
@@ -112,7 +136,7 @@ class HcthCongVanDi extends AdminPage {
                 readyUrl: '/user',
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                    'Danh sách công văn các phòng',
+                    'Danh sách công văn đi',
                 ],
                 backRoute: '/user',
                 baseUrl: '/user/cong-van-cac-phong',
@@ -174,6 +198,9 @@ class HcthCongVanDi extends AdminPage {
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']),
             hcthManagePermission = this.getUserPermission('hcthCongVanDi', ['manage']),
             unitManagePermission = this.getUserPermission('donViCongVanDi', ['manage']),
+            // chuyên viên soạn thảo
+            unitEditPermission = this.getUserPermission('donViCongVanDi', ['edit']),
+
             { baseUrl, breadcrumb, backRoute } = this.getSiteSetting();
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
@@ -185,9 +212,9 @@ class HcthCongVanDi extends AdminPage {
         }));
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let table = renderTable({
-            emptyTable: 'Chưa có dữ liệu công văn các phòng',
+            emptyTable: 'Chưa có dữ liệu công văn đi',
             getDataSource: () => list,
-            stickyHead: false,
+            stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>
@@ -266,9 +293,9 @@ class HcthCongVanDi extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn các phòng',
+            title: 'Công văn đi',
             breadcrumb: breadcrumb,
-            onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
+            onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) || (unitEditPermission && unitEditPermission.edit)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/cong-van-cac-phong/new') : this.props.history.push('/user/cong-van-cac-phong/new')) : null,
             header: <>
                 <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.congVanYear = e} placeholder="Năm" data={yearSelector} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
                 <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Loại công văn" data={selectCongVan} allowClear={true} onChange={() => this.changeAdvancedSearch()} />

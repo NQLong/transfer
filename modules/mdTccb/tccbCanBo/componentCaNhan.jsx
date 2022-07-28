@@ -28,7 +28,7 @@ class ComponentCaNhan extends AdminPage {
     }
 
     value = (item) => {
-        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan, emailTruong: item.email }, () => {
+        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan, emailTruong: item.email, noiSinhNuocNgoai: item.noiSinhNuocNgoai }, () => {
             this.shcc = item.shcc;
             this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
             this.donVi.value(item.maDonVi);
@@ -39,7 +39,7 @@ class ComponentCaNhan extends AdminPage {
             this.biDanh.value(item.biDanh ? item.biDanh : '');
             this.phai.value(item.phai);
             this.ngaySinh.value(item.ngaySinh ? item.ngaySinh : '');
-            this.noiSinh.value(item.maTinhNoiSinh, item.maHuyenNoiSinh, item.maXaNoiSinh);
+            this.state.noiSinhNuocNgoai ? this.noiSinhNuocNgoai.value(item.noiSinhNuocNgoai) : this.noiSinh.value(item.maTinhNoiSinh, item.maHuyenNoiSinh, item.maXaNoiSinh);
             this.nguyenQuan.value(item.maTinhNguyenQuan, item.maHuyenNguyenQuan, item.maXaNguyenQuan);
             this.thuongTru.value(item.thuongTruMaTinh, item.thuongTruMaHuyen, item.thuongTruMaXa, item.thuongTruSoNha);
             this.hienTai.value(item.hienTaiMaTinh, item.hienTaiMaHuyen, item.hienTaiMaXa, item.hienTaiSoNha);
@@ -167,6 +167,7 @@ class ComponentCaNhan extends AdminPage {
                     dienThoaiCaNhan: this.getValue(this.soDienThoaiCaNhan),
                     dienThoaiBaoTin: this.getValue(this.soDienThoaiBaoTin),
                     email: emailTruong,
+                    noiSinhNuocNgoai: this.getValue(this.noiSinhNuocNgoai),
                     emailCaNhan: this.getValue(this.emailCaNhan),
                     quocGia: this.getValue(this.quocTich),
                     danToc: this.getValue(this.danToc),
@@ -231,7 +232,8 @@ class ComponentCaNhan extends AdminPage {
                             </div>
                         </div>
                     </div>
-                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
+                    <ComponentDiaDiem ref={e => this.noiSinh = e} label={<span>Nơi sinh <a href='#' onClick={e => e.preventDefault() || this.setState({ noiSinhNuocNgoai: true })}>(Nơi sinh ở nước ngoài)</a></span>} className='col-md-12' style={{ display: this.state.noiSinhNuocNgoai ? 'none' : 'block' }} />
+                    <FormSelect className='col-md-4' data={SelectAdapter_DmQuocGia} ref={e => this.noiSinhNuocNgoai = e} label={<span>Nơi sinh nước ngoài <a href='#' onClick={e => e.preventDefault() || this.setState({ noiSinhNuocNgoai: false })}>(Nơi sinh ở Việt Nam)</a></span>} style={{ display: !this.state.noiSinhNuocNgoai ? 'none' : 'block' }} placeholder='Nơi sinh nước ngoài' />
                     <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
                     <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-12' requiredSoNhaDuong={true} />
                     <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-12' requiredSoNhaDuong={true} />
