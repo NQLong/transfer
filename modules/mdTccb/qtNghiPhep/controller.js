@@ -17,11 +17,18 @@ module.exports = app => {
         { name: 'qtNghiPhep:read', menu },
         { name: 'qtNghiPhep:write' },
         { name: 'qtNghiPhep:delete' },
+        { name: 'qtNghiPhep:export' },
     );
     app.get('/user/tccb/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghi-phep/group/:shcc', app.permission.check('qtNghiPhep:read'), app.templates.admin);
     app.get('/user/nghi-phep', app.permission.check('staff:login'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtNghiPhep', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtNghiPhep:read', 'qtNghiPhep:write', 'qtNghiPhep:delete', 'qtNghiPhep:export');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
     app.post('/api/user/qua-trinh/nghi-phep', app.permission.check('staff:login'), (req, res) => {
@@ -155,7 +162,7 @@ module.exports = app => {
         })
     );
 
-    app.delete('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
+    app.delete('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:delete'), (req, res) =>
         app.model.qtNghiPhep.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ phép');
             res.send({ error });
@@ -198,7 +205,7 @@ module.exports = app => {
         });
     };
 
-    app.get('/api/qua-trinh/nghi-phep/download-excel/:filter', app.permission.check('qtNghiPhep:read'), (req, res) => {
+    app.get('/api/qua-trinh/nghi-phep/download-excel/:filter', app.permission.check('qtNghiPhep:export'), (req, res) => {
         let objFilter = app.parse(req.params.filter);
         let batDau = objFilter && objFilter.batDau ? objFilter.batDau : null;
         if (batDau) {

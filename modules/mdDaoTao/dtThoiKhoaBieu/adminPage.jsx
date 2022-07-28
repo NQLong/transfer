@@ -370,7 +370,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             </>
                         }
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                            {!item.phong && <>
+                            {(permission.write || permission.manage) && !item.phong && <>
                                 {this.state.editId != item.id && <Tooltip title='Điều chỉnh' arrow>
                                     <button className='btn btn-primary' onClick={e => e.preventDefault() || this.handleEdit(item)}>
                                         <i className='fa fa-lg fa-edit' />
@@ -384,12 +384,12 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                         <i className='fa fa-lg fa-check' />
                                     </button>
                                 </Tooltip>}</>}
-                            {item.phong && <Tooltip title='Điều chỉnh' arrow>
+                            {(permission.write || permission.manage) && item.phong && <Tooltip title='Điều chỉnh' arrow>
                                 <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
                                     <i className='fa fa-lg fa-cog' />
                                 </button>
                             </Tooltip>}
-                            {item.phong && <Tooltip title='Xóa' arrow>
+                            {(permission.write || permission.manage) && item.phong && <Tooltip title='Xóa' arrow>
                                 <button className='btn btn-danger' onClick={e => e.preventDefault() || this.delete(item)}>
                                     <i className='fa fa-lg fa-trash' />
                                 </button>

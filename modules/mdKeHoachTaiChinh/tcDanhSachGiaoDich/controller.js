@@ -6,11 +6,18 @@ module.exports = app => {
         },
     };
 
-    app.permission.add({ name: 'tcGiaoDich:read', menu });
-    app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRolesTcGiaoDich', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:manage');
+            resolve();
+        } else resolve();
+    }));
+
+    app.permission.add({ name: 'tcGiaoDich:manage', menu });
+    app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:manage'), app.templates.admin);
 
 
-    app.get('/api/finance/danh-sach-giao-dich/page/:pageNumber/:pageSize', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/page/:pageNumber/:pageSize', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
         try {
             let filter = req.query.filter || {};
             const settings = await getSettings();
@@ -30,18 +37,18 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
         try {
             const searchTerm = req.query.condition;
             const list = await app.model.tcHocPhiTransaction.listBank(searchTerm || '');
             res.send({ items: list.rows.map(item => item.bank) });
         } catch (error) {
-            res.send({error});
+            res.send({ error });
         }
     });
 
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
-    app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
         try {
             let filter = app.parse(req.query.filter, {});
             const settings = await getSettings();

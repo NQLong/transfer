@@ -5,15 +5,23 @@ module.exports = (app) => {
     };
 
     app.permission.add(
-        { name: 'tcLoaiPhi:read', menu },
+        { name: 'tcLoaiPhi:manage', menu },
         { name: 'tcLoaiPhi:write' },
         { name: 'tcLoaiPhi:delete' },
     );
 
-    app.get('/user/finance/loai-phi', app.permission.check('tcLoaiPhi:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRolesTcLoaiPhi', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcLoaiPhi:manage', 'tcLoaiPhi:write', 'tcLoaiPhi:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
+    app.get('/user/finance/loai-phi', app.permission.check('tcLoaiPhi:manage'), app.templates.admin);
 
     // API ---------------------------------------------------------------------------------------------------
-    app.get('/api/finance/loai-phi/page/:pageNumber/:pageSize', app.permission.check('tcLoaiPhi:read'), async (req, res) => {
+    app.get('/api/finance/loai-phi/page/:pageNumber/:pageSize', app.permission.check('tcLoaiPhi:manage'), async (req, res) => {
         try {
             const pageNumber = parseInt(req.params.pageNumber),
                 pageSize = parseInt(req.params.pageSize);
@@ -31,7 +39,7 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/finance/loai-phi/all', app.permission.check('tcLoaiPhi:read'), async (req, res) => {
+    app.get('/api/finance/loai-phi/all', app.permission.check('tcLoaiPhi:manage'), async (req, res) => {
         try {
             let items = await app.model.tcLoaiPhi.getAll();
             res.send({ items });
@@ -40,7 +48,7 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/finance/loai-phi/item/:id', app.permission.check('tcLoaiPhi:read'), async (req, res) => {
+    app.get('/api/finance/loai-phi/item/:id', app.permission.check('tcLoaiPhi:manage'), async (req, res) => {
         try {
             const item = await app.model.tcLoaiPhi.get({ id: req.params.id });
             res.send({ item });

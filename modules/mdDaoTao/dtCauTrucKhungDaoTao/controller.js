@@ -13,9 +13,15 @@ module.exports = app => {
         { name: 'dtCauTrucKhungDaoTao:write' },
         { name: 'dtCauTrucKhungDaoTao:delete' },
     );
+    app.permissionHooks.add('staff', 'addRolesDtCauTrucKhungDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtCauTrucKhungDaoTao:read', 'dtCauTrucKhungDaoTao:write', 'dtCauTrucKhungDaoTao:delete');
+            resolve();
+        } else resolve();
+    }));
 
     app.get('/user/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
-    app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
+    app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {

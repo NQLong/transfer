@@ -122,9 +122,9 @@ class ClusterPage extends AdminPage {
                     <h3 className='tile-title'>Clusters</h3>
                     <div className='tile-body'>{clusterTable}</div>
                     <div style={{ textAlign: 'right' }}>
-                        <button className='btn btn-primary' type='button' onClick={this.createCluster}>
+                        {permission.write && <button className='btn btn-primary' type='button' onClick={this.createCluster}>
                             <i className='fa fa-fw fa-lg fa-plus' />Add
-                        </button>
+                        </button>}
                     </div>
                 </div>
 
@@ -132,9 +132,9 @@ class ClusterPage extends AdminPage {
                     <h3 className='tile-title'>System Images</h3>
                     <div className='tile-body'>{imageTable}</div>
                     <div style={{ textAlign: 'right' }}>
-                        <button className='btn btn-warning' type='button' onClick={this.refreshSystemImages}>
+                        {permission.write && <button className='btn btn-warning' type='button' onClick={this.refreshSystemImages}>
                             <i className='fa fa-fw fa-lg fa-refresh' />Refresh
-                        </button>
+                        </button>}
                     </div>
                 </div>
             </>,
