@@ -37,8 +37,8 @@ class EditModal extends AdminModal {
     };
     onShow = (item) => {
         let { id, shcc, batDau, batDauType, ketThuc, ketThucType } = item ? item : {
-                id: '', shcc: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: ''
-            };
+            id: '', shcc: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: ''
+        };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
@@ -212,7 +212,7 @@ class QtNghiThaiSan extends AdminPage {
             s += ketThucs[i] ? (ketThucs[i] != '-1' ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
             results.push(<div key={results.length}> <span>
-                {i+1}. {s}
+                {i + 1}. {s}
             </span></div>);
         }
         if (soQt > 15) {
@@ -240,14 +240,13 @@ class QtNghiThaiSan extends AdminPage {
         });
         e.preventDefault();
     }
-    
+
     handleTime = (value) => {
         value ? this.setState({ visibleTime: true }) : this.setState({ visibleTime: false });
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtNghiThaiSan', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtNghiThaiSan', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.pageGr ?
                 this.props.qtNghiThaiSan.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -262,7 +261,7 @@ class QtNghiThaiSan extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ nữ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian nghỉ</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lần nghỉ</th>}
@@ -335,7 +334,7 @@ class QtNghiThaiSan extends AdminPage {
                         </> : <div className='form-group col-8' />}
                     <FormSelect className='col-12 col-md-2' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
-                            { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }, { id: 3, text: 'Chưa diễn ra'}
+                            { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }, { id: 3, text: 'Chưa diễn ra' }
                         ]} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-5' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-5' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ nữ' data={SelectAdapter_FwCanBoFemale} allowClear={true} minimumResultsForSearch={-1} />
@@ -356,13 +355,12 @@ class QtNghiThaiSan extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtNghiThaiSan} update={this.props.updateQtNghiThaiSan} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null };
 

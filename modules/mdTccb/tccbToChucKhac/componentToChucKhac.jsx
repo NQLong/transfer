@@ -57,9 +57,10 @@ class ComponentToChucKhac extends AdminPage {
     }
 
     render() {
-        const dataToChucKhac = this.props.staff?.dataStaff?.toChucKhac || [];
+        const dataToChucKhac = this.props.staff?.dataStaff?.toChucKhac || [],
+            readOnly = this.props.readOnly;
         let isCanBo = this.getUserPermission('staff', ['login']).login, permission = {
-            write: isCanBo, read: isCanBo, delete: isCanBo
+            write: isCanBo || readOnly, read: isCanBo || readOnly, delete: isCanBo || readOnly
         };
 
         const renderTableToChucKhac = (items) => (
@@ -88,14 +89,14 @@ class ComponentToChucKhac extends AdminPage {
         return (
             <div style={{ marginTop: '1rem' }}>{this.props.label}
                 <div style={{ marginTop: '1rem' }} className='tile-body'>{renderTableToChucKhac(dataToChucKhac)}</div>
-                <div className='tile-footer' style={{ textAlign: 'right' }}>
+                {!readOnly && <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm
                     </button>
-                </div>
+                </div>}
                 <ToChucKhacModal ref={e => this.modal = e} shcc={this.props.shcc}
                     create={this.props.createToChucKhacStaff}
-                    update={this.props.updateToChucKhacStaff} />
+                    update={this.props.updateToChucKhacStaff} readOnly={readOnly} />
             </div>
         );
     }

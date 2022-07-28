@@ -93,7 +93,7 @@ class QtHopDongDvtlPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtHopDongDvtl', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtHopDongDvtl', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
             (this.props.qtHopDongDvtl && this.props.qtHopDongDvtl.pageGr ?
                 this.props.qtHopDongDvtl.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
@@ -168,10 +168,10 @@ class QtHopDongDvtlPage extends AdminPage {
                         }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={`/user/tccb/qua-trinh/hop-dong-dvtl/${item.ID}`} onDelete={this.delete} >
-                                <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
+                                onEdit={() => permission.write ? this.props.history.push(`/user/tccb/qua-trinh/hop-dong-dvtl/${item.ID}`) : T.notify('Vui lòng liên hệ phòng Tổ chức - Cán bộ!', 'warning')} onDelete={this.delete} >
+                                {permission.export && <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                     <i className='fa fa-lg fa-file-word-o' />
-                                </a>
+                                </a>}
                             </TableCell>
                         }
                         {
@@ -209,11 +209,11 @@ class QtHopDongDvtlPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                {permission.read &&
+                {/* {permission.export &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
                         <i className='fa fa-lg fa-print' />
                     </button>
-                }
+                } */}
             </>,
             backRoute: '/user/tccb',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-dvtl/new') : null

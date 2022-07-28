@@ -80,29 +80,27 @@ export class ModalContent extends React.Component {
             <div className='row'>
                 <div className='col-md-8'>
                     <div className='row'>
-                        <FormTextBox ref={e => this.email = e} className='col-md-12' label='Email người dùng' required />
-                        <FormTextBox ref={e => this.lastName = e} className='col-md-8' label='Họ và tên lót' required />
-                        <FormTextBox ref={e => this.firstName = e} className='col-md-4' label='Tên' required />
+                        <FormTextBox readOnly={this.props.readOnly} ref={e => this.email = e} className='col-md-12' label='Email người dùng' required />
+                        <FormTextBox readOnly={this.props.readOnly} ref={e => this.lastName = e} className='col-md-8' label='Họ và tên lót' required />
+                        <FormTextBox readOnly={this.props.readOnly} ref={e => this.firstName = e} className='col-md-4' label='Tên' required />
                     </div>
                 </div>
-                <FormImageBox ref={e => this.img = e} postUrl='/user/upload' className='col-md-4 form-group' uploadType='UserImage' onSuccess={data => data.error == null && this.props.changeUser(Object.assign(this.state.data, { image: data.image }))} />
-                <FormCheckbox isSwitch ref={e => this.active = e} onChange={value => this.setState({ active: value })} label='Kích hoạt' className='col-md-12 form-group' />
+                <FormImageBox readOnly={this.props.readOnly} ref={e => this.img = e} postUrl='/user/upload' className='col-md-4 form-group' uploadType='UserImage' onSuccess={data => data.error == null && this.props.changeUser(Object.assign(this.state.data, { image: data.image }))} />
+                <FormCheckbox readOnly={this.props.readOnly} isSwitch ref={e => this.active = e} onChange={value => this.setState({ active: value })} label='Kích hoạt' className='col-md-12 form-group' />
                 <div className='col-sm-6'>
                     <div className='row'>
-                        <FormCheckbox isSwitch ref={e => this.isStaff = e} className='col-12' label='Là cán bộ' onChange={value => { value ? $('#shcc').show() : $('#shcc').hide(); this.setState({ isStaff: value }); }} />
-                        <div className='col-md-12' id='shcc'><FormTextBox placeholder='Mã thẻ cán bộ' ref={e => this.shcc = e} required={this.state.isStaff} /></div>
+                        <FormCheckbox readOnly={this.props.readOnly} isSwitch ref={e => this.isStaff = e} className='col-12' label='Là cán bộ' onChange={value => { value ? $('#shcc').show() : $('#shcc').hide(); this.setState({ isStaff: value }); }} />
+                        <div className='col-md-12' id='shcc'><FormTextBox readOnly={this.props.readOnly} placeholder='Mã thẻ cán bộ' ref={e => this.shcc = e} required={this.state.isStaff} /></div>
                     </div>
                 </div>
                 <div className='col-sm-6'>
                     <div className='row'>
-                        <FormCheckbox isSwitch ref={e => this.isStudent = e} className='col-12' label='Là sinh viên' onChange={value => { value ? $('#mssv').show() : $('#mssv').hide(); this.setState({ isStudent: value }); }} />
-                        <div className='col-md-12' id='mssv'><FormTextBox placeholder='Mã số sinh viên' ref={e => this.mssv = e} required={this.state.isStudent} /></div>
+                        <FormCheckbox readOnly={this.props.readOnly} isSwitch ref={e => this.isStudent = e} className='col-12' label='Là sinh viên' onChange={value => { value ? $('#mssv').show() : $('#mssv').hide(); this.setState({ isStudent: value }); }} />
+                        <div className='col-md-12' id='mssv'><FormTextBox readOnly={this.props.readOnly} placeholder='Mã số sinh viên' ref={e => this.mssv = e} required={this.state.isStudent} /></div>
                     </div>
                 </div>
-                <FormSelect className='col-md-12' ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} label='Đơn vị' />
-                <FormSelect className='col-md-12 form-group' multiple={true} ref={e => this.roles = e} data={SelectAdapter_Roles} label='Vai trò' minimumResultsForSearch={-1} allowClear />
-
-
+                <FormSelect readOnly={this.props.readOnly} className='col-md-12' ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} label='Đơn vị' />
+                <FormSelect readOnly={this.props.readOnly} className='col-md-12 form-group' multiple={true} ref={e => this.roles = e} data={SelectAdapter_Roles} label='Vai trò' minimumResultsForSearch={-1} allowClear />
             </div>
         );
     }

@@ -49,7 +49,7 @@ class EditModal extends AdminModal {
         daTiepNhan: false,
         baoCaoTinhTrang: 0,
         listFile: [],
-        noNeedTiepNhan: false, 
+        noNeedTiepNhan: false,
     };
     // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc, baoCaoTen, baoCaoNgayNop, baoCaoTinhTrang, baoCaoLyDoTraVe }
 
@@ -274,7 +274,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={readOnly} />
                 <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
-                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)' />
                 <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
@@ -332,7 +332,7 @@ class CreateModal extends AdminModal {
         this.mucDich.value('');
         this.noiDung.value('');
         this.chiPhi.value('');
-        this.ghiChu.value( '');
+        this.ghiChu.value('');
         this.soQuyetDinh.value('');
         this.ngayQuyetDinh.value('');
 
@@ -404,7 +404,7 @@ class CreateModal extends AdminModal {
                 <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={readOnly} />
                 <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
-                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)' />
                 <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
@@ -463,7 +463,7 @@ class ThongKeMucDichModal extends AdminModal {
             filterData.push({ id: item, len: dataGroupBy[item].length });
             totalItem += dataGroupBy[item].length;
         });
-        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+        filterData.sort(function (a, b) { //sắp xếp theo số lượng giảm dần
             return -(a.len - b.len);
         });
         return [filterData, totalItem];
@@ -539,7 +539,7 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             toYear.setHours(23, 59, 59, 999);
             toYear = toYear.getTime();
         }
-        
+
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
         const loaiHocVi = this.state.filter.loaiHocVi;
@@ -602,7 +602,7 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtDiNuocNgoai');
+        const permission = this.getUserPermission('qtDiNuocNgoai', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.pageMa ? this.props.qtDiNuocNgoai.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -614,7 +614,7 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
@@ -643,9 +643,9 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                                 {(item.tenDonVi || '')}
                             </>
                         )} />
-                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
+                        <TableCell type='text' style={{ color: 'blue' }} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
-                        <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachQuocGia || '')} />
+                        <TableCell type='text' style={{ color: 'blue' }} content={(item.danhSachQuocGia || '')} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />
                         <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(
@@ -657,10 +657,10 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><b><i>Đang ở<br/>nước ngoài</i></b></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
+                                <span>{(item.ngayDi <= item.today && item.ngayVe >= item.today) ? <span style={{ whiteSpace: 'nowrap' }}><b><i>Đang ở<br />nước ngoài</i></b></span> : item.ngayDi > item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Chưa diễn ra</i></span> : (item.soQdTiepNhan || T.dayDiff(new Date(item.ngayDi), new Date(item.ngayVe)) < 30) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br />về nước</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br />chưa tiếp nhận </span>} </span>
                             </>
                         )}></TableCell>
-                        <TableCell type='text' style={{ color: item.baoCaoTinhTrang == 0 ? 'red' : 'blue'}} content={mapperBaoCaoTinhTrang[item.baoCaoTinhTrang]}></TableCell>
+                        <TableCell type='text' style={{ color: item.baoCaoTinhTrang == 0 ? 'red' : 'blue' }} content={mapperBaoCaoTinhTrang[item.baoCaoTinhTrang]}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
@@ -679,8 +679,8 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} allowClear={true} onChange={this.handleTime} />
-                    {this.state.visibleTime && 
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} allowClear={true} onChange={this.handleTime} />
+                    {this.state.visibleTime &&
                         <>
                             <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' />
                             <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' />
@@ -690,14 +690,14 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                             { id: 1, text: 'Đã tiếp nhận về nước' },
                             { id: 2, text: 'Hết hạn và chưa tiếp nhận' },
                             { id: 3, text: 'Đang ở nước ngoài' },
-                            { id: 4, text: 'Chưa diễn ra'},
+                            { id: 4, text: 'Chưa diễn ra' },
                         ]} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrangBaoCao = e} label='Tình trạng báo cáo' data={listBaoCaoTinhTrang} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
-                        <button className='btn btn-info' type='button' style={{ marginRight: '10px' }} onClick={e => e.preventDefault() || this.thongKeMucDich.show()}>
+                        {permission.export && <button className='btn btn-info' type='button' style={{ marginRight: '10px' }} onClick={e => e.preventDefault() || this.thongKeMucDich.show()}>
                             <i className='fa fa-fw fa-lg fa-th-list' />Thống kê mục đích
-                        </button>
+                        </button>}
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                         </button>
@@ -724,16 +724,16 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/di-nuoc-ngoai',
             onCreate: permission && permission.write ? (e) => this.showCreateModal(e) : null,
-            onExport: (e) => {
+            onExport: permission && permission.export ? (e) => {
                 e.preventDefault();
                 let { pageCondition } = this.props && this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.pageMa ? this.props.qtDiNuocNgoai.pageMa : { pageCondition: {} };
                 pageCondition = typeof pageCondition === 'string' ? pageCondition : '';
                 if (pageCondition.length == 0) pageCondition = null;
-                
+
                 const filter = T.stringify(this.state.filter);
 
                 T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${filter}/${pageCondition}`), 'dinuocngoai.xlsx');
-            }
+            } : null
         });
     }
 }

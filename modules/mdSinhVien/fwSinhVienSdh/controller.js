@@ -1,4 +1,4 @@
-module.exports = app => { 
+module.exports = app => {
     const menuSvSdh = {
         parentMenu: app.parentMenu.students,
         menus: {
@@ -7,22 +7,28 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'svSdh:read', menu: menuSvSdh },
+        { name: 'svSdh:manage', menu: menuSvSdh },
         { name: 'svSdh:write' },
         { name: 'svSdh:delete' }
     );
 
-    app.get('/user/sv-sdh/list', app.permission.check('svSdh:read'), app.templates.admin);
-    app.get('/user/sv-sdh/upload', app.permission.check('svSdh:read'), app.templates.admin);
+    app.get('/user/sv-sdh/list', app.permission.check('svSdh:manage'), app.templates.admin);
+    app.get('/user/sv-sdh/upload', app.permission.check('svSdh:manage'), app.templates.admin);
     app.get('/user/sv-sdh/item/:mssv', app.permission.check('svSdh:write'), app.templates.admin);
-    
+
+    app.permissionHooks.add('staff', 'addRoleStudentSdh', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && ['34', '37'].includes(staff.maDonVi)) {
+            app.permissionHooks.pushUserPermission(user, 'svSdh:manage', 'svSdh:write', 'svSdh:delete');
+            resolve();
+        } else resolve();
+    }));
     //API----------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/sv-sdh/page/:pageNumber/:pageSize', app.permission.check('svSdh:read'), (req, res) => {
+    app.get('/api/sv-sdh/page/:pageNumber/:pageSize', app.permission.check('svSdh:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            const { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = (req.query.filter && req.query.filter != '%%%%%%%%%%%%%%%%%%') ? req.query.filter : { listFaculty: null, listFromCity: null, listEthnic: null, listNationality: null, listReligion: null, listTinhTrangSinhVien: null, gender: null };
+        const { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = (req.query.filter && req.query.filter != '%%%%%%%%%%%%%%%%%%') ? req.query.filter : { listFaculty: null, listFromCity: null, listEthnic: null, listNationality: null, listReligion: null, listTinhTrangSinhVien: null, gender: null };
 
         app.model.fwSinhVienSdh.searchPage(pageNumber, pageSize, listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender, searchTerm, (error, page) => {
             if (error || page == null) {
@@ -35,7 +41,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/sv-sdh/:mssv', app.permission.check('svSdh:read'), (req, res) => {
+    app.get('/api/sv-sdh/:mssv', app.permission.check('svSdh:manage'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwSinhVienSdh.get({ ma: mssv }, (error, item) => {
             res.send({ error, item });
@@ -88,7 +94,7 @@ module.exports = app => {
             });
         })).then(() => new Promise(resolve => {
             app.model.dmTinhThanhPho.getAll({ kichHoat: 1 }, (error, items) => {
-                (items || []).forEach(item => tinhTpMapping[item.ten.toLowerCase().replace('tỉnh','').replace('thành phố','').trim()] = item.ma);
+                (items || []).forEach(item => tinhTpMapping[item.ten.toLowerCase().replace('tỉnh', '').replace('thành phố', '').trim()] = item.ma);
                 resolve();
             });
         })).then(() => new Promise(resolve => {
@@ -154,13 +160,13 @@ module.exports = app => {
             let result = [];
             const handleCreateItem = (index = 0) => {
                 let item = data[index];
-                
+
                 if (index < data.length) {
                     new Promise(resolve => {
                         if (item.maKhoa) {
-                            app.model.dmKhoaSauDaiHoc.get({ ma: item.maKhoa}, (error, khoaSdh) => {
+                            app.model.dmKhoaSauDaiHoc.get({ ma: item.maKhoa }, (error, khoaSdh) => {
                                 if (!error && !khoaSdh) {
-                                    app.model.dmKhoaSauDaiHoc.create({ ma: item.maKhoa, ten: item.khoa, kichHoat: 1}, () => {
+                                    app.model.dmKhoaSauDaiHoc.create({ ma: item.maKhoa, ten: item.khoa, kichHoat: 1 }, () => {
                                         resolve();
                                     });
                                 } else resolve();
@@ -168,16 +174,16 @@ module.exports = app => {
                         } else resolve();
                     }).then(() => new Promise(resolve => {
                         if (item.maNganh) {
-                            app.model.dmNganhSauDaiHoc.get({ maNganh: item.maNganh}, (error, nganhSdh) => {
+                            app.model.dmNganhSauDaiHoc.get({ maNganh: item.maNganh }, (error, nganhSdh) => {
                                 if (!error && !nganhSdh) {
-                                    app.model.dmNganhSauDaiHoc.create({ maNganh: item.maNganh, ten: item.nganh, kichHoat: 1, maKhoa: item.maKhoa}, () => {
+                                    app.model.dmNganhSauDaiHoc.create({ maNganh: item.maNganh, ten: item.nganh, kichHoat: 1, maKhoa: item.maKhoa }, () => {
                                         resolve();
                                     });
                                 } else resolve();
                             });
                         } else resolve();
                     })).then(() => {
-                        app.model.fwSinhVienSdh.get({ ma: item.ma}, (error, svSdh) => {
+                        app.model.fwSinhVienSdh.get({ ma: item.ma }, (error, svSdh) => {
                             // ma, ho, ten, gioiTinh, ngaySinh, danToc, tonGiao, quocTich, nguyenQuanMaTinh, hienTaiSoNha, hienTaiMaXa, hienTaiMaHuyen, hienTaiMaTinh, noiSinhSoNha, noiSinhMaXa, noiSinhMaHuyen, noiSinhMaTinh, maKhoa, maNganh, thuongTruSoNha, thuongTruMaXa, thuongTruMaHuyen, thuongTruMaTinh, namTuyenSinh, nienKhoa, bacDaoTao, chuongTrinhDaoTao, sdtCaNhan, sdtLienHe, email, coQuan, gvhd, tenDeTai, tinhTrang, heDaoTao
                             const newData = {
                                 ho: item.ho,
@@ -189,23 +195,23 @@ module.exports = app => {
                                 quocTich: item.quocTich ? quocGiaMapping[item.quocTich.toLowerCase()] : '',
                                 nguyenQuanMaTinh: item.nguyenQuan ? tinhTpMapping[item.nguyenQuan.toLowerCase().trim()] : '',
                                 noiSinhMaTinh: item.noiSinh ? item.noiSinh.toLowerCase().includes('hcm') || item.noiSinh.toLowerCase().includes('hồ chí minh') ? tinhTpMapping['hồ chí minh'] : tinhTpMapping[item.noiSinh.toLowerCase().trim()] : '',
-                                maKhoa: item.maKhoa, 
+                                maKhoa: item.maKhoa,
                                 maNganh: item.maNganh,
-                                thuongTruSoNha: item.thuongTruSoNha ? item.thuongTruSoNha : '', 
-                                thuongTruMaXa: item.thuongTruXa ? xaMapping[item.thuongTruXa.toLowerCase()] : '', 
+                                thuongTruSoNha: item.thuongTruSoNha ? item.thuongTruSoNha : '',
+                                thuongTruMaXa: item.thuongTruXa ? xaMapping[item.thuongTruXa.toLowerCase()] : '',
                                 thuongTruMaHuyen: item.thuongTruHuyen ? huyenMapping[item.thuongTruHuyen.toLowerCase()] : '',
                                 thuongTruMaTinh: item.thuongTruTinh ? tinhTpMapping[item.thuongTruTinh.toLowerCase()] : '',
                                 namTuyenSinh: item.namTuyenSinh,
-                                nienKhoa: item.nienKhoa, 
-                                bacDaoTao: item.bacDaoTao ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '', 
-                                chuongTrinhDaoTao: item.chuongTrinhDaoTao, 
-                                sdtCaNhan: item.sdtCaNhan, 
-                                sdtLienHe: item.sdtLienHe, 
-                                email: item.email, 
-                                coQuan: item.tenCoQuan, 
-                                gvhd: item.gvhd ? getGvhd(item.gvhd) : '', 
-                                tenDeTai: item.tenDeTai, 
-                                tinhTrang: item.maTinhTrang, 
+                                nienKhoa: item.nienKhoa,
+                                bacDaoTao: item.bacDaoTao ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '',
+                                chuongTrinhDaoTao: item.chuongTrinhDaoTao,
+                                sdtCaNhan: item.sdtCaNhan,
+                                sdtLienHe: item.sdtLienHe,
+                                email: item.email,
+                                coQuan: item.tenCoQuan,
+                                gvhd: item.gvhd ? getGvhd(item.gvhd) : '',
+                                tenDeTai: item.tenDeTai,
+                                tinhTrang: item.maTinhTrang,
                                 heDaoTao: item.heDaoTao ? heDaoTaoMapping[item.heDaoTao.toLowerCase()] : '',
                                 hoTenCha: item.hoTenCha ? item.hoTenCha : '',
                                 namSinhCha: item.namSinhCha ? item.namSinhCha : '',
@@ -217,15 +223,15 @@ module.exports = app => {
                                 sdtMe: item.sdtMe ? item.sdtMe : '',
                                 sdtNguoiThan: item.sdtNguoiThan ? item.sdtNguoiThan : '',
                             };
-                            
+
                             if (svSdh) {
-                                app.model.fwSinhVienSdh.update({ma: item.ma}, newData, () => {
-                                    handleCreateItem(index+1);
+                                app.model.fwSinhVienSdh.update({ ma: item.ma }, newData, () => {
+                                    handleCreateItem(index + 1);
                                 });
                             } else {
                                 newData.ma = item.ma;
                                 app.model.fwSinhVienSdh.create(newData, () => {
-                                    handleCreateItem(index+1);
+                                    handleCreateItem(index + 1);
                                 });
                             }
                         });
@@ -252,7 +258,7 @@ module.exports = app => {
                 });
             }).then(() => {
                 app.excel.readFile(srcPath, workbook => {
-                    if (workbook) { 
+                    if (workbook) {
                         const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
                         const handleUpload = (index = 2) => {
                             const value = worksheet.getRow(index).values;
@@ -303,7 +309,7 @@ module.exports = app => {
                                     tenDeTai: value[43],
                                     gvhd: value[44]
                                 };
-                                
+
                                 element.push(data);
                                 handleUpload(index + 1);
                             }

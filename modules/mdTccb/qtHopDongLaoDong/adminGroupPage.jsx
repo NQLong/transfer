@@ -80,7 +80,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
         T.download(T.url('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel'), 'HDLD.xlsx');
     }
     render() {
-        const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.pageMa ? this.props.qtHopDongLaoDong.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -102,9 +102,8 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                         <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href={'/user/tccb/qua-trinh/hop-dong-lao-dong/' + item.ma}>
-                                    <span>{item.hoBenA + ' ' + item.tenBenA}</span><br />
-                                    <span>Mã thẻ cán bộ: {item.shcc}</span></a>
+                                <span>{item.hoBenA + ' ' + item.tenBenA}</span><br />
+                                <span>Mã thẻ cán bộ: {item.shcc}</span>
                             </>
                         )}
                         />
@@ -134,9 +133,9 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
-                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
+                            {permission.export && <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                 <i className='fa fa-lg fa-file-word-o' />
-                            </a>
+                            </a>}
                         </TableCell>
                     </tr>
                 )
