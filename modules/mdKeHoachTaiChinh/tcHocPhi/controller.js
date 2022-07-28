@@ -14,19 +14,27 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'tcHocPhi:read', menu },
-        { name: 'tcHocPhi:read', menu: menuStatistic },
+        { name: 'tcHocPhi:manage', menu },
+        { name: 'tcHocPhi:manage', menu: menuStatistic },
         'tcHocPhi:write', 'tcHocPhi:delete',
     );
 
-    app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRolesTcHocPhi', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcHocPhi:manage', 'tcHocPhi:write', 'tcHocPhi:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
+    app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:manage'), app.templates.admin);
     app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
-    app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
-    app.get('/user/finance/statistic', app.permission.check('tcHocPhi:read'), app.templates.admin);
-    app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:manage'), app.templates.admin);
+    app.get('/user/finance/statistic', app.permission.check('tcHocPhi:manage'), app.templates.admin);
+    app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:manage'), app.templates.admin);
 
     //APIs ------------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
+    app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:manage', 'student:login'), async (req, res) => {
         let { pageNumber, pageSize } = req.params;
         let searchTerm = `%${req.query.searchTerm || ''}%`;
         let filter = req.query.filter || {};
@@ -38,7 +46,7 @@ module.exports = app => {
         const { namHoc, hocKy } = filter;
         filter = app.stringify(filter, '');
         let mssv = '';
-        if (!req.session.user.permissions.includes('tcHocPhi:read')) mssv = req.session.user.data.mssv;
+        if (!req.session.user.permissions.includes('tcHocPhi:manage')) mssv = req.session.user.data.mssv;
 
         app.model.tcHocPhi.searchPage(parseInt(pageNumber), parseInt(pageSize), mssv, searchTerm, filter, (error, page) => {
             if (error || !page) {
@@ -53,7 +61,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.orCheck('tcHocPhi:read'), async (req, res) => {
+    app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.orCheck('tcHocPhi:manage'), async (req, res) => {
         try {
             const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings(),
                 mssv = req.params.mssv;
@@ -70,12 +78,12 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/user/hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
+    app.get('/api/finance/user/hoc-phi', app.permission.orCheck('tcHocPhi:manage', 'student:login'), async (req, res) => {
         try {
             const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings();
             const user = req.session.user, permissions = user.permissions;
             let mssv = '';
-            if (!permissions.includes('tcHocPhi:read')) {
+            if (!permissions.includes('tcHocPhi:manage')) {
                 mssv = user.data.mssv;
                 const khoa = await app.model.dmDonVi.get({ ma: user.data.khoa }, 'ten');
                 user.data.tenKhoa = khoa.ten;
@@ -94,11 +102,11 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/user/get-all-hoc-phi', app.permission.orCheck('student:login', 'tcHocPhi:read'), async (req, res) => {
+    app.get('/api/finance/user/get-all-hoc-phi', app.permission.orCheck('student:login', 'tcHocPhi:manage'), async (req, res) => {
         try {
             const user = req.session.user, permissions = user.permissions;
             let mssv = '';
-            if (!permissions.includes('tcHocPhi:read')) {
+            if (!permissions.includes('tcHocPhi:manage')) {
                 mssv = user.data.mssv;
             } else mssv = req.query.mssv;
             const data = await app.model.tcHocPhi.getAllFeeOfStudent(mssv);
@@ -196,7 +204,7 @@ module.exports = app => {
 
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
 
-    app.get('/api/finance/huong-dan-dong-hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
+    app.get('/api/finance/huong-dan-dong-hoc-phi', app.permission.orCheck('tcHocPhi:manage', 'student:login'), async (req, res) => {
         const { hocPhiHuongDan } = await getSettings();
         res.send({ hocPhiHuongDan });
     });
@@ -290,7 +298,7 @@ module.exports = app => {
         app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
     });
 
-    app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:read'), async (req, res) => {
+    app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:manage'), async (req, res) => {
         try {
             let filter = app.parse(req.query.filter, {});
             const settings = await getSettings();

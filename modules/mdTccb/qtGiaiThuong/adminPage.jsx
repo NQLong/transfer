@@ -185,8 +185,7 @@ class QtGiaiThuong extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtGiaiThuong', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtGiaiThuong', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtGiaiThuong && this.props.qtGiaiThuong.pageGr ?
                 this.props.qtGiaiThuong.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -201,7 +200,7 @@ class QtGiaiThuong extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt giải</th>}
@@ -236,7 +235,7 @@ class QtGiaiThuong extends AdminPage {
                             </>
 
                         )} />}
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue'}} content={(item.namCap)} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue' }} content={(item.namCap)} />}
                         {!this.checked && <TableCell type='text' content={(<i>{item.noiCap}</i>)} />}
                         {this.checked && <TableCell type='text' content={item.soGiaiThuong} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachGiaiThuong, item.soGiaiThuong, item.danhSachNamCap)} />}
@@ -279,8 +278,7 @@ class QtGiaiThuong extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtGiaiThuongMultiple} update={this.props.updateQtGiaiThuongStaff}
                 />
             </>,

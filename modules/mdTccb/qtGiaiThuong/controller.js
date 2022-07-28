@@ -13,6 +13,13 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/giai-thuong', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/giai-thuong/group/:shcc', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtGiaiThuong', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtGiaiThuong:read', 'qtGiaiThuong:write', 'qtGiaiThuong:delete');
+            resolve();
+        } else resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/giai-thuong/page/:pageNumber/:pageSize', app.permission.check('qtGiaiThuong:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),

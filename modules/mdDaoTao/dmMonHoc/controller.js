@@ -14,6 +14,13 @@ module.exports = app => {
     );
     app.get('/user/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRolesDtMonHoc', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dmMonHoc:read', 'dmMonHoc:write', 'dmMonHoc:delete', 'dmMonHoc:upload');
+            resolve();
+        } else resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),

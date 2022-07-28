@@ -193,7 +193,7 @@ class StaffEditPage extends AdminPage {
 
     canChiDao = () => {
         const permissions = this.getCurrentPermissions();
-        return permissions.includes('president:login') || permissions.includes('hcth:login') || this.state.quyenChiDao?.includes(this.state.shcc);
+        return permissions.includes('president:login') || permissions.includes('hcth:manage') || this.state.quyenChiDao?.includes(this.state.shcc);
     };
 
     renderChiDao = (readOnly) => {
@@ -226,6 +226,7 @@ class StaffEditPage extends AdminPage {
         }
 
         const canChiDao = this.canChiDao();
+
         return (
             <div className='tile'>
                 <div className='form-group'>
@@ -608,8 +609,8 @@ class StaffEditPage extends AdminPage {
         let maDonViCanBo = this.props.system?.user?.staff?.maDonVi;
         return (
             currentPermission.includes('rectors:login') ||
-            currentPermission.includes('hcth:login') ||
-            (currentPermission.includes('donViCongVanDen:test') && maDonViNhan.includes(maDonViCanBo)) ||
+            (currentPermission.includes('hcth:login') && currentPermission.includes('hcthCongVanDen:write')) ||
+            (currentPermission.includes('donViCongVanDen:read') && maDonViNhan.includes(maDonViCanBo)) ||
             this.getUserDonViQuanLy().find(item => maDonViNhan.includes(item.maDonVi)) ||
             maCanBoNhan.includes(this.state.shcc)
         );
@@ -637,7 +638,10 @@ class StaffEditPage extends AdminPage {
         return this.state.id && (this.getUserPermission('president', ['login']).login || quyenChiDao.split(',').includes(this.state.shcc)) && this.state.trangThai == trangThaiSwitcher.CHO_DUYET.id;
     }
 
-    canFinish = () => this.state.id && [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id].includes(this.state.trangThai)
+    canFinish = () => {
+        const hcthCongVanDenPermission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
+        return this.state.id && hcthCongVanDenPermission.write && [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id].includes(this.state.trangThai);
+    }
 
     onChangeNeedConduct = (value) => {
         const permissions = this.props.system?.user?.permissions || [];
