@@ -111,13 +111,17 @@ module.exports = app => {
             if (error) {
                 res.send({ error });
             } else {
-                app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
-                    item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
-                    app.model.dmDonVi.get({ ma: item.maDonVi }, (error, donVi) => {
-                        item = { ...item, tenDonVi: donVi ? donVi.ten : '' };
-                        res.send({ item });
+                if (item) {
+                    app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
+                        item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
+                        app.model.dmDonVi.get({ ma: item.maDonVi }, (error, donVi) => {
+                            item = { ...item, tenDonVi: donVi ? donVi.ten : '' };
+                            res.send({ item });
+                        });
                     });
-                });
+                } else {
+                    res.send({ item: {} });
+                }
             }
         });
     });
