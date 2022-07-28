@@ -5,7 +5,6 @@ module.exports = app => {
     app.permission.add('tcInvoice:read', 'tcInvoice:write', 'tcInvoice:delete');
     const misaChunkSize = 30;
 
-    const baseURL = 'https://testapi.meinvoice.vn/api/v3/';
 
     const url = {
         login: '/auth/token',
@@ -16,11 +15,13 @@ module.exports = app => {
 
     const getMisaToken = async () => {
         try {
-            const response = await app.getMisaAxiosInstance(false).post(url.login, {
-                'appid': 'f8a619af-0418-11ed-b268-005056b219fb',
-                'taxcode': '0101243150-382',
-                'username': 'testmisa@yahoo.com',
-                'password': '123456Aa'
+            const { meinvoiceAppId: appid, meinvoiceMaSoThue: taxcode, meinvoiceUsername: username, matKhauMeinvoice: password } = await app.model.tcSetting.getValue('meinvoiceAppId', 'meinvoiceMaSoThue', 'meinvoiceUsername', 'matKhauMeinvoice');
+            const instance = await app.getMisaAxiosInstance(false);
+            const response = await instance.post(url.login, {
+                appid,
+                taxcode,
+                username,
+                password,
             });
             return response.Data;
         } catch (error) {
@@ -28,9 +29,10 @@ module.exports = app => {
         }
     };
 
-    app.getMisaAxiosInstance = (errorHandler = true) => {
+    app.getMisaAxiosInstance = async (errorHandler = true) => {
+        const baseUrl = (await app.model.tcSetting.getValue('meinvoiceUrl')).meinvoiceUrl;
         const axiosInstance = axios.create({
-            baseURL: baseURL,
+            baseURL: baseUrl,
             timeout: 100000,
             headers: {
                 Authorization: 'Bearer ' + app.misaInvoiceAccessToken,
@@ -40,7 +42,7 @@ module.exports = app => {
         });
 
         axiosInstance.interceptors.response.use(async (response) => {
-            const data = response.data;
+            const data = response.data || {};
             if (!data.Success) {
                 const originalRequest = response.config;
                 if (originalRequest.url.endsWith(url.login)) {
@@ -52,14 +54,14 @@ module.exports = app => {
                         if (newToken) {
                             app.misaInvoiceAccessToken = newToken;
                             originalRequest.headers.Authorization = `Bearer ${newToken}`;
-                            return app.getMisaAxiosInstance(false)(originalRequest);
+                            return (await app.getMisaAxiosInstance(false))(originalRequest);
                         }
                     }
                 }
                 return Promise.reject(response.data);
             }
             return response.data;
-        }, async (error) => {
+        }, (error) => {
             console.error('MisaInvoice: error');
             return Promise.reject(error);
         });
@@ -67,10 +69,10 @@ module.exports = app => {
     };
     app.misaInvoiceAccessToken = 'Bearer Token';
 
-    const compileInvoice = (hocPhi, transactions) => {
+    const compileInvoice = (hocPhi, details) => {
         const invoiceDate = new Date(),
             refID = `${hocPhi.mssv}-${hocPhi.namHoc}-${hocPhi.hocKy}-${invoiceDate.getTime()}`,
-            totalAmountOC = transactions.reduce((partialSum, transaction) => partialSum + transaction.amount, 0);
+            totalAmountOC = details.reduce((partialSum, detail) => partialSum + detail.soTien, 0);
         return {
             'RefID': refID,
             'OriginalInvoiceData': {
@@ -96,27 +98,27 @@ module.exports = app => {
                 // 'BuyerAddress': '',
                 'BuyerEmail': hocPhi.email,
                 'ContactName': null,
-                'DiscountRate': null,
+                'DiscountRate': 0,
                 'TotalAmountWithoutVATOC': null,
                 // 'TotalVATAmountOC': 15000.0,
-                'TotalDiscountAmountOC': null,
+                'TotalDiscountAmountOC': 0,
                 'TotalAmountOC': totalAmountOC,
                 'TotalAmountInWords': app.numberToVnText(`${totalAmountOC}`) + ' đồng.',
-                'OriginalInvoiceDetail': transactions.length ? transactions.map((transaction, index) => {
+                'OriginalInvoiceDetail': details.length ? details.map((detail, index) => {
                     return {
                         'ItemType': 1,
                         'LineNumber': index + 1,
                         'SortOrder': index + 1,
                         'ItemCode': 'HOC-PHI',
-                        'ItemName': hocPhi.loaiPhi,
+                        'ItemName': detail.loaiPhi,
                         // 'UnitName': null,
                         // 'Quantity': 1.0,
                         // 'UnitPrice': 150000.0,
                         'DiscountRate': null,
                         'DiscountAmountOC': null,
                         'DiscountAmount': null,
-                        'AmountOC': transaction.amount,
-                        'Amount': transaction.amount,
+                        'AmountOC': detail.soTien,
+                        'Amount': detail.soTien,
                         // 'VATRateName': '10%',
                         // 'VATAmountOC': 15000.0,
                         // 'VATAmount': 15000.0
@@ -144,8 +146,8 @@ module.exports = app => {
                 'TotalAmount': totalAmountOC,
                 'TotalAmountWithoutVAT': null,
                 'TotalVATAmount': null,
-                'TotalDiscountAmount': null,
-                'TotalSaleAmountOC': null,
+                'TotalDiscountAmount': 0,
+                'TotalSaleAmountOC': 0,
                 'TotalSaleAmount': null,
                 'IsTaxReduction43': null,
                 'IsTaxReduction': null,
@@ -159,7 +161,7 @@ module.exports = app => {
         try {
             const { mssv, hocKy, namHoc } = req.body;
             if (await app.model.tcHocPhiTransactionInvoice.get({ mssv, hocKy, namHoc })) {
-                throw 'Invocie đã tồn tại';
+                throw 'Hóa đơn đã tồn tại';
             }
             let hocPhi = await app.model.tcHocPhi.getInvoiceInfo(mssv, parseInt(namHoc), parseInt(hocKy));
             if (!hocPhi.rows || !hocPhi.rows.length) {
@@ -169,15 +171,18 @@ module.exports = app => {
             if (hocPhi.congNo) {
                 throw 'Dữ liệu hóa đơn không hợp lệ';
             }
-            const transactions = await app.model.tcHocPhiTransaction.getAll({ customerId: hocPhi.mssv, hocKy: hocPhi.hocKy, namHoc: hocPhi.namHoc }, '*', 'transDate');
-            if (!transactions.length) {
+
+            let hocPhiDetails = await app.model.tcHocPhi.getDetail(hocPhi.mssv, hocPhi.hocKy, hocPhi.namHoc);
+            hocPhiDetails = hocPhiDetails.rows;
+            if (!hocPhiDetails.length) {
                 throw 'Không có dữ liệu giao dịch';
             }
             let response = null;
             try {
-                response = await app.getMisaAxiosInstance().post(
+                const misaInstance = await app.getMisaAxiosInstance();
+                response = await misaInstance.post(
                     url.hsmPublish,
-                    [compileInvoice(hocPhi, transactions)]
+                    [compileInvoice(hocPhi, hocPhiDetails)]
                 );
             } catch (error) {
                 throw { message: 'Tạo hóa đơn lỗi', error };
@@ -206,10 +211,14 @@ module.exports = app => {
         try {
 
             const invoiceList = list.map(item => {
-                const transactions = item.transactions ? item.transactions.split(';').map(amount => ({ amount: parseInt(amount) })) : [];
-                return compileInvoice(item, transactions);
+                const details = item.details ? item.details.split('|||').map(detail => {
+                    const [loaiPhi, soTien] = detail.split('||');
+                    return {loaiPhi, soTien: parseInt(soTien)};
+                }) : [];
+                return compileInvoice(item, details);
             });
-            const response = await app.getMisaAxiosInstance().post(url.hsmPublish, invoiceList);
+            const instance = await app.getMisaAxiosInstance();
+            const response = await instance.post(url.hsmPublish, invoiceList);
             const data = app.parse(response.Data);
             const invoices = await Promise.all(data.map(async invoice => {
                 if (invoice.ErrorCode)
@@ -267,15 +276,17 @@ module.exports = app => {
 
             return res.send({ result });
         } catch (error) {
-            res.send({error});
+            res.send({ error });
         }
     });
 
     app.get('/api/finance/invoice/:id', app.permission.check('tcInvoice:write'), async (req, res) => {
         try {
             const id = req.params.id;
+            const instance = await app.getMisaAxiosInstance();
             const invoice = await app.model.tcHocPhiTransactionInvoice.get({ id });
-            const response = await app.getMisaAxiosInstance().post(url.view, [invoice.invoiceTransactionId]);
+            if (!invoice) throw 'Hóa đơn không tồn tại';
+            const response = await instance.post(url.view, [invoice.invoiceTransactionId]);
             request(response.Data).pipe(res);
         } catch (error) {
             res.status(400).send({ error });

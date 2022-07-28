@@ -108,8 +108,8 @@ class InvoiceResultModal extends AdminModal {
             title: 'Kết quả xuất hóa đơn',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox ref={e => this.tongHoaDon = e} className='col-md-12' label='Tổng số hóa đơn' />
-                <FormTextBox ref={e => this.thanhCong = e} className='col-md-12' label='Hóa đơn tạo thành công' />
+                <FormTextBox readOnly ref={e => this.tongHoaDon = e} className='col-md-12' label='Tổng số hóa đơn' />
+                <FormTextBox readOnly ref={e => this.thanhCong = e} className='col-md-12' label='Hóa đơn tạo thành công' />
             </div>
         });
     }
@@ -152,7 +152,6 @@ class TcHocPhiAdminPage extends AdminPage {
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
-            this.resultModal?.show({});
         });
     }
 

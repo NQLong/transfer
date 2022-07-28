@@ -293,5 +293,18 @@ module.exports = app => {
                     }
                 }));
         }),
+
+        getDetail: (masosinhvien, hocky, namhoc, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_get_detail(:masosinhvien, :hocky, :namhoc); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, masosinhvien, hocky, namhoc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
     };
 };
