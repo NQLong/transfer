@@ -6,7 +6,14 @@ module.exports = app => {
         },
     };
 
-    app.permission.add({ name: 'tcGiaoDich:read', menu });
+    app.permissionHooks.add('staff', 'addRolesTcGiaoDich', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:read');
+            resolve();
+        } else resolve();
+    }));
+
+    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export');
     app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:read'), app.templates.admin);
 
 
@@ -36,12 +43,13 @@ module.exports = app => {
             const list = await app.model.tcHocPhiTransaction.listBank(searchTerm || '');
             res.send({ items: list.rows.map(item => item.bank) });
         } catch (error) {
-            res.send({error});
+            res.send({ error });
         }
     });
 
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
-    app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+
+    app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:export'), async (req, res) => {
         try {
             let filter = app.parse(req.query.filter, {});
             const settings = await getSettings();

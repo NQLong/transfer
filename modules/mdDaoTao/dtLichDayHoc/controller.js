@@ -9,9 +9,17 @@ module.exports = app => {
         }
     };
     app.permission.add(
-        { name: 'dtThoiKhoaBieu:read', menu },
+        { name: 'dtThoiKhoaBieu:manage', menu },
     );
 
-    app.get('/user/dao-tao/lich-day-hoc', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRolesDtTkb', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:manage');
+            resolve();
+        } else resolve();
+    }));
+
+
+    app.get('/user/dao-tao/lich-day-hoc', app.permission.check('dtThoiKhoaBieu:manage'), app.templates.admin);
 
 };

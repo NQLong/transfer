@@ -60,7 +60,7 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
                         onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`) : null}
                     >
                         <Tooltip title='Sao chép' arrow>
-                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)}>
+                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || permission.write ? this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`) : T.notify('Vui lòng liên hệ người quản lý đào tạo!', 'danger')}>
                                 <i className='fa fa-lg fa-clone ' />
                             </a>
                         </Tooltip>

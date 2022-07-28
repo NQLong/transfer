@@ -174,12 +174,16 @@ module.exports = app => {
     };
 
     // Update user's session ------------------------------------------------------------------------------------------------------------------------
-    const initManager = (user, listChucVuTruong = ['013', '005', '003', '016', '009', '007']) => {
+    const initManager = async (user) => {
         if (!(user && user.staff && user.staff.listChucVu && user.staff.listChucVu.length)) {
             return [];
         } else {
+            const listMaChucVuQuanLy = await app.model.dmChucVu.getAll({
+                statement: 'ten LIKE :truongDonVi AND ten NOT LIKE :phoDonVi',
+                parameter: { truongDonVi: '%Trưởng%', phoDonVi: '%Phó%' }
+            }, 'ma');
             const listChucVu = user.staff.listChucVu;
-            return listChucVu.filter(item => listChucVuTruong.includes(item.maChucVu)).map(item => app.clone(item, { isManager: true }));
+            return listChucVu.filter(item => listMaChucVuQuanLy.map(item => item.ma).includes(item.maChucVu)).map(item => app.clone(item, { isManager: true }));
         }
     };
 
@@ -210,16 +214,19 @@ module.exports = app => {
                 // Add login permission => user.active == 1 => user:login
                 if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
                 if (app.developers.includes(user.email)) app.permissionHooks.pushUserPermission(user, 'developer:login', ...app.permission.all());
+
                 new Promise(resolve => {
                     //Check if user if a staff
                     user.isStaff && app.permissionHooks.pushUserPermission(user, 'staff:login');
+                    // user.isStaff && app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
                             user.isStaff = 0;
-                            app.permissionHooks.remove(user, 'staff:login');
+                            user.permissions = user.permissions.filter(item => item != 'staff:login');
                             resolve();
                         } else {
                             user.isStaff = 1;
+                            user.permissions = user.permissions.filter(item => item != 'student:login');
                             if (item.phai == '02') app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
                             user.firstName = item.ten;
@@ -262,18 +269,22 @@ module.exports = app => {
                     //Check cán bộ đặc biệt
                     if (user.isStaff) {
                         // Cán bộ quản lý
-                        user.staff.donViQuanLy = initManager(user);
-                        user.staff.donViQuanLy.length && app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write', 'fwAssignRole:write', 'fwAssignRole:read');
+                        initManager(user).then(donViQuanLy => {
+                            user.staff.donViQuanLy = donViQuanLy;
 
-                        if (user.staff.maDonVi == 68) {
-                            app.permissionHooks.pushUserPermission(user, 'rectors:login');
-                            if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
-                                app.permissionHooks.pushUserPermission(user, 'president:login');
-                            } else {
-                                app.permissionHooks.pushUserPermission(user, 'vice-president:login');
+                            user.staff.donViQuanLy.length ? app.permissionHooks.pushUserPermission(user, 'manager:login', 'manager:read', 'manager:write', 'fwAssignRole:write', 'fwAssignRole:read') : (user.permissions = user.permissions.filter(item => !['manager:login', 'manager:read', 'fwAssignRole:read'].includes(item)));
+                            if (user.staff.maDonVi == 68) {
+                                app.permissionHooks.pushUserPermission(user, 'rectors:login');
+                                if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
+                                    app.permissionHooks.pushUserPermission(user, 'president:login');
+                                } else {
+                                    app.permissionHooks.pushUserPermission(user, 'vice-president:login');
+                                }
                             }
-                        }
-                        app.permissionHooks.run('staff', user, user.staff).then(() => {
+                            app.permissionHooks.run('staff', user, user.staff).then(() => {
+                                resolve();
+                            });
+                        }).catch(() => {
                             resolve();
                         });
                     } else resolve();

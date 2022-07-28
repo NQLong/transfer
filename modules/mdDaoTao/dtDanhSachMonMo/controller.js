@@ -32,7 +32,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
+    app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {
         try {
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
                 idDangKyMoMon = req.query.id,
