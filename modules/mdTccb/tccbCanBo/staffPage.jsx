@@ -77,7 +77,7 @@ class StaffUserPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
-            shcc = this.props.system.user.staff.shcc;
+            shcc = this.props.system?.user?.staff.shcc;
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',

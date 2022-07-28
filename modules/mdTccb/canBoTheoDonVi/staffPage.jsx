@@ -85,7 +85,7 @@ class CanBoTheoDonVi extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ho + ' ' + item.ten} />}
             <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
             <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
-            {item.shcc != this.props.system.user.staff.shcc && <TableCell type='buttons'>
+            {item.shcc != this.props.system.user?.staff.shcc && <TableCell type='buttons'>
                 <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)} > <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
             </TableCell >}
         </tr >;
@@ -102,7 +102,7 @@ class CanBoTheoDonVi extends AdminPage {
             <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={CRUD[item.tccbLog?.thaoTac] || ''} />
             <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.quaTrinh || ''} />
             <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yy' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.ngay || null} />
-            {item.shcc != this.props.system.user.staff.shcc && <TableCell type='buttons'>
+            {item.shcc != this.props.system.user.staff?.shcc && <TableCell type='buttons'>
                 <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)}> <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
             </TableCell>}
         </tr>);
