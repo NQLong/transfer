@@ -219,7 +219,6 @@ module.exports = app => {
                 new Promise(resolve => {
                     //Check if user if a staff
                     user.isStaff && app.permissionHooks.pushUserPermission(user, 'staff:login');
-                    user.isStaff && app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
                             user.isStaff = 0;
