@@ -20,15 +20,25 @@ module.exports = app => {
         }
     };
 
+
     app.permission.add(
         { name: 'student:login', menu },
         { name: 'student:login', menu: menuHocPhi },
-        { name: 'student:read', menu: menuStudents },
+        { name: 'student:manage', menu: menuStudents },
         { name: 'student:write' },
         { name: 'student:delete' }
     );
+
+    app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
-    app.get('/user/students/list', app.permission.check('student:read'), app.templates.admin);
+    app.get('/user/students/list', app.permission.check('student:manage'), app.templates.admin);
     app.get('/user/students/item/:mssv', app.permission.check('student:write'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
@@ -62,7 +72,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/students/:mssv', app.permission.check('student:read'), (req, res) => {
+    app.get('/api/students/:mssv', app.permission.check('student:manage'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             res.send({ items: sinhVien, error });
