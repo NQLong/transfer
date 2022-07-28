@@ -235,11 +235,11 @@ class ComponentCaNhan extends AdminPage {
                             </div>
                         </div>
                     </div>
-                    <ComponentDiaDiem ref={e => this.noiSinh = e} label={<span>Nơi sinh <a href='#' onClick={e => e.preventDefault() || this.setState({ noiSinhNuocNgoai: true })}>(Nơi sinh ở nước ngoài)</a></span>} className='col-md-12' style={{ display: this.state.noiSinhNuocNgoai ? 'none' : 'block' }} />
-                    <FormSelect className='col-md-4' data={SelectAdapter_DmQuocGia} ref={e => this.noiSinhNuocNgoai = e} label={<span>Nơi sinh nước ngoài <a href='#' onClick={e => e.preventDefault() || this.setState({ noiSinhNuocNgoai: false })}>(Nơi sinh ở Việt Nam)</a></span>} style={{ display: !this.state.noiSinhNuocNgoai ? 'none' : 'block' }} placeholder='Nơi sinh nước ngoài' />
-                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
-                    <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-12' requiredSoNhaDuong={true} />
-                    <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-12' requiredSoNhaDuong={true} />
+                    <ComponentDiaDiem ref={e => this.noiSinh = e} label={<span>Nơi sinh <a href='#' onClick={e => e.preventDefault() || !readOnly && this.setState({ noiSinhNuocNgoai: true })}>(Nơi sinh ở nước ngoài)</a></span>} className='col-md-12' style={{ display: this.state.noiSinhNuocNgoai ? 'none' : 'block' }} readOnly={readOnly} />
+                    <FormSelect className='col-md-4' data={SelectAdapter_DmQuocGia} ref={e => this.noiSinhNuocNgoai = e} label={<span>Nơi sinh nước ngoài <a href='#' onClick={e => e.preventDefault() || this.setState({ noiSinhNuocNgoai: false })}>(Nơi sinh ở Việt Nam)</a></span>} style={{ display: !this.state.noiSinhNuocNgoai ? 'none' : 'block' }} placeholder='Nơi sinh nước ngoài' readOnly={readOnly} />
+                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' readOnly={readOnly} />
+                    <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-12' requiredSoNhaDuong={true} readOnly={readOnly} />
+                    <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => !readOnly && this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-12' requiredSoNhaDuong={true} readOnly={readOnly} />
 
                     <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD/Số định danh' className='form-group col-md-4' readOnly={readOnly} />
                     <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp' className='form-group col-md-4' readOnly={readOnly} />

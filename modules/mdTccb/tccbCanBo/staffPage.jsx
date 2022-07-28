@@ -28,8 +28,8 @@ class StaffUserPage extends AdminPage {
                     this.props.history.goBack();
                 } else {
                     this.shcc = staff.shcc;
-                    this.email = staff.email;
-                    this.props.updateStaffUser(this.email, { lastLogin: Date.now() });
+                    this.email = this.props.system.user.email;
+                    this.email && this.props.updateStaffUser(this.email, { lastLogin: Date.now() });
                 }
                 this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
@@ -78,7 +78,6 @@ class StaffUserPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
             shcc = this.props.system.user.staff.shcc;
-        console.log('staffpage', permission);
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',

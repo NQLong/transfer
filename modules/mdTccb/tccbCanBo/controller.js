@@ -82,7 +82,7 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/staff/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+    app.get('/api/staff/page/:pageNumber/:pageSize', app.permission.check('staff:read'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -787,7 +787,7 @@ module.exports = app => {
         app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/user/staff', app.permission.check('staff:read'), (req, res) => {
+    app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
         app.model.canBo.update({ email: req.body.email }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 

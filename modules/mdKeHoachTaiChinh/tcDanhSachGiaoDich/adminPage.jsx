@@ -115,6 +115,7 @@ class DanhSachGiaoDich extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcGiaoDich && this.props.tcGiaoDich.page ? this.props.tcGiaoDich.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
+        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export']);
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -183,7 +184,7 @@ class DanhSachGiaoDich extends AdminPage {
                         </div>
                     </div>
                 </div>,
-            buttons: [{ className: 'btn-danger', icon: 'fa-table', onClick: this.onDownloadPsc }]
+            onExport: permission.export ? e => this.onDownloadPsc(e) : null,
         });
     }
 }
