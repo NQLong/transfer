@@ -67,7 +67,6 @@ class CanBoPage extends AdminPage {
         }
     }
 
-
     render() {
         const permission = this.getUserPermission('staff');
         return this.renderPage({
