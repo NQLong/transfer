@@ -179,7 +179,7 @@ module.exports = app => {
             return [];
         } else {
             const listMaChucVuQuanLy = await app.model.dmChucVu.getAll({
-                statement: 'ten LIKE :phoDonVi OR ten LIKE :truongDonVi',
+                statement: 'ten LIKE :truongDonVi AND ten NOT LIKE :phoDonVi',
                 parameter: { truongDonVi: '%Trưởng%', phoDonVi: '%Phó%' }
             }, 'ma');
             const listChucVu = user.staff.listChucVu;
@@ -218,14 +218,15 @@ module.exports = app => {
                 new Promise(resolve => {
                     //Check if user if a staff
                     user.isStaff && app.permissionHooks.pushUserPermission(user, 'staff:login');
-                    user.isStaff && app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
+                    // user.isStaff && app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
                             user.isStaff = 0;
-                            app.permissionHooks.remove(user, 'staff:login');
+                            user.permissions = user.permissions.filter(item => item != 'staff:login');
                             resolve();
                         } else {
                             user.isStaff = 1;
+                            user.permissions = user.permissions.filter(item => item != 'student:login');
                             if (item.phai == '02') app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
                             user.firstName = item.ten;
@@ -270,8 +271,8 @@ module.exports = app => {
                         // Cán bộ quản lý
                         initManager(user).then(donViQuanLy => {
                             user.staff.donViQuanLy = donViQuanLy;
-                            user.staff.donViQuanLy.length && app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write', 'fwAssignRole:write', 'fwAssignRole:read');
 
+                            user.staff.donViQuanLy.length ? app.permissionHooks.pushUserPermission(user, 'manager:login', 'manager:read', 'manager:write', 'fwAssignRole:write', 'fwAssignRole:read') : (user.permissions = user.permissions.filter(item => !['manager:login', 'manager:read', 'fwAssignRole:read'].includes(item)));
                             if (user.staff.maDonVi == 68) {
                                 app.permissionHooks.pushUserPermission(user, 'rectors:login');
                                 if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
@@ -289,6 +290,7 @@ module.exports = app => {
                     } else resolve();
                 })).then(() => new Promise(resolve => {
                     // AssignRole hooks
+                    console.log(user.staff);
                     if (user.isStaff) {
                         app.model.fwAssignRole.getAll({ nguoiDuocGan: user.shcc }, (error, roles) => {
                             if (!error || roles != []) {
