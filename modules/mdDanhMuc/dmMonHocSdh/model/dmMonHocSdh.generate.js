@@ -1,6 +1,6 @@
-// Table name: DM_MON_HOC_SDH { ma, tenTiengViet, tenTiengAnh, tcLyThuyet, tcThucHanh, khoa }
+// Table name: DM_MON_HOC_SDH { ma, tenTiengViet, tenTiengAnh, tcLyThuyet, tcThucHanh, khoaSdh, kichHoat }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'tenTiengViet': 'TEN_TIENG_VIET', 'tenTiengAnh': 'TEN_TIENG_ANH', 'tcLyThuyet': 'TC_LY_THUYET', 'tcThucHanh': 'TC_THUC_HANH', 'khoa': 'KHOA' };
+const obj2Db = { 'ma': 'MA', 'tenTiengViet': 'TEN_TIENG_VIET', 'tenTiengAnh': 'TEN_TIENG_ANH', 'tcLyThuyet': 'TC_LY_THUYET', 'tcThucHanh': 'TC_THUC_HANH', 'khoaSdh': 'KHOA_SDH', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
     app.model.dmMonHocSdh = {
