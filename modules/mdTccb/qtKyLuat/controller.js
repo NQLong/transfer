@@ -18,11 +18,20 @@ module.exports = app => {
         { name: 'qtKyLuat:read', menu },
         { name: 'qtKyLuat:write' },
         { name: 'qtKyLuat:delete' },
+        { name: 'qtKyLuat:export' },
     );
     app.get('/user/tccb/qua-trinh/ky-luat/:id', app.permission.check('qtKyLuat:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/ky-luat/group/:shcc', app.permission.check('qtKyLuat:read'), app.templates.admin);
     app.get('/user/ky-luat', app.permission.check('staff:login'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRoleQtKyLuatAll', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtKyLuat:read', 'qtKyLuat:write', 'qtKyLuat:delete', 'qtKyLuat:export');
+            resolve();
+        } else resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
     app.post('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
@@ -168,14 +177,14 @@ module.exports = app => {
         });
     });
 
-    app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
+    app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:delete'), (req, res) => {
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Kỷ luật');
             res.send({ error });
         });
     });
 
-    app.get('/api/qua-trinh/ky-luat/download-excel/:filter', app.permission.check('qtKyLuat:read'), (req, res) => {
+    app.get('/api/qua-trinh/ky-luat/download-excel/:filter', app.permission.check('qtKyLuat:export'), (req, res) => {
         app.model.qtKyLuat.download(req.params.filter, (error, result) => {
             if (error || !result) {
                 res.send({ error });

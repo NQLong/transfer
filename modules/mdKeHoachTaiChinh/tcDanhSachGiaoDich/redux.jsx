@@ -65,3 +65,20 @@ export function createInvoice(transactionId, done, onError) {
         }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
     };
 }
+
+export function createGiaoDich(data, done) {
+    return dispatch => {
+        const url = '/api/finance/danh-sach-giao-dich';
+        T.post(url, data, res => {
+            if (res.error) {
+                T.notify('Tạo giao dịch lỗi. ' + (res.error.message && typeof res.error.message === 'string' ? res.error.message : ''), 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Tạo giao dịch thành công', 'success');
+                dispatch(getTongGiaoDichPage());
+                done && done(res.items);
+            }
+        }, () => T.notify('Tạo giao dịch lỗi', 'danger'));
+    };
+}

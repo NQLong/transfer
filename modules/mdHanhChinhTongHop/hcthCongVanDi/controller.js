@@ -57,18 +57,18 @@ module.exports = app => {
             || '';
         canBoXem = req.session?.user?.shcc || '';
 
-        let loaiCanBo = admin ? 4 : 
-                        rectorsPermission.login ? 1 : 
-                        (hcthManagePermission.manage || (permissions.includes('donViCongVanDi:manage') && hcthPermission.login))? 2: // chuyên viên quản lý thuộc phòng hcth
-                        (permissions.includes('donViCongVanDi:edit') && hcthPermission.login) ? 6 : //chuyên viên soạn thảo thuộc phòng hcth
-    
+        let loaiCanBo = admin ? 4 :
+            rectorsPermission.login ? 1 :
+                (hcthManagePermission.manage || (permissions.includes('donViCongVanDi:manage') && hcthPermission.login)) ? 2 : // chuyên viên quản lý thuộc phòng hcth
+                    (permissions.includes('donViCongVanDi:edit') && hcthPermission.login) ? 6 : //chuyên viên soạn thảo thuộc phòng hcth
+
                         permissions.includes('donViCongVanDi:edit') ? 5 :  // chuyên viên soạn thảo
-                        (hcthPermission.login && !hcthManagePermission.manage) ? 3 : 0; // nhân viên phòng hcth
+                            (hcthPermission.login && !hcthManagePermission.manage) ? 3 : 0; // nhân viên phòng hcth
 
         if (!admin && (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent))) {
             donViXem = '';
             canBoXem = '';
-        } 
+        }
 
         if (congVanYear && Number(congVanYear) > 1900) {
             timeType = 1;
@@ -292,7 +292,7 @@ module.exports = app => {
                                             console.log('1' + trangThaiBefore);
                                             console.log('2' + trangThaiAfter);
 
-                                            
+
                                             app.model.hcthHistory.create({
                                                 key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: hanhDong, thoiGian: new Date().getTime(),
                                                 shcc: req.session?.user?.shcc,
@@ -561,7 +561,7 @@ module.exports = app => {
             }
             const congVan = await app.model.hcthCongVanDi.get({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
-            if (!(await isRelated(congVan, donViNhan, req))) {
+            if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
             else if (congVan?.trangThai == trangThaiCongVanDi.DA_PHAN_PHOI.id && req.session.user?.shcc) {
@@ -650,7 +650,7 @@ module.exports = app => {
         }));
     };
 
-    const createStaffNotification = async(item, status) => {
+    const createStaffNotification = async (item, status) => {
         const staff = await app.model.hcthCongVanDi.getAllStaff(item.id);
 
         const emails = staff.rows.map(item => item.email);
@@ -694,7 +694,7 @@ module.exports = app => {
     };
 
     // Đang gửi cho hiệu trưởng
-    const createSchoolAdministratorNotification = async(item, status) => {
+    const createSchoolAdministratorNotification = async (item, status) => {
         const principal = await app.model.canBo.get({ shcc: '001.0068' }, 'shcc, email');
         await createNotification([principal.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
     };
@@ -703,13 +703,13 @@ module.exports = app => {
     const createAuthorNotification = async (id, shcc, status) => {
         const staff = await app.model.canBo.get({ shcc: shcc }, 'email');
 
-        await createNotification([staff.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}`});
+        await createNotification([staff.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
     };
 
     // Gửi cho cán bộ ký
     const createSignNotification = async (item, status) => {
         const signStaff = await app.model.hcthCongVanDi.getSignStaff(item.id);
-        
+
         const emails = signStaff.rows.map(item => item.email);
 
         await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });

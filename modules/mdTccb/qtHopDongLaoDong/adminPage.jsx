@@ -92,7 +92,7 @@ class QtHopDongLaoDongPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
             (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.pageGr ?
                 this.props.qtHopDongLaoDong.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
@@ -121,7 +121,7 @@ class QtHopDongLaoDongPage extends AdminPage {
                         <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href={'/user/tccb/qua-trinh/hop-dong-lao-dong/' + item.ma}>
+                                <a onClick={() => permission.write ? this.props.history.push(`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`) : T.notify('Vui lòng liên hệ phòng Tổ chức - Cán bộ', 'warning')}>
                                     <span>{(item.hoBenA ? item.hoBenA : '') + ' ' + (item.tenBenA ? item.tenBenA : '')}</span><br />
                                     <span>{item.shcc}</span></a>
                             </>
@@ -167,10 +167,10 @@ class QtHopDongLaoDongPage extends AdminPage {
                         }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} >
-                                <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
+                                onEdit={() => permission.write ? this.props.history.push(`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`) : T.notify('Vui lòng liên hệ phòng Tổ chức - Cán bộ', 'warning')} onDelete={this.delete} >
+                                {permission.export && <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                     <i className='fa fa-lg fa-file-word-o' />
-                                </a>
+                                </a>}
                             </TableCell>
                         }
                         {
@@ -208,7 +208,7 @@ class QtHopDongLaoDongPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                {permission.read &&
+                {permission.export &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
                         <i className='fa fa-lg fa-print' />
                     </button>

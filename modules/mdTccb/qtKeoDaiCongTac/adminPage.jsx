@@ -391,8 +391,7 @@ class QtKeoDaiCongTac extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.pageGr ?
                 this.props.qtKeoDaiCongTac.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -400,7 +399,7 @@ class QtKeoDaiCongTac extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -505,22 +504,21 @@ class QtKeoDaiCongTac extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtKeoDaiCongTacStaff} update={this.props.updateQtKeoDaiCongTacStaff}
-                    permissions={currentPermissions} getTuoiNghiHuu={this.props.getTuoiNghiHuu}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                    create={this.props.createQtKeoDaiCongTacStaff} update={this.props.updateQtKeoDaiCongTacStaff} getTuoiNghiHuu={this.props.getTuoiNghiHuu}
                 />
                 <UpdateQuyetDinhModal ref={e => this.updateQdModal = e} getListItem={this.props.getListItem}
                     updateMultipleQuyetDinh={this.props.updateMultipleQuyetDinh}
                 />
-                {!this.checked && <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '180px' }} tooltip='Cập nhật số quyết định theo năm' customIcon='fa-th-list' onClick={e => {
+                {!this.checked && permission.write && <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '180px' }} tooltip='Cập nhật số quyết định theo năm' customIcon='fa-th-list' onClick={e => {
                     e.preventDefault();
                     this.updateQdModal.show();
                 }} />}
             </>,
             backRoute: '/user/tccb',
-            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/keo-dai-cong-tac/create-list') : '',
+            onImport: !this.checked && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/keo-dai-cong-tac/create-list') : '',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 let { pageCondition } = this.props && this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageCondition: {} };
                 pageCondition = typeof pageCondition === 'string' ? pageCondition : '';

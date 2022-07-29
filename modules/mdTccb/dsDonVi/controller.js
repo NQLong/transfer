@@ -7,8 +7,15 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'tccbDanhSachDonVi:read', menu },
+        { name: 'tccbDSDV:manage', menu },
     );
 
-    app.get('/user/tccb/danh-sach-don-vi', app.permission.check('tccbDanhSachDonVi:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRoleDsdvTccb', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'tccbDSDV:manage');
+            resolve();
+        } else resolve();
+    }));
+
+    app.get('/user/tccb/danh-sach-don-vi', app.permission.check('tccbDSDV:manage'), app.templates.admin);
 };

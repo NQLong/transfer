@@ -226,8 +226,8 @@ class TcHocPhiAdminPage extends AdminPage {
     }
 
     render() {
-        let permission = this.getUserPermission('tcHocPhi');
         let invoicePermission = this.getUserPermission('tcInvoice');
+        let permission = this.getUserPermission('tcHocPhi', ['read', 'write', 'delete', 'manage', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
@@ -244,6 +244,9 @@ class TcHocPhiAdminPage extends AdminPage {
                 });
             }
         });
+
+        permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
+
 
         let table = renderTable({
             getDataSource: () => list,
@@ -338,20 +341,17 @@ class TcHocPhiAdminPage extends AdminPage {
                             {table}
                             <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                                 getPage={this.getPage} />
-                            <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
-                            <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
+                            <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} readOnly={!permission.readOnly} />
+                            <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} readOnly={!permission.write} />
                         </div>
                     </div>
                     <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} />
                     <InvoiceResultModal ref={e => this.resultModal = e} />
                 </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
-            onExport: permission.write ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
-            buttons: [
-                ...buttons,
-                { type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || this.props.history.push('/user/finance/statistic') },
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
+            buttons: buttons,
                 // { type: 'danger', icon: 'fa-reply-all', tooltip: 'Gửi mail nhắc nhở', onClick: this.sendEmailNhacNho }
-            ]
         });
     }
 }

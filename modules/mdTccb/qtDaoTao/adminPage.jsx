@@ -97,7 +97,7 @@ class QtDaoTao extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtDaoTao && this.props.qtDaoTao.pageGr ?
                 this.props.qtDaoTao.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -237,13 +237,13 @@ class QtDaoTao extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.checked ? this.props.getQtDaoTaoGroupPage : this.props.getQtDaoTaoPage} />
-                <DaoTaoModal ref={e => this.modal = e} isCanBo={false}
-                    create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao}
+                <DaoTaoModal ref={e => this.modal = e} isCanBo={false} readOnly={!permission.write}
+                    create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao} canEdit={permission.write}
                 />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 const { fromYear, toYear, listShcc, listDv, listLoaiBang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listLoaiBang: null };
                 T.download(T.url(`/api/qua-trinh/dao-tao/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${listLoaiBang ? listLoaiBang : null}`), 'daotaoboiduong.xlsx');

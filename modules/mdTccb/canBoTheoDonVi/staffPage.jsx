@@ -80,20 +80,21 @@ class CanBoTheoDonVi extends AdminPage {
         item.firstName = item.ten;
         return <tr key={index}>
             <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-            <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={e => e.preventDefault() || this.assignRolesModal.show(item)} content={item.ho + ' ' + item.ten} />
-
+            {item.shcc != this.props.system.user.staff.shcc ?
+                <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={e => e.preventDefault() || this.assignRolesModal.show(item)} content={item.ho + ' ' + item.ten} /> :
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ho + ' ' + item.ten} />}
             <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
             <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
-            <TableCell type='buttons'>
+            {item.shcc != this.props.system.user?.staff.shcc && <TableCell type='buttons'>
                 <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)} > <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
-            </TableCell >
+            </TableCell >}
         </tr >;
     }
 
     tccbRows = (item, index) => {
         item.lastName = item.ho;
         item.firstName = item.ten;
-        return <tr key={index}>
+        return (<tr key={index}>
             <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
             <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={e => e.preventDefault() || this.assignRolesModal.show(item)} content={item.ho + ' ' + item.ten} />
             <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
@@ -101,26 +102,25 @@ class CanBoTheoDonVi extends AdminPage {
             <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={CRUD[item.tccbLog?.thaoTac] || ''} />
             <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.quaTrinh || ''} />
             <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yy' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.ngay || null} />
-            <TableCell type='buttons'>
+            {item.shcc != this.props.system.user.staff?.shcc && <TableCell type='buttons'>
                 <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)}> <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
-            </TableCell>
-        </tr>;
+            </TableCell>}
+        </tr>);
     }
 
     render() {
         const assignRolePermissions = this.getUserPermission('fwAssignRole', ['read', 'write']),
             daoTaoPermission = this.getCurrentPermissions().includes('faculty:login'),
             quanLyDaoTaoPermission = this.getCurrentPermissions().includes('quanLyDaoTao:manager'),
-            managerPermission = this.getUserPermission('manager', ['write']),
+            managerPermission = this.getUserPermission('manager', ['write', 'login']),
             congVanPermission = this.getUserPermission('hcth', ['manage']);
         let nhomRoles = ['ttDoanhNghiep'];
-        daoTaoPermission && nhomRoles.push('daoTao');
-        quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
-
         congVanPermission.manage && nhomRoles.push('quanLyCongVanDen', 'hcthQuanLyCongVanDi');
         managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong', 'soanThaoCongVanDi');
+        managerPermission.login && nhomRoles.push('quanLyDonVi');
+        quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
+        daoTaoPermission && nhomRoles.push('daoTao');
 
-        
         const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};
         let table = renderTable({
             emptyTable: 'Đơn vị chưa có cán bộ',

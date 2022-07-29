@@ -20,6 +20,7 @@ module.exports = app => {
         }
     };
 
+
     app.permission.add(
         { name: 'student:login', menu },
         { name: 'student:login', menu: menuHocPhi },
@@ -27,6 +28,15 @@ module.exports = app => {
         { name: 'student:write' },
         { name: 'student:delete' }
     );
+
+    app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
+            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/students/list', app.permission.check('student:read'), app.templates.admin);
     app.get('/user/students/item/:mssv', app.permission.check('student:write'), app.templates.admin);
@@ -46,7 +56,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:login'), (req, res) => {
+    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';

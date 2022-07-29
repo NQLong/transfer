@@ -17,11 +17,18 @@ module.exports = app => {
         { name: 'qtDiNuocNgoai:read', menu },
         { name: 'qtDiNuocNgoai:write' },
         { name: 'qtDiNuocNgoai:delete' },
+        { name: 'qtDiNuocNgoai:export' },
     );
     app.get('/user/tccb/qua-trinh/di-nuoc-ngoai', app.permission.check('qtDiNuocNgoai:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/di-nuoc-ngoai/group/:shcc', app.permission.check('qtDiNuocNgoai:read'), app.templates.admin);
     app.get('/user/di-nuoc-ngoai', app.permission.check('staff:login'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtDiNuocNgoai', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtDiNuocNgoai:read', 'qtDiNuocNgoai:write', 'qtDiNuocNgoai:delete', 'qtDiNuocNgoai:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
@@ -170,7 +177,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:filter/:searchTerm', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
+    app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:filter/:searchTerm', app.permission.check('qtDiNuocNgoai:export'), (req, res) => {
         let searchTerm = req.params.searchTerm;
         if (searchTerm == 'null') searchTerm = '';
         app.model.qtDiNuocNgoai.download(req.params.filter, searchTerm, (err, result) => {

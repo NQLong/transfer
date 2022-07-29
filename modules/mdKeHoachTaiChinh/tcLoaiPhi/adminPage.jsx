@@ -81,8 +81,7 @@ class tcLoaiPhiAdminPage extends AdminPage {
 
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('tcLoaiPhi', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('tcLoaiPhi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcLoaiPhi && this.props.tcLoaiPhi.page ?
             this.props.tcLoaiPhi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
@@ -118,8 +117,8 @@ class tcLoaiPhiAdminPage extends AdminPage {
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getTcLoaiPhiPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createTcLoaiPhi} update={this.props.updateTcLoaiPhi} permissions={currentPermissions} />
+                <EditModal ref={e => this.modal = e}
+                    create={this.props.createTcLoaiPhi} update={this.props.updateTcLoaiPhi} readOnly={!permission.write} />
             </>,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });

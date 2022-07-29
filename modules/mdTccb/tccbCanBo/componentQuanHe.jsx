@@ -46,19 +46,22 @@ class EditModal extends AdminModal {
         }
     }
 
-    render = () => this.renderModal({
-        title: 'Thông tin quan hệ gia đình',
-        size: 'large',
-        body: <div className='row'>
-            <FormTextBox className='col-md-6' ref={e => this.hoTen = e} label='Họ tên' required />
-            <FormSelect className='col-md-6' ref={e => this.moiQuanHe = e} data={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' required />
-            <FormTextBox className='col-md-8' ref={e => this.ngheNghiep = e} label='Nghề nghiệp' />
-            <FormDatePicker ref={e => this.namSinh = e} type='year-mask' className='form-group col-md-4' label='Năm sinh' required />
-            <FormTextBox className='col-md-12' ref={e => this.noiCongTac = e} label='Nơi công tác' />
-            <FormTextBox className='col-md-12' ref={e => this.queQuan = e} label='Nguyên quán' />
-            <FormTextBox className='col-md-12' ref={e => this.diaChi = e} label='Địa chỉ hiện tại' />
-        </div>,
-    });
+    render = () => {
+        const readOnly = this.props.readOnly;
+        return this.renderModal({
+            title: 'Thông tin quan hệ gia đình',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox className='col-md-6' ref={e => this.hoTen = e} label='Họ tên' required readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.moiQuanHe = e} data={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' required readOnly={readOnly} />
+                <FormTextBox className='col-md-8' ref={e => this.ngheNghiep = e} label='Nghề nghiệp' readOnly={readOnly} />
+                <FormDatePicker ref={e => this.namSinh = e} type='year-mask' className='form-group col-md-4' label='Năm sinh' required readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.noiCongTac = e} label='Nơi công tác' readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.queQuan = e} label='Nguyên quán' readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.diaChi = e} label='Địa chỉ hiện tại' readOnly={readOnly} />
+            </div>,
+        });
+    }
 }
 class ComponentQuanHe extends AdminPage {
     state = {
@@ -120,8 +123,12 @@ class ComponentQuanHe extends AdminPage {
 
     render() {
         const dataQuanHe = this.props.staff?.dataStaff?.quanHeCanBo || [];
-        let isCanBo = this.getUserPermission('staff', ['login']).login, permission = { write: isCanBo, read: isCanBo, delete: isCanBo },
-            voChongText = this.props.phai == '01' ? 'vợ' : 'chồng';
+        let permission = { ...this.props.permission };
+        if (permission.login) {
+            permission.write = true;
+            permission.delete = true;
+        }
+        let voChongText = this.props.phai == '01' ? 'vợ' : 'chồng';
         let familyTabs = [
             {
                 title: 'Về bản thân',
@@ -144,13 +151,13 @@ class ComponentQuanHe extends AdminPage {
                 <h3 className='tile-title'>Thông tin quan hệ gia đình</h3>
                 <FormTabs ref={e => this.tab = e} tabClassName='col-md-12' tabs={familyTabs} />
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    {permission.write && <button className='btn btn-info' type='button' onClick={e => this.createRelation(e)}>
+                    {permission.write ? <button className='btn btn-info' type='button' onClick={e => this.createRelation(e)}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin người thân
-                    </button>}
+                    </button> : null}
                 </div>
                 <EditModal ref={e => this.modal = e}
                     create={this.props.createQuanHeCanBo}
-                    update={this.props.updateQuanHeCanBo} />
+                    update={this.props.updateQuanHeCanBo} readOnly={!permission.write} />
             </div>
         );
     }

@@ -28,8 +28,8 @@ class StaffUserPage extends AdminPage {
                     this.props.history.goBack();
                 } else {
                     this.shcc = staff.shcc;
-                    this.email = staff.email;
-                    this.props.updateStaffUser(this.email, { lastLogin: Date.now() });
+                    this.email = this.props.system.user.email;
+                    this.email && !this.props.system.user.originalEmail && this.props.updateStaffUser(this.email, { lastLogin: Date.now() });
                 }
                 this.props.getStaffEdit(this.shcc, data => {
                     if (data.error) {
@@ -77,8 +77,7 @@ class StaffUserPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('staff', ['login', 'read', 'write', 'delete']),
-            shcc = this.props.system.user.staff.shcc;
-
+            shcc = this.props.system?.user?.staff.shcc;
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',
@@ -89,11 +88,11 @@ class StaffUserPage extends AdminPage {
             ],
             content: <>
                 {!this.state.item && <Loading />}
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={shcc} />
-                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} phai={this.state.phai} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={shcc} readOnly={!permission.write} />
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.login} shcc={shcc} readOnlyByTccb={!permission.write} />
+                <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={shcc} phai={this.state.phai} permission={permission} />
+                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={shcc} permission={permission} />
                 <ComponentHTCT />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} tccb={false} readOnly={true} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={shcc} permission={permission} />
 
                 <SupportModal ref={e => this.supportModal = e} create={this.props.createTccbSupport} system={this.props.system} />
                 {!permission.write && <CirclePageButton type='custom' tooltip='Yêu cầu thay đổi thông tin' customIcon='fa-universal-access' customClassName='btn-danger' style={{ marginRight: '185px' }} onClick={e => e.preventDefault() || this.supportModal.show({ item: this.state.staff })} />}
