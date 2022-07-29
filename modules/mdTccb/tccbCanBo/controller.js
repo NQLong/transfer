@@ -82,7 +82,16 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/staff/page/:pageNumber/:pageSize', app.permission.check('staff:read'), (req, res) => {
+    const checkDeveloperPermission = (req, res, next) => {
+        if (app.isDebug) next();
+        else {
+            let user = req.session.user;
+            if (app.developers.includes(user.originalEmail)) next();
+            else app.permission.check('staff:login')(req, res, next);
+        }
+    };
+
+    app.get('/api/staff/page/:pageNumber/:pageSize', checkDeveloperPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
