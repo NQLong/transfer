@@ -2,7 +2,7 @@ import React from 'react';
 import { AdminPage } from 'view/component/AdminPage';
 import { getStatisticTcHocPhi } from './redux';
 import { ChartArea } from 'modules/mdTccb/dashboardTCCB/adminPage';
-import { NumberIcon } from './adminPage';
+import NumberIcon from './adminPage';
 import { DefaultColors } from 'view/component/Chart';
 // import { DefaultColors } from 'view/component/Chart';
 
