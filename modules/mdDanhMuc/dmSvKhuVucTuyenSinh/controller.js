@@ -14,11 +14,19 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'dmSvKhuVucTuyenSinh:read', menu },
-        { name: 'dmSvKhuVucTuyenSinh:read', menu: menuDaoTao },
+        { name: 'dtSvKhuVucTuyenSinh:read', menu: menuDaoTao },
         { name: 'dmSvKhuVucTuyenSinh:write' },
         { name: 'dmSvKhuVucTuyenSinh:delete' },
     );
-    app.get('/user/dao-tao/khu-vuc-tuyen-sinh', app.permission.check('dmSvKhuVucTuyenSinh:read'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRolesKhuVucTs', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtSvKhuVucTuyenSinh:read');
+            resolve();
+        } else resolve();
+    }));
+
+    app.get('/user/dao-tao/khu-vuc-tuyen-sinh', app.permission.check('dtSvKhuVucTuyenSinh:read'), app.templates.admin);
     app.get('/user/danh-muc/khu-vuc-tuyen-sinh', app.permission.check('dmSvKhuVucTuyenSinh:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khu-vuc-tuyen-sinh/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
