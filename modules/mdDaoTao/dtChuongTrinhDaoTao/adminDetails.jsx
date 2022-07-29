@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, deleteMultiDtChuongTrinhDaoTao } from './redux';
+import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, deleteMultiDtChuongTrinhDaoTao, downloadWord } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, CirclePageButton, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
 import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -183,6 +183,24 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         });
     }
 
+    downloadWord = (e) => {
+        e.preventDefault();
+        if(!this.ma) return;
+        const namDaoTao = this.validation(this.namDaoTao);
+        const maNganh = this.validation(this.maNganh);
+        const chuyenNganh = this.validation(this.chuyenNganh);
+        SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(namDaoTao, res => {
+            const {text: textNamDaoTao} = res;
+            SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc).fetchOne(chuyenNganh, res => {
+                const {text: textChuyenNganh} = res;
+                this.props.downloadWord(this.ma, data => {
+                    T.FileSaver(new Blob([new Uint8Array(data.data)]), textNamDaoTao + '_' + maNganh + '_' + textChuyenNganh + '.docx');
+                });
+            });
+        });
+       
+    }
+
     render() {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         const readOnly = !(permission.write || permission.manage),
@@ -284,7 +302,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                         );
                     })
                 }
-
+                {this.ma && <CirclePageButton type='custom' tooltip='Tải về chương trình đào tạo' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '60px' }} onClick={(e) => this.downloadWord(e)} />}
             </>,
             backRoute: '/user/dao-tao/chuong-trinh-dao-tao',
             onSave: permission.write || permission.manage ? this.save : null,
@@ -293,5 +311,5 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, deleteMultiDtChuongTrinhDaoTao };
+const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, deleteMultiDtChuongTrinhDaoTao, downloadWord };
 export default connect(mapStateToProps, mapActionsToProps)(DtChuongTrinhDaoTaoDetails);

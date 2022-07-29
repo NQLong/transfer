@@ -82,7 +82,16 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/staff/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+    const checkDeveloperPermission = (req, res, next) => {
+        if (app.isDebug) next();
+        else {
+            let user = req.session.user;
+            if (user.originalEmail && app.developers.includes(user.originalEmail)) next();
+            else app.permission.check('staff:login')(req, res, next);
+        }
+    };
+
+    app.get('/api/staff/page/:pageNumber/:pageSize', checkDeveloperPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -136,13 +145,17 @@ module.exports = app => {
             if (error) {
                 res.send({ error });
             } else {
-                app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
-                    item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
-                    app.model.dmDonVi.get({ ma: item.maDonVi }, (error, donVi) => {
-                        item = { ...item, tenDonVi: donVi ? donVi.ten : '' };
-                        res.send({ item });
+                if (item) {
+                    app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
+                        item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
+                        app.model.dmDonVi.get({ ma: item.maDonVi }, (error, donVi) => {
+                            item = { ...item, tenDonVi: donVi ? donVi.ten : '' };
+                            res.send({ item });
+                        });
                     });
-                });
+                } else {
+                    res.send({ item: {} });
+                }
             }
         });
     });
@@ -183,13 +196,13 @@ module.exports = app => {
     //     app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
     // });
 
-    app.get('/api/staff/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/staff/all', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.getAll({}, (error, items) => {
             res.send({ error, items });
         });
     });
 
-    app.get('/api/staff/edit/item', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/staff/edit/item', app.permission.orCheck('staff:login', 'staff:read'), async (req, res) => {
         app.model.canBo.get(req.query.condition, (error, canBo) => {
             if (error) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
@@ -783,7 +796,7 @@ module.exports = app => {
         app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/user/staff', app.permission.check('staff:read'), (req, res) => {
+    app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
         app.model.canBo.update({ email: req.body.email }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 

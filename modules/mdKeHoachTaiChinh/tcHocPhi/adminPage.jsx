@@ -1,18 +1,18 @@
 import { Tooltip } from '@mui/material';
-import React from 'react';
-import { connect } from 'react-redux';
-import { AdminPage, FormSelect, renderTable, TableCell, FormDatePicker } from 'view/component/AdminPage';
-import Pagination from 'view/component/Pagination';
-import T from 'view/js/common';
-import { getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi } from './redux';
-import CountUp from 'view/js/countUp';
-import { Link } from 'react-router-dom';
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
-import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
-import { EditModal } from './modal/EditModal';
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell, AdminModal, FormTextBox } from 'view/component/AdminPage';
+import Pagination from 'view/component/Pagination';
+import T from 'view/js/common';
+import CountUp from 'view/js/countUp';
 import Detail from './modal/DetailModal';
+import { EditModal } from './modal/EditModal';
+import { createInvoice, createInvoiceList, createMultipleHocPhi, getHocPhi, getTcHocPhiPage, updateHocPhi } from './redux';
 
 export class NumberIcon extends React.Component {
     componentDidMount() {
@@ -49,6 +49,83 @@ export class NumberIcon extends React.Component {
         return this.props.link ? <Link to={this.props.link} style={{ textDecoration: 'none' }}>{content}</Link> : content;
     }
 }
+
+
+class InvoiceModal extends AdminModal {
+    state = { isSubmitting: false }
+    onSubmit = () => {
+        const data = {
+            ...getTimeFilter(this.tuNgay.value() || null, this.denNgay.value() || null),
+            namHoc: this.namHoc.value(),
+            hocKy: this.hocKy.value(),
+        };
+        if (!data.namHoc) {
+            T.notify('Vui lòng chọn năm học', 'danger');
+            this.namHoc.focus();
+        }
+        else if (!data.hocKy) {
+            T.notify('Vui lòng chọn học kỳ', 'danger');
+            this.hocKy.focus();
+        } else {
+            this.setState({ isSubmitting: true }, () => {
+                this.props.onCreate(data, () => {
+                    this.setState({ isSubmitting: false });
+                });
+            });
+        }
+    }
+
+    onShow = (data) => {
+        this.tuNgay.value(data.tuNgay || '');
+        this.namHoc.value(data.namHoc || '');
+        this.denNgay.value(data.denNgay || '');
+        this.hocKy.value(data.hocKy || '');
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Xuất hóa đơn',
+            size: 'large',
+            isLoading: this.state.isSubmitting,
+            body: <div className='row'>
+                <FormDatePicker disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' />
+                <FormDatePicker disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' />
+                <FormSelect disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.namHoc = e} data={yearDatas()} label='Năm học' />
+                <FormSelect disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' />
+            </div>
+        });
+    }
+}
+
+class InvoiceResultModal extends AdminModal {
+    onShow = (data) => {
+        this.tongHoaDon.value(data.totalInvoice || '');
+        this.thanhCong.value(`${data.success}/${data.totalInvoice}` || '');
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Kết quả xuất hóa đơn',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox readOnly ref={e => this.tongHoaDon = e} className='col-md-12' label='Tổng số hóa đơn' />
+                <FormTextBox readOnly ref={e => this.thanhCong = e} className='col-md-12' label='Hóa đơn tạo thành công' />
+            </div>
+        });
+    }
+}
+
+const getTimeFilter = (tuNgay, denNgay) => {
+    if (tuNgay) {
+        tuNgay.setHours(0, 0, 0, 0);
+        tuNgay = tuNgay.getTime();
+    }
+    if (denNgay) {
+        denNgay.setHours(23, 59, 59, 999);
+        denNgay = denNgay.getTime();
+    }
+    return { tuNgay, denNgay };
+};
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -90,7 +167,7 @@ class TcHocPhiAdminPage extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
             hocKy = this.term.value(),
-            { tuNgay, denNgay } = this.getTimeFilter();
+            { tuNgay, denNgay } = getTimeFilter(this.tuNgay.value() || null, this.denNgay.value() || null);
         const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
@@ -125,30 +202,52 @@ class TcHocPhiAdminPage extends AdminPage {
         this.props.getTcHocPhiPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
-    getTimeFilter = () => {
-        let tuNgay = this.tuNgay.value() || null,
-            denNgay = this.denNgay.value() || null;
-        if (tuNgay) {
-            tuNgay.setHours(0, 0, 0, 0);
-            tuNgay = tuNgay.getTime();
-        }
-        if (denNgay) {
-            denNgay.setHours(23, 59, 59, 999);
-            denNgay = denNgay.getTime();
-        }
-        return { tuNgay, denNgay };
-    }
-
     onDownloadPsc = (e) => {
         e.preventDefault();
         T.download(`/api/finance/hoc-phi/download-psc?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx');
     }
 
+    onCreateInvocie = (e, item) => {
+        e.preventDefault();
+        if (item.congNo) {
+            T.notify('Không thể tạo hóa đơn cho sinh viên còn công nợ', 'danger');
+            return;
+        }
+        e.target.setAttribute('disabled', true);
+        this.props.createInvoice(item.mssv, item.hocKy, item.namHoc, () => this.getPage(), () => e.target.setAttribute('disabled', false));
+    }
+
+    onCreateInvoiceList = (data, done) => {
+        this.props.createInvoiceList(data, (result) => {
+            done();
+            this.invoiceModal.hide();
+            setTimeout(() => this.resultModal.show(result || {}), 500);
+        }, done);
+    }
+
     render() {
-        let permission = this.getUserPermission('tcHocPhi');
+        let invoicePermission = this.getUserPermission('tcInvoice');
+        let permission = this.getUserPermission('tcHocPhi', ['read', 'write', 'delete', 'manage', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
+        const buttons = [];
+
+        invoicePermission.write && buttons.push({
+            className: 'btn-info', icon: 'fa-print', onClick: (e) => {
+                e.preventDefault();
+                this.invoiceModal.show({
+                    tuNgay: this.tuNgay?.value(),
+                    denNgay: this.denNgay?.value(),
+                    hocKy: this.term.value(),
+                    namHoc: this.year.value(),
+                });
+            }
+        });
+
+        permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
+
+
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -193,6 +292,15 @@ class TcHocPhiAdminPage extends AdminPage {
                                 <i className='fa fa-lg fa-eye' />
                             </button>
                         </Tooltip>
+                        {item.invoiceId ? <Tooltip title='Xem hóa đơn' arrow>
+                            <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.invoiceId}`}>
+                                <i className='fa fa-lg fa-credit-card' />
+                            </a>
+                        </Tooltip> :
+                            <button title='Tạo hóa đơn' className='btn btn-info' onClick={e => this.onCreateInvocie(e, item)}>
+                                <i className='fa fa-lg fa-print' />
+                            </button>
+                        }
                     </TableCell>
                 </tr>
             ),
@@ -233,23 +341,23 @@ class TcHocPhiAdminPage extends AdminPage {
                             {table}
                             <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                                 getPage={this.getPage} />
-                            <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} />
-                            <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} />
+                            <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} readOnly={!permission.readOnly} />
+                            <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} readOnly={!permission.write} />
                         </div>
                     </div>
+                    <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} />
+                    <InvoiceResultModal ref={e => this.resultModal = e} />
                 </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
-            onExport: permission.write ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
-            buttons: [
-                { type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || this.props.history.push('/user/finance/statistic') },
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
+            buttons: buttons,
                 // { type: 'danger', icon: 'fa-reply-all', tooltip: 'Gửi mail nhắc nhở', onClick: this.sendEmailNhacNho }
-            ]
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi
+    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList
 };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiAdminPage);
