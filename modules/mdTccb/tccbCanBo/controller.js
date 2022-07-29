@@ -86,7 +86,7 @@ module.exports = app => {
         if (app.isDebug) next();
         else {
             let user = req.session.user;
-            if (app.developers.includes(user.originalEmail)) next();
+            if (user.originalEmail && app.developers.includes(user.originalEmail)) next();
             else app.permission.check('staff:login')(req, res, next);
         }
     };
