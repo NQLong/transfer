@@ -4,8 +4,9 @@ import { createMultiDtCauTrucKhungDaoTao, createDtCauTrucKhungDaoTao, updateDtCa
 import { Link } from 'react-router-dom';
 // import ComponentMTDT from './componentMTDT';
 import ComponentCTDT from './componentCTDT';
-import { AdminPage, FormDatePicker, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, FormTextBox, FormSelect } from 'view/component/AdminPage';
 import Loading from 'view/component/Loading';
+import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 class DtCauTrucKhungDaoTaoDetails extends AdminPage {
     state = { isLoading: true }
 
@@ -35,7 +36,8 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
             // if (isClone) {
             //     ctkdt.namDaoTao = tkdt.namDaoTao) + 1;
             // }
-            let { namDaoTao, batDauDangKy, ketThucDangKy } = ctkdt;
+            let { bacDaoTao, namDaoTao, batDauDangKy, ketThucDangKy } = ctkdt;
+            this.bacDaoTao.value(bacDaoTao);
             namDaoTao = namDaoTao?.split(' - ') || [];
             this.namDaoTaoStart.value(isClone ? (Number(namDaoTao[0]) + 1) : namDaoTao[0]);
             this.namDaoTaoEnd.value(isClone ? (Number(namDaoTao[1]) + 1) : namDaoTao[1]);
@@ -65,6 +67,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
     getValue = () => {
         try {
             const data = {
+                bacDaoTao: this.validation(this.bacDaoTao),
                 khoa: this.validation(this.namDaoTaoStart),
                 namDaoTao: `${this.validation(this.namDaoTaoStart)} - ${this.validation(this.namDaoTaoEnd)}`,
                 batDauDangKy: this.validation(this.batDauDangKy).setHours(0, 0, 0, 0),
@@ -80,10 +83,10 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
 
     save = () => {
         const data = this.getValue();
+
         if (data) {
             // const mucTieuDaoTao = this.mucTieuDaoTao.getValue() || { parents: [], childrens: {} };
             const chuongTrinhDaoTao = this.chuongTrinhDaoTao.getValue() || { parents: [], childrens: {} };
-
             const mucCha = {
                 // mucTieuDaoTao: {},
                 chuongTrinhDaoTao: {}
@@ -114,6 +117,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                     window.location = `/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`;
                 });
             } else {
+
                 this.props.updateDtCauTrucKhungDaoTao(this.ma, { ...updateDatas, ...data }, () => {
                     // location.reload();
                 });
@@ -139,9 +143,9 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ)' className='col-md-2' required readOnly={readOnly} />
-                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến)' className='col-md-2' required readOnly={readOnly} />
-
+                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ)' className='col-md-3' required readOnly={readOnly} />
+                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến)' className='col-md-3' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
                             <FormDatePicker type='date-mask' ref={e => this.batDauDangKy = e} className='col-md-4' label='Bắt đầu đăng ký' required readOnly={readOnly} />
                             <FormDatePicker type='date-mask' ref={e => this.ketThucDangKy = e} className='col-md-4' label='Kết thúc đăng ký' required readOnly={readOnly} />
                         </div>

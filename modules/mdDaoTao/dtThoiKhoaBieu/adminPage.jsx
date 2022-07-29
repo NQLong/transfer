@@ -317,7 +317,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete', 'manage']);
+        const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete', 'manage', 'export']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtThoiKhoaBieu?.page || { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '', list: [] };
         let table = renderTable({
             emptyTable: 'Không có dữ liệu thời khóa biểu',
@@ -423,7 +423,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <ThoiGianPhanCongGiangDay ref={e => this.thoiGianModal = e} create={this.props.createDtThoiGianPhanCong} />
                 <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} />
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
-                    || this.autoGen.show()} style={{ marginRight: '60px' }} />}
+                    || this.autoGen.show()} style={{ marginRight: '180px' }} />}
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-thumb-tack' tooltip='Tạo thời gian phân công giảng dạy' onClick={e => e.preventDefault()
                     || this.thoiGianModal.show()} style={{ marginRight: '120px' }} />}
             </>,
@@ -449,7 +449,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     </button>
                 </div>
             </div>,
-            onCreate: permission.write ? (e) => e.preventDefault() || this.addingModal.show() : null
+            onCreate: permission.write ? (e) => e.preventDefault() || this.addingModal.show() : null,
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/dao-tao/thoi-khoa-bieu/download-excel?filter=${T.stringify(this.state.filter)}`, 'THOIKHOABIEU.xlsx') : null,
         });
     }
 }
