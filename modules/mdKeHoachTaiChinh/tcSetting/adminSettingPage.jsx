@@ -45,7 +45,7 @@ class AdminSettingsPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('TcSetting'),
+        const permission = this.getUserPermission('tcSetting'),
             readOnly = !permission.write;
 
         return this.renderPage({
