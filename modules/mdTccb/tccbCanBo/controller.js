@@ -193,7 +193,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/staff/edit/item', app.permission.orCheck('staff:read', 'staff:login'), async (req, res) => {
+    app.get('/api/staff/edit/item', app.permission.orCheck('staff:login', 'staff:read'), async (req, res) => {
         app.model.canBo.get(req.query.condition, (error, canBo) => {
             if (error) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
