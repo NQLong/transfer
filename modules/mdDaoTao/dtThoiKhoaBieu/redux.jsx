@@ -13,18 +13,9 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case DtThoiKhoaBieuUpdate:
             if (state) {
-                let updatedItems = Object.assign({}, state.items),
-                    updatedPage = Object.assign({}, state.page),
+                let updatedPage = Object.assign({}, state.page),
                     updatedItem = data.item;
-                if (updatedItems) {
-                    for (let i = 0, n = updatedItems.length; i < n; i++) {
-                        if (updatedItems[i].id == updatedItem.id) {
-                            updatedItems.splice(i, 1, updatedItem);
-                            break;
-                        }
-                    }
-                }
-                if (updatedPage) {
+                if (updatedPage.list) {
                     for (let i = 0, n = updatedPage.list.length; i < n; i++) {
                         if (updatedPage.list[i].id == updatedItem.id) {
                             updatedPage.list.splice(i, 1, updatedItem);
@@ -32,7 +23,7 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
+                return Object.assign({}, state, { page: updatedPage });
             } else {
                 return null;
             }
@@ -62,11 +53,11 @@ export function getDtThoiKhoaBieuAll(condition, done) {
 }
 
 T.initPage('pageDtThoiKhoaBieu');
-export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition);
+export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter, done) {
+    const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/dao-tao/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: pageCondition }, data => {
+        T.get(url, { condition: pageCondition, filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -78,15 +69,18 @@ export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done)
     };
 }
 
-export function createDtThoiKhoaBieu(item, done) {
-    return () => {
+export function createDtThoiKhoaBieu(item, settings, done) {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu';
-        T.post(url, { item }, data => {
+        T.post(url, { item, settings }, data => {
             if (data.error) {
                 T.notify('Tạo thời khoá biểu bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error.message}`);
             } else {
                 T.notify('Tạo thời khoá biểu thành công!', 'success');
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
                 if (done) done();
             }
         });
@@ -94,7 +88,9 @@ export function createDtThoiKhoaBieu(item, done) {
 }
 
 export function deleteDtThoiKhoaBieu(id, done) {
-    return () => {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -102,6 +98,7 @@ export function deleteDtThoiKhoaBieu(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Thời khoá biểu đã xóa thành công!', 'success', false, 800);
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
                 done && done();
             }
         }, () => T.notify('Xóa thời khoá biểu bị lỗi!', 'danger'));
@@ -109,7 +106,9 @@ export function deleteDtThoiKhoaBieu(id, done) {
 }
 
 export function updateDtThoiKhoaBieu(id, changes, done) {
-    return () => {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -117,8 +116,7 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data);
             } else {
-                T.notify('Điều chỉnh thành công!', 'success');
-                // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
                 done && done(data);
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
@@ -126,7 +124,9 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
 }
 
 export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
-    return () => {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu-condition';
         T.put(url, { condition, changes }, data => {
             if (data.error) {
@@ -135,8 +135,8 @@ export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
                 done && done(data);
             } else {
                 T.notify('Điều chỉnh thành công!', 'success');
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
                 done && done(data);
-                // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
     };

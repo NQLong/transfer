@@ -13,20 +13,27 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'doctor:login', menu: menuStaff },
+        { name: 'staff:doctor', menu: menuStaff },
         { name: 'qtKeoDaiCongTac:read', menu },
         { name: 'qtKeoDaiCongTac:write' },
         { name: 'qtKeoDaiCongTac:delete' },
+        { name: 'qtKeoDaiCongTac:export' },
     );
 
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/create-list', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/keo-dai-cong-tac/:shcc', app.permission.check('qtKeoDaiCongTac:read'), app.templates.admin);
-    app.get('/user/keo-dai-cong-tac', app.permission.check('doctor:login'), app.templates.admin);
+    app.get('/user/keo-dai-cong-tac', app.permission.check('staff:doctor'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtKeoDaiCongTac', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtKeoDaiCongTac:read', 'qtKeoDaiCongTac:write', 'qtKeoDaiCongTac:delete', 'qtKeoDaiCongTac:export');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
-    app.post('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('doctor:login'), (req, res) => {
+    app.post('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:doctor'), (req, res) => {
         if (req.body.data && req.session.user) {
             const data = req.body.data;
             app.model.qtKeoDaiCongTac.create(data, (error, item) => res.send({ error, item }));
@@ -35,7 +42,7 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('doctor:login'), (req, res) => {
+    app.put('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:doctor'), (req, res) => {
         if (req.body.changes && req.session.user) {
             app.model.qtKeoDaiCongTac.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
@@ -54,7 +61,7 @@ module.exports = app => {
         }
     });
 
-    app.delete('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('doctor:login'), (req, res) => {
+    app.delete('/api/user/qua-trinh/keo-dai-cong-tac', app.permission.check('staff:doctor'), (req, res) => {
         if (req.session.user) {
             app.model.qtKeoDaiCongTac.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
@@ -72,7 +79,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/user/qua-trinh/keo-dai-cong-tac/page/:pageNumber/:pageSize', app.permission.check('doctor:login'), (req, res) => {
+    app.get('/api/user/qua-trinh/keo-dai-cong-tac/page/:pageNumber/:pageSize', app.permission.check('staff:doctor'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';

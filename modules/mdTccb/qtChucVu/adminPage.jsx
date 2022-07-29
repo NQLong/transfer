@@ -139,7 +139,7 @@ export class EditModal extends AdminModal {
                 <FormSelect className='col-md-6' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={this.handleChucVu} allowClear={true} readOnly={readOnly} />
                 <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
                 <FormSelect className='col-md-12' ref={e => this.maBoMon = e} style={{ display: this.state.capChucVu ? 'none' : '' }} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
+                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch() || readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} onChange={this.handleThoiChucVu} label='Thôi giữ chức vụ' readOnly={readOnly} />
@@ -160,17 +160,12 @@ class QtChucVu extends AdminPage {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.timeType?.value(0);
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.maDonVi?.value('');
-                this.mulCanBo?.value('');
-                this.gioiTinh?.value('');
+
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
             }
-            this.changeAdvancedSearch(true);
+            this.changeAdvancedSearch(false, true);
         });
     }
 
@@ -187,7 +182,7 @@ class QtChucVu extends AdminPage {
         const fromAge = this.fromAge?.value();
         const toAge = this.toAge?.value();
         const filterCookie = T.storage('pageQtChucVu').F;
-        const pageFilter = isInitial ? filterCookie : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
+        const pageFilter = (isInitial || isReset) ? filterCookie : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
         this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -203,21 +198,24 @@ class QtChucVu extends AdminPage {
                     this.mulMaChucDanh?.value(filter.listChucDanh || filterCookie.listChucDanh);
                     this.fromAge?.value(filter.fromAge || filterCookie.fromAge);
                     this.toAge?.value(filter.toAge || filterCookie.toAge);
-                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && this.showAdvanceSearch();
-                } else {
+                    Object.values(filterCookie).some(item => item && item != '' && item != 0) && typeof (filterCookie) !== 'string' && this.showAdvanceSearch();
+
+                } else if (isReset) {
+                    this.fromYear?.value('');
+                    this.toYear?.value('');
+                    this.maDonVi.value('');
+                    this.mulCanBo.value('');
+                    this.timeType.value('');
+                    this.mulMaChucVu.value('');
+                    this.gioiTinh.value('');
+                    this.mulMaChucDanh.value('');
+                    this.fromAge.value('');
+                    this.toAge.value('');
                     this.hideAdvanceSearch();
-                    if (isReset) {
-                        this.fromYear?.value('');
-                        this.toYear?.value('');
-                        this.maDonVi.value('');
-                        this.mulCanBo.value('');
-                        this.timeType.value('');
-                        this.mulMaChucVu.value('');
-                        this.gioiTinh.value('');
-                        this.mulMaChucDanh.value('');
-                        this.fromAge.value('');
-                        this.toAge.value('');
-                    }
+
+                }
+                else {
+                    this.hideAdvanceSearch();
                 }
             });
         });
@@ -268,7 +266,7 @@ class QtChucVu extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
             (this.props.qtChucVu && this.props.qtChucVu.pageGr ?
                 this.props.qtChucVu.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
@@ -314,7 +312,6 @@ class QtChucVu extends AdminPage {
                 </tr>
             )
         });
-
         let groupTable = renderTable({
             getDataSource: () => list, stickyHead: true,
             renderHead: () => (
@@ -394,13 +391,13 @@ class QtChucVu extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} getQtChucVuAll={this.props.getQtChucVuAll}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} getQtChucVuAll={this.props.getQtChucVuAll}
                     create={this.props.createQtChucVuStaff} update={this.props.updateQtChucVuStaff} getDmChucVu={this.props.getDmChucVu}
                 />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 const { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
 
@@ -412,7 +409,6 @@ class QtChucVu extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
-    getQtChucVuPage, deleteQtChucVuStaff, createQtChucVuStaff,
-    updateQtChucVuStaff, getQtChucVuGroupPage, getQtChucVuAll, getDmChucVu
+    getQtChucVuPage, deleteQtChucVuStaff, createQtChucVuStaff, updateQtChucVuStaff, getQtChucVuGroupPage, getQtChucVuAll, getDmChucVu
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);

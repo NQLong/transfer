@@ -6,7 +6,15 @@ module.exports = app => {
         },
     };
 
-    app.permission.add({ name: 'tcGiaoDich:read', menu });
+    app.permissionHooks.add('staff', 'addRolesTcGiaoDich', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:read');
+            resolve();
+        } else resolve();
+    }));
+
+    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write');
+
     app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:read'), app.templates.admin);
 
 
@@ -30,8 +38,19 @@ module.exports = app => {
         }
     });
 
+    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+        try {
+            const searchTerm = req.query.condition;
+            const list = await app.model.tcHocPhiTransaction.listBank(searchTerm || '');
+            res.send({ items: list.rows.map(item => item.bank) });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
-    app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+
+    app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:export'), async (req, res) => {
         try {
             let filter = app.parse(req.query.filter, {});
             const settings = await getSettings();
@@ -88,5 +107,41 @@ module.exports = app => {
         } catch (error) {
             res.send({ error });
         }
+    });
+
+
+    app.post('/api/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:write'), async (req, res) => {
+        try {
+            let { soTien, sinhVien, namHoc, hocKy } = req.body;
+            soTien = parseInt(soTien);
+            hocKy = parseInt(hocKy);
+            namHoc = parseInt(namHoc);
+            if (!Number.isInteger(soTien) || !Number.isInteger(soTien) || !Number.isInteger(soTien) || !sinhVien)
+                throw 'Dữ liệu không hợp lệ.';
+            const hocPhi = await app.model.tcHocPhi.get({ mssv: sinhVien, namHoc, hocKy });
+            if (!hocPhi) throw 'Dữ liệu học phí sinh viên không tồn tại.';
+            if (!hocPhi.congNo) throw 'Sinh viên không có công nợ.';
+            const timeStamp = new Date().getTime();
+            const manualTransid = `${sinhVien}-${timeStamp}`;
+            const result = await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, '', manualTransid, timeStamp, sinhVien, '', '', soTien, '');
+            //: (namhoc, hocky, ebank, transid, transdate, customerid, billid, serviceid, eamount, echecksum, done)
+            if (!result?.outBinds?.ret)
+                throw {};
+
+            await app.model.tcHocPhiLog.create({
+                namHoc, hocKy,
+                mssv: sinhVien,
+                email: req.session.user.email,
+                thaoTac: 'c',
+                ngay: timeStamp,
+                duLieuCu: app.stringify({}),
+                duLieuMoi: app.stringify({ hocPhi: `${soTien}`, transId: manualTransid })
+            });
+
+            res.send();
+        } catch (error) {
+            res.send({ error });
+        }
+
     });
 };

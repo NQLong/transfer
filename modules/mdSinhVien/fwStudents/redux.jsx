@@ -160,3 +160,16 @@ export function updateStudentUser(changes, done) {
         }, () => T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger'));
     };
 }
+
+export function downloadWord(done) {
+    return () => {
+        const url = '/api/students-download-syll';
+        T.get(url, result => {
+            if (result.error) {
+                T.notify('Tải sơ yếu lý lịch lỗi', 'danger');
+            } else if (done) {
+                done(result.buffer);
+            }
+        });
+    };
+}

@@ -7,15 +7,20 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'staff:read', menu },
-        { name: 'staff:write' },
-        { name: 'staff:delete' },
+        { name: 'tccbDashboard:manage', menu },
     );
 
-    app.get('/user/tccb/dashboard', app.permission.check('staff:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRoleDashboardTccb', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'tccbDashboard:manage');
+            resolve();
+        } else resolve();
+    }));
+
+    app.get('/user/tccb/dashboard', app.permission.check('tccbDashboard:manage'), app.templates.admin);
     //API------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/tccb/dashboard/get-data', app.permission.check('staff:read'), (req, res) => {
+    app.get('/api/tccb/dashboard/get-data', app.permission.check('tccbDashboard:manage'), (req, res) => {
         let time = req.query.time || null;
         app.model.canBo.getDashboardData(time, (error, item) => {
             if (error) res.send({ error });

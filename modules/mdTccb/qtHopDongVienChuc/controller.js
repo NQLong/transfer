@@ -9,13 +9,19 @@ module.exports = app => {
         { name: 'qtHopDongVienChuc:read', menu },
         { name: 'qtHopDongVienChuc:write' },
         { name: 'qtHopDongVienChuc:delete' },
+        { name: 'qtHopDongVienChuc:export' },
     );
     app.get('/user/tccb/qua-trinh/hop-dong-lam-viec/:ma', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-lam-viec', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-lam-viec/group/:shcc', app.permission.check('qtHopDongVienChuc:read'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtHopDongVienChuc', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtHopDongVienChuc:read', 'qtHopDongVienChuc:write', 'qtHopDongVienChuc:delete', 'qtHopDongVienChuc:export');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/page/:pageNumber/:pageSize', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -63,15 +69,15 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/all', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/all', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         app.model.qtHopDongVienChuc.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/item/:ma', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/item/:ma', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         app.model.qtHopDongVienChuc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/edit/item/:ma', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/edit/item/:ma', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
         app.model.qtHopDongVienChuc.get({ ma: req.params.ma }, (error, qtHopDongVienChuc) => {
             if (error || qtHopDongVienChuc == null) {
                 res.send({ error });
@@ -113,7 +119,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/download-word/:ma', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/download-word/:ma', app.permission.check('qtHopDongVienChuc:export'), (req, res) => {
         if (req.params && req.params.ma) {
             app.model.qtHopDongVienChuc.download(req.params.ma, (error, item) => {
                 if (error || !item) {
@@ -176,7 +182,7 @@ module.exports = app => {
         return fdate !== '' ? (fdate.getDate()) + '/' + (fdate.getMonth() + 1) + '/' + fdate.getFullYear() : '';
     };
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/download-excel', app.permission.check('qtHopDongVienChuc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lam-viec/download-excel', app.permission.check('qtHopDongVienChuc:export'), (req, res) => {
         const pageNumber = 0,
             pageSize = 1000000,
             searchTerm = '';

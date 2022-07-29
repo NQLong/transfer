@@ -10,6 +10,14 @@ module.exports = (app) => {
         { name: 'tcLoaiPhi:delete' },
     );
 
+    app.permissionHooks.add('staff', 'addRolesTcLoaiPhi', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcLoaiPhi:read', 'tcLoaiPhi:write', 'tcLoaiPhi:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/finance/loai-phi', app.permission.check('tcLoaiPhi:read'), app.templates.admin);
 
     // API ---------------------------------------------------------------------------------------------------

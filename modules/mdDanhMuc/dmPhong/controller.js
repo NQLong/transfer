@@ -18,6 +18,14 @@ module.exports = app => {
         { name: 'dmPhong:delete' },
         { name: 'dmPhong:upload' }
     );
+
+    app.permissionHooks.add('staff', 'addRolesPhong', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtPhong:read', 'dmPhong:write', 'dmPhong:delete');
+            resolve();
+        } else resolve();
+    }));
+
     app.get('/user/danh-muc/phong', app.permission.check('dmPhong:read'), app.templates.admin);
     app.get('/user/dao-tao/phong', app.permission.check('dtPhong:read'), app.templates.admin);
     app.get('/user/danh-muc/phong/upload', app.permission.check('dmPhong:write'), app.templates.admin);

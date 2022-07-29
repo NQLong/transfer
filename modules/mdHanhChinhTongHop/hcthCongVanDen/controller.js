@@ -783,6 +783,44 @@ module.exports = (app) => {
         });
     });
 
+    const sendMailToRelatedStaff = async (item) => {
+        const listRelatedStaff = await app.model.hcthCongVanDen.getRelatedStaff(item.id);
+        const emails = listRelatedStaff.rows.map(item => item.email);
+
+        const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui});
+            
+        const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, nhanCongVanDenEmailTitle, nhanCongVanDenEmailEditorText, nhanCongVanDenEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'nhanCongVanDenEmailTitle', 'nhanCongVanDenEmailEditorText', 'nhanCongVanDenEmailEditorHtml');
+
+        const rootUrl = app.rootUrl;
+        let mailTitle = nhanCongVanDenEmailTitle.toUpperCase(), 
+            mailText = nhanCongVanDenEmailEditorText.replaceAll('{id}', item.id)
+                        .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                        .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                        .replaceAll('{donViGui}', donViGuiInfo.ten)
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                        .replaceAll('{trichYeu}', item.trichYeu),
+            mailHtml = nhanCongVanDenEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`)
+                        .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                        .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                        .replaceAll('{donViGui}', donViGuiInfo.ten)
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                        .replaceAll('{trichYeu}', item.trichYeu);   
+
+        if (app.isDebug) {
+            app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
+                if (error) throw error;
+            });
+        } else {
+            emails.map(email => {
+                app.email.normalSendEmail(fromMail, fromMailPassword, email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                    if (error) throw error;
+                });
+            });
+        }
+    };
+
     const sendChiDaoCongVanDenMailToRectors = async (item) => {
         const canBoChiDao = item.quyenChiDao?.split(',') || [];
         const canBos = await app.model.canBo.getAll({
@@ -793,9 +831,27 @@ module.exports = (app) => {
         }, 'email', 'email');
 
         const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
+
+        const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui});
+
         const rootUrl = app.rootUrl;
-        let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
-            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
+        
+        let mailTitle = chiDaoEmailTitle.toUpperCase(), 
+            mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id)
+                        .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                        .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                        .replaceAll('{donViGui}', donViGuiInfo.ten)
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                        .replaceAll('{trichYeu}', item.trichYeu),
+            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id)
+                        .replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`)
+                        .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                        .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                        .replaceAll('{donViGui}', donViGuiInfo.ten)
+                        .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                        .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                        .replaceAll('{trichYeu}', item.trichYeu); 
         if (app.isDebug) {
             app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
                 if (error) throw (error);
@@ -809,11 +865,20 @@ module.exports = (app) => {
         }
     };
 
+    const createDistributingNotification = async (item) => {
+        const canBos = await app.model.hcthCongVanDen.getAuthorizedStaff();
+        const emails = canBos.rows.map(canBo => canBo.email);
+
+        const notificationPromise = new Promise((resolve, reject) => createNotification(emails, { title: 'Công văn đến cần phân phối', icon: 'fa-book', subTitle: 'Bạn có một công văn đến cần kiểm tra và phân phối.', iconColor: 'info', link: `/user/hcth/cong-van-den/${item.id}` }, (error) => error ? reject(error) : resolve()
+        ));
+        return await notificationPromise;
+    };
+
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
         try {
             if (before == after)
                 resolve();
-            if (after == trangThaiSwitcher.CHO_DUYET.id) {
+            else if (after == trangThaiSwitcher.CHO_DUYET.id) {
                 createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
                 sendChiDaoCongVanDenMailToRectors(item);
             }
@@ -822,7 +887,13 @@ module.exports = (app) => {
             }
             else if (after == trangThaiSwitcher.DA_PHAN_PHOI.id) {
                 createRelatedStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+                sendMailToRelatedStaff(item);
             }
+            else if (after == trangThaiSwitcher.CHO_PHAN_PHOI.id) {
+                createDistributingNotification(item).then(() => resolve()).catch(error => { throw error; });
+            }
+            else
+                resolve();
         } catch (error) {
             console.error('fail to send notification', error);
             resolve();

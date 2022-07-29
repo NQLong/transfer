@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_TRINH_KY { id, nguoiTao, thoiGian, fileCongVan }
+// Table name: HCTH_CONG_VAN_TRINH_KY { id, nguoiTao, thoiGian, fileCongVan, noiDungHash, congVan }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'thoiGian': 'THOI_GIAN', 'fileCongVan': 'FILE_CONG_VAN' };
+const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'thoiGian': 'THOI_GIAN', 'fileCongVan': 'FILE_CONG_VAN', 'noiDungHash': 'NOI_DUNG_HASH', 'congVan': 'CONG_VAN' };
 
 module.exports = app => {
     app.model.hcthCongVanTrinhKy = {
@@ -229,9 +229,9 @@ module.exports = app => {
                 }));
         }),
 
-        getAllFrom: (fileid, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_trinh_ky_get_from(:fileid); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, fileid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        getAllFrom: (congvanid, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_trinh_ky_get_all_from(:congvanid); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

@@ -2,18 +2,37 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.finance,
         menus: {
-            5003: { title: 'Học phí', link: '/user/finance/hoc-phi' },
+            5003: { title: 'Quản lý học phí', link: '/user/finance/hoc-phi' },
+        },
+    };
+
+    const menuStatistic = {
+        parentMenu: app.parentMenu.finance,
+        menus: {
+            5006: { title: 'Thống kê', link: '/user/finance/statistic' },
         },
     };
 
     app.permission.add(
-        { name: 'tcHocPhi:read', menu }, 'tcHocPhi:write', 'tcHocPhi:delete',
+        { name: 'tcHocPhi:read', menu },
+        { name: 'tcHocPhi:manage', menu },
+        { name: 'tcHocPhi:manage', menu: menuStatistic },
+        'tcHocPhi:write', 'tcHocPhi:delete', 'tcHocPhi:export'
     );
+
+    app.permissionHooks.add('staff', 'addRolesTcHocPhi', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcHocPhi:manage', 'tcHocPhi:write', 'tcHocPhi:delete', 'tcHocPhi:read');
+            resolve();
+        } else resolve();
+    }));
+
 
     app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
     app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
-    app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), app.templates.admin);
-    app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:manage'), app.templates.admin);
+    app.get('/user/finance/statistic', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/finance/import-hoc-phi', app.permission.check('tcHocPhi:manage'), app.templates.admin);
 
     //APIs ------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/finance/page/:pageNumber/:pageSize', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
@@ -43,7 +62,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.orCheck('tcHocPhi:read'), async (req, res) => {
+    app.get('/api/finance/hoc-phi-transactions/:mssv', app.permission.orCheck('tcHocPhi:manage'), async (req, res) => {
         try {
             const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await getSettings(),
                 mssv = req.params.mssv;
@@ -186,11 +205,10 @@ module.exports = app => {
 
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
 
-    app.get('/api/finance/huong-dan-dong-hoc-phi', app.permission.orCheck('tcHocPhi:read', 'student:login'), async (req, res) => {
+    app.get('/api/finance/huong-dan-dong-hoc-phi', app.permission.orCheck('tcHocPhi:manage', 'student:login'), async (req, res) => {
         const { hocPhiHuongDan } = await getSettings();
         res.send({ hocPhiHuongDan });
     });
-
 
     const tcHocPhiImportData = async (fields, files, done) => {
         let worksheet = null;
@@ -255,7 +273,8 @@ module.exports = app => {
 
     const termDatas = ['HK1', 'HK2', 'HK3'];
 
-    app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:write'), async (req, res) => {
+    //Export xlsx
+    app.get('/api/finance/hoc-phi/download-template', app.permission.check('tcHocPhi:export'), async (req, res) => {
         let loaiPhiData = await app.model.tcLoaiPhi.getAll({ kichHoat: 1 });
         loaiPhiData = loaiPhiData.map(item => item.ten);
         const workBook = app.excel.create();
@@ -278,6 +297,167 @@ module.exports = app => {
             row.getCell('loaiPhi').dataValidation = { type: 'list', allowBlank: true, formulae: [type] };
         });
         app.excel.attachment(workBook, res, 'Hoc_phi_Template.xlsx');
+    });
+
+    app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:manage'), async (req, res) => {
+        try {
+            let filter = app.parse(req.query.filter, {});
+            const settings = await getSettings();
+
+            if (!filter.namHoc || !filter.hocKy) {
+                if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
+                if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
+            }
+            filter = app.stringify(filter, '');
+            let data = await app.model.tcHocPhi.searchPage(1, 1000000, '', '', filter);
+            const list = data.rows;
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet(`${settings.hocPhiNamHoc}_${settings.hocPhiHocKy}`);
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 10 },
+                { header: 'MSSV', key: 'mssv', width: 15 },
+                { header: 'HỌ VÀ TÊN LÓT', key: 'ho', width: 30 },
+                { header: 'TÊN', key: 'ten', width: 10 },
+                { header: 'GIỚI TÍNH', key: 'gioiTinh', width: 10 },
+                { header: 'NGÀY SINH', key: 'ngaySinh', width: 10 },
+                { header: 'BẬC ĐÀO TẠO', key: 'bacDaoTao', width: 10 },
+                { header: 'HỆ ĐÀO TẠO', key: 'heDaoTao', width: 10 },
+                { header: 'KHOA/BỘ MÔN', key: 'donVi', width: 20 },
+                { header: 'MÃ NGÀNH', key: 'maNganh', width: 10 },
+                { header: 'TÊN NGÀNH HỌC', key: 'tenNganh', width: 20 },
+                { header: 'HỌC KỲ', key: 'term', width: 10 },
+                { header: 'NĂM HỌC', key: 'year', width: 20 },
+                { header: 'SỐ TIỀN THU (VND)', key: 'hocPhi', width: 15 },
+                { header: 'ĐÃ THU (VND)', key: 'congNo', width: 15 },
+                { header: 'THỜI GIAN ĐÓNG', key: 'thoiGian', width: 20 },
+                { header: 'MÃ HOÁ ĐƠN', key: 'idTrans', width: 20 },
+            ];
+            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+            // ws.getRow(1).height = 0;
+            ws.getRow(1).font = {
+                name: 'Times New Roman',
+                family: 4,
+                size: 12,
+                bold: true,
+                color: { argb: 'FF000000' }
+            };
+            list.forEach((item, index) => {
+                ws.getRow(index + 2).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+                ws.getRow(index + 2).font = { name: 'Times New Roman' };
+                ws.getCell('A' + (index + 2)).value = index + 1;
+                ws.getCell('B' + (index + 2)).value = item.mssv;
+                ws.getCell('C' + (index + 2)).value = item.ho.toUpperCase();
+                ws.getCell('D' + (index + 2)).value = item.ten.toUpperCase();
+                ws.getCell('E' + (index + 2)).value = item.gioiTinh == 1 ? 'Nam' : 'Nữ';
+                ws.getCell('F' + (index + 2)).value = app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy');
+                ws.getCell('G' + (index + 2)).value = item.tenBacDaoTao;
+                ws.getCell('H' + (index + 2)).value = item.tenLoaiHinhDaoTao;
+                ws.getCell('I' + (index + 2)).value = item.tenKhoa;
+                ws.getCell('J' + (index + 2)).value = item.maNganh;
+                ws.getCell('K' + (index + 2)).value = item.tenNganh;
+                ws.getCell('L' + (index + 2)).value = settings.hocPhiHocKy;
+                ws.getCell('M' + (index + 2)).value = `${settings.hocPhiNamHoc} - ${parseInt(settings.hocPhiNamHoc) + 1}`;
+                ws.getCell('N' + (index + 2)).value = item.hocPhi.toString().numberDisplay();
+                ws.getCell('O' + (index + 2)).value = (parseInt(item.hocPhi) - parseInt(item.congNo)).toString().numberDisplay();
+                ws.getCell('P' + (index + 2)).value = item.lastTransaction ? app.date.dateTimeFormat(new Date(Number(item.lastTransaction)), 'HH:MM:ss dd/mm/yyyy') : '';
+                ws.getCell('Q' + (index + 2)).value = item.lastTransactionId;
+                ws.getCell('L' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('M' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('N' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('O' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'right' };
+                ws.getCell('P' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+                ws.getCell('E' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+                ws.getCell('F' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
+
+            });
+            let fileName = `HOC_PHI_NH_${settings.hocPhiNamHoc}_${parseInt(settings.hocPhiNamHoc) + 1}_HK${settings.hocPhiHocKy}.xlsx`;
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
+    // //Email notify -------------------------------------------------------------------------------------------------------------------------
+    // app.get('/api/finance/email-nhac-nho', app.permission.check('tcHocPhi:write'), async (req, res) => {
+    //     try {
+    //         const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'email', 'emailPassword', 'hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditorHtml', 'hocPhiEmailNhacNhoEditorText'),
+    //             { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = config;
+    //         let data = await app.model.tcHocPhi.getAll({
+    //             statement: 'namHoc = :namHoc AND hocKy = :hocKy AND congNo > 0',
+    //             parameter: { namHoc, hocKy }
+    //         });
+    //         if (!data || !data.length) throw 'Không tìm thấy dữ liệu sinh viên nợ';
+    //         data = data.map(item => ({ ...item, email: `${item.mssv}@hcmussh.edu.vn` }));
+    //         let listEmail = data.map(item => item.email);
+
+    //         let i = 0;
+    //         while (data.length) {
+    //             const item = data[i];
+    //             let mailTitle = config.hocPhiEmailNhacNhoTitle.replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
+    //                 .replaceAll('{hoc_ky}', hocKy)
+    //                 .replaceAll('{ho_ten}', item.hoTen)
+    //                 .replaceAll('{mssv}', item.mssv)
+    //                 .replaceAll('{cong_no}', item.congNo)
+    //                 ,
+    //                 mailText = config.hocPhiEmailNhacNhoEditorText.replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
+    //                     .replaceAll('{hoc_ky}', hocKy)
+    //                     .replaceAll('{ho_ten}', item.hoTen)
+    //                     .replaceAll('{mssv}', item.mssv)
+    //                     .replaceAll('{cong_no}', item.congNo),
+    //                 mailHtml = config.hocPhiEmailNhacNhoEditorHtml.replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
+    //                     .replaceAll('{hoc_ky}', hocKy)
+    //                     .replaceAll('{ho_ten}', item.hoTen)
+    //                     .replaceAll('{mssv}', item.mssv)
+    //                     .replaceAll('{cong_no}', item.congNo);
+    //             await app.email.normalSendEmail(config.email, config.emailPassword, '', '', listEmail.splice(0, 50), mailTitle, mailText, mailHtml);
+    //         }
+    //         res.send({ data });
+    //     } catch (error) {
+    //         res.send({ error });
+    //     }
+    // });
+
+    const countGroupBy = (array, key) => {
+        let data = array.groupBy(key);
+        Object.keys(data).forEach(item => {
+            data[item] = data[item].length;
+        });
+        return data;
+    };
+    //Statistic -------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/finance/statistic', app.permission.check('tcHocPhi:write'), async (req, res) => {
+        try {
+            let filter = app.parse(req.query.filter, {});
+            const settings = await getSettings();
+
+            if (!filter.namHoc || !filter.hocKy) {
+                if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
+                if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
+            }
+            filter = app.stringify(filter);
+            const data = await app.model.tcHocPhi.getStatistic(filter);
+
+            let dataByStudents = data.rows,
+                dataTransactions = data.transactions;
+            let dataByDate = dataTransactions.map(item => ({ ...item, 'date': app.date.viDateFormat(new Date(Number(item.ngayDong))) }));
+            let totalStudents = dataByStudents.length,
+                totalByDate = countGroupBy(dataByDate, 'date'),
+                totalTransactions = dataTransactions.length,
+                totalCurrentMoney = dataTransactions.reduce((sum, item) => sum + parseInt(item.khoanDong), 0),
+                amountByDepartment = countGroupBy(dataTransactions, 'tenNganh'),
+                amountByBank = countGroupBy(dataTransactions, 'nganHang'),
+                amountByEduLevel = countGroupBy(dataByStudents, 'tenBacDaoTao'),
+                amountByEduMethod = countGroupBy(dataByStudents, 'loaiHinhDaoTao'),
+                amountPaid = dataByStudents.filter(item => item.congNo == 0).length,
+                amountNotPaid = totalStudents - amountPaid;
+            const statistic = { totalStudents, totalTransactions, amountByBank, amountByEduLevel, amountByEduMethod, amountPaid, amountNotPaid, totalCurrentMoney, amountByDepartment, totalByDate };
+            res.send({ statistic, settings });
+        } catch (error) {
+            res.send({ error });
+        }
+
+
     });
 
 };

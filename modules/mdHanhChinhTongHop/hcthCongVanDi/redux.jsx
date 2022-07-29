@@ -8,6 +8,7 @@ const hcthCongVanDiGet = 'hcthCongVanDi:Get';
 const hcthCongVanDiGetHistory = 'hcthCongVanDi:GetHistory';
 const hcthCongVanDiGetError = 'hcthCongVanDi:GetError';
 const hcthCongVanDiGetPhanHoi = 'hcthCongVanDi:GetPhanHoi';
+const hcthCongVanDiGetCongVanTrinhKy = 'hcthCongVanDi:GetCongVanTrinhKy';
 
 export default function hcthCongVanDiReducer(state = null, data) {
     switch (data.type) {
@@ -25,6 +26,8 @@ export default function hcthCongVanDiReducer(state = null, data) {
             return Object.assign({}, state, { item: { ...(state?.item || {}), error: data.error } });
         case hcthCongVanDiGetPhanHoi:
             return Object.assign({}, state, { item: { ...(state?.item || {}), phanHoi: data.phanHoi } });
+        case hcthCongVanDiGetCongVanTrinhKy:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), yeuCauKy: data.yeuCauKy } });
         default:
             return state;
     }
@@ -42,7 +45,7 @@ export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, filter
         const url = `/api/hcth/cong-van-cac-phong/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách sách công văn các phòng bị lỗi!, 1', 'danger');
+                T.notify('Lấy danh sách sách công văn đi bị lỗi!, 1', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -50,7 +53,7 @@ export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, filter
                 dispatch({ type: hcthCongVanDiGetPage, page: data.page });
                 done && done(data.page);
             }
-        }, () => T.notify('Lấy danh sách sách công văn các phòng bị lỗi!, 2', 'danger'));
+        }, () => T.notify('Lấy danh sách sách công văn đi bị lỗi!, 2', 'danger'));
     };
 }
 
@@ -59,13 +62,13 @@ export function getHcthCongVanDiAll(done) {
         const url = '/api/hcth/cong-van-cac-phong/all';
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách công văn các phòng bị lỗi, 3' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách công văn đi bị lỗi, 3' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 done && done(data.items);
                 dispatch({ type: hcthCongVanDiGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách công văn các phòng bị lỗi, 4' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách công văn đi bị lỗi, 4' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -74,14 +77,14 @@ export function createHcthCongVanDi(data, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm công văn các phòng bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                T.notify('Thêm công văn đi bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ', res.error);
             } else {
-                T.notify('Thêm công văn các phòng thành công!', 'success');
+                T.notify('Thêm công văn đi thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done(data);
             }
-        }, () => T.notify('Thêm công văn các phòng bị lỗi', 'danger'));
+        }, () => T.notify('Thêm công văn đi bị lỗi', 'danger'));
     };
 }
 
@@ -90,15 +93,15 @@ export function updateHcthCongVanDi(id, changes, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật công văn các phòng bị lỗi!', 'danger');
+                T.notify('Cập nhật công văn đi bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật công văn các phòng thành công!', 'success');
+                T.notify('Cập nhật công văn đi thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done();
             }
-        }, () => T.notify('Cập nhật công văn các phòng bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật công văn đi bị lỗi!', 'danger'));
     };
 }
 
@@ -107,13 +110,13 @@ export function deleteHcthCongVanDi(id) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa công văn các phòng bị lỗi!, lỗi 1', 'danger');
+                T.notify('Xóa công văn đi bị lỗi!, lỗi 1', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.notify('Xóa công văn các phòng thành công!', 'success');
+                T.notify('Xóa công văn đi thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
             }
-        }, () => T.notify('Xóa công văn các phòng bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa công văn đi bị lỗi!', 'danger'));
     };
 }
 
@@ -139,10 +142,10 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
     };
 }
 
-export function deleteFile(id, fileId, file, done) {
+export function deleteFile(id, fileId, updateFileId, file, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/delete-file';
-        T.put(url, { id, fileId, file }, data => {
+        T.put(url, { id, fileId, updateFileId, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
                 T.notify('Xóa file đính kèm lỗi!', 'danger');
@@ -170,7 +173,7 @@ export function getCongVanDi(id, context, done) {
                     dispatch({ type: hcthCongVanDiGetError, error: 401 });
                 }
                 console.error('GET: ' + url + '.', data.error);
-                T.notify('Lấy công văn các phòng bị lỗi!', 'danger');
+                T.notify('Lấy công văn đi bị lỗi!', 'danger');
             } else {
                 dispatch({ type: hcthCongVanDiGet, item: data.item });
                 done && done(data.item);
@@ -217,29 +220,17 @@ export const SelectAdapter_CongVanDi = {
     fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
 };
 
-
-// export function createHistory(data, done) {
-//     return () => {
-//         const url = '/api/hcth/cong-van-cac-phong/lich-su';
-//         T.put(url, { data: data }, res => {
-//             if (res.error) {
-//                 T.notify('Thêm lịch sử bị lỗi', 'danger');
-//                 console.error('PUT: ' + url + '. ' + res.error);
-//             } else {
-//                 done && done(data);
-//             }
-//         }, () => T.notify('Thêm lịch sử bị lỗi', 'danger'));
-//     };
-// }
-
 export function updateStatus(data, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/status';
+        // console.log('hello');
         T.put(url, { data }, res => {
             if (res.error) {
+                console.log('hello1');
                 T.notify('Cập nhật trạng thái công văn bị lỗi,1', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
             } else {
+                console.log('hello2');
                 T.notify('Cập nhật trạng thái công văn thành công', 'success');
                 done && done(data);
             }
@@ -266,6 +257,21 @@ export function getHistory(id, context, done) {
     };
 }
 
+export function getYeuCauKy(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-cac-phong/yeu-cau-ky/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy yêu cầu ký lỗi', 'danger');
+                console.error('GET: ' + url + '. ' + res.error);
+            } else {
+                dispatch({ type: hcthCongVanDiGetCongVanTrinhKy, yeuCauKy: res.item });
+                done && done(res.item);
+            }
+        }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
+    };
+}
+
 export function readCongVanDi(data, done) {
     return () => {
         const url = `/api/hcth/cong-van-cac-phong/read/${data.id}`;
@@ -283,6 +289,22 @@ export function readCongVanDi(data, done) {
                 done && done();
             }
         }, () => T.notify('Đọc công văn lỗi', 'danger'));
+    };
+}
+
+export function publishingCongVanDi(id, done) {
+    return () => {
+        const url = `/api/hcth/cong-van-cac-phong/publishing/${id}`;
+        T.put(url, {}, res => {
+            if (res.error) {
+                T.notify('Câp nhật công văn thất bại. ' + (res.error.message || ''), 'danger');
+                console.error(`PUT: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Câp nhật công văn thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Câp nhật công văn thất bại', 'danger'));
     };
 }
 

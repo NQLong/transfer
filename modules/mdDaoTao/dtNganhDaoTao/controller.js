@@ -18,24 +18,40 @@ module.exports = app => {
     );
     app.get('/user/dao-tao/nganh-dao-tao', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRolesDtNganhDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtNganhDaoTao:read', 'dtNganhDaoTao:write', 'dtNganhDaoTao:delete');
+            resolve();
+        } else resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/dao-tao/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'student:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         const user = req.session.user, permissions = user.permissions;
         let donVi = req.query.donViFilter;
-        if (!permissions.includes('dtChuongTrinhDaoTao:read')) {
+        if (user.studentId && permissions.includes('student:login')) {
+            donVi = user.data.khoa;
+        }
+        else if (!permissions.includes('dtChuongTrinhDaoTao:read')) {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
-
         app.model.dtNganhDaoTao.getPage(pageNumber, pageSize, {
             statement: '((:donVi) IS NULL OR khoa = (: donVi)) AND (lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText)',
             parameter: { donVi, searchText: `%${(req.query.condition || '').toLowerCase()}%` }
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/dao-tao/nganh-dao-tao-student', app.permission.check('student:login'), (req, res) => {
+        app.model.dtNganhDaoTao.getAll({
+            statement: '(lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText) AND kichHoat = 1',
+            parameter: { searchText: `%${(req.query.condition || '').toLowerCase()}%` }
+        }, '*', 'khoa', (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'student:login'), (req, res) => {
         app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
     });
 

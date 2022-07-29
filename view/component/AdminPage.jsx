@@ -1011,10 +1011,12 @@ export class AdminPage extends React.Component {
             right += 60;
         }
         if (buttons) {
-            if (Array.isArray(buttons)) {
+            if (Array.isArray(buttons) && buttons.length) {
                 customButtons = buttons.map((item, index) => {
-                    right += 60;
-                    return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;
+                    if (item) {
+                        right += 60;
+                        return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} tooltip={item.tooltip} />;
+                    }
                 });
             }
             else {
