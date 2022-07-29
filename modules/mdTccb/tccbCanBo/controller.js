@@ -187,13 +187,13 @@ module.exports = app => {
     //     app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
     // });
 
-    app.get('/api/staff/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/staff/all', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.getAll({}, (error, items) => {
             res.send({ error, items });
         });
     });
 
-    app.get('/api/staff/edit/item', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/staff/edit/item', app.permission.orCheck('staff:read', 'staff:login'), async (req, res) => {
         app.model.canBo.get(req.query.condition, (error, canBo) => {
             if (error) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
