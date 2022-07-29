@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
         this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenNgonNgu.value(tenNgonNgu || '');
-        maCode && this.imageBox.setData('nationFlag:' + maCode);
+        maCode && this.imageBox.setData('nationFlag:' + maCode, '/img/flag/' + maCode + '.png');
     }
 
     onSubmit = (e) => {
