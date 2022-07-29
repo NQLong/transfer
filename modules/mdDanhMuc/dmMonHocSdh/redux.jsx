@@ -138,6 +138,21 @@ export function getDmMonHocSdh(ma, done) {
     };
 }
 
+export function createDmMonHocSdhMutiple(data, done) {
+    return (dispatch) => {
+        const url = '/api/danh-muc/mon-hoc-sdh/multiple';
+        T.post(url, { data }, (data) => {
+            if (data.errors && data.errors.length > 0) {
+                T.notify('Tạo mới môn học sau đại học lỗi', 'danger');
+                console.error(`POST ${url}. ${data.error}`);
+            } else {
+                if (done) done();
+                dispatch(getDmMonHocSdhPage());
+            }
+        });
+    };
+}
+
 export function changeDmMonHocSdh(item) {
     return { type: DmMonHocSdhUpdate, item };
 }

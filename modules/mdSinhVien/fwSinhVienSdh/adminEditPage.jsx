@@ -10,7 +10,7 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import T from 'view/js/common';
-import { SelectAdapter_DmKhoaSdh } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux';
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmNganhSdh } from 'modules/mdDanhMuc/dmNganhSauDaiHoc/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmHocSdhVer2 } from 'modules/mdDanhMuc/dmHocSdh/redux';
@@ -200,7 +200,7 @@ class SinhVienPage extends AdminPage {
                             <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly={readOnly} />
                             <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly={readOnly} />
                             <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-2' readOnly={readOnly} data={SelectAdapter_DmGioiTinhV2} />
-                            <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-3' readOnly={readOnly} data={SelectAdapter_DmKhoaSdh} onChange={value => this.setState({ khoa: value.id})}/>
+                            <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-3' readOnly={readOnly} data={SelectAdapter_DmDonViFaculty_V2} onChange={value => this.setState({ khoa: value.id})}/>
                             <FormSelect ref={e => this.nganh = e} label='Ngành' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmNganhSdh(this.state.khoa)} />
                             <FormTextBox type='year' ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' className='col-md-2' readOnly={readOnly} />
                             <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly={readOnly} />

@@ -139,6 +139,21 @@ export function updateDmNganhSdh(ma, changes, done) {
     };
 }
 
+export function createDmNganhSdhMutiple(data, done) {
+    return (dispatch) => {
+        const url = '/api/danh-muc/nganh-sau-dai-hoc/multiple';
+        T.post(url, { data }, (data) => {
+            if (data.errors && data.errors.length > 0) {
+                T.notify('Tạo mới môn học sau đại học lỗi', 'danger');
+                console.error(`POST ${url}. ${data.error}`);
+            } else {
+                if (done) done();
+                dispatch(getDmNganhSdhPage());
+            }
+        });
+    };
+}
+
 export function changeDmNganhSdh(item) {
     return { type: DmNganhSdhUpdate, item };
 }

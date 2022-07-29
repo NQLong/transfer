@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createDmNganhSdh, getDmNganhSdhPage, updateDmNganhSdh, deleteDmNganhSdh } from './redux';
-import { getDmKhoaSdhAll, SelectAdapter_DmKhoaSdh } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux';
+import { SelectAdapter_DmDonViFaculty_V2, getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
@@ -60,7 +60,7 @@ class EditModal extends AdminModal {
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên ngành'
                     readOnly={readOnly} required />
-                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmKhoaSdh} label='Khoa sau đại học' readOnly={readOnly} />
+                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmDonViFaculty_V2} label='Khoa sau đại học' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
         });
@@ -74,7 +74,7 @@ class DmNganhSdhPage extends AdminPage {
             T.onSearch = (searchText) => this.props.getDmNganhSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmNganhSdhPage();
-            this.props.getDmKhoaSdhAll(items => {
+            this.props.getDmDonViFaculty(items => {
                 let dmKhoaSdh = {};
                 items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
                 this.setState({ dmKhoaSdh });
@@ -144,10 +144,11 @@ class DmNganhSdhPage extends AdminPage {
             </>,
             backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/nganh-sau-dai-hoc/upload') : null
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmNganhSdh: state.danhMuc.dmNganhSdh });
-const mapActionsToProps = { createDmNganhSdh, getDmNganhSdhPage, updateDmNganhSdh, deleteDmNganhSdh, getDmKhoaSdhAll };
+const mapActionsToProps = { createDmNganhSdh, getDmNganhSdhPage, updateDmNganhSdh, deleteDmNganhSdh, getDmDonViFaculty };
 export default connect(mapStateToProps, mapActionsToProps)(DmNganhSdhPage);

@@ -11,6 +11,7 @@ module.exports = app => {
         { name: 'dmMonHocSdh:delete' },
     );
     app.get('/user/danh-muc/mon-hoc-sdh', app.permission.check('dmMonHocSdh:read'), app.templates.admin);
+    app.get('/user/danh-muc/mon-hoc-sdh/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/mon-hoc-sdh/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
@@ -67,4 +68,82 @@ module.exports = app => {
     app.delete('/api/danh-muc/mon-hoc-sdh', app.permission.check('dmMonHocSdh:delete'), (req, res) => {
         app.model.dmMonHocSdh.delete({ maNganh: req.body.ma }, errors => res.send({ errors }));
     });
+
+    app.post('/api/danh-muc/mon-hoc-sdh/multiple', app.permission.check('dmMonHocSdh:write'), (req, res) => {
+        const data = req.body.data;
+        let errors = [], donViMapping = {};
+        new Promise(resolve => {
+            app.model.dmDonVi.getAll({ kichHoat: 1 }, (error, items) => {
+                (items || []).forEach(item => donViMapping[item.ten.toLowerCase()] = item.ma);
+                resolve();
+            });
+        }).then(() => {
+            const handleCreateItem = (index = 0) => {
+                let item = data[index];
+    
+                if (index < data.length) {
+                    const newData = {
+                        ma: item.ma,
+                        tenTiengViet: item.tenTiengViet,
+                        tenTiengAnh: item.tenTiengAnh ? item.tenTiengAnh : '',
+                        tcLyThuyet: item.tcLyThuyet ? item.tcLyThuyet : '',
+                        tcThucHanh: item.tcThucHanh ? item.tcThucHanh : '',
+                        khoaSdh: item.khoaSdh ? donViMapping[item.khoaSdh.toLowerCase()] : '',
+                        kichHoat: 1
+                    };
+                    app.model.dmMonHocSdh.get({ ma: item.ma }, (error, dmMonHocSdh) => {
+                        if (error || dmMonHocSdh) {
+                            handleCreateItem(index+1);
+                        } else {
+                            app.model.dmMonHocSdh.create(newData, () => {
+                                handleCreateItem(index+1);
+                            });
+                        }
+                    });
+                } else {
+                    res.send({ errors });
+                }
+            };
+            handleCreateItem();
+        });
+        
+    });
+
+    // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
+    app.uploadHooks.add('dmMonHocSdhImportData', (req, fields, files, params, done) =>
+        app.permission.has(req, () => dmMonHocSdhImportData(req, fields, files, params, done), done, 'dmMonHocSdh:write'));
+
+    const dmMonHocSdhImportData = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'dmMonHocSdhImportData' && files.dmMonHocSdhFile && files.dmMonHocSdhFile.length > 0) {
+            const srcPath = files.dmMonHocSdhFile[0].path;
+            app.excel.readFile(srcPath, workbook => {
+                if (workbook) {
+                    const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
+                    const handleUpload = (index = 2) => {
+                        const value = worksheet.getRow(index).values;
+                        if (value.length == 0 || index == totalRow + 1) {
+                            app.deleteFile(srcPath);
+                            done({ element });
+                        } else {
+                            let data = {
+                                ma: value[1],
+                                tenTiengViet: value[2] ? value[2].trim() : '',
+                                tenTiengAnh: value[3] ? value[3].trim() : '',
+                                tcLyThuyet: value[4],
+                                tcThucHanh: value[5],
+                                khoaSdh: value[6]
+                            };
+
+                            element.push(data);
+                            handleUpload(index + 1);
+                        }
+                    };
+                    handleUpload();
+                } else {
+                    app.deleteFile(srcPath);
+                    done({ error: 'Error' });
+                }
+            });
+        }
+    };
 };

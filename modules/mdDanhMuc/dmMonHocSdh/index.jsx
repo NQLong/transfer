@@ -10,6 +10,10 @@ export default {
     },
     routes: [
         {
+            path: '/user/danh-muc/mon-hoc-sdh/upload',
+            component: Loadable({ loading: Loading, loader: () => import('./adminUploadPage') })
+        },
+        {
             path: '/user/danh-muc/mon-hoc-sdh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },

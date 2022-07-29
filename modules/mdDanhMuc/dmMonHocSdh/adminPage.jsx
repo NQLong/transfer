@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createDmMonHocSdh, getDmMonHocSdhPage, updateDmMonHocSdh, deleteDmMonHocSdh } from './redux';
-import { getDmKhoaSdhAll, SelectAdapter_DmKhoaSdh } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux';
+import { SelectAdapter_DmDonViFaculty_V2, getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
@@ -66,7 +66,7 @@ class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} />
                 <FormTextBox type='number' className='col-md-3' ref={e => this.tcLyThuyet = e} label='Tín chỉ lý thuyết' min={1} max={99} readOnly={readOnly} />
                 <FormTextBox type='number' className='col-md-3' ref={e => this.tcThucHanh = e} label='Tín chỉ thực hành' min={1} max={99} readOnly={readOnly} />
-                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmKhoaSdh} label='Khoa sau đại học' readOnly={readOnly} />
+                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmDonViFaculty_V2} label='Khoa sau đại học' readOnly={readOnly} />
             </div>
         });
     }
@@ -79,7 +79,7 @@ class DmMonHocSdhPage extends AdminPage {
             T.onSearch = (searchText) => this.props.getDmMonHocSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmMonHocSdhPage();
-            this.props.getDmKhoaSdhAll(items => {
+            this.props.getDmDonViFaculty(items => {
                 let dmKhoaSdh = {};
                 items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
                 this.setState({ dmKhoaSdh });
@@ -155,10 +155,11 @@ class DmMonHocSdhPage extends AdminPage {
             </>,
             backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/mon-hoc-sdh/upload') : null
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmMonHocSdh: state.danhMuc.dmMonHocSdh });
-const mapActionsToProps = { createDmMonHocSdh, getDmMonHocSdhPage, updateDmMonHocSdh, deleteDmMonHocSdh, getDmKhoaSdhAll };
+const mapActionsToProps = { createDmMonHocSdh, getDmMonHocSdhPage, updateDmMonHocSdh, deleteDmMonHocSdh, getDmDonViFaculty };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocSdhPage);
