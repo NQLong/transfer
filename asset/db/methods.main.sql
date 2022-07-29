@@ -16011,6 +16011,21 @@ END ;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_GET_DETAIL(maSoSinhVien in STRING, hocKy in Number, namHoc in Number) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    Open my_cursor for
+        Select
+        LP.TEN as "loaiPhi",
+        dt.SO_TIEN as "soTien"
+        from TC_HOC_PHI_DETAIL dt LEFT JOIN TC_LOAI_PHI LP on LP.ID = dt.LOAI_PHI where dt.MSSV = maSoSinhVien and dt.HOC_KY = hocKy and dt.NAM_HOC = namHoc;
+    RETURN my_cursor;
+END ;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE Function TC_HOC_PHI_GET_INVOICE_INFO(maSoSinhVien in STRING, namHoc in Number, hocKy in Number) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -16072,14 +16087,13 @@ BEGIN
                NDT.TEN_NGANH   AS                           "tenNganh",
                DV.TEN          AS                           "tenKhoa",
                LHDT.TEN        AS                           "tenLoaiHinhDaoTao",
-               TLP.TEN         AS                           "loaiPhi",
+
                (
-                   SELECT LISTAGG(TRANS.AMOUNT, '; ') WITHIN GROUP (order by TRANS.TRANS_DATE)
-                   FROM TC_HOC_PHI_TRANSACTION TRANS
-                   WHERE HP.HOC_KY = TRANS.HOC_KY
-                     AND HP.NAM_HOC = TRANS.NAM_HOC
-                     AND HP.MSSV = TRANS.CUSTOMER_ID
-               )               AS                           "transactions",
+                   SELECT LISTAGG(LP.TEN || '||' || TO_CHAR(dt.SO_TIEN), '|||') WITHIN GROUP (order by dt.LOAI_PHI)
+                   from TC_HOC_PHI_DETAIL dt LEFT JOIN TC_LOAI_PHI LP
+                   on LP.ID = dt.LOAI_PHI
+                   where dt.MSSV = hp.MSSV and dt.HOC_KY = hp.HOC_KY and dt.NAM_HOC = hp.NAM_HOC
+               )               AS                           "details",
                ROW_NUMBER() OVER (ORDER BY THPT.TRANS_DATE) R
         FROM TC_HOC_PHI HP
                  LEFT JOIN FW_STUDENT FS
@@ -16088,9 +16102,6 @@ BEGIN
                  LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                  LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                  LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
-                 LEFT JOIN TC_HOC_PHI_DETAIL HPD
-                           on HP.HOC_KY = HPD.HOC_KY and HP.MSSV = HPD.MSSV and HP.NAM_HOC = HPD.NAM_HOC
-                 LEFT JOIN TC_LOAI_PHI TLP on HPD.LOAI_PHI = TLP.ID
                  LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE HPI
                            on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY
                  LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
@@ -16297,7 +16308,7 @@ BEGIN
 --                                           WHERE HP.HOC_KY = TRANS.HOC_KY
 --                                             AND HP.NAM_HOC = TRANS.NAM_HOC
 --                                             AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransactionId",
-                     ROW_NUMBER() OVER (ORDER BY FS.TEN) R
+                     ROW_NUMBER() OVER (ORDER BY FS.TEN, FS.HO, FS.MSSV) R
               FROM TC_HOC_PHI HP
                        LEFT JOIN FW_STUDENT FS
                                  on HP.MSSV = FS.MSSV
@@ -16390,7 +16401,8 @@ BEGIN
                   ))
 
 
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+    ORDER BY R;
     RETURN my_cursor;
 END ;
 
