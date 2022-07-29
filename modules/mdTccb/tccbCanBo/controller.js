@@ -187,7 +187,7 @@ module.exports = app => {
     //     app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
     // });
 
-    app.get('/api/staff/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/staff/all', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.getAll({}, (error, items) => {
             res.send({ error, items });
         });
