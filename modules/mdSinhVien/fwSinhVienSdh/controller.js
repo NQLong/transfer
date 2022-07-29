@@ -162,57 +162,69 @@ module.exports = app => {
                 let item = data[index];
 
                 if (index < data.length) {
-                    app.model.fwSinhVienSdh.get({ ma: item.ma }, (error, svSdh) => {
-                        // ma, ho, ten, gioiTinh, ngaySinh, danToc, tonGiao, quocTich, nguyenQuanMaTinh, hienTaiSoNha, hienTaiMaXa, hienTaiMaHuyen, hienTaiMaTinh, noiSinhSoNha, noiSinhMaXa, noiSinhMaHuyen, noiSinhMaTinh, maKhoa, maNganh, thuongTruSoNha, thuongTruMaXa, thuongTruMaHuyen, thuongTruMaTinh, namTuyenSinh, nienKhoa, bacDaoTao, chuongTrinhDaoTao, sdtCaNhan, sdtLienHe, email, coQuan, gvhd, tenDeTai, tinhTrang, heDaoTao
-                        const newData = {
-                            ho: item.ho,
-                            ten: item.ten,
-                            gioiTinh: item.gioiTinh ? item.gioiTinh == 'Nam' ? '01' : '02' : '',
-                            ngaySinh: item.ngaySinh,
-                            danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : '',
-                            tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : '',
-                            quocTich: item.quocTich && quocGiaMapping[item.quocTich.toLowerCase()] ? quocGiaMapping[item.quocTich.toLowerCase()] : '',
-                            nguyenQuanMaTinh: item.nguyenQuan ? tinhTpMapping[item.nguyenQuan.toLowerCase().trim()] : '',
-                            noiSinhMaTinh: item.noiSinh ? item.noiSinh.toLowerCase().includes('hcm') || item.noiSinh.toLowerCase().includes('hồ chí minh') ? tinhTpMapping['hồ chí minh'] : tinhTpMapping[item.noiSinh.toLowerCase().trim()] ? tinhTpMapping[item.noiSinh.toLowerCase().trim()] : '' : '',
-                            maKhoa: item.khoa && donViMapping[item.khoa.toLowerCase()] ? donViMapping[item.khoa.toLowerCase()] : '',
-                            maNganh: item.maNganh,
-                            thuongTruSoNha: item.thuongTruSoNha ? item.thuongTruSoNha : '',
-                            thuongTruMaXa: item.thuongTruXa && xaMapping[item.thuongTruXa.toLowerCase()] ? xaMapping[item.thuongTruXa.toLowerCase()] : '',
-                            thuongTruMaHuyen: item.thuongTruHuyen && huyenMapping[item.thuongTruHuyen.toLowerCase()] ? huyenMapping[item.thuongTruHuyen.toLowerCase()] : '',
-                            thuongTruMaTinh: item.thuongTruTinh && tinhTpMapping[item.thuongTruTinh.toLowerCase()] ? tinhTpMapping[item.thuongTruTinh.toLowerCase()] : '',
-                            namTuyenSinh: item.namTuyenSinh,
-                            nienKhoa: item.nienKhoa,
-                            bacDaoTao: item.bacDaoTao && bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '',
-                            chuongTrinhDaoTao: item.chuongTrinhDaoTao,
-                            sdtCaNhan: item.sdtCaNhan,
-                            sdtLienHe: item.sdtLienHe,
-                            email: item.email,
-                            coQuan: item.tenCoQuan,
-                            gvhd: item.gvhd ? getGvhd(item.gvhd) : '',
-                            tenDeTai: item.tenDeTai,
-                            tinhTrang: item.maTinhTrang,
-                            heDaoTao: item.heDaoTao && heDaoTaoMapping[item.heDaoTao.toLowerCase()] ? heDaoTaoMapping[item.heDaoTao.toLowerCase()] : '',
-                            hoTenCha: item.hoTenCha ? item.hoTenCha : '',
-                            namSinhCha: item.namSinhCha ? item.namSinhCha : '',
-                            ngheNghiepCha: item.ngheNghiepCha ? item.ngheNghiepCha : '',
-                            sdtCha: item.sdtCha ? item.sdtCha : '',
-                            hoTenMe: item.hoTenMe ? item.hoTenMe : '',
-                            namSinhMe: item.namSinhMe ? item.namSinhMe : '',
-                            ngheNghiepMe: item.ngheNghiepMe ? item.ngheNghiepMe : '',
-                            sdtMe: item.sdtMe ? item.sdtMe : '',
-                            sdtNguoiThan: item.sdtNguoiThan ? item.sdtNguoiThan : '',
-                        };
-                        if (svSdh) {
-                            app.model.fwSinhVienSdh.update({ ma: item.ma }, newData, () => {
-                                handleCreateItem(index + 1);
+                    new Promise(resolve => {
+                        if (item.maNganh) {
+                            app.model.dmNganhSauDaiHoc.get({ maNganh: item.maNganh }, (error, nganhSdh) => {
+                                if (!error && !nganhSdh) {
+                                    app.model.dmNganhSauDaiHoc.create({ maNganh: item.maNganh, ten: item.nganh, kichHoat: 1, maKhoa: item.maKhoa }, () => {
+                                        resolve();
+                                    });
+                                } else resolve();
                             });
-                        } else {
-                            newData.ma = item.ma;
-                            app.model.fwSinhVienSdh.create(newData, () => {
-                                handleCreateItem(index + 1);
-                            });
-                        }
-                        
+                        } else resolve();
+                    }).then(() => {
+                        app.model.fwSinhVienSdh.get({ ma: item.ma }, (error, svSdh) => {
+                            // ma, ho, ten, gioiTinh, ngaySinh, danToc, tonGiao, quocTich, nguyenQuanMaTinh, hienTaiSoNha, hienTaiMaXa, hienTaiMaHuyen, hienTaiMaTinh, noiSinhSoNha, noiSinhMaXa, noiSinhMaHuyen, noiSinhMaTinh, maKhoa, maNganh, thuongTruSoNha, thuongTruMaXa, thuongTruMaHuyen, thuongTruMaTinh, namTuyenSinh, nienKhoa, bacDaoTao, chuongTrinhDaoTao, sdtCaNhan, sdtLienHe, email, coQuan, gvhd, tenDeTai, tinhTrang, heDaoTao
+                            const newData = {
+                                ho: item.ho,
+                                ten: item.ten,
+                                gioiTinh: item.gioiTinh ? item.gioiTinh == 'Nam' ? '01' : '02' : '',
+                                ngaySinh: item.ngaySinh,
+                                danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : '',
+                                tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : '',
+                                quocTich: item.quocTich && quocGiaMapping[item.quocTich.toLowerCase()] ? quocGiaMapping[item.quocTich.toLowerCase()] : '',
+                                nguyenQuanMaTinh: item.nguyenQuan ? tinhTpMapping[item.nguyenQuan.toLowerCase().trim()] : '',
+                                noiSinhMaTinh: item.noiSinh ? item.noiSinh.toLowerCase().includes('hcm') || item.noiSinh.toLowerCase().includes('hồ chí minh') ? tinhTpMapping['hồ chí minh'] : tinhTpMapping[item.noiSinh.toLowerCase().trim()] ? tinhTpMapping[item.noiSinh.toLowerCase().trim()] : '' : '',
+                                maKhoa: item.khoa && donViMapping[item.khoa.toLowerCase()] ? donViMapping[item.khoa.toLowerCase()] : '',
+                                maNganh: item.maNganh,
+                                thuongTruSoNha: item.thuongTruSoNha ? item.thuongTruSoNha : '',
+                                thuongTruMaXa: item.thuongTruXa && xaMapping[item.thuongTruXa.toLowerCase()] ? xaMapping[item.thuongTruXa.toLowerCase()] : '',
+                                thuongTruMaHuyen: item.thuongTruHuyen && huyenMapping[item.thuongTruHuyen.toLowerCase()] ? huyenMapping[item.thuongTruHuyen.toLowerCase()] : '',
+                                thuongTruMaTinh: item.thuongTruTinh && tinhTpMapping[item.thuongTruTinh.toLowerCase()] ? tinhTpMapping[item.thuongTruTinh.toLowerCase()] : '',
+                                namTuyenSinh: item.namTuyenSinh,
+                                nienKhoa: item.nienKhoa,
+                                bacDaoTao: item.bacDaoTao && bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '',
+                                chuongTrinhDaoTao: item.chuongTrinhDaoTao,
+                                sdtCaNhan: item.sdtCaNhan,
+                                sdtLienHe: item.sdtLienHe,
+                                email: item.email,
+                                coQuan: item.tenCoQuan,
+                                gvhd: item.gvhd ? getGvhd(item.gvhd) : '',
+                                tenDeTai: item.tenDeTai,
+                                tinhTrang: item.maTinhTrang,
+                                heDaoTao: item.heDaoTao && heDaoTaoMapping[item.heDaoTao.toLowerCase()] ? heDaoTaoMapping[item.heDaoTao.toLowerCase()] : '',
+                                hoTenCha: item.hoTenCha ? item.hoTenCha : '',
+                                namSinhCha: item.namSinhCha ? item.namSinhCha : '',
+                                ngheNghiepCha: item.ngheNghiepCha ? item.ngheNghiepCha : '',
+                                sdtCha: item.sdtCha ? item.sdtCha : '',
+                                hoTenMe: item.hoTenMe ? item.hoTenMe : '',
+                                namSinhMe: item.namSinhMe ? item.namSinhMe : '',
+                                ngheNghiepMe: item.ngheNghiepMe ? item.ngheNghiepMe : '',
+                                sdtMe: item.sdtMe ? item.sdtMe : '',
+                                sdtNguoiThan: item.sdtNguoiThan ? item.sdtNguoiThan : '',
+                            };
+                            if (svSdh) {
+                                app.model.fwSinhVienSdh.update({ ma: item.ma }, newData, () => {
+                                    handleCreateItem(index + 1);
+                                });
+                            } else {
+                                newData.ma = item.ma;
+                                app.model.fwSinhVienSdh.create(newData, () => {
+                                    handleCreateItem(index + 1);
+                                });
+                            }
+                            
+                        });
                     });
                 } else {
                     res.send({ errors, result });
