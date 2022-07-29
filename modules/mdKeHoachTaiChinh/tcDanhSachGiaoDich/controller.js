@@ -8,7 +8,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesTcGiaoDich', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:read');
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:read', 'tcGiaoDich:export', 'tcGiaoDich:write');
             resolve();
         } else resolve();
     }));
