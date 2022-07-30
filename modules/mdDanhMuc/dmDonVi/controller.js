@@ -27,7 +27,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/all', app.permission.check('user:login'), (req, res) => {
         let searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
             kichHoat = req.query.kichHoat || null;
 
