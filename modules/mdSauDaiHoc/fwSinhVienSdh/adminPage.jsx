@@ -15,7 +15,7 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 class AdminSvSdhPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/students', () => {
+        T.ready('/user/sau-dai-hoc/sinh-vien', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.props.getSvSdhPage(undefined, undefined, searchText || '', this.state.filter);
             T.showSearchBox(() => {

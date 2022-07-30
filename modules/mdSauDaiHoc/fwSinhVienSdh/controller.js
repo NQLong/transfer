@@ -1,8 +1,8 @@
 module.exports = app => {
     const menuSvSdh = {
-        parentMenu: app.parentMenu.students,
+        parentMenu: app.parentMenu.sdh,
         menus: {
-            6102: { title: 'Danh sách sinh viên SDH', link: '/user/sv-sdh/list', icon: 'fa-users', backgroundColor: '#2962ff' }
+            6102: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien' }
         }
     };
 
@@ -12,7 +12,7 @@ module.exports = app => {
         { name: 'svSdh:delete' }
     );
 
-    app.get('/user/sv-sdh/list', app.permission.check('svSdh:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/sinh-vien', app.permission.check('svSdh:manage'), app.templates.admin);
     app.get('/user/sv-sdh/upload', app.permission.check('svSdh:manage'), app.templates.admin);
     app.get('/user/sv-sdh/item/:mssv', app.permission.check('svSdh:write'), app.templates.admin);
 
@@ -223,7 +223,7 @@ module.exports = app => {
                                     handleCreateItem(index + 1);
                                 });
                             }
-                            
+
                         });
                     });
                 } else {

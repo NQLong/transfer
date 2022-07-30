@@ -13,7 +13,7 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminUploadPage') })
         },
         {
-            path: '/user/sv-sdh/list',
+            path: '/user/sau-dai-hoc/sinh-vien',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {

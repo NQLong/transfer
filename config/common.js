@@ -118,6 +118,10 @@ module.exports = (app, appConfig) => {
             index: 7000, title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-diamond',
             subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'DANH SÁCH']
         },
+        sdh: {
+            index: 7500, title: 'Sau đại học', link: '/user/sau-dai-hoc', icon: 'fa-graduation-cap ',
+            subMenusRender: true
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,
