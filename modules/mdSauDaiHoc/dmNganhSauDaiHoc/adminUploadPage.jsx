@@ -26,7 +26,7 @@ class AdminSvSdhUploadPage extends AdminPage {
             this.setState({ loading: true });
             this.props.createDmNganhSdhMutiple(data, () => {
                 this.setState({ loading: false });
-                this.props.history.push('/user/danh-muc/nganh-sau-dai-hoc');
+                this.props.history.push('/user/sau-dai-hoc/danh-sach-nganh');
             });
         }
     }
@@ -63,7 +63,7 @@ class AdminSvSdhUploadPage extends AdminPage {
             title: 'Import data',
             breadcrumb: [
                 <Link key={0} to='/user/category'>Danh mục</Link>,
-                <Link key={1} to='/user/danh-muc/nganh-sau-dai-hoc'>Danh mục Ngành sau đại học</Link>,
+                <Link key={1} to='/user/sau-dai-hoc/danh-sach-nganh'>Danh mục Ngành sau đại học</Link>,
                 'Import data'
             ],
             content: <>
@@ -87,7 +87,7 @@ class AdminSvSdhUploadPage extends AdminPage {
                         <i className='fa fa-lg fa-save' />
                     </button>}
             </>,
-            backRoute: '/user/danh-muc/nganh-sau-dai-hoc',
+            backRoute: '/user/sau-dai-hoc/danh-sach-nganh',
 
         });
     }

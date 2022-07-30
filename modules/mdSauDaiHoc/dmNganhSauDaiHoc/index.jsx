@@ -5,16 +5,16 @@ import dmNganhSdh from './redux';
 
 export default {
     redux: {
-        parent: 'danhMuc',
+        parent: 'sdh',
         reducers: { dmNganhSdh }
     },
     routes: [
         {
-            path: '/user/danh-muc/nganh-sau-dai-hoc/upload',
+            path: '/user/sau-dai-hoc/danh-sach-nganh/upload',
             component: Loadable({ loading: Loading, loader: () => import('./adminUploadPage') })
         },
         {
-            path: '/user/danh-muc/nganh-sau-dai-hoc',
+            path: '/user/sau-dai-hoc/danh-sach-nganh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

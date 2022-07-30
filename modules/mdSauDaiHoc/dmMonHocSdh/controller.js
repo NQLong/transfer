@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
+        parentMenu: app.parentMenu.sdh,
         menus: {
-            4105: { title: 'Môn học Sau đại học', link: '/user/danh-muc/mon-hoc-sdh' },
+            7503: { title: 'Danh sách Môn học', link: '/user/sau-dai-hoc/mon-hoc' },
         },
     };
     app.permission.add(
@@ -10,11 +10,11 @@ module.exports = app => {
         { name: 'dmMonHocSdh:write' },
         { name: 'dmMonHocSdh:delete' },
     );
-    app.get('/user/danh-muc/mon-hoc-sdh', app.permission.check('dmMonHocSdh:read'), app.templates.admin);
-    app.get('/user/danh-muc/mon-hoc-sdh/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/mon-hoc/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/mon-hoc-sdh/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/sau-dai-hoc/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -49,27 +49,27 @@ module.exports = app => {
         app.model.dmMonHocSdh.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/mon-hoc-sdh/all', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/sau-dai-hoc/mon-hoc/all', app.permission.check('dmMonHocSdh:read'), (req, res) => {
         app.model.dmMonHocSdh.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/mon-hoc-sdh/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmMonHocSdh.get({maNganh: req.params.ma}, (error, item) => res.send({ error, item }));
+    app.get('/api/sau-dai-hoc/mon-hoc/item/:ma', app.permission.check('dmMonHocSdh:read'), (req, res) => {
+        app.model.dmMonHocSdh.get({ maNganh: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/danh-muc/mon-hoc-sdh', app.permission.check('dmMonHocSdh:write'), (req, res) => {
+    app.post('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {
         app.model.dmMonHocSdh.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/danh-muc/mon-hoc-sdh', app.permission.check('dmMonHocSdh:write'), (req, res) => {
-        app.model.dmMonHocSdh.update({ maNganh: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
+    app.put('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {
+        app.model.dmMonHocSdh.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/danh-muc/mon-hoc-sdh', app.permission.check('dmMonHocSdh:delete'), (req, res) => {
-        app.model.dmMonHocSdh.delete({ maNganh: req.body.ma }, errors => res.send({ errors }));
+    app.delete('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:delete'), (req, res) => {
+        app.model.dmMonHocSdh.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.post('/api/danh-muc/mon-hoc-sdh/multiple', app.permission.check('dmMonHocSdh:write'), (req, res) => {
+    app.post('/api/sau-dai-hoc/mon-hoc/multiple', app.permission.check('dmMonHocSdh:write'), (req, res) => {
         const data = req.body.data;
         let errors = [], donViMapping = {};
         new Promise(resolve => {
@@ -80,7 +80,7 @@ module.exports = app => {
         }).then(() => {
             const handleCreateItem = (index = 0) => {
                 let item = data[index];
-    
+
                 if (index < data.length) {
                     const newData = {
                         ma: item.ma,
@@ -93,10 +93,10 @@ module.exports = app => {
                     };
                     app.model.dmMonHocSdh.get({ ma: item.ma }, (error, dmMonHocSdh) => {
                         if (error || dmMonHocSdh) {
-                            handleCreateItem(index+1);
+                            handleCreateItem(index + 1);
                         } else {
                             app.model.dmMonHocSdh.create(newData, () => {
-                                handleCreateItem(index+1);
+                                handleCreateItem(index + 1);
                             });
                         }
                     });
@@ -106,7 +106,7 @@ module.exports = app => {
             };
             handleCreateItem();
         });
-        
+
     });
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------

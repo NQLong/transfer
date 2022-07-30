@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
+        parentMenu: app.parentMenu.sdh,
         menus: {
-            4104: { title: 'Ngành Sau đại học', link: '/user/danh-muc/nganh-sau-dai-hoc' },
+            7502: { title: 'Danh sách Ngành', link: '/user/sau-dai-hoc/danh-sach-nganh' },
         },
     };
     app.permission.add(
@@ -10,11 +10,11 @@ module.exports = app => {
         { name: 'dmNganhSdh:write' },
         { name: 'dmNganhSdh:delete' },
     );
-    app.get('/user/danh-muc/nganh-sau-dai-hoc', app.permission.check('dmNganhSdh:read'), app.templates.admin);
-    app.get('/user/danh-muc/nganh-sau-dai-hoc/upload', app.permission.check('dmNganhSdh:write'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/danh-sach-nganh/upload', app.permission.check('dmNganhSdh:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/nganh-sau-dai-hoc/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/sau-dai-hoc/danh-sach-nganh/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -49,27 +49,27 @@ module.exports = app => {
         app.model.dmNganhSauDaiHoc.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/nganh-sau-dai-hoc/all', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/sau-dai-hoc/danh-sach-nganh/all', app.permission.check('user:login'), (req, res) => {
         app.model.dmNganhSauDaiHoc.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/nganh-sau-dai-hoc/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNganhSauDaiHoc.get({maNganh: req.params.ma}, (error, item) => res.send({ error, item }));
+    app.get('/api/sau-dai-hoc/danh-sach-nganh/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmNganhSauDaiHoc.get({ maNganh: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/danh-muc/nganh-sau-dai-hoc', app.permission.check('dmNganhSdh:write'), (req, res) => {
+    app.post('/api/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:write'), (req, res) => {
         app.model.dmNganhSauDaiHoc.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/danh-muc/nganh-sau-dai-hoc', app.permission.check('dmNganhSdh:write'), (req, res) => {
+    app.put('/api/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:write'), (req, res) => {
         app.model.dmNganhSauDaiHoc.update({ maNganh: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/danh-muc/nganh-sau-dai-hoc', app.permission.check('dmNganhSdh:delete'), (req, res) => {
+    app.delete('/api/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:delete'), (req, res) => {
         app.model.dmNganhSauDaiHoc.delete({ maNganh: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.post('/api/danh-muc/nganh-sau-dai-hoc/multiple', app.permission.check('dmNganhSdh:write'), (req, res) => {
+    app.post('/api/sau-dai-hoc/danh-sach-nganh/multiple', app.permission.check('dmNganhSdh:write'), (req, res) => {
         const data = req.body.data;
         let errors = [];
         const handleCreateItem = (index = 0) => {
@@ -77,15 +77,15 @@ module.exports = app => {
 
             if (index < data.length) {
                 const newData = {
-                    maNganh: item.maNganh,
+                    maNganh: item.ma,
                     ten: item.ten,
                 };
-                app.model.dmNganhSauDaiHoc.get({ maNganh: item.maNganh }, (error, svSdh) => {
+                app.model.dmNganhSauDaiHoc.get({ maNganh: item.ma }, (error, svSdh) => {
                     if (error || svSdh) {
-                        handleCreateItem(index+1);
+                        handleCreateItem(index + 1);
                     } else {
                         app.model.dmNganhSauDaiHoc.create(newData, () => {
-                            handleCreateItem(index+1);
+                            handleCreateItem(index + 1);
                         });
                     }
                 });

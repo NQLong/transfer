@@ -5,7 +5,8 @@ import svSdh from './redux';
 
 export default {
     redux: {
-        svSdh
+        parent: 'sdh',
+        reducers: { svSdh }
     },
     routes: [
         {

@@ -247,7 +247,7 @@ class SinhVienPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, svSdh: state.svSdh });
+const mapStateToProps = state => ({ system: state.system, svSdh: state.sdh.svSdh });
 const mapActionsToProps = {
     getSvSdhAdmin, updateSvSdhAdmin
 };

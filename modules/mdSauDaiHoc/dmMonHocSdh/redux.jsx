@@ -44,7 +44,7 @@ export default function dmMonHocSdhReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmMonHocSdhAll(done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc-sdh/all';
+        const url = '/api/sau-dai-hoc/mon-hoc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách môn học bị lỗi', 'danger');
@@ -61,7 +61,7 @@ T.initPage('pageDmMonHocSdh');
 export function getDmMonHocSdhPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmMonHocSdh', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/danh-muc/mon-hoc-sdh/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/sau-dai-hoc/mon-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách môn học bị lỗi!', 'danger');
@@ -77,7 +77,7 @@ export function getDmMonHocSdhPage(pageNumber, pageSize, pageCondition, done) {
 
 export function createDmMonHocSdh(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc-sdh';
+        const url = '/api/sau-dai-hoc/mon-hoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo môn học bị lỗi!', 'danger');
@@ -93,7 +93,7 @@ export function createDmMonHocSdh(item, done) {
 
 export function deleteDmMonHocSdh(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc-sdh';
+        const url = '/api/sau-dai-hoc/mon-hoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa môn học bị lỗi!', 'danger');
@@ -108,7 +108,7 @@ export function deleteDmMonHocSdh(ma) {
 
 export function updateDmMonHocSdh(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc-sdh';
+        const url = '/api/sau-dai-hoc/mon-hoc';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật môn học bị lỗi!', 'danger');
@@ -126,7 +126,7 @@ export function updateDmMonHocSdh(ma, changes, done) {
 
 export function getDmMonHocSdh(ma, done) {
     return () => {
-        const url = `/api/danh-muc/mon-hoc-sdh/item/${ma}`;
+        const url = `/api/sau-dai-hoc/mon-hoc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin môn học bị lỗi!', 'danger');
@@ -140,7 +140,7 @@ export function getDmMonHocSdh(ma, done) {
 
 export function createDmMonHocSdhMutiple(data, done) {
     return (dispatch) => {
-        const url = '/api/danh-muc/mon-hoc-sdh/multiple';
+        const url = '/api/sau-dai-hoc/mon-hoc/multiple';
         T.post(url, { data }, (data) => {
             if (data.errors && data.errors.length > 0) {
                 T.notify('Tạo mới môn học sau đại học lỗi', 'danger');
@@ -158,9 +158,9 @@ export function changeDmMonHocSdh(item) {
 }
 
 export const SelectAdapter_DmMonHocSdh = (maKhoaSdh) => {
-    return { 
+    return {
         ajax: true,
-        url: '/api/danh-muc/mon-hoc-sdh/page/1/20',
+        url: '/api/sau-dai-hoc/mon-hoc/page/1/20',
         data: params => ({ condition: params.term, kichHoat: 1, maKhoaSdh }),
         processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.tenTiengViet })) : [] }),
         fetchOne: (id, done) => (getDmMonHocSdh(id, item => item && done && done({ id: item.ma, text: item.ten })))(),

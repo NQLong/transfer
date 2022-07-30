@@ -26,7 +26,7 @@ class AdminSvSdhUploadPage extends AdminPage {
             this.setState({ loading: true });
             this.props.createDmMonHocSdhMutiple(data, () => {
                 this.setState({ loading: false });
-                this.props.history.push('/user/danh-muc/mon-hoc-sdh');
+                this.props.history.push('/user/sau-dai-hoc/mon-hoc');
             });
         }
     }
@@ -70,7 +70,7 @@ class AdminSvSdhUploadPage extends AdminPage {
             title: 'Import data',
             breadcrumb: [
                 <Link key={0} to='/user/category'>Danh mục</Link>,
-                <Link key={1} to='/user/danh-muc/mon-hoc-sdh'>Danh mục Môn học sau đại học</Link>,
+                <Link key={1} to='/user/sau-dai-hoc/mon-hoc'>Danh mục Môn học sau đại học</Link>,
                 'Import data'
             ],
             content: <>
@@ -94,7 +94,7 @@ class AdminSvSdhUploadPage extends AdminPage {
                         <i className='fa fa-lg fa-save' />
                     </button>}
             </>,
-            backRoute: '/user/danh-muc/mon-hoc-sdh'
+            backRoute: '/user/sau-dai-hoc/mon-hoc'
 
         });
     }

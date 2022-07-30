@@ -2,7 +2,7 @@ module.exports = app => {
     const menuSvSdh = {
         parentMenu: app.parentMenu.sdh,
         menus: {
-            6102: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien' }
+            7501: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien' }
         }
     };
 

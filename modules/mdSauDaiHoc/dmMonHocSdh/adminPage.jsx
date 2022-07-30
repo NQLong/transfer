@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { createDmMonHocSdh, getDmMonHocSdhPage, updateDmMonHocSdh, deleteDmMonHocSdh } from './redux';
 import { SelectAdapter_DmDonViFaculty_V2, getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
-import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
@@ -75,7 +74,7 @@ class EditModal extends AdminModal {
 class DmMonHocSdhPage extends AdminPage {
     state = { dmKhoaSdh: {} };
     componentDidMount() {
-        T.ready('/user/category', () => {
+        T.ready('/user/sau-dai-hoc/mon-hoc', () => {
             T.onSearch = (searchText) => this.props.getDmMonHocSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmMonHocSdhPage();
@@ -93,7 +92,7 @@ class DmMonHocSdhPage extends AdminPage {
     }
 
     changeActive = item => this.props.updateDmMonHocSdh(item.ma, { kichHoat: item.kichHoat });
- 
+
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa danh mục môn học sau đại học', 'Bạn có chắc bạn muốn xóa môn học này?', true, isConfirm =>
@@ -101,65 +100,64 @@ class DmMonHocSdhPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dmMonHocSdh', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('dmMonHocSdh', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHocSdh && this.props.dmMonHocSdh.page ?
             this.props.dmMonHocSdh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-        let table = 'Không có danh sách môn học sau đại học!';
-        if (list && list.length > 0) {
-            table = renderTable({
-                getDataSource: () => list, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '50%' }} nowrap='true'>Tên tiếng Việt</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Tên tiếng Anh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>TC Lý thuyết</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>TC Thực hành</th>
-                        <th style={{ width: '50%', textAlign: 'center' }}>Khoa</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>
-                ),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
-                            onClick={() => this.modal.show(item)} />
-                        <TableCell type='text' content={item.tenTiengViet ? item.tenTiengViet : ''} />
-                        <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tcLyThuyet ? item.tcLyThuyet : ''} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tcThucHanh ? item.tcThucHanh : ''} />
-                        <TableCell type='text' content={item.khoaSdh ? this.state.dmKhoaSdh[item.khoaSdh] : ''} />
-                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
-                            onChanged={() => this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
-                    </tr>
-                )
-            });
-        }
+        let table = renderTable({
+            getDataSource: () => list, stickyHead: false,
+            emptyTable: 'Không có danh sách môn học sau đại học!',
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>STT</th>
+                    <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>Mã</th>
+                    <th style={{ width: '50%' }} nowrap='true'>Tên tiếng Việt</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Tên tiếng Anh</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>TC Lý thuyết</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>TC Thực hành</th>
+                    <th style={{ width: '50%', textAlign: 'center' }}>Khoa</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
+                        onClick={() => this.modal.show(item)} />
+                    <TableCell type='text' content={item.tenTiengViet ? item.tenTiengViet : ''} />
+                    <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
+                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.tcLyThuyet ? item.tcLyThuyet : '0'} />
+                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.tcThucHanh ? item.tcThucHanh : '0'} />
+                    <TableCell type='text' content={item.khoaSdh ? this.state.dmKhoaSdh[item.khoaSdh] : ''} />
+                    <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDmMonHocSdh(item.ma, { kichHoat: Number(value) })} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
+                </tr>
+            )
+        });
+
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
             title: 'Danh mục môn học sau đại học',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
                 'Danh mục môn học sau đại học'
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmMonHocSdhPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createDmMonHocSdh} update={this.props.updateDmMonHocSdh} permissions={currentPermissions} />
+                    create={this.props.createDmMonHocSdh} update={this.props.updateDmMonHocSdh}
+                    readOnly={!permission.write} />
             </>,
-            backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/mon-hoc-sdh/upload') : null
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sau-dai-hoc/mon-hoc/upload') : null
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmMonHocSdh: state.danhMuc.dmMonHocSdh });
+const mapStateToProps = state => ({ system: state.system, dmMonHocSdh: state.sdh.dmMonHocSdh });
 const mapActionsToProps = { createDmMonHocSdh, getDmMonHocSdhPage, updateDmMonHocSdh, deleteDmMonHocSdh, getDmDonViFaculty };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocSdhPage);
