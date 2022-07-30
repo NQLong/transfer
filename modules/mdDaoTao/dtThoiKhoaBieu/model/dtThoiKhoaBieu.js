@@ -25,7 +25,7 @@ module.exports = app => {
             data[item.phong][item.thu] = data[item.phong][item.thu] || [];
             data[item.phong][item.thu].push(...range(Number(item.tietBatDau), Number(item.tietBatDau) + Number(item.soTietBuoi)));
         });
-        //Môn A thứ 2 từ tiết 1-4, thứ 3 từ tiết 6-8 --> data = { A: { 2: [1,2,3,4], 3: [6,7,8] } }
+        //Phong A thứ 2 từ tiết 1-4, thứ 3 từ tiết 6-8 --> data = { A: { 2: [1,2,3,4], 3: [6,7,8] } }
         return data;
     };
 
