@@ -297,7 +297,7 @@ class AdminHeader extends AdminPage {
     render() {
         const isDebug = this.props.system && this.props.system.isDebug,
             // isAdmin = this.props.system && this.props.system.user && this.props.system.user.roles.some(role => role.name == 'admin'),
-            isDeveloper = this.props.system?.user?.permissions?.length && (this.props.system.user.permissions.includes('developer:login') || this.props.system.user.originalEmail);
+            isDeveloper = this.props.system?.user?.permissions?.length && this.props.system.user.permissions.includes('developer:login');
 
         return [
             <header key={0} className='app-header'>
