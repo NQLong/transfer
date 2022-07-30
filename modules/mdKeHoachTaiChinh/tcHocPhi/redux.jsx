@@ -220,3 +220,19 @@ export function createInvoiceList(data, done, onError) {
         }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
     };
 }
+
+export function getStudentHocPhi(mssv, namHoc, hocKy, done) {
+    return () => {
+        const url = `/api/finance/hoc-phi/${mssv}`;
+        T.get(url, { namHoc, hocKy }, res => {
+            if (res.error) {
+                T.notify('Lấy dữ liệu học phí lỗi. ' + (res.error.errorMessage && typeof res.error.errorMessage === 'string' ? res.error.errorMessage : ''), 'danger');
+                console.error(`GET: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Lấy dữ liệu học phí thành công', 'success');
+                done && done(res.hocPhi);
+            }
+        }, () => T.notify('Lấy dữ liệu học phí lỗi', 'danger'));
+    };
+}
