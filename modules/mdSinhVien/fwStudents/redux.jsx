@@ -173,3 +173,17 @@ export function downloadWord(done) {
         });
     };
 }
+
+export function loginStudentForTest(data) {
+    return () => {
+        const url = '/api/students-login-test';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+            } else {
+                T.cookie('personId', result.user.studentId);
+                location.reload();
+            }
+        });
+    };
+}

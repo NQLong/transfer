@@ -88,7 +88,7 @@ module.exports = (app, appConfig) => {
         },
         user: {
             index: 1000, title: 'Trang cá nhân', link: '/user', icon: 'fa-user',
-            subMenusRender: false, groups: ['Thông tin cá nhân', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn', 'Công văn']
+            subMenusRender: false, groups: ['Thông tin cá nhân', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn', 'Văn bản']
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-pie-chart',
@@ -117,6 +117,10 @@ module.exports = (app, appConfig) => {
         daoTao: {
             index: 7000, title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-diamond',
             subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'DANH SÁCH']
+        },
+        sdh: {
+            index: 7500, title: 'Sau đại học', link: '/user/sau-dai-hoc', icon: 'fa-graduation-cap ',
+            subMenusRender: true
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',

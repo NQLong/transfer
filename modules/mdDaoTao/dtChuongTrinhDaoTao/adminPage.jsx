@@ -339,6 +339,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu chương trình đào tạo',
+            stickyHead: true,
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
