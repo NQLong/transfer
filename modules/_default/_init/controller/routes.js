@@ -98,12 +98,13 @@ module.exports = app => {
                     if (submenus) {
                         data.submenus = submenus.slice();
                     }
+
+                    data.languageText = await app.model.dmNgonNguTruyenThong.getLanguage();
                 }
 
-                app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'mapLink'], result => {
                     data.headerTitle = result.headerTitle;
                     data.headerLink = result.headerLink;
-                    data.address2 = result.address2;
                     data.isShowHeaderTitle = result.isShowHeaderTitle;
                     data.mapLink = result.mapLink;
                     if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
@@ -119,13 +120,6 @@ module.exports = app => {
                         delete data.user.menu['6000'].menus['6008'];
 
                     }
-                    // else if (data.user && data.user.permissions
-                    //     && data.user.permissions.includes('unit:write')
-                    //     && !data.user.permissions.includes('news:write') && data.user.menu['6000']) {
-                    //     delete data.user.menu['6000'].menus['6001'];
-                    //     delete data.user.menu['6000'].menus['6002'];
-                    //     delete data.user.menu['6000'].menus['6003'];
-                    // }
                     if (data.user && data.user.permissions
                         && data.user.permissions.includes('website:write')
                         && !data.user.permissions.includes('news:write')) {

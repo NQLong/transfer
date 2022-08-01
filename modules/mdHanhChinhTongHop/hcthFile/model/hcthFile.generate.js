@@ -1,6 +1,6 @@
-// Table name: HCTH_FILE { id, ten, viTri, thoiGian, loai, ma, nguoiTao, tenFile, kichThuoc }
+// Table name: HCTH_FILE { id, ten, viTri, thoiGian, loai, ma, nguoiTao, tenFile, kichThuoc, capNhatFileId }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'viTri': 'VI_TRI', 'thoiGian': 'THOI_GIAN', 'loai': 'LOAI', 'ma': 'MA', 'nguoiTao': 'NGUOI_TAO', 'tenFile': 'TEN_FILE', 'kichThuoc': 'KICH_THUOC' };
+const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'viTri': 'VI_TRI', 'thoiGian': 'THOI_GIAN', 'loai': 'LOAI', 'ma': 'MA', 'nguoiTao': 'NGUOI_TAO', 'tenFile': 'TEN_FILE', 'kichThuoc': 'KICH_THUOC', 'capNhatFileId': 'CAP_NHAT_FILE_ID' };
 
 module.exports = app => {
     app.model.hcthFile = {

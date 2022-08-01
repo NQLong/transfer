@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage } from 'view/component/AdminPage';
 import { userGetStaff, updateStaffUser } from 'modules/mdTccb/tccbCanBo/redux';
 import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
 import SubMenusPage from 'view/component/SubMenusPage';
-import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
 
 class ProfileCanBo extends AdminPage {
     state = { isHCMUSSH: false, isLoad: true };
@@ -29,9 +28,6 @@ class ProfileCanBo extends AdminPage {
                 <>
                     {this.state.isLoad && <Loading />}
                     <ProfileCommon ref={e => this.profileCommon = e} />
-                    <div className='tile'>
-                        <FormMultipleLanguage gridClassName='col-md-4' languages={['vn', 'en', 'de']} title={{ vi: 'Tiêu đề', en: 'Title', de: 'Titel' }} FormElement={FormTextBox} />
-                    </div>
                 </>,
         });
     }

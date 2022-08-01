@@ -43,9 +43,10 @@ class SectionNews extends React.Component {
 
     render() {
         const language = T.language(this.state.category),
-            viewAll = T.language(texts).viewAll,
             newsList = this.state.list,
             detail = this.props.item && this.props.item.detail ? JSON.parse(this.props.item.detail) : {};
+        let languageText = this.props.system && this.props.system.languageText || {};
+        const newLanguage = T.language(languageText);
         let news = <span className='text-center w-100'>{language.noNewsTitle}</span>;
 
         if (newsList.length !== 0) {
@@ -75,8 +76,7 @@ class SectionNews extends React.Component {
                             })}
                         </div>
                         <div className='col-12 d-flex justify-content-center'>
-                            <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll'
-                                style={{ borderRadius: 0 }}>{viewAll}</Link>
+                            <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{newLanguage.xemTatCa}</Link>
                         </div>
                     </div>
                 </div>

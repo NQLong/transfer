@@ -12,10 +12,16 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { maCode, tenNgonNgu } = item ? item : { maCode: '', tenNgonNgu: '' };
+        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '' };
         this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenNgonNgu.value(tenNgonNgu || '');
+        this.timKiem.value(timKiem || '');
+        this.trangCaNhan.value(trangCaNhan || '');
+        this.dangNhap.value(dangNhap || '');
+        this.dangXuat.value(dangXuat || '');
+        this.xemTatCa.value(xemTatCa || '');
+
         maCode && this.imageBox.setData('nationFlag:' + maCode, '/img/flag/' + maCode + '.png');
     }
 
@@ -23,7 +29,12 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             maCode: getValue(this.maCode).toLowerCase(),
-            tenNgonNgu: getValue(this.tenNgonNgu)
+            tenNgonNgu: getValue(this.tenNgonNgu),
+            timKiem: getValue(this.timKiem),
+            trangCaNhan: getValue(this.trangCaNhan),
+            dangNhap: getValue(this.dangNhap),
+            dangXuat: getValue(this.dangXuat),
+            xemTatCa: getValue(this.xemTatCa)
         };
 
         if (changes.maCode == '') {
@@ -39,10 +50,30 @@ class EditModal extends AdminModal {
         const maCode = this.state.maCode;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật danh mục ngoại ngữ' : 'Tạo mới danh mục ngoại ngữ',
+            size: 'large',
             body: <div className='row'>
-                <FormTextBox className='col-md-6' ref={e => this.maCode = e} label='Mã ngôn ngữ' readOnly={this.state.maCode ? true : readOnly} required />
-                <FormTextBox className='col-md-12' ref={e => this.tenNgonNgu = e} label='Tên ngôn ngữ' readOnly={readOnly} />
-                <FormImageBox ref={e => this.imageBox = e} className='col-md-12' readOnly={readOnly} style={{ display: maCode ? '' : 'none' }} uploadType='NationFlag' onSuccess={() => this.props.getAll('')} />
+                <div className='col-md-6'>
+                    <FormTextBox ref={e => this.maCode = e} label='Mã ngôn ngữ' readOnly={this.state.maCode ? true : readOnly} required />
+                    <FormTextBox ref={e => this.tenNgonNgu = e} label='Tên ngôn ngữ' readOnly={readOnly} />
+                </div>
+                <div className='col-md-6'>
+                    <FormImageBox ref={e => this.imageBox = e} readOnly={readOnly} style={{ display: maCode ? '' : 'none' }} uploadType='NationFlag' onSuccess={() => this.props.getAll('')} />
+                </div>
+                <div className='col-md-12'>
+                    <h4 className='tile-title'>Ngôn ngữ hiển thị</h4>
+                    <h6 className='tile-title'>Header</h6>
+                    <div className='row'>
+                        <FormTextBox ref={e => this.timKiem = e} label='Khung tìm kiếm' className='col-md-6' required />
+                        <FormTextBox ref={e => this.trangCaNhan = e} label='Trang cá nhân' className='col-md-6' required />
+                        <FormTextBox ref={e => this.dangNhap = e} label='Đăng nhập' className='col-md-6' required />
+                        <FormTextBox ref={e => this.dangXuat = e} label='Đăng xuất' className='col-md-6' required />
+                    </div>
+
+                    <h6 className='tile-title'>Tin tức, sự kiện</h6>
+                    <div className='row'>
+                        <FormTextBox ref={e => this.xemTatCa = e} label='Xem tất cả' className='col-md-6' required />
+                    </div>
+                </div>
             </div>
         });
     }

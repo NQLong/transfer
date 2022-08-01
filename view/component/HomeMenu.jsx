@@ -6,21 +6,6 @@ import LanguageSwitch from './LanguageSwitch';
 import { divisionHomeMenuGetAll, homeMenuGet2 } from 'modules/_default/fwMenu/redux';
 import { getDvWebsite } from 'modules/_default/websiteDonVi/redux';
 
-const texts = {
-    vi: {
-        loginButton: 'ĐĂNG NHẬP',
-        logoutButton: 'ĐĂNG XUẤT',
-        search: '  TÌM KIẾM',
-        adminPage: 'TRANG CÁ NHÂN'
-    },
-    en: {
-        loginButton: 'SIGN IN',
-        logoutButton: 'SIGN OUT',
-        search: 'Search',
-        adminPage: 'DASHBOARD'
-    }
-};
-
 class HomeMenu extends React.Component {
     constructor(props) {
         super(props);
@@ -104,8 +89,8 @@ class HomeMenu extends React.Component {
     }
 
     render() {
-        const language = T.language(texts);
-        let menusView, menus = this.props.system && this.props.system.menus ? [...this.props.system.menus] : [];
+        let menusView, menus = this.props.system && this.props.system.menus ? [...this.props.system.menus] : [], languageText = this.props.system && this.props.system.languageText || {};
+        const newLanguage = T.language(languageText);
         if (this.props.isDonVi) {
             menus = this.state.divisionMenu;
         }
@@ -214,16 +199,16 @@ class HomeMenu extends React.Component {
                     {submenus}
                     <div className='d-flex align-items-center'>
                         {languageToggle}
-                        <input type='text' className='mx-2 px-2 subMenu' id='inputID' onKeyPress={this.onKeyPress} placeholder={language.search} style={{ borderColor: '#0139a6', backgroundColor: 'transparent', borderRadius: 5, marginLeft: 10, marginBottom: 2 }} />
+                        <input type='text' className='mx-2 px-2 subMenu' id='inputID' onKeyPress={this.onKeyPress} placeholder={newLanguage.timKiem} style={{ borderColor: '#0139a6', backgroundColor: 'transparent', borderRadius: 5, marginLeft: 10, marginBottom: 2 }} />
                     </div>
                     <div className='d-flex align-items-center'>
                         {user &&
                             <a href='/user' target='_blank' style={{ color: '#0139a6', fontWeight: 'bold', fontSize: '0.9vw', paddingLeft: 5 }}>
-                                <span>{language.adminPage}</span>
+                                <span>{newLanguage.trangCaNhan}</span>
                             </a>
                         }
                         <a href='#' onClick={this.logout} className='nav-link' style={{ color: '#0139a6', padding: '0 10px', fontWeight: 'bold', fontSize: '0.9vw' }}>
-                            <span>{user ? language.logoutButton : language.loginButton}</span>
+                            <span>{user ? newLanguage.dangXuat : newLanguage.dangNhap}</span>
                         </a>
                     </div>
                 </div>
@@ -255,14 +240,14 @@ class HomeMenu extends React.Component {
                                         {user && (
                                             <li className='nav-item'>
                                                 <a href='/user' className='nav-link' style={{ fontWeight: 'bold', fontSize: 16, color: '#002060' }}>
-                                                    <span style={{ marginLeft: 10 }}>{language.adminPage}</span>
+                                                    <span style={{ marginLeft: 10 }}>{newLanguage.trangCaNhan}</span>
                                                 </a>
                                             </li>
                                         )}
                                         {user && (
                                             <li className='nav-item'>
                                                 <a href='#' onClick={this.logout} className='nav-link' style={{ fontWeight: 'bold', fontSize: 16, color: '#002060' }}>
-                                                    <span style={{ marginLeft: 10 }}>{language.logoutButton}</span>
+                                                    <span style={{ marginLeft: 10 }}>{newLanguage.dangXuat}</span>
                                                 </a>
                                             </li>
                                         )}

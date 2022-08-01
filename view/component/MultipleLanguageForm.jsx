@@ -43,7 +43,7 @@ export class FormMultipleLanguage extends React.Component {
             const langTitle = !title || typeof title == 'string' ? `${title} (${code})` : title[code];
             let langClassName = tabRender ? '' : gridClassName;
             langClassName += ' ' + className;
-            return <FormElement key={this.randomId + code} ref={e => this.element[code] = e} className={langClassName} label={langTitle} readOnly={finalReadOnly[code]} required={finalRequired[code]} />;
+            return <FormElement key={this.randomId + code} ref={e => this.element[code] = e} className={langClassName} label={tabRender ? null : langTitle} placeholder={langTitle} readOnly={finalReadOnly[code]} required={finalRequired[code]} />;
         });
         this.setState({ elements }, () => done && done());
     }

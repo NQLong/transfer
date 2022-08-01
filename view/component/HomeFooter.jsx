@@ -361,7 +361,6 @@ class Footer extends React.Component {
                         <div id='fb-root' />
                         <div id='fb-customer-chat' className='fb-customerchat' />
                     </div> : null}
-
                 </div>
             </footer>
         );
