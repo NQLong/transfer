@@ -3,8 +3,8 @@ import { getDmMonHoc } from 'modules/mdDaoTao/dmMonHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormSelect } from 'view/component/AdminPage';
-import { SelectAdapter_DmKhoiKienThucAll } from 'modules/mdDaoTao/dmKhoiKienThuc/redux';
 import { deleteSdhCauTrucKhungDaoTao } from './redux';
+import { SelectAdapter_SdhDmKhoiKienThucAll } from '../sdhDmKhoiKienThuc/redux';
 
 export class ComponentCTDT extends AdminPage {
     state = { parentItems: {}, childItems: {} };
@@ -143,7 +143,7 @@ export class ComponentCTDT extends AdminPage {
             !isDeleted &&
             (<>
                 <FormSelect
-                    ref={e => ref.value = e} data={SelectAdapter_DmKhoiKienThucAll(isParent ? null : this.parentRows[parentId].value.value())}
+                    ref={e => ref.value = e} data={SelectAdapter_SdhDmKhoiKienThucAll(isParent ? null : this.parentRows[parentId].value.value())}
                     style={{ marginBottom: 0 }} className='form-group col-8' placeholder={`Chọn khối kiến thức ${isParent ? 'cha' : 'con'}`}
                     readOnly={readOnly}
                 />

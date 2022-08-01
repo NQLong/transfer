@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.sdh,
         menus: {
-            7503: { title: 'Danh sách Môn học', link: '/user/sau-dai-hoc/mon-hoc' },
+            7503: { title: 'Danh mục Môn học', link: '/user/sau-dai-hoc/mon-hoc' },
         },
     };
     app.permission.add(
@@ -13,7 +13,12 @@ module.exports = app => {
     app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:read'), app.templates.admin);
     app.get('/user/sau-dai-hoc/mon-hoc/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
 
-
+    app.permissionHooks.add('staff', 'addRolesMonHocSdh', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '37') {
+            app.permissionHooks.pushUserPermission(user, 'dmMonHocSdh:manage', 'dmMonHocSdh:write', 'dmMonHocSdh:delete');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/sau-dai-hoc/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdh:read'), (req, res) => {

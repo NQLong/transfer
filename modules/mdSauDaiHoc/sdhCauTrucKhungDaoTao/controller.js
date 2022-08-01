@@ -2,19 +2,20 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.sdh,
         menus: {
-            7504: {
+            7505: {
                 title: 'Cấu trúc CTĐT',
                 link: '/user/sau-dai-hoc/cau-truc-khung-dao-tao'
             },
         },
     };
+
     app.permission.add(
         { name: 'sdhCauTrucKhungDaoTao:read', menu },
         { name: 'sdhCauTrucKhungDaoTao:write' },
         { name: 'sdhCauTrucKhungDaoTao:delete' },
     );
-    app.permissionHooks.add('staff', 'addRolesDtCauTrucKhungDaoTao', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && staff.maDonVi == '33') {
+    app.permissionHooks.add('staff', 'addRolesSdhCauTrucKhungDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '37') {
             app.permissionHooks.pushUserPermission(user, 'sdhCauTrucKhungDaoTao:read', 'sdhCauTrucKhungDaoTao:write', 'sdhCauTrucKhungDaoTao:delete');
             resolve();
         } else resolve();
@@ -24,41 +25,41 @@ module.exports = app => {
     app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao/:ma', app.permission.check('sdhCauTrucKhungDaoTao:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('sdhCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
-        app.model.sdhCauTrucKhungDaoTao.searchPage(pageNumber, pageSize, searchTerm, (error, result) => {
-            if (error) res.send({ error });
-            else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = result;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
+    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.check('sdhCauTrucKhungDaoTao:read'), async (req, res) => {
+        try {
+            let _pageNumber = parseInt(req.params.pageNumber),
+                _pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
+            let result = await app.model.sdhCauTrucKhungDaoTao.searchPage(_pageNumber, _pageSize, searchTerm);
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = result;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+        } catch (error) {
+            res.send({ error });
+        }
+
     });
 
     app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/all', app.permission.check('sdhCauTrucKhungDaoTao:read'), (req, res) => {
         app.model.sdhCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/:id', app.permission.orCheck('sdhCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
+    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/:id', app.permission.orCheck('sdhCauTrucKhungDaoTao:read', 'sdhChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
         app.model.sdhCauTrucKhungDaoTao.get({ id: req.params.id }, '*', 'id ASC', (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.check('sdhCauTrucKhungDaoTao:write'), (req, res) => {
-        const item = req.body.item;
-        const namDaoTao = item?.namDaoTao;
-        app.model.sdhCauTrucKhungDaoTao.get({ namDaoTao: namDaoTao }, (error, ctKhungDt) => {
-            if (!error && !ctKhungDt) {
-                app.model.sdhCauTrucKhungDaoTao.create(item, async (error, item) => {
-                    if (!error) {
-                        //TODO: Send Email - Notification;
-                        // let listEmail = await app.model.qtChucVu.getAllTruongKhoaEmail();
-                    }
-                    res.send({ error, item });
-                });
-            } else res.send({ error: `Năm ${namDaoTao} đã tồn tại!` });
-        });
+    app.post('/api/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.check('sdhCauTrucKhungDaoTao:write'), async (req, res) => {
+        try {
+            const item = req.body.item;
+            const namDaoTao = item?.namDaoTao;
+            const ctKhungDt = await app.model.sdhCauTrucKhungDaoTao.get({ namDaoTao });
+            if (!ctKhungDt) {
+                let item = await app.model.sdhCauTrucKhungDaoTao.create({ ...item, bacDaoTao: 'SDH' });
+                res.send({ item });
+            } else throw `Năm ${namDaoTao} đã tồn tại!`;
+        } catch (error) {
+            res.send({ error });
+        }
+
 
     });
 
@@ -131,16 +132,17 @@ module.exports = app => {
     });
 
     app.put('/api/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.check('sdhCauTrucKhungDaoTao:write'), async (req, res) => {
-        let id = req.body.id, changes = req.body.changes;
         try {
-            app.model.sdhCauTrucKhungDaoTao.update({ id }, changes, (error, item) => res.send({ error, item }));
+            let id = req.body.id, changes = req.body.changes;
+            let item = await app.model.sdhCauTrucKhungDaoTao.update({ id }, changes);
+            res.send({ item });
         } catch (error) {
             res.send({ error });
         }
     });
 
     app.delete('/api/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.check('sdhCauTrucKhungDaoTao:delete'), (req, res) => {
-        app.model.sdhCauTrucKhungDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.sdhCauTrucKhungDaoTao.delete({ id: req.body.id }, error => res.send({ error }));
     });
 
     app.delete('/api/sau-dai-hoc/cau-truc-khung-dao-tao/multiple', app.permission.check('sdhCauTrucKhungDaoTao:delete'), (req, res) => {
