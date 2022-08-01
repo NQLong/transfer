@@ -425,6 +425,22 @@ module.exports = app => {
         });
         return data;
     };
+
+    app.get('/api/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:read'), async (req, res) => {
+        try {
+            let mssv = req.params.mssv,
+                { namHoc, hocKy } = req.query;
+            namHoc = parseInt(namHoc);
+            hocKy = parseInt(hocKy);
+            if (!mssv || !Number.isInteger(namHoc) || !Number.isInteger(hocKy)) throw { errorMessage: 'Dữ liệu học phí không hợp lệ' };
+            const hocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
+            if (!hocPhi) throw { errorMessage: 'Không tìm thấy dữ liệu học phí' };
+            res.send({ hocPhi });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     //Statistic -------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/finance/statistic', app.permission.check('tcHocPhi:write'), async (req, res) => {
         try {

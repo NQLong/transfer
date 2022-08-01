@@ -1,15 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell, AdminModal } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getTongGiaoDichPage, getListNganHang, createGiaoDich } from './redux';
-import { getStudentHocPhi } from '../tcHocPhi/redux';
+import { getInvoicePage } from './redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
-import { SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
+import { Tooltip } from '@mui/material';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -17,85 +16,15 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
-class EditModal extends AdminModal {
-
-    onChangeQuery = () => {
-        const mssv = this.sinhVien.value();
-        const hocKy = this.hocKy.value();
-        const namHoc = this.namHoc.value();
-        if (mssv && hocKy && namHoc) {
-            this.props.get(mssv, namHoc, hocKy, (hocPhi) => {
-                this.soTien.value(hocPhi.congNo);
-                this.setAmountText(hocPhi.congNo);
-            });
-        }
-    }
-
-
-    setAmountText = (value) => {
-        if (Number.isInteger(value))
-            this.thanhChu?.value(T.numberToVnText(value.toString()) + ' đồng');
-    }
-
-    onShow = () => {
-        this.soTien?.value('');
-        this.thanhChu?.value('');
-        this.sinhVien?.value('');
-    }
-
-    onSubmit = () => {
-        const data = {
-            soTien: this.soTien.value(),
-            hocKy: this.hocKy.value(),
-            namHoc: this.namHoc.value(),
-            sinhVien: this.sinhVien.value()
-        };
-        if (!data.namHoc) {
-            T.notify('Năm học trống ', 'danger');
-            this.namHoc.focus();
-        }
-        else if (!data.hocKy) {
-            T.notify('Học kỳ trống ', 'danger');
-            this.hocKy.focus();
-        }
-        else if (!data.sinhVien) {
-            T.notify('Sinh viên trống ', 'danger');
-            this.sinhVien.focus();
-        }
-        else if (!data.soTien) {
-            T.notify('Số tiền trống', 'danger');
-            this.soTien.focus();
-        }
-        else {
-            this.props.create(data, () => this.hide());
-        }
-    }
-
-    render = () => {
-        return this.renderModal({
-            title: 'Thêm giao dịch',
-            size: 'large',
-            body: <div className='row'>
-                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
-                <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
-                <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
-                <FormTextBox readOnly label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} />
-                <FormTextBox readOnly label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
-            </div>
-        });
-    }
-}
-
-class DanhSachGiaoDich extends AdminPage {
+class DanhSachHoaDon extends AdminPage {
     state = {
         filter: {},
     }
 
     componentDidMount() {
-        T.ready('/user/finance/danh-sach-giao-dich', () => {
+        T.ready('/user/finance/invoice', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '', page => this.setFilter(page));
             T.showSearchBox(true);
-            this.props.getListNganHang();
         });
         this.changeAdvancedSearch(true);
     }
@@ -123,10 +52,9 @@ class DanhSachGiaoDich extends AdminPage {
             listLoaiHinhDaoTao = this.loaiHinhDaoTao.value().toString(),
             listNganh = this.nganh.value().toString(),
             listKhoa = this.khoa.value().toString(),
-            nganHang = this.nganHang?.value().toString(),
-            { tuNgay, denNgay } = this.getTimeFilter();
+            nganHang = this.nganHang?.value().toString();
 
-        const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, tuNgay, denNgay, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, nganHang };
+        const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, nganHang };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 this.setFilter(page, isInitial);
@@ -135,12 +63,7 @@ class DanhSachGiaoDich extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getTongGiaoDichPage(pageN, pageS, pageC, this.state.filter, done);
-    }
-
-    onDownloadPsc = (e) => {
-        e.preventDefault();
-        T.download(`/api/finance/danh-sach-giao-dich/download-psc?filter=${T.stringify({ ...this.state.filter, ...this.getTimeFilter() })}`, 'HOC_PHI.xlsx');
+        this.props.getInvoicePage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     onClearSearch = (e) => {
@@ -149,25 +72,11 @@ class DanhSachGiaoDich extends AdminPage {
         this.changeAdvancedSearch();
     }
 
-    getTimeFilter = () => {
-        let tuNgay = this.tuNgay.value() || null,
-            denNgay = this.denNgay.value() || null;
-        if (tuNgay) {
-            tuNgay.setHours(0, 0, 0, 0);
-            tuNgay = tuNgay.getTime();
-        }
-        if (denNgay) {
-            denNgay.setHours(23, 59, 59, 999);
-            denNgay = denNgay.getTime();
-        }
-        return { tuNgay, denNgay };
-    }
-
     render() {
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcGiaoDich && this.props.tcGiaoDich.page ? this.props.tcGiaoDich.page : {
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcInvoice && this.props.tcInvoice.page ? this.props.tcInvoice.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write']);
+        // let permission = this.getUserPermission('tcInvoice');
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -178,30 +87,30 @@ class DanhSachGiaoDich extends AdminPage {
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học kỳ</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>MSSV</th>
                 <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Họ tên</th>
-                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoản đóng (VNĐ)</th>
-                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngân hàng</th>
-                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian đóng</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hóa đơn</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoa</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
-                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trạng thái</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (<tr key={index}>
                 <TableCell style={{ textAlign: 'right' }} content={item.R} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.namHoc} - HK0${item.hocKy}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.mssv} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.ho || ''} ${item.ten || ''}`.toUpperCase().trim()} />
-                <TableCell style={{ whiteSpace: 'nowrap' }} type='number' content={item.khoanDong} />
-                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.nganHang} />
-                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ngayDong ? T.dateToText(new Date(parseInt(item.ngayDong)), 'HH:MM, dd/mm/yyyy') : ''} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.invoiceNumber} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maNganh}: ${item.tenNganh}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenBacDaoTao} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiHinhDaoTao} />
-                <TableCell style={{ whiteSpace: 'nowrap' }} content={
-                    item.trangThai ? <div style={{ color: 'green' }}><i className='fa fa-lg fa-check-square-o' /> Thành công</div> : <div style={{ color: 'red' }}><i className='fa fa-lg fa-times' /> Thất bại</div>
-                } />
+                <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
+                    <Tooltip title='Xem hóa đơn' arrow>
+                        <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.id}`}>
+                            <i className='fa fa-lg fa-eye' />
+                        </a>
+                    </Tooltip>
+                </TableCell>
             </tr>),
 
         });
@@ -218,14 +127,14 @@ class DanhSachGiaoDich extends AdminPage {
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' allowClear multiple />
                 <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' allowClear multiple />
                 <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' allowClear multiple />
-                <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
-                <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear />
+                {/* <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
+                <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear /> */}
                 <div className='col-md-12 d-flex justify-content-end' style={{ gap: 10 }}>
                     <button className='btn btn-danger' onClick={this.onClearSearch}><i className='fa fa-lg fa-times' />Xóa tìm kiếm</button>
                     <button className='btn btn-success' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}><i className='fa fa-lg fa-search' />Tìm kiếm</button>
                 </div>
             </div>,
-            breadcrumb: ['Danh sách giao dịch'],
+            breadcrumb: ['Danh sách hóa đơn'],
             content: (<div className='row'>
                 <div className='col-md-12'>
                     <div className='tile'>
@@ -234,14 +143,11 @@ class DanhSachGiaoDich extends AdminPage {
                             getPage={this.getPage} />
                     </div>
                 </div>
-                <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
             </div>),
-            onCreate: permission.write ? () => this.modal.show() : null,
-            onExport: permission.export ? e => this.onDownloadPsc(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi };
-export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);
+const mapStateToProps = state => ({ system: state.system, tcInvoice: state.finance.tcInvoice });
+const mapActionsToProps = { getInvoicePage };
+export default connect(mapStateToProps, mapActionsToProps)(DanhSachHoaDon);

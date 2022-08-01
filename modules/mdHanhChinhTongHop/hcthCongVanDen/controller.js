@@ -22,6 +22,13 @@ module.exports = (app) => {
     app.permission.add({ name: 'hcth:login' });
     app.permission.add({ name: 'hcth:manage' });
 
+    app.permissionHooks.add('staff', 'addRolesHcthCongVanDen', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == MA_HCTH) {
+            app.permissionHooks.pushUserPermission(user, 'hcth:login', 'hcthCongVanDen:read', 'hcthCongVanDen:write', 'hcthCongVanDen:delete', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write');
+            resolve();
+        } else resolve();
+    }));
+
     app.get('/user/van-ban-den', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/van-ban-den/:id', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/hcth/van-ban-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
