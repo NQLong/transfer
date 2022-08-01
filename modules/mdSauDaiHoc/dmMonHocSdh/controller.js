@@ -13,6 +13,8 @@ module.exports = app => {
     app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:read'), app.templates.admin);
     app.get('/user/sau-dai-hoc/mon-hoc/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
 
+
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/sau-dai-hoc/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),

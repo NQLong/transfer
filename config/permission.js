@@ -222,7 +222,9 @@ module.exports = app => {
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
                             user.isStaff = 0;
-                            user.permissions = user.permissions.filter(item => item != 'staff:login');
+                            if (!user.isStaff) {
+                                user.permissions = user.permissions.filter(item => item != 'staff:login');
+                            }
                             resolve();
                         } else {
                             user.isStaff = 1;
