@@ -1,165 +1,3 @@
-CREATE OR REPLACE FUNCTION DT_DANH_SACH_MON_MO_GET_CURRENT(TG_MO_MON IN STRING, CHUONG_TRINH_DAO_TAO OUT SYS_REFCURSOR,
-                                                THONG_TIN OUT SYS_REFCURSOR)
-    RETURN SYS_REFCURSOR
-AS
-    DANH_SACH_MON_MO  SYS_REFCURSOR;
-    KHOA_SINH_VIEN    NUMBER(4);
-    HOC_KY_MO_MON     NUMBER(1);
-    ID_DANG_KY_MO_MON NUMBER;
-BEGIN
-    SELECT JSON_VALUE(TG_MO_MON, '$.khoa') INTO KHOA_SINH_VIEN FROM DUAL;
-    SELECT JSON_VALUE(TG_MO_MON, '$.hocKy') INTO HOC_KY_MO_MON FROM DUAL;
-    SELECT JSON_VALUE(TG_MO_MON, '$.idDangKyMoMon') INTO ID_DANG_KY_MO_MON FROM DUAL;
-
-    OPEN THONG_TIN FOR
-        SELECT DKMM.KHOA              AS "khoaDangKy",
-               DKMM.MA_NGANH          AS "maNganh",
-               NDT.TEN_NGANH          AS "tenNganh",
-               DV.TEN                 AS "tenKhoaDangKy",
-               DKMM.IS_DUYET          AS "isDuyet",
-               DKMM.LOAI_HINH_DAO_TAO AS "loaiHinhDaoTao",
-               DKMM.BAC_DAO_TAO       AS "bacDaoTao"
-        FROM DT_DANG_KY_MO_MON DKMM
-                 LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = DKMM.MA_NGANH
-                 LEFT JOIN DM_DON_VI DV ON DV.MA = DKMM.KHOA
-        WHERE DKMM.ID = ID_DANG_KY_MO_MON;
-
-    OPEN CHUONG_TRINH_DAO_TAO FOR
-        SELECT CTDT.MA_MON_HOC        AS "maMonHoc",
-               MH.TEN                 AS "tenMonHoc",
-               CTDT.SO_TIET_LY_THUYET AS "soTietLyThuyet",
-               CTDT.SO_TIET_THUC_HANH AS "soTietThucHanh",
-               CTDT.HOC_KY_DU_KIEN    AS "hocKyDuKien",
-               CTDT.LOAI_MON_HOC      AS "loaiMonHoc",
-               CTDT.KHOA              AS "khoa",
-               MH.KHOA                AS "monHocKhoa",
-               CTDT.TONG_SO_TIET      AS "tongSoTiet",
-               CTKDT.KHOA             AS "khoaSinhVien"
-
-        FROM DT_CHUONG_TRINH_DAO_TAO CTDT
-                 LEFT JOIN DT_KHUNG_DAO_TAO KDT ON KDT.ID = CTDT.MA_KHUNG_DAO_TAO
-                 LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT on KDT.NAM_DAO_TAO = CTKDT.ID
-                 LEFT JOIN DT_DANG_KY_MO_MON DKMM ON DKMM.MA_NGANH = KDT.MA_NGANH
-                 LEFT JOIN DM_MON_HOC MH ON MH.MA = CTDT.MA_MON_HOC
-        WHERE DKMM.ID = ID_DANG_KY_MO_MON
-            AND MH.KHOA != 33
-            AND
-            --E.g: Current Semester: 1, Current Year: 2022
-              (CTKDT.KHOA = KHOA_SINH_VIEN AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON)         -- Student 2022 - Sem 1
-           OR (CTKDT.KHOA = KHOA_SINH_VIEN - 1 AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON + 2) -- Student 2021 - Sem 3
-           OR (CTKDT.KHOA = KHOA_SINH_VIEN - 2 AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON + 4) -- Student 2021 - Sem 3
-           OR (CTKDT.KHOA = KHOA_SINH_VIEN - 3 AND CTDT.HOC_KY_DU_KIEN = HOC_KY_MO_MON + 6) -- Student 2021 - Sem 3
-    ;
-
-
-    OPEN DANH_SACH_MON_MO FOR
-        SELECT DS.MA_MON_HOC        as "maMonHoc",
-               DS.TEN_MON_HOC       AS "tenMonHoc",
-               DS.LOAI_MON_HOC      AS "loaiMonHoc",
-               DS.SO_TIET_LY_THUYET AS "soTietLyThuyet",
-               DS.SO_TIET_THUC_HANH AS "soTietThucHanh",
-               DS.NAM               AS "nam",
-               DS.HOC_KY            AS "hocKy",
-               DS.MA_NGANH          AS "maNganh",
-               DS.CHUYEN_NGANH      AS "chuyenNganh",
-               DS.ID                AS "id",
-               DS.SO_LOP            AS "soLop",
-               DS.SO_BUOI_TUAN      AS "soBuoiTuan",
-               DS.SO_TIET_BUOI      AS "soTietBuoi",
-               DS.SO_LUONG_DU_KIEN  AS "soLuongDuKien",
-               DS.KHOA              AS "monHocKhoa",
-               DS.KHOA_SV           AS "khoaSv",
-               CN.TEN               AS "tenChuyenNganh",
-               DS.MA_DANG_KY        AS "maDangKy"
-        FROM DT_DANH_SACH_MON_MO DS
-                 LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CN ON CN.ID = DS.CHUYEN_NGANH
-        WHERE DS.MA_DANG_KY = ID_DANG_KY_MO_MON;
-
-    return DANH_SACH_MON_MO;
-END;
-
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_TRINH_KY_SEARCH_PAGE(
-    pageNumber IN OUT NUMBER,
-    pageSize IN OUT NUMBER,
-    shccCanBo IN STRING,
-    filterParam in STRING,
-    searchTerm IN STRING,
-    totalItem OUT NUMBER,
-    pageTotal OUT NUMBER
-) RETURN SYS_REFCURSOR AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-
-BEGIN
-
-    SELECT COUNT(*)
-    INTO totalItem
-    FROM HCTH_CONG_VAN_TRINH_KY cvtk
--- LEFT JOIN HCTH_CAN_BO_NHAN hcthcbn ON hcthcbn.KEY = nv.ID AND hcthcbn.LOAI = 'NHIEM_VU'
-             LEFT JOIN HCTH_CAN_BO_KY cbk on cvtk.ID = cbk.CONG_VAN_TRINH_KY
-    where (
-                      cvtk.NGUOI_TAO = shccCanBo
-                  OR cbk.NGUOI_KY = shccCanBo
-              );
-    IF pageNumber < 1 THEN
-        pageNumber := 1;
-    END IF;
-    IF pageSize < 1 THEN
-        pageSize := 1;
-    END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (SELECT cvtk.ID               as "id",
-                     cvtk.FILE_CONG_VAN    as "congVanId",
-                     cvtk.NGUOI_TAO        as "nguoiTao",
-                     cvtk.THOI_GIAN        as "thoiGian",
-                     cbt.HO                as "hoNguoiTao",
-                     cbt.TEN               as "tenNguoiTao",
-                     hcthcvd.TRICH_YEU     as "trichYeu",
-                     hcthcvd.LOAI_CONG_VAN as "loaiCongVan",
-                     (SELECT LISTAGG(
-                                     CASE
-                                         WHEN cb.HO IS NULL THEN cb.TEN
-                                         WHEN cb.TEN IS NULL THEN cb.HO
-                                         ELSE CONCAT(CONCAT(cb.HO, ' '), cb.TEN)
-                                         END,
-                                     ';'
-                                 ) WITHIN GROUP (
-                                         order by cb.TEN
-                                         ) as "hoVaTenCanBo"
-                      FROM HCTH_CAN_BO_KY cbk
-                               LEFT JOIN TCHC_CAN_BO cb on cbk.NGUOI_KY = cb.SHCC
-                      where cbk.CONG_VAN_TRINH_KY = cvtk.id
-                     )                     as "danhSachCanBoKy",
-
-                     ROW_NUMBER() OVER (
-                         ORDER BY cvtk.ID DESC
-                         )                    R
-              FROM HCTH_CONG_VAN_TRINH_KY cvtk
-                       LEFT JOIN TCHC_CAN_BO cbt on cbt.SHCC = cvtk.NGUOI_TAO
-                       LEFT JOIN HCTH_FILE hcthfile on hcthfile.LOAI = 'DI' and hcthfile.ID = cvtk.FILE_CONG_VAN
-                       LEFT JOIN HCTH_CONG_VAN_DI hcthcvd on hcthcvd.ID = hcthfile.MA
-                       LEFT JOIN HCTH_CAN_BO_KY cbk on cvtk.ID = cbk.CONG_VAN_TRINH_KY
-              WHERE
--- check if user is related to congVanTrinhKy
-(
-            cvtk.NGUOI_TAO = shccCanBo
-        OR cbk.NGUOI_KY = shccCanBo
-    ))
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
-        ORDER BY 'id' DESC;
-    RETURN my_cursor;
-END;
-
-/
---EndMethod--
-
 CREATE OR REPLACE FUNCTION TC_HOC_PHI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, imssv IN STRING,
                                        searchTerm IN STRING, filter IN STRING,
                                        totalItem OUT NUMBER, pageTotal OUT NUMBER, totalCurrent OUT NUMBER,
@@ -224,7 +62,7 @@ BEGIN
       AND (searchTerm = ''
         OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT
         OR FS.MSSV LIKE ST)
-      and ((tuNgay is not null and denNgay is not null) or
+      and ((tuNgay is null and denNgay is null) or
            (
                        IS_NUMERIC(THPT.TRANS_DATE) = 1
                    and (tuNgay is null or TO_NUMBER(THPT.TRANS_DATE) >= tuNgay)
@@ -273,6 +111,7 @@ BEGIN
                      BDT.TEN_BAC              AS         "tenBacDaoTao",
                      THPT.TRANS_ID            AS         "lastTransactionId",
                      THPT.TRANS_DATE          AS         "lastTransaction",
+                     HPI.ID                   AS         "invoiceId",
 
 --                      (SELECT TRANS_DATE
 --                       FROM TC_HOC_PHI_TRANSACTION
@@ -289,7 +128,7 @@ BEGIN
 --                                           WHERE HP.HOC_KY = TRANS.HOC_KY
 --                                             AND HP.NAM_HOC = TRANS.NAM_HOC
 --                                             AND HP.MSSV = TRANS.CUSTOMER_ID)) AS "lastTransactionId",
-                     ROW_NUMBER() OVER (ORDER BY FS.TEN) R
+                     ROW_NUMBER() OVER (ORDER BY FS.TEN, FS.HO, FS.MSSV) R
               FROM TC_HOC_PHI HP
                        LEFT JOIN FW_STUDENT FS
                                  on HP.MSSV = FS.MSSV
@@ -297,6 +136,8 @@ BEGIN
                        LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                        LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
+                       LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE HPI
+                                 on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY
                        LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
                   AND HP.NAM_HOC = THPT.NAM_HOC
                   AND HP.MSSV = THPT.CUSTOMER_ID
@@ -371,7 +212,7 @@ BEGIN
                 AND (searchTerm = ''
                   OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT
                   OR FS.MSSV LIKE ST)
-                and ((tuNgay is not null and denNgay is not null) or
+                and ((tuNgay is null and denNgay is null) or
                      (
                                  IS_NUMERIC(THPT.TRANS_DATE) = 1
                              and (tuNgay is null or TO_NUMBER(THPT.TRANS_DATE) >= tuNgay)
@@ -380,110 +221,49 @@ BEGIN
                   ))
 
 
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+    ORDER BY R;
     RETURN my_cursor;
 END ;
 
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION IS_NUMERIC(P_INPUT IN VARCHAR2) RETURN INTEGER IS
-  RESULT INTEGER;
-  NUM NUMBER ;
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_GET_SIGN_STAFF(
+    congVanId IN NUMBER
+)
+    RETURN SYS_REFCURSOR
+AS
+    CVD_INFO SYS_REFCURSOR;
 BEGIN
-  NUM:=TO_NUMBER(P_INPUT);
-  RETURN 1;
-EXCEPTION WHEN OTHERS THEN
-  RETURN 0;
-END IS_NUMERIC;
+    OPEN CVD_INFO FOR
+        select UNIQUE cb.email AS "email"
+        FROM TCHC_CAN_BO cb
+        WHERE cb.SHCC IN (
+            SELECT cbk.NGUOI_KY
+            FROM HCTH_CAN_BO_KY cbk
+                     LEFT JOIN HCTH_CONG_VAN_TRINH_KY cvtk on cvtk.CONG_VAN = congVanId
+            WHERE cbk.CONG_VAN_TRINH_KY = cvtk.ID
+        );
+    RETURN CVD_INFO;
+end;
 
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_DOWNLOAD_PSC(filter IN STRING) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION SDH_CAU_TRUC_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                      searchTerm IN STRING,
+                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER)
+    RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
-    namHoc    NUMBER(4);
-    hocKy     NUMBER(1);
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
 BEGIN
-    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
-
-    OPEN my_cursor FOR
-        SELECT FS.MSSV         AS                           "mssv",
-               FS.HO           AS                           "ho",
-               FS.TEN          AS                           "ten",
-               THPT.HOC_KY     AS                           "hocKy",
-               THPT.BANK       as                           "nganHang",
-               THPT.NAM_HOC    AS                           "namHoc",
-               THPT.AMOUNT     AS                           "khoanDong",
-               FS.MA_NGANH     AS                           "maNganh",
-               NDT.TEN_NGANH   AS                           "tenNganh",
-               DV.TEN          AS                           "tenKhoa",
-               LHDT.TEN        AS                           "tenLoaiHinhDaoTao",
-               BDT.TEN_BAC     AS                           "tenBacDaoTao",
-               THPT.TRANS_DATE AS                           "ngayDong",
-
-               ROW_NUMBER() OVER (ORDER BY THPT.TRANS_DATE) R
-        FROM TC_HOC_PHI_TRANSACTION THPT
-                 LEFT JOIN FW_STUDENT FS
-                           on THPT.CUSTOMER_ID = FS.MSSV
-                 LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
-                 LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
-                 LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
-                 LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
-    where THPT.NAM_HOC = namHoc and THPT.HOC_KY = hocKy;
-
-    RETURN my_cursor;
-END ;
-
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                   searchTerm IN STRING, filter IN STRING,
-                                                   totalItem OUT NUMBER, pageTotal OUT NUMBER
-) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(502) := '%' || lower(searchTerm) || '%';
-    namHoc    NUMBER(4);
-    hocKy     NUMBER(1);
-    tuNgay    NUMBER(20);
-    denNgay   NUMBER(20);
-
-BEGIN
-    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.tuNgay') INTO tuNgay FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.denNgay') INTO denNgay FROM DUAL;
-
     SELECT COUNT(*)
     INTO totalItem
-    FROM TC_HOC_PHI_TRANSACTION THPT
-             LEFT JOIN FW_STUDENT FS on THPT.CUSTOMER_ID = FS.MSSV
-             LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
-             LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
-             LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
-             LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
-    where THPT.NAM_HOC = namHoc
-      and THPT.STATUS = 1
-      and THPT.HOC_KY = hocKy
-      and ((tuNgay is not null and denNgay is not null) or
-           (
-                       IS_NUMERIC(THPT.TRANS_DATE) = 1
-                   and (tuNgay is null or TO_NUMBER(THPT.TRANS_DATE) >= tuNgay)
-                   and (denNgay is null or TO_NUMBER(THPT.TRANS_DATE) <= denNgay)
-               )
-        )
-      and (
-          searchTerm = '' or
-                LOWER(FS.HO) like sT or
-                LOWER(NDT.TEN_NGANH) like sT or
-                LOWER(BDT.TEN_BAC) like sT or
-                LOWER(FS.MSSV) like sT or
-                LOWER(FS.TEN) like sT
-        );
+    FROM SDH_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
+    WHERE searchTerm = ''
+       OR cauTrucKhungDt.NAM_DAO_TAO LIKE st;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -492,51 +272,61 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT FS.MSSV         AS                  "mssv",
-                     FS.HO           AS                  "ho",
-                     FS.TEN          AS                  "ten",
-                     THPT.HOC_KY     AS                  "hocKy",
-                     THPT.BANK       as                  "nganHang",
-                     THPT.NAM_HOC    AS                  "namHoc",
-                     THPT.AMOUNT     AS                  "khoanDong",
-                     FS.MA_NGANH     AS                  "maNganh",
-                     NDT.TEN_NGANH   AS                  "tenNganh",
-                     DV.TEN          AS                  "tenKhoa",
-                     LHDT.TEN        AS                  "tenLoaiHinhDaoTao",
-                     BDT.TEN_BAC     AS                  "tenBacDaoTao",
-                     THPT.TRANS_DATE AS                  "ngayDong",
-                     THPT.STATUS     AS                  "trangThai",
-
-                     ROW_NUMBER() OVER (ORDER BY FS.TEN) R
-              FROM TC_HOC_PHI_TRANSACTION THPT
-                       LEFT JOIN FW_STUDENT FS on THPT.CUSTOMER_ID = FS.MSSV
-                       LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
-                       LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
-                       LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
-                       LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
-              where THPT.NAM_HOC = namHoc
-                and THPT.HOC_KY = hocKy
-                and ((tuNgay is not null and denNgay is not null) or
-                     (
-                                 IS_NUMERIC(THPT.TRANS_DATE) = 1
-                             and (tuNgay is null or TO_NUMBER(THPT.TRANS_DATE) >= tuNgay)
-                             and (denNgay is null or TO_NUMBER(THPT.TRANS_DATE) <= denNgay)
-                         )
-                  )
-                and THPT.STATUS = 1
-                and (
-                    searchTerm = '' or
-                          LOWER(FS.HO) like sT or
-                          LOWER(NDT.TEN_NGANH) like sT or
-                          LOWER(BDT.TEN_BAC) like sT or
-                          LOWER(FS.MSSV) like sT or
-                          LOWER(FS.TEN) like sT
-                  ))
-
-
+        FROM (SELECT cauTrucKhungDt.ID               as                      "id",
+                     cauTrucKhungDt.BAT_DAU_DANG_KY  as                      "batDauDangKy",
+                     cauTrucKhungDt.KET_THUC_DANG_KY as                      "ketThucDangKy",
+                     cauTrucKhungDt.MUC_CHA          as                      "mucCha",
+                     cauTrucKhungDt.MUC_CON          as                      "mucCon",
+                     cauTrucKhungDt.NAM_DAO_TAO      as                      "namDaoTao",
+                     BDT.TEN_BAC                     AS                      "tenBacDaoTao",
+                     ROW_NUMBER() OVER (ORDER BY cauTrucKhungDt.NAM_DAO_TAO) R
+              FROM SDH_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
+                       LEFT JOIN DM_SV_BAC_DAO_TAO BDT ON BDT.MA_BAC = cauTrucKhungDt.BAC_DAO_TAO
+              WHERE searchTerm = ''
+                 OR cauTrucKhungDt.NAM_DAO_TAO LIKE st)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
-END ;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION SDH_DM_KHOI_KIEN_THUC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                  searchTerm IN STRING,
+                                                  totalItem OUT NUMBER, pageTotal OUT NUMBER)
+    RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM SDH_DM_KHOI_KIEN_THUC kienThuc
+             LEFT JOIN SDH_DM_KHOI_KIEN_THUC kienThucCha ON kienThucCha.MA = kienThuc.KHOI_CHA
+    WHERE searchTerm = ''
+       OR lower(kienThuc.TEN) LIKE st
+       OR lower(kienThucCha.TEN) LIKE st;
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT kienThuc.MA       as                     "ma",
+                     kienThuc.TEN      as                     "ten",
+                     kienThuc.KHOI_CHA as                     "khoiCha",
+                     kienThucCha.TEN   as                     "tenKhoiCha",
+                     ROW_NUMBER() OVER (ORDER BY kienThuc.MA) R
+              FROM SDH_DM_KHOI_KIEN_THUC kienThuc
+                       LEFT JOIN SDH_DM_KHOI_KIEN_THUC kienThucCha ON kienThucCha.MA = kienThuc.KHOI_CHA
+              WHERE searchTerm = ''
+                 OR lower(kienThuc.TEN) LIKE st
+                 OR lower(kienThucCha.TEN) LIKE st)
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+END;
 
 /
 --EndMethod--

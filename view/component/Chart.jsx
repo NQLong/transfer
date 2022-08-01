@@ -2,8 +2,8 @@
 import React from 'react';
 
 export const DefaultColors = {
-    red: '#dc3545',
     blue: '#007bff',
+    red: '#dc3545',
     yellow: '#ffc107',
     info: '#11a2b8',
     green: '#28a745',
@@ -27,6 +27,7 @@ export class AdminChart extends React.Component {
             aspectRatio: this.props.aspectRatio || 1.7,
             events: false,
             legend: {
+                display: type === 'pie' || type === 'doughnut',
                 position: 'bottom',
                 labels: {
                     fontStyle: 'bold',
@@ -45,6 +46,13 @@ export class AdminChart extends React.Component {
                 mode: 'index',
                 intersect: false
             },
+            scales: type === 'bar' || type === 'line' ? {
+                yAxes: [{
+                    ticks: {
+                        display: false
+                    }
+                }]
+            } : null,
             animation: {
                 duration: 1000,
                 easing: 'easeOutQuart',

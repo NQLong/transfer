@@ -17,6 +17,14 @@ module.exports = app => {
         { name: 'dtDanhSachChuyenNganh:delete' },
     );
 
+    app.permissionHooks.add('staff', 'addRolesDtDanhSachChuyenNganh', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtDanhSachChuyenNganh:read', 'dtDanhSachChuyenNganh:write', 'dtDanhSachChuyenNganh:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/dao-tao/danh-sach-chuyen-nganh', app.permission.orCheck('dtDanhSachChuyenNganh:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
     const checkDaoTaoPermission = (req, res, next) => app.isDebug ? next() : app.permission.orCheck('dtDanhSachChuyenNganh:read', 'dtChuongTrinhDaoTao:manage')(req, res, next);

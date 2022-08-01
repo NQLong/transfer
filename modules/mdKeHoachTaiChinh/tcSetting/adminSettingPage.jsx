@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting } from './redux';
+import { getTcSettingAll, updateTcSetting, deleteTcSetting } from './redux';
 import { AdminPage, FormTextBox } from 'view/component/AdminPage';
 
 class AdminSettingsPage extends AdminPage {
@@ -9,7 +9,7 @@ class AdminSettingsPage extends AdminPage {
             this.props.getTcSettingAll(items => {
                 (items || []).forEach(item => {
                     const component = this[item.key];
-                    component && component.value && component.value(item.value || '');
+                    component && item.key != 'matKhauMeinvoice' && component.value && component.value(item.value || '');
                 });
             });
         });
@@ -24,8 +24,28 @@ class AdminSettingsPage extends AdminPage {
         arguments.length && this.props.updateTcSetting(changes);
     }
 
+    onSaveMatKhauMeinVoice = () => {
+        const matKhau = this.matKhauMeinvoice.value();
+        const xacNhan = this.xacNhanMatKhauMeInvoice.value();
+        if (!matKhau) {
+            T.notify('Mật khẩu trống', 'danger');
+            this.matKhauMeinvoice.focus();
+        } else if (!xacNhan) {
+            T.notify('Mật khẩu xác nhận trống', 'danger');
+            this.matKhauMeinvoice.focus();
+        } else if (matKhau !== xacNhan) {
+            T.notify('Mật khẩu xác nhận không khớp', 'danger');
+            this.matKhauMeinvoice.focus();
+        } else {
+            this.props.updateTcSetting({ 'matKhauMeinvoice': matKhau }, ()=>{
+                this.matKhauMeinvoice.clear();
+                this.xacNhanMatKhauMeInvoice.clear();
+            });
+        }
+    }
+
     render() {
-        const permission = this.getUserPermission('TcSetting'),
+        const permission = this.getUserPermission('tcSetting'),
             readOnly = !permission.write;
 
         return this.renderPage({
@@ -104,11 +124,43 @@ class AdminSettingsPage extends AdminPage {
                         </div>
                     </div>
                 </div>
+                <div className='col-md-6'>
+                    <div className='tile'>
+                        <h3 className='tile-title'>Thông tin tài khoản meinvoice</h3>
+                        <div className='tile-body row'>
+                            <FormTextBox className='col-md-12' label='Meinvoice app id' ref={e => this.meinvoiceAppId = e} />
+                            <FormTextBox className='col-md-12' label='Mã số thuế' ref={e => this.meinvoiceMaSoThue = e} />
+                            <FormTextBox className='col-md-12' label='Tài khoản' ref={e => this.meinvoiceUsername = e} />
+                            <FormTextBox className='col-md-12' label='Meinvoice url' ref={e => this.meinvoiceUrl = e} />
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('meinvoiceAppId', 'meinvoiceMaSoThue', 'meinvoiceUsername', 'meinvoiceUrl')}>
+                                <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div className='col-md-6'>
+                    <div className='tile'>
+                        <h3 className='tile-title'>Cập nhật mật khẩu tài khoản meinvoice</h3>
+                        <div className='tile-body row'>
+                            <FormTextBox className='col-md-12' label='Mật khẩu' ref={e => this.matKhauMeinvoice = e} type='password' />
+                            <FormTextBox className='col-md-12' label='Xác nhận mật khẩu' ref={e => this.xacNhanMatKhauMeInvoice = e} type='password' />
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <button className='btn btn-success' type='button' onClick={this.onSaveMatKhauMeinVoice}>
+                                <i className='fa fa-fw fa-lg fa-save'></i>Cập nhật
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, TcSetting: state.finance.TcSetting });
-const mapActionsToProps = { getTcSettingAll, getTcSetting, updateTcSetting, deleteTcSetting };
+const mapActionsToProps = { getTcSettingAll, updateTcSetting, deleteTcSetting };
 export default connect(mapStateToProps, mapActionsToProps)(AdminSettingsPage);

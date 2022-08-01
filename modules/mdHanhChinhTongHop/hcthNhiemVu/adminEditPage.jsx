@@ -60,7 +60,7 @@ class AdminEditPage extends AdminPage {
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '' },
                 { staff } = user;
             this.setState({
-                id: params.id === 'new' ? null : params.id, maDonVi: staff.maDonVi
+                id: params.id === 'new' ? null : params.id, maDonVi: staff?.maDonVi
             }, () => this.getData());
         });
     }

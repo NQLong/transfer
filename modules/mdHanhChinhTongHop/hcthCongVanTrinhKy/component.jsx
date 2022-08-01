@@ -18,7 +18,7 @@ export class YeuCauKyModal extends AdminModal {
     onSubmit = () => {
         const data = {
             tenFile: this.ten.value(),
-            congVanId: this.props.congVanId,
+            congVan: this.props.congVanId,
             fileCongVan: this.state.id,
             canBoKy: this.canBoKy.value() || []
         };
@@ -28,18 +28,18 @@ export class YeuCauKyModal extends AdminModal {
             this.canBoKy.focus();
         } else {
             if (this.state.canBoKy) {
-                this.props.update(this.state.id, data, () => {                    
-                    this.props.getCongVanDi(this.props.congVanId);
+                this.props.update(this.state.id, data, () => {
+                    this.props.getYeuCauKy(this.props.congVanId, () => this.props.onSubmitCallback());
                     this.hide();
                 });
             } else {
                 this.props.create(data, () => {
                     // this.props.onSubmitCallback && this.props.onSubmitCallback();
-                    this.props.getCongVanDi(this.props.congVanId);
+                    this.props.getYeuCauKy(this.props.congVanId, () => this.props.onSubmitCallback());
                     this.hide();
                 });
             }
-            
+
         }
     }
 
@@ -62,9 +62,9 @@ export class YeuCauKy extends React.Component {
     deleteFile = (e, item) => {
         e.preventDefault();
         const { id: fileId, congVanId } = item;
-        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa văn bản trình ký này, văn bản sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
+        T.confirm('Yêu cầu ký', 'Bạn có chắc muốn xóa yêu cầu ký này, yêu cầu ý sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
             isConfirm && this.props.deleteCongVanTrinhKy(fileId, congVanId, () => {
-               this.props.getCongVanDi(this.props.hcthCongVanDi?.item?.id,);
+                this.props.getYeuCauKy(congVanId, () => this.props.onSubmitCallback());
             })
         );
     }
@@ -90,23 +90,27 @@ export class YeuCauKy extends React.Component {
             },
             renderRow: (item, index) => {
                 const danhSachCanBoKy = item.danhSachTenCanBoKy.split(',');
-                return  <tr key={item.id}>
+                return <tr key={item.id}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell type='text' style={{ wordBreak: 'break-all' }} content={item.ten} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                         <>
                             <span>{danhSachCanBoKy && danhSachCanBoKy.length > 0 ? danhSachCanBoKy.map((canBo, index) => (
-                                    <span key={index}>
-                                        <b style={{ color: 'blue' }}>{canBo.normalizedName()}</b>
-                                        <br />
-                                    </span>
-                                )) : null}
+                                <span key={index}>
+                                    <b style={{ color: 'blue' }}>{canBo.normalizedName()}</b>
+                                    <br />
+                                </span>
+                            )) : null}
                             </span>
                         </>
                     } />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM')} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={this.props.permission} onEdit={e => this.props.onEditVanBanTrinhKy(e, item)} onDelete={e => this.deleteFile(e, {...item, congVanId: this.props.id})}>
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                        item.listCanBoKy.every(canBoKy => canBoKy.trangThai && canBoKy.trangThai === 'DA_KY') ?
+                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>Đã ký</span> : <span style={{ color: '#007bff', fontWeight: 'bold' }}>Chờ ký</span>
+                    } />
+
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={this.props.permission} onEdit={e => this.props.onEditVanBanTrinhKy(e, item)} onDelete={e => this.deleteFile(e, { ...item, congVanId: this.props.id })}>
                     </TableCell>
                 </tr>;
             },

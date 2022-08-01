@@ -10,7 +10,7 @@ import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 class TreeModal extends AdminModal {
-    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [], isSemesterMode: false, mucConSwitch: {}, hocKySwitch: {} }
+    state = { chuongTrinhDaoTaoCha: {}, chuongTrinhDaoTaoCon: {}, monHoc: [], isFullMode: false, mucConSwitch: {}, hocKySwitch: {} }
     hocKyDuKien = [1, 2, 3, 4, 5, 6, 7, 8];
     onShow = (item) => {
         const { idNamDaoTao, tenNganh, id, namDaoTao } = item;
@@ -38,6 +38,14 @@ class TreeModal extends AdminModal {
             });
         });
     };
+
+    showAllMucCon = (flag = false) => {
+        const mucConSwitchState = { ...this.state.mucConSwitch };
+        Object.keys(mucConSwitchState).forEach(key => {
+            mucConSwitchState[key] = flag;
+        });
+        this.setState({ mucConSwitch: mucConSwitchState });
+    }
 
     onChangeMucConSwitch = (id) => {
         const mucConSwitchState = { ...this.state.mucConSwitch };
@@ -245,16 +253,20 @@ class TreeModal extends AdminModal {
             size: 'elarge',
             buttons:
                 <div style={{ textAlign: 'center' }} className='toggle'>
-                    <label style={{ marginRight: 10 }}>Xem theo học kỳ dự kiến</label>
+                    <label style={{ marginRight: 10 }}>Xem đầy đủ</label>
                     <label>
-                        <input type='checkbox' checked={this.state.isSemesterMode} onChange={() => { this.setState({ isSemesterMode: !this.state.isSemesterMode }); }} />
+                        <input type='checkbox' checked={this.state.isFullMode} onChange={() => {
+                            this.setState({ isFullMode: !this.state.isFullMode }, () => {
+                                this.showAllMucCon(this.state.isFullMode);
+                            });
+                        }} />
                         <span className='button-indecator' />
                     </label>
                 </div>,
             body: <div className='row'>
                 <div className="container organization-tree">
                     <p className="level-1 rectangle">{this.tenNganh}</p>
-                    {!this.state.isSemesterMode ? this.initChuongTrinhDaoTao() : this.initHocKyDuKien()}
+                    {this.initChuongTrinhDaoTao()}
                 </div>
             </div>
 
@@ -327,6 +339,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu chương trình đào tạo',
+            stickyHead: true,
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
@@ -359,11 +372,11 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                         <Tooltip title='Xem cây chương trình' arrow placeholder='bottom' >
                             <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
                         </Tooltip>
-                        <Tooltip title='Sao chép' arrow>
+                        {permission.write && <Tooltip title='Sao chép' arrow>
                             <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || this.cloneModal.show(item)}>
                                 <i className='fa fa-lg fa-clone ' />
                             </a>
-                        </Tooltip>
+                        </Tooltip>}
                     </TableCell>
                 </tr>
             )

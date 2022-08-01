@@ -170,7 +170,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
             toYear = this.toYear.value();
             toYear.setHours(23, 59, 59, 999);
             toYear = toYear.getTime();
-        }    
+        }
         const timeType = this.timeType.value() == '' ? null : this.timeType.value();
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
@@ -219,8 +219,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.pageMa ? this.props.qtKeoDaiCongTac.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -265,7 +264,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
-                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
+                        <TableCell type='text' style={{ color: 'blue' }} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
                         <TableCell type='date' style={{ whiteSpace: 'nowrap', color: 'red' }} dateFormat='dd/mm/yyyy' content={item.ngayNghiHuu} />
                         <TableCell type='text' content={(
                             <>
@@ -297,8 +296,8 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={this.handleTime} />
                     {this.state.visibleTime &&
                         <>
-                            <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian'  />
-                            <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian'  />
+                            <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' />
+                            <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' />
                         </>}
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <div style={{ marginRight: '10px' }}>Tìm thấy: &nbsp;{<b>{totalItem}</b>} kết quả</div>
@@ -317,8 +316,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} canBo = {this.state.canBo} getTuoiNghiHuu={this.props.getTuoiNghiHuu}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} canBo={this.state.canBo} getTuoiNghiHuu={this.props.getTuoiNghiHuu}
                     create={this.props.createQtKeoDaiCongTacGroupPageMa} update={this.props.updateQtKeoDaiCongTacGroupPageMa}
                 />
             </>,

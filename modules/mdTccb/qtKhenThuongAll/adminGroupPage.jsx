@@ -125,9 +125,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, listShcc: this.loaiDoiTuong == '02' ? this.ma : '', listDv: ''} });
+            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, listShcc: this.loaiDoiTuong == '02' ? this.ma : '', listDv: '' } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-            
+
             T.showSearchBox(() => {
                 let filterCookie = T.getCookiePage('groupPageMaQtKhenThuongAll', 'F'), {
                     fromYear = null, toYear = null, listThanhTich = ''
@@ -142,7 +142,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
-        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50, pageCondition: {}};
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50, pageCondition: {} };
 
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
 
@@ -193,8 +193,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -279,20 +278,19 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtKhenThuongAllGroupPageMa} update={this.props.updateQtKhenThuongAllGroupPageMa}
-                    permissions={currentPermissions} ma={this.ma} loaiDoiTuong={this.loaiDoiTuong}
+                    ma={this.ma} loaiDoiTuong={this.loaiDoiTuong}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
+            onExport: permission && permission.export ? (e) => {
                 e.preventDefault();
                 const filter = T.stringify(this.state.filter);
-
                 T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${filter}`), 'khenthuong.xlsx');
-            }
+            } : null
         });
     }
 }

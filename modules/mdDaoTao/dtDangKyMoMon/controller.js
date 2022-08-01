@@ -13,8 +13,17 @@ module.exports = app => {
         { name: 'quanLyDaoTao:manager' }
     );
 
+    app.permissionHooks.add('staff', 'addRolesDtDangKyMoMon', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
-    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
+
+    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), app.templates.admin);
 
     //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
@@ -52,9 +61,9 @@ module.exports = app => {
     app.post('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
         try {
             const now = Date.now();
+            let { data, settings } = req.body;
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-            let data = req.body.data;
-            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == data.loaiHinhDaoTao && item.bacDaoTao == data.bacDaoTao);
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             if (now > thoiGianMoMon.ketThuc) throw 'Đã hết hạn đăng ký!';
             const hocKy = thoiGianMoMon.hocKy,
                 nam = thoiGianMoMon.nam;
@@ -62,7 +71,7 @@ module.exports = app => {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {
                 let item = await app.model.dtDangKyMoMon.get({
-                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: data.loaiHinhDaoTao, bacDaoTao: data.bacDaoTao
+                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: settings.loaiHinhDaoTao, bacDaoTao: settings.bacDaoTao
                 });
                 if (item) throw `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}`;
                 item = await app.model.dtDangKyMoMon.create(data);
@@ -74,49 +83,31 @@ module.exports = app => {
     });
 
     app.put('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == data.loaiHinhDaoTao && item.bacDaoTao == data.bacDaoTao);
-        const hocKy = thoiGianMoMon.hocKy,
-            nam = thoiGianMoMon.nam;
-        let { data, id, isDuyet } = req.body,
-            thoiGian = new Date().getTime(),
-            changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
-            isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
+        try {
+            let { data, id, isDuyet, settings } = req.body,
+                thoiGian = new Date().getTime(),
+                changes = isDuyet ? { isDuyet: 1 } : { thoiGian },
+                isDaoTao = req.session.user.permissions.includes('dtDangKyMoMon:read');
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
+            const hocKy = thoiGianMoMon.hocKy,
+                nam = thoiGianMoMon.nam;
 
-        if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
-            res.send({ error: 'Không thuộc thời gian đăng ký hiện tại' });
-            return;
-        } else {
-            const updateDanhSachMonMo = (list) => new Promise((resolve, reject) => {
-                const newDanhSach = [];
-                const update = (index = 0) => {
-                    if (index == list.length) {
-                        resolve();
-                    } else {
-                        let monHoc = list[index];
+            if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
+                throw 'Không thuộc thời gian đăng ký hiện tại';
+            } else {
+                if (data && data.length) {
+                    await app.model.dtDanhSachMonMo.delete({ maDangKy: id });
+                    for (let monHoc of data) {
                         delete monHoc.id;
-                        app.model.dtDanhSachMonMo.create(monHoc, (error, item) => {
-                            if (error || !item) reject(error);
-                            else {
-                                newDanhSach.push(item);
-                                update(index + 1);
-                            }
-                        });
+                        await app.model.dtDanhSachMonMo.create(monHoc);
                     }
-                };
-                app.model.dtDanhSachMonMo.delete({ maDangKy: id }, (error) => {
-                    if (error) reject(error);
-                    else {
-                        update();
-                    }
-                });
-            });
-            try {
-                data && data.length ? await updateDanhSachMonMo(data) : [];
-                app.model.dtDangKyMoMon.update({ id }, changes, (error, item) => res.send({ error, item }));
-            } catch (error) {
-                res.send({ error });
+                }
+                const item = await app.model.dtDangKyMoMon.update({ id }, changes);
+                res.send({ item });
             }
+        } catch (error) {
+            res.send({ error });
         }
     });
 

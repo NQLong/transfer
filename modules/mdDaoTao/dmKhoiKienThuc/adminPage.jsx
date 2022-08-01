@@ -44,14 +44,14 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-                title: this.state.item ? 'Tạo mới' : 'Cập nhật khối kiến thức',
-                size: 'large',
-                body: <div className='row'>
-                    <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.item} required />
-                    <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
-                    <FormSelect data={SelectAdapter_DmKhoiKienThucAll} className='col-12' ref={e => this.khoiCha = e} label='Khối cha' readOnly={readOnly} placeholder='Khối cha' />
-                </div>
-            }
+            title: this.state.item ? 'Tạo mới' : 'Cập nhật khối kiến thức',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.item} required />
+                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
+                <FormSelect data={SelectAdapter_DmKhoiKienThucAll()} className='col-12' ref={e => this.khoiCha = e} label='Khối cha' readOnly={readOnly} placeholder='Khối cha' />
+            </div>
+        }
         );
     }
 }

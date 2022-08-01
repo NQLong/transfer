@@ -13,9 +13,15 @@ module.exports = app => {
         { name: 'dtCauTrucKhungDaoTao:write' },
         { name: 'dtCauTrucKhungDaoTao:delete' },
     );
+    app.permissionHooks.add('staff', 'addRolesDtCauTrucKhungDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtCauTrucKhungDaoTao:read', 'dtCauTrucKhungDaoTao:write', 'dtCauTrucKhungDaoTao:delete');
+            resolve();
+        } else resolve();
+    }));
 
     app.get('/user/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
-    app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:read'), app.templates.admin);
+    app.get('/user/dao-tao/cau-truc-khung-dao-tao/:ma', app.permission.check('dtCauTrucKhungDaoTao:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
@@ -42,9 +48,9 @@ module.exports = app => {
     app.post('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:write'), (req, res) => {
         const item = req.body.item;
         const namDaoTao = item?.namDaoTao;
-        app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namDaoTao }, (error, ctKhungDt) => {
+        app.model.dtCauTrucKhungDaoTao.get({ namDaoTao }, (error, ctKhungDt) => {
             if (!error && !ctKhungDt) {
-                app.model.dtCauTrucKhungDaoTao.create(item, async (error, item) => {
+                app.model.dtCauTrucKhungDaoTao.create({ ...item, bacDaoTao: 'DH' }, async (error, item) => {
                     if (!error) {
                         //TODO: Send Email - Notification;
                         // let listEmail = await app.model.qtChucVu.getAllTruongKhoaEmail();

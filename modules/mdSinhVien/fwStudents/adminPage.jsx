@@ -10,9 +10,30 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { getStudentsPage } from './redux';
+import { getStudentsPage, loginStudentForTest } from './redux';
+
+class LoginToTestModal extends AdminModal {
+
+    onSubmit = (e) => {
+        e && e.preventDefault();
+        const data = {
+            email: getValue(this.email),
+            pass: getValue(this.password)
+        };
+        this.props.loginStudentForTest(data);
+    }
+    render = () => {
+        return this.renderModal({
+            title: 'Đăng nhập tài khoản Test',
+            body: <div className='row'>
+                <FormTextBox type='email' ref={e => this.email = e} label='Email test' className='col-md-12' />
+                <FormTextBox type='password' ref={e => this.password = e} label='Mật khẩu' className='col-md-12' />
+            </div>
+        });
+    }
+}
 class AdminStudentsPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
@@ -82,7 +103,7 @@ class AdminStudentsPage extends AdminPage {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
-            this.props.sinhVien.page : { pageNumber: 1, pageSize: 500, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
+            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu sinh viên',
@@ -159,6 +180,7 @@ class AdminStudentsPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getStudentsPage} />
+                <LoginToTestModal ref={e => this.loginModal = e} loginStudentForTest={this.props.loginStudentForTest} />
             </>
             ,
             backRoute: '/user/students',
@@ -169,14 +191,15 @@ class AdminStudentsPage extends AdminPage {
                 } else {
                     T.confirm('Cảnh báo', 'Bạn không có quyền thêm mới sinh viên. Liên hệ người có quyền để thao tác', 'warning', true);
                 }
-            }
-
-
+            },
+            buttons: [
+                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null
+            ]
         });
     }
 }
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
 const mapActionsToProps = {
-    getStudentsPage
+    getStudentsPage, loginStudentForTest
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminStudentsPage);

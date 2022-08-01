@@ -42,7 +42,7 @@ class QtDaoTaoGroupPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtDaoTao', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtDaoTao && this.props.qtDaoTao.page ? this.props.qtDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu',
@@ -117,17 +117,17 @@ class QtDaoTaoGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtDaoTaoPage} />
-                <DaoTaoModal ref={e => this.modal = e} isCanBo={false}
+                <DaoTaoModal ref={e => this.modal = e} isCanBo={false} readOnly={!permission.write}
                     create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/dao-tao',
-            onCreate: e => e.preventDefault() || this.modal.show({ shcc: this.ma }),
-            onExport: (e) => {
+            onCreate: permission.write ? e => e.preventDefault() || this.modal.show({ shcc: this.ma }) : null,
+            onExport: permission.export ? (e) => {
                 e.preventDefault();
                 const listShcc = this.ma;
                 T.download(T.url(`/api/qua-trinh/dao-tao/download-excel/${listShcc ? listShcc : null}/${null}/${null}/${null}/${null}`), 'daotaoboiduong.xlsx');
-            }
+            } : null
         });
     }
 }

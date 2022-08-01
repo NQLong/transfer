@@ -20,6 +20,7 @@ module.exports = app => {
         }
     };
 
+
     app.permission.add(
         { name: 'student:login', menu },
         { name: 'student:login', menu: menuHocPhi },
@@ -27,20 +28,32 @@ module.exports = app => {
         { name: 'student:write' },
         { name: 'student:delete' }
     );
+
+    app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
+            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/students/list', app.permission.check('student:read'), app.templates.admin);
     app.get('/user/students/item/:mssv', app.permission.check('student:write'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
-    app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), (req, res) => {
-        let mssv = req.session.user.data?.mssv.trim() || '';
-        app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
-            if (error || !sinhVien) {
-                res.send({ error: 'Không tìm thấy thông tin sinh viên!' });
-            } else {
-                res.send({ item: Object.assign(sinhVien, { image: req.session.user.image }) });
+    app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let mssv = req.session.user.data?.mssv.trim() || '';
+            const item = await app.model.fwStudents.get({ mssv });
+            if (!item.image) {
+                let user = await app.model.fwUser.get({ email: item.emailTruong });
+                item.image = user.image;
             }
-        });
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:read'), (req, res) => {
@@ -62,10 +75,7 @@ module.exports = app => {
     app.get('/api/students/:mssv', app.permission.check('student:read'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
-            if (error) res.send({ error });
-            else app.model.fwUser.get({ studentId: mssv }, (e1, data) => {
-                res.send({ items: Object.assign(sinhVien, { image: data ? data.image : null }) });
-            });
+            res.send({ items: sinhVien, error });
         });
     });
 
@@ -99,15 +109,108 @@ module.exports = app => {
         }
     });
 
+    const password = 'ctsvussh@2022';
+    app.post('/api/students-login-test', app.permission.check('student:write'), async (req, res) => {
+        try {
+            let data = req.body.data;
+            if (data.pass != password) throw 'Sai mật khẩu!';
+            const sinhVien = await app.model.fwStudents.get({ emailTruong: data.email });
+            console.log(sinhVien);
+            if (sinhVien) {
+                const user = { email: sinhVien.emailTruong, lastName: sinhVien.ho, firstName: sinhVien.ten, active: 1, isStudent: 1, studentId: sinhVien.mssv };
+                app.updateSessionUser(req, user, () => {
+                    !app.isDebug && req.session.save();
+                    res.send({ user });
+                });
+            } else {
+                throw 'Sinh viên test không tồn tại!';
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+
+    });
+
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
     app.createFolder(app.path.join(app.publicPath, '/img/sinhVien'));
 
     const uploadSinhVienImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('SinhVienImage:') && files.SinhVienImage && files.SinhVienImage.length) {
-            app.uploadComponentImage(req, 'sinhVien', app.model.fwUser, { studentId: fields.userData[0].substring('SinhVienImage:'.length) }, files.SinhVienImage[0].path, done);
+            app.uploadComponentImage(req, 'sinhVien', app.model.fwStudents, { mssv: fields.userData[0].substring('SinhVienImage:'.length) }, files.SinhVienImage[0].path, done);
         }
     };
 
     app.uploadHooks.add('uploadSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSinhVienImage(req, fields, files, params, done), done, 'student:login'));
+
+    app.get('/api/students-download-syll', app.permission.check('student:login'), async (req, res) => {
+        try {
+            const source = app.path.join(__dirname, 'resource', 'syll2022.docx');
+            const user = req.session.user;
+
+            let data = await app.model.fwStudents.getData(user.studentId);
+            data = data.rows[0];
+            data.ngaySinh = app.date.viDateFormat(new Date(data.ngaySinh));
+            data.cmndNgayCap = app.date.viDateFormat(new Date(data.cmndNgayCap));
+            if (data.ngayVaoDang) {
+                data.dav = 'X';
+                data.ngayVaoDang = app.date.viDateFormat(new Date(data.ngayVaoDang));
+            } else {
+                data.ngayVaoDang = '';
+                data.dav = '';
+            }
+            if (data.ngayVaoDoan) {
+                data.dov = 'X';
+                data.ngayVaoDoan = app.date.viDateFormat(new Date(data.ngayVaoDoan));
+            } else {
+                data.dov = '';
+                data.ngayVaoDoan = '';
+            }
+            data.ngaySinhCha = new Date(data.ngaySinhCha).getFullYear();
+            data.ngaySinhMe = new Date(data.ngaySinhMe).getFullYear();
+            data.thuongTru = (data.soNhaThuongTru ? data.soNhaThuongTru + ', ' : '')
+                + (data.xaThuongTru ? data.xaThuongTru + ', ' : '')
+                + (data.huyenThuongTru ? data.huyenThuongTru + ', ' : '')
+                + (data.tinhThuongTru ? data.tinhThuongTru : '');
+
+            data.thuongTruCha = (data.soNhaThuongTruCha ? data.soNhaThuongTruCha + ', ' : '')
+                + (data.xaThuongTruCha ? data.xaThuongTruCha + ', ' : '')
+                + (data.huyenThuongTruCha ? data.huyenThuongTruCha + ', ' : '')
+                + (data.tinhThuongTruCha ? data.tinhThuongTruCha : '');
+
+            data.thuongTruMe = (data.soNhaThuongTruMe ? data.soNhaThuongTruMe + ', ' : '')
+                + (data.xaThuongTruMe ? data.xaThuongTruMe + ', ' : '')
+                + (data.huyenThuongTruMe ? data.huyenThuongTruMe + ', ' : '')
+                + (data.tinhThuongTruMe ? data.tinhThuongTruMe : '');
+
+            data.lienLac = (data.soNhaLienLac ? data.soNhaTLienLac + ', ' : '')
+                + (data.xaLienLac ? data.xaLienLac + ', ' : '')
+                + (data.huyenLienLac ? data.huyenLienLac + ', ' : '')
+                + (data.tinhLienLac ? data.tinhLienLac : '');
+            // data.image = app.path.join(app.publicPath, data.image);
+            // data.image = data.image.substring(0, data.image.indexOf('?'));
+            data.image = '';
+            const qrCode = require('qrcode');
+            let qrCodeImage = app.path.join(app.assetPath, '/qr-syll', data.mssv + '.png');
+            app.createFolder(app.path.join(app.assetPath, '/qr-syll'));
+            app.createFolder(app.path.join(app.assetPath, '/syll'), app.path.join(app.assetPath, `/syll/${new Date().getFullYear()}`));
+            await qrCode.toFile(qrCodeImage, JSON.stringify({ mssv: data.mssv, updatedAt: data.lastModified }));
+            data.qrCode = qrCodeImage;
+            app.docx.generateFileHasImage(source, data, async (error, buffer) => {
+                if (error)
+                    res.send({ error });
+                else {
+                    const filePdfPath = app.path.join(app.assetPath, `/syll/${new Date().getFullYear()}`, data.mssv + '.pdf');
+                    const toPdf = require('office-to-pdf');
+                    const pdfBuffer = await toPdf(buffer);
+                    app.fs.writeFileSync(filePdfPath, pdfBuffer);
+                    app.deleteFile(qrCodeImage);
+                    res.download(filePdfPath, `SYLL_${data.mssv}`);
+                }
+            });
+        } catch (error) {
+            res.send({ error });
+        }
+
+    });
 };
