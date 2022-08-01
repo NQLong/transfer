@@ -335,7 +335,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/nhiem-vu/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/nhiem-vu/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login','developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -444,7 +444,7 @@ module.exports = (app) => {
         return lichSuDoc;
     };
 
-    app.get('/api/hcth/nhiem-vu/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/nhiem-vu/:id', app.permission.orCheck('staff:login','developer:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const nhiemVuItem = await app.model.hcthNhiemVu.get({ id });

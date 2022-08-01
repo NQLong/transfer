@@ -243,7 +243,7 @@ module.exports = (app) => {
 
 
 
-    app.get('/api/hcth/van-ban-den/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         try {
             const
                 obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' },
@@ -381,7 +381,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/van-ban-den/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthPhanHoi.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
@@ -426,7 +426,7 @@ module.exports = (app) => {
         return lichSuDoc;
     };
 
-    app.get('/api/hcth/van-ban-den/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id))
@@ -483,12 +483,12 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login','developer:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
 
-    app.get('/api/hcth/van-ban-den/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
@@ -631,7 +631,7 @@ module.exports = (app) => {
     });
 
 
-    app.get('/api/hcth/van-ban-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
@@ -642,7 +642,7 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.orCheck('staff:login','developer:login'), async (req, res) => {
         app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 

@@ -33,7 +33,7 @@ module.exports = app => {
     app.get('/user/hcth/van-ban-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login','developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -553,7 +553,7 @@ module.exports = app => {
     };
 
 
-    app.get('/api/hcth/van-ban-di/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/:id', app.permission.orCheck('staff:login','developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id)) {
