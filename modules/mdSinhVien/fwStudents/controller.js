@@ -109,6 +109,28 @@ module.exports = app => {
         }
     });
 
+    const password = 'ctsvussh@2022';
+    app.post('/api/students-login-test', app.permission.check('student:write'), async (req, res) => {
+        try {
+            let data = req.body.data;
+            if (data.pass != password) throw 'Sai mật khẩu!';
+            const sinhVien = await app.model.fwStudents.get({ emailTruong: data.email });
+            console.log(sinhVien);
+            if (sinhVien) {
+                const user = { email: sinhVien.emailTruong, lastName: sinhVien.ho, firstName: sinhVien.ten, active: 1, isStudent: 1, studentId: sinhVien.mssv };
+                app.updateSessionUser(req, user, () => {
+                    !app.isDebug && req.session.save();
+                    res.send({ user });
+                });
+            } else {
+                throw 'Sinh viên test không tồn tại!';
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+
+    });
+
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
     app.createFolder(app.path.join(app.publicPath, '/img/sinhVien'));
 
