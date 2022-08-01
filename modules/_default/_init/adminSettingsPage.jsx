@@ -2,70 +2,53 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { saveSystemState, createFooterItem, updateFooterItem, swapFooterItem, getFooterSystem, deleteFooterItem, updateFwSetting, getValueFwSetting } from './reduxSystem';
 import { getDmNgonNguAll } from 'modules/mdDanhMuc/dmNgonNguTruyenThong/redux';
-import { AdminPage, AdminModal, FormImageBox, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, FormImageBox, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
 
 const listKeysViettel = ['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel'];
 
 class EditFooterModal extends AdminModal {
-    modal = React.createRef();
-    state = {
-        active: false,
-        header: false
-    };
+    state = { id: null };
 
     onShow = menu => {
         let { title, link, active, header, id } = menu || { title: '{ "vi": "", "en": "" }', link: '', active: false, header: false, id: '' };
         this.title.value(title);
         this.link.value(link);
-        this.setState({ active: !!active, header: !!header });
-
-        $(this.modal.current).find('.modal-title').html(menu ? 'Cập nhật Footer' : 'Tạo mới Footer');
-        $(this.modal.current).data('data-id', id);
+        this.active.value(active);
+        this.header.value(header);
+        this.setState({ id });
     }
 
-    save = e => {
-        e.preventDefault();
-        const id = $(this.modal.current).data('data-id'),
+    onSubmit = () => {
+        const id = this.state.id,
             changes = {
                 title: this.title.value(),
                 link: this.link.value(),
-                active: this.state.active ? 1 : 0,
-                header: this.state.header ? 1 : 0
+                active: Number(this.active.value()),
+                header: Number(this.header.value())
             };
+
         if (id) {
             this.props.update(id, changes);
         } else {
             this.props.create(changes);
         }
-        $(this.modal.current).modal('hide');
+        this.hide();
     }
 
     render = () => {
         return this.renderModal({
             title: 'Thông tin footer',
+            size: 'large',
             body: <>
-                <FormMultipleLanguage ref={e => this.title = e} languages={this.props.languages} FormElement={FormTextBox} title='Tiêu đề' />
-                <FormTextBox ref={e => this.link = e} label='Link' />
+                <FormMultipleLanguage ref={e => this.title = e} gridClassName='col-md-6' languages={this.props.languages} FormElement={FormTextBox} title='Tiêu đề' />
                 <div className='row'>
-                    <div className='form-group col-12 row'>
-                        <div className='col-6 d-flex'>
-                            <label className='control-label'>Kích hoạt: &nbsp;</label>
-                            <div className='toggle'>
-                                <label>
-                                    <input type='checkbox' id='submenuActive' checked={this.state.active} onChange={e => this.setState({ active: e.target.checked })} />
-                                    <span className='button-indecator' />
-                                </label>
-                            </div>
-                        </div>
-                        <div className='col-6 d-flex'>
-                            <label className='control-label'>Mục chính: &nbsp;</label>
-                            <div className='toggle'>
-                                <label>
-                                    <input type='checkbox' id='header' checked={this.state.header} onChange={e => this.setState({ header: e.target.checked })} />
-                                    <span className='button-indecator' />
-                                </label>
-                            </div>
+                    <FormTextBox ref={e => this.link = e} className='col-md-6' label='Link' />
+                    <div className='col-md-6'>
+                        <label/>
+                        <div className='row'>
+                            <FormCheckbox ref={e => this.active = e} className='col-md-6' label='Kích hoạt' />
+                            <FormCheckbox ref={e => this.header = e} className='col-md-6' label='Mục chính' />
                         </div>
                     </div>
                 </div>

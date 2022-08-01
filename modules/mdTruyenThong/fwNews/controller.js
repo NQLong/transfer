@@ -292,21 +292,26 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/news/default', (req, res) => {
-        const permissions = req.session.user.permissions,
+    app.post('/api/news/default', app.permission.check(), (req, res) => {
+        const user = req.session.user, permissions = user.permissions, maDonVi = req.body.maDonVi,
             valid = permissions.includes('news:write') || permissions.includes('news:tuyensinh') || permissions.includes('website:write');
         if (valid) {
-            app.model.fwNews.create2({
+            const newData = {
                 title: JSON.stringify({ vi: 'Tên bài viết', en: 'News title' }),
                 active: 0,
                 abstract: JSON.stringify({ vi: '', en: '' }),
                 content: JSON.stringify({ vi: '', en: '' }),
                 createdDate: new Date().getTime(),
                 isTranslate: 0,
-                language: 'vi',
-                maDonVi: permissions.includes('news:manage') ? '0' : (req.session.user && req.session.user.maDonVi ?
-                    req.session.user.maDonVi : -1),
-            }, (error, item) => res.send({ error, item }));
+                language: 'vi'
+            };
+
+            if (permissions.includes('news:manage') || permissions.includes('website:manage')) {
+                newData.maDonVi = maDonVi ? maDonVi : '0';
+            } else {
+                newData.maDonVi = user && user.maDonVi ? user.maDonVi : -1;
+            }
+            app.model.fwNews.create2(newData, (error, item) => res.send({ error, item }));
         } else {
             res.send({ error: 'User not has permission.' });
         }

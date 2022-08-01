@@ -1,30 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateNews, getNews, getDraftNews, checkLink, adminCheckLink, createDraftNews, updateDraftNews } from './redux';
-import { getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDvWebsite } from 'modules/_default/websiteDonVi/redux';
 import { SelectAdapter_FwStorage } from 'modules/_default/fwStorage/redux';
 import { Link, withRouter } from 'react-router-dom';
-import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';
 import { Select } from 'view/component/Input';
-import { FormTextBox } from 'view/component/AdminPage';
+import { FormTextBox, AdminPage, FormImageBox, FormCheckbox, FormSelect, FormDatePicker, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 
 const languageOption = [
     { value: 'vi', text: 'Tiếng Việt' },
     { value: 'en', text: 'Tiếng Anh' }
 ];
 
-class NewsEditPage extends React.Component {
+class NewsEditPage extends AdminPage {
+    state = { item: null, displayCover: 1, categories: [] };
     constructor (props) {
         super(props);
-        this.state = { item: null, displayCover: 1 };
-        // this.newsLink = React.createRef();
-        this.imageBox = React.createRef();
-        this.viEditor = React.createRef();
-        this.enEditor = React.createRef();
         this.language = React.createRef();
-        this.file = React.createRef();
-        this.DonVi = React.createRef();
     }
 
     componentDidMount() {
@@ -33,12 +26,6 @@ class NewsEditPage extends React.Component {
             this.neNewsViTitle.focus();
             $('#neNewsCategories').select2();
             $('#neNewsStartPost').datetimepicker(T.dateFormat);
-        });
-    }
-    componentDidUpdate() {
-        $(this.DonVi.current).on('change', e => {
-            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
-            if (donVi != this.state.donVi) this.setState({ donVi });
         });
     }
 
@@ -55,11 +42,8 @@ class NewsEditPage extends React.Component {
                     this.props.history.goBack();
                     return;
                 }
-                let categories = data.categories.map(item => ({ id: item.id, text: T.language.parse(item.text) }));
-                $('#neNewsCategories').select2({ data: categories }).val(data.item.categories).trigger('change');
-                const neNewsStartPost = $('#neNewsStartPost').datetimepicker(T.dateFormat);
-                if (data.item.startPost)
-                    neNewsStartPost.val(T.dateToText(data.item.startPost, 'dd/mm/yyyy HH:MM')).datetimepicker('update');
+
+                let categories = data.categories.map(item => ({ id: item.id, text: T.language.parse(item.text, 'vi') }));
                 if (data.item.link) {
                     this.neNewsLink.value(data.item.link);
                     $(this.newsLink).html(T.rootUrl + '/tin-tuc/' + data.item.link).attr('href', '/tin-tuc/' + data.item.link);
@@ -73,42 +57,40 @@ class NewsEditPage extends React.Component {
                     $(this.newsEnLink).html('').attr('');
                 }
                 data.image = data.item.image ? data.item.image : '/image/avatar.png';
-                this.imageBox.current.setData('news:' + (data.item.id ? data.item.id : 'new'), data.item.image);
+                this.imageBox.setData('news:' + (data.item.id ? data.item.id : 'new'), data.item.image);
+                this.active.value(data.item.active);
+                this.isInternal.value(data.item.isInternal);
+                this.displayCover.value(data.item.displayCover);
+                this.views.value(data.item.views);
+                this.createdDate.value(data.item.createdDate);
+                this.startPost.value(data.item.startPost);
+
                 let title = T.language.parse(data.item.title, true),
                     abstract = T.language.parse(data.item.abstract, true),
                     content = T.language.parse(data.item.content, true);
                 this.language.current.setVal(data.item.language);
                 this.neNewsViTitle.value(title.vi);
                 this.neNewsEnTitle.value(title.en);
+                this.viAbstract.value(abstract.vi);
+                this.viEditor.value(content.vi);
                 $('#neNewsViAbstract').val(abstract.vi); $('#neNewsEnAbstract').val(abstract.en);
-                this.viEditor.current.html(content.vi); this.enEditor.current.html(content.en);
-                if (data.listAttachment) this.file.current.setVal(data.listAttachment.map(item => ({ value: item.id, text: item.nameDisplay })));
-                this.props.getDmDonViFaculty(items => {
-                    $(this.DonVi.current).select2({
-                        data: [{ id: 0, text: 'TRƯỜNG ĐẠI HỌC KHXH & NV' }, ...items.map(item => ({ id: item.ma, text: item.ten }))],
-                        placeholder: 'Chọn đơn vị'
-                    }).val(data.item && data.item.maDonVi
-                        ? data.item.maDonVi : 0).trigger('change');
-                });
+                this.enEditor.current.html(content.en);
+                if (data.listAttachment) this.file.value(data.listAttachment.map(item => ({ id: item.id, text: item.nameDisplay })));
+
                 this.setState(data);
+                this.setState({ categories }, () => {
+                    this.categories.value(data.item.categories || []);
+                });
             } else {
                 this.props.history.push('/user/news/list');
             }
         });
     }
 
-    changeActive = (event) => {
-        this.setState({ item: Object.assign({}, this.state.item, { active: event.target.checked }) });
-    }
-    changeisInternal = (event) => {
-        this.setState({ item: Object.assign({}, this.state.item, { isInternal: event.target.checked }) });
-    }
     changeIsTranslate = (event) => {
         this.setState({ item: Object.assign({}, this.state.item, { isTranslate: event.target.checked ? 1 : 0 }) });
     }
-    changeDisplayCover = (event) => {
-        this.setState({ item: Object.assign({}, this.state.item, { displayCover: event.target.checked }) });
-    }
+
     checkLink = (item) => {
         this.props.checkLink(item.id, this.neNewsLink.value().trim());
     }
@@ -141,7 +123,7 @@ class NewsEditPage extends React.Component {
             isTranslate: this.state.item.isTranslate ? 1 : 0,
             abstract: JSON.stringify({ vi: $('#neNewsViAbstract').val(), en: $('#neNewsEnAbstract').val() }),
             content: JSON.stringify({ vi: this.viEditor.current.html(), en: this.enEditor.current.html() }),
-            attachment: this.file.current.val().toString(),
+            attachment: this.file.value().toString(),
             displayCover: this.state.item.displayCover ? 1 : 0,
             maDonVi: this.state.donVi,
         };
@@ -190,9 +172,8 @@ class NewsEditPage extends React.Component {
     };
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
-        let readOnly = currentPermissions.contains('news:draft')
-            && !currentPermissions.contains('news:write')
-            && !currentPermissions.contains('website:write');
+        let readOnly = currentPermissions.contains('news:draft') && !currentPermissions.contains('news:write') && !currentPermissions.contains('website:write');
+
         const item = this.state.item ? this.state.item : {
             priority: 1,
             categories: [],
@@ -229,63 +210,19 @@ class NewsEditPage extends React.Component {
                                 <FormTextBox ref={e => this.neNewsViTitle = e} label='Tên bài viết' />
                                 <FormTextBox ref={e => this.neNewsEnTitle = e} label='News title' />
                                 <div className='row'>
+                                    <FormImageBox ref={e => this.imageBox = e} className='col-md-6' postUrl='/user/upload' uploadType='NewsImage' label='Hình ảnh' />
                                     <div className='col-md-6'>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Hình ảnh</label>
-                                            <ImageBox ref={this.imageBox} postUrl='/user/upload' uploadType='NewsImage' readOnly={false} />
-                                        </div>
-                                    </div>
-                                    <div className='col-md-6'>
-                                        {currentPermissions.includes('news:write')
-                                            || currentPermissions.includes('news:tuyensinh')
-                                            || currentPermissions.includes('website:write') ? <div className='form-group' style={{ display: 'inline-flex', margin: 0 }}>
-                                            <label className='control-label'>Kích hoạt:&nbsp;</label>
-                                            <div className='toggle'>
-                                                <label>
-                                                    <input type='checkbox' checked={item.active} onChange={this.changeActive} disabled={readOnly} />
-                                                    <span className='button-indecator' />
-                                                </label>
-                                            </div>
-                                        </div> : null}
-                                        <div className='form-group'>
-                                            <label className='control-label'>Tin nội bộ:&nbsp;</label>
-                                            <span className='toggle'>
-                                                <label>
-                                                    <input type='checkbox' checked={item.isInternal} onChange={this.changeisInternal} disabled={readOnly} />
-                                                    <span className='button-indecator' />
-                                                </label>
-                                            </span>
-                                        </div>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Hiện thị ảnh bài viết:&nbsp;</label>
-                                            <span className='toggle'>
-                                                <label>
-                                                    <input type='checkbox' checked={item.displayCover} onChange={this.changeDisplayCover} disabled={readOnly} />
-                                                    <span className='button-indecator' />
-                                                </label>
-                                            </span>
-                                        </div>
-                                        <div className='form-group row'>
-                                            <label className='control-label col-12'>Lượt xem: {item.views}</label>
-                                        </div>
+                                        <FormCheckbox ref={e => this.active = e} label='Kích hoạt' isSwitch inline={false} readOnly={!(currentPermissions.includes('news:write') || currentPermissions.includes('news:tuyensinh') || currentPermissions.includes('website:write'))} />
+                                        <FormCheckbox ref={e => this.isInternal = e} label='Tin nội bộ' isSwitch inline={false} readOnly={readOnly} />
+                                        <FormCheckbox ref={e => this.displayCover = e} label='Hiển thị ảnh bài viết' isSwitch inline={false} readOnly={readOnly} />
+                                        <FormTextBox ref={e => this.views = e} label='Lượt xem' readOnly />
                                     </div>
                                 </div>
-                                <div className='form-group'>
-                                    <label className='control-label'>Danh mục bài viết</label>
-                                    <select className='form-control' id='neNewsCategories' multiple={true} defaultValue={[]} disabled={readOnly}>
-                                        <optgroup label='Lựa chọn danh mục' />
-                                    </select>
-                                </div>
-                                <div className='form-group' style={{ display: 'none' }}>
-                                    <label className='control-label'>Đơn vị</label>
-                                    <select ref={this.DonVi} placeholder='Chọn danh mục' multiple={false} className='select2-input' disabled={readOnly}></select>
-                                </div>
-                                <div className='form-group'>
-                                    <label className='control-label'>Tệp tin đính kèm</label>
-                                    <Select ref={this.file} adapter={SelectAdapter_FwStorage} multiple={true} disabled={readOnly} />
-                                </div>
+                                <FormSelect ref={e => this.categories = e} label='Danh mục bài viết' data={this.state.categories} multiple />
+                                <FormSelect ref={e => this.file = e} label='Tệp tin đính kèm' data={SelectAdapter_FwStorage} multiple readOnly={readOnly} />
                             </div>
                         </div>
+
                         <div className='tile'>
                             <h3 className='tile-title'>Ngôn ngữ</h3>
                             <div className='tile-body'>
@@ -304,13 +241,11 @@ class NewsEditPage extends React.Component {
                             </div>
                         </div>
                     </div>
+
                     <div className='col-md-6'>
                         <div className='tile'>
                             <h3 className='tile-title'>Link</h3>
                             <div className='tile-body'>
-                                {/* <div className='form-group'>
-                                    <label className='control-label'>Link mặc định</label><br />
-                                </div> */}
                                 <FormTextBox ref={e => this.neNewsLink = e} label='Link truyền thông' onChange={this.newsLinkChange} />
                                 <FormTextBox ref={e => this.neNewsEnLink = e} label='Link truyền thông tiếng Anh(nếu có)' onChange={this.newsEnLinkChange} />
                                 <div>
@@ -332,17 +267,12 @@ class NewsEditPage extends React.Component {
                         <div className='tile'>
                             <h3 className='tile-title'>Ngày tháng</h3>
                             <div className='tile-body'>
-                                <div className='form-group'>
-                                    <label className='control-label'>Ngày tạo: {T.dateToText(item.createdDate)}</label>
-                                </div>
-                                <div className='form-group'>
-                                    <label className='control-label'>Ngày bắt đầu đăng bài viết{readOnly && item.startPost ? ': ' + T.dateToText(item.startPost, 'dd/mm/yyyy HH:MM') : ''}</label>
-                                    <input className='form-control' id='neNewsStartPost' type='text' placeholder='Ngày bắt đầu đăng bài viết' autoComplete='off' defaultValue={item.startPost}
-                                        disabled={readOnly} />
-                                </div>
+                                <FormDatePicker type='time-mask' ref={e => this.createdDate = e} label='Ngày tạo' readOnly />
+                                <FormDatePicker type='time-mask' ref={e => this.startPost = e} label='Ngày bắt đầu đăng bài viết' readOnly={readOnly} />
                             </div>
                         </div>
                     </div>
+
                     <div className='col-md-12'>
                         <div className='tile'>
                             <div className='tile-body'>
@@ -356,9 +286,11 @@ class NewsEditPage extends React.Component {
                                 </ul>
                                 <div className='tab-content' style={{ paddingTop: '12px' }}>
                                     <div id='newsViTab' className='tab-pane fade show active'>
+                                        <FormRichTextBox ref={e => this.viAbstract = e} label='Tóm tắt bài viết' readOnly={readOnly} />
                                         <label className='control-label'>Tóm tắt bài viết</label>
                                         <textarea defaultValue='' className='form-control' id='neNewsViAbstract' placeholder='Tóm tắt bài viết' readOnly={readOnly}
                                             style={{ minHeight: '100px', marginBottom: '12px' }} />
+                                        <FormEditor ref={e => this.viEditor = e} label='Nội dung bài viết' uploadUrl='/user/upload?category=news' readOnly={readOnly} />
                                         <label className='control-label'>Nội dung bài viết</label>
                                         <Editor ref={this.viEditor} height='400px' placeholder='Nội dung bài biết' uploadUrl='/user/upload?category=news' readOnly={readOnly} />
                                     </div>
@@ -388,5 +320,5 @@ class NewsEditPage extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system, news: state.news });
-const mapActionsToProps = { updateNews, getNews, getDraftNews, checkLink, adminCheckLink, createDraftNews, updateDraftNews, getDmDonViFaculty };
+const mapActionsToProps = { updateNews, getNews, getDraftNews, checkLink, adminCheckLink, createDraftNews, updateDraftNews, getDvWebsite };
 export default withRouter(connect(mapStateToProps, mapActionsToProps)(NewsEditPage));

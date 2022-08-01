@@ -43,7 +43,8 @@ class NewsPage extends AdminPage {
     }
 
     create = (e) => {
-        this.props.createNews(data => this.props.history.push('/user/news/edit/' + data.item.id));
+        const permissionManage = this.getUserPermission('website', ['manage']).manage;
+        this.props.createNews(permissionManage ? this.state.maDonVi : null, data => this.props.history.push('/user/news/edit/' + data.item.id));
         e.preventDefault();
     }
 
