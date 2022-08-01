@@ -4691,7 +4691,7 @@ CREATE OR REPLACE FUNCTION HCTH_DASHBOARD_GET_DATA(
     HCTH_CONG_VAN_DI OUT SYS_REFCURSOR
 ) RETURN SYS_REFCURSOR
 AS
-    DATA_HCTH SYS_REFCURSOR;
+    DATA_VB SYS_REFCURSOR;
     today     NUMBER(20);
 BEGIN
     select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
@@ -4700,14 +4700,20 @@ BEGIN
         SELECT COUNT(*) AS "tongVanBanDen"
 
         FROM HCTH_CONG_VAN_DEN cvden
-        WHERE cvden.TRICH_YEU IS NOT NULL;
+        WHERE cvden.TRICH_YEU IS NOT NULL
+              AND (time IS NULL OR (cvden.NGAY_NHAN <= time));
 
     OPEN HCTH_CONG_VAN_DI FOR
         SELECT COUNT(*) AS "tongVanBanDi"
         FROM HCTH_CONG_VAN_DI cvdi
-        WHERE cvdi.TRICH_YEU IS NOT NULL;
+        WHERE cvdi.TRICH_YEU IS NOT NULL
+            AND (time IS NULL OR (cvdi.NGAY_GUI <= time));
+    OPEN DATA_VB FOR
+        SELECT COUNT(*)
+        FROM HCTH_DON_VI_NHAN dvn
+        WHERE dvn.DON_VI_NHAN IS NOT NULL;
 
-    RETURN  DATA_HCTH;
+    RETURN  DATA_VB;
 END;
 
 /
@@ -14926,6 +14932,86 @@ BEGIN
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION SDH_CAU_TRUC_KHUNG_DAO_TAO_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                      searchTerm IN STRING,
+                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER)
+    RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM SDH_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
+    WHERE searchTerm = ''
+       OR cauTrucKhungDt.NAM_DAO_TAO LIKE st;
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT cauTrucKhungDt.ID               as                      "id",
+                     cauTrucKhungDt.BAT_DAU_DANG_KY  as                      "batDauDangKy",
+                     cauTrucKhungDt.KET_THUC_DANG_KY as                      "ketThucDangKy",
+                     cauTrucKhungDt.MUC_CHA          as                      "mucCha",
+                     cauTrucKhungDt.MUC_CON          as                      "mucCon",
+                     cauTrucKhungDt.NAM_DAO_TAO      as                      "namDaoTao",
+                     BDT.TEN_BAC                     AS                      "tenBacDaoTao",
+                     ROW_NUMBER() OVER (ORDER BY cauTrucKhungDt.NAM_DAO_TAO) R
+              FROM SDH_CAU_TRUC_KHUNG_DAO_TAO cauTrucKhungDt
+                       LEFT JOIN DM_SV_BAC_DAO_TAO BDT ON BDT.MA_BAC = cauTrucKhungDt.BAC_DAO_TAO
+              WHERE searchTerm = ''
+                 OR cauTrucKhungDt.NAM_DAO_TAO LIKE st)
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION SDH_DM_KHOI_KIEN_THUC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                  searchTerm IN STRING,
+                                                  totalItem OUT NUMBER, pageTotal OUT NUMBER)
+    RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM SDH_DM_KHOI_KIEN_THUC kienThuc
+             LEFT JOIN SDH_DM_KHOI_KIEN_THUC kienThucCha ON kienThucCha.MA = kienThuc.KHOI_CHA
+    WHERE searchTerm = ''
+       OR lower(kienThuc.TEN) LIKE st
+       OR lower(kienThucCha.TEN) LIKE st;
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT kienThuc.MA       as                     "ma",
+                     kienThuc.TEN      as                     "ten",
+                     kienThuc.KHOI_CHA as                     "khoiCha",
+                     kienThucCha.TEN   as                     "tenKhoiCha",
+                     ROW_NUMBER() OVER (ORDER BY kienThuc.MA) R
+              FROM SDH_DM_KHOI_KIEN_THUC kienThuc
+                       LEFT JOIN SDH_DM_KHOI_KIEN_THUC kienThucCha ON kienThucCha.MA = kienThuc.KHOI_CHA
+              WHERE searchTerm = ''
+                 OR lower(kienThuc.TEN) LIKE st
+                 OR lower(kienThucCha.TEN) LIKE st)
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
 END;
 
 /
