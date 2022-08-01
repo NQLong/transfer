@@ -3,7 +3,7 @@ module.exports = app => {
     const userMenu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1056: { title: 'Công văn trình ký', link: '/user/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00', groupIndex: 5 },
+            1056: { title: 'Văn bản trình ký', link: '/user/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00', groupIndex: 5 },
         },
     };
     app.permission.add({ name: 'staff:login', menu: userMenu });

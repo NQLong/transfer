@@ -18,7 +18,7 @@ export class FileHistoryModal extends AdminModal {
             component: <>
                 <span className="time">{T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM:ss')}</span>
                 <p style={{ display: 'flex', justifyContent: 'space-between', color: 'blue' }}>
-                    <a href={`/api/hcth/cong-van-cac-phong/download/${item.ma}/${item.tenFile}`} download>{item.ten}</a>
+                    <a href={`/api/hcth/van-ban-di/download/${item.ma}/${item.tenFile}`} download>{item.ten}</a>
                     <span>{(item.hoNguoiTao ? item.hoNguoiTao.normalizedName() : ' ') + ' ' + (item.tenNguoiTao ? item.tenNguoiTao.normalizedName() : ' ')}</span>
                 </p>
             </>
@@ -36,7 +36,7 @@ export class FileHistoryModal extends AdminModal {
         let listHistoryFile = this.state.item?.danhSachCapNhat || [];
 
         return this.renderModal({
-            title: <span><i className={`btn fa fa-sort-amount-${this.state.historySortType ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử công văn</span>,
+            title: <span><i className={`btn fa fa-sort-amount-${this.state.historySortType ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử văn bản</span>,
             body: <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16, maxHeight: 400, overflowY: 'scroll' }}>
                     {this.renderHistory(listHistoryFile)}

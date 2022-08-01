@@ -10,19 +10,19 @@ export default {
     },
     routes: [
         {
-            path: '/user/hcth/cong-van-cac-phong',
+            path: '/user/hcth/van-ban-di',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/hcth/cong-van-cac-phong/:id',
+            path: '/user/hcth/van-ban-di/:id',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         },
         {
-            path: '/user/cong-van-cac-phong',
+            path: '/user/van-ban-di',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/cong-van-cac-phong/:id',
+            path: '/user/van-ban-di/:id',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         }
     ]
