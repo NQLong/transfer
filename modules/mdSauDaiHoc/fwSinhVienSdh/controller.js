@@ -1,8 +1,8 @@
 module.exports = app => {
     const menuSvSdh = {
-        parentMenu: app.parentMenu.students,
+        parentMenu: app.parentMenu.sdh,
         menus: {
-            6102: { title: 'Danh sách sinh viên SDH', link: '/user/sv-sdh/list', icon: 'fa-users', backgroundColor: '#2962ff' }
+            7501: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien' }
         }
     };
 
@@ -12,7 +12,7 @@ module.exports = app => {
         { name: 'svSdh:delete' }
     );
 
-    app.get('/user/sv-sdh/list', app.permission.check('svSdh:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/sinh-vien', app.permission.check('svSdh:manage'), app.templates.admin);
     app.get('/user/sv-sdh/upload', app.permission.check('svSdh:manage'), app.templates.admin);
     app.get('/user/sv-sdh/item/:mssv', app.permission.check('svSdh:write'), app.templates.admin);
 
@@ -69,7 +69,7 @@ module.exports = app => {
 
     app.post('/api/sv-sdh/multiple', app.permission.check('svSdh:write'), (req, res) => {
         const data = req.body.data;
-        let gioiTinhMapping = {}, quocGiaMapping = {}, danTocMapping = {}, tonGiaoMapping = {}, tinhTpMapping = {}, huyenMapping = {}, xaMapping = {}, khoaSdhMapping = {}, nganhSdhMapping = {},
+        let gioiTinhMapping = {}, quocGiaMapping = {}, danTocMapping = {}, tonGiaoMapping = {}, tinhTpMapping = {}, huyenMapping = {}, xaMapping = {}, donViMapping = {}, nganhSdhMapping = {},
             bacDaoTaoMapping = {}, heDaoTaoMapping = {}, tinhTrangMapping = {}, canBoMapping = {};
 
         new Promise(resolve => {
@@ -108,8 +108,8 @@ module.exports = app => {
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            app.model.dmKhoaSauDaiHoc.getAll((error, items) => {
-                (items || []).forEach(item => khoaSdhMapping[item.ten.toLowerCase()] = item.ma);
+            app.model.dmDonVi.getAll((error, items) => {
+                (items || []).forEach(item => donViMapping[item.ten.toLowerCase()] = item.ma);
                 resolve();
             });
         })).then(() => new Promise(resolve => {
@@ -163,16 +163,6 @@ module.exports = app => {
 
                 if (index < data.length) {
                     new Promise(resolve => {
-                        if (item.maKhoa) {
-                            app.model.dmKhoaSauDaiHoc.get({ ma: item.maKhoa }, (error, khoaSdh) => {
-                                if (!error && !khoaSdh) {
-                                    app.model.dmKhoaSauDaiHoc.create({ ma: item.maKhoa, ten: item.khoa, kichHoat: 1 }, () => {
-                                        resolve();
-                                    });
-                                } else resolve();
-                            });
-                        } else resolve();
-                    }).then(() => new Promise(resolve => {
                         if (item.maNganh) {
                             app.model.dmNganhSauDaiHoc.get({ maNganh: item.maNganh }, (error, nganhSdh) => {
                                 if (!error && !nganhSdh) {
@@ -182,7 +172,7 @@ module.exports = app => {
                                 } else resolve();
                             });
                         } else resolve();
-                    })).then(() => {
+                    }).then(() => {
                         app.model.fwSinhVienSdh.get({ ma: item.ma }, (error, svSdh) => {
                             // ma, ho, ten, gioiTinh, ngaySinh, danToc, tonGiao, quocTich, nguyenQuanMaTinh, hienTaiSoNha, hienTaiMaXa, hienTaiMaHuyen, hienTaiMaTinh, noiSinhSoNha, noiSinhMaXa, noiSinhMaHuyen, noiSinhMaTinh, maKhoa, maNganh, thuongTruSoNha, thuongTruMaXa, thuongTruMaHuyen, thuongTruMaTinh, namTuyenSinh, nienKhoa, bacDaoTao, chuongTrinhDaoTao, sdtCaNhan, sdtLienHe, email, coQuan, gvhd, tenDeTai, tinhTrang, heDaoTao
                             const newData = {
@@ -190,20 +180,20 @@ module.exports = app => {
                                 ten: item.ten,
                                 gioiTinh: item.gioiTinh ? item.gioiTinh == 'Nam' ? '01' : '02' : '',
                                 ngaySinh: item.ngaySinh,
-                                danToc: item.danToc ? danTocMapping[item.danToc.toLowerCase()] : '',
-                                tonGiao: item.tonGiao ? tonGiaoMapping[item.tonGiao.toLowerCase()] : '',
-                                quocTich: item.quocTich ? quocGiaMapping[item.quocTich.toLowerCase()] : '',
+                                danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : '',
+                                tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : '',
+                                quocTich: item.quocTich && quocGiaMapping[item.quocTich.toLowerCase()] ? quocGiaMapping[item.quocTich.toLowerCase()] : '',
                                 nguyenQuanMaTinh: item.nguyenQuan ? tinhTpMapping[item.nguyenQuan.toLowerCase().trim()] : '',
-                                noiSinhMaTinh: item.noiSinh ? item.noiSinh.toLowerCase().includes('hcm') || item.noiSinh.toLowerCase().includes('hồ chí minh') ? tinhTpMapping['hồ chí minh'] : tinhTpMapping[item.noiSinh.toLowerCase().trim()] : '',
-                                maKhoa: item.maKhoa,
+                                noiSinhMaTinh: item.noiSinh ? item.noiSinh.toLowerCase().includes('hcm') || item.noiSinh.toLowerCase().includes('hồ chí minh') ? tinhTpMapping['hồ chí minh'] : tinhTpMapping[item.noiSinh.toLowerCase().trim()] ? tinhTpMapping[item.noiSinh.toLowerCase().trim()] : '' : '',
+                                maKhoa: item.khoa && donViMapping[item.khoa.toLowerCase()] ? donViMapping[item.khoa.toLowerCase()] : '',
                                 maNganh: item.maNganh,
                                 thuongTruSoNha: item.thuongTruSoNha ? item.thuongTruSoNha : '',
-                                thuongTruMaXa: item.thuongTruXa ? xaMapping[item.thuongTruXa.toLowerCase()] : '',
-                                thuongTruMaHuyen: item.thuongTruHuyen ? huyenMapping[item.thuongTruHuyen.toLowerCase()] : '',
-                                thuongTruMaTinh: item.thuongTruTinh ? tinhTpMapping[item.thuongTruTinh.toLowerCase()] : '',
+                                thuongTruMaXa: item.thuongTruXa && xaMapping[item.thuongTruXa.toLowerCase()] ? xaMapping[item.thuongTruXa.toLowerCase()] : '',
+                                thuongTruMaHuyen: item.thuongTruHuyen && huyenMapping[item.thuongTruHuyen.toLowerCase()] ? huyenMapping[item.thuongTruHuyen.toLowerCase()] : '',
+                                thuongTruMaTinh: item.thuongTruTinh && tinhTpMapping[item.thuongTruTinh.toLowerCase()] ? tinhTpMapping[item.thuongTruTinh.toLowerCase()] : '',
                                 namTuyenSinh: item.namTuyenSinh,
                                 nienKhoa: item.nienKhoa,
-                                bacDaoTao: item.bacDaoTao ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '',
+                                bacDaoTao: item.bacDaoTao && bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '',
                                 chuongTrinhDaoTao: item.chuongTrinhDaoTao,
                                 sdtCaNhan: item.sdtCaNhan,
                                 sdtLienHe: item.sdtLienHe,
@@ -212,7 +202,7 @@ module.exports = app => {
                                 gvhd: item.gvhd ? getGvhd(item.gvhd) : '',
                                 tenDeTai: item.tenDeTai,
                                 tinhTrang: item.maTinhTrang,
-                                heDaoTao: item.heDaoTao ? heDaoTaoMapping[item.heDaoTao.toLowerCase()] : '',
+                                heDaoTao: item.heDaoTao && heDaoTaoMapping[item.heDaoTao.toLowerCase()] ? heDaoTaoMapping[item.heDaoTao.toLowerCase()] : '',
                                 hoTenCha: item.hoTenCha ? item.hoTenCha : '',
                                 namSinhCha: item.namSinhCha ? item.namSinhCha : '',
                                 ngheNghiepCha: item.ngheNghiepCha ? item.ngheNghiepCha : '',
@@ -223,7 +213,6 @@ module.exports = app => {
                                 sdtMe: item.sdtMe ? item.sdtMe : '',
                                 sdtNguoiThan: item.sdtNguoiThan ? item.sdtNguoiThan : '',
                             };
-
                             if (svSdh) {
                                 app.model.fwSinhVienSdh.update({ ma: item.ma }, newData, () => {
                                     handleCreateItem(index + 1);
@@ -234,6 +223,7 @@ module.exports = app => {
                                     handleCreateItem(index + 1);
                                 });
                             }
+
                         });
                     });
                 } else {
