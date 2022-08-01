@@ -52,7 +52,6 @@ module.exports = app => {
                 maKhoa: req.query.maKhoaSdh
             };
         }
-
         app.model.dmNganhSauDaiHoc.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
@@ -76,64 +75,52 @@ module.exports = app => {
         app.model.dmNganhSauDaiHoc.delete({ maNganh: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.post('/api/sau-dai-hoc/danh-sach-nganh/multiple', app.permission.check('dmNganhSdh:write'), (req, res) => {
-        const data = req.body.data;
-        let errors = [];
-        const handleCreateItem = (index = 0) => {
-            let item = data[index];
-
-            if (index < data.length) {
+    app.post('/api/sau-dai-hoc/danh-sach-nganh/multiple', app.permission.check('dmNganhSdh:write'), async (req, res) => {
+        try {
+            const data = req.body.data;
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index];
                 const newData = {
                     maNganh: item.ma,
                     ten: item.ten,
                 };
-                app.model.dmNganhSauDaiHoc.get({ maNganh: item.ma }, (error, svSdh) => {
-                    if (error || svSdh) {
-                        handleCreateItem(index + 1);
-                    } else {
-                        app.model.dmNganhSauDaiHoc.create(newData, () => {
-                            handleCreateItem(index + 1);
-                        });
-                    }
-                });
-            } else {
-                res.send({ errors });
+                let data = await app.model.dmNganhSauDaiHoc.get({ maNganh: item.ma });
+                if (!data) await app.model.dmNganhSauDaiHoc.create(newData);
             }
-        };
-        handleCreateItem();
+            res.end();
+        } catch (error) { res.send({ error }); }
     });
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
     app.uploadHooks.add('dmNganhSdhImportData', (req, fields, files, params, done) =>
         app.permission.has(req, () => dmNganhSdhImportData(req, fields, files, params, done), done, 'dmNganhSdh:write'));
 
-    const dmNganhSdhImportData = (req, fields, files, params, done) => {
+    const dmNganhSdhImportData = async (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0] && fields.userData[0] == 'dmNganhSdhImportData' && files.dmNganhSdhFile && files.dmNganhSdhFile.length > 0) {
             const srcPath = files.dmNganhSdhFile[0].path;
-            app.excel.readFile(srcPath, workbook => {
-                if (workbook) {
-                    const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
-                    const handleUpload = (index = 2) => {
-                        const value = worksheet.getRow(index).values;
-                        if (value.length == 0 || index == totalRow + 1) {
-                            app.deleteFile(srcPath);
-                            done({ element });
-                        } else {
-                            let data = {
-                                maNganh: value[1],
-                                ten: value[2] ? value[2].trim() : '',
-                            };
+            const workbook = await app.excel.readFile(srcPath);
+            if (workbook) {
+                const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
+                const handleUpload = (index = 2) => {
+                    const value = worksheet.getRow(index).values;
+                    if (value.length == 0 || index == totalRow + 1) {
+                        app.deleteFile(srcPath);
+                        done({ element });
+                    } else {
+                        let data = {
+                            maNganh: value[1],
+                            ten: value[2] ? value[2].trim() : '',
+                        };
 
-                            element.push(data);
-                            handleUpload(index + 1);
-                        }
-                    };
-                    handleUpload();
-                } else {
-                    app.deleteFile(srcPath);
-                    done({ error: 'Error' });
-                }
-            });
+                        element.push(data);
+                        handleUpload(index + 1);
+                    }
+                };
+                handleUpload();
+            } else {
+                app.deleteFile(srcPath);
+                done({ error: 'Error' });
+            }
         }
     };
 };
