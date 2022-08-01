@@ -1,239 +1,250 @@
 .component {
-    position: relative;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    min-height: 72px;
-    background-color: #eee;
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  min-height: 72px;
+  background-color: #eee;
 
-    .control {
-        display: none;
-        position: absolute;
-        top: 6px;
-        right: 6px;
-    }
+  .control {
+    display: none;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+  }
 
-    &:hover > .control {
-        display: block;
-    }
+  &:hover > .control {
+    display: block;
+  }
 }
 
 .widget-small {
-    background-color: white;
+  background-color: white;
 
-    img {
-        background-color: transparent;
+  img {
+    background-color: transparent;
+  }
+
+  .info {
+    flex: 1;
+    padding: "0 20px";
+    align-self: center;
+
+    p {
+      color: black;
     }
-
-    .info {
-        flex: 1;
-        padding: "0 20px";
-        align-self: center;
-
-        p {
-            color: black;
-        }
-    }
+  }
 }
 
 .central-box {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    border: 1px dashed #167ce9;
-    padding: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  border: 1px dashed #167ce9;
+  padding: 10px;
 
-    p {
-        margin: 16px;
-    }
+  p {
+    margin: 16px;
+  }
 }
 
 .table td {
-    vertical-align: middle !important;
+  vertical-align: middle !important;
 }
 
 .select2-container {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 .menuList > li {
-    width: "100%";
-    margin-top: 10px;
-    margin-bottom: 10px;
+  width: "100%";
+  margin-top: 10px;
+  margin-bottom: 10px;
 
-    .buttons {
-        display: block;
-        margin-left: 6px;
-    }
+  .buttons {
+    display: block;
+    margin-left: 6px;
+  }
 
-    div > div.buttons {
-        visibility: hidden;
-    }
-    div:hover > div.buttons {
-        visibility: visible;
-    }
+  div > div.buttons {
+    visibility: hidden;
+  }
+  div:hover > div.buttons {
+    visibility: visible;
+  }
 }
 
 .menuSub > li {
-    width: "100%";
-    margin-top: 10px;
-    margin-bottom: 10px;
+  width: "100%";
+  margin-top: 10px;
+  margin-bottom: 10px;
 
-    .buttons {
-        display: block;
-        margin-left: 6px;
-    }
+  .buttons {
+    display: block;
+    margin-left: 6px;
+  }
 
-    div > div.buttons {
-        visibility: hidden;
-    }
-    div:hover > div.buttons {
-        visibility: visible;
-    }
+  div > div.buttons {
+    visibility: hidden;
+  }
+  div:hover > div.buttons {
+    visibility: visible;
+  }
 }
 
 .tinTucList > li {
-    width: "100%";
-    margin-top: 10px;
-    margin-bottom: 10px;
+  width: "100%";
+  margin-top: 10px;
+  margin-bottom: 10px;
 
-    .buttons {
-        display: block;
-        margin-left: 6px;
-    }
+  .buttons {
+    display: block;
+    margin-left: 6px;
+  }
 
-    div > div.buttons {
-        visibility: hidden;
-    }
-    div:hover > div.buttons {
-        visibility: visible;
-    }
+  div > div.buttons {
+    visibility: hidden;
+  }
+  div:hover > div.buttons {
+    visibility: visible;
+  }
 }
 
 .btn-circle {
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    padding: 10px 16px;
-    line-height: 1.33;
-    border-radius: 50%;
-    font-size: 18px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  padding: 10px 16px;
+  line-height: 1.33;
+  border-radius: 50%;
+  font-size: 18px;
 
-    .fa {
-        font-size: 18px;
-    }
+  .fa {
+    font-size: 18px;
+  }
 }
 
 .swal-button--false {
-    background-color: #28a745;
+  background-color: #28a745;
 }
 
 .has-search {
-    .form-control {
-        padding-left: 2.375rem;
-    }
-    .form-control-feedback {
-        position: absolute;
-        z-index: 2;
-        display: block;
-        width: 2.375rem;
-        height: 2.375rem;
-        line-height: 2.375rem;
-        text-align: center;
-        pointer-events: none;
-        color: #aaa;
-    }
-    .form-control-clear {
-        z-index: 2;
-        display: block;
-        line-height: 2.375rem;
-        text-align: center;
-        pointer-events: none;
-        color: red;
-        top: 5px;
-        right: 0px;
-        width: 16px;
-        height: 16px;
-        float: right;
-    }
+  .form-control {
+    padding-left: 2.375rem;
+  }
+  .form-control-feedback {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 2.375rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #aaa;
+  }
+  .form-control-clear {
+    z-index: 2;
+    display: block;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: red;
+    top: 5px;
+    right: 0px;
+    width: 16px;
+    height: 16px;
+    float: right;
+  }
 }
 
 .form-control-black:focus {
-    border-color: #343a40;
+  border-color: #343a40;
 }
 
 .menuSearchItem {
-    margin-top: 24px;
-    text-align: center;
+  margin-top: 24px;
+  text-align: center;
 }
 
 .button-edit {
-    width: 40px;
-    height: 30px;
-    text-align: center;
-    padding: 0px;
+  width: 40px;
+  height: 30px;
+  text-align: center;
+  padding: 0px;
 }
 
 .list-group-item-tin-tuc {
-    border: 0px;
+  border: 0px;
 }
 
 .show-on-hover {
-    & .btn {
-        visibility: hidden;
-    }
-    &:hover .btn {
-        visibility: visible;
-    }
+  & .btn {
+    visibility: hidden;
+  }
+  &:hover .btn {
+    visibility: visible;
+  }
 }
 
 .cke_editable {
-    img {
-        width: 100%;
-    }
+  img {
+    width: 100%;
+  }
 }
 
 .app-advance-search {
-    display: none;
-    background-color: #fff;
-    margin: -30px -30px 30px;
-    padding: 0 30px 20px 30px;
+  display: none;
+  background-color: #fff;
+  margin: -30px -30px 30px;
+  padding: 0 30px 20px 30px;
 
-    &.show {
-        display: block;
-    }
+  &.show {
+    display: block;
+  }
 }
 
 .admin-form-select {
-    span.select2-selection__clear {
-        color: #888;
-        font-size: 22px;
-        font-weight: unset;
-        margin-right: 10px;
-        height: 36px;
-        line-height: 34px;
-    }
+  span.select2-selection__clear {
+    color: #888;
+    font-size: 22px;
+    font-weight: unset;
+    margin-right: 10px;
+    height: 36px;
+    line-height: 34px;
+  }
 }
 
 .tile-table-fix-head {
-    height: calc(100vh - 252px);
-    //overflow-y: scroll;
+  height: calc(100vh - 252px);
 
-    table {
-        overflow-y: auto;
-        height: 100%;
-
-        thead th {
-            color: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 400;
-            border: 0;
-        }
+  table {
+    overflow-y: auto;
+    height: 100%;
+    &::-webkit-scrollbar {
+      width: 0px;
     }
+
+    thead th {
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 400;
+      border: 0;
+    }
+  }
+  table:hover {
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.35);
+      border-radius: 10px;
+    }
+  }
 }
 
 .notify-alert.alert-warning {
-    color: #000;
+  color: #000;
 }
