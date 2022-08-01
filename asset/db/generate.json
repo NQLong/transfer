@@ -15558,6 +15558,9 @@
             "active": true,
             "moduleName": "sdhCauTrucKhungDaoTao",
             "modelName": "sdhCauTrucKhungDaoTao",
+            "methods": {
+                "SDH_CAU_TRUC_KHUNG_DAO_TAO_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "MUC_CON": {
                     "value": "mucCon",
@@ -15755,7 +15758,7 @@
         },
         "SDH_KHUNG_DAO_TAO": {
             "active": true,
-            "moduleName": "sdhKhungDaoTao",
+            "moduleName": "sdhCauTrucKhungDaoTao",
             "modelName": "sdhKhungDaoTao",
             "columns": {
                 "NAM_DAO_TAO": {
@@ -15844,6 +15847,42 @@
                 }
             },
             "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SDH_DM_KHOI_KIEN_THUC": {
+            "active": true,
+            "moduleName": "sdhDmKhoiKienThuc",
+            "modelName": "sdhDmKhoiKienThuc",
+            "methods": {
+                "SDH_DM_KHOI_KIEN_THUC_SEARCH_PAGE": "searchPage"
+            },
+            "columns": {
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "KHOI_CHA": {
+                    "value": "khoiCha",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
             "foreignKeys": [],
             "type": "table"
         }

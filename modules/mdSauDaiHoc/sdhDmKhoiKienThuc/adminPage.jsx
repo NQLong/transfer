@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmKhoiKienThucPage, deleteDmKhoiKienThuc, createDmKhoiKienThuc, updateDmKhoiKienThuc, SelectAdapter_DmKhoiKienThucAll } from './redux';
-import { Link } from 'react-router-dom';
+import { getSdhDmKhoiKienThucPage, deleteSdhDmKhoiKienThuc, createSdhDmKhoiKienThuc, updateSdhDmKhoiKienThuc, SelectAdapter_SdhDmKhoiKienThucAll } from './redux';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
@@ -49,18 +48,21 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.item} required />
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
-                <FormSelect data={SelectAdapter_DmKhoiKienThucAll()} className='col-12' ref={e => this.khoiCha = e} label='Khối cha' readOnly={readOnly} placeholder='Khối cha' />
+                <FormSelect data={SelectAdapter_SdhDmKhoiKienThucAll()} className='col-12' ref={e => this.khoiCha = e} label='Khối cha' readOnly={readOnly} placeholder='Khối cha' />
             </div>
         }
         );
     }
 }
 
-class DmKhoiKienThucPage extends AdminPage {
+class SdhDmKhoiKienThucPage extends AdminPage {
     componentDidMount() {
-        T.onSearch = (searchText) => this.props.getDmKhoiKienThucPage(undefined, undefined, searchText || '');
-        T.showSearchBox();
-        this.props.getDmKhoiKienThucPage();
+        T.ready('/user/sau-dai-hoc/khoi-kien-thuc', () => {
+            T.onSearch = (searchText) => this.props.getSdhDmKhoiKienThucPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getSdhDmKhoiKienThucPage();
+        });
+
     }
 
     showModal = (e) => {
@@ -70,7 +72,7 @@ class DmKhoiKienThucPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa khối kiến thức', `Bạn có chắc bạn muốn xóa khối kiến thức ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteDmKhoiKienThuc(item.ma, error => {
+            isConfirm && this.props.deleteSdhDmKhoiKienThuc(item.ma, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá khối kiến thức ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá khối kiến thức ${item.ten} thành công!`, 'success', false, 800);
             });
@@ -79,10 +81,10 @@ class DmKhoiKienThucPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('dmKhoiKienThuc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('sdhDmKhoiKienThuc', ['read', 'write', 'delete']);
 
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmKhoiKienThuc && this.props.dmKhoiKienThuc.page ?
-            this.props.dmKhoiKienThuc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
+        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhDmKhoiKienThuc && this.props.sdhDmKhoiKienThuc.page ?
+            this.props.sdhDmKhoiKienThuc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         const table = renderTable({
             getDataSource: () => list,
             stickyHead: false,
@@ -110,13 +112,12 @@ class DmKhoiKienThucPage extends AdminPage {
             icon: 'fa fa-crosshairs',
             title: 'Khối kiến thức',
             breadcrumb: [
-                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Khối kiến thức'
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmKhoiKienThucPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createDmKhoiKienThuc} update={this.props.updateDmKhoiKienThuc} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getSdhDmKhoiKienThucPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createSdhDmKhoiKienThuc} update={this.props.updateSdhDmKhoiKienThuc} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
@@ -124,6 +125,6 @@ class DmKhoiKienThucPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmKhoiKienThuc: state.danhMuc.dmKhoiKienThuc });
-const mapActionsToProps = { getDmKhoiKienThucPage, deleteDmKhoiKienThuc, createDmKhoiKienThuc, updateDmKhoiKienThuc };
-export default connect(mapStateToProps, mapActionsToProps)(DmKhoiKienThucPage);
+const mapStateToProps = state => ({ system: state.system, sdhDmKhoiKienThuc: state.sdh.sdhDmKhoiKienThuc });
+const mapActionsToProps = { getSdhDmKhoiKienThucPage, deleteSdhDmKhoiKienThuc, createSdhDmKhoiKienThuc, updateSdhDmKhoiKienThuc };
+export default connect(mapStateToProps, mapActionsToProps)(SdhDmKhoiKienThucPage);

@@ -223,6 +223,8 @@ module.exports = app => {
                         if (e || item == null) {
                             if (!user.isStaff) {
                                 user.permissions = user.permissions.filter(item => item != 'staff:login');
+                            } else {
+                                user.isUnit = 1;
                             }
                             resolve();
                         } else {
