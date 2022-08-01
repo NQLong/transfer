@@ -221,7 +221,6 @@ module.exports = app => {
                     // user.isStaff && app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:test');
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
-                            user.isStaff = 0;
                             if (!user.isStaff) {
                                 user.permissions = user.permissions.filter(item => item != 'staff:login');
                             }
