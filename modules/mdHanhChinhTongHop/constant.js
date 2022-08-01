@@ -6,7 +6,7 @@ module.exports = {
         CHO_PHAN_PHOI: { id: 3, text: 'Chờ phân phối' },
         TRA_LAI_HCTH: { id: 4, text: 'Trả lại (HCTH)' },
         DA_PHAN_PHOI: { id: 5, text: 'Đã phân phối' },
-        DA_DUYET: {id: 6, text: 'Đã duyệt'}
+        DA_DUYET: { id: 6, text: 'Đã duyệt' }
     },
 
     trangThaiCongVanDi: {
@@ -17,11 +17,11 @@ module.exports = {
         TRA_LAI: { id: '4', text: 'Trả lại' },
         DA_XEM_XET: { id: '5', text: 'Đã xem xét' },
         DA_DUYET: { id: '7', text: 'Đã duyệt' },
-        CHO_PHAN_PHOI: {id: '8', text: 'Chờ phân phối'},
-        CHO_KY: {id: '9', text: 'Chờ ký'},
-        DA_PHAN_PHOI: {id:'10', text: 'Đã phân phối'},
-        TRA_LAI_PHONG: {id: '11', text: 'Trả lại (Đơn vị)'},
-        TRA_LAI_HCTH: {id: '12', text: 'Trả lại (HCTH)'}
+        CHO_PHAN_PHOI: { id: '8', text: 'Chờ phân phối' },
+        CHO_KY: { id: '9', text: 'Chờ ký' },
+        DA_PHAN_PHOI: { id: '10', text: 'Đã phân phối' },
+        TRA_LAI_PHONG: { id: '11', text: 'Trả lại (Đơn vị)' },
+        TRA_LAI_HCTH: { id: '12', text: 'Trả lại (HCTH)' }
     },
 
     action: {
@@ -92,12 +92,12 @@ module.exports = {
     loaiLienKet: {
         'CONG_VAN_DEN': {
             id: 'CONG_VAN_DEN',
-            text: 'Công văn đến',
+            text: 'Văn bản đến',
         },
 
         'CONG_VAN_DI': {
             id: 'CONG_VAN_DI',
-            text: 'Công văn đi',
+            text: 'Văn bản đi',
         }
     },
 
@@ -116,12 +116,12 @@ module.exports = {
     loaiCongVan: {
         DON_VI: {
             id: 'DON_VI',
-            text: 'Công văn đơn vị',
+            text: 'Văn bản đơn vị',
             color: 'blue',
         },
         TRUONG: {
             id: 'TRUONG',
-            text: 'Công văn trường',
+            text: 'Văn bản trường',
             color: 'red',
         }
     }

@@ -116,7 +116,7 @@ class AddingModal extends AdminModal {
             size: 'large',
             submitText: 'Mở môn học',
             body: <div className='row'>
-                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' label='Bậc đào tạo' />
+                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' label='Bậc đào tạo' readOnly />
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-6' label='Hệ đào tạo' />
                 <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-6' label='Năm' />
                 <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-6' />

@@ -48,9 +48,9 @@ module.exports = app => {
     app.post('/api/dao-tao/cau-truc-khung-dao-tao', app.permission.check('dtCauTrucKhungDaoTao:write'), (req, res) => {
         const item = req.body.item;
         const namDaoTao = item?.namDaoTao;
-        app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namDaoTao }, (error, ctKhungDt) => {
+        app.model.dtCauTrucKhungDaoTao.get({ namDaoTao }, (error, ctKhungDt) => {
             if (!error && !ctKhungDt) {
-                app.model.dtCauTrucKhungDaoTao.create(item, async (error, item) => {
+                app.model.dtCauTrucKhungDaoTao.create({ ...item, bacDaoTao: 'DH' }, async (error, item) => {
                     if (!error) {
                         //TODO: Send Email - Notification;
                         // let listEmail = await app.model.qtChucVu.getAllTruongKhoaEmail();

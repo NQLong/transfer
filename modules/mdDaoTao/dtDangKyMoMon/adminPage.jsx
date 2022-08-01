@@ -14,8 +14,8 @@ import { getDtDangKyMoMonPage, createDangKyMoMon } from './redux';
 
 class NganhModal extends AdminModal {
     onShow = () => {
-        this.setState({ bacDaoTao: '', loaiHinhDaoTao: '' });
-        this.bacDaoTao.value('');
+        this.setState({ bacDaoTao: 'DH', loaiHinhDaoTao: '' });
+        this.bacDaoTao.value('DH');
         this.loaiHinhDaoTao.value('');
         this.namHoc.value('');
         this.hocKy.value('');
@@ -55,7 +55,7 @@ class NganhModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-6' ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} onChange={e => {
                     this.setState({ bacDaoTao: e.id }, () => this.loaiHinhDaoTao.focus());
-                }} />
+                }} readOnly />
                 <FormSelect className='col-md-6' ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} onChange={e => {
                     this.setState({ loaiHinhDaoTao: e.id }, () => {
                         if (!this.bacDaoTao.value()) {

@@ -14,7 +14,7 @@ export class RefreshStatusModal extends AdminModal {
     }
 
     onShow = (item) => {
-        this.setState({ item});
+        this.setState({ item });
         this.phanHoi.value('');
     }
 
@@ -180,7 +180,7 @@ export class CanBoNhan extends AdminPage {
     });
 
     resetUserStatus = (data, done) => {
-        this.props.refreshCanBoNhanStatus(data, () =>{
+        this.props.refreshCanBoNhanStatus(data, () => {
             this.props.getHistory();
             done && done();
         });
@@ -377,7 +377,7 @@ class CongVanDenSelector extends React.Component {
                 return (<tr key={item.id}>
                     <TableCell style={{}} content={<FormCheckbox ref={e => this.itemRef[item.id] = e} onChange={(value) => this.handleToggleItem(item, value)} />} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<Link to={`/user/cong-van-den/${item.id}`} target='_blank' rel='noopener noreferrer' >{item.soCongVan || 'Chưa có số'}</Link>} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<Link to={`/user/van-ban-den/${item.id}`} target='_blank' rel='noopener noreferrer' >{item.soCongVan || 'Chưa có số'}</Link>} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.soDen} />
                     <TableCell contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.tenDonViGuiCV} />
                     <TableCell contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.trichYeu} />
@@ -477,7 +477,7 @@ class CongVanDiSelector extends React.Component {
                 return (<tr key={item.id}>
                     <TableCell style={{}} content={<FormCheckbox ref={e => this.itemRef[item.id] = e} onChange={(value) => this.handleToggleItem(item, value)} />} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<Link to={`/user/cong-van-cac-phong/${item.id}`} target='_blank' rel='noopener noreferrer' >{item.soDi || 'Chưa có số'}</Link>} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<Link to={`/user/van-ban-di/${item.id}`} target='_blank' rel='noopener noreferrer' >{item.soDi || 'Chưa có số'}</Link>} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
 
                     <TableCell contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.tenDonViGui} />
@@ -569,7 +569,7 @@ export class LienKet extends React.Component {
         return (<tr key={index}>
             <TableCell style={{ textAlign: 'right' }} content={index + 1} />
             <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                <Link to={`/user/cong-van-den/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
+                <Link to={`/user/van-ban-den/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
                     {(item.soCongVanDen || 'Chưa có') + (item.soDen ? `(${item.soDen})` : '')}
                 </Link>
             }
@@ -583,7 +583,7 @@ export class LienKet extends React.Component {
             } />
             <TableCell type='text' style={{}} content={item.trichYeuDen} />
             <TableCell type='buttons' permission={{ delete: canDelete }} onDelete={(e) => this.onDelete(e, item)}>
-                <Link className='btn btn-primary' role='button' to={`/user/cong-van-den/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
+                <Link className='btn btn-primary' role='button' to={`/user/van-ban-den/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
                     <i className='fa fa-eye'></i>
                 </Link>
             </TableCell>
@@ -594,7 +594,7 @@ export class LienKet extends React.Component {
         return (<tr key={index}>
             <TableCell style={{ textAlign: 'right' }} content={index + 1} />
             <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                <Link to={`/user/cong-van-cac-phong/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
+                <Link to={`/user/van-ban-di/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
                     {item.soDi || 'Chưa có'}
                 </Link>
             }
@@ -603,7 +603,7 @@ export class LienKet extends React.Component {
             <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
             <TableCell type='text' style={{}} content={item.trichYeuDi} />
             <TableCell type='buttons' permission={{ delete: canDelete }} onDelete={(e) => this.onDelete(e, item)}>
-                <Link className='btn btn-primary' role='button' to={`/user/cong-van-cac-phong/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
+                <Link className='btn btn-primary' role='button' to={`/user/van-ban-di/${item.keyB}?nhiemVu=${item.keyA}`} target='_blank' rel='noopener noreferrer'>
                     <i className='fa fa-eye'></i>
                 </Link>
             </TableCell>

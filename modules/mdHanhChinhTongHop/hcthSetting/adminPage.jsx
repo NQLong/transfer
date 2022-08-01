@@ -56,12 +56,12 @@ class HcthSettingAdminPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('hcthSetting'),
             readOnly = !permission.write;
-        
+
         return this.renderPage({
             title: 'Cấu hình',
             icon: 'fa fa-cog',
             breadcrumb: [
-                <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>, 
+                <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                 'Cấu hình'
             ],
             content: <div className='row'>
@@ -94,7 +94,7 @@ class HcthSettingAdminPage extends AdminPage {
                             <a className='nav-link active show' data-toggle='tab' href='#chiDaoEmail'>Email chỉ đạo</a>
                         </li>
                         <li className='nav-item'>
-                            <a className='nav-link' data-toggle='tab' href='#nhanCongVanDenEmail'>Email nhận công văn đến</a>
+                            <a className='nav-link' data-toggle='tab' href='#nhanCongVanDenEmail'>Email nhận văn bản đến</a>
                         </li>
                     </ul>
 

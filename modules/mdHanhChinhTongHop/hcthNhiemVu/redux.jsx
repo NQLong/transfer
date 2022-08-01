@@ -364,10 +364,10 @@ export function getCongVanDenSelector(pageNumber, pageSize, pageCondition, filte
     const page = T.updatePage('pageLienKetCongVanDen', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         dispatch({ type: HcthHcthNhiemVuCVDSelector, page: { list: null } });
-        const url = `/api/hcth/cong-van-den/selector/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hcth/van-ban-den/selector/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách công văn đến bị lỗi', 'danger');
+                T.notify('Lấy danh sách văn bản đến bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -388,10 +388,10 @@ export function getCongVanCacPhongSelector(pageNumber, pageSize, pageCondition, 
     const page = T.updatePage('pageLienKetCongVanDi', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         dispatch({ type: HcthHcthNhiemVuCVCPSelector, page: { list: null } });
-        const url = `/api/hcth/cong-van-cac-phong/selector/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hcth/van-ban-di/selector/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách công văn đến bị lỗi', 'danger');
+                T.notify('Lấy danh sách văn bản đến bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -485,7 +485,7 @@ export function refreshCanBoNhanStatus(data, done) {
             } else {
                 T.notify('Thay đổi trạng thái thành công', 'success');
                 // dispatch(getListHistory(data.id));
-                dispatch(getListCanBoNhanNhiemVu({ ma: data.id}));
+                dispatch(getListCanBoNhanNhiemVu({ ma: data.id }));
                 done && done();
             }
         }, () => T.notify('Thay đổi trạng thái thành công lỗi', 'danger'));

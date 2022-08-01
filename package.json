@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.176",
+    "version": "1.0.177",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -168,6 +168,8 @@
         "long.nguyen0709@hcmut.edu.vn",
         "thanhtung@hcmut.edu.vn",
         "quangsang@hcmut.edu.vn",
-        "tien.trantan@hcmut.edu.vn"
+        "tien.trantan@hcmut.edu.vn",
+        "huy.nguyenviethuy30@hcmut.edu.vn",
+        "hieu.ngo2212@hcmut.edu.vn"
     ]
 }

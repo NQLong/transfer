@@ -6,14 +6,14 @@ module.exports = app => {
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            502: { title: 'Công văn đi', link: '/user/hcth/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
+            502: { title: 'Văn bản đi', link: '/user/hcth/van-ban-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
 
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1053: { title: 'Công văn đi', link: '/user/cong-van-cac-phong', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
+            1053: { title: 'Văn bản đi', link: '/user/van-ban-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
         },
     };
     app.permission.add(
@@ -27,13 +27,13 @@ module.exports = app => {
         { name: 'hcth:manage' }
     );
 
-    app.get('/user/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/cong-van-cac-phong/:id', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
-    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/van-ban-di', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/van-ban-di/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/van-ban-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/hcth/van-ban-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/cong-van-cac-phong/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -98,7 +98,7 @@ module.exports = app => {
         return permission;
     };
 
-    app.get('/api/hcth/cong-van-cac-phong/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
 
@@ -122,7 +122,7 @@ module.exports = app => {
         }
     };
 
-    app.post('/api/hcth/cong-van-cac-phong', (req, res) => {
+    app.post('/api/hcth/van-ban-di', (req, res) => {
         const { fileList, donViNhan, donViNhanNgoai, ...data } = req.body.data;
         app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user?.staff?.shcc }, (error, item) => {
             if (error) {
@@ -210,7 +210,7 @@ module.exports = app => {
     };
 
     // Cần sửa lại
-    app.put('/api/hcth/cong-van-cac-phong', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/van-ban-di', app.permission.check('staff:login'), (req, res) => {
         const { fileList, donViNhan, donViNhanNgoai, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
@@ -312,11 +312,11 @@ module.exports = app => {
         }
     });
 
-    app.delete('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
+    app.delete('/api/hcth/van-ban-di', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -432,7 +432,7 @@ module.exports = app => {
 
 
     //Delete file
-    app.put('/api/hcth/cong-van-cac-phong/delete-file', app.permission.check('hcthCongVanDi:delete'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/delete-file', app.permission.check('hcthCongVanDi:delete'), async (req, res) => {
         try {
             const
                 id = req.body.id,
@@ -482,7 +482,7 @@ module.exports = app => {
 
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -553,7 +553,7 @@ module.exports = app => {
     };
 
 
-    app.get('/api/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id)) {
@@ -597,7 +597,7 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/hcth/cong-van-cac-phong/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login'), (req, res) => {
         const { canBoGui, noiDung, key, ngayTao, loai } = req.body.data;
 
         const newPhanHoi = {
@@ -615,9 +615,9 @@ module.exports = app => {
     const getMessage = (status) => {
         switch (status) {
             case '4':
-                return 'Bạn có công văn đi bị trả lại';
+                return 'Bạn có văn bản đi bị trả lại';
             case '5':
-                return 'Bạn đã nhận công văn đi mới';
+                return 'Bạn đã nhận văn bản đi mới';
             default:
                 return '';
         }
@@ -637,7 +637,7 @@ module.exports = app => {
 
 
 
-    app.get('/api/hcth/cong-van-cac-phong/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
@@ -655,14 +655,14 @@ module.exports = app => {
 
         const emails = staff.rows.map(item => item.email);
 
-        await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+        await createNotification(emails, { title: 'Văn bản đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
     };
 
     // Đang gửi cho phòng Hcth
     const createHcthStaffNotification = async (item, status) => {
         const hcthStaff = await app.model.hcthCongVanDi.getHcthStaff();
         const emails = hcthStaff.rows.map(item => item.email);
-        await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/cong-van-cac-phong/${item.id}` });
+        await createNotification(emails, { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/van-ban-di/${item.id}` });
 
     };
 
@@ -689,21 +689,21 @@ module.exports = app => {
             listEmail = [...listEmail, ...listStaffEmail];
         }
 
-        await createNotification(listEmail, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần xem xét', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+        await createNotification(listEmail, { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản cần xem xét', iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
 
     };
 
     // Đang gửi cho hiệu trưởng
     const createSchoolAdministratorNotification = async (item, status) => {
         const principal = await app.model.canBo.get({ shcc: '001.0068' }, 'shcc, email');
-        await createNotification([principal.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn cần duyệt', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+        await createNotification([principal.email], { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản cần duyệt', iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
     };
 
     // Gửi cho người tạo
     const createAuthorNotification = async (id, shcc, status) => {
         const staff = await app.model.canBo.get({ shcc: shcc }, 'email');
 
-        await createNotification([staff.email], { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn bị trả lại', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${id}` });
+        await createNotification([staff.email], { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản bị trả lại', iconColor: getIconColor(status), link: `/user/van-ban-di/${id}` });
     };
 
     // Gửi cho cán bộ ký
@@ -712,13 +712,13 @@ module.exports = app => {
 
         const emails = signStaff.rows.map(item => item.email);
 
-        await createNotification(emails, { title: 'Công văn đi', icon: 'fa-book', subTitle: 'Bạn có một công văn chờ ký', iconColor: getIconColor(status), link: `/user/cong-van-cac-phong/${item.id}` });
+        await createNotification(emails, { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản chờ ký', iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
     };
 
-    // Phân quyền Quản lý công văn đi trong đơn vị
+    // Phân quyền Quản lý Văn bản đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
 
-    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý công văn đi trong đơn vị' });
+    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý văn bản đi trong đơn vị' });
 
     app.assignRoleHooks.addHook(quanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -745,10 +745,10 @@ module.exports = app => {
         resolve();
     }));
 
-    // Phân quyền hành chính tổng hợp - Quản lí công văn đi
+    // Phân quyền hành chính tổng hợp - Quản lí văn bản đi
 
     const hcthQuanLyCongVanDiRole = 'hcthQuanLyCongVanDi';
-    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đi' });
+    app.assignRoleHooks.addRoles(hcthQuanLyCongVanDiRole, { id: 'hcthCongVanDi:manage', text: 'Hành chính - Tổng hợp: Quản lý văn bản đi' });
 
     app.assignRoleHooks.addHook(hcthQuanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -775,10 +775,10 @@ module.exports = app => {
         resolve();
     }));
 
-    // Phân quyền soạn thảo công văn đi trong đơn vị
+    // Phân quyền soạn thảo văn bản đi trong đơn vị
     const soanThaoCongVanDiRole = 'soanThaoCongVanDi';
 
-    app.assignRoleHooks.addRoles(soanThaoCongVanDiRole, { id: 'donViCongVanDi:edit', text: 'Soạn thảo công văn đi trong đơn vị' });
+    app.assignRoleHooks.addRoles(soanThaoCongVanDiRole, { id: 'donViCongVanDi:edit', text: 'Soạn thảo văn bản đi trong đơn vị' });
 
     app.assignRoleHooks.addHook(soanThaoCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -799,7 +799,7 @@ module.exports = app => {
     }));
 
 
-    app.get('/api/hcth/cong-van-cac-phong/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber);
         const pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -894,7 +894,7 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/hcth/cong-van-cac-phong/status', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/status', app.permission.check('staff:login'), async (req, res) => {
         try {
             let { id, trangThai, donViGui } = req.body.data;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -934,7 +934,7 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/hcth/cong-van-cac-phong/read/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/read/:id', app.permission.check('staff:login'), async (req, res) => {
         const { id, shcc } = req.body.data;
         // check permission
         const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
@@ -956,7 +956,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_DI_TYPE);
@@ -966,7 +966,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/yeu-cau-ky/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/yeu-cau-ky/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
 
@@ -984,7 +984,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
         let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
         let donViXem = '', canBoXem = '';
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -1072,7 +1072,7 @@ module.exports = app => {
                         }
                     },
                     {
-                        header: 'Số công văn', width: 20, style: {
+                        header: 'Số văn bản', width: 20, style: {
                             border: {
                                 top: { style: 'thin' },
                                 left: { style: 'thin' },
@@ -1169,15 +1169,15 @@ module.exports = app => {
 
 
     //api chuyển từ giai đoạn soạn thảo sang phát hành
-    app.put('/api/hcth/cong-van-cac-phong/publishing/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/publishing/:id', app.permission.check('staff:login'), async (req, res) => {
         // TODO: viết cho trường hợp có cán bộ ký
         try {
             const id = Number(req.params.id);
             const congVan = await app.model.hcthCongVanDi.get({ id });
-            if (!congVan) throw 'Công văn không tồn tại';
+            if (!congVan) throw 'văn bản không tồn tại';
             if (congVan.loaiCongVan == loaiCongVan.DON_VI.id) {
                 // TODO: check quyền throw '...'
-                if (congVan.trangThai != trangThaiCongVanDi.DA_XEM_XET.id) throw 'Trạng thái công văn không hợp lệ';
+                if (congVan.trangThai != trangThaiCongVanDi.DA_XEM_XET.id) throw 'Trạng thái văn bản không hợp lệ';
                 const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAll({ congVan: id });
                 const trangThaiMoi = congVanTrinhKy.length ? trangThaiCongVanDi.CHO_KY.id : trangThaiCongVanDi.DA_PHAN_PHOI.id;
                 if (!congVan.laySoTuDong) {
@@ -1187,16 +1187,16 @@ module.exports = app => {
                     try {
                         await app.model.hcthCongVanDi.validateSoCongVan(Number(id), congVan.donViGui, nam, trangThaiMoi);
                     } catch {
-                        throw { message: 'Số công văn không hợp lệ' };
+                        throw { message: 'Số văn bản không hợp lệ' };
                     }
                 } else await app.model.hcthCongVanDi.update({ id }, { trangThai: trangThaiMoi });
-                // TODO: gửi thông báo nếu có công văn trình ký
+                // TODO: gửi thông báo nếu có văn bản trình ký
                 return res.send({});
             }
             else {
                 //
                 if (congVan.trangThai != trangThaiCongVanDi.DA_DUYET.id) {
-                    throw 'Trạng thái công văn không hợp lệ';
+                    throw 'Trạng thái văn bản không hợp lệ';
                 }
                 // const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAll({ congVan: id });
                 const trangThaiMoi = trangThaiCongVanDi.CHO_PHAN_PHOI.id;

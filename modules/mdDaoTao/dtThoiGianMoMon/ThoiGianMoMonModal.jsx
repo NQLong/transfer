@@ -8,6 +8,10 @@ import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redu
 import { getPageDtThoiGianMoMon, createDtThoiGianMoMon, deleteDtThoiGianMoMon, updateDtThoiGianMoMon } from './redux';
 
 export class TaoThoiGianMoMon extends AdminModal {
+
+    onShow = () => {
+        this.bacDaoTao.value('DH');
+    }
     batDau = [];
     ketThuc = [];
     state = { edit: {} }
@@ -177,7 +181,7 @@ export class TaoThoiGianMoMon extends AdminModal {
                 <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.year = e} label='Năm học' className='col-md-3' readOnly={readOnly} />
                 <FormSelect ref={e => this.semester = e} label='Học kỳ' className='col-md-3' data={[1, 2, 3]} readOnly={readOnly} />
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' className='col-md-3' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} readOnly={readOnly} onChange={value => this.setState({ loaiHinhDaoTao: value.id })} />
-                <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' className='col-md-3' data={SelectAdapter_DmSvBacDaoTao} readOnly={readOnly} onChange={value => this.setState({ bacDaoTao: value.id })} />
+                <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' className='col-md-3' data={SelectAdapter_DmSvBacDaoTao} readOnly onChange={value => this.setState({ bacDaoTao: value.id })} />
                 <FormDatePicker type='date-mask' ref={e => this.batDauMoMon = e} label='Ngày mở' className='col-md-6' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' ref={e => this.ketThucMoMon = e} label='Ngày đóng' className='col-md-5' readOnly={readOnly} />
                 {permission.write && <div className='form-group col-md-1 d-flex align-items-end justify-content-end' style={{ paddingLeft: 0 }}>

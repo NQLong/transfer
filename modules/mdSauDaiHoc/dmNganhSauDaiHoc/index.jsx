@@ -1,24 +1,21 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import svSdh from './redux';
+import dmNganhSdh from './redux';
 
 export default {
     redux: {
-        svSdh
+        parent: 'sdh',
+        reducers: { dmNganhSdh }
     },
     routes: [
         {
-            path: '/user/sv-sdh/upload',
+            path: '/user/sau-dai-hoc/danh-sach-nganh/upload',
             component: Loadable({ loading: Loading, loader: () => import('./adminUploadPage') })
         },
         {
-            path: '/user/sv-sdh/list',
+            path: '/user/sau-dai-hoc/danh-sach-nganh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
-        {
-            path: '/user/sv-sdh/item/:mssv',
-            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
-        }
     ],
-};
+}; 
