@@ -1,9 +1,22 @@
 module.exports = app => {
+    const menu = {
+        parentMenu: app.parentMenu.finance,
+        menus: {
+            5007: { title: 'Danh sách hóa đơn', link: '/user/finance/invoice' },
+        },
+    };
     const request = require('request');
     const axios = require('axios');
 
-    app.permission.add('tcInvoice:read', 'tcInvoice:write', 'tcInvoice:delete');
+    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete');
     const misaChunkSize = 30;
+
+    app.permissionHooks.add('staff', 'addRolesTcInvoice', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcInvoice:read', 'tcInvoice:write', 'tcInvoice:delete');
+            resolve();
+        } else resolve();
+    }));
 
 
     const url = {
@@ -11,6 +24,8 @@ module.exports = app => {
         hsmPublish: '/code/itg/invoicepublishing/publishhsm',
         view: '/invoicepublished/linkview'
     };
+
+    app.get('/user/finance/invoice', app.permission.check('tcInvoice:read'), app.templates.admin);
 
 
     const getMisaToken = async () => {
@@ -213,7 +228,7 @@ module.exports = app => {
             const invoiceList = list.map(item => {
                 const details = item.details ? item.details.split('|||').map(detail => {
                     const [loaiPhi, soTien] = detail.split('||');
-                    return {loaiPhi, soTien: parseInt(soTien)};
+                    return { loaiPhi, soTien: parseInt(soTien) };
                 }) : [];
                 return compileInvoice(item, details);
             });
@@ -290,6 +305,29 @@ module.exports = app => {
             request(response.Data).pipe(res);
         } catch (error) {
             res.status(400).send({ error });
+        }
+    });
+
+    const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
+
+    app.get('/api/finance/invoice/page/:pageNumber/:pageSize', app.permission.check('tcInvoice:read'), async (req, res) => {
+        try {
+            let filter = req.query.filter || {};
+            const settings = await getSettings();
+            const namHoc = filter.namHoc || settings.hocPhiNamHoc;
+            const hocKy = filter.hocKy || settings.hocPhiHocKy;
+            filter.tuNgay = filter.tuNgay || '';
+            filter.denNgay = filter.denNgay || '';
+            const filterData = app.stringify({ ...filter, namHoc, hocKy });
+            const pageCondition = req.query.searchTerm;
+            const page = await app.model.tcHocPhiTransactionInvoice.searchPage(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), pageCondition, filterData);
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            res.send({
+                page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, filter, settings: { namHoc, hocKy } }
+            });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
         }
     });
 };
