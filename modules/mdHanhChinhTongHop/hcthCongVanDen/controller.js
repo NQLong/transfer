@@ -29,17 +29,17 @@ module.exports = (app) => {
         } else resolve();
     }));
 
-    app.get('/user/van-ban-den', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/van-ban-den/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/van-ban-den', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
+    app.get('/user/van-ban-den/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/hcth/van-ban-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
     app.get('/user/hcth/van-ban-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
 
     //api
-    app.get('/api/hcth/van-ban-den/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/all', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/van-ban-den/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -356,7 +356,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/van-ban-den/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDen.get({ id });
@@ -483,7 +483,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login','developer:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.check('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
@@ -642,7 +642,7 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.orCheck('staff:login','developer:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
@@ -950,7 +950,7 @@ module.exports = (app) => {
     };
 
 
-    app.get('/api/hcth/van-ban-den/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -1033,7 +1033,7 @@ module.exports = (app) => {
 
     // Download Template ---------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/hcth/van-ban-den/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status, sortBy, sortType } = req.params.filter ? JSON.parse(req.params.filter) : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null, sortBy: '', sortType: '' };
 
         const obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' };
