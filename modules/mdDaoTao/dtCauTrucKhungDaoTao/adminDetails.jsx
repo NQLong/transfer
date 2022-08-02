@@ -23,7 +23,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                 if (id > 0) {
                     this.getData(id, true);
                     return;
-                }
+                } else this.bacDaoTao?.value('DH');
                 [
                     // this.mucTieuDaoTao,
                     this.chuongTrinhDaoTao].forEach(e => e.setVal({ parents: {}, childs: {} }));
@@ -37,7 +37,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
             //     ctkdt.namDaoTao = tkdt.namDaoTao) + 1;
             // }
             let { bacDaoTao, namDaoTao, batDauDangKy, ketThucDangKy } = ctkdt;
-            this.bacDaoTao.value(bacDaoTao);
+            this.bacDaoTao.value(isClone ? 'DH' : bacDaoTao);
             namDaoTao = namDaoTao?.split(' - ') || [];
             this.namDaoTaoStart.value(isClone ? (Number(namDaoTao[0]) + 1) : namDaoTao[0]);
             this.namDaoTaoEnd.value(isClone ? (Number(namDaoTao[1]) + 1) : namDaoTao[1]);
@@ -143,11 +143,11 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ)' className='col-md-3' required readOnly={readOnly} />
-                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến)' className='col-md-3' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
-                            <FormDatePicker type='date-mask' ref={e => this.batDauDangKy = e} className='col-md-4' label='Bắt đầu đăng ký' required readOnly={readOnly} />
-                            <FormDatePicker type='date-mask' ref={e => this.ketThucDangKy = e} className='col-md-4' label='Kết thúc đăng ký' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={true} />
+                            <FormTextBox type='year' ref={e => this.namDaoTaoStart = e} label='Năm đào tạo (từ)' className='col-md-4' required readOnly={readOnly} />
+                            <FormTextBox type='year' ref={e => this.namDaoTaoEnd = e} label='Năm đào tạo (đến)' className='col-md-4' required readOnly={readOnly} />
+                            <FormDatePicker type='date-mask' ref={e => this.batDauDangKy = e} className='col-md-6' label='Bắt đầu đăng ký' required readOnly={readOnly} />
+                            <FormDatePicker type='date-mask' ref={e => this.ketThucDangKy = e} className='col-md-6' label='Kết thúc đăng ký' required readOnly={readOnly} />
                         </div>
                     </div>
                 </div>

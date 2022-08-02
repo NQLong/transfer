@@ -75,9 +75,8 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, () => {
                 if (isInitial) {
-                    ['nam', 'donViFilter'].forEach(e => {
-                        this[e].value('');
-                    });
+                    this.nam.value('');
+                    this.donViFilter.value('');
                     this.hideAdvanceSearch();
                 }
             });
@@ -145,8 +144,8 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
             </>,
             backRoute: '/user/dao-tao',
             advanceSearch: <div className='row'>
-                <FormSelect ref={e => this.nam = e} className='col-md-4' placeholder='Năm đào tạo' data={SelectAdapter_DtCauTrucKhungDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value?.id } })} allowClear />
-                <FormSelect ref={e => this.donViFilter = e} className='col-md-4' placeholder='Danh sách Khoa, bộ môn' data={SelectAdapter_DmDonViFaculty_V2} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id } })} allowClear />
+                <FormSelect ref={e => this.nam = e} className='col-md-6' placeholder='Năm đào tạo' data={SelectAdapter_DtCauTrucKhungDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, nam: value?.id } })} allowClear />
+                <FormSelect ref={e => this.donViFilter = e} className='col-md-6' placeholder='Danh sách Khoa, bộ môn' data={SelectAdapter_DmDonViFaculty_V2} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id } })} allowClear />
                 <div style={{ display: 'flex', justifyContent: 'end' }} className='form-group col-md-12'>
                     <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.changeAdvancedSearch(true)} style={{ marginRight: '15px' }}>
                         <i className='fa fa-lg fa-times' /> Reset

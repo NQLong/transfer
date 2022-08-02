@@ -35,11 +35,7 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
 
-        let filter = req.query.filter || {},
-            donVi = filter.donVi,
-            idNamDaoTao = filter.idNamDaoTao;
-
-        filter = app.stringify(app.clone(filter, { donVi, idNamDaoTao }));
+        let filter = app.stringify(req.query.filter || {});
 
         app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
