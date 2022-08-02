@@ -5662,6 +5662,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "LANGUAGES": {
+                    "value": "languages",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -12966,10 +12973,10 @@
                 },
                 "CHUYEN_NGANH": {
                     "value": "chuyenNganh",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 100
                 },
                 "NAM": {
                     "value": "nam",

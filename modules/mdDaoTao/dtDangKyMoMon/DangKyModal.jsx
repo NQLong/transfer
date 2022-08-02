@@ -1,39 +1,55 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { getDanhSachMonChuongTrinhDaoTao } from '../dtChuongTrinhDaoTao/redux';
 import { createDtDanhSachMonMo } from '../dtDanhSachMonMo/redux';
 class MonHocCtdtModal extends AdminModal {
+    monChung = {}
+    monChuyenNganh = {}
+    subChuyenNganh = {}
     state = { listMonHocChonChung: [], listMonHocChonChuyenNganh: [] }
-    onShow = (item) => {
-        let { khoaSv, thongTinKhoaNganh, maDangKy } = item;
-        let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
 
+    onShow = (item) => {
+        let { khoaSv, thongTinKhoaNganh, maDangKy, nam } = item;
+        let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
+        this.setState({ listMonHocChonChung: [], listMonHocChonChuyenNganh: [] });
         this.props.getDanhSachMonChuongTrinhDaoTao({ maNganh, khoaSv, loaiHinhDaoTao, bacDaoTao }, value => {
-            this.setState({ ...value, khoaSv, maNganh, khoaDangKy, maDangKy, loaiHinhDaoTao, bacDaoTao }, () => {
+            this.setState({ listMonHocChung: value.listMonHocChung || [], listMonHocChuyenNganh: value.listMonHocChuyenNganh || [], khoaSv, maNganh, khoaDangKy, maDangKy, loaiHinhDaoTao, bacDaoTao, nam }, () => {
+                if (!this.state.listMonHocChung.length) this.setState({ listMonHocChonChung: [] });
                 this.state.listMonHocChung.forEach(item => {
                     if (item.isMo) {
-                        let listMonHocChonChung = this.state.listMonHocChonChung;
-                        listMonHocChonChung.push(item);
-                        this.setState({ listMonHocChonChung });
+                        this.setState({ listMonHocChonChung: [...this.state.listMonHocChonChung, item] });
                         ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                            this[textBox][item.maMonHoc].value(item[textBox]);
+                            this.monChung[textBox][item.maMonHoc].value(item[textBox]);
                         });
                     }
                 });
-                this.state.listMonHocChuyenNganh.forEach(item => {
-                    item.danhSachMonChuyenNganh.forEach(monChuyenNganh => {
-                        if (monChuyenNganh.isMo) {
-                            let listMonHocChonChuyenNganh = this.state.listMonHocChonChuyenNganh;
-                            listMonHocChonChuyenNganh.push(monChuyenNganh);
-                            this.setState({ listMonHocChonChuyenNganh });
-                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                                this[textBox][monChuyenNganh.chuyenNganh][monChuyenNganh.maMonHoc].value(monChuyenNganh[textBox]);
-                            });
-                        }
-                    });
+                if (!this.state.listMonHocChuyenNganh.length) this.setState({ listMonHocChonChuyenNganh: [] });
+                this.state.listMonHocChuyenNganh.forEach((item, index) => {
+                    if (item.isMo) {
+                        this.setState({ listMonHocChonChuyenNganh: [...this.state.listMonHocChonChuyenNganh, item] });
+                        if (item.soLop && !isNaN(item.soLop)) {
+                            item.soLop = Number(item.soLop);
+                            if (item.soLop == 1 || item.chuyenNganh.length == 1) {
+                                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                                    this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
+                                });
+                            } else if (item.soLop > 1 && item.chuyenNganh.length > 1) {
+                                this.setState({ [index]: item.soLop }, () => {
+                                    this.monChuyenNganh.soLop[item.maMonHoc].value(item.soLop);
+                                    Array.from({ length: Number(item.soLop) }, (_, i) => i).forEach(i => {
+                                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                                            this.subChuyenNganh[item.maMonHoc][textBox][i + 1].value(item[textBox][i]);
+                                        });
+                                        this.subChuyenNganh[item.maMonHoc]['chuyenNganh'][i + 1].value(item.currentCn[i]);
+                                    });
 
+                                });
+
+                            }
+                        }
+                    }
                 });
             });
         });
@@ -58,7 +74,7 @@ class MonHocCtdtModal extends AdminModal {
         </tr>,
         renderRow: (item, index) => {
             ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                this[textBox] = {};
+                this.monChung[textBox] = {};
             });
             return (
                 <tr key={index}>
@@ -68,21 +84,21 @@ class MonHocCtdtModal extends AdminModal {
                     <TableCell style={{ textAlign: 'right' }} content={item.soTietLyThuyet} />
                     <TableCell style={{ textAlign: 'right' }} content={item.soTietThucHanh} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                        <FormTextBox type='number' ref={e => this.soLop[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} />
+                        <FormTextBox type='number' ref={e => this.monChung.soLop[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} />
                     } />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                        <FormTextBox type='number' ref={e => this.soTietBuoi[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} />
+                        <FormTextBox type='number' ref={e => this.monChung.soTietBuoi[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} />
                     } />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                        <FormTextBox type='number' ref={e => this.soBuoiTuan[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} />
+                        <FormTextBox type='number' ref={e => this.monChung.soBuoiTuan[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} />
                     } />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                        <FormTextBox type='number' ref={e => this.soLuongDuKien[item.maMonHoc] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={!item.isMo} />
+                        <FormTextBox type='number' ref={e => this.monChung.soLuongDuKien[item.maMonHoc] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={!item.isMo} />
                     } />
                     <TableCell type='checkbox' content={item.isMo} permission={{ write: true }} onChanged={(value) => {
                         list[index].isMo = !list[index].isMo;
                         this.setState({ listMonHocChung: list }, () => {
-                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => this[textBox][item.maMonHoc].value(list[index].isMo ? item[textBox] : ''));
+                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => this.monChung[textBox][item.maMonHoc].value(list[index].isMo ? item[textBox] : ''));
                             let listMonHocChonChung = this.state.listMonHocChonChung;
                             if (value) {
                                 listMonHocChonChung.push(item);
@@ -97,10 +113,11 @@ class MonHocCtdtModal extends AdminModal {
 
     renderMonHocChuyenNganh = (list) => renderTable({
         getDataSource: () => list,
-        emptyTable: 'Không có môn học riêng các chuyên ngành',
+        emptyTable: 'Không có môn học',
         header: 'thead-light',
+        // stickyHead: true,
         renderHead: () => <tr>
-            <th style={{ width: 'auto' }}>Chuyên ngành</th>
+            <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
             <th style={{ width: '80%' }}>Môn học</th>
             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Tự chọn</th>
             <th style={{ width: '10%', textAlign: 'right' }}>Số tiết LT</th>
@@ -108,85 +125,149 @@ class MonHocCtdtModal extends AdminModal {
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lớp</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết <br /> /buổi</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số buổi <br />/tuần</th>
-            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lượng <br /> dự kiến</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>SLDK</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chuyên ngành</th>
             <th style={{ width: 'auto' }}>Chọn</th>
         </tr>,
-        renderRow: (item) => {
-            let danhSachMonChuyenNganh = item.danhSachMonChuyenNganh || [],
-                rowSpan = danhSachMonChuyenNganh.length;
-            const rows = danhSachMonChuyenNganh.map((monHoc, index) => {
-                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                    this[textBox][monHoc.chuyenNganh] = {};
-                });
-                return (
-                    <tr key={item.tenChuyenNganh + index}>
-                        {index == 0 && <TableCell contentClassName='multiple-lines-2' content={monHoc.tenChuyenNganh} rowSpan={rowSpan} />}
-                        <TableCell content={<>{monHoc.maMonHoc} <br /> {monHoc.tenMonHoc}</>} />
-                        <TableCell style={{ textAlign: 'center' }} content={monHoc.loaiMonHoc ? 'x' : ''} />
-                        <TableCell style={{ textAlign: 'right' }} content={monHoc.soTietLyThuyet} />
-                        <TableCell style={{ textAlign: 'right' }} content={monHoc.soTietThucHanh} />
+        renderRow: (item, index) => {
+            ['chuyenNganh', 'soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                this.monChuyenNganh[textBox] = {};
+            });
+            let readOnly = !item.isMo || this.state[index];
+            return (
+                <React.Fragment key={index}>
+                    <tr key={0}>
+                        <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell content={<>{item.maMonHoc} <br /> {item.tenMonHoc}</>} />
+                        <TableCell style={{ textAlign: 'center' }} content={item.loaiMonHoc ? 'x' : ''} />
+                        <TableCell style={{ textAlign: 'right' }} content={item.soTietLyThuyet} />
+                        <TableCell style={{ textAlign: 'right' }} content={item.soTietThucHanh} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soLop[monHoc.chuyenNganh][monHoc.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!monHoc.isMo} />
+                            <FormTextBox type='number' ref={e => this.monChuyenNganh.soLop[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!item.isMo} min={1} max={5} onChange={e => {
+                                if (item.chuyenNganh.length > 1) {
+                                    item.soLop = e;
+                                    if (!isNaN(e) && e > 1) {
+                                        this.setState({ [index]: e });
+                                    } else if (e == 1) {
+                                        this.setState({ [index]: null });
+                                    }
+                                }
+                            }} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soTietBuoi[monHoc.chuyenNganh][monHoc.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!monHoc.isMo} />
+                            <FormTextBox type='number' ref={e => this.monChuyenNganh.soTietBuoi[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={readOnly} min={1} max={5} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soBuoiTuan[monHoc.chuyenNganh][monHoc.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={!monHoc.isMo} />
+                            <FormTextBox type='number' ref={e => this.monChuyenNganh.soBuoiTuan[item.maMonHoc] = e} style={{ marginBottom: '0' }} readOnly={readOnly} min={1} max={3} />
                         } />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soLuongDuKien[monHoc.chuyenNganh][monHoc.maMonHoc] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={!monHoc.isMo} />
+                            <FormTextBox type='number' ref={e => this.monChuyenNganh.soLuongDuKien[item.maMonHoc] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={readOnly} />
                         } />
-                        <TableCell type='checkbox' content={monHoc.isMo} permission={{ write: true }} onChanged={(value) => {
-                            danhSachMonChuyenNganh[index].isMo = !danhSachMonChuyenNganh[index].isMo;
+                        <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
+                            item.chuyenNganh.length > 1 && item.isMo && !this.state[index] ?
+                                <FormSelect ref={e => this.monChuyenNganh.chuyenNganh[item.maMonHoc] = e} style={{ marginBottom: '0', width: 'auto' }} data={item.chuyenNganh.map((cn, index) => ({ id: cn, text: item.tenChuyenNganh[index] }))} multiple /> : item.tenChuyenNganh.join(', ')
+                        } />
+                        <TableCell type='checkbox' content={item.isMo} permission={{ write: true }} onChanged={(value) => {
+                            item.isMo = !item.isMo;
                             this.setState({ listMonHocChuyenNganh: list }, () => {
-                                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => this[textBox][monHoc.chuyenNganh][monHoc.maMonHoc].value(danhSachMonChuyenNganh[index].isMo ? monHoc[textBox] : ''));
-                                let listMonHocChonChuyenNganh = this.state.listMonHocChonChuyenNganh;
                                 if (value) {
-                                    listMonHocChonChuyenNganh.push(monHoc);
-                                } else listMonHocChonChuyenNganh = listMonHocChonChuyenNganh.filter(monHocCN => monHocCN.maMonHoc != monHoc.maMonHoc);
+                                    ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => this.monChuyenNganh[textBox][item.maMonHoc]?.value(item.isMo ? Number(item[textBox]) : ''));
 
-                                this.setState({ listMonHocChonChuyenNganh });
+                                    if (item.isMo && (!item.soLop || item.soLop == '')) this.monChuyenNganh.soLop[item.maMonHoc].value(1);
+                                    if (item.isMo && item.chuyenNganh.length > 1) this.monChuyenNganh.chuyenNganh[item.maMonHoc].value(item.chuyenNganh);
+                                    this.monChuyenNganh.soLop[item.maMonHoc].focus();
+                                    this.setState({ listMonHocChonChuyenNganh: [...this.state.listMonHocChonChuyenNganh, item] });
+                                } else {
+                                    ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => this.monChuyenNganh[textBox][item.maMonHoc]?.value(''));
+
+                                    if (item.chuyenNganh.length > 1) {
+                                        this.setState({ [index]: null }, () => {
+                                            this.subChuyenNganh[item.maMonHoc] = null;
+                                        });
+                                    }
+                                    this.setState({ listMonHocChonChuyenNganh: [...this.state.listMonHocChonChuyenNganh].filter(monChon => monChon.maMonHoc != item.maMonHoc) });
+                                }
+
                             });
                         }} />
                     </tr>
-                );
-            });
-            return rows;
+                    {Array.from({ length: this.state[index] }, (_, i) => i + 1).map(i => {
+                        this.subChuyenNganh[item.maMonHoc] = {
+                            soLuongDuKien: {},
+                            soTietBuoi: {},
+                            soBuoiTuan: {},
+                            chuyenNganh: {}
+                        };
+                        const style = { marginBottom: '0', width: 'auto' };
+                        return (
+                            <tr key={`sub-${i}`} style={{ display: this.state[index] ? '' : 'none' }}>
+                                <TableCell style={{ textAlign: 'right' }} content={`Lớp ${i}`} colSpan={6} />
+                                <TableCell content={
+                                    <FormTextBox type='number' ref={e => this.subChuyenNganh[item.maMonHoc].soTietBuoi[i] = e} min={1} max={5} style={style} />
+                                } />
+                                <TableCell content={
+                                    <FormTextBox type='number' ref={e => this.subChuyenNganh[item.maMonHoc].soBuoiTuan[i] = e} min={1} max={5} style={style} />
+                                } />
+                                <TableCell content={
+                                    <FormTextBox type='number' ref={e => this.subChuyenNganh[item.maMonHoc].soLuongDuKien[i] = e} style={style} />
+                                } />
+                                <TableCell content={
+                                    <FormSelect ref={e => this.subChuyenNganh[item.maMonHoc].chuyenNganh[i] = e} data={item.chuyenNganh.map((cn, index) => ({ id: cn, text: item.tenChuyenNganh[index] }))} multiple style={style} />
+                                } colSpan={2} />
+                            </tr>
+                        );
+                    })
+                    }
+                </React.Fragment>
+            );
         }
-
     })
 
     getData = () => {
         let { listMonHocChonChung, listMonHocChonChuyenNganh } = this.state;
         try {
-            listMonHocChonChung.forEach(monHoc => {
+            listMonHocChonChung && listMonHocChonChung.length && listMonHocChonChung.forEach(monHoc => {
                 ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                    if (!this[textBox][monHoc.maMonHoc].value()) {
-                        this[textBox][monHoc.maMonHoc].focus();
+                    if (!this.monChung[textBox][monHoc.maMonHoc].value()) {
+                        this.monChung[textBox][monHoc.maMonHoc].focus();
                         throw ('Vui lòng nhập đầy đủ thông tin');
                     }
-                    else monHoc[textBox] = this[textBox][monHoc.maMonHoc].value();
+                    else monHoc[textBox] = this.monChung[textBox][monHoc.maMonHoc].value();
                 });
                 monHoc.khoa = this.state.khoaDangKy;
                 monHoc.khoaSv = this.state.khoaSv;
                 monHoc.maDangKy = this.state.maDangKy;
             });
 
-            listMonHocChonChuyenNganh.forEach(monHoc => {
-                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                    if (!this[textBox][monHoc.chuyenNganh][monHoc.maMonHoc].value()) {
-                        this[textBox][monHoc.chuyenNganh][monHoc.maMonHoc].focus();
-                        throw ('Vui lòng nhập đầy đủ thông tin');
-                    }
-                    else monHoc[textBox] = this[textBox][monHoc.chuyenNganh][monHoc.maMonHoc].value();
-                });
+            listMonHocChonChuyenNganh && listMonHocChonChuyenNganh.length && listMonHocChonChuyenNganh.forEach(monHoc => {
+                if (monHoc.chuyenNganh.length == 1 || (monHoc.chuyenNganh.length > 1 && monHoc.soLop == 1)) {
+                    ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                        if (!this.monChuyenNganh[textBox][monHoc.maMonHoc].value()) {
+                            this.monChuyenNganh[textBox][monHoc.maMonHoc].focus();
+                            throw ('Vui lòng nhập đầy đủ thông tin');
+                        }
+                        else monHoc[textBox] = this.monChuyenNganh[textBox][monHoc.maMonHoc].value();
+                    });
+                } else {
+                    monHoc.monChuyenNganh = {};
+                    ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(textBox => {
+                        monHoc.monChuyenNganh[textBox] = {};
+                        Array.from({ length: monHoc.soLop }, (_, i) => i + 1).forEach(i => {
+                            if (!this.subChuyenNganh[monHoc.maMonHoc][textBox][i].value()) {
+                                this.subChuyenNganh[monHoc.maMonHoc][textBox][i].focus();
+                                throw ('Vui lòng nhập đầy đủ thông tin');
+                            }
+                            else {
+                                let value = textBox == 'chuyenNganh' ? this.subChuyenNganh[monHoc.maMonHoc][textBox][i].value() : this.subChuyenNganh[monHoc.maMonHoc][textBox][i].value();
+                                monHoc.monChuyenNganh[textBox][i] = value;
+                            }
+                        });
+                    });
+                }
                 monHoc.khoa = this.state.khoaDangKy;
                 monHoc.khoaSv = this.state.khoaSv;
                 monHoc.maDangKy = this.state.maDangKy;
-
             });
-
             return [...listMonHocChonChung, ...listMonHocChonChuyenNganh];
         } catch (error) {
             T.notify(error, 'danger');
@@ -197,26 +278,34 @@ class MonHocCtdtModal extends AdminModal {
         e.preventDefault();
         let { loaiHinhDaoTao, bacDaoTao } = this.state;
         let data = this.getData();
-        data && data.length && this.props.createDtDanhSachMonMo(this.state.maNganh, data, { loaiHinhDaoTao, bacDaoTao }, () => {
-            this.props.reinit();
+        data && data.length && this.props.createDtDanhSachMonMo(this.state.maNganh, data, { loaiHinhDaoTao, bacDaoTao, maDangKy: this.state.maDangKy }, () => {
+            // this.props.reinit();
             this.hide();
         });
-        // this.setState({ listMonHocChonChung, listMonHocChonChuyenNganh }, () => console.log(this.state.listMonHocChonChung, this.state.listMonHocChonChuyenNganh));
     }
 
     render = () => {
-        let { listMonHocChung, listMonHocChuyenNganh } = this.state;
+        let { listMonHocChung, listMonHocChuyenNganh, khoaSv } = this.state;
         return this.renderModal({
-            title: 'Chọn môn học từ Chương trình đào tạo',
+            title: `Chọn môn học từ Chương trình đào tạo khóa ${khoaSv || ''}`,
             size: 'elarge',
-            body: <div className='row'>
-                <div className='form-group col-md-12'>
-                    <label>Môn chung:</label>
-                    {this.renderMonHocChung(listMonHocChung)}
-                </div>
-                <div className='form-group col-md-12'>
-                    <label>Môn chuyên ngành:</label>
-                    {this.renderMonHocChuyenNganh(listMonHocChuyenNganh)}
+            isShowSubmit: listMonHocChung?.length && listMonHocChuyenNganh?.length,
+            body: <div>
+                <ul className='nav nav-tabs'>
+                    <li className='nav-item'>
+                        <a className='nav-link active show' data-toggle='tab' href='#monChung'>Chọn các môn cho toàn khóa {khoaSv || ''}</a>
+                    </li>
+                    <li className='nav-item'>
+                        <a className='nav-link' data-toggle='tab' href='#monChuyenNganh'>Chọn các môn cho chuyên ngành</a>
+                    </li>
+                </ul>
+                <div className='tab-content'>
+                    <div className='tab-pane fade active show' id='monChung'>
+                        {this.renderMonHocChung(listMonHocChung)}
+                    </div>
+                    <div className='tab-pane fade' id='monChuyenNganh'>
+                        {this.renderMonHocChuyenNganh(listMonHocChuyenNganh)}
+                    </div>
                 </div>
             </div>
         });

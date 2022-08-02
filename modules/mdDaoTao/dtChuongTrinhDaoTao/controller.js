@@ -111,21 +111,30 @@ module.exports = app => {
                 let monTheoChuyenNganh = listMonHoc
                     .filter(item => item.tinhChatMon == 1)
                     .map(item => {
-                        item.isMo = danhSachMonMoChuyenNganh.map(item => ({ maMonHoc: item.maMonHoc, chuyenNganh: item.chuyenNganh })).some(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc && monChuyenNganh.chuyenNganh == item.chuyenNganh);
-                        if (item.isMo) {
-                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc && monChuyenNganh.chuyenNganh == item.chuyenNganh)[textBox]);
-                        }
+                        item.isMo = danhSachMonMoChuyenNganh.map(item => item.maMonHoc).includes(item.maMonHoc);
                         item.tenChuyenNganh = chuyenNganhMapper[item.chuyenNganh];
+                        if (item.isMo) {
+                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)[textBox]));
+                            item.currentCn = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)['chuyenNganh']);
+                        }
                         return item;
-                    })
-                    .groupBy('tenChuyenNganh');
-                let listMonHocChuyenNganh = Object.keys(monTheoChuyenNganh).map(item => {
-                    return { tenChuyenNganh: item, danhSachMonChuyenNganh: monTheoChuyenNganh[item] };
-                });
-                res.send({ listMonHocChung, listMonHocChuyenNganh });
+                    });
+                let tmp = monTheoChuyenNganh.reduce((prev, curr) => {
+                    delete curr.id;
+                    if (prev.some(item => item.maMonHoc == curr.maMonHoc)) {
+                        let element = prev.find(item => item.maMonHoc == curr.maMonHoc);
+                        element.chuyenNganh = [...element.chuyenNganh, curr.chuyenNganh];
+                        element.tenChuyenNganh = [...element.tenChuyenNganh, curr.tenChuyenNganh];
+                    } else {
+                        curr.chuyenNganh = [curr.chuyenNganh];
+                        curr.tenChuyenNganh = [curr.tenChuyenNganh];
+                        prev.push(curr);
+                    }
+                    return prev;
+                }, []);
+                res.send({ listMonHocChung, listMonHocChuyenNganh: tmp });
             });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
