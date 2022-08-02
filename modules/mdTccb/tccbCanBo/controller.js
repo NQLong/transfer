@@ -82,7 +82,16 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/staff/page/:pageNumber/:pageSize', app.permission.check('staff:read'), (req, res) => {
+    const checkDeveloperPermission = (req, res, next) => {
+        if (app.isDebug) next();
+        else {
+            let user = req.session.user;
+            if ((user.originalEmail && app.developers.includes(user.originalEmail)) || app.developers.includes(user.email)) next();
+            else app.permission.check('staff:login')(req, res, next);
+        }
+    };
+
+    app.get('/api/staff/page/:pageNumber/:pageSize', checkDeveloperPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -187,7 +196,7 @@ module.exports = app => {
     //     app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
     // });
 
-    app.get('/api/staff/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/staff/all', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.getAll({}, (error, items) => {
             res.send({ error, items });
         });

@@ -63,6 +63,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     }
 
     getData = (id, isClone = false, khoaDt) => {
+        this.trinhDoDaoTao.value('DH');
         id && this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
             this.maNganh.value(data.maNganh);
@@ -70,7 +71,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.setState({ maNganh: data.maNganh });
             this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
             this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
-            this.trinhDoDaoTao.value(data.trinhDoDaoTao);
             this.loaiHinhDaoTao.value(data.loaiHinhDaoTao);
             this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
             this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
@@ -185,20 +185,20 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 
     downloadWord = (e) => {
         e.preventDefault();
-        if(!this.ma) return;
+        if (!this.ma) return;
         const namDaoTao = this.validation(this.namDaoTao);
         const maNganh = this.validation(this.maNganh);
         const chuyenNganh = this.validation(this.chuyenNganh);
         SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(namDaoTao, res => {
-            const {text: textNamDaoTao} = res;
+            const { text: textNamDaoTao } = res;
             SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc).fetchOne(chuyenNganh, res => {
-                const {text: textChuyenNganh} = res;
+                const { text: textChuyenNganh } = res;
                 this.props.downloadWord(this.ma, data => {
                     T.FileSaver(new Blob([new Uint8Array(data.data)]), textNamDaoTao + '_' + maNganh + '_' + textChuyenNganh + '.docx');
                 });
             });
         });
-       
+
     }
 
     render() {
@@ -242,7 +242,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                             </div>
 
 
-                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-4' required readOnly={readOnly} />
                             <FormSelect data={[
                                 { id: 4, text: '4 năm' },

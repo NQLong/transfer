@@ -185,3 +185,54 @@ export function vnPayGoToTransaction(bank, done) {
         });
     };
 }
+
+export function createInvoice(mssv, hocKy, namHoc, done, onError) {
+    return () => {
+        const url = '/api/finance/invoice';
+        T.post(url, { mssv, hocKy, namHoc }, res => {
+            if (res.error) {
+                T.notify('Tạo hóa đơn lỗi', 'danger');
+                console.error(`GET: ${url}.`, res.error);
+                onError && onError();
+            }
+            else {
+                T.notify('Tạo hóa đơn thành công', 'success');
+                // dispatch(getTongGiaoDichPage());
+                done && done(res.item);
+            }
+        }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
+    };
+}
+
+export function createInvoiceList(data, done, onError) {
+    return () => {
+        const url = '/api/finance/invoice/list';
+        T.post(url, data, res => {
+            if (res.error) {
+                T.notify('Tạo hóa đơn lỗi', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+                onError && onError();
+            }
+            else {
+                T.notify('Tạo hóa đơn thành công', 'success');
+                done && done(res.result);
+            }
+        }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
+    };
+}
+
+export function getStudentHocPhi(mssv, namHoc, hocKy, done) {
+    return () => {
+        const url = `/api/finance/hoc-phi/${mssv}`;
+        T.get(url, { namHoc, hocKy }, res => {
+            if (res.error) {
+                T.notify('Lấy dữ liệu học phí lỗi. ' + (res.error.errorMessage && typeof res.error.errorMessage === 'string' ? res.error.errorMessage : ''), 'danger');
+                console.error(`GET: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Lấy dữ liệu học phí thành công', 'success');
+                done && done(res.hocPhi);
+            }
+        }, () => T.notify('Lấy dữ liệu học phí lỗi', 'danger'));
+    };
+}

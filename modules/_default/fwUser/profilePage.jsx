@@ -12,7 +12,7 @@ class ProfileCanBo extends AdminPage {
         T.ready('/user', () => {
             if (this.props.system && this.props.system.user) {
                 const user = this.props.system.user;
-                if (user.isStaff != 1 && user.isStudent != 1) {
+                if (user.isStaff != 1 && user.isStudent != 1 || user.isUnit == 1) {
                     this.setState({ isLoad: false });
                     this.profileCommon.value(user);
                 } else this.setState({ isHCMUSSH: true });

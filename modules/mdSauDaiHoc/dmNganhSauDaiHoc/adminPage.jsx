@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createDmNganhSdh, getDmNganhSdhPage, updateDmNganhSdh, deleteDmNganhSdh } from './redux';
-import { getDmKhoaSdhAll, SelectAdapter_DmKhoaSdh } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux';
+import { SelectAdapter_DmDonViFaculty_V2, getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
-import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
@@ -26,6 +25,7 @@ class EditModal extends AdminModal {
     }
 
     onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
             maNganh: this.ma.value(),
             ten: this.ten.value(),
@@ -42,7 +42,6 @@ class EditModal extends AdminModal {
         } else {
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
-        e.preventDefault();
     }
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
@@ -50,7 +49,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật khoa sau đại học' : 'Tạo mới khoa sau đại học',
+            title: this.state.ma ? 'Cập nhật ngành sau đại học' : 'Tạo mới ngành sau đại học',
             size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã ngành'
@@ -60,7 +59,7 @@ class EditModal extends AdminModal {
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên ngành'
                     readOnly={readOnly} required />
-                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmKhoaSdh} label='Khoa sau đại học' readOnly={readOnly} />
+                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmDonViFaculty_V2} label='Khoa sau đại học' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
         });
@@ -70,11 +69,11 @@ class EditModal extends AdminModal {
 class DmNganhSdhPage extends AdminPage {
     state = { dmKhoaSdh: {} };
     componentDidMount() {
-        T.ready('/user/category', () => {
+        T.ready('/user/sau-dai-hoc/danh-sach-nganh', () => {
             T.onSearch = (searchText) => this.props.getDmNganhSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmNganhSdhPage();
-            this.props.getDmKhoaSdhAll(items => {
+            this.props.getDmDonViFaculty(items => {
                 let dmKhoaSdh = {};
                 items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
                 this.setState({ dmKhoaSdh });
@@ -87,12 +86,10 @@ class DmNganhSdhPage extends AdminPage {
         this.modal.show();
     }
 
-    changeActive = item => this.props.updateDmNganhSdh(item.ma, { kichHoat: item.kichHoat });
- 
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa danh mục ngành sau đại học', 'Bạn có chắc bạn muốn xóa ngành này?', true, isConfirm =>
-            isConfirm && this.props.deleteDmNganhSdh(item.ma));
+            isConfirm && this.props.deleteDmNganhSdh(item.maNganh));
     }
 
     render() {
@@ -106,6 +103,7 @@ class DmNganhSdhPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
+                        <th style={{ width: 'auto', textAlign: 'right' }}>STT</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã ngành</th>
                         <th style={{ width: '50%' }}>Tên ngành</th>
                         <th style={{ width: '50%' }}>Khoa</th>
@@ -115,12 +113,13 @@ class DmNganhSdhPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
+                        <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' style={{ textAlign: 'right' }} content={item.maNganh ? item.maNganh : ''}
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='text' content={item.maKhoa ? this.state.dmKhoaSdh[item.maKhoa] : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
-                            onChanged={() => this.changeActive(item)} />
+                            onChanged={value => this.props.updateDmNganhSdh(item.maNganh, { kichHoat: Number(value) })} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
                     </tr>
@@ -132,22 +131,21 @@ class DmNganhSdhPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Danh mục ngành sau đại học',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
                 'Danh mục ngành sau đại học'
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmNganhSdhPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmNganhSdh} update={this.props.updateDmNganhSdh} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sau-dai-hoc/danh-sach-nganh/upload') : null
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmNganhSdh: state.danhMuc.dmNganhSdh });
-const mapActionsToProps = { createDmNganhSdh, getDmNganhSdhPage, updateDmNganhSdh, deleteDmNganhSdh, getDmKhoaSdhAll };
+const mapStateToProps = state => ({ system: state.system, dmNganhSdh: state.sdh.dmNganhSdh });
+const mapActionsToProps = { createDmNganhSdh, getDmNganhSdhPage, updateDmNganhSdh, deleteDmNganhSdh, getDmDonViFaculty };
 export default connect(mapStateToProps, mapActionsToProps)(DmNganhSdhPage);

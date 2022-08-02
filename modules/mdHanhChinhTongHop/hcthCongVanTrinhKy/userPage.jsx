@@ -28,10 +28,10 @@ class CreateModal extends AdminModal {
 
     render = () => {
         return this.renderModal({
-            title: 'Tạo công văn trình ký',
+            title: 'Tạo văn bản trình ký',
             size: 'elarge',
             body: <div className='row'>
-                <FormSelect ref={e => this.congVan = e} data={SelectAdapter_CongVanDi} label='Công văn đi' className='col-md-12' />
+                <FormSelect ref={e => this.congVan = e} data={SelectAdapter_CongVanDi} label='Văn bản đi' className='col-md-12' />
                 <FormSelect ref={e => this.danhSachCaNBo = e} data={SelectAdapter_FwCanBo} label='Cán bộ kí' className='col-md-12' multiple={true} />
             </div>
         });
@@ -89,7 +89,7 @@ class HcthCongVanTrinhKyUserPage extends AdminPage {
                 return <tr key={item.id}>
                     <TableCell type='number' content={item.R} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={`${item.hoNguoiTao} ${item.tenNguoiTao}`.trim().normalizedName()} />
-                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} url={`/user/cong-van-di/${item.congVanId}`} content={item.soCongVan || 'Công văn chưa có số'} />
+                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} url={`/user/van-ban-di/${item.congVanId}`} content={item.soCongVan || 'Công văn chưa có số'} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.loaiCongVan ? loaiCongVan[item.loaiCongVan]?.color : 'blue' }} content={item.loaiCongVan ? loaiCongVan[item.loaiCongVan]?.text : ''} />
                     <TableCell type='text' content={item.trichYeu} contentClassName='multiple-lines-3' />
                     <TableCell type='text' content={
@@ -106,7 +106,7 @@ class HcthCongVanTrinhKyUserPage extends AdminPage {
         });
         return this.renderPage({
             icon: 'fa fa-pencil-square-o',
-            title: 'Công văn trình ký',
+            title: 'Văn bản trình ký',
             content: <>
                 <div className='tile'>
                     {table}

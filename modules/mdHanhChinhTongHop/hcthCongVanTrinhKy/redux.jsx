@@ -41,7 +41,7 @@ export function searchCongVanTrinhKy(pageNumber, pageSize, pageCondition, filter
         const url = `/api/hcth/cong-van-trinh-ky/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách công văn trình ký bị lỗi', 'danger');
+                T.notify('Lấy danh sách văn bản trình ký bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -49,22 +49,22 @@ export function searchCongVanTrinhKy(pageNumber, pageSize, pageCondition, filter
                 dispatch({ type: HcthCongVanTrinhKySearchPage, page: data.page });
                 done && done(data.page);
             }
-        }, () => T.notify('Lấy danh sách công văn trình ký bị lỗi', 'danger'));
+        }, () => T.notify('Lấy danh sách văn bản trình ký bị lỗi', 'danger'));
     };
 }
 
 export function getCongVanTrinhKy(id, done) {
     return dispatch => {
-        dispatch({type: HcthCongVanTrinhKyGet, item: null});
+        dispatch({ type: HcthCongVanTrinhKyGet, item: null });
         const url = `/api/hcth/cong-van-trinh-ky/${id}`;
         T.get(url, res => {
             if (res.error) {
-                T.notify('Lấy công văn trình ký lỗi', 'danger');
+                T.notify('Lấy văn bản trình ký lỗi', 'danger');
                 console.error('GET: ' + url, res.error);
             }
             else {
-                T.notify('Lấy công văn trình ký thành công', 'success');
-                dispatch({type: HcthCongVanTrinhKyGet, item: res.item});
+                T.notify('Lấy văn bản trình ký thành công', 'success');
+                dispatch({ type: HcthCongVanTrinhKyGet, item: res.item });
                 done && done(res.item);
             }
         });
@@ -76,14 +76,14 @@ export function updateCongVanTrinhKy(id, changes, done) {
         const url = '/api/hcth/cong-van-trinh-ky';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật công văn trình ký bị lỗi!', 'danger');
+                T.notify('Cập nhật văn bản trình ký bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật công văn trình ký thành công!', 'success');
+                T.notify('Cập nhật văn bản trình ký thành công!', 'success');
                 done && done();
             }
-        }, () => T.notify('Cập nhật công văn trình ký bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật văn bản trình ký bị lỗi!', 'danger'));
     };
 }
 
@@ -92,13 +92,13 @@ export function deleteCongVanTrinhKy(id, congVanId, done) {
         const url = '/api/hcth/cong-van-trinh-ky';
         T.delete(url, { id, congVanId }, data => {
             if (data.error) {
-                T.notify('Xóa công văn trình ký bị lỗi!', 'danger');
+                T.notify('Xóa văn bản trình ký bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.notify('Xóa công văn trình ký thành công!', 'success');
+                T.notify('Xóa văn bản trình ký thành công!', 'success');
                 done && done();
             }
-        }, () => T.notify('Xóa công văn trình ký bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa văn bản trình ký bị lỗi!', 'danger'));
     };
 }
 

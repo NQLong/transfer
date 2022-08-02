@@ -48,7 +48,25 @@ export function getListNganHang(done) {
     };
 }
 
-export function createGiaoDich(data, done){
+export function createInvoice(transactionId, done, onError) {
+    return dispatch => {
+        const url = '/api/finance/invoice';
+        T.post(url, { transactionId }, res => {
+            if (res.error) {
+                T.notify('Tạo hóa đơn lỗi', 'danger');
+                console.error(`GET: ${url}.`, res.error);
+                onError && onError();
+            }
+            else {
+                T.notify('Tạo hóa đơn thành công', 'success');
+                dispatch(getTongGiaoDichPage());
+                done && done(res.item);
+            }
+        }, () => T.notify('Tạo hóa đơn lỗi', 'danger'));
+    };
+}
+
+export function createGiaoDich(data, done) {
     return dispatch => {
         const url = '/api/finance/danh-sach-giao-dich';
         T.post(url, data, res => {

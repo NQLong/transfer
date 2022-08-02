@@ -4,6 +4,7 @@ import { AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableC
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import { getTongGiaoDichPage, getListNganHang, createGiaoDich } from './redux';
+import { getStudentHocPhi } from '../tcHocPhi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -17,6 +18,20 @@ const yearDatas = () => {
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
 class EditModal extends AdminModal {
+
+    onChangeQuery = () => {
+        const mssv = this.sinhVien.value();
+        const hocKy = this.hocKy.value();
+        const namHoc = this.namHoc.value();
+        if (mssv && hocKy && namHoc) {
+            this.props.get(mssv, namHoc, hocKy, (hocPhi) => {
+                this.soTien.value(hocPhi.congNo);
+                this.setAmountText(hocPhi.congNo);
+            });
+        }
+    }
+
+
     setAmountText = (value) => {
         if (Number.isInteger(value))
             this.thanhChu?.value(T.numberToVnText(value.toString()) + ' đồng');
@@ -61,11 +76,11 @@ class EditModal extends AdminModal {
             title: 'Thêm giao dịch',
             size: 'large',
             body: <div className='row'>
-                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} />
-                <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} />
-                <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} />
-                <FormTextBox required type='number' min={1} max={9999999999} label='Số tiền' className='col-md-12' ref={e => this.soTien = e} onChange={this.setAmountText} />
-                <FormTextBox readOnly label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText={'Vui lòng nhập số tiền'} />
+                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
+                <FormTextBox readOnly label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} />
+                <FormTextBox readOnly label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
             </div>
         });
     }
@@ -219,7 +234,7 @@ class DanhSachGiaoDich extends AdminPage {
                             getPage={this.getPage} />
                     </div>
                 </div>
-                <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich}/>
+                <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
             </div>),
             onCreate: permission.write ? () => this.modal.show() : null,
             onExport: permission.export ? e => this.onDownloadPsc(e) : null,
@@ -228,5 +243,5 @@ class DanhSachGiaoDich extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich };
+const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);
