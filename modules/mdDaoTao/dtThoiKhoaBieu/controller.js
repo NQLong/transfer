@@ -174,6 +174,7 @@ module.exports = app => {
                 { header: 'STT', key: 'stt', width: 5 },
                 { header: 'MÃ', key: 'ma', width: 10 },
                 { header: 'MÔN HỌC', key: 'monHoc', width: 40 },
+                { header: 'TỰ CHỌN', key: 'tuChon', width: 10 },
                 { header: 'LỚP', key: 'lop', width: 10 },
                 { header: 'TỔNG TIẾT', key: 'tongTiet', width: 10 },
                 { header: 'PHÒNG', key: 'phong', width: 10 },
@@ -184,24 +185,27 @@ module.exports = app => {
                 { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 20 },
                 { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 20 },
                 { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 30 },
+                { header: 'MÃ NGÀNH', key: 'maNganh', width: 20 },
                 { header: 'NGÀNH', key: 'nganh', width: 20 },
                 { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 }
             ];
             ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
-            ws.getRow(1).font = {
-                name: 'Times New Roman',
-                family: 4,
-                size: 12,
-                bold: true,
-                color: { argb: 'FF000000' }
-            };
+            ws.getRow(1).font = { name: 'Times New Roman' };
+            // ws.getRow(1).font = {
+            //     name: 'Times New Roman',
+            //     family: 4,
+            //     size: 12,
+            //     bold: true,
+            //     color: { argb: 'FF000000' }
+            // };
 
             const list = data.rows;
             list.forEach((item, index) => {
                 ws.addRow({
                     stt: index + 1,
                     ma: item.maMonHoc,
-                    monHoc: `${app.parse(item.tenMonHoc).vi}\n${item.tenKhoaBoMon}`,
+                    monHoc: `${app.parse(item.tenMonHoc).vi}`,
+                    tuChon: item.loaiMonHoc ? 'x' : '',
                     lop: item.nhom,
                     tongTiet: item.tongTiet,
                     phong: item.phong,
@@ -212,6 +216,7 @@ module.exports = app => {
                     ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
                     ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
                     khoa: item.tenKhoaDangKy,
+                    maNganh: item.maNganh,
                     nganh: item.tenNganh,
                     giangVien: item.tenGiangVien,
                 }, index === 0 ? 'n' : 'i');
@@ -219,13 +224,7 @@ module.exports = app => {
                 if (index === 0) {
                     ws.getRow(2).alignment = { ...ws.getRow(2).alignment, vertical: 'middle', wrapText: true };
                     ws.getRow(2).font = { name: 'Times New Roman' };
-
-                    ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('E' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('G' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('H' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('I' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('J' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
+                    // ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
                 }
             });
 
