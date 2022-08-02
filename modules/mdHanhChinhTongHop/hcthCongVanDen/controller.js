@@ -483,7 +483,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.check('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
