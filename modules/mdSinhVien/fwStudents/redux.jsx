@@ -160,3 +160,30 @@ export function updateStudentUser(changes, done) {
         }, () => T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger'));
     };
 }
+
+export function downloadWord(done) {
+    return () => {
+        const url = '/api/students-download-syll';
+        T.get(url, result => {
+            if (result.error) {
+                T.notify('Tải sơ yếu lý lịch lỗi', 'danger');
+            } else if (done) {
+                done(result.buffer);
+            }
+        });
+    };
+}
+
+export function loginStudentForTest(data) {
+    return () => {
+        const url = '/api/students-login-test';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+            } else {
+                T.cookie('personId', result.user.studentId);
+                location.reload();
+            }
+        });
+    };
+}

@@ -146,8 +146,7 @@ class QtSangKien extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtSangKien', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtSangKien', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtSangKien && this.props.qtSangKien.page ? this.props.qtSangKien.page
             : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
@@ -179,7 +178,7 @@ class QtSangKien extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                        <>  
+                        <>
                             <span> {item.tenChucVu || ''}<br /> </span>
                             {(item.tenDonVi || '')}
                         </>
@@ -187,7 +186,7 @@ class QtSangKien extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />
                     <TableCell type='text' content={(item.tenSangKien || '')} />
                     <TableCell type='text' content={(item.soQuyetDinh || '')} />
-                    <TableCell type='text' content={(item.capAnhHuong == 1 ? 'Cấp bộ' : (item.capAnhHuong == 2 ? 'Cấp cơ sở': ''))} />
+                    <TableCell type='text' content={(item.capAnhHuong == 1 ? 'Cấp bộ' : (item.capAnhHuong == 2 ? 'Cấp cơ sở' : ''))} />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -212,7 +211,7 @@ class QtSangKien extends AdminPage {
                     <div className='col-12'>
                         <div className='row justify-content-between'>
                             <div className='col-md-6'>Tìm thấy: <b>{totalItem}</b> kết quả</div>
-                            <div className='form-group col-md-6' style={{ textAlign:'right' }}>
+                            <div className='form-group col-md-6' style={{ textAlign: 'right' }}>
                                 <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                                     <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
                                 </button>
@@ -230,19 +229,18 @@ class QtSangKien extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtSangKienStaff} update={this.props.updateQtSangKienStaff}
-                    permissions={currentPermissions}
                 />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
+            onExport: permission && permission.write ? (e) => {
                 e.preventDefault();
                 const filter = T.stringify(this.state.filter);
                 T.download(T.url(`/api/qua-trinh/sang-kien/download-excel/${filter}`), 'sangkien.xlsx');
-            },
-            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/sang-kien/upload') : null,
+            } : null,
+            onImport: !this.checked && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/sang-kien/upload') : null,
         });
     }
 }

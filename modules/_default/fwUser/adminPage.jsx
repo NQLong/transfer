@@ -28,7 +28,7 @@ class UserModal extends AdminModal {
             title: 'Thông tin người dùng',
             size: 'large',
             body: <div className='rows'>
-                <ModalContent ref={e => this.modalContent = e} allRoles={this.props.allRoles} changeUser={this.props.changeUser} />
+                <ModalContent readOnly={this.props.readOnly} ref={e => this.modalContent = e} allRoles={this.props.allRoles} changeUser={this.props.changeUser} />
             </div>
         });
     }
@@ -116,7 +116,7 @@ class UserPage extends AdminPage {
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getUserPage} />
-                <UserModal ref={e => this.userModal = e} permissionWrite={permission.write} allRoles={allRoles} updateUser={this.props.updateUser} createUser={this.props.createUser} changeUser={this.props.changeUser} />
+                <UserModal ref={e => this.userModal = e} readOnly={!permission.write} permissionWrite={permission.write} allRoles={allRoles} updateUser={this.props.updateUser} createUser={this.props.createUser} changeUser={this.props.changeUser} />
             </>,
             onCreate: permission && permission.write ? e => this.edit(e, null) : null,
             backRoute: '/user/settings'

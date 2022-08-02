@@ -17,6 +17,16 @@ module.exports = app => {
         { name: 'dmCaHoc:write' },
         { name: 'dmCaHoc:delete' },
     );
+
+    app.permissionHooks.add('staff', 'addRolesCaHoc', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtCaHoc:read', 'dmCaHoc:write', 'dmCaHoc:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
+
     app.get('/user/danh-muc/ca-hoc', app.permission.check('dmCaHoc:read'), app.templates.admin);
     app.get('/user/dao-tao/ca-hoc', app.permission.check('dtCaHoc:read'), app.templates.admin);
 

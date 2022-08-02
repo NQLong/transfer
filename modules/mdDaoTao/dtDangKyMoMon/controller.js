@@ -13,8 +13,17 @@ module.exports = app => {
         { name: 'quanLyDaoTao:manager' }
     );
 
+    app.permissionHooks.add('staff', 'addRolesDtDangKyMoMon', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
-    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
+
+    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), app.templates.admin);
 
     //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
@@ -83,6 +92,7 @@ module.exports = app => {
             thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             const hocKy = thoiGianMoMon.hocKy,
                 nam = thoiGianMoMon.nam;
+
             if ((!data.nam || !data.hocKy || data.nam != nam || data.hocKy != hocKy) && !isDaoTao) {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {

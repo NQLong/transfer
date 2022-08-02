@@ -9,9 +9,18 @@ module.exports = app => {
         { name: 'qtNghiViec:read', menu },
         { name: 'qtNghiViec:write' },
         { name: 'qtNghiViec:delete' },
+        { name: 'qtNghiViec:export' },
     );
     app.get('/user/tccb/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghi-viec/create-list', app.permission.check('qtNghiViec:read'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRoleQtNghiViec', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtNghiViec:read', 'qtNghiViec:write', 'qtNghiViec:delete', 'qtNghiViec:export');
+            resolve();
+        } else resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/nghi-viec/page/:pageNumber/:pageSize', app.permission.check('qtNghiViec:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -74,7 +83,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/nghi-viec/download-excel/:filter', app.permission.check('qtNghiViec:read'), (req, res) => {
+    app.get('/api/qua-trinh/nghi-viec/download-excel/:filter', app.permission.check('qtNghiViec:export'), (req, res) => {
         app.model.qtNghiViec.downloadExcel(req.params.filter, (error, result) => {
             if (error || !result) {
                 res.send({ error });
@@ -220,7 +229,7 @@ module.exports = app => {
         solve();
     });
 
-    app.get('/api/tccb/qua-trinh/download-nghi-huu-du-kien', app.permission.check('qtNghiViec:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/download-nghi-huu-du-kien', app.permission.check('qtNghiViec:export'), (req, res) => {
         const yearCalc = req.query.year;
         console.log(yearCalc);
         const endYear = new Date(yearCalc, 11, 31, 23, 59, 59, 999);

@@ -27,7 +27,7 @@ import { getTrangThaiText } from './staffEditPage';
 const { trangThaiSwitcher } = require('../constant');
 
 const timeList = [
-    { id: 1, text: 'Theo ngày công văn' },
+    { id: 1, text: 'Theo ngày văn bản' },
     { id: 2, text: 'Theo ngày nhận' },
     { id: 3, text: 'Theo ngày hết hạn' },
 ];
@@ -72,20 +72,20 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 readyUrl: '/user/hcth',
                 breadcrumb: [
                     <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
-                    'Danh sách công văn đến',
+                    'Danh sách Văn bản đến',
                 ],
                 backRoute: '/user/hcth',
-                baseUrl: '/user/hcth/cong-van-den',
+                baseUrl: '/user/hcth/van-ban-den',
             };
         else
             return {
                 readyUrl: '/user',
                 breadcrumb: [
                     <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                    'Danh sách công văn đến',
+                    'Danh sách Văn bản đến',
                 ],
                 backRoute: '/user',
-                baseUrl: '/user/cong-van-den',
+                baseUrl: '/user/van-ban-den',
             };
     }
 
@@ -137,7 +137,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
 
     onDelete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa công văn đến', 'Bạn có chắc bạn muốn xóa công văn này?', true,
+        T.confirm('Xóa Văn bản đến', 'Bạn có chắc bạn muốn xóa văn bản này?', true,
             isConfirm => isConfirm && this.props.deleteHcthCongVanDen(item.id));
     }
 
@@ -159,12 +159,12 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let table = renderTable({
             style: { marginTop: '5px' },
             getDataSource: () => this.state.loading ? null : list,
-            emptyTable: 'Không có dữ liệu công văn đến',
-            stickyHead: false,
+            emptyTable: 'Không có dữ liệu Văn bản đến',
+            stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số CV</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số VB</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số đến</th>
                     <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayNhan'} onSort={(type) => this.onSort('ngayNhan', type)}>Ngày nhận</TableHeader>
                     <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayHetHan'} onSort={(type) => this.onSort('ngayHetHan', type)}>Hết hạn</TableHeader>
@@ -182,8 +182,8 @@ class HcthCongVanDenStaffPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={
                             <>
-                                <Link to={`${baseUrl}/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
-                                {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
+                                <Link to={`${baseUrl}/${item.id}`}>{item.soCongVan || 'Chưa có số văn bản'}</Link>
+                                {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày VB: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soDen} />
@@ -245,7 +245,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn đến',
+            title: 'Văn bản đến',
             breadcrumb,
             header: <>
                 <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />
@@ -255,15 +255,15 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 <div className='row'>
                     <div className='col-12 col-md-12 row'>
 
-                        <FormSelect allowClear={true} className='col-md-3' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                        <FormSelect allowClear={true} className='col-md-4' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
                         {this.timeType?.value() && (<>
-                            <FormDatePicker type='date' className='col-md-3' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
-                            <FormDatePicker type='date' className='col-md-3' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='date' className='col-md-4' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='date' className='col-md-4' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
                         </>)}
                     </div>
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi văn bản' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận văn bản' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận văn bản' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <div className='tile'>
@@ -278,7 +278,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 e.preventDefault();
                 let filter = T.stringify(this.state.filter);
                 if (filter.includes('%')) filter = '{}';
-                T.download(`/api/hcth/cong-van-den/download-excel/${filter}`, 'CONG_VAN_DEN.xlsx');
+                T.download(`/api/hcth/van-ban-den/download-excel/${filter}`, 'CONG_VAN_DEN.xlsx');
             },
             backRoute,
         });

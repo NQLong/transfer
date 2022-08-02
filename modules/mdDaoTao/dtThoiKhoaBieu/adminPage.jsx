@@ -15,6 +15,7 @@ import { SelectAdapter_DtNganhDaoTaoFilter } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
+import AutoGenSchedModal from './autoGenSchedModal';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     dataHocKy = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
@@ -115,7 +116,7 @@ class AddingModal extends AdminModal {
             size: 'large',
             submitText: 'Mở môn học',
             body: <div className='row'>
-                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' label='Bậc đào tạo' />
+                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-6' label='Bậc đào tạo' readOnly />
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-6' label='Hệ đào tạo' />
                 <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-6' label='Năm' />
                 <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-6' />
@@ -231,22 +232,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 this.props.deleteDtThoiKhoaBieu(item.id);
             }
         });
-    }
-
-    taoThoiKhoaBieu = () => {
-        let content = {
-            element: 'input',
-            attributes: {
-                type: 'date',
-            },
-        };
-        T.confirmLoading('Tạo thời khóa biểu', 'Xác nhận tạo thời khóa biểu tự động?', 'Tạo thời khóa biểu thành công', 'Tạo thời khóa biểu thất bại', 'info', 'Tạo', content, (ngayBatDau) =>
-            new Promise(resolve => {
-                this.props.initSchedule(ngayBatDau, (result) => {
-                    result.success && setTimeout(() => location.reload(), 2000);
-                    resolve(result);
-                });
-            }));
     }
 
     handleCheck = (value, item) => {
@@ -368,7 +353,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell style={{ textAlign: 'right' }} content={indexOfItem} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={permission} />
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
-                        <TableCell contentClassName='multiple-lines-4' content={<>
+                        <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
                             <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
                             <i> {item.tenKhoaBoMon}</i>
                         </>} />
@@ -385,7 +370,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                             </>
                         }
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                            {!item.phong && <>
+                            {(permission.write || permission.manage) && !item.phong && <>
                                 {this.state.editId != item.id && <Tooltip title='Điều chỉnh' arrow>
                                     <button className='btn btn-primary' onClick={e => e.preventDefault() || this.handleEdit(item)}>
                                         <i className='fa fa-lg fa-edit' />
@@ -399,12 +384,12 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                         <i className='fa fa-lg fa-check' />
                                     </button>
                                 </Tooltip>}</>}
-                            {item.phong && <Tooltip title='Điều chỉnh' arrow>
+                            {(permission.write || permission.manage) && item.phong && <Tooltip title='Điều chỉnh' arrow>
                                 <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
                                     <i className='fa fa-lg fa-cog' />
                                 </button>
                             </Tooltip>}
-                            {item.phong && <Tooltip title='Xóa' arrow>
+                            {(permission.write || permission.manage) && item.phong && <Tooltip title='Xóa' arrow>
                                 <button className='btn btn-danger' onClick={e => e.preventDefault() || this.delete(item)}>
                                     <i className='fa fa-lg fa-trash' />
                                 </button>
@@ -434,10 +419,11 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <AdjustModal ref={e => this.modal = e} quanLyKhoa={permission.manage}
                     update={this.props.updateDtThoiKhoaBieuCondition}
                 />
+                <AutoGenSchedModal ref={e => this.autoGen = e} permission={permission} />
                 <ThoiGianPhanCongGiangDay ref={e => this.thoiGianModal = e} create={this.props.createDtThoiGianPhanCong} />
                 <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} />
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
-                    || this.taoThoiKhoaBieu()} style={{ marginRight: '60px' }} />}
+                    || this.autoGen.show()} style={{ marginRight: '60px' }} />}
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-thumb-tack' tooltip='Tạo thời gian phân công giảng dạy' onClick={e => e.preventDefault()
                     || this.thoiGianModal.show()} style={{ marginRight: '120px' }} />}
             </>,

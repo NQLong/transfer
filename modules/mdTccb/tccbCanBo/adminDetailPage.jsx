@@ -67,7 +67,6 @@ class CanBoPage extends AdminPage {
         }
     }
 
-
     render() {
         const permission = this.getUserPermission('staff');
         return this.renderPage({
@@ -81,15 +80,13 @@ class CanBoPage extends AdminPage {
             content: <>
                 {this.state.load && <Loading />}
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} shcc={this.state.shcc} />
-                {!this.state.create && <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} phai={this.state.phai} />}
-                {!this.state.create && <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} readOnly={!permission.write} />}
-                {!this.state.create && <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} readOnly={!permission.write} />}
+                {!this.state.create && <ComponentQuanHe ref={e => this.componentQuanHe = e} shcc={this.state.shcc} phai={this.state.phai} permission={permission} />}
+                {!this.state.create && <ComponentTTCongTac ref={e => this.componentTTCongTac = e} shcc={this.state.shcc} permission={permission} />}
+                {!this.state.create && <ComponentTrinhDo ref={e => this.componentTrinhDo = e} shcc={this.state.shcc} permission={permission} canEdit={true} />}
 
-                <CirclePageButton type='custom' tooltip='Tải về lý lịch viên chức (2019)' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '125px' }} onClick={e => this.downloadWord(e, 'vc')} />
-
-                <CirclePageButton type='custom' tooltip='Tải về lý lịch công chức (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={e => this.downloadWord(e, 'cc')} />
-
-                <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />
+                {permission.write && <CirclePageButton type='custom' tooltip='Tải về lý lịch viên chức (2019)' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '125px' }} onClick={e => this.downloadWord(e, 'vc')} />}
+                {permission.write && <CirclePageButton type='custom' tooltip='Tải về lý lịch công chức (2008)' customIcon='fa-file-word-o' customClassName='btn-primary' style={{ marginRight: '65px' }} onClick={e => this.downloadWord(e, 'cc')} />}
+                {permission.write && <CirclePageButton type='custom' tooltip='Lưu thay đổi' customIcon='fa-save' customClassName='btn-success' style={{ marginRight: '5px' }} onClick={this.save} />}
             </>,
             backRoute: '/user/tccb/staff',
         });

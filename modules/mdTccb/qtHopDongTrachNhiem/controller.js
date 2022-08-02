@@ -9,11 +9,18 @@ module.exports = app => {
         { name: 'qtHopDongTrachNhiem:read', menu },
         { name: 'qtHopDongTrachNhiem:write' },
         { name: 'qtHopDongTrachNhiem:delete' },
+        { name: 'qtHopDongTrachNhiem:export' },
     );
 
     app.get('/user/tccb/qua-trinh/hop-dong-trach-nhiem/:ma', app.permission.check('qtHopDongTrachNhiem:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-trach-nhiem', app.permission.check('qtHopDongTrachNhiem:read'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtHopDongTrachNhiem', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtHopDongTrachNhiem:read', 'qtHopDongTrachNhiem:write', 'qtHopDongTrachNhiem:delete', 'qtHopDongTrachNhiem:export');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/hop-dong-trach-nhiem/page/:pageNumber/:pageSize', app.permission.check('qtHopDongTrachNhiem:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),

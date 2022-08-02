@@ -130,6 +130,14 @@ export const SelectAdapter_DtNganhDaoTao = {
     fetchOne: (maNganh, done) => (getDtNganhDaoTao(maNganh, item => done && done({ id: item.maNganh, text: item.tenNganh })))(),
 };
 
+export const SelectAdapter_DtNganhDaoTaoStudent = {
+    ajax: true,
+    url: '/api/dao-tao/nganh-dao-tao-student',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}`, khoa: item.khoa })) : [] }),
+    fetchOne: (maNganh, done) => (getDtNganhDaoTao(maNganh, item => done && done({ id: item.maNganh, text: item.tenNganh })))(),
+};
+
 
 export const SelectAdapter_DtNganhDaoTaoMa = {
     ajax: true,

@@ -17,6 +17,14 @@ module.exports = app => {
         { name: 'dmSvLoaiHinhDaoTao:write' },
         { name: 'dmSvLoaiHinhDaoTao:delete' },
     );
+
+    app.permissionHooks.add('staff', 'addRolesLoaiHinhDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtSvLoaiHinhDaoTao:read');
+            resolve();
+        } else resolve();
+    }));
+
     app.get('/user/danh-muc/loai-hinh-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:read'), app.templates.admin);
     app.get('/user/dao-tao/loai-hinh-dao-tao', app.permission.check('dtSvLoaiHinhDaoTao:read'), app.templates.admin);
 

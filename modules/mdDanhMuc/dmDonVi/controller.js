@@ -27,7 +27,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/all', app.permission.check('user:login'), (req, res) => {
         let searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
             kichHoat = req.query.kichHoat || null;
 
@@ -48,7 +48,7 @@ module.exports = app => {
         }, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/don-vi/item/:ma', app.permission.orCheck('staff:login', 'student:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/item/:ma', app.permission.check('user:login'), (req, res) => {
         if (req.params.ma == 0) res.send({
             item: {
                 ma: 0, ten: 'Trường ĐH Khoa học Xã hội và Nhân văn - TPHCM'

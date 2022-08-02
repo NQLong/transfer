@@ -1,22 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell, AdminModal } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getTongGiaoDichPage, getListNganHang } from './redux';
+import { getTongGiaoDichPage, getListNganHang, createGiaoDich } from './redux';
+import { getStudentHocPhi } from '../tcHocPhi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
-/**
- * TODO
- * filter time
- * export psc
- * filter hoc ky
- * filter nam hoc
- * sort theo thoi gian
- * 
- */
+import { SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -24,21 +17,80 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
-// class EditModal extends AdminModal {
-//     render = () => {
-//         return this.renderModal({
-//             title: 'Thêm giao dịch',
-//             body: <div className='col-md-12'>
+class EditModal extends AdminModal {
 
-//             </div>
-//         })
-//     }
-// }
+    onChangeQuery = () => {
+        const mssv = this.sinhVien.value();
+        const hocKy = this.hocKy.value();
+        const namHoc = this.namHoc.value();
+        if (mssv && hocKy && namHoc) {
+            this.props.get(mssv, namHoc, hocKy, (hocPhi) => {
+                this.soTien.value(hocPhi.congNo);
+                this.setAmountText(hocPhi.congNo);
+            });
+        }
+    }
+
+
+    setAmountText = (value) => {
+        if (Number.isInteger(value))
+            this.thanhChu?.value(T.numberToVnText(value.toString()) + ' đồng');
+    }
+
+    onShow = () => {
+        this.soTien?.value('');
+        this.thanhChu?.value('');
+        this.sinhVien?.value('');
+    }
+
+    onSubmit = () => {
+        const data = {
+            soTien: this.soTien.value(),
+            hocKy: this.hocKy.value(),
+            namHoc: this.namHoc.value(),
+            sinhVien: this.sinhVien.value()
+        };
+        if (!data.namHoc) {
+            T.notify('Năm học trống ', 'danger');
+            this.namHoc.focus();
+        }
+        else if (!data.hocKy) {
+            T.notify('Học kỳ trống ', 'danger');
+            this.hocKy.focus();
+        }
+        else if (!data.sinhVien) {
+            T.notify('Sinh viên trống ', 'danger');
+            this.sinhVien.focus();
+        }
+        else if (!data.soTien) {
+            T.notify('Số tiền trống', 'danger');
+            this.soTien.focus();
+        }
+        else {
+            this.props.create(data, () => this.hide());
+        }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thêm giao dịch',
+            size: 'large',
+            body: <div className='row'>
+                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
+                <FormTextBox readOnly label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} />
+                <FormTextBox readOnly label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
+            </div>
+        });
+    }
+}
 
 class DanhSachGiaoDich extends AdminPage {
     state = {
         filter: {},
     }
+
     componentDidMount() {
         T.ready('/user/finance/danh-sach-giao-dich', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '', page => this.setFilter(page));
@@ -115,6 +167,7 @@ class DanhSachGiaoDich extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcGiaoDich && this.props.tcGiaoDich.page ? this.props.tcGiaoDich.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
+        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write']);
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -165,29 +218,30 @@ class DanhSachGiaoDich extends AdminPage {
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' allowClear multiple />
                 <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' allowClear multiple />
                 <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' allowClear multiple />
-                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
-                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear />
+                <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
+                <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear />
                 <div className='col-md-12 d-flex justify-content-end' style={{ gap: 10 }}>
                     <button className='btn btn-danger' onClick={this.onClearSearch}><i className='fa fa-lg fa-times' />Xóa tìm kiếm</button>
                     <button className='btn btn-success' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}><i className='fa fa-lg fa-search' />Tìm kiếm</button>
                 </div>
             </div>,
             breadcrumb: ['Danh sách giao dịch'],
-            content:
-                <div className='row'>
-                    <div className='col-md-12'>
-                        <div className='tile'>
-                            {table}
-                            <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                                getPage={this.getPage} />
-                        </div>
+            content: (<div className='row'>
+                <div className='col-md-12'>
+                    <div className='tile'>
+                        {table}
+                        <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                            getPage={this.getPage} />
                     </div>
-                </div>,
-            buttons: [{ className: 'btn-danger', icon: 'fa-table', onClick: this.onDownloadPsc }]
+                </div>
+                <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
+            </div>),
+            onCreate: permission.write ? () => this.modal.show() : null,
+            onExport: permission.export ? e => this.onDownloadPsc(e) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage, getListNganHang };
+const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);

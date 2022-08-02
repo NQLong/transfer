@@ -224,3 +224,17 @@ export function getDanhSachMonChuongTrinhDaoTao(condition, done) {
         });
     };
 }
+
+export function downloadWord(id, done) {
+    return () => {
+        const url = `/api/dao-tao/chuong-trinh-dao-tao/download-word/${id}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Tải file word bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data.data);
+            }
+        }, () => T.notify('Tải file word bị lỗi', 'danger'));
+    };
+}
