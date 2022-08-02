@@ -219,13 +219,6 @@ module.exports = app => {
                 if (index === 0) {
                     ws.getRow(2).alignment = { ...ws.getRow(2).alignment, vertical: 'middle', wrapText: true };
                     ws.getRow(2).font = { name: 'Times New Roman' };
-
-                    ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('E' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('G' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('H' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('I' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                    ws.getCell('J' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
                 }
             });
 
