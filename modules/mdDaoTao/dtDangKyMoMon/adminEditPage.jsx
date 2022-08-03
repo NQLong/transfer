@@ -68,8 +68,8 @@ class DtDsMonMoEditPage extends AdminPage {
         this.id = route.id;
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
-                let { thoiGianMoMon } = data;
-                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao }, nam: thoiGianMoMon.nam });
+                let { thoiGianMoMon, thongTinKhoaNganh } = data;
+                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao, maNganh: thongTinKhoaNganh.maNganh }, nam: thoiGianMoMon.nam });
             });
         });
 
@@ -112,11 +112,14 @@ class DtDsMonMoEditPage extends AdminPage {
         e.preventDefault();
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
-            this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
-                // location.reload();
-            });
+        this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
+            // location.reload();
         });
+        // this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
+        //     this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
+        //         // location.reload();
+        //     });
+        // });
     }
 
     renderMonHocTable = (yearth, data) => {

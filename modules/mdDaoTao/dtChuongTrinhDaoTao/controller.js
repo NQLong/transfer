@@ -91,6 +91,7 @@ module.exports = app => {
             const danhSachChuyenNganh = await app.model.dtDanhSachChuyenNganh.getAll({ namHoc: item.id });
             let chuyenNganhMapper = {};
             danhSachChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
+
             Promise.all(listPromise).then(listMonHocCtdt => {
                 let listMonHoc = listMonHocCtdt.flat().map(item => {
                     item.maNganh = maNganh;

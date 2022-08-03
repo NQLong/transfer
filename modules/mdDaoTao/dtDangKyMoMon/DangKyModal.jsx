@@ -9,26 +9,24 @@ class MonHocCtdtModal extends AdminModal {
     monChuyenNganh = {}
     subChuyenNganh = {}
     state = { listMonHocChonChung: [], listMonHocChonChuyenNganh: [] }
-
     onShow = (item) => {
         let { khoaSv, thongTinKhoaNganh, maDangKy, nam } = item;
         let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
         this.setState({ listMonHocChonChung: [], listMonHocChonChuyenNganh: [] });
         this.props.getDanhSachMonChuongTrinhDaoTao({ maNganh, khoaSv, loaiHinhDaoTao, bacDaoTao }, value => {
             this.setState({ listMonHocChung: value.listMonHocChung || [], listMonHocChuyenNganh: value.listMonHocChuyenNganh || [], khoaSv, maNganh, khoaDangKy, maDangKy, loaiHinhDaoTao, bacDaoTao, nam }, () => {
-                if (!this.state.listMonHocChung.length) this.setState({ listMonHocChonChung: [] });
-                this.state.listMonHocChung.forEach(item => {
-                    if (item.isMo) {
-                        this.setState({ listMonHocChonChung: [...this.state.listMonHocChonChung, item] });
+                this.setState({ listMonHocChonChung: this.state.listMonHocChung.filter(item => item.isMo) }, () => {
+                    this.state.listMonHocChonChung.forEach(item => {
                         ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
                             this.monChung[textBox][item.maMonHoc].value(item[textBox]);
                         });
-                    }
+                    });
                 });
-                if (!this.state.listMonHocChuyenNganh.length) this.setState({ listMonHocChonChuyenNganh: [] });
-                this.state.listMonHocChuyenNganh.forEach((item, index) => {
-                    if (item.isMo) {
-                        this.setState({ listMonHocChonChuyenNganh: [...this.state.listMonHocChonChuyenNganh, item] });
+
+                this.setState({ listMonHocChonChuyenNganh: this.state.listMonHocChuyenNganh.filter(item => item.isMo) }, () => {
+                    this.currentMonChonChuyenNganh = this.state.listMonHocChonChuyenNganh;
+                    for (let index = 0; index < this.state.listMonHocChonChuyenNganh.length; index++) {
+                        const item = this.state.listMonHocChonChuyenNganh[index];
                         if (item.soLop && !isNaN(item.soLop)) {
                             item.soLop = Number(item.soLop);
                             if (item.soLop == 1 || item.chuyenNganh.length == 1) {
@@ -36,7 +34,7 @@ class MonHocCtdtModal extends AdminModal {
                                     this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
                                 });
                             } else if (item.soLop > 1 && item.chuyenNganh.length > 1) {
-                                this.setState({ [index]: item.soLop }, () => {
+                                this.setState({ [`CN_${item.maMonHoc}`]: item.soLop }, () => {
                                     this.monChuyenNganh.soLop[item.maMonHoc].value(item.soLop);
                                     Array.from({ length: Number(item.soLop) }, (_, i) => i).forEach(i => {
                                         ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
@@ -44,7 +42,6 @@ class MonHocCtdtModal extends AdminModal {
                                         });
                                         this.subChuyenNganh[item.maMonHoc]['chuyenNganh'][i + 1].value(item.currentCn[i]);
                                     });
-
                                 });
 
                             }
@@ -133,7 +130,7 @@ class MonHocCtdtModal extends AdminModal {
             ['chuyenNganh', 'soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
                 this.monChuyenNganh[textBox] = {};
             });
-            let readOnly = !item.isMo || this.state[index];
+            let readOnly = !item.isMo || this.state[`CN_${item.maMonHoc}`];
             return (
                 <React.Fragment key={index}>
                     <tr key={0}>
@@ -147,9 +144,9 @@ class MonHocCtdtModal extends AdminModal {
                                 if (item.chuyenNganh.length > 1) {
                                     item.soLop = e;
                                     if (!isNaN(e) && e > 1) {
-                                        this.setState({ [index]: e });
+                                        this.setState({ [`CN_${item.maMonHoc}`]: e });
                                     } else if (e == 1) {
-                                        this.setState({ [index]: null });
+                                        this.setState({ [`CN_${item.maMonHoc}`]: null });
                                     }
                                 }
                             }} />
@@ -164,7 +161,7 @@ class MonHocCtdtModal extends AdminModal {
                             <FormTextBox type='number' ref={e => this.monChuyenNganh.soLuongDuKien[item.maMonHoc] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={readOnly} />
                         } />
                         <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
-                            item.chuyenNganh.length > 1 && item.isMo && !this.state[index] ?
+                            item.chuyenNganh.length > 1 && item.isMo && !this.state[`CN_${item.maMonHoc}`] ?
                                 <FormSelect ref={e => this.monChuyenNganh.chuyenNganh[item.maMonHoc] = e} style={{ marginBottom: '0', width: 'auto' }} data={item.chuyenNganh.map((cn, index) => ({ id: cn, text: item.tenChuyenNganh[index] }))} multiple /> : item.tenChuyenNganh.join(', ')
                         } />
                         <TableCell type='checkbox' content={item.isMo} permission={{ write: true }} onChanged={(value) => {
@@ -191,7 +188,7 @@ class MonHocCtdtModal extends AdminModal {
                             });
                         }} />
                     </tr>
-                    {Array.from({ length: this.state[index] }, (_, i) => i + 1).map(i => {
+                    {Array.from({ length: this.state[`CN_${item.maMonHoc}`] }, (_, i) => i + 1).map(i => {
                         this.subChuyenNganh[item.maMonHoc] = {
                             soLuongDuKien: {},
                             soTietBuoi: {},
@@ -200,7 +197,7 @@ class MonHocCtdtModal extends AdminModal {
                         };
                         const style = { marginBottom: '0', width: 'auto' };
                         return (
-                            <tr key={`sub-${i}`} style={{ display: this.state[index] ? '' : 'none' }}>
+                            <tr key={`sub-${i}`} style={{ display: this.state[`CN_${item.maMonHoc}`] ? '' : 'none' }}>
                                 <TableCell style={{ textAlign: 'right' }} content={`Lớp ${i}`} colSpan={6} />
                                 <TableCell content={
                                     <FormTextBox type='number' ref={e => this.subChuyenNganh[item.maMonHoc].soTietBuoi[i] = e} min={1} max={5} style={style} />
@@ -274,14 +271,16 @@ class MonHocCtdtModal extends AdminModal {
             return [];
         }
     }
+
     onSubmit = (e) => {
         e.preventDefault();
         let { loaiHinhDaoTao, bacDaoTao } = this.state;
         let data = this.getData();
-        data && data.length && this.props.createDtDanhSachMonMo(this.state.maNganh, data, { loaiHinhDaoTao, bacDaoTao, maDangKy: this.state.maDangKy }, () => {
-            // this.props.reinit();
-            this.hide();
-        });
+        if (data && data.length) {
+            this.props.createDtDanhSachMonMo(this.state.maNganh, data, { loaiHinhDaoTao, bacDaoTao, maDangKy: this.state.maDangKy }, this.hide);
+        } else {
+            T.notify('Chưa chọn môn mở cho khóa!', 'danger');
+        }
     }
 
     render = () => {

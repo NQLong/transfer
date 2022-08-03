@@ -73,7 +73,7 @@ export function createDtThoiKhoaBieu(item, settings, done) {
     return dispatch => {
         const cookie = T.updatePage('pageDtThoiKhoaBieu');
         const { pageNumber, pageSize, pageCondition, filter } = cookie;
-        const url = '/api/dao-tao/thoi-khoa-bieu';
+        const url = '/api/dao-tao/thoi-khoa-bieu/multiple';
         T.post(url, { item, settings }, data => {
             if (data.error) {
                 T.notify('Tạo thời khoá biểu bị lỗi!', 'danger');

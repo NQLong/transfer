@@ -58,6 +58,66 @@ module.exports = app => {
         app.model.dtThoiKhoaBieu.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
+    app.post('/api/dao-tao/thoi-khoa-bieu/multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let item = req.body.item || [],
+                settings = req.body.settings;
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
+                { loaiHinhDaoTao, bacDaoTao, maNganh } = settings;
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+
+            let promiseList = [];
+            let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
+            for (let index = 0; index < item.length; index++) {
+                let monHoc = item[index];
+                delete monHoc.id;
+                let { maMonHoc, loaiMonHoc, khoaSv, chuyenNganh, soTietBuoi, soBuoiTuan, soLuongDuKien, soLop } = monHoc;
+                ['chuyenNganh', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => delete monHoc[key]);
+                const tkb = await app.model.dtThoiKhoaBieu.get({ maMonHoc, loaiMonHoc, khoaSinhVien: khoaSv, maNganh });
+                if (!tkb) {
+                    if (chuyenNganh) {
+                        if (Array.isArray(chuyenNganh)) {
+                            Array.from({ length: parseInt(chuyenNganh.length) }, (_, i) => i).forEach(index => {
+                                let soTiet = parseInt(soTietBuoi[index]), soBuoi = parseInt(soBuoiTuan[index]), sldk = parseInt(soLuongDuKien[index]), chNg = chuyenNganh[index];
+                                if (soBuoi > 1) {
+                                    Array.from({ length: parseInt(soBuoi) }, (_, i) => i + 1).forEach(buoi => {
+                                        promiseList.push(app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi, nam, hocKy, soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk }));
+                                    });
+                                } else {
+                                    promiseList.push(app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi: 1, nam, hocKy, soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk }));
+                                }
+                            });
+                        } else {
+                            soLop = parseInt(soLop);
+                            Array.from({ length: parseInt(chuyenNganh.length) }, (_, i) => i + 1).forEach(nhom => {
+                                let soBuoi = parseInt(soBuoiTuan);
+                                if (soBuoi > 1) {
+                                    Array.from({ length: parseInt(soBuoi) }, (_, i) => i + 1).forEach(buoi => {
+                                        promiseList.push(app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTiet: parseInt(soTietBuoi), chuyenNganh, soLuongDuKien: parseInt(soLuongDuKien) }));
+                                    });
+                                } else promiseList.push(app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTiet: parseInt(soTietBuoi), chuyenNganh, soLuongDuKien: parseInt(soLuongDuKien) }));
+                            });
+                        }
+                    } else {
+                        soLop = parseInt(soLop);
+                        Array.from({ length: parseInt(chuyenNganh.length) }, (_, i) => i + 1).forEach(nhom => {
+                            let soBuoi = parseInt(soBuoiTuan);
+                            if (soBuoi > 1) {
+                                Array.from({ length: parseInt(soBuoi) }, (_, i) => i + 1).forEach(buoi => {
+                                    promiseList.push(app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTiet: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien) }));
+                                });
+                            } else promiseList.push(app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTiet: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien) }));
+                        });
+                    }
+                }
+            }
+            await Promise.all(promiseList);
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         let item = req.body.item || [],
             settings = req.body.settings;
