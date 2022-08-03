@@ -87,7 +87,8 @@ class StoragePage extends AdminPage {
 
     copyClipboard = (e, item) => {
         e.preventDefault();
-        copy(`${T.rootUrl}/static/document/${item.nameDisplay}.${item.path.split('.').pop()}`);
+        // copy(`${T.rootUrl}/static/document/${encodeURI(item.nameDisplay)}.${item.path.split('.').pop()}`);
+        copy(`${T.rootUrl}/api/storage/download/${item.path}?displayName=${encodeURI(item.nameDisplay)}`);
     }
 
 
