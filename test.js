@@ -1,13 +1,122 @@
-// let data = "[{\"RefID\":\"cb8f8f2a-109b-4aba-b6c2-f3b0273ea506\",\"TransactionID\":\"ZMIQU6J_AA\",\"InvNo\":\"00000001\",\"InvDate\":\"2022-07-12T00:00:00+07:00\",\"InvoiceData\":\"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><HDon><DLHDon Id=\\\"ZMIQU6J_AA\\\"><TTChung><PBan>2.0.0</PBan><THDon>Hóa đơn thu học phí</THDon><KHMSHDon>2</KHMSHDon><KHHDon>C22TCH</KHHDon><SHDon>00000001</SHDon><NLap>2022-07-12</NLap><HDDCKPTQuan>0</HDDCKPTQuan><DVTTe>VND</DVTTe><TGia>1.00</TGia><HTTToan>TM/CK</HTTToan><MSTTCGP>0101243150</MSTTCGP><TTKhac><TTin><TTruong>CustomField1</TTruong><KDLieu>string</KDLieu><DLieu>1</DLieu></TTin><TTin><TTruong>CustomField10</TTruong><KDLieu>string</KDLieu><DLieu>10</DLieu></TTin><TTin><TTruong>CustomField2</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>CustomField3</TTruong><KDLieu>string</KDLieu><DLieu>3</DLieu></TTin><TTin><TTruong>CustomField4</TTruong><KDLieu>string</KDLieu><DLieu>4</DLieu></TTin><TTin><TTruong>CustomField5</TTruong><KDLieu>string</KDLieu><DLieu>5</DLieu></TTin><TTin><TTruong>CustomField6</TTruong><KDLieu>string</KDLieu><DLieu>6</DLieu></TTin><TTin><TTruong>CustomField7</TTruong><KDLieu>string</KDLieu><DLieu>7</DLieu></TTin><TTin><TTruong>CustomField8</TTruong><KDLieu>string</KDLieu><DLieu>8</DLieu></TTin><TTin><TTruong>CustomField9</TTruong><KDLieu>string</KDLieu><DLieu>9</DLieu></TTin></TTKhac></TTChung><NDHDon><NBan><Ten>TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN</Ten><MST>0101243150-382</MST><DChi>10-12 Đinh Tiên Hoàng - Phường Bến Nghé - Quận 1 - TP Hồ Chí Minh</DChi><SDThoai>(028) 3829 3828</SDThoai><STKNHang>0911 0000 66668</STKNHang><TNHang>tại Ngân hàng Vietcombank</TNHang><Fax>(028) 3829 3828</Fax><Website>http://hcmussh.edu.vn/</Website><TTKhac><TTin><TTruong>SellerBankAccount</TTruong><KDLieu>string</KDLieu><DLieu>0911 0000 66668</DLieu></TTin><TTin><TTruong>SellerBankName</TTruong><KDLieu>string</KDLieu><DLieu>tại Ngân hàng Vietcombank</DLieu></TTin><TTin><TTruong>SellerFax</TTruong><KDLieu>string</KDLieu><DLieu>(028) 3829 3828</DLieu></TTin><TTin><TTruong>SellerPhoneNumber</TTruong><KDLieu>string</KDLieu><DLieu>(028) 3829 3828</DLieu></TTin><TTin><TTruong>SellerWebsite</TTruong><KDLieu>string</KDLieu><DLieu>http://hcmussh.edu.vn/</DLieu></TTin><TTin><TTruong>SellerAddress</TTruong><KDLieu>string</KDLieu><DLieu>10-12 Đinh Tiên Hoàng - Phường Bến Nghé - Quận 1 - TP Hồ Chí Minh</DLieu></TTin></TTKhac></NBan><NMua><Ten>Công ty cổ phần MISA (Test - 666)</Ten><MST>0101243150-666</MST><DChi>Hà Nội</DChi><DCTDTu>meinvoiceemail@gmail.com</DCTDTu><TTKhac><TTin><TTruong>ContactName</TTruong><KDLieu>string</KDLieu><DLieu>MeInvoice Nhận hóa đơn</DLieu></TTin></TTKhac></NMua><DSHHDVu><HHDVu><TChat>1</TChat><STT>1</STT><MHHDVu>AO-NAM</MHHDVu><THHDVu>Áo nam</THHDVu><DVTinh>Chiếc</DVTinh><SLuong>1.000000</SLuong><DGia>150000.000000</DGia><TTKhac><TTin><TTruong>AmountOC</TTruong><KDLieu>numeric</KDLieu><DLieu>150000.0</DLieu></TTin><TTin><TTruong>Amount</TTruong><KDLieu>numeric</KDLieu><DLieu>150000.0</DLieu></TTin><TTin><TTruong>VATAmount</TTruong><KDLieu>numeric</KDLieu><DLieu>15000.0</DLieu></TTin><TTin><TTruong>VATAmountOC</TTruong><KDLieu>numeric</KDLieu><DLieu>15000.0</DLieu></TTin><TTin><TTruong>SortOrder</TTruong><KDLieu>numeric</KDLieu><DLieu>1</DLieu></TTin></TTKhac></HHDVu></DSHHDVu><TToan><TgTTTBSo>165000.000000</TgTTTBSo><TgTTTBChu>Một triệu năm trăm hai mươi hai nghìn ba trăm hai mươi ba phẩy mười hai đồng.</TgTTTBChu><TTKhac><TTin><TTruong>TotalAmount</TTruong><KDLieu>numeric</KDLieu><DLieu>165000.0</DLieu></TTin><TTin><TTruong>TotalSaleAmount</TTruong><KDLieu>numeric</KDLieu><DLieu>150000.0</DLieu></TTin><TTin><TTruong>TotalVATAmount</TTruong><KDLieu>numeric</KDLieu><DLieu>15000.0</DLieu></TTin><TTin><TTruong>TotalSaleAmountOC</TTruong><KDLieu>numeric</KDLieu><DLieu>150000.0</DLieu></TTin></TTKhac></TToan></NDHDon><TTKhac><TTin><TTruong>InvoiceTemplateID</TTruong><KDLieu>string</KDLieu><DLieu>854e5970-f78f-482e-a904-1467a8d07d7f</DLieu></TTin><TTin><TTruong>RefID</TTruong><KDLieu>string</KDLieu><DLieu>cb8f8f2a-109b-4aba-b6c2-f3b0273ea506</DLieu></TTin><TTin><TTruong>AmountDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>AmountOCDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>CoefficientDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>ExchangRateDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>MainCurrency</TTruong><KDLieu>string</KDLieu><DLieu>VND</DLieu></TTin><TTin><TTruong>QuantityDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>3</DLieu></TTin><TTin><TTruong>UnitPriceDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>UnitPriceOCDecimalDigits</TTruong><KDLieu>string</KDLieu><DLieu>2</DLieu></TTin><TTin><TTruong>AppID</TTruong><KDLieu>string</KDLieu><DLieu>f8a619af-0418-11ed-b268-005056b219fb</DLieu></TTin><TTin><TTruong>TransactionID</TTruong><KDLieu>string</KDLieu><DLieu>ZMIQU6J_AA</DLieu></TTin></TTKhac></DLHDon><DLQRCode>00020199950032C721209B2844486899946F922FF5F97C01130101243150382020120306C22TCH0401105082022071206061650006304543F</DLQRCode><DSCKS><NBan></NBan></DSCKS></HDon>\",\"ErrorCode\":null,\"ErrorData\":null,\"TokenCallback\":null,\"CallbackUrl\":null}]";
+const fs = require('fs');
+const forge = require('node-forge');
+
+const privateKey = fs.readFileSync('./myCA.key', 'utf-8');
+const cert = fs.readFileSync('./myCA.pem', 'utf-8');
+// const caKey = (forge.pki.decryptRsaPrivateKey(privateKey, 'benn1904'));
+const caKey = forge.pki.decryptRsaPrivateKey(privateKey, 'benn1904');
+const caCert = forge.pki.certificateFromPem(cert);
+const hostKeys = forge.pki.rsa.generateKeyPair(2048);
+
+const getCertNotBefore = () => {
+    let twoDaysAgo = new Date(Date.now() - 60 * 60 * 24 * 2 * 1000);
+    let year = twoDaysAgo.getFullYear();
+    let month = (twoDaysAgo.getMonth() + 1).toString().padStart(2, '0');
+    let day = twoDaysAgo.getDate();
+    return new Date(`${year}-${month}-${day} 00:00:00Z`);
+}
+
+// Get Certificate Expiration Date (Valid for 365 Days)
+const getCertNotAfter = (notBefore) => {
+    let ninetyDaysLater = new Date(notBefore.getTime() + 60 * 60 * 24 * 365 * 1000);
+    let year = ninetyDaysLater.getFullYear();
+    let month = (ninetyDaysLater.getMonth() + 1).toString().padStart(2, '0');
+    let day = ninetyDaysLater.getDate();
+    return new Date(`${year}-${month}-${day} 23:59:59Z`);
+}
+
+// // Get CA Expiration Date (Valid for 100 Years)
+// const getCANotAfter = (notBefore) => {
+//     let year = notBefore.getFullYear() + 100;
+//     let month = (notBefore.getMonth() + 1).toString().padStart(2, '0');
+//     let day = notBefore.getDate();
+//     return new Date(`${year}-${month}-${day} 23:59:59Z`);
+// }
+
+const makeNumberPositive = (hexString) => {
+    let mostSignificativeHexDigitAsInt = parseInt(hexString[0], 16);
+
+    if (mostSignificativeHexDigitAsInt < 8) return hexString;
+
+    mostSignificativeHexDigitAsInt -= 8
+    return mostSignificativeHexDigitAsInt.toString() + hexString.substring(1)
+}
+
+// Generate a random serial number for the Certificate
+const randomSerialNumber = () => {
+    return makeNumberPositive(forge.util.bytesToHex(forge.random.getBytesSync(20)));
+}
+// Define the attributes/properties for the Host Certificate
+const attributes = [{
+    shortName: 'C',
+    value: 'VN'
+}, {
+    shortName: 'ST',
+    value: 'Ho Chi Minh'
+}, {
+    shortName: 'L',
+    value: 'Quan 1'
+}, {
+    shortName: 'CN',
+    value: '004.0001'
+}];
+
+const extensions = [{
+    name: 'basicConstraints',
+    cA: false
+}, {
+    name: 'nsCertType',
+    server: true
+}, {
+    name: 'subjectKeyIdentifier'
+}, {
+    name: 'authorityKeyIdentifier',
+    authorityCertIssuer: true,
+    serialNumber: caCert.serialNumber
+}, {
+    name: 'keyUsage',
+    digitalSignature: true,
+    nonRepudiation: true,
+    keyEncipherment: true
+}, {
+    name: 'extKeyUsage',
+    serverAuth: true
+},
+    // {
+    //     name: 'subjectAltName',
+    //     altNames: validDomains.map(domain => { return { type: 2, value: domain } })
+    // }
+];
+
+// Create an empty Certificate
+let newHostCert = forge.pki.createCertificate();
+
+// Set the attributes for the new Host Certificate
+newHostCert.publicKey = hostKeys.publicKey;
+newHostCert.serialNumber = randomSerialNumber();
+newHostCert.validity.notBefore = getCertNotBefore();
+newHostCert.validity.notAfter = getCertNotAfter(newHostCert.validity.notBefore);
+newHostCert.setSubject(attributes);
+newHostCert.setIssuer(caCert.subject.attributes);
+newHostCert.setExtensions(extensions);
+
+// Sign the new Host Certificate using the CA
+newHostCert.sign(caKey, forge.md.sha512.create());
+
+// Convert to PEM format
+let pemHostCert = forge.pki.certificateToPem(newHostCert);
+let pemHostKey = forge.pki.privateKeyToPem(hostKeys.privateKey);
 
 
-// let jsonData = JSON.parse(data);
-// const { parseString } = require("xml2js"); 
-// // console.log(jsonData);
-// // parseString(jsonData[0].InvoiceData, (err, data) => {
-// //     console.log(JSON.stringify(data, null, 2));
-// // });
-// var convert = require('xml-js');
+var p12Asn1 = forge.pkcs12.toPkcs12Asn1(
+    hostKeys.privateKey, newHostCert, 'password',
+    { algorithm: '3des' });
 
-// var result = convert.xml2json(jsonData[0].InvoiceData, {compact: true, spaces: 4});
-// console.log(result);
+// base64-encode p12
+var p12Der = forge.asn1.toDer(p12Asn1).getBytes();
+var p12b64 = forge.util.encode64(p12Der);
+
+fs.writeFileSync('./test.p12', p12b64, 'base64');
+
+
+console.log({ pemHostCert, pemHostKey });

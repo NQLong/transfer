@@ -124,5 +124,11 @@ module.exports = {
             text: 'Văn bản trường',
             color: 'red',
         }
+    },
+
+    trangThaiRequest: {
+        CHO_DUYET: { id: 'CHO_DUYET', text: 'Chờ duyệt' },
+        DA_DUYET: { id: 'DA_DUYET', text: 'Đã duyệt' },
+        TU_CHOI: { id: 'TU_CHOI', text: 'Từ chối' },
     }
 };

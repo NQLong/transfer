@@ -1,6 +1,6 @@
-// Table name: HCTH_YEU_CAU_TAO_KHOA { id, shcc, ngayTao, ngayDuyet, trangThai, lyDo, shccNguoiDuyet }
+// Table name: HCTH_YEU_CAU_TAO_KHOA { id, shcc, ngayTao, ngayCapNhat, trangThai, lyDo, capNhatBoi }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'ngayTao': 'NGAY_TAO', 'ngayDuyet': 'NGAY_DUYET', 'trangThai': 'TRANG_THAI', 'lyDo': 'LY_DO', 'shccNguoiDuyet': 'SHCC_NGUOI_DUYET' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'ngayTao': 'NGAY_TAO', 'ngayCapNhat': 'NGAY_CAP_NHAT', 'trangThai': 'TRANG_THAI', 'lyDo': 'LY_DO', 'capNhatBoi': 'CAP_NHAT_BOI' };
 
 module.exports = app => {
     app.model.hcthYeuCauTaoKhoa = {
@@ -214,6 +214,19 @@ module.exports = app => {
                     resolve(result);
                 }
             });
+        }),
+
+        searchPage: (pagenumber, pagesize, searchterm, filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_yeu_cau_tao_khoa_search_page(:pagenumber, :pagesize, :searchterm, :filter, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, filter, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
         }),
     };
 };
