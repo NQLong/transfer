@@ -62,6 +62,7 @@ module.exports = app => {
                 for (let index = 0; index < dataArray.length; index++) {
                     let id = dataArray[index],
                         changes = data.data[id];
+                    console.log(changes);
                     let startDate = new Date(parseInt(ngayBatDau)),
                         currentDay = startDate.getDay() + 1,
                         distance = changes.thu - currentDay;
@@ -76,7 +77,8 @@ module.exports = app => {
                 done({ success: 'Sinh thời khóa biểu thành công!' });
             }
         } catch (error) {
-            done({ error: 'Sinh thời khoá biểu thất bại!' });
+            console.error(error);
+            done({ error: error || 'Sinh thời khoá biểu thất bại!' });
         }
     };
 
@@ -150,12 +152,21 @@ module.exports = app => {
                     let listRoomsAvailable = [];
                     for (let room of listRooms) {
                         if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, listSubjects, {
-                            tietBatDau: subject.tietBatDau || startedPeriod, soTiet: parseInt(subject.soTietBuoi), day: subject.thu || day
+                            tietBatDau: subject.tietBatDau || startedPeriod, soTietBuoi: parseInt(subject.soTietBuoi), day: subject.thu || day
                         })) listRoomsAvailable.push(room);
                     }
                     let roomResult = bestFit(subject, listRoomsAvailable);
                     if (roomResult) {
-                        data[subject.id] = { tietBatDau: subject.tietBatDau || startedPeriod, thu: subject.thu || day, phong: roomResult.ten, sucChua: roomResult.sucChua, maMonHoc: subject.maMonHoc, soTiet: subject.soTietBuoi };
+                        data[subject.id] = {
+                            tietBatDau: subject.tietBatDau || startedPeriod,
+                            thu: subject.thu || day,
+                            phong: roomResult.ten,
+                            sucChua: roomResult.sucChua,
+                            maMonHoc: subject.maMonHoc,
+                            soTietBuoi: subject.soTietBuoi,
+                            nhom: subject.nhom,
+                            buoi: subject.buoi
+                        };
                         subject.loaiMonHoc == 0 && dataNganh[subject.maNganh][subject.maMonHoc].push({
                             thu: day,
                             tietBatDau: startedPeriod,
@@ -182,7 +193,7 @@ module.exports = app => {
     });
 
     app.model.dtThoiKhoaBieu.isAvailabledRoom = (room, listSubjects, condition) => {
-        let { tietBatDau, soTiet, day } = condition, tietKetThuc = tietBatDau + soTiet - 1;
+        let { tietBatDau, soTietBuoi, day } = condition, tietKetThuc = tietBatDau + soTietBuoi - 1;
 
         let listPresentStatus = listSubjects.filter(subject => subject.phong == room && subject.thu == day).map(subject => subject = { tietBatDau: subject.tietBatDau, tietKetThuc: subject.tietBatDau + subject.soTietBuoi - 1 });
 
@@ -195,20 +206,20 @@ module.exports = app => {
         }
     };
 
-    const isValidPeriod = (tietBatDau, soTiet) => {
+    const isValidPeriod = (tietBatDau, soTietBuoi) => {
         /**
          * Sáng 5 tiết: từ 1 tới 5
          * Chiều 4 tiết: từ 6 tới 9
          */
 
         //Case 1: Nếu số tiết >= 6 => Undefinded
-        if (soTiet >= 6) return undefined;
+        if (soTietBuoi >= 6) return undefined;
 
         //Case 2: Nếu số tiết = 5 mà bắt đầu trong từ tiết 2 tới chiều => False
-        else if (soTiet == 5 && tietBatDau >= 2) return false;
+        else if (soTietBuoi == 5 && tietBatDau >= 2) return false;
 
         //Case 3: Nếu số tiết >= 4 mà bắt đầu từ tiết 3,4,5,7,8,9 => False
-        else if (soTiet >= 4 && tietBatDau != 6 && tietBatDau >= 3) return false;
+        else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) return false;
 
         //Case _
         return true;
@@ -238,6 +249,7 @@ module.exports = app => {
                 let { soTietLyThuyet, soTietThucHanh, soBuoiTuan, soTietBuoi } = item,
                     tongTiet = soTietLyThuyet + soTietThucHanh,
                     soTuan = Math.ceil(tongTiet / (soTietBuoi * soBuoiTuan));
+                console.log(tongTiet, soTietBuoi, soBuoiTuan);
                 let ngayKetThuc = monHoc.ngayBatDau + soTuan * 7 * DATE_UNIX;
                 for (let ngayLe of listNgayLe) {
                     if (ngayLe.ngay > monHoc.ngayBatDau && ngayLe.ngay <= ngayKetThuc && new Date(ngayLe.ngay).getDay() == monHoc.thu - 1) ngayKetThuc += 7 * DATE_UNIX;

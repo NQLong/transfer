@@ -14,6 +14,7 @@ class MonHocCtdtModal extends AdminModal {
         let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
         this.setState({ listMonHocChonChung: [], listMonHocChonChuyenNganh: [] });
         this.props.getDanhSachMonChuongTrinhDaoTao({ maNganh, khoaSv, loaiHinhDaoTao, bacDaoTao }, value => {
+
             this.setState({ listMonHocChung: value.listMonHocChung || [], listMonHocChuyenNganh: value.listMonHocChuyenNganh || [], khoaSv, maNganh, khoaDangKy, maDangKy, loaiHinhDaoTao, bacDaoTao, nam }, () => {
                 this.setState({ listMonHocChonChung: this.state.listMonHocChung.filter(item => item.isMo) }, () => {
                     this.state.listMonHocChonChung.forEach(item => {
@@ -24,12 +25,11 @@ class MonHocCtdtModal extends AdminModal {
                 });
 
                 this.setState({ listMonHocChonChuyenNganh: this.state.listMonHocChuyenNganh.filter(item => item.isMo) }, () => {
-                    this.currentMonChonChuyenNganh = this.state.listMonHocChonChuyenNganh;
                     for (let index = 0; index < this.state.listMonHocChonChuyenNganh.length; index++) {
                         const item = this.state.listMonHocChonChuyenNganh[index];
                         if (item.soLop && !isNaN(item.soLop)) {
                             item.soLop = Number(item.soLop);
-                            if (item.soLop == 1 || item.chuyenNganh.length == 1) {
+                            if (item.soLop == 1 && item.chuyenNganh.length == 1) {
                                 ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
                                     this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
                                 });
@@ -43,7 +43,10 @@ class MonHocCtdtModal extends AdminModal {
                                         this.subChuyenNganh[item.maMonHoc]['chuyenNganh'][i + 1].value(item.currentCn[i]);
                                     });
                                 });
-
+                            } else {
+                                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(textBox => {
+                                    this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
+                                });
                             }
                         }
                     }

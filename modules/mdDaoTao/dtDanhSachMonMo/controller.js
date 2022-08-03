@@ -11,26 +11,28 @@ module.exports = app => {
             if (now < batDau || now > ketThuc) {
                 throw 'Không thuộc thời gian cho phép thao tác';
             }
-            await app.model.dtDanhSachMonMo.delete({ maNganh, nam, hocKy });
-            const promiseList = [];
+            app.model.dtDanhSachMonMo.delete({ maNganh, nam, hocKy });
             for (let index = 0; index < data.length; index++) {
                 let item = data[index];
                 delete item.id;
                 item.nam = nam;
                 item.hocKy = hocKy;
-                if (item.chuyenNganh.length == 1) {
-                    item.chuyenNganh = JSON.stringify(item.chuyenNganh);
+                if (item.chuyenNganh) {
+                    if (item.chuyenNganh.length == 1) {
+                        item.chuyenNganh = JSON.stringify(item.chuyenNganh);
+                    }
+                    else if (item.chuyenNganh.length && item.monChuyenNganh) {
+                        item.chuyenNganh = {};
+                        let data = item.monChuyenNganh;
+                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(key => {
+                            item[key] = JSON.stringify(data[key]);
+                        });
+                    } else {
+                        item.chuyenNganh = JSON.stringify(item.chuyenNganh);
+                    }
                 }
-                else if (item.chuyenNganh.length && item.monChuyenNganh) {
-                    item.chuyenNganh = {};
-                    let data = item.monChuyenNganh;
-                    ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(key => {
-                        item[key] = JSON.stringify(data[key]);
-                    });
-                }
-                promiseList.push(app.model.dtDanhSachMonMo.create(item));
+                app.model.dtDanhSachMonMo.create(item);
             }
-            await Promise.all(promiseList);
             res.end();
         } catch (error) {
             res.send({ error });
@@ -66,7 +68,7 @@ module.exports = app => {
                     if (row.chuyenNganh && Array.isArray(row.chuyenNganh)) {
                         if (row.chuyenNganh.length > 1) {
                             row.tenChuyenNganh = row.chuyenNganh.map(item => {
-                                item = item.map(maNganh => chuyenNganhMapper[maNganh]);
+                                item = Array.isArray(item) ? item.map(maNganh => chuyenNganhMapper[maNganh]) : chuyenNganhMapper[item];
                                 return item;
                             });
                         } else {
