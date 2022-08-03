@@ -11864,10 +11864,10 @@
                 },
                 "CHUYEN_NGANH": {
                     "value": "chuyenNganh",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 50
                 },
                 "KHOA_DANG_KY": {
                     "value": "khoaDangKy",
@@ -15906,6 +15906,63 @@
             },
             "primaryKeys": [
                 "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_DM_LOP_SINH_VIEN": {
+            "active": true,
+            "moduleName": "svDmLopSinhVien",
+            "modelName": "svDmLopSinhVien",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "KHOA": {
+                    "value": "khoa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_KHUNG_DAO_TAO": {
+                    "value": "maKhungDaoTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "NIEN_KHOA": {
+                    "value": "nienKhoa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "KHOA",
+                "MA",
+                "MA_NGANH",
+                "NIEN_KHOA"
             ],
             "foreignKeys": [],
             "type": "table"
