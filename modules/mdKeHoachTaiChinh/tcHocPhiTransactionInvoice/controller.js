@@ -22,7 +22,8 @@ module.exports = app => {
     const url = {
         login: '/auth/token',
         hsmPublish: '/code/itg/invoicepublishing/publishhsm',
-        view: '/invoicepublished/linkview'
+        view: '/invoicepublished/linkview',
+        download: '/code/itg/invoicepublished/downloadinvoice'
     };
 
     app.get('/user/finance/invoice', app.permission.check('tcInvoice:read'), app.templates.admin);
@@ -84,7 +85,7 @@ module.exports = app => {
     };
     app.misaInvoiceAccessToken = 'Bearer Token';
 
-    const compileInvoice = (hocPhi, details) => {
+    const compileInvoice = (hocPhi, details, mauHoaDon) => {
         const invoiceDate = new Date(),
             refID = `${hocPhi.mssv}-${hocPhi.namHoc}-${hocPhi.hocKy}-${invoiceDate.getTime()}`,
             totalAmountOC = details.reduce((partialSum, detail) => partialSum + detail.soTien, 0);
@@ -92,7 +93,7 @@ module.exports = app => {
             'RefID': refID,
             'OriginalInvoiceData': {
                 'RefID': refID,
-                'InvSeries': '2C22TCH',
+                'InvSeries': mauHoaDon,
                 'InvoiceName': 'Hóa đơn thu học phí',
                 'InvDate': app.toIsoString(invoiceDate),
                 'CurrencyCode': 'VND',
@@ -104,7 +105,7 @@ module.exports = app => {
                 'Customfield1': hocPhi.mssv,
                 //Khóa lớp
                 'Customfield2': hocPhi.tenLoaiHinhDaoTao,
-                //Hệ
+                //Khoa
                 'Customfield3': hocPhi.tenKhoa,
                 // 'SellerAddress': 'Tầng X, Tòa nhà Y, Số zzz Cầu Giấy - Hà Nội',
                 // 'BuyerLegalName': 'Công ty cổ phần MISA (Test - 666)',
@@ -192,12 +193,13 @@ module.exports = app => {
             if (!hocPhiDetails.length) {
                 throw 'Không có dữ liệu giao dịch';
             }
+            const mauHoaDon = await app.model.tcSetting.getValue('meinvoiceMauHoaDon');
             let response = null;
             try {
                 const misaInstance = await app.getMisaAxiosInstance();
                 response = await misaInstance.post(
                     url.hsmPublish,
-                    [compileInvoice(hocPhi, hocPhiDetails)]
+                    [compileInvoice(hocPhi, hocPhiDetails, mauHoaDon.meinvoiceMauHoaDon)]
                 );
             } catch (error) {
                 throw { message: 'Tạo hóa đơn lỗi', error };
@@ -222,7 +224,7 @@ module.exports = app => {
     });
 
 
-    const createInvoiceList = async list => {
+    const createInvoiceList = async (list, config, email, meinvoiceMauHoaDon) => {
         try {
 
             const invoiceList = list.map(item => {
@@ -230,7 +232,7 @@ module.exports = app => {
                     const [loaiPhi, soTien] = detail.split('||');
                     return { loaiPhi, soTien: parseInt(soTien) };
                 }) : [];
-                return compileInvoice(item, details);
+                return compileInvoice(item, details, meinvoiceMauHoaDon);
             });
             const instance = await app.getMisaAxiosInstance();
             const response = await instance.post(url.hsmPublish, invoiceList);
@@ -241,13 +243,16 @@ module.exports = app => {
                 const refId = invoice.RefID;
                 const [mssv, namHoc, hocKy] = refId.split('-');
                 try {
-                    return await app.model.tcHocPhiTransactionInvoice.create({
+                    const item = await app.model.tcHocPhiTransactionInvoice.create({
                         transactionId: 'transaction.transId',
                         invoiceTransactionId: invoice.TransactionID,
                         invoiceNumber: invoice.InvNo,
                         mssv: mssv, hocKy: hocKy, namHoc: namHoc
                     });
+                    sendSinhVienInvoice(item, null, config, email);
+                    return item;
                 } catch (createError) {
+                    console.error(createError);
                     return null;
                 }
             }));
@@ -271,11 +276,7 @@ module.exports = app => {
             const { tuNgay, denNgay, namHoc, hocKy } = req.body;
             const { rows: list } = await app.model.tcHocPhi.getInvoiceList(tuNgay, denNgay, hocKy, namHoc);
             if (!list.length) {
-                return res.send({
-                    totalInvoice: 0,
-                    success: 0,
-                    error: 0
-                });
+                return res.send({ result: { totalInvoice: 0, success: 0, error: 0 } });
             }
             const chunkList = app.arrayToChunk(list, misaChunkSize);
             const result = {
@@ -283,8 +284,15 @@ module.exports = app => {
                 success: 0,
                 error: 0
             };
+            const emails = await getMailConfig();
+            let mailList = [...emails];
+            const config = await app.model.tcSetting.getValue('meinvoiceMauHoaDon', 'hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
             for (let i = 0; i < chunkList.length; i++) {
-                const ret = await createInvoiceList(chunkList[i]);
+                if (!mailList)
+                    mailList = [...emails];
+                const email = mailList.splice(Math.floor(Math.random() * mailList.length), 1).pop();
+
+                const ret = await createInvoiceList(chunkList[i], config, email, config.meinvoiceMauHoaDon);
                 result.success += ret.success;
                 result.error += ret.error;
             }
@@ -325,6 +333,53 @@ module.exports = app => {
             res.send({
                 page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, filter, settings: { namHoc, hocKy } }
             });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
+    const getMailConfig = async () => {
+        const mailConfig = await app.model.tcSetting.getValue('taiChinhEmailPrefix', 'taiChinhEmailPassword');
+        const mailList = [...Array(25).keys()].map(key => {
+            return {
+                email: mailConfig.taiChinhEmailPrefix + `0${key + 1}`.slice(-2) + '@hcmussh.edu.vn',
+                password: mailConfig.taiChinhEmailPassword
+            };
+        });
+        return mailList;
+    };
+
+    const sendSinhVienInvoice = async (invoice, sinhVien, config, email) => {
+        sinhVien = sinhVien || await app.model.fwStudents.get({ mssv: invoice.mssv });
+        config = config || await app.model.tcSetting.getValue('hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
+        const url = `${app.isDebug ? app.debugUrl : app.rootUrl}/api/finance/invoice/${invoice.id}`;
+        const title = config.hocPhiEmailTraHoaDonTitle.replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc);
+        const html = config.hocPhiEmailTraHoaDonEditorHtml.replace('{link}', 'link').replace(/href=.*?>/, `href="${url}">`).replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim()).replace('{mssv}', sinhVien.mssv).replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail);
+        const text = config.hocPhiEmailTraHoaDonEditorText.replace('{link}', `dẫn ${url}`).replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim()).replace('{mssv}', sinhVien.mssv).replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail);
+        if (!app.isDebug)
+            await app.email.normalSendEmail(email.email, email.password, sinhVien.emailTruong, [], (app.isDebug ? 'TEST: ' : '') + title, text, html, []);
+        else
+            await app.email.normalSendEmail(email.email, email.password, 'nqlong.dev@gmail.com', [], (app.isDebug ? 'TEST: ' : '') + title, text, html, []);
+    };
+
+    app.post('/api/finance/invoice/mail', app.permission.check('tcInvoice:write'), async (req, res) => {
+        try {
+            const id = req.body.id;
+            const invoice = await app.model.tcHocPhiTransactionInvoice.get({ id });
+            // console.log(invoice);
+            // const instance = await app.getMisaAxiosInstance();
+            // let response = await instance.post(url.download, [invoice.invoiceTransactionId], { params: { downloadDataType: 'pdf' } });
+            // const invoiceArray = app.parse(response.Data);
+            // if (!invoiceArray.length || invoiceArray[0].ErrorCode) throw 'Lấy hóa đơn lỗi';
+            // const fileContent = invoiceArray[0].Data;
+            // const attachment = Buffer.from(fileContent, 'base64');
+            const sinhVien = await app.model.fwStudents.get({ mssv: invoice.mssv });
+            const mailData = await app.model.tcSetting.getValue('hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
+            const emails = await getMailConfig();
+            const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
+            await sendSinhVienInvoice(invoice, sinhVien, mailData, email);
+            res.send();
         } catch (error) {
             console.error(error);
             res.send({ error });

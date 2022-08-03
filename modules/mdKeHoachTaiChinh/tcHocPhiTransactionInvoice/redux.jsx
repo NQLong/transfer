@@ -28,3 +28,18 @@ export function getInvoicePage(pageNumber, pageSize, pageCondition, pageFilter, 
         });
     };
 }
+
+export function sendInvoiceMail(id, done) {
+    return () => {
+        const url = '/api/finance/invoice/mail';
+        T.post(url, { id }, data => {
+            if (data.error) {
+                T.notify('Gửi mail hóa đơn lỗi!', 'danger');
+                console.error(`POST ${url}.`, data.error);
+            } else {
+                T.notify('Gửi mail hóa đơn thành công', 'success');
+                if (done) done(data.page);
+            }
+        }, () => T.notify('Gửi mail hóa đơn lỗi!', 'danger'));
+    };
+}
