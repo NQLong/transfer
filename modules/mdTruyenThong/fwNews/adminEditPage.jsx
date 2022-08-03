@@ -1,35 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateNews, getNews, getDraftNews, checkLink, adminCheckLink, createDraftNews, updateDraftNews } from './redux';
-import { getDvWebsite } from 'modules/_default/websiteDonVi/redux';
+import { getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwStorage } from 'modules/_default/fwStorage/redux';
 import { Link, withRouter } from 'react-router-dom';
-import Editor from 'view/component/CkEditor4';
-import { Select } from 'view/component/Input';
 import { FormTextBox, AdminPage, FormImageBox, FormCheckbox, FormSelect, FormDatePicker, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
-
-const languageOption = [
-    { value: 'vi', text: 'Tiếng Việt' },
-    { value: 'en', text: 'Tiếng Anh' }
-];
+import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
+import { getDmNgonNguAll } from 'modules/mdDanhMuc/dmNgonNguTruyenThong/redux';
 
 class NewsEditPage extends AdminPage {
-    state = { item: null, displayCover: 1, categories: [] };
-    constructor (props) {
+    state = { id: null, createdDate: '', title: '', displayCover: 1, categories: [], homeLanguages: ['vi', 'en'], languageAdapter: [] };
+
+    constructor(props) {
         super(props);
         this.language = React.createRef();
     }
 
     componentDidMount() {
         T.ready('/user/truyen-thong', () => {
-            this.getData();
-            this.neNewsViTitle.focus();
-            $('#neNewsCategories').select2();
-            $('#neNewsStartPost').datetimepicker(T.dateFormat);
+            this.getData(true);
         });
     }
 
-    getData = () => {
+    getData = (initial = false) => {
         const route = T.routeMatcher('/user/news/edit/:newsId'),
             newsId = route.parse(window.location.pathname).newsId,
             currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
@@ -41,6 +34,18 @@ class NewsEditPage extends AdminPage {
                 if (data.item.maDonVi == 0 && !currentPermissions.includes('news:write')) {
                     this.props.history.goBack();
                     return;
+                }
+
+                if (initial && data.item.maDonVi) {
+                    this.props.getDmDonVi(data.item.maDonVi, item => {
+                        const homeLanguages = item && item.homeLanguage ? item.homeLanguage.split(',') : ['vi', 'en'];
+                        this.props.getDmNgonNguAll('', items => {
+                            const languageAdapter = items.filter(item => homeLanguages.includes(item.maCode)).map(item => ({ id: item.maCode, text: `${item.maCode}: ${item.tenNgonNgu}` }));
+                            this.setState({ languageAdapter, homeLanguages }, () => {
+                                this.homeLanguage.value(data.item.languages ? data.item.languages.split(',') : ['vi']);
+                            });
+                        });
+                    });
                 }
 
                 let categories = data.categories.map(item => ({ id: item.id, text: T.language.parse(item.text, 'vi') }));
@@ -65,20 +70,12 @@ class NewsEditPage extends AdminPage {
                 this.createdDate.value(data.item.createdDate);
                 this.startPost.value(data.item.startPost);
 
-                let title = T.language.parse(data.item.title, true),
-                    abstract = T.language.parse(data.item.abstract, true),
-                    content = T.language.parse(data.item.content, true);
-                this.language.current.setVal(data.item.language);
-                this.neNewsViTitle.value(title.vi);
-                this.neNewsEnTitle.value(title.en);
-                this.viAbstract.value(abstract.vi);
-                this.viEditor.value(content.vi);
-                $('#neNewsViAbstract').val(abstract.vi); $('#neNewsEnAbstract').val(abstract.en);
-                this.enEditor.current.html(content.en);
-                if (data.listAttachment) this.file.value(data.listAttachment.map(item => ({ id: item.id, text: item.nameDisplay })));
+                this.title.value(data.item.title);
+                this.abstract.value(data.item.abstract);
+                this.editor.value(data.item.content);
 
-                this.setState(data);
-                this.setState({ categories }, () => {
+                if (data.listAttachment) this.file.value(data.listAttachment.map(item => ({ id: item.id, text: item.nameDisplay })));
+                this.setState({ categories, id: data.item.id, createdDate: data.item.createdDate, title: data.item.title }, () => {
                     this.categories.value(data.item.categories || []);
                 });
             } else {
@@ -87,13 +84,10 @@ class NewsEditPage extends AdminPage {
         });
     }
 
-    changeIsTranslate = (event) => {
-        this.setState({ item: Object.assign({}, this.state.item, { isTranslate: event.target.checked ? 1 : 0 }) });
+    checkLink = () => {
+        this.props.checkLink(this.state.id, this.neNewsLink.value().trim());
     }
 
-    checkLink = (item) => {
-        this.props.checkLink(item.id, this.neNewsLink.value().trim());
-    }
     newsLinkChange = (e) => {
         if (e.target.value) {
             $(this.newsLink).html(T.rootUrl + '/tin-tuc/' + e.target.value).attr('href', '/tin-tuc/' + e.target.value);
@@ -101,6 +95,7 @@ class NewsEditPage extends AdminPage {
             $(this.newsLink).html('').attr('href', '#');
         }
     }
+
     newsEnLinkChange = (e) => {
         if (e.target.value) {
             $(this.newsEnLink).html(T.rootUrl + '/article/' + e.target.value).attr('href', '/article/' + e.target.value);
@@ -110,59 +105,65 @@ class NewsEditPage extends AdminPage {
     }
 
     save = () => {
-        const neNewsStartPost = $('#neNewsStartPost').val() ? T.formatDate($('#neNewsStartPost').val()).getTime() : null,
-            isTranslated = this.neNewsEnTitle.value() && $('#neNewsEnAbstract').val() && this.enEditor.current.html();
+        const permissions = this.getCurrentPermissions();
+        const neNewsStartPost = this.startPost.value() ? this.startPost.value().getTime() : null;
+        const translatedLanguages = this.state.homeLanguages.filter(lang => lang != 'vi');
+        let isTranslated = true;
+        for (const lang of translatedLanguages) {
+            if (!(this.title.value[lang]() && this.abstract.value[lang]() && this.editor.value[lang]())) {
+                isTranslated = false;
+                break;
+            }
+        }
 
         const changes = {
-            categories: $('#neNewsCategories').val().length ? $('#neNewsCategories').val() : ['-1'],
-            title: JSON.stringify({ vi: this.neNewsViTitle.value(), en: this.neNewsEnTitle.value() }),
+            categories: this.categories.value().length ? this.categories.value() : ['-1'],
+            title: this.title.value(),
             link: this.neNewsLink.value().trim(),
             linkEn: this.neNewsEnLink.value().trim(),
-            active: this.state.item.active ? 1 : 0,
-            isInternal: this.state.item.isInternal ? 1 : 0,
-            isTranslate: this.state.item.isTranslate ? 1 : 0,
-            abstract: JSON.stringify({ vi: $('#neNewsViAbstract').val(), en: $('#neNewsEnAbstract').val() }),
-            content: JSON.stringify({ vi: this.viEditor.current.html(), en: this.enEditor.current.html() }),
+            active: Number(this.active.value()),
+            isInternal: Number(this.isInternal.value()),
+            languages: this.homeLanguage.value().join(','),
+            abstract: this.abstract.value(),
+            content: this.editor.value(),
             attachment: this.file.value().toString(),
-            displayCover: this.state.item.displayCover ? 1 : 0,
-            maDonVi: this.state.donVi,
+            displayCover: Number(this.displayCover.value()),
+            startPost: this.startPost.value() ? this.startPost.value().getTime() : null
         };
-        if (!this.state.item.isTranslate) changes.language = this.language.current.getVal() ? this.language.current.getVal() : 'vi';
+
         if (neNewsStartPost) changes.startPost = neNewsStartPost;
         let newDraft = {
-            title: JSON.stringify({ vi: this.neNewsViTitle.value(), en: this.neNewsEnTitle.value() }),
+            title: this.title.value(),
             editorId: this.props.system.user.shcc,
-            documentId: this.state.item.id,
+            documentId: this.state.id,
             editorName: this.props.system.user.firstName + ' ' + this.props.system.user.lastName,
-            isInternal: this.state.item.isInternal ? 1 : 0,
+            isInternal: Number(this.isInternal.value()),
             documentType: 'news',
             documentJson: JSON.stringify(changes),
             isTranslated: isTranslated ? 'done' : 'ready',
-            displayCover: this.state.item.displayCover ? 1 : 0,
+            displayCover: Number(this.displayCover.value())
         };
-        if (this.props.system.user.permissions.includes('news:write') || this.props.system.user.permissions.includes('website:write')) {
-            this.props.adminCheckLink(this.state.item.id, this.neNewsLink.value().trim(), done => {
+
+        if (permissions.includes('news:write') || permissions.includes('website:write')) {
+            this.props.adminCheckLink(this.state.id, this.neNewsLink.value().trim(), done => {
                 if (this.neNewsLink.value().trim() && done.error) {
                     T.notify('Link truyền thông không hợp lệ hoặc đã bị trùng!', 'danger');
                 } else {
-                    this.props.updateNews(this.state.item.id, changes, () => {
-                        this.neNewsLink.value(changes.link);
-                    });
+                    this.props.updateNews(this.state.id, changes);
                 }
             });
-        } else if (this.props.system.user.permissions.includes('news:tuyensinh')) {
-            let labelSelected = $('#neNewsCategories').find('option:selected').text();
-            if (!labelSelected.includes('TS')) {
+        } else if (permissions.includes('news:tuyensinh')) {
+            const textSelected = (this.categories.data() || []).map(item => item.text).toString();
+            if (!textSelected.includes('TS')) {
                 T.notify('Vui lòng chọn danh mục Tuyển sinh!', 'danger');
                 return;
             }
-            this.props.adminCheckLink(this.state.item.id, this.neNewsLink.value().trim(), done => {
+
+            this.props.adminCheckLink(this.state.id, this.neNewsLink.value().trim(), done => {
                 if (this.neNewsLink.value().trim() && done.error) {
                     T.notify('Link truyền thông không hợp lệ hoặc đã bị trùng!', 'danger');
                 } else {
-                    this.props.updateNews(this.state.item.id, changes, () => {
-                        this.neNewsLink.value(changes.link);
-                    });
+                    this.props.updateNews(this.state.id, changes);
                 }
             });
         } else {
@@ -170,45 +171,24 @@ class NewsEditPage extends AdminPage {
             this.props.createDraftNews(newDraft, () => { this.getData(); });
         }
     };
+
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
-        let readOnly = currentPermissions.contains('news:draft') && !currentPermissions.contains('news:write') && !currentPermissions.contains('website:write');
+        const currentPermissions = this.getCurrentPermissions();
+        let readOnly = currentPermissions.includes('news:draft') && !currentPermissions.includes('news:write') && !currentPermissions.includes('website:write');
 
-        const item = this.state.item ? this.state.item : {
-            priority: 1,
-            categories: [],
-            title: '',
-            content: '',
-            image: T.url('/image/avatar.png'),
-            createdDate: new Date(),
-            active: false, isInternal: false,
-            view: 0,
-            isTranslate: 0,
-            displayCover: 1
-        };
-        let title = T.language.parse(item.title, true), linkDefaultNews = T.rootUrl + '/news/item/' + item.id;
-
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <div>
-                        <h1><i className='fa fa-file' /> Bài viết: Chỉnh sửa</h1>
-                        <p dangerouslySetInnerHTML={{ __html: title.vi != '' ? 'Tiêu đề: <b>' + title.vi + '</b> - ' + T.dateToText(item.createdDate) : '' }} />
-                    </div>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/news/list'>Danh sách bài viết</Link>
-                        &nbsp;/&nbsp;Chỉnh sửa
-                    </ul>
-                </div>
+        let linkDefaultNews = T.rootUrl + '/news/item/' + this.state.id;
+        return this.renderPage({
+            icon: 'fa fa-file',
+            title: 'Bài viết: Chỉnh sửa',
+            subTitle: <>Tiêu đề: <strong>{T.language.parse(this.state.title, 'vi')}</strong> - {T.dateToText(this.state.createdDate)}</>,
+            breadcrumb: [<Link key={0} to='/user/news/list'>Danh sách bài viết</Link>, 'Chỉnh sửa'],
+            content: <>
                 <div className='row'>
                     <div className='col-md-6'>
                         <div className='tile'>
                             <h3 className='tile-title'>Thông tin chung</h3>
                             <div className='tile-body'>
-                                <FormTextBox ref={e => this.neNewsViTitle = e} label='Tên bài viết' />
-                                <FormTextBox ref={e => this.neNewsEnTitle = e} label='News title' />
+                                <FormMultipleLanguage ref={e => this.title = e} title='Tiêu đề' languages={this.state.homeLanguages} FormElement={FormTextBox} />
                                 <div className='row'>
                                     <FormImageBox ref={e => this.imageBox = e} className='col-md-6' postUrl='/user/upload' uploadType='NewsImage' label='Hình ảnh' />
                                     <div className='col-md-6'>
@@ -222,24 +202,6 @@ class NewsEditPage extends AdminPage {
                                 <FormSelect ref={e => this.file = e} label='Tệp tin đính kèm' data={SelectAdapter_FwStorage} multiple readOnly={readOnly} />
                             </div>
                         </div>
-
-                        <div className='tile'>
-                            <h3 className='tile-title'>Ngôn ngữ</h3>
-                            <div className='tile-body'>
-                                <div className='form-group' >
-                                    <label className='control-label'>Song ngữ:&nbsp;</label>
-                                    <span className='toggle'>
-                                        <label>
-                                            <input type='checkbox' checked={item.isTranslate} onChange={this.changeIsTranslate} disabled={readOnly} />
-                                            <span className='button-indecator' />
-                                        </label>
-                                    </span>
-                                </div>
-                                <div className='form-group' style={{ display: !item.isTranslate ? 'block' : 'none' }}>
-                                    <Select ref={this.language} data={languageOption} hideSearchBox={true} label='Chọn ngôn ngữ hiển thị' disabled={readOnly || item.isTranslate} />
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <div className='col-md-6'>
@@ -249,7 +211,7 @@ class NewsEditPage extends AdminPage {
                                 <FormTextBox ref={e => this.neNewsLink = e} label='Link truyền thông' onChange={this.newsLinkChange} />
                                 <FormTextBox ref={e => this.neNewsEnLink = e} label='Link truyền thông tiếng Anh(nếu có)' onChange={this.newsEnLinkChange} />
                                 <div>
-                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
+                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel='noreferrer'>{linkDefaultNews}</a>
                                 </div>
                                 <div>
                                     <a href='#' ref={e => this.newsLink = e} style={{ fontWeight: 'bold' }} target='_blank' />
@@ -258,7 +220,7 @@ class NewsEditPage extends AdminPage {
                             </div>
                             {readOnly ? '' :
                                 <div className='tile-footer'>
-                                    <button className='btn btn-danger' type='button' onClick={() => this.checkLink(item)}>
+                                    <button className='btn btn-danger' type='button' onClick={() => this.checkLink()}>
                                         <i className='fa fa-fw fa-lg fa-check-circle' />Kiểm tra link
                                     </button>
                                 </div>
@@ -275,50 +237,29 @@ class NewsEditPage extends AdminPage {
 
                     <div className='col-md-12'>
                         <div className='tile'>
+                            <h3 className='tile-title'>Ngôn ngữ</h3>
                             <div className='tile-body'>
-                                <ul className='nav nav-tabs'>
-                                    <li className='nav-item'>
-                                        <a className='nav-link active show' data-toggle='tab' href='#newsViTab'>Việt Nam</a>
-                                    </li>
-                                    <li className='nav-item'>
-                                        <a className='nav-link' data-toggle='tab' href='#newsEnTab'>English</a>
-                                    </li>
-                                </ul>
-                                <div className='tab-content' style={{ paddingTop: '12px' }}>
-                                    <div id='newsViTab' className='tab-pane fade show active'>
-                                        <FormRichTextBox ref={e => this.viAbstract = e} label='Tóm tắt bài viết' readOnly={readOnly} />
-                                        <label className='control-label'>Tóm tắt bài viết</label>
-                                        <textarea defaultValue='' className='form-control' id='neNewsViAbstract' placeholder='Tóm tắt bài viết' readOnly={readOnly}
-                                            style={{ minHeight: '100px', marginBottom: '12px' }} />
-                                        <FormEditor ref={e => this.viEditor = e} label='Nội dung bài viết' uploadUrl='/user/upload?category=news' readOnly={readOnly} />
-                                        <label className='control-label'>Nội dung bài viết</label>
-                                        <Editor ref={this.viEditor} height='400px' placeholder='Nội dung bài biết' uploadUrl='/user/upload?category=news' readOnly={readOnly} />
-                                    </div>
-                                    <div id='newsEnTab' className='tab-pane fade'>
-                                        <label className='control-label'>News abstract</label>
-                                        <textarea defaultValue='' className='form-control' id='neNewsEnAbstract' placeholder='News abstracts' readOnly={readOnly}
-                                            style={{ minHeight: '100px', marginBottom: '12px' }} />
-                                        <label className='control-label'>News content</label>
-                                        <Editor ref={this.enEditor} height='400px' placeholder='News content' uploadUrl='/user/upload?category=news' readOnly={readOnly} />
-                                    </div>
-                                </div>
+                                <FormSelect ref={e => this.homeLanguage = e} label='Ngôn ngữ truyền thông' data={this.state.languageAdapter} readOnly={readOnly} multiple />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='col-md-12'>
+                        <div className='tile'>
+                            <div className='tile-body'>
+                                <FormMultipleLanguage ref={e => this.abstract = e} tabRender title='Tóm tắt' languages={this.state.homeLanguages} FormElement={FormRichTextBox} />
+                                <FormMultipleLanguage ref={e => this.editor = e} tabRender title='Nội dung' languages={this.state.homeLanguages} FormElement={FormEditor} formProps={{ uploadUrl: '/user/upload?category=news' }} />
                             </div>
                         </div>
                     </div>
                 </div>
-                <button onClick={() => {
-                    this.props.history.goBack();
-                }} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </button>
-                <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
-                    <i className='fa fa-lg fa-save' />
-                </button>
-            </main>
-        );
+            </>,
+            onSave: () => this.save(),
+            backRoute: () => this.props.history.goBack()
+        });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, news: state.news });
-const mapActionsToProps = { updateNews, getNews, getDraftNews, checkLink, adminCheckLink, createDraftNews, updateDraftNews, getDvWebsite };
+const mapActionsToProps = { updateNews, getNews, getDraftNews, checkLink, adminCheckLink, createDraftNews, updateDraftNews, getDmDonVi, getDmNgonNguAll };
 export default withRouter(connect(mapStateToProps, mapActionsToProps)(NewsEditPage));

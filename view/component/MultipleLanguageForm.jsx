@@ -21,7 +21,7 @@ export class FormMultipleLanguage extends React.Component {
     }
 
     init = (done) => {
-        let { tabRender = false, languages = ['vi', 'en'], title, gridClassName = 'col-md-12', className = '', readOnly, required, FormElement } = this.props;
+        let { tabRender = false, languages = ['vi', 'en'], title, gridClassName = 'col-md-12', className = '', readOnly, required, FormElement, formProps = {} } = this.props;
 
         // Handle readOnly
         let finalReadOnly = {};
@@ -43,9 +43,14 @@ export class FormMultipleLanguage extends React.Component {
             const langTitle = !title || typeof title == 'string' ? `${title} (${code})` : title[code];
             let langClassName = tabRender ? '' : gridClassName;
             langClassName += ' ' + className;
-            return <FormElement key={this.randomId + code} ref={e => this.element[code] = e} className={langClassName} label={tabRender ? null : langTitle} placeholder={langTitle} readOnly={finalReadOnly[code]} required={finalRequired[code]} />;
+            return <FormElement key={this.randomId + code} ref={e => this.element[code] = e} className={langClassName} label={tabRender ? null : langTitle} placeholder={langTitle} readOnly={finalReadOnly[code]} required={finalRequired[code]} {...formProps} />;
         });
-        this.setState({ elements }, () => done && done());
+        this.setState({ elements }, () => {
+            languages.forEach(code => {
+                this.value[code] = () => this.element[code] && this.element[code].value ? this.element[code].value() : null;
+            });
+            done && done();
+        });
     }
 
     value = function (text) {
