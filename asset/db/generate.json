@@ -5662,6 +5662,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "LANGUAGES": {
+                    "value": "languages",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -12945,17 +12952,17 @@
                 },
                 "SO_TIET_BUOI": {
                     "value": "soTietBuoi",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 50
                 },
                 "SO_BUOI_TUAN": {
                     "value": "soBuoiTuan",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 50
                 },
                 "MA_NGANH": {
                     "value": "maNganh",
@@ -12966,10 +12973,10 @@
                 },
                 "CHUYEN_NGANH": {
                     "value": "chuyenNganh",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 100
                 },
                 "NAM": {
                     "value": "nam",
@@ -13004,14 +13011,14 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "3,0"
+                    "size": "2,0"
                 },
                 "SO_LUONG_DU_KIEN": {
                     "value": "soLuongDuKien",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 50
                 },
                 "KHOA_SV": {
                     "value": "khoaSv",
@@ -14915,13 +14922,27 @@
                     "value": "publicKey",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 1048
                 },
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_147641\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "YEU_CAU": {
+                    "value": "yeuCau",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
                 }
@@ -14936,6 +14957,9 @@
             "active": true,
             "moduleName": "hcthYeuCauTaoKhoa",
             "modelName": "hcthYeuCauTaoKhoa",
+            "methods": {
+                "HCTH_YEU_CAU_TAO_KHOA_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -14958,8 +14982,8 @@
                     "nullable": false,
                     "size": "20,0"
                 },
-                "NGAY_DUYET": {
-                    "value": "ngayDuyet",
+                "NGAY_CAP_NHAT": {
+                    "value": "ngayCapNhat",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -14979,8 +15003,8 @@
                     "nullable": true,
                     "size": 512
                 },
-                "SHCC_NGUOI_DUYET": {
-                    "value": "shccNguoiDuyet",
+                "CAP_NHAT_BOI": {
+                    "value": "capNhatBoi",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
