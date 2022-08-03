@@ -30,23 +30,26 @@ module.exports = app => {
     const checkDaoTaoPermission = (req, res, next) => app.isDebug ? next() : app.permission.orCheck('dtDanhSachChuyenNganh:read', 'dtChuongTrinhDaoTao:manage')(req, res, next);
 
     //APIs -------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/danh-sach-chuyen-nganh/page/:pageNumber/:pageSize', checkDaoTaoPermission, (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+    app.get('/api/dao-tao/danh-sach-chuyen-nganh/page/:pageNumber/:pageSize', checkDaoTaoPermission, async (req, res) => {
+        try {
+            const pageNumber = parseInt(req.params.pageNumber),
+                pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.searchTerm === 'string' ? req.query.searchTerm : '';
 
-        let filter = app.stringify(req.query.filter || {});
+            let filter = app.stringify(req.query.filter || {});
 
-        app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
+            const page = await app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm);
+            if (!page) {
+                throw { message: 'Lấy danh sách chuyên ngành bị lỗi.' };
+            }
+            else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
                 const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+                res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
-        });
-
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/item/:id', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
