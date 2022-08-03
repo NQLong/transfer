@@ -27,13 +27,13 @@ module.exports = app => {
         { name: 'hcth:manage' }
     );
 
-    app.get('/user/van-ban-di', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/van-ban-di/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/van-ban-di', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
+    app.get('/user/van-ban-di/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/hcth/van-ban-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
     app.get('/user/hcth/van-ban-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login','developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -98,7 +98,7 @@ module.exports = app => {
         return permission;
     };
 
-    app.get('/api/hcth/van-ban-di/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/all', app.permission.orCheck('hcthCongVanDi:read', 'developer:login'), (req, res) => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
 
@@ -210,7 +210,7 @@ module.exports = app => {
     };
 
     // Cần sửa lại
-    app.put('/api/hcth/van-ban-di', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/van-ban-di', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { fileList, donViNhan, donViNhanNgoai, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
@@ -316,7 +316,7 @@ module.exports = app => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    app.get('/api/hcth/van-ban-di/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -482,7 +482,7 @@ module.exports = app => {
 
     });
 
-    app.get('/api/hcth/van-ban-di/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -553,7 +553,7 @@ module.exports = app => {
     };
 
 
-    app.get('/api/hcth/van-ban-di/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id)) {
@@ -597,7 +597,7 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login', 'developer:login'), (req, res) => {
         const { canBoGui, noiDung, key, ngayTao, loai } = req.body.data;
 
         const newPhanHoi = {
@@ -637,7 +637,7 @@ module.exports = app => {
 
 
 
-    app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
@@ -799,7 +799,7 @@ module.exports = app => {
     }));
 
 
-    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber);
         const pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -894,7 +894,7 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/hcth/van-ban-di/status', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/status', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             let { id, trangThai, donViGui } = req.body.data;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -934,7 +934,7 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/hcth/van-ban-di/read/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/read/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         const { id, shcc } = req.body.data;
         // check permission
         const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
@@ -956,7 +956,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_DI_TYPE);
@@ -966,7 +966,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/yeu-cau-ky/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/yeu-cau-ky/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
 
@@ -984,7 +984,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
         let donViXem = '', canBoXem = '';
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -1169,7 +1169,7 @@ module.exports = app => {
 
 
     //api chuyển từ giai đoạn soạn thảo sang phát hành
-    app.put('/api/hcth/van-ban-di/publishing/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/publishing/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         // TODO: viết cho trường hợp có cán bộ ký
         try {
             const id = Number(req.params.id);
