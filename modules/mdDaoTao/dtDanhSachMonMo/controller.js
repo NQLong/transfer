@@ -37,7 +37,6 @@ module.exports = app => {
         } catch (error) {
             res.send({ error });
         }
-
     });
 
     app.get('/api/dao-tao/danh-sach-mon-mo/current', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), async (req, res) => {

@@ -115,7 +115,6 @@ module.exports = app => {
             let data = req.body.data;
             if (data.pass != password) throw 'Sai mật khẩu!';
             const sinhVien = await app.model.fwStudents.get({ emailTruong: data.email });
-            console.log(sinhVien);
             if (sinhVien) {
                 const user = { email: sinhVien.emailTruong, lastName: sinhVien.ho, firstName: sinhVien.ten, active: 1, isStudent: 1, studentId: sinhVien.mssv };
                 app.updateSessionUser(req, user, () => {
@@ -147,7 +146,7 @@ module.exports = app => {
         try {
             const source = app.path.join(__dirname, 'resource', 'syll2022.docx');
             const user = req.session.user;
-
+            const now = new Date().yyyymmdd();
             let data = await app.model.fwStudents.getData(user.studentId);
             data = data.rows[0];
             data.ngaySinh = app.date.viDateFormat(new Date(data.ngaySinh));
@@ -183,29 +182,32 @@ module.exports = app => {
                 + (data.huyenThuongTruMe ? data.huyenThuongTruMe + ', ' : '')
                 + (data.tinhThuongTruMe ? data.tinhThuongTruMe : '');
 
-            data.lienLac = (data.soNhaLienLac ? data.soNhaTLienLac + ', ' : '')
+            data.lienLac = (data.soNhaLienLac ? data.soNhaLienLac + ', ' : '')
                 + (data.xaLienLac ? data.xaLienLac + ', ' : '')
                 + (data.huyenLienLac ? data.huyenLienLac + ', ' : '')
                 + (data.tinhLienLac ? data.tinhLienLac : '');
-            // data.image = app.path.join(app.publicPath, data.image);
-            // data.image = data.image.substring(0, data.image.indexOf('?'));
+
+            data.yyyy = now.substring(0, 4);
+            data.mm = now.substring(4, 6);
+            data.dd = now.substring(6, 8);
             data.image = '';
             const qrCode = require('qrcode');
             let qrCodeImage = app.path.join(app.assetPath, '/qr-syll', data.mssv + '.png');
             app.createFolder(app.path.join(app.assetPath, '/qr-syll'));
-            app.createFolder(app.path.join(app.assetPath, '/syll'), app.path.join(app.assetPath, `/syll/${new Date().getFullYear()}`));
             await qrCode.toFile(qrCodeImage, JSON.stringify({ mssv: data.mssv, updatedAt: data.lastModified }));
             data.qrCode = qrCodeImage;
             app.docx.generateFileHasImage(source, data, async (error, buffer) => {
                 if (error)
                     res.send({ error });
                 else {
-                    const filePdfPath = app.path.join(app.assetPath, `/syll/${new Date().getFullYear()}`, data.mssv + '.pdf');
                     const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
-                    app.fs.writeFileSync(filePdfPath, pdfBuffer);
                     app.deleteFile(qrCodeImage);
-                    res.download(filePdfPath, `SYLL_${data.mssv}`);
+                    app.email.normalSendEmail('no-reply-khtc25@hcmussh.edu.vn', 'kehoachtaichinh2022', 'tientrantan30@gmail.com', '', 'TEST', 'ALO', '', [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
+                        // Success callback
+                    }, () => {
+                        // Error callback
+                    });
                 }
             });
         } catch (error) {
