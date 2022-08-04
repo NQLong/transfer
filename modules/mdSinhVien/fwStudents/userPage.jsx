@@ -8,6 +8,7 @@ import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
+import { getSvSettingKeys } from '../svSetting/redux';
 // import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 // import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
@@ -27,8 +28,11 @@ class SinhVienPage extends AdminPage {
                 if (data.error) {
                     T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
                 } else {
-                    this.setState({ item: data.item, daNhapHoc: data.item.ngayNhapHoc && data.item.ngayNhapHoc != -1 });
-                    this.setVal(data.item);
+                    this.props.getSvSettingKeys('choPhepEdit', items => {
+                        this.setState({ item: data.item, pending: data.item.ngayNhapHoc && data.item.ngayNhapHoc == -1, edit: items.choPhepEdit == 'true', daNhapHoc: data.item.ngayNhapHoc && data.item.ngayNhapHoc != -1 });
+                        this.setVal(data.item);
+                    });
+
                 }
             });
         });
@@ -208,7 +212,7 @@ class SinhVienPage extends AdminPage {
         T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường', 'info', true, isConfirm => {
             if (isConfirm) {
                 T.download('/api/students-download-syll');
-                this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime(), daNhapHoc: true }));
+                this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime(), pending: true }));
             }
         });
     }
@@ -216,8 +220,12 @@ class SinhVienPage extends AdminPage {
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
-        let daNhapHoc = this.state.daNhapHoc,
-            readOnly = daNhapHoc || this.state.edit;
+        let pending = this.state.pending,
+            daNhapHoc = this.state.daNhapHoc,
+            readOnly = pending || daNhapHoc;
+        if (daNhapHoc) readOnly = !this.state.edit;
+        else if (pending) readOnly = true;
+        else readOnly = false;
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
             title: 'Lý lịch cá nhân sinh viên',
@@ -302,8 +310,8 @@ class SinhVienPage extends AdminPage {
                 !readOnly && {
                     icon: 'fa-save', className: 'btn-success', onClick: this.save
                 },
-                !this.state.daNhapHoc && {
-                    icon: 'fa-file-word-o', className: 'btn-primary', onClick: this.downloadWord
+                (!pending && !daNhapHoc) && {
+                    icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord
                 }
             ]
         });
@@ -312,6 +320,6 @@ class SinhVienPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
 const mapActionsToProps = {
-    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord
+    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord, getSvSettingKeys
 };
 export default connect(mapStateToProps, mapActionsToProps)(SinhVienPage);

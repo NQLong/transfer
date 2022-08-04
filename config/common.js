@@ -107,7 +107,7 @@ module.exports = (app, appConfig) => {
             subMenusRender: false
         },
         students: {
-            index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
+            index: 6100, title: 'Công tác sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
         hocPhi: {

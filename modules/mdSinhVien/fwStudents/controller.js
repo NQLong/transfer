@@ -24,14 +24,17 @@ module.exports = app => {
     app.permission.add(
         { name: 'student:login', menu },
         { name: 'student:login', menu: menuHocPhi },
-        { name: 'student:read', menu: menuStudents },
+        { name: 'student:manage', menu: menuStudents },
         { name: 'student:write' },
         { name: 'student:delete' }
     );
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
-            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete');
+            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete', 'student:manage');
+            resolve();
+        } else if (staff.maDonVi && staff.maDonVi == '32') {
+            app.permissionHooks.pushUserPermission(user, 'student:manage');
             resolve();
         } else resolve();
     }));
@@ -72,14 +75,14 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/students/:mssv', app.permission.check('student:read'), (req, res) => {
+    app.get('/api/students/item/:mssv', app.permission.check('student:read'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             res.send({ items: sinhVien, error });
         });
     });
 
-    app.put('/api/students/:mssv', app.permission.check('student:write'), (req, res) => {
+    app.put('/api/students/item/:mssv', app.permission.check('student:write'), (req, res) => {
         const mssv = req.params.mssv;
         const changes = req.body.changes;
         app.model.fwStudents.update({ mssv }, changes, (error, items) => res.send({ error, items }));
@@ -203,7 +206,8 @@ module.exports = app => {
                     const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
                     app.deleteFile(qrCodeImage);
-                    app.email.normalSendEmail('no-reply-khtc25@hcmussh.edu.vn', 'kehoachtaichinh2022', 'tientrantan30@gmail.com', '', 'TEST', 'ALO', '', [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
+                    let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, defaultEmail, defaultPassword } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
+                    app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, data.emailCaNhan, ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
                         // Success callback
                     }, () => {
                         // Error callback

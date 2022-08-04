@@ -75,7 +75,7 @@ export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, don
 
 export function getStudentAdmin(mssv, done) {
     return dispatch => {
-        const url = `/api/students/${mssv}`;
+        const url = `/api/students/item/${mssv}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin sinh viên, học sinh không thành công!', 'danger');
@@ -90,7 +90,7 @@ export function getStudentAdmin(mssv, done) {
 
 export function updateStudentAdmin(mssv, changes, done) {
     return dispatch => {
-        const url = `/api/students/${mssv}`;
+        const url = `/api/students/item/${mssv}`;
         T.put(url, { changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật không thành công!', 'danger');
