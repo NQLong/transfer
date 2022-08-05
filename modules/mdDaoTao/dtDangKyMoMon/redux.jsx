@@ -76,10 +76,10 @@ export function getDtDangKyMoMonPage(pageNumber, pageSize, pageCondition, done) 
         });
     };
 }
-export function createDangKyMoMon(data, done) {
+export function createDangKyMoMon(data, settings, done) {
     return dispatch => {
         const url = '/api/dao-tao/dang-ky-mo-mon';
-        T.post(url, { data }, item => {
+        T.post(url, { data, settings }, item => {
             if (item.error) {
                 T.notify(`Lỗi: ${item.error.message}`, 'danger');
                 console.error(item.error.message);

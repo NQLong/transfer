@@ -218,9 +218,7 @@ export function getDanhSachMonChuongTrinhDaoTao(condition, done) {
             if (result.error) {
                 T.notify(result.error?.message || 'Lấy danh sách môn CTDT lỗi', 'danger');
                 console.error(result.error);
-            } else {
-                done(result);
-            }
+            } done(result);
         });
     };
 }

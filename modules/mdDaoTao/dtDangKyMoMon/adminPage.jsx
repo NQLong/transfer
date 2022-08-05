@@ -38,10 +38,11 @@ class NganhModal extends AdminModal {
             ketThuc: this.props.thoiGianMoMon.ketThuc,
             khoa: this.state.khoa,
             maNganh: this.nganh.value(),
+        }, settings = {
             bacDaoTao: this.bacDaoTao.value(),
             loaiHinhDaoTao: this.loaiHinhDaoTao.value()
         };
-        this.props.create(data, item => {
+        this.props.create(data, settings, item => {
             this.hide();
             this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`);
         });
@@ -195,7 +196,7 @@ class DtDangKyMoMonPage extends AdminPage {
             backRoute: '/user/dao-tao',
             onCreate: (e) => {
                 e.preventDefault();
-                if (permissionDaoTao.manage) {
+                if (permissionDaoTao.manage || permissionDaoTao.write) {
                     this.nganhModal.show();
                 } else T.notify('Bạn không có quyền đăng ký tại đây!', 'danger');
             }
