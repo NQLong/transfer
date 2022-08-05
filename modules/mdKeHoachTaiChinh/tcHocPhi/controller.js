@@ -370,6 +370,91 @@ module.exports = app => {
                 ws.getCell('F' + (index + 2)).alignment = { ...ws.getRow(index + 2).alignment, horizontal: 'center' };
 
             });
+
+            // Sheet thống kê học phí
+            filter = app.parse(filter, {});
+            let dataTransaction = await app.model.tcHocPhi.downloadExcel(app.stringify({
+                namHoc: filter.namHoc,
+                hocKy: filter.hocKy
+            }, ''));
+            const listTransaction = dataTransaction.rows;
+            const thongKe = workBook.addWorksheet('Thống kê học phí');
+            thongKe.columns = [
+                { header: 'ROW LABELS', key: 'label', width: 40 },
+                { header: 'SỐ LƯỢNG CẦN THU', key: 'totalCurrent', width: 30 },
+                { header: 'TỔNG SỐ TIỀN CẦN THU', key: 'totalCurrentMoney', width: 30 },
+                { header: 'SỐ LƯỢNG ĐÃ ĐÓNG ĐỦ', key: 'totalPaid', width: 30 },
+                { header: 'TỔNG SỐ TIỀN ĐÃ THU', key: 'totalPaidMoney', width: 30 }
+            ];
+
+            thongKe.addRow({
+                label: `NH: ${filter.namHoc} - ${Number(filter.namHoc) + 1}, HK ${filter.hocKy}`
+            }).font = { 'bold': true };
+
+            let tableTotalCurrent = 0, tableTotalPaid = 0, tableTotalCurrentMoney = 0, tableTotalPaidMoney = 0,
+                groupLoaiHinh = listTransaction.groupBy('tenLoaiHinhDaoTao'),
+                index = 3;
+
+            Object.keys(groupLoaiHinh).forEach(loaiHinh => {
+                thongKe.addRow({
+                    label: loaiHinh !== 'null' ? loaiHinh : 'Loại hình đào tạo (trống)',
+                    totalCurrent: groupLoaiHinh[loaiHinh].length,
+                });
+
+
+                let groupNganh = groupLoaiHinh[loaiHinh].groupBy('tenNganh'),
+                    loaiHinhTotalCurMoney = 0, loaiHinhTotalPaid = 0, loaiHinhTotalPaidMoney = 0;
+
+                Object.keys(groupNganh).forEach(nganh => {
+
+                    let money = groupNganh[nganh].reduce((result = {}, item = {}) => {
+                        result.totalCurrentMoney += item.hocPhi;
+
+                        if (item.congNo === 0) {
+                            result.totalPaid++;
+                        }
+                        else result.totalUnPaidMoney += item.congNo;
+                        return result;
+                    }, {
+                        totalCurrentMoney: 0,
+                        totalUnPaidMoney: 0,
+                        totalPaid: 0,
+                    });
+
+                    // console.log(money);
+                    thongKe.addRow({
+                        label: nganh !== 'null' ? nganh : 'Ngành đào tạo (trống)',
+                        totalCurrent: groupNganh[nganh].length,
+                        totalCurrentMoney: money.totalCurrentMoney,
+                        totalPaidMoney: money.totalCurrentMoney - money.totalUnPaidMoney,
+                        totalPaid: money.totalPaid,
+
+                    });
+                    console.log(money.totalCurrentMoney - money.totalUnPaidMoney);
+                    loaiHinhTotalCurMoney += money.totalCurrentMoney;
+                    loaiHinhTotalPaid += money.totalPaid;
+                    loaiHinhTotalPaidMoney += money.totalCurrentMoney - money.totalUnPaidMoney;
+
+                    tableTotalCurrent += groupNganh[nganh].length;
+                });
+
+                tableTotalCurrentMoney += loaiHinhTotalCurMoney;
+                tableTotalPaid += loaiHinhTotalPaid;
+                tableTotalPaidMoney += loaiHinhTotalPaidMoney;
+
+                thongKe.getRow(index).font = { 'bold': true };
+                thongKe.getRow(index).getCell('totalCurrentMoney').value = loaiHinhTotalCurMoney;
+                thongKe.getRow(index).getCell('totalPaid').value = loaiHinhTotalPaid;
+                thongKe.getRow(index).getCell('totalPaidMoney').value = loaiHinhTotalPaidMoney;
+
+                index += Object.keys(groupNganh).length + 1;
+            });
+
+            thongKe.getRow(2).getCell('totalCurrent').value = tableTotalCurrent;
+            thongKe.getRow(2).getCell('totalCurrentMoney').value = tableTotalCurrentMoney;
+            thongKe.getRow(2).getCell('totalPaid').value = tableTotalPaid;
+            thongKe.getRow(2).getCell('totalPaidMoney').value = tableTotalPaidMoney;
+
             let fileName = `HOC_PHI_NH_${settings.hocPhiNamHoc}_${parseInt(settings.hocPhiNamHoc) + 1}_HK${settings.hocPhiHocKy}.xlsx`;
             app.excel.attachment(workBook, res, fileName);
         } catch (error) {
