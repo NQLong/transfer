@@ -51,7 +51,6 @@ module.exports = app => {
                 <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
                 <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
                 <meta property='og:image' content='${app.rootUrl + news.image}' />
-                <meta property='language' content='vi' />
                 <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '00'} />`);
             res.send(data);
         };
@@ -90,7 +89,6 @@ module.exports = app => {
             <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
             <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
             <meta property='og:image' content='${app.rootUrl + news.image}' />
-            <meta property='language' content='en' />
             <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '67'} />`);
             res.send(data);
         };

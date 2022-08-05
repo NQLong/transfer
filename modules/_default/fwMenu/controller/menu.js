@@ -281,18 +281,28 @@ module.exports = app => {
         }
     });
 
-    app.get('/home/menu', (req, res) => {
-        const { maDonVi, link, language } = req.query;
-        let condition = {};
-        if (language && maDonVi) {// route from news page
-            condition = {
-                statement: `MA_WEBSITE ${language == 'en' ? 'LIKE' : 'NOT LIKE'} '%${maDonVi == '00' ? 'en' : '/en'}%' AND MA_DON_VI ='${maDonVi}' AND ACTIVE=1 `,
-                parameter: {}
-            };
-        } else condition = { link };
-        app.model.fwMenu.get(condition, (error, menu) => {
-            res.send({ error, menu });
-        });
+    app.get('/home/menu', async (req, res) => {
+        try {
+            const { maDonVi, link, language } = req.query;
+            let condition = {}, menu = null;
+            if (language && maDonVi) { // route from news page
+                if (language == 'en') {
+                    const enMenu = await app.model.fwMenu.get({
+                        statement: 'maWebsite LIKE :maWebsite AND maDonVi = :maDonVi AND active = :active',
+                        parameter: { maWebsite: `%${maDonVi == '00' ? 'en' : '/en'}%`, maDonVi, active: 1 }
+                    });
+                    if (enMenu) return res.send({ menu: enMenu });
+                }
+                condition = { maDonVi, active: 1 };
+            } else {
+                condition = { link };
+            }
+
+            menu = await app.model.fwMenu.get(condition);
+            res.send({ menu });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
 };

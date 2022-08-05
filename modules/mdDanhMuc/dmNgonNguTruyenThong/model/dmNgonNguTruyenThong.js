@@ -10,7 +10,8 @@ module.exports = app => {
                     trangCaNhan: item.trangCaNhan || '',
                     dangNhap: item.dangNhap || '',
                     dangXuat: item.dangXuat || '',
-                    xemTatCa: item.xemTatCa || ''
+                    xemTatCa: item.xemTatCa || '',
+                    tapTinDinhKem: item.tapTinDinhKem || '',
                 };
             });
         }

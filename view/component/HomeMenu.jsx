@@ -49,10 +49,9 @@ class HomeMenu extends React.Component {
     };
 
     getMenu = (maDonVi) => {
-        const language = $('meta[property=language]').attr('content');
         const path = window.location.pathname,
             link = path.endsWith('/') && path.length > 1 ? path.substring(0, path.length - 1) : path;
-        this.props.homeMenuGet2(link, maDonVi, language, (data) => {
+        this.props.homeMenuGet2(link, maDonVi, (data) => {
             if (data.menu || maDonVi) {
                 const condition = { maDonVi: maDonVi ? maDonVi : data.menu.maDonVi, kichHoat: 1 };
                 if (data.menu && data.menu.maWebsite) condition.shortname = data.menu.maWebsite;

@@ -61,7 +61,7 @@ module.exports = app => {
 
     app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => next(), async (req, res) => {
         try {
-            const template = req.query.template, link = req.query.link;
+            const template = req.query.template, link = req.query.link, maDonVi = req.query.maDonVi;
             const data = await app.state.get();
             if (data == null) {
                 res.send({ error: 'System has error!' });
@@ -86,7 +86,9 @@ module.exports = app => {
 
                     if (template == 'unit') {
                         data.divisionMenus = [];
-                        if (link) {
+                        if (maDonVi) {
+                            data.divisionMenus = await app.model.fwMenu.homeGetDivisionMenuTree(maDonVi);
+                        } else if (link) {
                             const checkMenu = await app.model.fwMenu.get({ link });
                             if (checkMenu && checkMenu.maDonVi) {
                                 data.divisionMenus = await app.model.fwMenu.homeGetDivisionMenuTree(checkMenu.maDonVi);

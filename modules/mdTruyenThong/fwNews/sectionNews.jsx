@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 
 const texts = {
     vi: {
-        noNewsTitle: <h3>Không có tin tức!</h3>,
+        noNewsTitle: 'Không có tin tức!',
         newsTitle: 'TIN TỨC',
         view: 'Lượt xem',
         viewAll: 'Xem tất cả'
     },
     en: {
-        noNewsTitle: <h3>No latest news!</h3>,
+        noNewsTitle: 'No latest news!',
         newsTitle: 'LATEST NEWS',
         view: 'View',
         viewAll: 'View All'
@@ -42,19 +42,19 @@ class SectionNews extends React.Component {
     }
 
     render() {
-        const language = T.language(this.state.category),
+        const language = T.language(texts),
             newsList = this.state.list,
             detail = this.props.item && this.props.item.detail ? JSON.parse(this.props.item.detail) : {};
         let languageText = this.props.system && this.props.system.languageText || {};
         const newLanguage = T.language(languageText);
-        let news = <span className='text-center w-100'>{language.noNewsTitle}</span>;
+        let news = <span className='text-center w-100'><h3>{language.noNewsTitle}</h3></span>;
 
         if (newsList.length !== 0) {
             news = (
                 <div className='container-fluid'>
                     <div className='row d-flex'>
                         <div className='col-lg-6 col-12'>
-                            <Link to={T.linkNewsDetail(newsList[0])} className='block-20 block-50' style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
+                            <Link to={T.linkNewsDetail(newsList[0])} className='block-20 block-50' style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}/>
                             <div className='text py-4 d-block w-100 text-justify'>
                                 <Link to={T.linkNewsDetail(newsList[0])}><h4 className='homeHeading' style={{ color: '#626262' }}><b>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].title) : T.language.parse(newsList[0].title, true)[newsList[0].language]}</b></h4></Link>
                                 <h6 className='homeBody' style={{ color: '#626262', fontWeight: 'normal' }}>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].abstract) : T.language.parse(newsList[0].abstract, true)[newsList[0].language]}</h6>
@@ -64,7 +64,7 @@ class SectionNews extends React.Component {
                             {newsList.slice(1).map((item, index) => {
                                 if (index < 4) return (
                                     <div className='col-lg-6 col-12' key={index}>
-                                        <Link to={T.linkNewsDetail(item)} className='block-20' style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
+                                        <Link to={T.linkNewsDetail(item)} className='block-20' style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', borderRadius: '5px' }}/>
                                         <div className='text py-3 d-block w-100 text-justify'>
                                             <Link to={T.linkNewsDetail(item)}><h6 className='homeBody' style={{ color: '#626262' }}>
                                                 <b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}
@@ -76,7 +76,7 @@ class SectionNews extends React.Component {
                             })}
                         </div>
                         <div className='col-12 d-flex justify-content-center'>
-                            <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{newLanguage.xemTatCa}</Link>
+                            <Link to={`${detail.linkSeeAll}?${T.language.getLanguage()}`} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{newLanguage.xemTatCa}</Link>
                         </div>
                     </div>
                 </div>
@@ -91,6 +91,7 @@ class SectionNews extends React.Component {
                     </div>
                 </div>
                 {news}
+                <h3>{language.noNewsTitle}</h3>
             </section>
         );
     }

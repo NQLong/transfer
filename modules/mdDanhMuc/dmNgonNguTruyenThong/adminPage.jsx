@@ -12,7 +12,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '' };
+        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '' };
         this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenNgonNgu.value(tenNgonNgu || '');
@@ -21,6 +21,8 @@ class EditModal extends AdminModal {
         this.dangNhap.value(dangNhap || '');
         this.dangXuat.value(dangXuat || '');
         this.xemTatCa.value(xemTatCa || '');
+        this.tapTinDinhKem.value(tapTinDinhKem || '');
+        this.khongTinTuc.value(khongTinTuc || '');
 
         maCode && this.imageBox.setData('nationFlag:' + maCode, '/img/flag/' + maCode + '.png');
     }
@@ -34,7 +36,9 @@ class EditModal extends AdminModal {
             trangCaNhan: getValue(this.trangCaNhan),
             dangNhap: getValue(this.dangNhap),
             dangXuat: getValue(this.dangXuat),
-            xemTatCa: getValue(this.xemTatCa)
+            xemTatCa: getValue(this.xemTatCa),
+            tapTinDinhKem: getValue(this.tapTinDinhKem),
+            khongTinTuc: getValue(this.khongTinTuc),
         };
 
         if (changes.maCode == '') {
@@ -72,6 +76,8 @@ class EditModal extends AdminModal {
                     <h6 className='tile-title'>Tin tức, sự kiện</h6>
                     <div className='row'>
                         <FormTextBox ref={e => this.xemTatCa = e} label='Xem tất cả' className='col-md-6' required />
+                        <FormTextBox ref={e => this.tapTinDinhKem = e} label='Tập tin đính kèm' className='col-md-6' required />
+                        <FormTextBox ref={e => this.khongTinTuc = e} label='Không có tin tức' className='col-md-6' required />
                     </div>
                 </div>
             </div>

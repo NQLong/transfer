@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            4103: { title: 'Ngôn ngữ truyền thông', link: '/user/danh-muc/ngon-ngu-truyen-thong' }
+            4104: { title: 'Ngôn ngữ truyền thông', link: '/user/danh-muc/ngon-ngu-truyen-thong' }
         }
     };
     app.permission.add(

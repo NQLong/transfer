@@ -1,6 +1,6 @@
-// Table name: DM_NGON_NGU_TRUYEN_THONG { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa }
+// Table name: DM_NGON_NGU_TRUYEN_THONG { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc }
 const keys = ['MA_CODE'];
-const obj2Db = { 'maCode': 'MA_CODE', 'tenNgonNgu': 'TEN_NGON_NGU', 'timKiem': 'TIM_KIEM', 'trangCaNhan': 'TRANG_CA_NHAN', 'dangNhap': 'DANG_NHAP', 'dangXuat': 'DANG_XUAT', 'xemTatCa': 'XEM_TAT_CA' };
+const obj2Db = { 'maCode': 'MA_CODE', 'tenNgonNgu': 'TEN_NGON_NGU', 'timKiem': 'TIM_KIEM', 'trangCaNhan': 'TRANG_CA_NHAN', 'dangNhap': 'DANG_NHAP', 'dangXuat': 'DANG_XUAT', 'xemTatCa': 'XEM_TAT_CA', 'tapTinDinhKem': 'TAP_TIN_DINH_KEM', 'khongTinTuc': 'KHONG_TIN_TUC' };
 
 module.exports = app => {
     app.model.dmNgonNguTruyenThong = {
