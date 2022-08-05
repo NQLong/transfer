@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getInvoicePage } from './redux';
+import { getInvoicePage, sendInvoiceMail } from './redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -72,6 +72,11 @@ class DanhSachHoaDon extends AdminPage {
         this.changeAdvancedSearch();
     }
 
+    onSendMail = (e, item) => {
+        e.preventDefault();
+        this.props.sendInvoiceMail(item.id);
+    }
+
     render() {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcInvoice && this.props.tcInvoice.page ? this.props.tcInvoice.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
@@ -109,6 +114,11 @@ class DanhSachHoaDon extends AdminPage {
                         <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.id}`}>
                             <i className='fa fa-lg fa-eye' />
                         </a>
+                    </Tooltip>
+                    <Tooltip title='Mail hóa đơn' arrow>
+                        <button className='btn btn-success' onClick={(e) => this.onSendMail(e, item)} >
+                            <i className='fa fa-lg fa-envelope' />
+                        </button>
                     </Tooltip>
                 </TableCell>
             </tr>),
@@ -149,5 +159,5 @@ class DanhSachHoaDon extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcInvoice: state.finance.tcInvoice });
-const mapActionsToProps = { getInvoicePage };
+const mapActionsToProps = { getInvoicePage, sendInvoiceMail };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachHoaDon);

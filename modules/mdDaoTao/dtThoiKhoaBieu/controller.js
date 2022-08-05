@@ -25,27 +25,28 @@ module.exports = app => {
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const user = req.session.user, permissions = user.permissions;
-        let filter = req.query.filter || {},
-            donVi = filter.donVi;
-        if (!permissions.includes('dtThoiKhoaBieu:read')) {
-            if (user.staff?.maDonVi) donVi = user.maDonVi;
-            else return res.send({ error: 'Permission denied!' });
-        }
-        filter = app.stringify(app.clone(filter, { donVi }));
-        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
+    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber),
+                _pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            const user = req.session.user, permissions = user.permissions;
+            let filter = req.query.filter || {},
+                donVi = filter.donVi || '';
+            if (!permissions.includes('dtThoiKhoaBieu:read')) {
+                if (user.staff?.maDonVi) donVi = user.maDonVi;
+                else throw 'Permission denied!';
             }
-        });
+            filter = app.stringify(app.clone(filter, { donVi }));
+
+            let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
+
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
+            const pageCondition = searchTerm;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/dao-tao/thoi-khoa-bieu/all', app.permission.check('user:login'), (req, res) => {
@@ -56,6 +57,66 @@ module.exports = app => {
 
     app.get('/api/dao-tao/thoi-khoa-bieu/item/:id', app.permission.check('user:login'), (req, res) => {
         app.model.dtThoiKhoaBieu.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let item = req.body.item || [],
+                settings = req.body.settings;
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
+                { loaiHinhDaoTao, bacDaoTao, maNganh } = settings;
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+            let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
+            for (let index = 0; index < item.length; index++) {
+                let monHoc = item[index];
+                delete monHoc.id;
+                let { maMonHoc, loaiMonHoc, khoaSv, chuyenNganh, soTietBuoi, soBuoiTuan, soLuongDuKien, soLop } = monHoc;
+                ['chuyenNganh', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => delete monHoc[key]);
+                const tkb = await app.model.dtThoiKhoaBieu.get({ maMonHoc, loaiMonHoc, khoaSinhVien: khoaSv, maNganh, loaiHinhDaoTao, bacDaoTao });
+                if (!tkb) {
+                    if (chuyenNganh) {
+                        if (Array.isArray(chuyenNganh) && chuyenNganh.every(item => typeof item == 'object')) {
+                            for (let index = 0; index < parseInt(chuyenNganh.length); index++) {
+                                let soTiet = parseInt(soTietBuoi[index]), soBuoi = parseInt(soBuoiTuan[index]), sldk = parseInt(soLuongDuKien[index]), chNg = chuyenNganh[index];
+                                if (soBuoi > 1) {
+                                    for (let buoi = 1; buoi <= parseInt(soBuoi); buoi++) {
+                                        app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi, nam, hocKy, soTietBuoi: soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                    }
+                                } else {
+                                    app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi: 1, nam, hocKy, soTietBuoi: soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                }
+                            }
+                        } else {
+                            soLop = parseInt(soLop);
+                            for (let nhom = 1; nhom <= parseInt(soLop); nhom++) {
+                                let soBuoi = parseInt(soBuoiTuan);
+                                if (soBuoi > 1) {
+                                    for (let buoi = 1; buoi <= parseInt(soBuoi); buoi++) {
+                                        app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                    }
+                                } else app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                            }
+                        }
+                    } else {
+                        soLop = parseInt(soLop);
+                        for (let nhom = 1; nhom <= soLop; nhom++) {
+                            let soBuoi = parseInt(soBuoiTuan);
+                            if (soBuoi > 1) {
+                                for (let buoi = 1; buoi <= soBuoi; buoi++) {
+                                    app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                }
+                            } else app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                        }
+                    }
+                }
+            }
+            // console.log(promiseList);
+            // await Promise.all(promiseList);
+            res.end();
+        } catch (error) {
+            console.log(error);
+            res.send({ error });
+        }
     });
 
     app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
@@ -72,13 +133,13 @@ module.exports = app => {
                     resolve(m);
                     return;
                 }
-                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet, loaiHinhDaoTao, bacDaoTao, khoaSinhVien: m.khoaSinhVien }, (error, tkb) => {
+                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTietBuoi: m.soTietBuoi, loaiHinhDaoTao, bacDaoTao, khoaSinhVien: m.khoaSinhVien }, (error, tkb) => {
                     if (error) reject(error);
                     else if (!tkb) {
                         m.nhom = i;
                         delete m.id;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i, loaiHinhDaoTao, bacDaoTao }, (error, item) => {
+                            ({ ...m, nam, hocKy, soTietBuoi: m.soTietBuoi, buoi: i, loaiHinhDaoTao, bacDaoTao }, (error, item) => {
                                 if (error || !item) reject(error);
                             });
                         }
@@ -97,11 +158,11 @@ module.exports = app => {
     app.put('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
         let changes = req.body.changes, id = req.body.id;
         if (changes.thu) {
-            let { tietBatDau, thu, soTiet, phong } = changes;
+            let { tietBatDau, thu, soTietBuoi, phong } = changes;
             let condition = {
                 tietBatDau,
                 day: thu,
-                soTiet
+                soTietBuoi
             };
             app.model.dtThoiKhoaBieu.get({ id }, (error, item) => {
                 if (error) {
@@ -120,7 +181,7 @@ module.exports = app => {
                                 return;
                             } else {
                                 if (app.model.dtThoiKhoaBieu.isAvailabledRoom(changes.phong, items, condition)) app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
-                                else res.send({ error: `Phòng ${changes.phong} không trống vào thứ ${changes.thu}, tiết ${changes.tietBatDau} - ${changes.tietBatDau + changes.soTiet - 1}` });
+                                else res.send({ error: `Phòng ${changes.phong} không trống vào thứ ${changes.thu}, tiết ${changes.tietBatDau} - ${changes.tietBatDau + changes.soTietBuoi - 1}` });
                             }
                         });
                     }
@@ -169,4 +230,5 @@ module.exports = app => {
         }
         resolve();
     }));
+
 };

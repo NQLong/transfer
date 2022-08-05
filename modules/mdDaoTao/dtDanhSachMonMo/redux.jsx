@@ -44,34 +44,13 @@ export function getDtDanhSachMonMoCurrent(id, done) {
             else {
                 dispatch({ type: dtDanhSachMonMoGetCurrent, data });
                 done && done(data);
-                // data.chuongTrinhDaoTao = data.chuongTrinhDaoTao.map(item => {
-                //     item.tenMonHoc = T.parse(item.tenMonHoc).vi;
-                //     item.maDangKy = id;
-                //     return item;
-                // });
-                // if (!data.danhSachMonMo.length) {
-                //     data.danhSachMonMo = data.chuongTrinhDaoTao;
-                //     saveDangKyMoMon(id, data.chuongTrinhDaoTao.map(item => {
-                //         item.maDangKy = id;
-                //         return item;
-                //     }), () => {
-                //         T.notify('Lấy danh sách dự kiến từ CTĐT các khóa', 'info');
-                //         dispatch({ type: dtDanhSachMonMoGetCurrent, data });
-                //         done && done(data);
-                //     });
-                // }
-                // else {
-                //     dispatch({ type: dtDanhSachMonMoGetCurrent, data });
-                //     done && done(data);
-                // }
-
             }
         });
     };
 }
 
 export function createDtDanhSachMonMo(maNganh, data, settings, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/dao-tao/danh-sach-mon-mo';
         T.post(url, { data, maNganh, ...settings }, result => {
             if (result.error) {
@@ -79,7 +58,7 @@ export function createDtDanhSachMonMo(maNganh, data, settings, done) {
                 console.error(result.error.message);
             } else {
                 T.notify('Bổ sung thành công', 'success');
-                // dispatch(getDtDanhSachMonMoCurrent(maDangKy));
+                dispatch(getDtDanhSachMonMoCurrent(settings.maDangKy));
                 done && done();
             }
         });

@@ -4,7 +4,7 @@ import { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys } f
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 // import { getTcThongTin } from '../tcThongTin/redux';
 
-const listKeys = ['hocPhiNamHoc', 'hocPhiHocKy', 'email', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditorText', 'hocPhiEmailPhatSinhEditorHtml', 'hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditorText', 'hocPhiEmailHoanTraEditorHtml', 'hocPhiSmsDong', 'hocPhiSmsPhatSinh', 'hocPhiSmsHoanTra', 'hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditorText', 'hocPhiEmailNhacNhoEditorHtml'];
+const listKeys = ['hocPhiNamHoc', 'hocPhiHocKy', 'email', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditorText', 'hocPhiEmailPhatSinhEditorHtml', 'hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditorText', 'hocPhiEmailHoanTraEditorHtml', 'hocPhiSmsDong', 'hocPhiSmsPhatSinh', 'hocPhiSmsHoanTra', 'hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditorText', 'hocPhiEmailNhacNhoEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'hocPhiEmailTraHoaDonEditorHtml'];
 class TcSettingAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/setting', () => {
@@ -19,6 +19,8 @@ class TcSettingAdminPage extends AdminPage {
                             this.hocPhiEmailHoanTraEditor.html(item.value);
                         } else if (item.key == 'hocPhiEmailNhacNhoEditorHtml') {
                             this.hocPhiEmailNhacNhoEditor.html(item.value);
+                        } else if (item.key == 'hocPhiEmailTraHoaDonEditorHtml') {
+                            this.hocPhiEmailTraHoaDonEditor.html(item.value);
                         } else {
                             if (item.key == 'hocPhiNamHoc') this.hocPhiNamHocEnd.value(Number(item.value) + 1);
                             const component = this[item.key];
@@ -147,6 +149,9 @@ class TcSettingAdminPage extends AdminPage {
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiEmailHoanTra'>Email hoàn trả học phí</a>
                             </li>
                             <li className='nav-item'>
+                                <a className='nav-link' data-toggle='tab' href='#hocPhiEmailTraHoaDon'>Email trả hóa đơn</a>
+                            </li>
+                            <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiSmsDong'>SMS đóng học phí</a>
                             </li>
                             {/* <li className='nav-item'>
@@ -201,6 +206,18 @@ class TcSettingAdminPage extends AdminPage {
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditor')}>
+                                        <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className='tab-pane fade' id='hocPhiEmailTraHoaDon'>
+                                <div className='tile-body'>
+                                    <FormTextBox ref={e => this.hocPhiEmailTraHoaDonTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                    <FormEditor ref={e => this.hocPhiEmailTraHoaDonEditor = e} label='Nội dung email' height={400} />
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailTraHoaDonTitle', 'hocPhiEmailTraHoaDonEditor')}>
                                         <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                     </button>
                                 </div>
