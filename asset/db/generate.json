@@ -14663,6 +14663,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "TAP_TIN_DINH_KEM": {
+                    "value": "tapTinDinhKem",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "KHONG_TIN_TUC": {
+                    "value": "khongTinTuc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [
@@ -15963,6 +15977,32 @@
                 "MA",
                 "MA_NGANH",
                 "NIEN_KHOA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_SETTING": {
+            "active": true,
+            "moduleName": "svSetting",
+            "modelName": "svSetting",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
             ],
             "foreignKeys": [],
             "type": "table"
