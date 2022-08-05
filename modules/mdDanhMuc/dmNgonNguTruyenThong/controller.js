@@ -11,6 +11,17 @@ module.exports = app => {
         { name: 'dmNgonNgu:delete' }
     );
 
+    app.readyHooks.add('Init dmNgonNguTruyenThong', {
+        ready: () => app.database.oracle.connected && app.model.dmNgonNguTruyenThong,
+        run: async () => {
+            try {
+                if (app.primaryWorker) await app.model.dmNgonNguTruyenThong.init();
+            } catch (e) {
+                console.error('Init dmNgonNguTruyenThong failed!');
+            }
+        },
+    });
+
     app.get('/user/danh-muc/ngon-ngu-truyen-thong', app.permission.check('dmNgonNgu:read'), app.templates.admin);
 
     app.get('/api/danh-muc/ngon-ngu/all', app.permission.check('user:login'), async (req, res) => {

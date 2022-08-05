@@ -3,21 +3,6 @@ import { connect } from 'react-redux';
 import { getNewsByNews, getNewsByCategory } from './redux';
 import { Link } from 'react-router-dom';
 
-const texts = {
-    vi: {
-        noNewsTitle: 'Không có tin tức!',
-        newsTitle: 'TIN TỨC',
-        view: 'Lượt xem',
-        viewAll: 'Xem tất cả'
-    },
-    en: {
-        noNewsTitle: 'No latest news!',
-        newsTitle: 'LATEST NEWS',
-        view: 'View',
-        viewAll: 'View All'
-    }
-};
-
 class SectionNews extends React.Component {
     state = {
         list: [], category: { vi: ' ', en: ' ' }
@@ -42,12 +27,11 @@ class SectionNews extends React.Component {
     }
 
     render() {
-        const language = T.language(texts),
-            newsList = this.state.list,
-            detail = this.props.item && this.props.item.detail ? JSON.parse(this.props.item.detail) : {};
+        const category = T.language(this.state.category);
+        const newsList = this.state.list, detail = this.props.item && this.props.item.detail ? JSON.parse(this.props.item.detail) : {};
         let languageText = this.props.system && this.props.system.languageText || {};
         const newLanguage = T.language(languageText);
-        let news = <span className='text-center w-100'><h3>{language.noNewsTitle}</h3></span>;
+        let news = <span className='text-center w-100'><h3>{newLanguage.khongTinTuc}</h3></span>;
 
         if (newsList.length !== 0) {
             news = (
@@ -87,11 +71,10 @@ class SectionNews extends React.Component {
             <section className='row bg-light py-3' data-aos='fade-up'>
                 <div className='col-12 justify-content-start mb-3'>
                     <div className='heading-section'>
-                        <h3 className='text-center homeTitle' style={{ color: '#0139A6', paddingTop: 10 }}><strong>{language.toUpperCase()}</strong></h3>
+                        <h3 className='text-center homeTitle' style={{ color: '#0139A6', paddingTop: 10 }}><strong>{category.toUpperCase()}</strong></h3>
                     </div>
                 </div>
                 {news}
-                <h3>{language.noNewsTitle}</h3>
             </section>
         );
     }
