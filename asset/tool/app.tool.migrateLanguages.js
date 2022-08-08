@@ -11,6 +11,8 @@ const app = {
     database: {},
     model: {}
 };
+
+if (!app.isDebug) package = Object.assign({}, package, require('../config.json'));
 // Configure ==================================================================
 require('../../config/common')(app);
 require('../../config/lib/fs')(app);
@@ -40,7 +42,7 @@ const run = async () => {
     }
 }
 
-app.readyHooks.add('Run tool.chucVu.js', {
+app.readyHooks.add('Run tool.migrateLanguages.js', {
     ready: () => app.database.oracle.connected && app.model && app.model.fwNews,
     run,
 });

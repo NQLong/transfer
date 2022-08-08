@@ -36,7 +36,7 @@ class NewsEditPage extends AdminPage {
                     return;
                 }
 
-                if (initial && data.item.maDonVi) {
+                if (initial && data.item && data.item.hasOwnProperty('maDonVi')) {
                     this.props.getDmDonVi(data.item.maDonVi, item => {
                         const homeLanguages = item && item.homeLanguage ? item.homeLanguage.split(',') : ['vi', 'en'];
                         this.props.getDmNgonNguAll('', items => {

@@ -182,14 +182,14 @@ class HomeMenu extends React.Component {
         }
         header =
             <div className='d-none d-lg-flex row p-4' style={{ backgroundImage: `url(${headerImage})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', minHeight: '12vw' }}>
-                {showHeaderTitle && (
+                {showHeaderTitle ? (
                     <div className='p-2 col-3 offset-9 d-flex align-items-center justify-content-center' style={{ backgroundColor: '#e2e3ff' }}>
                         {isExternalLink ?
                             <a href={link} target='_blank' className='d-flex' rel='noreferrer'><h5 className='m-0 text-center p-2' style={{ color: '#303591' }}><b className='homeHeading'>{title}</b></h5></a> :
                             <Link to={link} className='d-flex'><h5 className='m-0 text-center' style={{ color: '#303591' }}><b className='homeHeading'>{title}</b></h5></Link>
                         }
                     </div>
-                )}
+                ) : null}
             </div>;
         return (
             <>

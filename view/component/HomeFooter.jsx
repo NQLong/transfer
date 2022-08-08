@@ -267,7 +267,7 @@ class Footer extends React.Component {
                         </ul>
                     </div>
                 </div>;
-            } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en')) {
+            } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en') || (T.language() == 'en' && (hostname.includes('/tin-tuc') || hostname.includes('/news')))) {
                 footerList[0] = <div className='col-sm' key={'1'}>
                     <div className='footer-link'>
                         <h3>{'TRAINING PROGRAMS'} <i className='fa fa-angle-down d-md-none'></i></h3>

@@ -202,6 +202,7 @@ module.exports = app => {
             res.send(response);
         });
     });
+
     app.get('/api/draft/news/:userId', app.permission.check('news:read'), (req, res) => {
         const userId = req.params.userId;
         let response = {};
@@ -556,19 +557,20 @@ module.exports = app => {
             language = req.query.language;
 
         let condition = {
-            statement: 'MA_DON_VI = :maDonVi AND ACTIVE = :active AND (START_POST <= :startPost )',
+            statement: 'maDonVi = :maDonVi AND active = :active AND (startPost <= :startPost )',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
         };
 
         if (!user) {
-            condition.statement += ' AND IS_INTERNAL = :isInternal';
+            condition.statement += ' AND isInternal = :isInternal';
             condition.parameter.isInternal = 0;
         }
-        if (language == 'en') {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
-        } else {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
+
+        if (language) {
+            condition.statement += ' AND languages like :languages)';
+            condition.parameter.languages = `%${language}%`;
         }
+
         app.model.fwNews.getPage(pageNumber, pageSize, condition, '*', 'START_POST DESC', (error, page) => {
             const response = {};
             if (error || page == null) {
@@ -588,19 +590,22 @@ module.exports = app => {
             user = req.session.user,
             categoryType = parseInt(req.params.categoryType),
             language = req.query.language;
+
         const condition = {
             statement: 'FN.ACTIVE = :active AND (START_POST <= :today OR STOP_POST >= :today)',
             parameter: { active: 1, today }
         };
+
         if (!user) {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
             condition.parameter.isInternal = 0;
         }
-        if (language == 'en') {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
-        } else {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
+
+        if (language) {
+            condition.statement += ' AND FN.LANGUAGES like :languages';
+            condition.parameter.languages = `%${language}%`;
         }
+
         app.model.fwCategory.get({ id: categoryType }, (error, category) => {
             if (error) {
                 res.send({ error });
