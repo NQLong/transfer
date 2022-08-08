@@ -1126,7 +1126,8 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_GET_FREE(config IN STRING, hocPhanDaXep OUT SYS_REFCURSOR)
+CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_GET_FREE(config IN STRING, hocPhanTheoIdNganh OUT SYS_REFCURSOR,
+                                           hocPhanDaXep OUT SYS_REFCURSOR)
     RETURN SYS_REFCURSOR
 AS
     my_cursor     SYS_REFCURSOR;
@@ -1147,13 +1148,20 @@ begin
 
     SELECT LISTAGG(TMP.ID_THOI_KHOA_BIEU, ',') WITHIN GROUP ( ORDER BY TMP.ID_THOI_KHOA_BIEU)
     INTO listIdHocPhan
-    FROM (
-    SELECT DISTINCT TKBN.ID_THOI_KHOA_BIEU
-    FROM DT_THOI_KHOA_BIEU_NGANH TKBN
-    WHERE TKBN.ID_NGANH IN
-          (SELECT regexp_substr(listIdNganh, '[^,]+', 1, level)
-           from dual
-           connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null)) TMP;
+    FROM (SELECT DISTINCT TKBN.ID_THOI_KHOA_BIEU
+          FROM DT_THOI_KHOA_BIEU_NGANH TKBN
+          WHERE TKBN.ID_NGANH IN
+                (SELECT regexp_substr(listIdNganh, '[^,]+', 1, level)
+                 from dual
+                 connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null)) TMP;
+
+    open hocPhanTheoIdNganh FOR
+        SELECT TKBN.ID_NGANH          AS "idNganh",
+               TKBN.ID_THOI_KHOA_BIEU AS "idThoiKhoaBieu"
+        FROM DT_THOI_KHOA_BIEU_NGANH TKBN
+        WHERE TKBN.ID_NGANH IN (SELECT regexp_substr(listIdNganh, '[^,]+', 1, level)
+                                from dual
+                                connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null);
 
     open hocPhanDaXep FOR
         SELECT TKB.ID                                  AS "id",
@@ -16182,9 +16190,41 @@ BEGIN
             (namHoc IS NOT NULL AND TCDM.NAM_HOC = namHoc OR namHoc IS NULL)
             AND (hocKy IS NOT NULL AND TCDM.HOC_KY = hocKy OR hocKy IS NULL)
             AND (loaiDaoTao IS NOT NULL AND TCDM.LOAI_DAO_TAO = loaiDaoTao OR loaiDaoTao IS NULl)
-        );
-  RETURN NULL;
-END TC_DINH_MUC_HOC_PHI_SEARCH_PAGE;
+        ) AND TCLP.KICH_HOAT = 1;
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN TC_INFO FOR
+        SELECT *
+        FROM (
+            SELECT TCDM.MA                                          AS "ma",
+                TCDM.HOC_KY                                         AS "hocKy",
+                TCDM.LOAI_PHI                                       AS "loaiPhi",
+                TCLP.TEN                                            AS "tenLoaiPhi",
+                TCDM.LOAI_DAO_TAO                                   AS "loaiDaoTao",
+                LDT.TEN                                             AS "tenLoaiDaoTao",
+                TCDM.NAM_HOC                                        AS "namHoc",
+                TCDM.SO_TIEN                                        AS "soTien",
+                ROW_NUMBER() OVER (ORDER BY TCDM.NAM_HOC DESC NULLS LAST, TCDM.HOC_KY ) R
+            FROM TC_DINH_MUC_HOC_PHI TCDM
+                LEFT JOIN TC_LOAI_PHI TCLP ON TCLP.ID = TCDM.LOAI_PHI
+                LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LDT ON LDT.MA = TCDM.LOAI_DAO_TAO
+            WHERE (
+                    searchTerm = ''
+                    OR NAM_HOC LIKE sT
+                    OR lower(TCLP.TEN) LIKE sT
+                ) AND
+                (
+                    (namHoc IS NOT NULL AND TCDM.NAM_HOC = namHoc OR namHoc IS NULL)
+                    AND (hocKy IS NOT NULL AND TCDM.HOC_KY = hocKy OR hocKy IS NULL)
+                    AND (loaiDaoTao IS NOT NULL AND TCDM.LOAI_DAO_TAO = loaiDaoTao OR loaiDaoTao IS NULl)
+                ) AND TCLP.KICH_HOAT = 1
+        ) WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+  RETURN TC_INFO;
+END;
 
 /
 --EndMethod--
@@ -16750,7 +16790,7 @@ BEGIN
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                        LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
                        LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE HPI
-                                 on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY
+                                 on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY and HPI.LY_DO_HUY is null
                        LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
                   AND HP.NAM_HOC = THPT.NAM_HOC
                   AND HP.MSSV = THPT.CUSTOMER_ID
