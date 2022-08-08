@@ -19,11 +19,11 @@
     },
     "db": {
         "main": {
-            "owner": "HCMUSSH",
+            "owner": "DEV_HCMUSSH",
             "host": "116.109.45.163",
             "sid": "orcl",
-            "username": "hcmussh",
-            "password": "CLJOe4sDH1"
+            "username": "dev_hcmussh",
+            "password": "2x$@!zXBm<Z{5%."
         }
     },
     "keywords": [
