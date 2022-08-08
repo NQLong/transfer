@@ -25,19 +25,31 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/category-donvi/:type', (req, res) => {
-        let condition = req.query.condition;
-        if (condition) {
-            condition = {
-                statement: 'title LIKE :searchText AND type LIKE :type',
-                parameter: { searchText: `%${condition}%`, type: `%${req.params.type}%` }
-            };
-        } else {
-            condition = { type: req.params.type, maDonVi: req.session.user.maDonVi };
+    app.get('/api/category-donvi/:type', app.permission.check(), async (req, res) => {
+        try {
+            const permissions = req.session.user.permissions || [];
+            let condition = req.query.condition, type = req.params.type, maDonVi = req.query.maDonVi;
+            let pageCondition = { statement: 'type LIKE:type', parameter: { type } };
+            if (condition) {
+                pageCondition.statement += ' AND lower(title) LIKE :searchText';
+                pageCondition.parameter.searchText = `%${condition.toLowerCase()}%`;
+            }
+
+            if (permissions.includes('website:manage')) {
+                if (maDonVi) {
+                    pageCondition.statement += ' AND maDonVi LIKE :maDonVi';
+                    pageCondition.parameter.maDonVi = maDonVi;
+                }
+            } else {
+                pageCondition.statement += ' AND maDonVi LIKE :maDonVi';
+                pageCondition.parameter.maDonVi = req.session.user.maDonVi;
+            }
+
+            const items = await app.model.fwCategory.getAll(pageCondition, '*', 'priority DESC');
+            res.send({ items });
+        } catch (error) {
+            res.send({ error });
         }
-        app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, items) => {
-            res.send({ error, items });
-        });
     });
 
     app.post('/api/category', app.permission.check('category:write'), (req, res) => {
