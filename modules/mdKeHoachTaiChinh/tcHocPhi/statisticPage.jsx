@@ -4,6 +4,7 @@ import { getStatisticTcHocPhi } from './redux';
 import { ChartArea } from 'modules/mdTccb/dashboardTCCB/adminPage';
 import { NumberIcon } from './adminPage';
 import { DefaultColors } from 'view/component/Chart';
+import T from 'view/js/common';
 // import { DefaultColors } from 'view/component/Chart';
 
 export default class StatisticModal extends AdminPage {
@@ -40,9 +41,14 @@ export default class StatisticModal extends AdminPage {
                         <p>Các bậc đào tạo: <b>{Object.keys(amountByEduLevel).join(', ')}</b></p>
                         <p>Các hệ đào tạo: <b>{Object.keys(amountByEduMethod).join(', ')}</b></p>
 
-                        <div className='d-flex justify-content-center' style={{ gap: 10 }}>
+                        <div className=' d-flex justify-content-center' style={{ gap: 10 }}>
                             <button className='btn btn-primary' onClick={e => e.preventDefault() || this.props.history.push('/user/finance/hoc-phi')}><i className='fa fa-lg fa-child' />Trang học viên</button>
                             <button className='btn btn-success' onClick={e => e.preventDefault() || this.props.history.push('/user/finance/danh-sach-giao-dich')}><i className='fa fa-lg fa-money' />Trang giao dịch</button>
+                        </div>
+
+                        <div className=' d-flex justify-content-center' style={{ gap: 10, marginTop: '10px' }}>
+                            <button className='btn btn-info' onClick={e => e.preventDefault() || T.download(`/api/finance/danh-sach-giao-dich/download-psc?filter=${T.stringify({})}`)}><i className='fa fa-lg fa-download' />Danh sách giao dịch</button>
+                            <button className='btn btn-info' onClick={e => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify({})}`)}><i className='fa fa-lg fa-download' />Quản lý học phí</button>
                         </div>
                     </div>
                 </div>
