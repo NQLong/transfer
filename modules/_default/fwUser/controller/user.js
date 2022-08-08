@@ -19,7 +19,7 @@ module.exports = app => {
         run: () => {
             app.model.fwUser.count({}, (error, numberOfUser) => {
                 if (error == null) {
-                    numberOfUser = Number(numberOfUser);
+                    numberOfUser = Number(numberOfUser.rows[0]['COUNT(*)']);
                     app.model.setting.setValue({ numberOfUser: isNaN(numberOfUser) ? 0 : Number(numberOfUser) });
                 }
             });

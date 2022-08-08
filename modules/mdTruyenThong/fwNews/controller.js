@@ -51,7 +51,6 @@ module.exports = app => {
                 <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
                 <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
                 <meta property='og:image' content='${app.rootUrl + news.image}' />
-                <meta property='language' content='vi' />
                 <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '00'} />`);
             res.send(data);
         };
@@ -90,7 +89,6 @@ module.exports = app => {
             <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
             <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
             <meta property='og:image' content='${app.rootUrl + news.image}' />
-            <meta property='language' content='en' />
             <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '67'} />`);
             res.send(data);
         };
@@ -155,31 +153,40 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/news-donvi/page/:pageNumber/:pageSize', app.permission.check('website:read'), (req, res) => {
-        let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            condition = req.query.condition;
-        if (condition) {
-            condition = {
-                statement: 'title LIKE :searchText',
-                parameter: { searchText: `%${condition}%` }
-            };
-        } else if (req.session.user && req.session.user.maDonVi) {
-            condition = { maDonVi: req.session.user.maDonVi };
-        }
-        app.model.fwNews.getPage(pageNumber, pageSize, condition, '*', 'pinned DESC, priority DESC', (error, page) => {
-            const response = {};
-            if (error || page == null) {
-                response.error = 'Danh sách bài viết không sẵn sàng!';
-            } else {
-                let list = page.list.map(item => app.clone(item, { content: null }));
-                response.page = app.clone(page, { list });
+    app.get('/api/news-donvi/page/:pageNumber/:pageSize', app.permission.check('website:read'), async (req, res) => {
+        try {
+            let pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize), condition = req.query.condition;
+            const pageCondition = { statement: '', parameter: {} }, permissions = req.session.user.permissions;
+            let donViConditionText = '', maDonVi = '';
+            if (condition) {
+                if (condition.searchText) {
+                    pageCondition.statement += 'lower(title) LIKE :searchText';
+                    pageCondition.parameter.searchText = `%${condition.searchText.toLowerCase()}%`;
+                }
+                if (condition.maDonVi && permissions.includes('website:manage')) {
+                    donViConditionText = 'maDonVi LIKE :maDonVi';
+                    maDonVi = condition.maDonVi;
+                }
             }
-            res.send(response);
-        });
+
+            if (!permissions.includes('website:manage')) {
+                donViConditionText = 'maDonVi LIKE :maDonVi';
+                maDonVi = req.session.user.maDonVi;
+            }
+
+            if (donViConditionText) {
+                pageCondition.statement += (pageCondition.statement .length ? ' AND ' : '') + donViConditionText;
+                pageCondition.parameter.maDonVi = maDonVi;
+            }
+
+            const page = await app.model.fwNews.getPage(pageNumber, pageSize, pageCondition, 'id, priority, title, image, link, active, isInternal, createdDate, startPost, maDonVi, pinned', 'pinned DESC, priority DESC');
+            res.send({ page });
+        } catch (error) {
+            res.send({ error: 'Danh sách bài viết không sẵn sàng!' });
+        }
     });
 
-    app.get('/api/news-category/page/:pageNumber/:pageSize', (req, res) => {//TODO permissions
+    app.get('/api/news-category/page/:pageNumber/:pageSize', (req, res) => { //TODO permissions
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             categoryType = req.query.category;
@@ -195,6 +202,7 @@ module.exports = app => {
             res.send(response);
         });
     });
+
     app.get('/api/draft/news/:userId', app.permission.check('news:read'), (req, res) => {
         const userId = req.params.userId;
         let response = {};
@@ -283,21 +291,26 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/news/default', (req, res) => {
-        const permissions = req.session.user.permissions,
+    app.post('/api/news/default', app.permission.check(), (req, res) => {
+        const user = req.session.user, permissions = user.permissions, maDonVi = req.body.maDonVi,
             valid = permissions.includes('news:write') || permissions.includes('news:tuyensinh') || permissions.includes('website:write');
         if (valid) {
-            app.model.fwNews.create2({
+            const newData = {
                 title: JSON.stringify({ vi: 'Tên bài viết', en: 'News title' }),
                 active: 0,
                 abstract: JSON.stringify({ vi: '', en: '' }),
                 content: JSON.stringify({ vi: '', en: '' }),
                 createdDate: new Date().getTime(),
                 isTranslate: 0,
-                language: 'vi',
-                maDonVi: permissions.includes('news:manage') ? '0' : (req.session.user && req.session.user.maDonVi ?
-                    req.session.user.maDonVi : -1),
-            }, (error, item) => res.send({ error, item }));
+                language: 'vi'
+            };
+
+            if (permissions.includes('news:manage') || permissions.includes('website:manage')) {
+                newData.maDonVi = maDonVi ? maDonVi : '0';
+            } else {
+                newData.maDonVi = user && user.maDonVi ? user.maDonVi : -1;
+            }
+            app.model.fwNews.create2(newData, (error, item) => res.send({ error, item }));
         } else {
             res.send({ error: 'User not has permission.' });
         }
@@ -544,19 +557,20 @@ module.exports = app => {
             language = req.query.language;
 
         let condition = {
-            statement: 'MA_DON_VI = :maDonVi AND ACTIVE = :active AND (START_POST <= :startPost )',
+            statement: 'maDonVi = :maDonVi AND active = :active AND (startPost <= :startPost )',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
         };
 
         if (!user) {
-            condition.statement += ' AND IS_INTERNAL = :isInternal';
+            condition.statement += ' AND isInternal = :isInternal';
             condition.parameter.isInternal = 0;
         }
-        if (language == 'en') {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
-        } else {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
+
+        if (language) {
+            condition.statement += ' AND languages like :languages)';
+            condition.parameter.languages = `%${language}%`;
         }
+
         app.model.fwNews.getPage(pageNumber, pageSize, condition, '*', 'START_POST DESC', (error, page) => {
             const response = {};
             if (error || page == null) {
@@ -576,19 +590,22 @@ module.exports = app => {
             user = req.session.user,
             categoryType = parseInt(req.params.categoryType),
             language = req.query.language;
+
         const condition = {
             statement: 'FN.ACTIVE = :active AND (START_POST <= :today OR STOP_POST >= :today)',
             parameter: { active: 1, today }
         };
+
         if (!user) {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
             condition.parameter.isInternal = 0;
         }
-        if (language == 'en') {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
-        } else {
-            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
+
+        if (language) {
+            condition.statement += ' AND FN.LANGUAGES like :languages';
+            condition.parameter.languages = `%${language}%`;
         }
+
         app.model.fwCategory.get({ id: categoryType }, (error, category) => {
             if (error) {
                 res.send({ error });

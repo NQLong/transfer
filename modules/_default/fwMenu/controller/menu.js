@@ -7,8 +7,7 @@ module.exports = app => {
         { name: 'menu:read', },
         { name: 'menu:write', },
         { name: 'menu:delete', },
-        { name: 'menu:manage', menu },
-
+        { name: 'menu:manage', menu }
     );
 
     app.get('/user/menu/edit/:id', app.permission.check('system:settings'), app.templates.admin);
@@ -17,31 +16,30 @@ module.exports = app => {
     app.get('/user/menu/edit/:divisionId/:id', app.permission.check('menu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.buildAppMenus = () => { // Get đệ quy menu theo array của parentMenus, mỗi parentMenu có array của subMenus
-        app.model.fwMenu.getMenuTree((_, menuTree) => {
-            if (menuTree == null) menuTree = [];
-            const menus = {}, divisionMenus = {}; // 2 loại menu: Menu chung và menu cho đơn vị, menu đơn vị có maDonVi != '00'
+    app.buildAppMenus = async () => { // Get đệ quy menu theo array của parentMenus, mỗi parentMenu có array của subMenus
+        let menuTree = await app.model.fwMenu.getMenuTree();
+        if (menuTree == null) menuTree = [];
+        const menus = {}, divisionMenus = {}; // 2 loại menu: Menu chung và menu cho đơn vị, menu đơn vị có maDonVi != '00'
 
-            // Mapper link của từng menu, kể cả subMenus vào trong 2 danh sách menu kể trên
-            while (menuTree.length) {
-                const item = menuTree.shift(); // Lấy phần tử menuTree[0] ra khỏi menuTree
-                if (item.maDonVi == '00') { // Nếu mã đơn vị == '00' nghĩa là không có đơn vị => Menu chung
-                    if (item.submenus && item.submenus.length) menuTree.push(...item.submenus);
-                    if (item.link != '#') {
-                        menus[item.link] = app.clone(item, { submenus: null });
-                    }
-                } else { // Ngược lại, mã đơn vị != '00' => Menu của đơn vị
-                    if (item.submenus && item.submenus.length) menuTree.push(...item.submenus);
-                    if (item.link != '#') {
-                        divisionMenus[item.link] = app.clone(item, { submenus: null });
-                    }
+        // Mapper link của từng menu, kể cả subMenus vào trong 2 danh sách menu kể trên
+        while (menuTree.length) {
+            const item = menuTree.shift(); // Lấy phần tử menuTree[0] ra khỏi menuTree
+            if (item.maDonVi == '00') { // Nếu mã đơn vị == '00' nghĩa là không có đơn vị => Menu chung
+                if (item.submenus && item.submenus.length) menuTree.push(...item.submenus);
+                if (item.link != '#') {
+                    menus[item.link] = app.clone(item, { submenus: null });
+                }
+            } else { // Ngược lại, mã đơn vị != '00' => Menu của đơn vị
+                if (item.submenus && item.submenus.length) menuTree.push(...item.submenus);
+                if (item.link != '#') {
+                    divisionMenus[item.link] = app.clone(item, { submenus: null });
                 }
             }
+        }
 
-            // Lưu vào trong redis
-            app.database.redis.set(app.database.redis.menusKey, JSON.stringify(menus));
-            app.database.redis.set(app.database.redis.divisionMenusKey, JSON.stringify(divisionMenus));
-        });
+        // Lưu vào trong redis
+        app.database.redis.set(app.database.redis.menusKey, JSON.stringify(menus));
+        app.database.redis.set(app.database.redis.divisionMenusKey, JSON.stringify(divisionMenus));
     };
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
@@ -93,10 +91,13 @@ module.exports = app => {
     });
 
 
-    app.get('/api/menu/all', app.permission.check('menu:read'), (req, res) => {
-        app.model.fwMenu.getDivisionMenuTree('00', '', (error, menuTree) => {
-            res.send({ error, items: menuTree });
-        });
+    app.get('/api/menu/all', app.permission.check('menu:read'), async (req, res) => {
+        try {
+            const menuTree = await app.model.fwMenu.getDivisionMenuTree('00', '');
+            res.send({ items: menuTree });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/menu/item/:id', app.permission.check('menu:read'), (req, res) => {
@@ -260,34 +261,48 @@ module.exports = app => {
         res.send('OK');
     });
 
-    app.get('/api/dvWebsite/menu/:maDonVi', app.permission.check('menu:read'), (req, res) => {
-        const maDonVi = req.params.maDonVi,
-            maWebsite = req.query.maWebsite;
-        app.model.fwMenu.getDivisionMenuTree(maDonVi, maWebsite, (error, menuTree) => {
-            res.send({ error, items: menuTree });
-        });
+    app.get('/api/dvWebsite/menu/:maDonVi', app.permission.check('menu:read'), async (req, res) => {
+        try {
+            const maDonVi = req.params.maDonVi, maWebsite = req.query.maWebsite;
+            const menuTree = await app.model.fwMenu.getDivisionMenuTree(maDonVi, maWebsite);
+            res.send({ items: menuTree });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
-    app.get('/home/dvWebsite/menu/:maDonVi', (req, res) => {
-        const maDonVi = req.params.maDonVi,
-            maWebsite = req.query.maWebsite;
-        app.model.fwMenu.homeGetDivisionMenuTree(maDonVi, maWebsite, (error, menuTree) => {
-            res.send({ error, items: menuTree });
-        });
+    app.get('/home/dvWebsite/menu/:maDonVi', async (req, res) => {
+        try {
+            const maDonVi = req.params.maDonVi, maWebsite = req.query.maWebsite;
+            const menuTree = await app.model.fwMenu.homeGetDivisionMenuTree(maDonVi, maWebsite);
+            res.send({ items: menuTree });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
-    app.get('/home/menu', (req, res) => {
-        const { maDonVi, link, language } = req.query;
-        let condition = {};
-        if (language && maDonVi) {// route from news page
-            condition = {
-                statement: `MA_WEBSITE ${language == 'en' ? 'LIKE' : 'NOT LIKE'} '%${maDonVi == '00' ? 'en' : '/en'}%' AND MA_DON_VI ='${maDonVi}' AND ACTIVE=1 `,
-                parameter: {}
-            };
-        } else condition = { link };
-        app.model.fwMenu.get(condition, (error, menu) => {
-            res.send({ error, menu });
-        });
+    app.get('/home/menu', async (req, res) => {
+        try {
+            const { maDonVi, link, language } = req.query;
+            let condition = {}, menu = null;
+            if (language && maDonVi) { // route from news page
+                if (language == 'en') {
+                    const enMenu = await app.model.fwMenu.get({
+                        statement: 'maWebsite LIKE :maWebsite AND maDonVi = :maDonVi AND active = :active',
+                        parameter: { maWebsite: `%${maDonVi == '00' ? 'en' : '/en'}%`, maDonVi, active: 1 }
+                    });
+                    if (enMenu) return res.send({ menu: enMenu });
+                }
+                condition = { maDonVi, active: 1 };
+            } else {
+                condition = { link };
+            }
+
+            menu = await app.model.fwMenu.get(condition);
+            res.send({ menu });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
 };

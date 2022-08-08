@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell, AdminModal } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import T from 'view/js/common';
 import { getTongGiaoDichPage, getListNganHang, createGiaoDich } from './redux';
 import { getStudentHocPhi } from '../tcHocPhi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
