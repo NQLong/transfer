@@ -602,7 +602,7 @@ module.exports = app => {
         }
 
         if (language) {
-            condition.statement += ' AND FN.LANGUAGES like :languages';
+            condition.statement += ' AND LANGUAGES like :languages';
             condition.parameter.languages = `%${language}%`;
         }
 

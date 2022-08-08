@@ -78,7 +78,7 @@ module.exports = app => {
 
                 if (template == 'home' || template == 'unit') {
                     if (template == 'home') {
-                        const menus = await app.model.fwMenu.homeGetDivisionMenuTree('00');
+                        const menus = await app.model.fwMenu.getDivisionMenuTree('00');
                         if (menus) {
                             data.menus = menus;
                         }
@@ -87,11 +87,11 @@ module.exports = app => {
                     if (template == 'unit') {
                         data.divisionMenus = [];
                         if (maDonVi) {
-                            data.divisionMenus = await app.model.fwMenu.homeGetDivisionMenuTree(maDonVi);
+                            data.divisionMenus = await app.model.fwMenu.getDivisionMenuTree(maDonVi);
                         } else if (link) {
                             const checkMenu = await app.model.fwMenu.get({ link });
                             if (checkMenu && checkMenu.maDonVi) {
-                                data.divisionMenus = await app.model.fwMenu.homeGetDivisionMenuTree(checkMenu.maDonVi);
+                                data.divisionMenus = await app.model.fwMenu.getDivisionMenuTree(checkMenu.maDonVi);
                             }
                         }
                     }
