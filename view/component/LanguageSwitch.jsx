@@ -1,12 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { homeMenuGet } from 'modules/_default/fwMenu/redux';
+import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 
 class LanguageSwitch extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             if (this.props.languages) {
                 T.language.setLanguages(this.props.languages);
+                this.props.updateSystemState({ updateDate: new Date().getTime() });
             }
         });
     }
@@ -15,12 +17,14 @@ class LanguageSwitch extends React.Component {
         $(document).ready(() => {
             if (this.props.languages && (!prevProps.languages || this.props.languages.toString() != prevProps.languages.toString())) {
                 T.language.setLanguages(this.props.languages);
+                this.props.updateSystemState({ updateDate: new Date().getTime() });
             }
         });
     }
 
     componentWillUnmount() {
         T.language.setLanguages(['vi', 'en']);
+        this.props.updateSystemState({ updateDate: new Date().getTime() });
     }
 
     change = (e) => {
@@ -71,5 +75,5 @@ class LanguageSwitch extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { homeMenuGet };
+const mapActionsToProps = { homeMenuGet, updateSystemState };
 export default connect(mapStateToProps, mapActionsToProps)(LanguageSwitch);

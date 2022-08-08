@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.181",
+    "version": "1.0.182",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -19,11 +19,11 @@
     },
     "db": {
         "main": {
-            "owner": "DEV_HCMUSSH",
+            "owner": "HCMUSSH",
             "host": "116.109.45.163",
             "sid": "orcl",
-            "username": "dev_hcmussh",
-            "password": "2x$@!zXBm<Z{5%."
+            "username": "hcmussh",
+            "password": "CLJOe4sDH1"
         }
     },
     "keywords": [

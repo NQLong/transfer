@@ -218,6 +218,7 @@ export function getValueFwSetting(keys, done) {
         });
     };
 }
+
 export function updateFwSetting(changes, done) {
     return () => {
         const url = '/api/fw-setting';
@@ -233,7 +234,6 @@ export function updateFwSetting(changes, done) {
     };
 }
 
-
 // AJAX ---------------------------------------------------------------------------------------------------------------
 export function register(data, done) {
     T.post('/register', data, res => {
@@ -248,7 +248,6 @@ export function register(data, done) {
 export function forgotPassword(email, onSuccess, onError) {
     T.put('/forgot-password', { email }, onSuccess, onError);
 }
-
 
 export function getSystemEmails(done) {
     T.get('/api/email/all', done, () => T.notify('Lấy thông tin email bị lỗi!', 'danger'));

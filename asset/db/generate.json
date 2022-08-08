@@ -16136,10 +16136,10 @@
                 },
                 "LOAI_PHI": {
                     "value": "loaiPhi",
-                    "dataType": "NVARCHAR2",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 20
+                    "size": "22,0"
                 },
                 "SO_TIEN": {
                     "value": "soTien",
