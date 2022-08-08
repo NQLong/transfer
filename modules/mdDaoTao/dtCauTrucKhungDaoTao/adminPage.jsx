@@ -54,7 +54,7 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell type='link' url={`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`} style={{ textAlign: 'center' }} content={item.namDaoTao} />
                     <TableCell style={{ textAlign: 'center' }} content={item.tenBacDaoTao} />
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.batDauDangKy} />
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ketThucDangKy} />

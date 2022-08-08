@@ -24,9 +24,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                     this.getData(id, true);
                     return;
                 } else this.bacDaoTao?.value('DH');
-                [
-                    // this.mucTieuDaoTao,
-                    this.chuongTrinhDaoTao].forEach(e => e.setVal({ parents: {}, childs: {} }));
+                [this.chuongTrinhDaoTao].forEach(e => e.setVal({ parents: {}, childs: {} }));
             }
         });
     }
