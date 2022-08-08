@@ -13,7 +13,8 @@ module.exports = app => {
                 dangXuat: 'ĐĂNG XUẤT',
                 xemTatCa: 'Xem tất cả',
                 tapTinDinhKem: 'Tập tin đính kèm',
-                khongTinTuc: 'Không có tin tức!'
+                khongTinTuc: 'Không có tin tức!',
+                ketNoi: 'KẾT NỐI VỚI USSH-VNUHCM',
             };
             await app.model.dmNgonNguTruyenThong.create(newViData);
         }
@@ -30,7 +31,8 @@ module.exports = app => {
                 dangXuat: 'SIGN OUT',
                 xemTatCa: 'View all',
                 tapTinDinhKem: 'Attachment files',
-                khongTinTuc: 'No latest news!'
+                khongTinTuc: 'No latest news!',
+                ketNoi: 'CONNECT US',
             };
             await app.model.dmNgonNguTruyenThong.create(newEnData);
         }
@@ -48,7 +50,8 @@ module.exports = app => {
                     dangXuat: item.dangXuat || '',
                     xemTatCa: item.xemTatCa || '',
                     tapTinDinhKem: item.tapTinDinhKem || '',
-                    khongTinTuc: item.khongTinTuc || ''
+                    khongTinTuc: item.khongTinTuc || '',
+                    ketNoi: item.ketNoi || '',
                 };
             });
         }

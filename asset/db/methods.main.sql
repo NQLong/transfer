@@ -4875,6 +4875,55 @@ END;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION HCTH_HO_SO_SEARCH_PAGE(
+    pageNumber IN OUT NUMBER,
+    pageSize IN OUT NUMBER,
+    filterParam IN STRING,
+    searchTerm IN STRING,
+    totalItem OUT NUMBER,
+    pageTotal OUT NUMBER
+) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+    ST        STRING(500) := '%' || lower(searchTerm) || '%';
+
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM HCTH_HO_SO hs;
+    --     WHERE (
+--
+--               )
+    IF pageNumber < 1 THEN
+        pageNumber := 1;
+    end if;
+    IF pageSize < 1 THEN
+        pageSize := 1;
+    END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT hs.ID        AS                         "id",
+                     hs.NGUOI_TAO AS                         "nguoiTao",
+                     hs.TIEU_DE   AS                         "tieuDe",
+--                      hs.VAN_BAN   AS                         "vanBan",
+                     cbt.HO       AS                         "hoNguoiTao",
+                     cbt.TEN      AS                         "tenNguoiTao",
+
+                     ROW_NUMBER() over (ORDER BY hs.ID DESC) R
+
+              FROM HCTH_HO_SO hs
+                       LEFT JOIN TCHC_CAN_BO cbt ON cbt.SHCC = hs.NGUOI_TAO
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY 'id' DESC;
+    RETURN my_cursor;
+END;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION HCTH_LIEN_KET_GET_ALL_FROM(
     targetA IN NUMBER,
     targetTypeA IN NVARCHAR2,
@@ -16041,6 +16090,20 @@ BEGIN
     RETURN my_cursor;
 
 end;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION TC_DINH_MUC_HOC_PHI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                       namHoc IN NUMBER, hocKy IN NUMBER, loaiPhi IN STRING,
+                                       loaiDaoTao IN STRING, searchTerm IN STRING,
+                                       totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    TC_INFO SYS_REFCURSOR;
+    ST           STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+  RETURN NULL;
+END TC_DINH_MUC_HOC_PHI_SEARCH_PAGE;
 
 /
 --EndMethod--

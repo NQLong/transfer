@@ -51,7 +51,7 @@ class LanguageSwitch extends React.Component {
     render() {
         const languages = this.props.languages && this.props.languages.length ? this.props.languages : ['vi', 'en'];
         if (languages.length <= 2) {
-            return <img src={this.props.address == 'https://hcmussh.edu.vn/nvduc/de' ? '/img/flag/de.png' : `/img/flag/${T.language.next()}.png`} alt='Nation flag' style={{ height: '1.4vw', cursor: 'pointer' }} onClick={this.change} />;
+            return <img src={`/img/flag/${T.language.next()}.png`} alt='Nation flag' style={{ height: '1.4vw', cursor: 'pointer' }} onClick={this.change} />;
         } else {
             let dropdownItems = languages.map((keyCode, index) =>
                 <a key={index} className='dropdown-item' href='#' onClick={e => this.onSwitch(e, keyCode)}>
@@ -61,7 +61,7 @@ class LanguageSwitch extends React.Component {
             return <>
                 <div className='dropdown' style={{ whiteSpace: 'nowrap', textDecoration: 'none', pointerEvents: 'auto' }}>
                     <a className='dropdown-toggle' href='#' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                        <img src={this.props.address == 'https://hcmussh.edu.vn/nvduc/de' ? '/img/flag/de.png' : `/img/flag/${T.language()}.png`} alt='Nation flag' style={{ height: '1.4vw' }} />
+                        <img src={`/img/flag/${T.language()}.png`} alt='Nation flag' style={{ height: '1.4vw' }} />
                     </a>
                     <div className='dropdown-menu'>{dropdownItems}</div>
                 </div>

@@ -12,7 +12,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '' };
+        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, ketNoi } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '', ketNoi: '' };
         this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenNgonNgu.value(tenNgonNgu || '');
@@ -23,6 +23,7 @@ class EditModal extends AdminModal {
         this.xemTatCa.value(xemTatCa || '');
         this.tapTinDinhKem.value(tapTinDinhKem || '');
         this.khongTinTuc.value(khongTinTuc || '');
+        this.ketNoi.value(ketNoi || '');
 
         maCode && this.imageBox.setData('nationFlag:' + maCode, '/img/flag/' + maCode + '.png');
     }
@@ -39,6 +40,7 @@ class EditModal extends AdminModal {
             xemTatCa: getValue(this.xemTatCa),
             tapTinDinhKem: getValue(this.tapTinDinhKem),
             khongTinTuc: getValue(this.khongTinTuc),
+            ketNoi: getValue(this.ketNoi),
         };
 
         if (changes.maCode == '') {
@@ -78,6 +80,11 @@ class EditModal extends AdminModal {
                         <FormTextBox ref={e => this.xemTatCa = e} label='Xem tất cả' className='col-md-6' required />
                         <FormTextBox ref={e => this.tapTinDinhKem = e} label='Tập tin đính kèm' className='col-md-6' required />
                         <FormTextBox ref={e => this.khongTinTuc = e} label='Không có tin tức' className='col-md-6' required />
+                    </div>
+
+                    <h6 className='tile-title'>Footer</h6>
+                    <div className='row'>
+                        <FormTextBox ref={e => this.ketNoi = e} label='Kết nối với USSH' className='col-md-6' required />
                     </div>
                 </div>
             </div>
