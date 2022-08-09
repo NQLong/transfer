@@ -40,6 +40,13 @@
             "password": "2x$@!zXBm<Z{5%."
         }
     },
+    "rabbitMQ": {
+        "ip": "localhost"
+    },
+    "redisDB": {
+        "host": "localhost",
+        "port": 6379
+    },
     "keywords": [
         "Khoa hoc xa hoi va nhan van",
         "University",
