@@ -460,7 +460,7 @@ module.exports = app => {
             originalUserEmail: req.session.user.originalEmail,
             userEmail: req.session.user.email,
             url: req.url,
-            reqBody: app.stringify(req.body)
+            reqBody: app.utils.stringify(req.body)
         };
         try {
             await app.model.fwTrackingLog.create(data);

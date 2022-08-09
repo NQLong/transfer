@@ -1,5 +1,5 @@
 module.exports = app => {
-    app.createFolder(app.bundlePath);
+    app.fs.createFolder(app.bundlePath);
 
     const menu = {
         parentMenu: app.parentMenu.setting,
@@ -59,9 +59,9 @@ module.exports = app => {
                     mainCodeFilename = require(destPath + '/package.json').main;
                 if (app.isDebug) {
                     destPath = app.bundlePath + '/dest';
-                    app.deleteFolder(destPath);
-                    app.createFolder(destPath);
-                    app.createFolder(destPath + '/public');
+                    app.fs.deleteFolder(destPath);
+                    app.fs.createFolder(destPath);
+                    app.fs.createFolder(destPath + '/public');
                 }
 
                 app.fs.renameSync(extractPath + '/' + mainCodeFilename, destPath + '/' + mainCodeFilename);
@@ -70,12 +70,12 @@ module.exports = app => {
                 app.fs.renameSync(extractPath + '/public/home.template', destPath + '/public/home.template');
                 app.fs.renameSync(extractPath + '/public/unit.template', destPath + '/public/unit.template'); //TODO: các giao diện khác thì sao => lấy tất cả các file .template
 
-                app.deleteFolder(destPath + '/public/css');
-                app.deleteFolder(destPath + '/public/fonts');
-                app.deleteFolder(destPath + '/public/home');
-                app.deleteFolder(destPath + '/public/js');
-                app.deleteFolder(destPath + '/config');
-                app.deleteFolder(destPath + '/modules');
+                app.fs.deleteFolder(destPath + '/public/css');
+                app.fs.deleteFolder(destPath + '/public/fonts');
+                app.fs.deleteFolder(destPath + '/public/home');
+                app.fs.deleteFolder(destPath + '/public/js');
+                app.fs.deleteFolder(destPath + '/config');
+                app.fs.deleteFolder(destPath + '/modules');
 
                 app.fs.renameSync(extractPath + '/public/css', destPath + '/public/css');
                 app.fs.renameSync(extractPath + '/public/fonts', destPath + '/public/fonts');
@@ -84,7 +84,7 @@ module.exports = app => {
                 app.fs.renameSync(extractPath + '/config', destPath + '/config');
                 app.fs.renameSync(extractPath + '/modules', destPath + '/modules');
 
-                app.deleteFolder(extractPath);
+                app.fs.deleteFolder(extractPath);
                 const imageInfoPath = app.path.join(destPath, 'imageInfo.txt');
                 app.fs.writeFileSync(imageInfoPath, app.path.basename(imageFile));
                 res.send({});
@@ -104,7 +104,7 @@ module.exports = app => {
             const filepath = app.path.join(app.bundlePath, req.body.filename),
                 state = app.fs.statSync(filepath);
             if (filepath.startsWith(app.bundlePath + '/') && app.fs.existsSync(filepath) && state.isFile()) {
-                app.deleteFile(filepath, () => res.send({}));
+                app.fs.deleteFile(filepath, () => res.send({}));
             }
         } else {
             res.send({ error: 'Invalid filename!' });

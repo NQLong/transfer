@@ -9,7 +9,7 @@ module.exports = app => {
     });
 
     // Upload hook
-    app.createFolder(app.path.join(app.publicPath, '/img/divisionHeader'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/divisionHeader'));
     app.uploadHooks.add('uploadDivisionHeader', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadDivisionHeader(req, fields, files, params, done), done, 'menu:write'));
 
@@ -23,8 +23,8 @@ module.exports = app => {
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (website) {
-                        app.deleteFile(srcPath);
-                        if (website.header) app.deleteFile(app.path.join(app.publicPath, website.header));
+                        app.fs.deleteFile(srcPath);
+                        if (website.header) app.fs.deleteFile(app.path.join(app.publicPath, website.header));
                         app.model.dvWebsite.update({ shortname }, { header: image }, (error,) => done({ error, image: image }));
                     }
                 });
@@ -46,8 +46,8 @@ module.exports = app => {
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (website) {
-                        app.deleteFile(srcPath);
-                        if (website.headerMobile) app.deleteFile(app.path.join(app.publicPath, website.headerMobile));
+                        app.fs.deleteFile(srcPath);
+                        if (website.headerMobile) app.fs.deleteFile(app.path.join(app.publicPath, website.headerMobile));
                         app.model.dvWebsite.update({ shortname }, { headerMobile: image }, (error,) => done({ error, image: image }));
                     }
                 });

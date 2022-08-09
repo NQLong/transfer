@@ -210,7 +210,7 @@ module.exports = app => {
                 //             });
                 //             resolve();
                 //         }).then(() => {
-                //             JSON.parse(item.fileMinhChung).map(file => app.deleteFile(app.assetPath + '/deTaiNCKH/new' + file));
+                //             JSON.parse(item.fileMinhChung).map(file => app.fs.deleteFile(app.assetPath + '/deTaiNCKH/new' + file));
                 //             const folderPath = app.assetPath + '/deTaiNCKH/new';
                 //             if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
                 //         });
@@ -246,7 +246,7 @@ module.exports = app => {
         app.model.qtNghienCuuKhoaHoc.get({ shcc: req.body.shcc, id: req.body.id }, (error, item) => {
             if (!error && item) {
                 if (item.fileMinhChung && JSON.parse(item.fileMinhChung).length > 0) {
-                    JSON.parse(item.fileMinhChung).map(file => app.deleteFile(app.assetPath + '/deTaiNCKH' + file));
+                    JSON.parse(item.fileMinhChung).map(file => app.fs.deleteFile(app.assetPath + '/deTaiNCKH' + file));
                     const folderPath = app.assetPath + '/deTaiNCKH/' + item.id;
                     if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
                 }
@@ -268,7 +268,7 @@ module.exports = app => {
     //             const srcPath = files.NCKHDataFile[0].path;
     //             const workbook = app.excel.create();
     //             workbook.xlsx.readFile(srcPath).then(() => {
-    //                 app.deleteFile(srcPath);
+    //                 app.fs.deleteFile(srcPath);
     //                 worksheet = workbook.getWorksheet(1);
     //                 worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
     //             });
@@ -332,9 +332,9 @@ module.exports = app => {
     // });
 
     //Upload File
-    // app.createFolder(app.path.join(app.assetPath, '/khcnDetaiNckh'));
+    // app.fs.createFolder(app.path.join(app.assetPath, '/khcnDetaiNckh'));
 
-    app.createFolder(app.path.join(app.assetPath, '/deTaiNCKH'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/deTaiNCKH'));
 
 
     app.get('/api/khcn/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
@@ -367,9 +367,9 @@ module.exports = app => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
-                app.createFolder(
+                app.fs.createFolder(
                     app.path.join(app.assetPath, '/deTaiNCKH/' + (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new'))
                 );
                 app.fs.rename(srcPath, destPath, error => {
@@ -394,7 +394,7 @@ module.exports = app => {
                 res.send({ error });
             } else if (item && item.fileMinhChung) {
                 let newList = JSON.parse(item.fileMinhChung);
-                app.deleteFile(app.assetPath + '/deTaiNCKH' + newList[index]);
+                app.fs.deleteFile(app.assetPath + '/deTaiNCKH' + newList[index]);
                 newList.splice(index, 1);
                 app.model.qtNghienCuuKhoaHoc.update(id, { fileMinhChung: JSON.stringify(newList) }, (error, qtNghienCuuKhoaHoc) => {
                     res.send({ error, qtNghienCuuKhoaHoc });
@@ -402,7 +402,7 @@ module.exports = app => {
             } else {
                 const filePath = app.path.join(app.assetPath, '/deTaiNCKH', file);
                 if (app.fs.existsSync(filePath)) {
-                    app.deleteFile(filePath);
+                    app.fs.deleteFile(filePath);
                     res.send({ error: null });
                 } else {
                     res.send({ error: 'Không tìm thấy đề tài' });

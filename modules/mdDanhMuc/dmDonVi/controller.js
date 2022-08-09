@@ -64,7 +64,7 @@ module.exports = app => {
                 imageLink = '/img/dmDonVi/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath),
                 destPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, destPath, () => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 data.image = imageLink;
                 app.model.dmDonVi.create(data, (error, item) => res.send({ error, item }));
             });
@@ -108,8 +108,8 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/dmDonVi'));
-    app.createFolder(app.path.join(app.publicPath, '/img/dmDonViImage'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/dmDonVi'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/dmDonViImage'));
 
 
     const uploadDmDonViImage = (req, fields, files, params, done) => {
@@ -132,8 +132,8 @@ module.exports = app => {
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (donVi) {
-                        app.deleteFile(srcPath);
-                        if (donVi.imageDisplay) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplay));
+                        app.fs.deleteFile(srcPath);
+                        if (donVi.imageDisplay) app.fs.deleteFile(app.path.join(app.publicPath, donVi.imageDisplay));
                         app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplay: image }, (error,) => done({ error, image: image }));
                     }
                 });
@@ -153,8 +153,8 @@ module.exports = app => {
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (donVi) {
-                        app.deleteFile(srcPath);
-                        if (donVi.imageDisplayTa) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplayTa));
+                        app.fs.deleteFile(srcPath);
+                        if (donVi.imageDisplayTa) app.fs.deleteFile(app.path.join(app.publicPath, donVi.imageDisplayTa));
                         app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplayTa: image }, (error,) => done({ error, image: image }));
                     }
                 });

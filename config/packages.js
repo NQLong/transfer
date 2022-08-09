@@ -128,6 +128,7 @@ module.exports = (app, http, config) => {
     app.jimp = require('jimp');
 
     // Libraries
+    require('./lib/utils')(app);
     require('./lib/fs')(app);
     require('./lib/string')(app);
     require('./lib/date')(app);
@@ -138,4 +139,5 @@ module.exports = (app, http, config) => {
     require('./lib/language')(app);
     require('./lib/docx')(app);
     require('./lib/sms')(app);
+    require('./lib/hooks')(app);
 };

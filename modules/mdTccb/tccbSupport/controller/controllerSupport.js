@@ -37,7 +37,7 @@ module.exports = app => {
         let shcc = req.session.user?.staff?.shcc;
         if (permissions.includes('tccbSupport:manage')) shcc = '';
         let condition = { shcc };
-        app.model.tccbSupport.searchPage(pageNumber, pageSize, app.stringify(condition), '', (error, page) => {
+        app.model.tccbSupport.searchPage(pageNumber, pageSize, app.utils.stringify(condition), '', (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -55,8 +55,8 @@ module.exports = app => {
             sentDate = new Date().getTime(),
             { firstName, lastName, shcc } = req.session.user;
         let fullName = `${lastName || ''} ${firstName || ''}`;
-        data = app.stringify(data);
-        oldData = app.stringify(oldData);
+        data = app.utils.stringify(data);
+        oldData = app.utils.stringify(oldData);
         shcc ? app.model.tccbSupport.create({ data, ...dataTccbSupport, shcc, sentDate, oldData }, (error, item) => {
             {
                 const sendNotification = (index = 0) => {
@@ -84,7 +84,7 @@ module.exports = app => {
         let data = req.body.data,
             id = req.body.id,
             dataTccbSupport = req.body.dataTccbSupport;
-        data = app.stringify(data);
+        data = app.utils.stringify(data);
         app.model.tccbSupport.update({ id }, { data, ...dataTccbSupport }, (error, item) => {
             res.send({ error, item });
         });
@@ -95,7 +95,7 @@ module.exports = app => {
             { firstName, lastName, shcc = '' } = req.session.user;
         let fullName = `${lastName || ''} ${firstName || ''}`;
         fullName = 'Phòng Tổ chức - Cán bộ';
-        let data = app.parse(changes.data);
+        let data = app.utils.parse(changes.data);
         let { qt, type, qtId, id } = changes;
         const updateApproved = () => {
             app.model.tccbSupport.update({ id }, {

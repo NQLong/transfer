@@ -152,7 +152,7 @@ module.exports = app => {
 
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    app.createFolder(app.path.join(app.publicPath, '/img/carouselItem'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/carouselItem'));
 
     const uploadCarouselItemImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('CarouselItem:') && files.CarouselItemImage && files.CarouselItemImage.length > 0) {

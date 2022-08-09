@@ -21,7 +21,7 @@ module.exports = app => {
 
     app.delete('/api/feature', app.permission.check('website:write'), (req, res) => {
         const item = req.body.item;
-        app.deleteImage(item.image);
+        app.fs.deleteImage(item.image);
         app.model.homeFeature.delete({ id: item.id }, error => res.send({ error }));
     });
 
@@ -42,7 +42,7 @@ module.exports = app => {
 
     app.delete('/api/featureItem', app.permission.check('website:write'), (req, res) => {
         const item = req.body.item;
-        app.deleteImage(item.image);
+        app.fs.deleteImage(item.image);
         app.model.homeFeatureItem.delete({ id: item.id }, error => res.send({ error }));
     });
 
@@ -56,7 +56,7 @@ module.exports = app => {
             res.send({ error, items })));
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    app.createFolder(app.path.join(app.publicPath, '/img/feature'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/feature'));
 
     const uploadFeature = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('feature:') && files.FeatureImage && files.FeatureImage.length > 0) {

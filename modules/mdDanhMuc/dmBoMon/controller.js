@@ -103,7 +103,7 @@ module.exports = app => {
                 const srcPath = files.DmBoMonFile[0].path;
                 const workbook = app.excel.create();
                 workbook.xlsx.readFile(srcPath).then(() => {
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                     worksheet = workbook.getWorksheet(1);
                     worksheet ? resolve() : reject('Invalid excel file!');
                 });

@@ -82,7 +82,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtDiNuocNgoai.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -99,7 +99,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtDiNuocNgoai.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -115,7 +115,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtDiNuocNgoai.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -164,8 +164,8 @@ module.exports = app => {
             if (error || item == null) {
                 res.send({ error });
             } else {
-                if (item.baoCaoTen && app.parse(item.baoCaoTen, []).length > 0) {
-                    app.parse(item.baoCaoTen, []).forEach(file => app.deleteFile(app.assetPath + '/baoCaoDiNuocNgoai' + file));
+                if (item.baoCaoTen && app.utils.parse(item.baoCaoTen, []).length > 0) {
+                    app.utils.parse(item.baoCaoTen, []).forEach(file => app.fs.deleteFile(app.assetPath + '/baoCaoDiNuocNgoai' + file));
                     const folderPath = app.assetPath + '/baoCaoDiNuocNgoai/' + item.shcc;
                     if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
                 }
@@ -299,7 +299,7 @@ module.exports = app => {
 
     app.get('/api/tccb/qua-trinh/di-nuoc-ngoai/thong-ke-muc-dich', app.permission.orCheck('qtDiNuocNgoai:read', 'staff:login'), (req, res) => {
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtDiNuocNgoai.download(filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -326,7 +326,7 @@ module.exports = app => {
         res.status(400).send('Không tìm thấy tập tin');
     });
 
-    app.createFolder(app.path.join(app.assetPath, '/baoCaoDiNuocNgoai'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/baoCaoDiNuocNgoai'));
 
     app.uploadHooks.add('baoCaoDiNuocNgoaiStaffFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => baoCaoDiNuocNgoaiStaffFile(req, fields, files, params, done), done, 'staff:login'));
@@ -342,9 +342,9 @@ module.exports = app => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
-                app.createFolder(
+                app.fs.createFolder(
                     app.path.join(app.assetPath, '/baoCaoDiNuocNgoai/' + shcc)
                 );
                 app.fs.rename(srcPath, destPath, error => {
@@ -364,7 +364,7 @@ module.exports = app => {
             file = req.body.file;
         const filePath = app.path.join(app.assetPath, '/baoCaoDiNuocNgoai', file);
         if (app.fs.existsSync(filePath)) {
-            app.deleteFile(filePath, () => {
+            app.fs.deleteFile(filePath, () => {
                 const folderPath = app.assetPath + '/baoCaoDiNuocNgoai/' + shcc;
                 if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
                 res.send({ error: null });

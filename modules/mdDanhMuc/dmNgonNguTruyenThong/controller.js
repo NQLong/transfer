@@ -77,7 +77,7 @@ module.exports = app => {
     });
 
     // Hook upload images
-    app.createFolder(app.path.join(app.publicPath, '/img/flag'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/flag'));
     const uploadFlagImage = (fields, files, done) => {
         if (fields.userData && fields.userData[0].startsWith('nationFlag:') && files.NationFlag && files.NationFlag.length > 0) {
             console.log('Hook: upload nation flag');
@@ -85,7 +85,7 @@ module.exports = app => {
             const srcPath = files.NationFlag[0].path;
             if (app.path.extname(srcPath) == '.png') {
                 app.jimp.read(srcPath).then(image => {
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                     if (image) {
                         image.resize(200, 120);
                         const link = `/img/flag/${maCode}.png`;
@@ -97,7 +97,7 @@ module.exports = app => {
                     }
                 });
             } else {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 done({ error: 'Yêu cầu định dạng file: .png' });
             }
         }

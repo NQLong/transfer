@@ -27,7 +27,7 @@ module.exports = app => {
             const pageNumber = parseInt(req.params.pageNumber),
                 pageSize = parseInt(req.params.pageSize),
                 searchTerm = req.query.condition || '';
-            let filter = app.stringify(req.query.filter || {});
+            let filter = app.utils.stringify(req.query.filter || {});
             const page = await app.model.qtHopDongTrachNhiem.searchPage(pageNumber, pageSize, filter, searchTerm);
             if (page == null) {
                 res.end();

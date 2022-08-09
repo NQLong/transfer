@@ -11,9 +11,9 @@ module.exports = app => {
     app.permission.add(
         { name: 'dtThoiKhoaBieu:read', menu },
         { name: 'dtThoiKhoaBieu:manage', menu },
-        { name: 'dtThoiKhoaBieu:write' },
-        { name: 'dtThoiKhoaBieu:delete' },
-        'dtThoiKhoaBieu:export'
+        'dtThoiKhoaBieu:write',
+        'dtThoiKhoaBieu:delete',
+        'dtThoiKhoaBieu:export',
     );
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
@@ -38,7 +38,7 @@ module.exports = app => {
                 if (user.staff?.maDonVi) donVi = user.maDonVi;
                 else throw 'Permission denied!';
             }
-            filter = app.stringify(app.clone(filter, { donVi }));
+            filter = app.utils.stringify(app.clone(filter, { donVi }));
 
             let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
 
