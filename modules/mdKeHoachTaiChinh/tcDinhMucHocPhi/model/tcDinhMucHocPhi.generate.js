@@ -1,6 +1,6 @@
-// Table name: TC_DINH_MUC_HOC_PHI { namBatDau, hocKy, loaiPhi, soTien, loaiDaoTao, ma, namKetThuc }
+// Table name: TC_DINH_MUC_HOC_PHI { namBatDau, hocKy, loaiPhi, soTien, loaiDaoTao, ma, namKetThuc, soTienMacDinh }
 const keys = ['MA'];
-const obj2Db = { 'namBatDau': 'NAM_BAT_DAU', 'hocKy': 'HOC_KY', 'loaiPhi': 'LOAI_PHI', 'soTien': 'SO_TIEN', 'loaiDaoTao': 'LOAI_DAO_TAO', 'ma': 'MA', 'namKetThuc': 'NAM_KET_THUC' };
+const obj2Db = { 'namBatDau': 'NAM_BAT_DAU', 'hocKy': 'HOC_KY', 'loaiPhi': 'LOAI_PHI', 'soTien': 'SO_TIEN', 'loaiDaoTao': 'LOAI_DAO_TAO', 'ma': 'MA', 'namKetThuc': 'NAM_KET_THUC', 'soTienMacDinh': 'SO_TIEN_MAC_DINH' };
 
 module.exports = app => {
     app.model.tcDinhMucHocPhi = {
@@ -216,9 +216,9 @@ module.exports = app => {
             });
         }),
 
-        searchPage: (pagenumber, pagesize, nambatdau, namketthuc, hocky, loaiphi, loaidaotao, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_dinh_muc_hoc_phi_search_page(:pagenumber, :pagesize, :nambatdau, :namketthuc, :hocky, :loaiphi, :loaidaotao, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, nambatdau, namketthuc, hocky, loaiphi, loaidaotao, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        searchPage: (pagenumber, pagesize, nambatdau, namketthuc, hocky, loaiphi, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_dinh_muc_hoc_phi_search_page(:pagenumber, :pagesize, :nambatdau, :namketthuc, :hocky, :loaiphi, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, nambatdau, namketthuc, hocky, loaiphi, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

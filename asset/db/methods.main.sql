@@ -1178,6 +1178,7 @@ begin
           AND TKB.TIET_BAT_DAU IS NOT NULL
           AND TKB.BAC_DAO_TAO = bac
           AND TKB.LOAI_HINH_DAO_TAO = he
+          AND TKB.IS_MO = 1
           AND TKB.KHOA_SINH_VIEN = khoaSv
           AND TKB.NAM = namHoc
           AND TKB.HOC_KY = hocKy;
@@ -1186,15 +1187,23 @@ begin
         select TKB.ID                AS "id",
                TKB.MA_MON_HOC        AS "maMonHoc",
                TKB.BAC_DAO_TAO       AS "bacDaoTao",
+               TKB.SO_TIET_BUOI      AS "soTietBuoi",
                TKB.LOAI_HINH_DAO_TAO AS "loaiHinhDaoTao",
-               TKB.NHOM              AS "nhom"
-        from DT_THOI_KHOA_BIEU TKB
-                 LEFT JOIN DT_THOI_KHOA_BIEU_NGANH TKBN ON TKB.ID = TKBN.ID_THOI_KHOA_BIEU
-        WHERE TKB.BAC_DAO_TAO = bac
+               TKB.NHOM              AS "nhom",
+               TKB.LOAI_MON_HOC      AS "loaiMonHoc"
+        From DT_THOI_KHOA_BIEU TKB
+        WHERE TKB.ID IN (SELECT regexp_substr(listIdHocPhan, '[^,]+', 1, level)
+                         from dual
+                         connect by regexp_substr(listIdHocPhan, '[^,]+', 1, level) is not null)
+          AND TKB.BAC_DAO_TAO = bac
           AND TKB.LOAI_HINH_DAO_TAO = he
+          AND TKB.THU IS NULL
+          AND TKB.TIET_BAT_DAU IS NULL
           AND TKB.KHOA_SINH_VIEN = khoaSv
+          AND TKB.IS_MO = 1
           AND TKB.NAM = namHoc
-          AND TKB.HOC_KY = hocKy;
+          AND TKB.HOC_KY = hocKy
+    ORDER BY TKB.SO_TIET_BUOI DESC;
     return my_cursor;
 end;
 
@@ -16169,27 +16178,26 @@ end;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION TC_DINH_MUC_HOC_PHI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                       namHoc IN NUMBER, hocKy IN NUMBER, loaiPhi IN STRING,
-                                       loaiDaoTao IN STRING, searchTerm IN STRING,
+                                       namBatDau IN NUMBER, namKetThuc IN NUMBER, hocKy IN NUMBER,
+                                       loaiPhi IN STRING, searchTerm IN STRING,
                                        totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     TC_INFO SYS_REFCURSOR;
-    ST           STRING(500) := '%' || lower(searchTerm) || '%';
+    sT           STRING(500) := '%' || lower(searchTerm) || '%';
 BEGIN
     SELECT COUNT(*)
     INTO totalItem
-    FROM TC_DINH_MUC_HOC_PHI TCDM
+    FROM (SELECT DISTINCT NAM_BAT_DAU, NAM_KET_THUC, HOC_KY, LOAI_PHI FROM TC_DINH_MUC_HOC_PHI) TCDM
         LEFT JOIN TC_LOAI_PHI TCLP ON TCLP.ID = TCDM.LOAI_PHI
-        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LDT ON LDT.MA = TCDM.LOAI_DAO_TAO
     WHERE (
             searchTerm = ''
-            OR NAM_HOC LIKE sT
             OR lower(TCLP.TEN) LIKE sT
         ) AND
         (
-            (namHoc IS NOT NULL AND TCDM.NAM_HOC = namHoc OR namHoc IS NULL)
+            (namBatDau IS NOT NULL AND TCDM.NAM_BAT_DAU = namBatDau OR namBatDau IS NULL)
+            AND (namKetThuc IS NOT NULL AND TCDM.NAM_KET_THUC = namKetThuc OR namKetThuc IS NULL)
             AND (hocKy IS NOT NULL AND TCDM.HOC_KY = hocKy OR hocKy IS NULL)
-            AND (loaiDaoTao IS NOT NULL AND TCDM.LOAI_DAO_TAO = loaiDaoTao OR loaiDaoTao IS NULl)
+            AND (loaiPhi IS NOT NULL AND TCDM.LOAI_PHI = loaiPhi OR loaiPhi IS NULL)
         ) AND TCLP.KICH_HOAT = 1;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
@@ -16200,27 +16208,24 @@ BEGIN
     OPEN TC_INFO FOR
         SELECT *
         FROM (
-            SELECT TCDM.MA                                          AS "ma",
+            SELECT
                 TCDM.HOC_KY                                         AS "hocKy",
                 TCDM.LOAI_PHI                                       AS "loaiPhi",
                 TCLP.TEN                                            AS "tenLoaiPhi",
-                TCDM.LOAI_DAO_TAO                                   AS "loaiDaoTao",
-                LDT.TEN                                             AS "tenLoaiDaoTao",
-                TCDM.NAM_HOC                                        AS "namHoc",
-                TCDM.SO_TIEN                                        AS "soTien",
-                ROW_NUMBER() OVER (ORDER BY TCDM.NAM_HOC DESC NULLS LAST, TCDM.HOC_KY ) R
-            FROM TC_DINH_MUC_HOC_PHI TCDM
+                TCDM.NAM_BAT_DAU                                    AS "namBatDau",
+                TCDM.NAM_KET_THUC                                   AS "namKetThuc",
+                ROW_NUMBER() OVER (ORDER BY TCDM.NAM_BAT_DAU DESC NULLS LAST, TCDM.HOC_KY, TCDM.LOAI_PHI) R
+            FROM (SELECT DISTINCT NAM_BAT_DAU, NAM_KET_THUC, HOC_KY, LOAI_PHI FROM TC_DINH_MUC_HOC_PHI) TCDM
                 LEFT JOIN TC_LOAI_PHI TCLP ON TCLP.ID = TCDM.LOAI_PHI
-                LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LDT ON LDT.MA = TCDM.LOAI_DAO_TAO
             WHERE (
                     searchTerm = ''
-                    OR NAM_HOC LIKE sT
                     OR lower(TCLP.TEN) LIKE sT
                 ) AND
                 (
-                    (namHoc IS NOT NULL AND TCDM.NAM_HOC = namHoc OR namHoc IS NULL)
+                    (namBatDau IS NOT NULL AND TCDM.NAM_BAT_DAU = namBatDau OR namBatDau IS NULL)
+                    AND (namKetThuc IS NOT NULL AND TCDM.NAM_KET_THUC = namKetThuc OR namKetThuc IS NULL)
                     AND (hocKy IS NOT NULL AND TCDM.HOC_KY = hocKy OR hocKy IS NULL)
-                    AND (loaiDaoTao IS NOT NULL AND TCDM.LOAI_DAO_TAO = loaiDaoTao OR loaiDaoTao IS NULl)
+                    AND (loaiPhi IS NOT NULL AND TCDM.LOAI_PHI = loaiPhi OR loaiPhi IS NULL)
                 ) AND TCLP.KICH_HOAT = 1
         ) WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
   RETURN TC_INFO;
@@ -16923,9 +16928,9 @@ BEGIN
                BDT.TEN_BAC                  AS "tenBacDaoTao",
                THPT.TRANS_DATE              AS "ngayDong",
                THPT.STATUS                  AS "trangThai",
-               THPTI.INVOICE_TRANSACTION_ID AS "invoiceTransactonId",
-               THPTI.INVOICE_NUMBER         AS "invoiceNumber",
-               THPTI.ID                     AS "invoiceID",
+--                THPTI.INVOICE_TRANSACTION_ID AS "invoiceTransactonId",
+--                THPTI.INVOICE_NUMBER         AS "invoiceNumber",
+--                THPTI.ID                     AS "invoiceID",
                THPT.TRANS_ID                AS "transactionId"
         FROM TC_HOC_PHI_TRANSACTION THPT
                  LEFT JOIN FW_STUDENT FS on THPT.CUSTOMER_ID = FS.MSSV
@@ -16933,7 +16938,7 @@ BEGIN
                  LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
                  LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                  LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
-                 LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE THPTI on THPT.TRANS_ID = THPTI.TRANSACTION_ID
+--                  LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE THPTI on THPT.TRANS_ID = THPTI.TRANSACTION_ID
         where THPT.NAM_HOC = namHoc
           and THPT.HOC_KY = hocKy
           and ((tuNgay is null and denNgay is null) or
@@ -17138,8 +17143,8 @@ END ;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                                      searchTerm IN STRING, filter IN STRING,
-                                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER
+                                                           searchTerm IN STRING, filter IN STRING,
+                                                           totalItem OUT NUMBER, pageTotal OUT NUMBER
 ) RETURN SYS_REFCURSOR
 AS
     my_cursor          SYS_REFCURSOR;
@@ -17239,9 +17244,10 @@ BEGIN
                      THPTI.INVOICE_TRANSACTION_ID AS                   "invoiceTransactonId",
                      THPTI.INVOICE_NUMBER         AS                   "invoiceNumber",
                      THPTI.ID                     AS                   "invoiceID",
+                     THPTI.LY_DO_HUY              AS                   "lyDoHuy",
 --                      THPT.TRANS_ID                AS              "transactionId",
 
-                     ROW_NUMBER() OVER (ORDER BY THPTI.INVOICE_NUMBER) R
+                     ROW_NUMBER() OVER (ORDER BY THPTI.ID DESC) R
               FROM TC_HOC_PHI_TRANSACTION_INVOICE THPTI
                        LEFT JOIN FW_STUDENT FS on THPTI.MSSV = FS.MSSV
                        LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
