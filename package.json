@@ -17,6 +17,20 @@
         "lint:fix": "npm run lint --  --fix",
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
+    "services": {
+        "emailService": {
+            "mainUrl": "http://localhost:7012",
+            "host": "localhost",
+            "port": "7016",
+            "isDebug": false
+        },
+        "bankService": {
+            "mainUrl": "http://localhost:7012",
+            "host": "localhost",
+            "port": "7014",
+            "isDebug": false
+        }
+    },
     "db": {
         "main": {
             "owner": "DEV_HCMUSSH",

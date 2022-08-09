@@ -53,6 +53,7 @@ module.exports = (cluster, isDebug) => {
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');
     app.loadModules();
+    app.loadServices();
     app.get('/user', app.permission.check(), app.templates.admin);
 
     let hasUpdate = new Set(); //Mỗi lần nodemon restart nó chỉ updateSessionUser 1 lần

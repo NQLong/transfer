@@ -121,27 +121,6 @@ module.exports = (app, appConfig) => {
                     console.log(` - #${process.pid}: The Oracle connection ${db.username} succeeded.`);
                     app.database.oracle.connection[dbName] = connection;
                     app.database.oracle.connected = true;
-
-                    setTimeout(() => { //Test model functions
-                        // app.model.canBo.getAll({
-                        //     statement: 'email IN (  :emails  ) AND ho IN ( :abcd) AND ten=:search',
-                        //     parameter: {
-                        //         emails: ['emaila@gmail.com', 'emailb@gmail.com'],
-                        //         abcd: ['1111', '2222'],
-                        //         search: 'TÙNG'
-                        //     }
-                        // }, (error, items) => console.log(error, items));
-
-                        // app.model.fwSinhVien.get({ mssv: '1611695' }, (error, sinhVien) => {
-                        //     if (sinhVien) {
-                        //         app.model.svBanCanSuLop.getAll({ tenLop: sinhVien.lop }, '*', 'namHoc DESC', (error, banCanSuLops) => {
-                        //             if (banCanSuLops && banCanSuLops.length) {
-                        //                 const namHoc = banCanSuLops[0].namHoc;
-                        //             }
-                        //         });
-                        //     }
-                        // });
-                    }, 1000);
                 }
                 getConnection(index + 1);
             }).catch(error => {
