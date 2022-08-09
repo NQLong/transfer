@@ -38,9 +38,12 @@ class LanguageSwitch extends React.Component {
         let newPathname = pathname;
         languages.forEach(language => {
             if (pathname.endsWith('/' + language)) {
-                newPathname = newPathname.substring(0, newPathname.length - 3);
+                newPathname = pathname.substring(0, pathname.length - 3);
+            } else if (pathname.includes('/' + language + '/')) {
+                newPathname = pathname.substring(0, pathname.indexOf('/' + language + '/'));
             }
         });
+
         if (keyCode != 'vi') newPathname += (pathname == '/' ? '' : '/') + keyCode;
         if (newPathname == '') newPathname = '/';
         this.props.homeMenuGet(newPathname, data => {

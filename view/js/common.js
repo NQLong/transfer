@@ -9,7 +9,8 @@ const T = {
         document.title = title && title != '' ? `${document.notification || ''} ${title} | USSH-VNUHCM` : 'USSH-VNUHCM';
     },
     FileSaver,
-    rootUrl: window.location.protocol + '//' + window.location.hostname, // rootUrl: 'https://hcmussh.edu.vn',
+    // rootUrl: window.location.protocol + '//' + window.location.hostname, // rootUrl: 'https://hcmussh.edu.vn',
+    rootUrl: window.location.origin,
     sexes: ['Nam', 'Nữ'],
     component: { '<empty>': null },
     pageTypes: [
@@ -427,6 +428,12 @@ T.language = texts => {
         lg = 'en';
     } else if (lang && languages.includes(lang.toLowerCase())) {
         lg = lang.toLowerCase();
+    } else {
+        for (let _lang of languages) {
+            if (pathname.includes('/' + _lang + '/') || pathname.endsWith('/' + _lang)) {
+                lg = _lang;
+            }
+        }
     }
 
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
