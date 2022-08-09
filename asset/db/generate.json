@@ -13835,7 +13835,8 @@
                 "TC_HOC_PHI_GET_INVOICE_INFO": "getInvoiceInfo",
                 "TC_HOC_PHI_GET_INVOICE_LIST": "getInvoiceList",
                 "TC_HOC_PHI_STATISTIC": "getStatistic",
-                "TC_HOC_PHI_GET_DETAIL": "getDetail"
+                "TC_HOC_PHI_GET_DETAIL": "getDetail",
+                "TC_HOC_PHI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "MSSV": {
@@ -16119,9 +16120,12 @@
             "active": true,
             "moduleName": "tcDinhMucHocPhi",
             "modelName": "tcDinhMucHocPhi",
+            "methods": {
+                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
-                "NAM_HOC": {
-                    "value": "namHoc",
+                "NAM_BAT_DAU": {
+                    "value": "namBatDau",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -16161,9 +16165,18 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_156781\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "NAM_KET_THUC": {
+                    "value": "namKetThuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
                 }
             },
-            "primaryKeys": [],
+            "primaryKeys": [
+                "MA"
+            ],
             "foreignKeys": [],
             "type": "table"
         }

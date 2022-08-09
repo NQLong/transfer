@@ -93,7 +93,7 @@ module.exports = app => {
                 ws.getRow(index + 2).font = { name: 'Times New Roman' };
                 ws.getCell('A' + (index + 2)).value = index + 1;
                 ws.getCell('B' + (index + 2)).value = item.mssv;
-                ws.getCell('C' + (index + 2)).value = `${item.ho.toUpperCase()} ${item.ten.toUpperCase()}`.trim();
+                ws.getCell('C' + (index + 2)).value = `${item.ho?.toUpperCase() || ''} ${item.ten?.toUpperCase() || ''}`.trim();
                 ws.getCell('D' + (index + 2)).value = ngayDong ? app.date.dateTimeFormat(ngayDong, 'dd/mm/yyyy') : '';
                 ws.getCell('E' + (index + 2)).value = item.khoanDong.toString().numberDisplay();
                 ws.getCell('F' + (index + 2)).value = `${item.nganHang}/${ngayDong ? `${('0' + (ngayDong.getMonth() + 1)).slice(-2)}${ngayDong.getFullYear().toString().slice(-2)}` : ''}`;
