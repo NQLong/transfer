@@ -5,14 +5,14 @@ module.exports = app => {
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            505: { title: 'Yêu cầu tạo khóa', link: '/user/hcth/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c' },
+            505: { title: 'Yêu cầu tạo chữ ký', link: '/user/hcth/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c' },
         },
     };
 
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1057: { title: 'Yêu cầu tạo khóa', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
+            1057: { title: 'Tạo khoá', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
         },
     };
 
@@ -256,4 +256,74 @@ module.exports = app => {
         await app.model.hcthYeuCauTaoKhoa.update({ id: request.id }, { trangThai: trangThaiRequest.TU_CHOI.id, capNhatBoi: shcc, ngayCapNhat: new Date().getTime() });
         //TODO: send notification
     };
+
+    app.post('/api/hcth/chu-ky', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const { shcc, dataUrl } = req.body;
+
+            if (!app.fs.existsSync(
+                app.path.join(app.assetPath, 'key')
+            )) {
+                app.createFolder(app.path.join(app.assetPath, 'key'));
+            }
+
+            const destPath = app.path.join(app.assetPath, 'key', `${shcc}.png`);
+            console.log(destPath);
+
+            const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+
+            app.fs.writeFileSync(destPath, base64Data, 'base64');
+
+            let item = await app.model.hcthChuKy.get({ shcc });
+
+            if (!item) item = await app.model.hcthChuKy.create({ shcc, ngayTao: Date.now() });
+
+            res.send({ item, error: null });
+
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.uploadHooks.add('hcthSignatureFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthSignatureFile(req, fields, files, params, done), done, 'staff:login'));
+
+    const hcthSignatureFile = (req, fields, files, params, done) => {
+            if (
+                fields.userData &&
+                fields.userData[0] &&
+                fields.userData[0].startsWith('hcthSignatureFile') &&
+                files.hcthSignatureFile &&
+                files.hcthSignatureFile.length > 0) {
+                    const srcPath = files.hcthSignatureFile[0].path,
+                        validUploadFileType = ['.png', '.jpg', '.jpeg'],
+                        baseNamePath = app.path.extname(srcPath);
+                    if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                        done && done({ error: 'Định dạng tập tin không hợp lệ!' });
+                        app.deleteFile(srcPath);
+                    } else {
+                        done && done({ item: files.hcthSignatureFile[0] });
+                    }
+            }
+        };
+    
+    app.get('/api/hcth/chu-ky', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+        try {
+            const shcc = req.session.user.shcc;
+            const signature = await app.model.hcthChuKy.get({ shcc });
+            if (signature) {
+                res.send({ item: signature });
+            } else {
+                res.send({ item: {} });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), (req, res) => {
+        const shcc = req.session.user.shcc;
+        const dir = app.path.join(app.assetPath, '/key');
+        return res.sendFile(app.path.join(dir, `${shcc}.png`));
+    });
 };

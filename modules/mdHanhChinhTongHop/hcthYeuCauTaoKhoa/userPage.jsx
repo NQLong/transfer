@@ -2,7 +2,9 @@ import React from 'react';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { connect } from 'react-redux';
 import { createRequest, getUserRequest, getKey, downloadKey } from './redux';
+import { DrawSignatureModal } from './components';
 const { trangThaiRequest } = require('../constant');
+import { createSignatureImg, getSignature } from './redux';
 class CreateModal extends AdminModal {
 
     onShow = () => {
@@ -74,6 +76,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
         T.ready(this.pageConfig.ready, () => {
             this.props.getUserRequest(0, 100);
             this.props.getKey();
+            this.props.getSignature();
         });
     }
 
@@ -140,6 +143,34 @@ export class UserYeuCauTaoKhoa extends AdminPage {
         }
     });
 
+    renderSignatureTable = () => renderTable({
+        getDataSource: () => {
+            const signature = this.props.hcthYeuCauTaoKhoa?.signature;
+            if (signature) return [signature];
+            else return [];
+        },
+        loadingOverlay: false,
+        emptyTable: 'Chưa có chữ ký',
+        renderHead: () => <tr>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>#</th>
+            <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chữ ký</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày tạo</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
+        </tr>,
+        renderRow: (item, index) => {
+            const
+                linkFile = '/api/hcth/chu-ky/download';
+            return <tr key={item.id}>
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.R || index + 1} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
+                    <a href={linkFile} download={`${item.shcc}.png`}>{item.shcc}.png</a>
+                </>} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ngayTao && T.dateToText(new Date(item.ngayTao), 'HH:MM dd/mm/yyyy')} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={<></>} />
+            </tr>;
+        }
+    });
+
     pageConfig = {
         title: 'Yêu cầu tạo khóa',
         ready: '/user',
@@ -152,9 +183,16 @@ export class UserYeuCauTaoKhoa extends AdminPage {
         });
     }
 
+    onShowDrawModal = () => {
+        this.drawSignatureModal.show();
+    }
 
     render() {
         const permissions = this.getCurrentPermissions();
+        const buttons = [];
+
+        buttons.push({ className: 'btn-success', icon: 'fa-pencil', onClick: this.onShowDrawModal });
+
         return this.renderPage({
             title: this.pageConfig.title,
             icon: this.pageConfig.icon,
@@ -171,14 +209,22 @@ export class UserYeuCauTaoKhoa extends AdminPage {
                         {this.renderTable({})}
                     </div>
                 </div>
+                <div className='tile row'>
+                    <h3 className='tile-header'>Chữ kí của bạn</h3>
+                    <div className='tile-body col-md-12'>
+                        {this.renderSignatureTable({})}
+                    </div>
+                </div> 
                 <CreateModal ref={e => this.modal = e} create={this.props.createRequest} />
                 <DownloadModal ref={e => this.downloadModal = e} download={(data, done) => this.onDownloadKey(data, done)} />
+                <DrawSignatureModal ref={e => this.drawSignatureModal = e} {...this.props} shcc={this.props?.system?.user?.shcc} />
             </>,
-            onCreate: permissions.some(item => ['rectors:login', 'persident:login', 'manager:write'].includes(item)) ? () => this.modal.show() : null
+            onCreate: permissions.some(item => ['rectors:login', 'persident:login', 'manager:write'].includes(item)) ? () => this.modal.show() : null,
+            buttons
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, hcthYeuCauTaoKhoa: state.hcth.hcthYeuCauTaoKhoa });
-const mapActionsToProps = { createRequest, getUserRequest, getKey, downloadKey };
+const mapStateToProps = state => ({ system: state.system, hcthYeuCauTaoKhoa: state.hcth.hcthYeuCauTaoKhoa, hcthChuKy: state.hcth.hcthChuKy });
+const mapActionsToProps = { createRequest, getUserRequest, getKey, downloadKey, createSignatureImg, getSignature };
 export default connect(mapStateToProps, mapActionsToProps)(UserYeuCauTaoKhoa);
