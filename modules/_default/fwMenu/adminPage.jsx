@@ -3,116 +3,79 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getAll, createMenu, updateMenuPriorities, updateMenu, deleteMenu, buildMenu } from './redux';
 import { getAllSubMenu, createSubMenu, updateSubMenu, deleteSubMenu, swapSubMenu } from './reduxSubMenu';
+import { getDmNgonNguAll } from 'modules/mdDanhMuc/dmNgonNguTruyenThong/redux';
 import { getHeader, updateHeader } from './reduxHeader';
-import ImageBox from 'view/component/ImageBox';
+import { AdminModal, AdminPage, FormCheckbox, FormImageBox, FormTextBox } from 'view/component/AdminPage';
+import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
 
-class EditModal extends React.Component {
-    modal = React.createRef();
-    state = {
-        active: false,
-        highlight: false
-    };
+class EditModal extends AdminModal {
+    state = { menu: null, languages: [] };
 
-    show = menu => {
-        let { title, link, active, highlight, id } = menu || { title: '{ "vi": "", "en": "" }', link: '', active: false, highlight: false, id: '' };
-
-        $('#submenuViTitle').val(JSON.parse(title).vi);
-        $('#submenuEnTitle').val(JSON.parse(title).en);
-        $('#submenuLink').val(link);
-        this.setState({ active: !!active, highlight: !!highlight });
-
-        $(this.modal.current).find('.modal-title').html(menu ? 'Cập nhật menu phụ' : 'Tạo mới menu phụ');
-        $(this.modal.current).data('data-id', id).modal('show');
+    componentDidMount() {
+        this.props.getDmNgonNguAll({}, languages => {
+            this.setState({ languages: languages.map(item => item.maCode) });
+        });
     }
 
-    save = e => {
-        e.preventDefault();
-        const id = $(this.modal.current).data('data-id'),
-            changes = {
-                title: JSON.stringify({ vi: $('#submenuViTitle').val(), en: $('#submenuEnTitle').val() }),
-                link: $('#submenuLink').val().trim(),
-                active: this.state.active ? 1 : 0,
-                highlight: this.state.highlight ? 1 : 0
-            };
+    onShow = menu => {
+        let { title, link, active, highlight } = menu || { title: '{ "vi": "", "en": "" }', link: '', active: false, highlight: false, id: '' };
+        this.submenuTitle.value(title);
+        this.submenuLink.value(link);
+        this.submenuActive.value(active);
+        this.submenuHighlight.value(highlight);
+        this.setState({ menu });
+    }
 
-        if (id) {
-            this.props.update(id, changes);
+    onSubmit = () => {
+        const changes = {
+            title: this.submenuTitle.value(),
+            link: this.submenuLink.value(),
+            active: Number(this.submenuActive.value()),
+            highlight: Number(this.submenuHighlight.value())
+        };
+
+        if (this.state.menu && this.state.menu.id) {
+            this.props.update(this.state.menu.id, changes);
         } else {
             this.props.create(changes);
         }
-
-        $(this.modal.current).modal('hide');
+        this.hide();
     }
 
-    render() {
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document'>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'></h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body row'>
-                            <div className='form-group col-12'>
-                                <label htmlFor='submenuViTitle'>Tiêu đề (VI)</label>
-                                <input type='text' className='form-control' id='submenuViTitle' placeholder='Tiêu đề (VI)' />
-                            </div>
-                            <div className='form-group col-12'>
-                                <label htmlFor='submenuEnTitle'>Tiêu đề (EN)</label>
-                                <input type='text' className='form-control' id='submenuEnTitle' placeholder='Tiêu đề (EN)' />
-                            </div>
-                            <div className='form-group col-12'>
-                                <label htmlFor='submenuLink'>Link</label>
-                                <input type='text' className='form-control' id='submenuLink' placeholder='Link' />
-                            </div>
-                            <div className='form-group col-12 row'>
-                                <div className='col-6 d-flex'>
-                                    <label className='control-label'>Kích hoạt: &nbsp;</label>
-                                    <div className='toggle'>
-                                        <label>
-                                            <input type='checkbox' id='submenuActive' checked={this.state.active} onChange={e => this.props.hasCreate && this.setState({ active: e.target.checked })} />
-                                            <span className='button-indecator' />
-                                        </label>
-                                    </div>
-                                </div>
-                                <div className='col-6 d-flex'>
-                                    <label className='control-label'>Nổi bật: &nbsp;</label>
-                                    <div className='toggle'>
-                                        <label>
-                                            <input type='checkbox' id='highlight' checked={this.state.highlight} onChange={e => this.props.hasCreate && this.setState({ highlight: e.target.checked })} />
-                                            <span className='button-indecator' />
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            <button type='submit' className='btn btn-success' onClick={e => this.save(e)}>Lưu</button>
+    render = () => {
+        return this.renderModal({
+            title: this.state.menu ? 'Cập nhật menu phụ' : 'Tạo mới menu phụ',
+            size: 'large',
+            body: <>
+                <FormMultipleLanguage ref={e => this.submenuTitle = e} gridClassName='col-6' languages={this.state.languages} FormElement={FormTextBox} title='Tiêu đề' />
+                <div className='row'>
+                    <FormTextBox ref={e => this.submenuLink = e} className='col-6' label='Link' />
+                    <div className='col-6'>
+                        <label>&nbsp;</label>
+                        <div className='row'>
+                            <FormCheckbox ref={e => this.submenuActive = e} className='col-6' label='Kích hoạt' />
+                            <FormCheckbox ref={e => this.submenuHighlight = e} className='col-6' label='Nổi bật' />
                         </div>
                     </div>
-                </form>
-            </div>
-        );
+                </div>
+            </>
+        });
     }
 }
 
-class MenuPage extends React.Component {
-    modal = React.createRef();
-    imageBox = React.createRef();
+class MenuPage extends AdminPage {
     state = { isShowHeaderTitle: false };
+
     componentDidMount() {
         this.props.getAll();
         this.getAllSubMenu();
         this.props.getHeader(data => {
-            $('#headerViTitle').val(data.headerTitle ? JSON.parse(data.headerTitle).vi : '');
-            $('#headerEnTitle').val(data.headerTitle ? JSON.parse(data.headerTitle).en : '');
-            $('#headerLink').val(data.headerLink || 'a');
-            this.setState({ isShowHeaderTitle: data.isShowHeaderTitle == '1' ? true : false });
+            this.headerViTitle.value(data.headerTitle ? JSON.parse(data.headerTitle).vi : '');
+            this.headerEnTitle.value(data.headerTitle ? JSON.parse(data.headerTitle).en : '');
+            this.headerLink.value(data.headerLink || 'a');
+            this.setState({ isShowHeaderTitle: data.isShowHeaderTitle == '1' });
         });
+
         T.ready(('/user/truyen-thong'), () => {
             $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
             $('.menuList').disableSelection();
@@ -127,6 +90,7 @@ class MenuPage extends React.Component {
             $('.menuSub').disableSelection();
         });
     }
+
     getAllSubMenu = () => {
         this.props.getAllSubMenu(data => {
             let maxPrioritySubmenu = 0;
@@ -196,19 +160,20 @@ class MenuPage extends React.Component {
 
     showSubMenu = (e, menu) => {
         e.preventDefault();
-        this.modal.current.show(menu);
+        this.modal.show(menu);
     }
 
     saveHeader = () => {
-        let titleVi = $('#headerViTitle').val();
-        let titleEn = $('#headerEnTitle').val();
-        let link = $('#headerLink').val();
+        let titleVi = this.headerViTitle.value();
+        let titleEn = this.headerEnTitle.value();
+        let link = this.headerLink.value();
+
         if (!titleVi) {
-            $('#headerViTitle').focus();
+            this.headerViTitle.focus();
         } else if (!titleEn) {
-            $('#headerEnTitle').focus();
+            this.headerEnTitle.focus();
         } else if (!link) {
-            $('#headerLink').focus();
+            this.headerLink.focus();
         } else {
             const payload = {
                 headerTitle: JSON.stringify({ vi: titleVi, en: titleEn }),
@@ -226,7 +191,7 @@ class MenuPage extends React.Component {
                     <Link to={'/user/menu/edit/' + menu.id} style={{ color: menu.active ? '#009688' : 'gray' }}>
                         {T.language.parse(menu.title, true).vi}
                     </Link>&nbsp;
-                    {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel="noreferrer">{menu.link}</a>)</p> : null}
+                    {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel='noreferrer'>{menu.link}</a>)</p> : null}
                 </div>
                 <div className='buttons btn-group btn-group-sm'>
                     {hasCreate && level == 0 ?
@@ -254,24 +219,21 @@ class MenuPage extends React.Component {
         </li>);
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('menu:write'),
-            permissionDelete = currentPermissions.includes('menu:delete');
+        const permission = this.getUserPermission('menu');
+        const componentPermission = this.getUserPermission('component', ['read']);
         const { header } = this.props.system ? this.props.system : { header: '' };
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-user' /> Menu</h1>
-                </div>
-
+        return this.renderPage({
+            icon: 'fa fa-bars',
+            title: 'Menu',
+            content: <>
                 <div className='row'>
                     <div className='col-6'>
                         <div className='tile'>
                             <h3>Menu chính</h3>
                             <ul id='menuMain' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0 }}>
-                                {(this.props.menu ? this.props.menu : []).map(menu => this.renderMenu(menu, 0, permissionWrite, permissionWrite, permissionDelete))}
+                                {(this.props.menu ? this.props.menu : []).map(menu => this.renderMenu(menu, 0, permission.write, permission.write, permission.delete))}
                             </ul>
-                            {permissionWrite ?
+                            {permission.write ?
                                 <div className='tile-footer text-right'>
                                     <button type='button' className='btn btn-primary' onClick={this.create}>
                                         <i className='fa fa-fw fa-lg fa-plus' />Tạo mới
@@ -291,7 +253,7 @@ class MenuPage extends React.Component {
                                                 <a href='#' onClick={(e) => this.showSubMenu(e, menu)} style={{ color: menu.active ? '#009688' : 'gray' }}>
                                                     {T.language.parse(menu.title)}
                                                 </a>&nbsp;
-                                                {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel="noreferrer">{menu.link}</a>)</p> : null}
+                                                {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel='noreferrer'>{menu.link}</a>)</p> : null}
                                             </div>
                                             <div className='buttons btn-group btn-group-sm'>
                                                 <a href='#' className={menu.active ? 'btn btn-warning' : 'btn btn-secondary'} onClick={e => this.changeSubMenuActive(e, menu)}>
@@ -300,7 +262,7 @@ class MenuPage extends React.Component {
                                                 <a href='#' onClick={(e) => this.showSubMenu(e, menu)} className='btn btn-primary'>
                                                     <i className='fa fa-lg fa-edit' />
                                                 </a>
-                                                {permissionDelete ?
+                                                {permission.delete ?
                                                     <a className='btn btn-danger' href='#' onClick={e => this.deleteSubMenu(e, menu)}>
                                                         <i className='fa fa-lg fa-trash' />
                                                     </a> : null}
@@ -309,7 +271,7 @@ class MenuPage extends React.Component {
                                     </li>
                                 ))}
                             </ul>
-                            {permissionWrite ?
+                            {permission.write ?
                                 <div className='tile-footer text-right'>
                                     <button type='button' className='btn btn-primary' onClick={e => this.showSubMenu(e)}>
                                         <i className='fa fa-fw fa-lg fa-plus' />Tạo mới
@@ -319,10 +281,7 @@ class MenuPage extends React.Component {
 
                         <div className='tile'>
                             <h3>Menu Header</h3>
-                            <div className='form-group'>
-                                <label>Hình ảnh</label>
-                                <ImageBox ref={this.imageBox} postUrl='/user/upload' uploadType='SettingImage' userData='header' image={header} />
-                            </div>
+                            <FormImageBox ref={e => this.imageBox = e} label='Hình ảnh' postUrl='/user/upload' uploadType='SettingImage' userData='header' image={header} />
                             <div className='form-group d-flex'>
                                 <label className='control-label'>Kích hoạt tiêu đề góc phải hình ảnh: &nbsp;</label>
                                 <div className='toggle'>
@@ -332,19 +291,10 @@ class MenuPage extends React.Component {
                                     </label>
                                 </div>
                             </div>
-                            <div style={{ display: this.state.isShowHeaderTitle ? 'block' : 'none' }}>
-                                <div className='form-group'>
-                                    <label htmlFor='headerViTitle'>Tiêu đề (VI)</label>
-                                    <input type='text' id='headerViTitle' className='form-control' />
-                                </div>
-                                <div className='form-group'>
-                                    <label htmlFor='headerEnTitle'>Tiêu đề (EN)</label>
-                                    <input type='text' id='headerEnTitle' className='form-control' />
-                                </div>
-                                <div className='form-group'>
-                                    <label htmlFor='headerLink'>Link</label>
-                                    <input type='text' id='headerLink' className='form-control' />
-                                </div>
+                            <div style={{ display: this.state.isShowHeaderTitle ? '' : 'none' }}>
+                                <FormTextBox ref={e => this.headerViTitle = e} label='Tiêu đề (VI)' />
+                                <FormTextBox ref={e => this.headerEnTitle = e} label='Tiêu đề (EN)' />
+                                <FormTextBox ref={e => this.headerLink = e} label='Link' />
                             </div>
                             <div className='tile-footer text-right'>
                                 <button type='button' className='btn btn-success' onClick={this.saveHeader}>
@@ -359,17 +309,16 @@ class MenuPage extends React.Component {
                     <i className='fa fa-lg fa-refresh' />
                 </button>
 
-                {currentPermissions.includes('component:read') ?
-                    <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: 10, bottom: 10 }}
-                        onClick={() => this.props.history.push('/user/component')}>
+                {componentPermission.read ?
+                    <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: 10, bottom: 10 }} onClick={() => this.props.history.push('/user/component')}>
                         <i className='fa fa-lg fa-cogs' />
                     </button> : null}
-                <EditModal ref={this.modal} create={this.createSubMenu} update={this.props.updateSubMenu} delete={this.props.deleteSubMenu} hasCreate={permissionWrite} hasUpdate={permissionWrite} hasDelete={permissionDelete} />
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} create={this.createSubMenu} update={this.props.updateSubMenu} delete={this.props.deleteSubMenu} hasCreate={permission.write} hasUpdate={permission.write} hasDelete={permission.delete} getDmNgonNguAll={this.props.getDmNgonNguAll} />
+            </>
+        });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, menu: state.menu, submenu: state.submenu });
-const mapActionsToProps = { getAll, createMenu, updateMenuPriorities, updateMenu, deleteMenu, buildMenu, getAllSubMenu, createSubMenu, updateSubMenu, deleteSubMenu, getHeader, updateHeader, swapSubMenu };
+const mapActionsToProps = { getAll, createMenu, updateMenuPriorities, updateMenu, deleteMenu, buildMenu, getAllSubMenu, createSubMenu, updateSubMenu, deleteSubMenu, getHeader, updateHeader, swapSubMenu, getDmNgonNguAll };
 export default connect(mapStateToProps, mapActionsToProps)(MenuPage);

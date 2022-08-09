@@ -19,12 +19,8 @@ module.exports = app => {
     app.get('/user/feature/edit/:id', app.permission.check('component:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.post('/api/menu/component', app.permission.check('staff:login'), (req, res) => {
-        const permissions = req.session.user.permissions,
-            valid = permissions.includes('component:write') || permissions.includes('news:tuyensinh')
-                || permissions.includes('website:write');
-
-        if (valid) app.model.fwComponent.get({ id: req.body.parentId }, (error, parent) => {
+    app.post('/api/menu/component', app.permission.orCheck('component:write', 'news:tuyensinh', 'website:write'), (req, res) => {
+        app.model.fwComponent.get({ id: req.body.parentId }, (error, parent) => {
             if (error || parent == null) {
                 res.send({ error: 'Id không chính xác!' });
             } else {
@@ -56,52 +52,37 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/menu/component', app.permission.check('staff:login'), (req, res) => {
-        const permissions = req.session.user.permissions,
-            valid = permissions.includes('component:write') || permissions.includes('news:tuyensinh')
-                || permissions.includes('website:write');
-        if (valid) app.model.fwComponent.update({ id: req.body.id }, req.body.changes, error => {
+    app.put('/api/menu/component', app.permission.orCheck('component:write', 'news:tuyensinh', 'website:write'), (req, res) => {
+        app.model.fwComponent.update({ id: req.body.id }, req.body.changes, error => {
             if (error == null) app.buildAppMenus();
             res.send({ error });
         });
     });
 
-    app.put('/api/menu/component/priorities', app.permission.check('staff:login'), (req, res) => {
-        const permissions = req.session.user.permissions,
-            valid = permissions.includes('component:write') || permissions.includes('news:tuyensinh')
-                || permissions.includes('website:write');
-        if (valid) {
-            let error = null;
-            const updateOneChange = (index) => {
-                if (index < req.body.changes.length) {
-                    const item = req.body.changes[index];
-                    if (item) {
-                        app.model.fwComponent.update({ id: item.id }, { priority: item.priority }, err => {
-                            if (err) error = err;
-                            updateOneChange(index + 1);
-                        });
-                    }
-                } else {
-                    if (error == null) app.buildAppMenus();
-                    res.send({ error });
+    app.put('/api/menu/component/priorities', app.permission.orCheck('component:write', 'news:tuyensinh', 'website:write'), (req, res) => {
+        let error = null;
+        const updateOneChange = (index) => {
+            if (index < req.body.changes.length) {
+                const item = req.body.changes[index];
+                if (item) {
+                    app.model.fwComponent.update({ id: item.id }, { priority: item.priority }, err => {
+                        if (err) error = err;
+                        updateOneChange(index + 1);
+                    });
                 }
-            };
-            updateOneChange(0);
-        }
-
-    });
-
-    app.delete('/api/menu/component', app.permission.check('staff:login'), (req, res) => {
-        const permissions = req.session.user.permissions,
-            valid = permissions.includes('component:write') || permissions.includes('news:tuyensinh')
-                || permissions.includes('website:write');
-        if (valid) {
-            app.model.fwComponent.deleteComponent(req.body.id, error => {
+            } else {
                 if (error == null) app.buildAppMenus();
                 res.send({ error });
-            });
-        }
+            }
+        };
+        updateOneChange(0);
+    });
 
+    app.delete('/api/menu/component', app.permission.orCheck('component:write', 'news:tuyensinh', 'website:write'), (req, res) => {
+        app.model.fwComponent.deleteComponent(req.body.id, error => {
+            if (error == null) app.buildAppMenus();
+            res.send({ error });
+        });
     });
 
     app.get('/api/menu/component/type/:pageType', app.permission.check('component:read'), (req, res) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTcSettingAll, updateTcSetting, deleteTcSetting } from './redux';
-import { AdminPage, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormTextBox, FormSelect } from 'view/component/AdminPage';
 
 class AdminSettingsPage extends AdminPage {
     componentDidMount() {
@@ -37,7 +37,7 @@ class AdminSettingsPage extends AdminPage {
             T.notify('Mật khẩu xác nhận không khớp', 'danger');
             this.matKhauMeinvoice.focus();
         } else {
-            this.props.updateTcSetting({ 'matKhauMeinvoice': matKhau }, ()=>{
+            this.props.updateTcSetting({ 'matKhauMeinvoice': matKhau }, () => {
                 this.matKhauMeinvoice.clear();
                 this.xacNhanMatKhauMeInvoice.clear();
             });
@@ -132,9 +132,10 @@ class AdminSettingsPage extends AdminPage {
                             <FormTextBox className='col-md-12' label='Mã số thuế' ref={e => this.meinvoiceMaSoThue = e} />
                             <FormTextBox className='col-md-12' label='Tài khoản' ref={e => this.meinvoiceUsername = e} />
                             <FormTextBox className='col-md-12' label='Meinvoice url' ref={e => this.meinvoiceUrl = e} />
+                            <FormSelect className='col-md-12' ref={e => this.meinvoiceMauHoaDon = e} label='Mẫu hóa đơn' data={['2C22TCH', '2C22TDH']} readOnly={readOnly} />
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <button className='btn btn-success' type='button' onClick={() => this.save('meinvoiceAppId', 'meinvoiceMaSoThue', 'meinvoiceUsername', 'meinvoiceUrl')}>
+                            <button className='btn btn-success' type='button' onClick={() => this.save('meinvoiceAppId', 'meinvoiceMaSoThue', 'meinvoiceUsername', 'meinvoiceUrl', 'meinvoiceMauHoaDon')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                             </button>
                         </div>

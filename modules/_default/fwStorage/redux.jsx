@@ -166,11 +166,9 @@ export const SelectAdapter_FwStorage = {
         results: response && response.page && response.page.list ?
             response.page.list.map(item => ({ id: item.id, text: `${item.nameDisplay}` })) : []
     }),
+    fetchOne: (id, done) => getStorageItem(id, response => done && done({ id: response.item.id, text: `${response.item.nameDisplay}` }))(),
     getOne: getStorageItem,
-    processResultOne: response => ({
-        value: response.item.id,
-        text: `${response.item.nameDisplay}`
-    }),
+    processResultOne: response => ({ value: response.item.id, text: `${response.item.nameDisplay}` })
 };
 
 export function getStorageItem(id, done) {

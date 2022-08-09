@@ -69,8 +69,7 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.dtDanhSachChuyenNganh && this.props.dtDanhSachChuyenNganh.page ? this.props.dtDanhSachChuyenNganh.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
-        const donVi = this.donViFilter.value(),
-            nam = this.nam.value();
+        const donVi = this.donViFilter.value(), nam = this.nam.value();
         const pageFilter = (isInitial) ? {} : { nam, donVi };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, () => {

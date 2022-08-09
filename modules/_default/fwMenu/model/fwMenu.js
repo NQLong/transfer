@@ -1,6 +1,7 @@
 module.exports = app => {
-    const queryMenuTree = (mainCondition, done) => {
-        app.model.fwMenu.getAll(mainCondition, '*', 'priority ASC', (error, items) => {
+    const queryMenuTree = async (mainCondition) => {
+        try {
+            let items = await app.model.fwMenu.getAll(mainCondition, '*', 'priority ASC');
             if (items && items.length) {
                 const queryItems = condition => {
                     const remainItems = items.filter(item => !condition(item));
@@ -23,25 +24,28 @@ module.exports = app => {
                     }
                     parentMenu.submenus = submenus;
                 }
-
-                done(error, parentMenus);
+                return parentMenus;
             } else {
-                done(error, []);
+                return [];
             }
-        });
+        } catch (e) {
+            return [];
+        }
     };
 
-    app.model.fwMenu.getMenuTree = (done) => queryMenuTree({}, done);
+    app.model.fwMenu.getMenuTree = async () => {
+        return await queryMenuTree({});
+    };
 
-    app.model.fwMenu.getDivisionMenuTree = (maDonVi, maWebsite, done) => {
+    app.model.fwMenu.getDivisionMenuTree = async (maDonVi, maWebsite) => {
         const condition = { maDonVi };
         if (maWebsite) condition.maWebsite = maWebsite;
-        queryMenuTree(condition, done);
+        return await queryMenuTree(condition);
     };
 
-    app.model.fwMenu.homeGetDivisionMenuTree = (maDonVi, maWebsite, done) => {
+    app.model.fwMenu.homeGetDivisionMenuTree = async (maDonVi, maWebsite) => {
         const condition = { maDonVi, active: 1 };
         if (maWebsite) condition.maWebsite = maWebsite;
-        queryMenuTree(condition, done);
+        return await queryMenuTree(condition);
     };
 };

@@ -99,7 +99,7 @@ class InvoiceModal extends AdminModal {
 
 class InvoiceResultModal extends AdminModal {
     onShow = (data) => {
-        this.tongHoaDon.value(data.totalInvoice || '');
+        this.tongHoaDon.value(data.totalInvoice.toString());
         this.thanhCong.value(`${data.success}/${data.totalInvoice}` || '');
     }
 

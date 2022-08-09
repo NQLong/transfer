@@ -556,8 +556,6 @@ module.exports = app => {
         } catch (error) {
             res.send({ error });
         }
-
-
     });
 
 };

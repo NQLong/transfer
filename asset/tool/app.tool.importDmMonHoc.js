@@ -6,8 +6,8 @@ const app = {
     isDebug: !path.join(__dirname, '../../').startsWith('/var/www/'),
     fs: require('fs'), path,
     database: {},
-    publicPath: path.join(__dirname, appConfig.path.public),
-    modulesPath: path.join(__dirname, '../../' + appConfig.path.modules)
+    publicPath: path.join(__dirname, 'public'),
+    modulesPath: path.join(__dirname, '../../modules')
 };
 
 if (!app.isDebug) appConfig = Object.assign({}, appConfig, require('../../asset/config.json'));
