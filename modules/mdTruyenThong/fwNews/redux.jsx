@@ -192,10 +192,14 @@ export function draftToNews(draftNewsId, done) {
     };
 }
 
-export function createNews(done) {
+export function createNews(maDonVi, done) {
+    if (typeof maDonVi == 'function') {
+        done = maDonVi;
+        maDonVi = null;
+    }
     return () => {
         const url = '/api/news/default';
-        T.post(url, data => {
+        T.post(url, { maDonVi }, data => {
             if (data.error) {
                 T.notify('Tạo tin tức bị lỗi!', 'danger');
                 console.error('POST: ' + url + '.', data.error);

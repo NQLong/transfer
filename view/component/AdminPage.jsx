@@ -779,14 +779,14 @@ export class FormDatePicker extends React.Component {
     }
 
     render() {
-        let { label = '', type = 'date', className = '', readOnly = false, required = false, style = {}, readOnlyEmptyText = '', placeholder = '' } = this.props; // type = date || time || date-mask || time-mask || month-mask
+        let { label = '', type = 'date', className = '', readOnly = false, required = false, style = {}, readOnlyEmptyText = '', placeholder = '', disabled = false } = this.props; // type = date || time || date-mask || time-mask || month-mask
         return (
             <div className={'form-group ' + (className || '')} style={style}>
                 {label && <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>}{readOnly && this.state.value ? <> {label && ':'} <b>{this.state.readOnlyText}</b></> : readOnly && readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
                 {(type.endsWith('-mask') || type == 'date-month') ? (
                     <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[089]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
                 ) : (
-                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: placeholder || label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
+                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat={type == 'dd/mm' ? 'DD/MM' : 'DD/MM/YYYY'} inputProps={{ placeholder: placeholder || label, ref: e => this.inputRef = e, readOnly: readOnly, disabled, style: { display: readOnly ? 'none' : '' } }} value={this.state.value} onChange={e => this.handleChange(e)} closeOnSelect={true} />
                 )}
             </div>);
     }
@@ -875,10 +875,14 @@ export class CirclePageButton extends React.Component {
         } else if (type == 'custom') {
             result = <button {...properties} className={'btn btn-circle ' + customClassName}><i className={'fa fa-lg ' + customIcon} /></button>;
         } else {
-            result = (
-                <Link to={to} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>);
+            if (typeof to == 'string') {
+                result = (
+                    <Link to={to} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }}>
+                        <i className='fa fa-lg fa-reply' />
+                    </Link>);
+            } else {
+                result = <button style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }} onClick={to} className='btn btn-circle btn-secondary'><i className='fa fa-lg fa-reply' /></button>;
+            }
         }
         return tooltip ?
             <Tooltip title={tooltip} arrow placement='top'>{result}</Tooltip> :
@@ -1012,10 +1016,13 @@ export class AdminPage extends React.Component {
         }
         if (buttons) {
             if (Array.isArray(buttons)) {
-                customButtons = buttons.map((item, index) => {
-                    right += 60;
-                    return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;
-                });
+                if (buttons.length)
+                    customButtons = buttons.map((item, index) => {
+                        if (item) {
+                            right += 60;
+                            return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} tooltip={item.tooltip} />;
+                        }
+                    });
             }
             else {
                 customButtons = <CirclePageButton type='custom' customClassName={buttons.className} customIcon={buttons.icon} onClick={buttons.onClick} style={{ right: right }} />;

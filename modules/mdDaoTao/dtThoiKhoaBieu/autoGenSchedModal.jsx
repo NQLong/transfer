@@ -22,7 +22,10 @@ class AutoGenModal extends AdminModal {
         else this.setState({ isLoading: true }, () => {
             this.props.initSchedule(data, (result) => {
                 result && this.setState({ isLoading: false });
-                if (result.error) T.notify(result.error, 'danger');
+                if (result.error) {
+                    T.notify(result.error.message, 'danger');
+                    console.error(result.error);
+                }
                 else T.notify(result.success, 'success');
                 this.hide();
             });

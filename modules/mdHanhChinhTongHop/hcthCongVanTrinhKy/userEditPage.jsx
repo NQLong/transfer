@@ -36,7 +36,7 @@ class AdminEditPage extends AdminPage {
             return <>
                 <div className='tile row'>
                     <div className='form-group'>
-                        <span style={{ fontWeight: 'bold' }}>Số công văn: </span> <Link to={`/user/cong-van-cac-phong/${item.congVan}`} target='_blank' rel='noopener noreferrer' >{congVanKy?.soCongVan || 'Chưa có số'}</Link>
+                        <span style={{ fontWeight: 'bold' }}>Số công văn: </span> <Link to={`/user/van-ban-di/${item.congVan}`} target='_blank' rel='noopener noreferrer' >{congVanKy?.soCongVan || 'Chưa có số'}</Link>
                     </div>
                 </div>
             </>;
@@ -48,7 +48,7 @@ class AdminEditPage extends AdminPage {
         //     // { congVanKy, canBoKy } = congVanTrinhKy;
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn trình ký',
+            title: 'Văn bản trình ký',
             content: this.renderContent(),
         });
     }

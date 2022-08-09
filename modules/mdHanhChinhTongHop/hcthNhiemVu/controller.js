@@ -24,8 +24,6 @@ module.exports = (app) => {
         { name: 'staff:login', menu },
     );
 
-
-
     app.get('/user/hcth/nhiem-vu', app.permission.check('hcth:login'), app.templates.admin);
     app.get('/user/hcth/nhiem-vu/:id', app.permission.check('hcth:login'), app.templates.admin);
 
@@ -59,6 +57,7 @@ module.exports = (app) => {
                 nhiemVu.donViNhan = donViNhan || [];
             }
             return (
+                permissions.includes('hcthGiaoNhiemVu:read') ||
                 permissions.includes('rectors:login') ||
                 permissions.includes('hcth:manage') ||
                 req.session.user?.staff.shcc == nhiemVu.nguoiTao ||
@@ -312,7 +311,7 @@ module.exports = (app) => {
         }
     });
 
-    app.put('/api/hcth/nhiem-vu', app.permission.orCheck('staff:login'), async (req, res) => {
+    app.put('/api/hcth/nhiem-vu', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const
                 { id, changes } = req.body,
@@ -336,7 +335,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/nhiem-vu/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/nhiem-vu/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -419,7 +418,7 @@ module.exports = (app) => {
         }
     };
 
-    app.get('/api/hcth/nhiem-vu/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/nhiem-vu/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/nhiemVu/${id}`);
         if (app.fs.existsSync(dir)) {
@@ -445,7 +444,7 @@ module.exports = (app) => {
         return lichSuDoc;
     };
 
-    app.get('/api/hcth/nhiem-vu/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/nhiem-vu/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const nhiemVuItem = await app.model.hcthNhiemVu.get({ id });
@@ -487,13 +486,13 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/nhiem-vu/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/nhiem-vu/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthPhanHoi.create({ ...req.body.data, loai: NHIEM_VU }, (error, item) => {
             res.send({ error, item });
         });
     });
 
-    app.get('/api/hcth/nhiem-vu/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/nhiem-vu/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
 
         const id = parseInt(req.params.id);
         app.model.hcthPhanHoi.getAllFrom(id, NHIEM_VU, (error, items) => {
@@ -545,7 +544,7 @@ module.exports = (app) => {
         }
     });
 
-    app.put('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { id, nhiemVuId, shccCanBoNhan, shccNguoiTao, vaiTroMoi, hoCanBo, tenCanBo } = req.body;
         app.model.hcthCanBoNhan.update({ id }, { vaiTro: vaiTroMoi }, async (error, item) => {
             if (error) throw error;
@@ -569,7 +568,7 @@ module.exports = (app) => {
     });
 
 
-    app.delete('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.check('staff:login'), (req, res) => {
+    app.delete('/api/hcth/nhiem-vu/can-bo-nhan', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { id, nhiemVuId, shccCanBoNhan, shccNguoiTao, hoNguoiXoa, tenNguoiXoa } = req.body;
         app.model.hcthCanBoNhan.delete({ id }, async (error, item) => {
             if (error) throw error;
@@ -591,7 +590,7 @@ module.exports = (app) => {
     });
 
 
-    app.post('/api/hcth/nhiem-vu/can-bo-nhan/list', app.permission.check('staff:login'), async (req, res) => {
+    app.post('/api/hcth/nhiem-vu/can-bo-nhan/list', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         const { ids, ma } = req.body;
         app.model.hcthCanBoNhan.getAllFrom(ma || null, NHIEM_VU, (ids || []).toString(), (error, result) => {
 
@@ -610,7 +609,7 @@ module.exports = (app) => {
         return Promise.all(promises);
     };
 
-    app.post('/api/hcth/nhiem-vu/lien-ket', app.permission.check('staff:login'), async (req, res) => {
+    app.post('/api/hcth/nhiem-vu/lien-ket', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id, lienKet, loaiLienKet } = req.body;
             await createListLienKet(lienKet, loaiLienKet, id, NHIEM_VU);
@@ -620,21 +619,21 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/hcth/nhiem-vu/lien-ket/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/nhiem-vu/lien-ket/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         const id = parseInt(req.params.id);
         app.model.hcthLienKet.getAllFrom(id, NHIEM_VU, null, null, (error, result) => {
             res.send({ error: error, items: result?.rows });
         });
     });
 
-    app.delete('/api/hcth/nhiem-vu/lien-ket', app.permission.check('staff:login'), (req, res) => {
+    app.delete('/api/hcth/nhiem-vu/lien-ket', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { id } = req.body;
         app.model.hcthLienKet.delete({ id }, (error) => {
             res.send({ error });
         });
     });
 
-    app.put('/api/hcth/nhiem-vu/delete-file', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/nhiem-vu/delete-file', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const
             id = req.body.id,
             fileId = req.body.fileId,
@@ -654,18 +653,18 @@ module.exports = (app) => {
     });
 
     // history
-    app.post('/api/hcth/nhiem-vu/lich-su/list', app.permission.check('staff:login'), async (req, res) => {
+    app.post('/api/hcth/nhiem-vu/lich-su/list', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         const { id } = req.body;
         app.model.hcthHistory.getAllFrom(id, NHIEM_VU, req.query.historySortType, (error, result) => {
             res.send({ error: error, items: result?.rows });
         });
     });
 
-    app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/nhiem-vu/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), NHIEM_VU, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
-    app.get('/api/hcth/nhiem-vu/hoan-thanh/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/nhiem-vu/hoan-thanh/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const nhiemVuItem = await app.model.hcthNhiemVu.get({ id });
@@ -687,7 +686,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/nhiem-vu/dong/:id', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/nhiem-vu/dong/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         try {
             const id = req.params.id;
             const { canBoNhan, nguoiTao } = req.body;
@@ -723,7 +722,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/nhiem-vu/mo-lai/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.post('/api/hcth/nhiem-vu/mo-lai/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const { canBoNhan, nguoiTao } = req.body;
@@ -759,7 +758,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/nhiem-vu/reset-trang-thai/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.post('/api/hcth/nhiem-vu/reset-trang-thai/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { content, shccCanBoNhan, hoCanBoNhan, tenCanBoNhan } = req.body;
             const nhiemVuId = req.params.id;

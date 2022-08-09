@@ -55,10 +55,10 @@ export function getAll(type, done) {
         }, () => T.notify('Lấy danh mục bị lỗi!', 'danger'));
     };
 }
-export function getByDonVi(type, done) {
+export function getByDonVi(type, maDonVi, done) {
     return dispatch => {
         const url = '/api/category-donvi/' + type;
-        T.get(url, data => {
+        T.get(url, { maDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy danh mục bị lỗi!', 'danger');
                 console.error('GET: ' + url + '.', data.error);

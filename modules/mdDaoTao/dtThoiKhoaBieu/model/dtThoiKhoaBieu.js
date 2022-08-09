@@ -11,6 +11,24 @@ module.exports = app => {
      * 
      * Condition: 
      */
+
+    const range = (start, stop, step = 1) => Array(stop - start).fill(start).map((x, y) => x + y * step);
+
+    app.model.dtThoiKhoaBieu.getCurrentStatusRooms = async () => {
+        let currentTKB = await app.model.dtThoiKhoaBieu.getAll({
+            statement: 'ngayBatDau <= :now AND ngayKetThuc > :now',
+            parameter: { now: Date.now() }
+        }, 'phong,thu,tietBatDau,soTietBuoi', 'phong');
+        let data = {};
+        currentTKB.forEach(item => {
+            data[item.phong] = data[item.phong] || {};
+            data[item.phong][item.thu] = data[item.phong][item.thu] || [];
+            data[item.phong][item.thu].push(...range(Number(item.tietBatDau), Number(item.tietBatDau) + Number(item.soTietBuoi)));
+        });
+        //Phong A thứ 2 từ tiết 1-4, thứ 3 từ tiết 6-8 --> data = { A: { 2: [1,2,3,4], 3: [6,7,8] } }
+        return data;
+    };
+
     app.model.dtThoiKhoaBieu.init = async (config, done) => {
         try {
             const listDays = [2, 3, 4, 5, 6, 7];
@@ -18,11 +36,15 @@ module.exports = app => {
                 thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
             thoiGianMoMon = thoiGianMoMon.find(item => item.bacDaoTao == bacDaoTao && item.loaiHinhDaoTao == loaiHinhDaoTao);
             let { hocKy, nam } = thoiGianMoMon;
-            const listSubjects = await app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, bacDaoTao, loaiHinhDaoTao, isMo: 1 }, '*', 'soLuongDuKien DESC');
-            const listPeriods = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+            const danhSachCanGen = await app.model.dtThoiKhoaBieu.getAll({ hocKy, nam, bacDaoTao, loaiHinhDaoTao, isMo: 1 }, '*', 'soLuongDuKien DESC');
+            let listPeriods = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+            listPeriods = listPeriods.map(item => parseInt(item.ten));
+
             let listRooms = await app.model.dmPhong.getAll({ kichHoat: 1 }, 'ten,sucChua', 'sucChua DESC');
+            // Lọc phòng không sử dụng
             listRooms = listPhongKhongSuDung && listPhongKhongSuDung.length ? listRooms.filter(item => !listPhongKhongSuDung.includes(item.ten)) : listRooms;
-            let data = await getDataGenerateSchedule(listSubjects.filter(item => item.isMo), listDays, listPeriods, listRooms);
+
+            let data = await getDataGenerateSchedule(danhSachCanGen.filter(item => item.isMo), listDays, listPeriods, listRooms);
             if (data.error) done(data);
             else {
                 let listNgayLe = await app.model.dmNgayLe.getAll({
@@ -40,7 +62,8 @@ module.exports = app => {
                 for (let index = 0; index < dataArray.length; index++) {
                     let id = dataArray[index],
                         changes = data.data[id];
-                    let startDate = new Date(ngayBatDau),
+                    console.log(changes);
+                    let startDate = new Date(parseInt(ngayBatDau)),
                         currentDay = startDate.getDay() + 1,
                         distance = changes.thu - currentDay;
                     if (distance < 0) distance += 7;
@@ -54,7 +77,8 @@ module.exports = app => {
                 done({ success: 'Sinh thời khóa biểu thành công!' });
             }
         } catch (error) {
-            done({ error: 'Sinh thời khoá biểu thất bại!' });
+            console.error(error);
+            done({ error: error || 'Sinh thời khoá biểu thất bại!' });
         }
     };
 
@@ -79,9 +103,8 @@ module.exports = app => {
             let subject = danhSachKhongPhong[index],
                 nganhBox = dataNganh[subject.maNganh];      //nganhBox = { abc: [ { tietBatDau, thu, phong } ], xyz: ... }
             lessonLoop: for (let period of listPeriods) {
-                let startedPeriod = parseInt(period.ten),
-                    isValid = isValidPeriod(startedPeriod, parseInt(subject.soTiet));
-
+                let startedPeriod = parseInt(period),
+                    isValid = isValidPeriod(startedPeriod, parseInt(subject.soTietBuoi));
                 if (isValid == undefined) {     // Nếu như số tiết không hợp lệ -> môn tiếp theo
                     setRoomForSubject(index + 1, list);
 
@@ -103,19 +126,19 @@ module.exports = app => {
                             let currentTime = {
                                 thu: subject.thu || day,
                                 tietBatDau: parseInt(subject.tietBatDau) || startedPeriod,
-                                tietKetThuc: (parseInt(subject.tietBatDau) || startedPeriod) + parseInt(subject.soTiet) - 1,
+                                tietKetThuc: (parseInt(subject.tietBatDau) || startedPeriod) + parseInt(subject.soTietBuoi) - 1,
                                 buoi: subject.buoi,
                                 nhom: subject.nhom
                             };
 
-                            if (nganhBox[subject.maMonHoc].length) {
-                                // Cùng môn, khác buổi, cùng nhóm mà cùng ngày thì continue
-                                if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi != currentTime.buoi && item.nhom == currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
+                            // if (nganhBox[subject.maMonHoc].length) {
+                            //     // Cùng môn, khác buổi, cùng nhóm mà cùng ngày thì continue
+                            //     if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi != currentTime.buoi && item.nhom == currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
 
-                                // Cùng môn, cùng buổi, khác nhóm mà cùng giờ thì continue
-                                //TODO: Nếu như hết xếp được thì quay lại từ đầu.
-                                else if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi == currentTime.buoi && item.nhom != currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
-                            }
+                            //     // Cùng môn, cùng buổi, khác nhóm mà cùng giờ thì continue
+                            //     //TODO: Nếu như hết xếp được thì quay lại từ đầu.
+                            //     else if (nganhBox[subject.maMonHoc].some(item => item.thu == currentTime.thu && item.buoi == currentTime.buoi && item.nhom != currentTime.nhom && isCoincidentTime(item, currentTime))) continue;
+                            // }
                             let nganhBoxExceptCurrentSubject = Object.keys(nganhBox).filter(maMonHoc => maMonHoc != subject.maMonHoc);
                             for (let maMonHoc of nganhBoxExceptCurrentSubject) {
                                 if (nganhBox[maMonHoc].length == 1 && nganhBox[maMonHoc].some(monKhac => {
@@ -129,16 +152,25 @@ module.exports = app => {
                     let listRoomsAvailable = [];
                     for (let room of listRooms) {
                         if (app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, listSubjects, {
-                            tietBatDau: subject.tietBatDau || startedPeriod, soTiet: parseInt(subject.soTiet), day: subject.thu || day
+                            tietBatDau: subject.tietBatDau || startedPeriod, soTietBuoi: parseInt(subject.soTietBuoi), day: subject.thu || day
                         })) listRoomsAvailable.push(room);
                     }
                     let roomResult = bestFit(subject, listRoomsAvailable);
                     if (roomResult) {
-                        data[subject.id] = { tietBatDau: subject.tietBatDau || startedPeriod, thu: subject.thu || day, phong: roomResult.ten, sucChua: roomResult.sucChua, maMonHoc: subject.maMonHoc, soTiet: subject.soTiet };
+                        data[subject.id] = {
+                            tietBatDau: subject.tietBatDau || startedPeriod,
+                            thu: subject.thu || day,
+                            phong: roomResult.ten,
+                            sucChua: roomResult.sucChua,
+                            maMonHoc: subject.maMonHoc,
+                            soTietBuoi: subject.soTietBuoi,
+                            nhom: subject.nhom,
+                            buoi: subject.buoi
+                        };
                         subject.loaiMonHoc == 0 && dataNganh[subject.maNganh][subject.maMonHoc].push({
                             thu: day,
                             tietBatDau: startedPeriod,
-                            tietKetThuc: startedPeriod + parseInt(subject.soTiet) - 1,
+                            tietKetThuc: startedPeriod + parseInt(subject.soTietBuoi) - 1,
                             nhom: subject.nhom, buoi: subject.buoi
                         });
                         let newList = listSubjects.map(item => {
@@ -161,9 +193,9 @@ module.exports = app => {
     });
 
     app.model.dtThoiKhoaBieu.isAvailabledRoom = (room, listSubjects, condition) => {
-        let { tietBatDau, soTiet, day } = condition, tietKetThuc = tietBatDau + soTiet - 1;
+        let { tietBatDau, soTietBuoi, day } = condition, tietKetThuc = tietBatDau + soTietBuoi - 1;
 
-        let listPresentStatus = listSubjects.filter(subject => subject.phong == room && subject.thu == day).map(subject => subject = { tietBatDau: subject.tietBatDau, tietKetThuc: subject.tietBatDau + subject.soTiet - 1 });
+        let listPresentStatus = listSubjects.filter(subject => subject.phong == room && subject.thu == day).map(subject => subject = { tietBatDau: subject.tietBatDau, tietKetThuc: subject.tietBatDau + subject.soTietBuoi - 1 });
 
         if (listPresentStatus.length == 0) return true;
         else {
@@ -174,20 +206,20 @@ module.exports = app => {
         }
     };
 
-    const isValidPeriod = (tietBatDau, soTiet) => {
+    const isValidPeriod = (tietBatDau, soTietBuoi) => {
         /**
          * Sáng 5 tiết: từ 1 tới 5
          * Chiều 4 tiết: từ 6 tới 9
          */
 
         //Case 1: Nếu số tiết >= 6 => Undefinded
-        if (soTiet >= 6) return undefined;
+        if (soTietBuoi >= 6) return undefined;
 
         //Case 2: Nếu số tiết = 5 mà bắt đầu trong từ tiết 2 tới chiều => False
-        else if (soTiet == 5 && tietBatDau >= 2) return false;
+        else if (soTietBuoi == 5 && tietBatDau >= 2) return false;
 
         //Case 3: Nếu số tiết >= 4 mà bắt đầu từ tiết 3,4,5,7,8,9 => False
-        else if (soTiet >= 4 && tietBatDau != 6 && tietBatDau >= 3) return false;
+        else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) return false;
 
         //Case _
         return true;
@@ -217,6 +249,7 @@ module.exports = app => {
                 let { soTietLyThuyet, soTietThucHanh, soBuoiTuan, soTietBuoi } = item,
                     tongTiet = soTietLyThuyet + soTietThucHanh,
                     soTuan = Math.ceil(tongTiet / (soTietBuoi * soBuoiTuan));
+                console.log(tongTiet, soTietBuoi, soBuoiTuan);
                 let ngayKetThuc = monHoc.ngayBatDau + soTuan * 7 * DATE_UNIX;
                 for (let ngayLe of listNgayLe) {
                     if (ngayLe.ngay > monHoc.ngayBatDau && ngayLe.ngay <= ngayKetThuc && new Date(ngayLe.ngay).getDay() == monHoc.thu - 1) ngayKetThuc += 7 * DATE_UNIX;

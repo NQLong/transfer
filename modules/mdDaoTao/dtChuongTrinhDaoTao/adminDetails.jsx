@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, deleteMultiDtChuongTrinhDaoTao } from './redux';
+import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, deleteMultiDtChuongTrinhDaoTao, downloadWord } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, CirclePageButton, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
 import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -63,14 +63,15 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     }
 
     getData = (id, isClone = false, khoaDt) => {
+        this.trinhDoDaoTao.value('DH');
         id && this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
             this.maNganh.value(data.maNganh);
+            this.setState({ chuyenNganh: data?.chuyenNganh || '' });
             this.chuyenNganh.value(data.chuyenNganh);
             this.setState({ maNganh: data.maNganh });
             this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
             this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
-            this.trinhDoDaoTao.value(data.trinhDoDaoTao);
             this.loaiHinhDaoTao.value(data.loaiHinhDaoTao);
             this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
             this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
@@ -183,6 +184,21 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         });
     }
 
+    downloadWord = (e) => {
+        e.preventDefault();
+        if (!this.ma) return;
+        const namDaoTao = this.validation(this.namDaoTao);
+        const maNganh = this.validation(this.maNganh);
+        const chuyenNganh = this.chuyenNganh.data()?.text || '';
+        SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(namDaoTao, res => {
+            const { text: textNamDaoTao } = res;
+            this.props.downloadWord(this.ma, data => {
+                T.FileSaver(new Blob([new Uint8Array(data.data)]), textNamDaoTao + '_' + maNganh + '_' + chuyenNganh + '.docx');
+            });
+        });
+
+    }
+
     render() {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         const readOnly = !(permission.write || permission.manage),
@@ -209,7 +225,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                             <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
 
                             <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
-                            <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' />
+                            <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' onChange={value => this.setState({ chuyenNganh: value?.text || '' })} />
                             <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
                                 <FormTabs tabs={[
                                     {
@@ -224,7 +240,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                             </div>
 
 
-                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-4' required readOnly={readOnly} />
                             <FormSelect data={[
                                 { id: 4, text: '4 năm' },
@@ -284,7 +300,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                         );
                     })
                 }
-
+                {this.ma && <CirclePageButton type='custom' tooltip='Tải về chương trình đào tạo' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '60px' }} onClick={(e) => this.downloadWord(e)} />}
             </>,
             backRoute: '/user/dao-tao/chuong-trinh-dao-tao',
             onSave: permission.write || permission.manage ? this.save : null,
@@ -293,5 +309,5 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, deleteMultiDtChuongTrinhDaoTao };
+const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, deleteMultiDtChuongTrinhDaoTao, downloadWord };
 export default connect(mapStateToProps, mapActionsToProps)(DtChuongTrinhDaoTaoDetails);

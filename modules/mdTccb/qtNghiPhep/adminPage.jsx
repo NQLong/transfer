@@ -465,8 +465,7 @@ class QtNghiPhep extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtNghiPhep', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtNghiPhep', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtNghiPhep && this.props.qtNghiPhep.pageGr ?
                 this.props.qtNghiPhep.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -588,14 +587,14 @@ class QtNghiPhep extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtNghiPhepStaff} update={this.props.updateQtNghiPhepStaff}
-                    permissions={currentPermissions} getAll={this.props.getQtNghiPhepAll} getNghiPhep={this.props.getDmNghiPhep} danhSachNgayLe={this.state.danhSachNgayLe}
+                    getAll={this.props.getQtNghiPhepAll} getNghiPhep={this.props.getDmNghiPhep} danhSachNgayLe={this.state.danhSachNgayLe}
                 />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? (e) => {
+            onExport: !this.checked && permission.export ? (e) => {
                 e.preventDefault();
                 const filter = T.stringify(this.state.filter);
 

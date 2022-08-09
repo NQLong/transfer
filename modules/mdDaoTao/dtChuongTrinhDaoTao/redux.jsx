@@ -218,9 +218,21 @@ export function getDanhSachMonChuongTrinhDaoTao(condition, done) {
             if (result.error) {
                 T.notify(result.error?.message || 'Lấy danh sách môn CTDT lỗi', 'danger');
                 console.error(result.error);
-            } else {
-                done(result);
-            }
+            } done(result);
         });
+    };
+}
+
+export function downloadWord(id, done) {
+    return () => {
+        const url = `/api/dao-tao/chuong-trinh-dao-tao/download-word/${id}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Tải file word bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data.data);
+            }
+        }, () => T.notify('Tải file word bị lỗi', 'danger'));
     };
 }

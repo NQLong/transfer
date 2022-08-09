@@ -53,7 +53,7 @@ class SectionAdmission extends React.Component {
             admission = (
                 <div className='col-12 row px-0 py-3 d-flex justify-content-start'>
                     <div className='col-lg-6 col-12 px-0 py-2'>
-                        <Link to={firstLink} className='block-20 block-50' style={{ backgroundImage: `url(${admissionList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
+                        <Link to={firstLink} className='block-20 block-50' style={{ backgroundImage: `url(${admissionList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}/>
                         <div className='text py-4 d-block w-100 text-justify'>
                             <Link to={firstLink}><h4 className='homeHeading' style={{ color: '#626262' }}><b>{admissionList[0].isTranslate == 1 ? T.language.parse(admissionList[0].title) : T.language.parse(admissionList[0].title, true)[admissionList[0].language]}</b></h4></Link>
                             <h6 className='homeBody' style={{ color: '#626262' }}>{admissionList[0].isTranslate == 1 ? T.language.parse(admissionList[0].abstract) : T.language.parse(admissionList[0].abstract, true)[admissionList[0].language]}</h6>

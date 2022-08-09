@@ -14,8 +14,8 @@ import { getDtDangKyMoMonPage, createDangKyMoMon } from './redux';
 
 class NganhModal extends AdminModal {
     onShow = () => {
-        this.setState({ bacDaoTao: '', loaiHinhDaoTao: '' });
-        this.bacDaoTao.value('');
+        this.setState({ bacDaoTao: 'DH', loaiHinhDaoTao: '' });
+        this.bacDaoTao.value('DH');
         this.loaiHinhDaoTao.value('');
         this.namHoc.value('');
         this.hocKy.value('');
@@ -38,10 +38,11 @@ class NganhModal extends AdminModal {
             ketThuc: this.props.thoiGianMoMon.ketThuc,
             khoa: this.state.khoa,
             maNganh: this.nganh.value(),
+        }, settings = {
             bacDaoTao: this.bacDaoTao.value(),
             loaiHinhDaoTao: this.loaiHinhDaoTao.value()
         };
-        this.props.create(data, item => {
+        this.props.create(data, settings, item => {
             this.hide();
             this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`);
         });
@@ -55,7 +56,7 @@ class NganhModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-6' ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} onChange={e => {
                     this.setState({ bacDaoTao: e.id }, () => this.loaiHinhDaoTao.focus());
-                }} />
+                }} readOnly />
                 <FormSelect className='col-md-6' ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} onChange={e => {
                     this.setState({ loaiHinhDaoTao: e.id }, () => {
                         if (!this.bacDaoTao.value()) {
@@ -121,8 +122,8 @@ class DtDangKyMoMonPage extends AdminPage {
                 }, totalItem: 0, list: null, thoiGianMoMon: null
             };
         let permission = {
-            write: permissionDaoTao.write,
-            delete: permissionDaoTao.delete
+            write: permissionDaoTao.write || permissionDaoTao.manage,
+            delete: permissionDaoTao.delete || permissionDaoTao.manage
         };
         let table = renderTable({
             getDataSource: () => list,
@@ -153,8 +154,8 @@ class DtDangKyMoMonPage extends AdminPage {
                     <TableCell content={'HK' + item.hocKy} />
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namHoc} />
                     <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.thoiGian} />
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ write: item.permissionWrite }} onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`)} />
-                    <TableCell contentClassName='multiple-lines-4' content={item.isDuyet ? 'Phòng Đào tạo đã xác nhận' : 'Phòng Đào tạo chưa xác nhận'} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ write: item.permissionWrite }} onEdit={() => permission.write ? this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`) : T.notify('Vui lòng liên hệ người quản lý đào tạo!', 'danger')} />
+                    <TableCell contentClassName='multiple-lines-4' content={item.isDuyet ? 'Đã xác nhận' : 'Chưa xác nhận'} />
 
                 </tr>)
         });
@@ -195,7 +196,7 @@ class DtDangKyMoMonPage extends AdminPage {
             backRoute: '/user/dao-tao',
             onCreate: (e) => {
                 e.preventDefault();
-                if (permissionDaoTao.manage) {
+                if (permissionDaoTao.manage || permissionDaoTao.write) {
                     this.nganhModal.show();
                 } else T.notify('Bạn không có quyền đăng ký tại đây!', 'danger');
             }

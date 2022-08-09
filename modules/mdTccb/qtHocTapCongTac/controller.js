@@ -22,6 +22,12 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/group/:shcc', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/hoc-tap-cong-tac', app.permission.check('staff:login'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRoleQtHocTapCongTac', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtHocTapCongTac:read', 'qtHocTapCongTac:write', 'qtHocTapCongTac:delete');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
     app.post('/api/user/qua-trinh/hoc-tap-cong-tac', app.permission.check('staff:login'), (req, res) => {

@@ -15,8 +15,15 @@ module.exports = app => {
         { name: 'dtChuongTrinhDaoTao:delete' },
     );
 
+    app.permissionHooks.add('staff', 'addRolesDtChuongTrinhDaoTao', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:delete');
+            resolve();
+        } else resolve();
+    }));
+
     app.get('/user/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
-    app.get('/user/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
+    app.get('/user/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/chuong-trinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
@@ -84,6 +91,7 @@ module.exports = app => {
             const danhSachChuyenNganh = await app.model.dtDanhSachChuyenNganh.getAll({ namHoc: item.id });
             let chuyenNganhMapper = {};
             danhSachChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
+
             Promise.all(listPromise).then(listMonHocCtdt => {
                 let listMonHoc = listMonHocCtdt.flat().map(item => {
                     item.maNganh = maNganh;
@@ -104,21 +112,30 @@ module.exports = app => {
                 let monTheoChuyenNganh = listMonHoc
                     .filter(item => item.tinhChatMon == 1)
                     .map(item => {
-                        item.isMo = danhSachMonMoChuyenNganh.map(item => ({ maMonHoc: item.maMonHoc, chuyenNganh: item.chuyenNganh })).some(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc && monChuyenNganh.chuyenNganh == item.chuyenNganh);
-                        if (item.isMo) {
-                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc && monChuyenNganh.chuyenNganh == item.chuyenNganh)[textBox]);
-                        }
+                        item.isMo = danhSachMonMoChuyenNganh.map(item => item.maMonHoc).includes(item.maMonHoc);
                         item.tenChuyenNganh = chuyenNganhMapper[item.chuyenNganh];
+                        if (item.isMo) {
+                            ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)[textBox]));
+                            item.currentCn = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)['chuyenNganh']);
+                        }
                         return item;
-                    })
-                    .groupBy('tenChuyenNganh');
-                let listMonHocChuyenNganh = Object.keys(monTheoChuyenNganh).map(item => {
-                    return { tenChuyenNganh: item, danhSachMonChuyenNganh: monTheoChuyenNganh[item] };
-                });
-                res.send({ listMonHocChung, listMonHocChuyenNganh });
+                    });
+                let tmp = monTheoChuyenNganh.reduce((prev, curr) => {
+                    delete curr.id;
+                    if (prev.some(item => item.maMonHoc == curr.maMonHoc)) {
+                        let element = prev.find(item => item.maMonHoc == curr.maMonHoc);
+                        element.chuyenNganh = [...element.chuyenNganh, curr.chuyenNganh];
+                        element.tenChuyenNganh = [...element.tenChuyenNganh, curr.tenChuyenNganh];
+                    } else {
+                        curr.chuyenNganh = [curr.chuyenNganh];
+                        curr.tenChuyenNganh = [curr.tenChuyenNganh];
+                        prev.push(curr);
+                    }
+                    return prev;
+                }, []);
+                res.send({ listMonHocChung, listMonHocChuyenNganh: tmp });
             });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
@@ -220,4 +237,91 @@ module.exports = app => {
         });
         resolve();
     }));
+
+    app.get('/api/dao-tao/chuong-trinh-dao-tao/download-word/:id', app.permission.check('dtChuongTrinhDaoTao:read'), (req, res) => {
+        if (req.params && req.params.id) {
+            const id = req.params.id;
+            app.model.dtKhungDaoTao.get({ id }, '*', 'id ASC', (error, kdt) => {
+                if (error) {
+                    res.send({ error });
+                    return;
+                }
+                const { maNganh, tenNganh, trinhDoDaoTao,
+                    loaiHinhDaoTao, thoiGianDaoTao, tenVanBang, namDaoTao
+                } = kdt;
+                app.model.dtCauTrucKhungDaoTao.get({ id: namDaoTao }, '*', 'id ASC', (error, ctkdt) => {
+                    if (error) {
+                        res.send({ error });
+                        return;
+                    }
+                    const mucCha = JSON.parse(ctkdt.mucCha || '{}');
+                    const mucCon = JSON.parse(ctkdt.mucCon || '{}');
+                    const chuongTrinhDaoTao = { parents: mucCha?.chuongTrinhDaoTao, childs: mucCon?.chuongTrinhDaoTao };
+                    const ctdt = [];
+                    app.model.dtChuongTrinhDaoTao.getAll({ maKhungDaoTao: id }, '*', 'id ASC', (error, monHocs) => {
+                        if (error) {
+                            res.send({ error });
+                            return;
+                        }
+                        const pushMhToObj = (idKkt, idKhoi, obj) => {
+                            monHocs.forEach(monHoc => {
+                                if ((idKkt && idKhoi && monHoc.maKhoiKienThucCon == idKkt && monHoc.maKhoiKienThuc == idKhoi) || (idKhoi && !idKkt && monHoc.maKhoiKienThuc == idKhoi)) {
+                                    const { maMonHoc, tenMonHoc, loaiMonHoc, tongSoTiet, soTietLyThuyet, soTietThucHanh } = monHoc;
+                                    const loaiMonHocStr = loaiMonHoc == 0 ? 'Bắt buộc' : 'Tự chọn';
+                                    obj.mh.push({ maMonHoc, tenMonHoc, loaiMonHoc: loaiMonHocStr, tongSoTiet, soTietLyThuyet, soTietThucHanh });
+                                }
+                            });
+                        };
+                        Object.keys(chuongTrinhDaoTao.parents).forEach((key, idx) => {
+                            const khoi = chuongTrinhDaoTao.parents[key];
+                            const { id: idKhoi, text } = khoi;
+                            const tmpCtdt = {
+                                stt: idx + 1,
+                                name: text,
+                                mh: [],
+                            };
+                            if (chuongTrinhDaoTao.childs[key]) {
+                                ctdt.push(tmpCtdt);
+                                chuongTrinhDaoTao.childs[key].forEach(kkt => {
+                                    const { id: idKkt, value } = kkt;
+                                    const tmpCtdt = {
+                                        stt: '',
+                                        name: value.text,
+                                        mh: [],
+                                    };
+                                    pushMhToObj(idKkt, idKhoi, tmpCtdt);
+                                    ctdt.push(tmpCtdt);
+                                });
+                            } else {
+                                pushMhToObj(null, idKhoi, tmpCtdt);
+                                ctdt.push(tmpCtdt);
+                            }
+                        });
+                        const source = app.path.join(__dirname, 'resource', 'ctdt_word.docx');
+                        new Promise(resolve => {
+                            const data = {
+                                tenNganhVi: JSON.parse(tenNganh).vi,
+                                tenNganhEn: JSON.parse(tenNganh).en,
+                                maNganh,
+                                trinhDoDaoTao,
+                                loaiHinhDaoTao,
+                                thoiGianDaoTao,
+                                tenVanBangVi: JSON.parse(tenVanBang).vi,
+                                tenVanBangEn: JSON.parse(tenVanBang).en,
+                                ctdt: ctdt,
+                            };
+                            resolve(data);
+                        }).then((data) => {
+                            app.docx.generateFile(source, data, (error, data) => {
+                                res.send({ error, data });
+                            });
+                        });
+                    });
+                });
+
+            });
+        } else {
+            res.send({ error: 'No permission' });
+        }
+    });
 };

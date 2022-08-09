@@ -4,13 +4,13 @@ module.exports = (app) => {
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            501: { title: 'Công văn đến', link: '/user/hcth/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
+            501: { title: 'Văn bản đến', link: '/user/hcth/van-ban-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
         },
     };
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1051: { title: 'Công văn đến', link: '/user/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00', groupIndex: 5 },
+            1051: { title: 'Văn bản đến', link: '/user/van-ban-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00', groupIndex: 5 },
         },
     };
     app.permission.add({ name: 'hcthCongVanDen:read', menu: staffMenu });
@@ -22,17 +22,24 @@ module.exports = (app) => {
     app.permission.add({ name: 'hcth:login' });
     app.permission.add({ name: 'hcth:manage' });
 
-    app.get('/user/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/cong-van-den/:id', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
-    app.get('/user/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+    app.permissionHooks.add('staff', 'addRolesHcthCongVanDen', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == MA_HCTH) {
+            app.permissionHooks.pushUserPermission(user, 'hcth:login', 'hcthCongVanDen:read', 'hcthCongVanDen:write', 'hcthCongVanDen:delete', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write');
+            resolve();
+        } else resolve();
+    }));
+
+    app.get('/user/van-ban-den', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
+    app.get('/user/van-ban-den/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
+    app.get('/user/hcth/van-ban-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+    app.get('/user/hcth/van-ban-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
 
     //api
-    app.get('/api/hcth/cong-van-den/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/all', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -59,7 +66,7 @@ module.exports = (app) => {
         return Promise.all(promises);
     };
 
-    app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
+    app.post('/api/hcth/van-ban-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
         const { fileList, chiDao, quyenChiDao, donViNhan, ...data } = req.body.data;
         const dsCanBoChiDao = quyenChiDao.length > 0 ? quyenChiDao.split(',') : [];
 
@@ -160,7 +167,7 @@ module.exports = (app) => {
         Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
     };
 
-    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), async (req, res) => {
+    app.put('/api/hcth/van-ban-den', app.permission.check('hcthCongVanDen:read'), async (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
         try {
             const congVan = await app.model.hcthCongVanDen.get({ id: req.body.id });
@@ -193,7 +200,7 @@ module.exports = (app) => {
                     });
                 });
             } else {
-                res.send({ error: 'Không tìm thấy công văn' });
+                res.send({ error: 'Không tìm thấy văn bản' });
             }
         } catch (error) {
             res.send({ error });
@@ -230,13 +237,13 @@ module.exports = (app) => {
     };
 
 
-    app.delete('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
+    app.delete('/api/hcth/van-ban-den', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
 
 
-    app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         try {
             const
                 obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' },
@@ -330,7 +337,7 @@ module.exports = (app) => {
     };
 
     //Delete file
-    app.put('/api/hcth/cong-van-den/delete-file', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
+    app.put('/api/hcth/van-ban-den/delete-file', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
         const
             id = req.body.id,
             fileId = req.body.fileId,
@@ -349,7 +356,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDen.get({ id });
@@ -374,7 +381,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/cong-van-den/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthPhanHoi.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
@@ -419,7 +426,7 @@ module.exports = (app) => {
         return lichSuDoc;
     };
 
-    app.get('/api/hcth/cong-van-den/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id))
@@ -476,12 +483,12 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:manage', 'hcth:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
 
-    app.get('/api/hcth/cong-van-den/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
@@ -516,7 +523,7 @@ module.exports = (app) => {
         }
     };
 
-    app.put('/api/hcth/cong-van-den/status', app.permission.orCheck('rectors:login', 'hcthCongVanDen:write'), async (req, res) => {
+    app.put('/api/hcth/van-ban-den/status', app.permission.orCheck('rectors:login', 'hcthCongVanDen:write'), async (req, res) => {
         try {
             let { id, trangThai } = req.body.data;
             trangThai = parseInt(trangThai);
@@ -539,7 +546,7 @@ module.exports = (app) => {
     });
 
 
-    app.put('/api/hcth/cong-van-den/tra-lai', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-den/tra-lai', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
         try {
             const { id, lyDo } = req.body;
             let congVan = await app.model.hcthCongVanDen.get({ id });
@@ -547,10 +554,10 @@ module.exports = (app) => {
             const quyenChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE),
                 canBoChiDao = (quyenChiDao?.rows || []).map(item => item.shccCanBoNhan);
             const userPermission = req.session.user?.permissions || [];
-            if (!congVan) throw 'Công văn không tồn tại';
-            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể trả lại công văn này';
-            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền trả lại công văn này';
-            else if (!lyDo) throw 'Vui lòng nhập lý do trả lại công văn';
+            if (!congVan) throw 'Văn bản không tồn tại';
+            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể trả lại văn bản này';
+            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền trả lại văn bản này';
+            else if (!lyDo) throw 'Vui lòng nhập lý do trả lại văn bản';
             else {
                 const chiDao = {
                     canBo: req.session.user?.shcc,
@@ -581,7 +588,7 @@ module.exports = (app) => {
         }
     });
 
-    app.put('/api/hcth/cong-van-den/duyet', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-den/duyet', app.permission.orCheck('hcthCongVanDen:manage', 'rectors:login'), async (req, res) => {
         try {
             const { id, noiDung } = req.body;
             let congVan = await app.model.hcthCongVanDen.get({ id });
@@ -589,9 +596,9 @@ module.exports = (app) => {
             const quyenChiDao = await app.model.hcthCanBoNhan.getAllFrom(id, CONG_VAN_TYPE),
                 canBoChiDao = (quyenChiDao?.rows || []).map(item => item.shccCanBoNhan);
             const userPermission = req.session.user?.permissions || [];
-            if (!congVan) throw 'Công văn không tồn tại';
-            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể duyệt lại công văn này';
-            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền duyệt công văn này';
+            if (!congVan) throw 'Văn bản không tồn tại';
+            else if (congVan.trangThai != trangThaiSwitcher.CHO_DUYET.id) throw 'Không thể duyệt lại văn bản này';
+            else if (!userPermission.includes('president:login') && !canBoChiDao.includes(userShcc)) throw 'Bạn không có quyền duyệt văn bản này';
             else if (!noiDung) throw 'Vui lòng nhập chỉ đạo';
             else {
                 const chiDao = {
@@ -624,7 +631,7 @@ module.exports = (app) => {
     });
 
 
-    app.get('/api/hcth/cong-van-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
@@ -635,14 +642,14 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/hcth/cong-van-den/chi-dao/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
 
     const docCongVanPhongRole = 'quanLyCongVanPhong';
-    app.assignRoleHooks.addRoles(docCongVanPhongRole, { id: 'donViCongVanDen:read', text: 'Quản lý công văn đến đơn vị' });
+    app.assignRoleHooks.addRoles(docCongVanPhongRole, { id: 'donViCongVanDen:read', text: 'Quản lý văn bản đến đơn vị' });
 
     app.assignRoleHooks.addHook(docCongVanPhongRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -671,7 +678,7 @@ module.exports = (app) => {
     }));
 
     const nhomRole = 'quanLyCongVanDen';
-    app.assignRoleHooks.addRoles(nhomRole, { id: 'hcthCongVanDen:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đến' });
+    app.assignRoleHooks.addRoles(nhomRole, { id: 'hcthCongVanDen:manage', text: 'Hành chính - Tổng hợp: Quản lý văn bản đến' });
 
     app.assignRoleHooks.addHook(nhomRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -702,13 +709,13 @@ module.exports = (app) => {
         switch (status) {
             case trangThaiSwitcher.TRA_LAI_BGH.id:
             case trangThaiSwitcher.TRA_LAI_HCTH.id:
-                return 'Bạn có công văn đến bị trả lại!';
+                return 'Bạn có văn bản đến bị trả lại!';
             case trangThaiSwitcher.CHO_PHAN_PHOI.id:
-                return 'Bạn có công văn chờ phân phối.';
+                return 'Bạn có văn bản chờ phân phối.';
             case trangThaiSwitcher.DA_PHAN_PHOI.id:
-                return 'Bạn có công văn đến mới.';
+                return 'Bạn có văn bản đến mới.';
             case trangThaiSwitcher.DA_DUYET.id:
-                return 'Công văn của bạn đã được duyệt.';
+                return 'Văn bản của bạn đã được duyệt.';
             default:
                 return '';
 
@@ -739,13 +746,13 @@ module.exports = (app) => {
             if (error) reject(error);
             else {
                 if (!trangThaiChiDao) {
-                    createNotification(canBos.map(item => item.email), { title: 'Công văn đến', icon: 'fa-book', iconColor: 'danger', subTitle: `Bạn đã bị xoá quyền chỉ đạo ra khỏi công văn #${item.id}`, link: `/user/cong-van-den/${item.id}` }, (error) => {
+                    createNotification(canBos.map(item => item.email), { title: 'Văn bản đến', icon: 'fa-book', iconColor: 'danger', subTitle: `Bạn đã bị xoá quyền chỉ đạo ra khỏi văn bản #${item.id}`, link: `/user/van-ban-den/${item.id}` }, (error) => {
                         if (error)
                             reject(error);
                         else resolve();
                     });
                 } else {
-                    createNotification(canBos.map(item => item.email), { title: 'Công văn đến', icon: 'fa-book', iconColor: 'info', subTitle: `Bạn được gán quyền chỉ đạo cho công văn #${item.id}`, link: `/user/cong-van-den/${item.id}` }, (error) => {
+                    createNotification(canBos.map(item => item.email), { title: 'Văn bản đến', icon: 'fa-book', iconColor: 'info', subTitle: `Bạn được gán quyền chỉ đạo cho văn bản #${item.id}`, link: `/user/van-ban-den/${item.id}` }, (error) => {
                         if (error)
                             reject(error);
                         else resolve();
@@ -761,7 +768,7 @@ module.exports = (app) => {
                 if (error) reject(error);
                 else if (staff && staff.email) {
                     const emails = [staff.email];
-                    createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/hcth/cong-van-den/${item.id}` }, error => {
+                    createNotification(emails, { title: 'Văn bản đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/hcth/van-ban-den/${item.id}` }, error => {
                         if (error) reject(error);
                         else resolve();
                     });
@@ -776,12 +783,50 @@ module.exports = (app) => {
             if (error) reject(error);
             else {
                 const emails = staffs.rows.map(item => item.email);
-                createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-den/${item.id}` }, error => {
+                createNotification(emails, { title: 'Văn bản đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/van-ban-den/${item.id}` }, error => {
                     error ? reject(error) : resolve();
                 });
             }
         });
     });
+
+    const sendMailToRelatedStaff = async (item) => {
+        const listRelatedStaff = await app.model.hcthCongVanDen.getRelatedStaff(item.id);
+        const emails = listRelatedStaff.rows.map(item => item.email);
+
+        const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui });
+
+        const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, nhanCongVanDenEmailTitle, nhanCongVanDenEmailEditorText, nhanCongVanDenEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'nhanCongVanDenEmailTitle', 'nhanCongVanDenEmailEditorText', 'nhanCongVanDenEmailEditorHtml');
+
+        const rootUrl = app.rootUrl;
+        let mailTitle = nhanCongVanDenEmailTitle.toUpperCase(),
+            mailText = nhanCongVanDenEmailEditorText.replaceAll('{id}', item.id)
+                .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                .replaceAll('{donViGui}', donViGuiInfo.ten)
+                .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                .replaceAll('{trichYeu}', item.trichYeu),
+            mailHtml = nhanCongVanDenEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/van-ban-den/${item.id}`)
+                .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                .replaceAll('{donViGui}', donViGuiInfo.ten)
+                .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                .replaceAll('{trichYeu}', item.trichYeu);
+
+        if (app.isDebug) {
+            app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
+                if (error) throw error;
+            });
+        } else {
+            emails.map(email => {
+                app.email.normalSendEmail(fromMail, fromMailPassword, email, [app.defaultAdminEmail], mailTitle, mailText, mailHtml, [], (error) => {
+                    if (error) throw error;
+                });
+            });
+        }
+    };
 
     const sendChiDaoCongVanDenMailToRectors = async (item) => {
         const canBoChiDao = item.quyenChiDao?.split(',') || [];
@@ -793,9 +838,27 @@ module.exports = (app) => {
         }, 'email', 'email');
 
         const { email: fromMail, emailPassword: fromMailPassword, chiDaoEmailDebug, chiDaoEmailTitle, chiDaoEmailEditorText, chiDaoEmailEditorHtml } = await app.model.hcthSetting.getValue('email', 'emailPassword', 'chiDaoEmailDebug', 'chiDaoEmailTitle', 'chiDaoEmailEditorText', 'chiDaoEmailEditorHtml');
+
+        const donViGuiInfo = await app.model.dmDonViGuiCv.get({ id: item.donViGui });
+
         const rootUrl = app.rootUrl;
-        let mailTitle = chiDaoEmailTitle, mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id),
-            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id).replaceAll('{link}', `${rootUrl}/user/cong-van-den/${item.id}`);
+
+        let mailTitle = chiDaoEmailTitle.toUpperCase(),
+            mailText = chiDaoEmailEditorText.replaceAll('{id}', item.id)
+                .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                .replaceAll('{donViGui}', donViGuiInfo.ten)
+                .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                .replaceAll('{trichYeu}', item.trichYeu),
+            mailHtml = chiDaoEmailEditorHtml.replaceAll('{id}', item.id)
+                .replaceAll('{link}', `${rootUrl}/user/van-ban-den/${item.id}`)
+                .replaceAll('{soDen}', item.soDen || 'Chưa có')
+                .replaceAll('{soCongVan}', item.soCongVan || 'Chưa có')
+                .replaceAll('{donViGui}', donViGuiInfo.ten)
+                .replaceAll('{ngayCongVan}', app.date.dateTimeFormat(new Date(item.ngayCongVan), 'dd/mm/yyyy'))
+                .replaceAll('{ngayNhan}', app.date.dateTimeFormat(new Date(item.ngayNhan), 'dd/mm/yyyy'))
+                .replaceAll('{trichYeu}', item.trichYeu);
         if (app.isDebug) {
             app.email.normalSendEmail(fromMail, fromMailPassword, chiDaoEmailDebug, [], mailTitle, mailText, mailHtml, [], (error) => {
                 if (error) throw (error);
@@ -809,11 +872,20 @@ module.exports = (app) => {
         }
     };
 
+    const createDistributingNotification = async (item) => {
+        const canBos = await app.model.hcthCongVanDen.getAuthorizedStaff();
+        const emails = canBos.rows.map(canBo => canBo.email);
+
+        const notificationPromise = new Promise((resolve, reject) => createNotification(emails, { title: 'Văn bản đến cần phân phối', icon: 'fa-book', subTitle: 'Bạn có một văn bản đến cần kiểm tra và phân phối.', iconColor: 'info', link: `/user/hcth/van-ban-den/${item.id}` }, (error) => error ? reject(error) : resolve()
+        ));
+        return await notificationPromise;
+    };
+
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
         try {
             if (before == after)
                 resolve();
-            if (after == trangThaiSwitcher.CHO_DUYET.id) {
+            else if (after == trangThaiSwitcher.CHO_DUYET.id) {
                 createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
                 sendChiDaoCongVanDenMailToRectors(item);
             }
@@ -822,7 +894,13 @@ module.exports = (app) => {
             }
             else if (after == trangThaiSwitcher.DA_PHAN_PHOI.id) {
                 createRelatedStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
+                sendMailToRelatedStaff(item);
             }
+            else if (after == trangThaiSwitcher.CHO_PHAN_PHOI.id) {
+                createDistributingNotification(item).then(() => resolve()).catch(error => { throw error; });
+            }
+            else
+                resolve();
         } catch (error) {
             console.error('fail to send notification', error);
             resolve();
@@ -853,7 +931,7 @@ module.exports = (app) => {
                                         const prmomises = [];
                                         result.rows.forEach(item => {
                                             prmomises.push(new Promise((resolve, reject) => {
-                                                createNotification(emails, { title: 'Công văn đến sắp hết hạn', icon: 'fa-book', subTitle: 'Công văn đến sắp hết hạn. Bạn hãy kiểm tra lại các đơn vị liên quan đã có thao tác cần thiết đối với công văn.', iconColor: 'danger', link: `/user/hcth/cong-van-den/${item.id}` }, (error) => {
+                                                createNotification(emails, { title: 'Văn bản đến sắp hết hạn', icon: 'fa-book', subTitle: 'Văn bản đến sắp hết hạn. Bạn hãy kiểm tra lại các đơn vị liên quan đã có thao tác cần thiết đối với văn bản.', iconColor: 'danger', link: `/user/hcth/van-ban-den/${item.id}` }, (error) => {
                                                     error ? reject(error) : resolve();
                                                 });
                                             }));
@@ -866,13 +944,13 @@ module.exports = (app) => {
                     }
                 });
             } catch (error) {
-                console.error('Gửi thông báo nhắc nhở công văn đến hết hạn lỗi', error);
+                console.error('Gửi thông báo nhắc nhở văn bản đến hết hạn lỗi', error);
             }
         }
     };
 
 
-    app.get('/api/hcth/cong-van-den/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -922,7 +1000,7 @@ module.exports = (app) => {
         return Promise.all(promises);
     };
 
-    app.post('/api/hcth/cong-van-den/quyen-chi-dao', app.permission.check('rectors:login'), async (req, res) => {
+    app.post('/api/hcth/van-ban-den/quyen-chi-dao', app.permission.check('rectors:login'), async (req, res) => {
         try {
             const { id, shcc, trangThaiCv, status } = req.body;
             let quyenChiDaoStatus = JSON.parse(status);
@@ -955,7 +1033,7 @@ module.exports = (app) => {
 
     // Download Template ---------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/hcth/cong-van-den/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status, sortBy, sortType } = req.params.filter ? JSON.parse(req.params.filter) : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null, sortBy: '', sortType: '' };
 
         const obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' };

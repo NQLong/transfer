@@ -17,6 +17,13 @@ module.exports = app => {
     });
 
     // Clear sessions ----------------------------------------------------------------------------------------------------------------------------------
+    const refreshSessionUser = (key, session) => new Promise((resolve) => app.updateSessionUser(null, session.user, newUser => {
+        if (newUser) {
+            session.user = newUser;
+            app.database.redis.set(key, JSON.stringify(session), () => resolve());
+        } else resolve();
+    }));
+
     app.readyHooks.add('clearSessionSchedule', {
         ready: () => app.database.redis,
         run: () => {
@@ -26,9 +33,9 @@ module.exports = app => {
                 app.database.redis.keys(sessionPrefix + '*', async (error, keys) => {
                     // Tính toán hôm nay và 7 ngày trước
                     const today = new Date().yyyymmdd();
-                    let last7Day = new Date();
-                    last7Day.setDate(last7Day.getDate() - 7);
-                    last7Day = last7Day.yyyymmdd();
+                    let last3Day = new Date();
+                    last3Day.setDate(last3Day.getDate() - 3);
+                    last3Day = last3Day.yyyymmdd();
 
                     if (!error) {
                         // Lấy sessionUser
@@ -37,7 +44,7 @@ module.exports = app => {
                         });
 
                         try {
-                            let deleteCounter = 0;
+                            let deleteCounter = 0, refreshCounter = 0;
                             console.log('Total sessions: ', keys.length); // Tổng cộng sessions
                             for (const key of keys) {
                                 const sessionUser = await getKey(key);
@@ -45,10 +52,13 @@ module.exports = app => {
                                     await app.database.redis.del(key);
                                     deleteCounter++;
                                 } else if (sessionUser.user) { // Có login
-                                    // Nếu ko có today hoặc session lâu hơn 7 ngày => Xóa session
-                                    if (!sessionUser.today || parseInt(sessionUser.today) < parseInt(last7Day)) {
+                                    // Nếu ko có today hoặc session lâu hơn 3 ngày => Xóa session
+                                    if (!sessionUser.today || parseInt(sessionUser.today) < parseInt(last3Day)) {
                                         await app.database.redis.del(key);
                                         deleteCounter++;
+                                    } else {
+                                        await refreshSessionUser(key, sessionUser);
+                                        refreshCounter++;
                                     }
                                 } else {
                                     // Không login
@@ -59,6 +69,7 @@ module.exports = app => {
                                 }
                             }
                             console.log(' - Number of deleted sessions: ', deleteCounter);
+                            console.log(' - Number of refreshed sessions: ', refreshCounter);
                             console.log(' - Schedule: Clear session user done!');
                         } catch (e) {
                             console.error(e);
@@ -321,38 +332,27 @@ module.exports = app => {
             });
         }),
 
-        get: (...params) => {
-            const n = params.length,
-                prefixKeyLength = app.state.prefixKey.length;
-            if (n >= 1 && typeof params[n - 1] == 'function') {
-                const done = params.pop(); // done(error, values)
-                const keys = n == 1 ? app.state.keys : params.map(key => `${app.appName}_state:${key}`); // get chỉ có done => đọc hết app.state
-                app.database.redis.mget(keys, (error, values) => {
-                    if (error || values == null) {
-                        done(error || 'Error when get Redis value!');
-                    } else if (n == 2) {
-                        done(null, values[0]);
-                    } else {
-                        const state = {};
-                        keys.forEach((key, index) => state[key.substring(prefixKeyLength)] = values[index]);
-                        done(null, state);
-                    }
-                });
-            } else {
-                console.log('Error when get app.state');
-            }
-        },
+        get: (...params) => new Promise((resolve, reject) => {
+            const n = params.length, prefixKeyLength = app.state.prefixKey.length;
+            const keys = n == 0 ? app.state.keys : params.map(key => `${app.appName}_state:${key}`); // get chỉ có done => đọc hết app.state
+            app.database.redis.mget(keys, (error, values) => {
+                if (error || values == null) {
+                    reject(error || 'Error when get Redis value!');
+                } else if (n == 1) { // Get 1 value
+                    resolve(values[0]);
+                } else {
+                    const state = {};
+                    keys.forEach((key, index) => state[key.substring(prefixKeyLength)] = values[index]);
+                    resolve(state);
+                }
+            });
+        }),
 
-        set: (...params) => {
+        set: (...params) => new Promise((resolve, reject) => {
             const n = params.length;
-            if (n >= 1 && typeof params[n - 1] == 'function') {
-                const done = (n % 2) ? params.pop() : null;
-                for (let i = 0; i < n - 1; i += 2) params[i] = app.state.prefixKey + params[i];
-                n == 1 ? done() : app.database.redis.mset(params, error => done && done(error));
-            } else {
-                console.log('Error when set app.state');
-            }
-        },
+            for (let i = 0; i < n - 1; i += 2) params[i] = app.state.prefixKey + params[i];
+            app.database.redis.mset(params, error => error ? reject(error) : resolve());
+        }),
     };
     app.state.keys = Object.keys(app.state.initState).map(key => app.state.prefixKey + key);
 

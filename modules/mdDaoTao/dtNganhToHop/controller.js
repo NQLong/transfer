@@ -16,6 +16,14 @@ module.exports = app => {
         { name: 'dtNganhToHop:write' },
         { name: 'dtNganhToHop:delete' },
     );
+
+    app.permissionHooks.add('staff', 'addRolesDtNganhToHop', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtNganhToHop:read', 'dtNganhToHop:write', 'dtNganhToHop:delete');
+            resolve();
+        } else resolve();
+    }));
+
     app.get('/user/dao-tao/nganh-theo-to-hop-thi', app.permission.orCheck('dtNganhToHop:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------

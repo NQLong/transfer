@@ -93,7 +93,7 @@ class QtHopDongVienChucPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtHopDongVienChuc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtHopDongVienChuc', ['read', 'write', 'delete', 'export']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
             (this.props.qtHopDongVienChuc && this.props.qtHopDongVienChuc.pageGr ?
                 this.props.qtHopDongVienChuc.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
@@ -120,7 +120,7 @@ class QtHopDongVienChucPage extends AdminPage {
                         <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href={'/user/tccb/qua-trinh/hop-dong-lam-viec/' + item.ma}>
+                                <a href={permission.write ? '/user/tccb/qua-trinh/hop-dong-lam-viec/' + item.ma : ''}>
                                     <span>{(item.hoBenB ? item.hoBenB : '') + ' ' + (item.tenBenB ? item.tenBenB : '')}</span><br />
                                     <span>{item.shcc}</span></a>
                             </>
@@ -159,7 +159,7 @@ class QtHopDongVienChucPage extends AdminPage {
                         }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={`/user/tccb/qua-trinh/hop-dong-lam-viec/${item.ma}`} onDelete={this.delete} >
+                                onEdit={permission.write ? () => this.props.history.push(`/user/tccb/qua-trinh/hop-dong-lam-viec/${item.ma}`) : T.notify('Vui lòng liên hệ phòng Tổ chức - cán bộ')} onDelete={this.delete} >
                                 {/* <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                     <i className='fa fa-lg fa-file-word-o' />
                                 </a> */}

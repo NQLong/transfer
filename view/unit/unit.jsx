@@ -40,6 +40,7 @@ modules.forEach(module => {
 });
 Object.keys(reducerContainer).forEach(key => reducers[key] = combineReducers(reducerContainer[key]));
 const store = createStore(combineReducers(reducers), {}, composeWithDevTools(applyMiddleware(thunk)));
+T.template = 'unit';
 window.T = T;
 
 // Main DOM render ----------------------------------------------------------------------------------------------------------------------------------

@@ -13,8 +13,17 @@ module.exports = app => {
         { name: 'quanLyDaoTao:manager' }
     );
 
+    app.permissionHooks.add('staff', 'addRolesDtDangKyMoMon', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete');
+            resolve();
+        } else resolve();
+    }));
+
+
     app.get('/user/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
-    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
+
+    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:write', 'dtDangKyMoMon:manage'), app.templates.admin);
 
     //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), async (req, res) => {
@@ -53,6 +62,7 @@ module.exports = app => {
         try {
             const now = Date.now();
             let { data, settings } = req.body;
+            console.log(data, settings);
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
             thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             if (now > thoiGianMoMon.ketThuc) throw 'Đã hết hạn đăng ký!';
@@ -62,13 +72,14 @@ module.exports = app => {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {
                 let item = await app.model.dtDangKyMoMon.get({
-                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: settings.loaiHinhDaoTao, bacDaoTao: settings.bacDaoTao
+                    nam, hocKy, maNganh: data.maNganh, ...settings
                 });
                 if (item) throw `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}`;
-                item = await app.model.dtDangKyMoMon.create(data);
+                item = await app.model.dtDangKyMoMon.create({ ...data, ...settings });
                 res.send({ item });
             }
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });

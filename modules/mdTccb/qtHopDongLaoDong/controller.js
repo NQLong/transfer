@@ -9,10 +9,18 @@ module.exports = app => {
         { name: 'qtHopDongLaoDong:read', menu },
         { name: 'qtHopDongLaoDong:write' },
         { name: 'qtHopDongLaoDong:delete' },
+        { name: 'qtHopDongLaoDong:export' },
     );
     app.get('/user/tccb/qua-trinh/hop-dong-lao-dong/:ma', app.permission.check('qtHopDongLaoDong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-lao-dong/group/:shcc', app.permission.check('qtHopDongLaoDong:read'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRoleQtHopDongLaoDong', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'qtHopDongLaoDong:read', 'qtHopDongLaoDong:write', 'qtHopDongLaoDong:delete', 'qtHopDongLaoDong:export');
+            resolve();
+        } else resolve();
+    }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -131,7 +139,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/:ma', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/:ma', app.permission.check('qtHopDongLaoDong:export'), (req, res) => {
         if (req.params && req.params.ma) {
             app.model.qtHopDongLaoDong.download(req.params.ma, (error, item) => {
                 if (error || !item) {
@@ -210,7 +218,7 @@ module.exports = app => {
         return fdate !== '' ? (fdate.getDate()) + '/' + (fdate.getMonth() + 1) + '/' + fdate.getFullYear() : '';
     };
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel', app.permission.check('qtHopDongLaoDong:export'), (req, res) => {
         const pageNumber = 0,
             pageSize = 1000000,
             searchTerm = '';

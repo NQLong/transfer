@@ -4,7 +4,7 @@ import { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys } f
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 // import { getTcThongTin } from '../tcThongTin/redux';
 
-const listKeys = ['hocPhiNamHoc', 'hocPhiHocKy', 'email', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditorText', 'hocPhiEmailPhatSinhEditorHtml', 'hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditorText', 'hocPhiEmailHoanTraEditorHtml', 'hocPhiSmsDong', 'hocPhiSmsPhatSinh', 'hocPhiSmsHoanTra'];
+const listKeys = ['hocPhiNamHoc', 'hocPhiHocKy', 'email', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditorText', 'hocPhiEmailPhatSinhEditorHtml', 'hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditorText', 'hocPhiEmailHoanTraEditorHtml', 'hocPhiSmsDong', 'hocPhiSmsPhatSinh', 'hocPhiSmsHoanTra', 'hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditorText', 'hocPhiEmailNhacNhoEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'hocPhiEmailTraHoaDonEditorHtml'];
 class TcSettingAdminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/finance/setting', () => {
@@ -17,6 +17,10 @@ class TcSettingAdminPage extends AdminPage {
                             this.hocPhiEmailPhatSinhEditor.html(item.value);
                         } else if (item.key == 'hocPhiEmailHoanTraEditorHtml') {
                             this.hocPhiEmailHoanTraEditor.html(item.value);
+                        } else if (item.key == 'hocPhiEmailNhacNhoEditorHtml') {
+                            this.hocPhiEmailNhacNhoEditor.html(item.value);
+                        } else if (item.key == 'hocPhiEmailTraHoaDonEditorHtml') {
+                            this.hocPhiEmailTraHoaDonEditor.html(item.value);
                         } else {
                             if (item.key == 'hocPhiNamHoc') this.hocPhiNamHocEnd.value(Number(item.value) + 1);
                             const component = this[item.key];
@@ -60,7 +64,7 @@ class TcSettingAdminPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('TcSetting'),
+        const permission = this.getUserPermission('tcSetting'),
             readOnly = !permission.write;
 
         return this.renderPage({
@@ -136,27 +140,33 @@ class TcSettingAdminPage extends AdminPage {
                                 <a className='nav-link active show' data-toggle='tab' href='#hocPhiEmailDong'>Email đóng học phí</a>
                             </li>
                             <li className='nav-item'>
+                                <a className='nav-link' data-toggle='tab' href='#hocPhiEmailNhacNho'>Email nhắc nhở</a>
+                            </li>
+                            <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiEmailPhatSinh'>Email phát sinh học phí</a>
                             </li>
                             <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiEmailHoanTra'>Email hoàn trả học phí</a>
                             </li>
                             <li className='nav-item'>
-                                <a className='nav-link' data-toggle='tab' href='#hocPhiSmsDong'>SMS đóng học phí</a>
+                                <a className='nav-link' data-toggle='tab' href='#hocPhiEmailTraHoaDon'>Email trả hóa đơn</a>
                             </li>
                             <li className='nav-item'>
+                                <a className='nav-link' data-toggle='tab' href='#hocPhiSmsDong'>SMS đóng học phí</a>
+                            </li>
+                            {/* <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiSmsPhatSinh'>SMS phát sinh học phí</a>
                             </li>
                             <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiSmsHoanTra'>SMS hoàn trả học phí</a>
-                            </li>
+                            </li> */}
                         </ul>
 
                         <div className='tab-content tile'>
                             <div className='tab-pane fade active show' id='hocPhiEmailDong'>
                                 <div className='tile-body'>
                                     <FormTextBox ref={e => this.hocPhiEmailDongTitle = e} label='Tiêu đề' readOnly={readOnly} />
-                                    <FormEditor ref={e => this.hocPhiEmailDongEditor = e} label='Nội dung email' smallText='Tham số: {name}, {subject}, {message}' height={400} />
+                                    <FormEditor ref={e => this.hocPhiEmailDongEditor = e} label='Nội dung email' height={400} />
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailDongTitle', 'hocPhiEmailDongEditor')}>
@@ -165,10 +175,22 @@ class TcSettingAdminPage extends AdminPage {
                                 </div>
                             </div>
 
+                            <div className='tab-pane fade' id='hocPhiEmailNhacNho'>
+                                <div className='tile-body'>
+                                    <FormTextBox ref={e => this.hocPhiEmailNhacNhoTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                    <FormEditor ref={e => this.hocPhiEmailNhacNhoEditor = e} label='Nội dung email' height={400} />
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditor')}>
+                                        <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                    </button>
+                                </div>
+                            </div>
+
                             <div className='tab-pane fade' id='hocPhiEmailPhatSinh'>
                                 <div className='tile-body'>
                                     <FormTextBox ref={e => this.hocPhiEmailPhatSinhTitle = e} label='Tiêu đề' readOnly={readOnly} />
-                                    <FormEditor ref={e => this.hocPhiEmailPhatSinhEditor = e} label='Nội dung email' smallText='Tham số: {name}, {subject}, {message}' height={400} />
+                                    <FormEditor ref={e => this.hocPhiEmailPhatSinhEditor = e} label='Nội dung email' height={400} />
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditor')}>
@@ -180,10 +202,22 @@ class TcSettingAdminPage extends AdminPage {
                             <div className='tab-pane fade' id='hocPhiEmailHoanTra'>
                                 <div className='tile-body'>
                                     <FormTextBox ref={e => this.hocPhiEmailHoanTraTitle = e} label='Tiêu đề' readOnly={readOnly} />
-                                    <FormEditor ref={e => this.hocPhiEmailHoanTraEditor = e} label='Nội dung email' smallText='Tham số: {name}, {subject}, {message}' height={400} />
+                                    <FormEditor ref={e => this.hocPhiEmailHoanTraEditor = e} label='Nội dung email' height={400} />
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditor')}>
+                                        <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className='tab-pane fade' id='hocPhiEmailTraHoaDon'>
+                                <div className='tile-body'>
+                                    <FormTextBox ref={e => this.hocPhiEmailTraHoaDonTitle = e} label='Tiêu đề' readOnly={readOnly} />
+                                    <FormEditor ref={e => this.hocPhiEmailTraHoaDonEditor = e} label='Nội dung email' height={400} />
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <button className='btn btn-success' type='button' onClick={() => this.saveEmailTempate('hocPhiEmailTraHoaDonTitle', 'hocPhiEmailTraHoaDonEditor')}>
                                         <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                     </button>
                                 </div>
@@ -201,7 +235,7 @@ class TcSettingAdminPage extends AdminPage {
                                 </div>
                             </div>
 
-                            <div className='tab-pane fade' id='hocPhiSmsPhatSinh'>
+                            {/* <div className='tab-pane fade' id='hocPhiSmsPhatSinh'>
                                 <div className='tile-body'>
                                     <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
                                     <FormRichTextBox ref={e => this.hocPhiSmsPhatSinh = e} />
@@ -223,7 +257,7 @@ class TcSettingAdminPage extends AdminPage {
                                         <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>,

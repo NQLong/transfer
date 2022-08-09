@@ -3,17 +3,8 @@ import { connect } from 'react-redux';
 import { getNewsByUser } from './redux';
 import SectionSideBar from 'view/component/SectionSideBar';
 
-const texts = {
-    vi: {
-        attachments: 'Tệp tin đính kèm:',
-    },
-    en: {
-        attachments: 'Attachment files:',
-    }
-};
-
 class NewsDetail extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = { language: '' };
     }
@@ -44,8 +35,9 @@ class NewsDetail extends React.Component {
     }
 
     render() {
-        const language = T.language(texts);
         const item = this.props.news && this.props.news.userNews ? this.props.news.userNews : null;
+        const languageText = this.props.system && this.props.system.languageText || {};
+        const newLanguage = T.language(languageText);
         const width = $(window).width();
         if (item == null) {
             return <p>...</p>;
@@ -70,45 +62,31 @@ class NewsDetail extends React.Component {
                                 </h2>
                                 <div className='row' style={{ justifyContent: 'flex-end', paddingBottom: 10 }}>
                                     <a href='#' onClick={() => { window.open(`http://www.facebook.com/sharer.php?u=${window.location.href}`); }}>
-                                        <img src="https://vnuhcm.edu.vn/img/facebook.png" alt="Facebook" style={{ height: 18, width: 18 }} />
+                                        <img src='https://vnuhcm.edu.vn/img/facebook.png' alt='Facebook' style={{ height: 18, width: 18 }} />
                                     </a>
-                                    <a href='#' style={{ paddingLeft: 15 }}
-                                        onClick={() => { window.open(`http://twitter.com/share?url=${window.location.href}`); }}>
-                                        <img src="https://vnuhcm.edu.vn/img/tiwtter.png" alt="Twitter" style={{ height: 18, width: 18 }} />
+                                    <a href='#' style={{ paddingLeft: 15 }} onClick={() => { window.open(`http://twitter.com/share?url=${window.location.href}`); }}>
+                                        <img src='https://vnuhcm.edu.vn/img/tiwtter.png' alt='Twitter' style={{ height: 18, width: 18 }} />
                                     </a>
-                                    <a href='#' style={{ paddingLeft: 15 }}
-                                        onClick={() => { window.open(`https://plus.google.com/share?url=${window.location.href}`); }}>
-                                        <img src="https://vnuhcm.edu.vn/img/google-plus.png" alt="Google plus" style={{ height: 18, width: 18 }} />
+                                    <a href='#' style={{ paddingLeft: 15 }} onClick={() => { window.open(`https://plus.google.com/share?url=${window.location.href}`); }}>
+                                        <img src='https://vnuhcm.edu.vn/img/google-plus.png' alt='Google plus' style={{ height: 18, width: 18 }} />
                                     </a>
                                 </div>
                                 {item.displayCover && item.image ?
                                     <p style={{ display: 'block', textAlign: 'center' }}>
-                                        <img src={item.image}
-                                            style={{ width: '100%' }} className='img-fluid'
-                                            alt={item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]} />
+                                        <img src={item.image} style={{ width: '100%' }} className='img-fluid' alt={item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]} />
                                     </p> : null}
-                                <p className='homeContent'
-                                    dangerouslySetInnerHTML={{
-                                        __html: content
-                                    }} />
+                                <p className='homeContent' dangerouslySetInnerHTML={{ __html: content }} />
                                 {attachments &&
-                                    <div>
-                                        {language.attachments}
-                                        {attachments}
-                                    </div>}
-                                {width < 500 ? <div style={{ width: '100%', }}>
-                                    <img src='https://i.giphy.com/media/Y3alJyRof3xcddXkew/giphy.webp' style={{ width: '100%', height: '100%', }} />
-                                </div> : null}
-
+                                <div>
+                                    {newLanguage.tapTinDinhKem}:
+                                    {attachments}
+                                </div>}
+                                {width < 500 && <div style={{ width: '100%' }}><img src='https://i.giphy.com/media/Y3alJyRof3xcddXkew/giphy.webp' style={{ width: '100%', height: '100%' }} alt='giphy.webp' /></div>}
                                 <div className='tag-widget post-tag-container mb-5 mt-5'>
-                                    <div className='tagcloud'>
-                                        {categories}
-                                    </div>
+                                    <div className='tagcloud'>{categories}</div>
                                 </div>
                             </div>
-                            {item.id && <div className='col-md-4 sidebar ftco-animate'>
-                                <SectionSideBar newsId={item.id} maDonVi={item.maDonVi} />
-                            </div>}
+                            {item.id && <div className='col-md-4 sidebar ftco-animate'><SectionSideBar newsId={item.id} maDonVi={item.maDonVi} /></div>}
                         </div>
                     </div>
                 </section>
@@ -117,6 +95,6 @@ class NewsDetail extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ news: state.news });
+const mapStateToProps = state => ({ news: state.news, system: state.system });
 const mapActionsToProps = { getNewsByUser };
 export default connect(mapStateToProps, mapActionsToProps)(NewsDetail);

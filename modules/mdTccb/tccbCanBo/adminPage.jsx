@@ -192,7 +192,7 @@ class StaffPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('staff');
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.staff && this.props.staff.page ?
             this.props.staff.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         const table = renderTable({
@@ -256,11 +256,11 @@ class StaffPage extends AdminPage {
                         </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='date' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.lastModified} />
                     <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}>
-                        <Tooltip title='Đánh dấu nghỉ việc' arrow>
+                        {permission.write && <Tooltip title='Đánh dấu nghỉ việc' arrow>
                             <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.nghiViec.show(item)}>
                                 <i className='fa fa-lg fa-user-times' />
                             </button>
-                        </Tooltip>
+                        </Tooltip>}
                     </TableCell>
                 </tr>)
         });
@@ -319,7 +319,7 @@ class StaffPage extends AdminPage {
                         getPage={this.getPage} />
                     <NghiViecModal ref={e => this.nghiViec = e} getStaffPage={this.props.getStaffPage}
                         create={this.props.createQtNghiViecStaff} update={this.props.updateQtNghiViecStaff} />
-                    {!this.state.baoCaoThang ? <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tải xuống báo cáo hàng tháng' customIcon='fa-th-list' onClick={e => {
+                    {permission.write && (!this.state.baoCaoThang ? <CirclePageButton type='custom' className='btn-warning' style={{ marginRight: '120px' }} tooltip='Tải xuống báo cáo hàng tháng' customIcon='fa-th-list' onClick={e => {
                         e.preventDefault();
                         this.setState({ baoCaoThang: true });
                         T.download(T.url('/api/staff/download-monthly-report'), 'BAO_CAO_HANG_THANG.xlsx');
@@ -333,8 +333,8 @@ class StaffPage extends AdminPage {
                                 <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' style={{ stroke: 'white' }} />
                             </svg>
                         </div>
-                    </button>}
-                    {!this.state.exported ? <CirclePageButton type='export' className='btn-warning' style={{ marginRight: '60px' }} tooltip='Tải danh sách' customIcon='fa-file-excel-o' onClick={e => this.export(e, pageCondition)} /> :
+                    </button>)}
+                    {permission.write && (!this.state.exported ? <CirclePageButton type='export' className='btn-warning' style={{ marginRight: '60px' }} tooltip='Tải danh sách' customIcon='fa-file-excel-o' onClick={e => this.export(e, pageCondition)} /> :
                         <button type='button' className='btn btn-circle btn-success'
                             style={{ position: 'fixed', right: '10px', bottom: '10px', zIndex: 500, marginRight: '60px' }} >
                             <div style={{ width: '30px' }}>
@@ -343,11 +343,11 @@ class StaffPage extends AdminPage {
                                 </svg>
                             </div>
                         </button>
-                    }
+                    )}
                 </div>
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission ? e => this.create(e) : null,
+            onCreate: permission.write ? e => this.create(e) : null,
             // onExport: !this.state.exported ? e => this.export(e, pageCondition) :
 
         });
