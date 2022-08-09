@@ -13835,7 +13835,8 @@
                 "TC_HOC_PHI_GET_INVOICE_INFO": "getInvoiceInfo",
                 "TC_HOC_PHI_GET_INVOICE_LIST": "getInvoiceList",
                 "TC_HOC_PHI_STATISTIC": "getStatistic",
-                "TC_HOC_PHI_GET_DETAIL": "getDetail"
+                "TC_HOC_PHI_GET_DETAIL": "getDetail",
+                "TC_HOC_PHI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "MSSV": {
