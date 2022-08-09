@@ -42,6 +42,13 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/dao-tao/danh-sach-chuyen-nganh/all/:maNganh/:nam', app.permission.check('dtNganhDaoTao:read'), (req, res) => {
+        app.model.dtDanhSachChuyenNganh.getAll({
+            namHoc: req.params.nam,
+            nganh: req.params.maNganh,
+        }, (error, items) => res.send({ error, items }));
+    });
+
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/item/:id', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dtDanhSachChuyenNganh.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });

@@ -421,7 +421,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 />
                 <AutoGenSchedModal ref={e => this.autoGen = e} permission={permission} />
                 <ThoiGianPhanCongGiangDay ref={e => this.thoiGianModal = e} create={this.props.createDtThoiGianPhanCong} />
-                <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} />
+                <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} disabledClickOutside />
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
                     || this.autoGen.show()} style={{ marginRight: '60px' }} />}
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-thumb-tack' tooltip='Tạo thời gian phân công giảng dạy' onClick={e => e.preventDefault()

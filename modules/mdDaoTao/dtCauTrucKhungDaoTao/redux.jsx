@@ -80,7 +80,7 @@ export function getDtCauTrucKhungDaoTaoPage(pageNumber, pageSize, pageCondition,
 
 export function getDtCauTrucKhungDaoTao(id, done) {
     return () => {
-        const url = `/api/dao-tao/cau-truc-khung-dao-tao/${id}`;
+        const url = `/api/dao-tao/cau-truc-khung-dao-tao/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy cấu trúc khung đào tạo bị lỗi!', 'danger');

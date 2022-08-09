@@ -87,6 +87,23 @@ export function createDtThoiKhoaBieu(item, settings, done) {
     };
 }
 
+export function createDtThoiKhoaBieuMultiple(data, settings, done) {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
+        const url = '/api/dao-tao/thoi-khoa-bieu/create-multiple';
+        T.post(url, { data, settings }, data => {
+            if (data.error) {
+                T.notify('Tạo lớp bị lỗi!', 'danger');
+                console.error(`POST ${url}. ${data.error.message}`);
+            } else {
+                T.notify('Tạo lớp thành công!', 'success');
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
+                if (done) done();
+            }
+        });
+    };
+}
 export function deleteDtThoiKhoaBieu(id, done) {
     return dispatch => {
         const cookie = T.updatePage('pageDtThoiKhoaBieu');
@@ -146,6 +163,20 @@ export function initSchedule(ngayBatDau, done) {
     return () => {
         T.get('/api/dao-tao/init-schedule', { ngayBatDau }, data => {
             done && done(data);
+        });
+    };
+}
+
+export function autoGenSched(config, listConfig, done) {
+    return dispatch => {
+        T.post('/api/dao-tao/gen-schedule', { config, listConfig }, result => {
+            if (result.error) {
+                T.notify(`Lỗi sinh thời khoá biểu: ${result.error.message}`, 'danger');
+            } else {
+                T.alert('Sinh thời khoá biểu thành công', 'success', false);
+                dispatch(getDtThoiKhoaBieuPage());
+                done && done(result);
+            }
         });
     };
 }

@@ -27,6 +27,13 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
         try {
+            // app.messageQueue.send('Test queue', 'Alo');
+
+            // app.messageQueue.consume('Test queue', (message) => {
+            //     console.log(message);
+            // });
+
+
             const _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -110,8 +117,34 @@ module.exports = app => {
                     }
                 }
             }
-            // console.log(promiseList);
-            // await Promise.all(promiseList);
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/create-multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let { data, settings } = req.body;
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index],
+                    maNganh = item.maNganh,
+                    chuyenNganh = item.chuyenNganh || [],
+                    soBuoiTuan = item.soBuoiTuan;
+                for (let buoi = 1; buoi <= parseInt(soBuoiTuan); buoi++) {
+                    const tkbItem = await app.model.dtThoiKhoaBieu.create(app.clone(item, settings, { nhom: index + 1 }));
+                    for (const nganhItem of maNganh) {
+                        if (chuyenNganh.length) {
+                            for (const chuyenNganhItem of chuyenNganh) {
+                                let idNganh = chuyenNganhItem ? `${nganhItem}&&${chuyenNganhItem}` : nganhItem;
+                                await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh });
+                            }
+                        } else {
+                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh: nganhItem });
+                        }
+                    }
+                }
+            }
             res.end();
         } catch (error) {
             console.log(error);
@@ -220,6 +253,9 @@ module.exports = app => {
             res.send({ error, items: items?.rows || [], listNgayLe });
         });
     });
+
+
+    app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
 
     //Quyền của đơn vị------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('daoTao', { id: 'dtThoiKhoaBieu:manage', text: 'Đào tạo: Phân công giảng dạy' });

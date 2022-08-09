@@ -32,6 +32,18 @@ export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition
     };
 }
 
+export function getDtDanhSachChuyenNganhFilter(maNganh, nam, done) {
+    const url = `/api/dao-tao/danh-sach-chuyen-nganh/all/${maNganh}/${nam}`;
+    T.get(url, data => {
+        if (data.error) {
+            T.notify('Lấy thông tin chuyên ngành bị lỗi!', 'danger');
+            console.error(`GET: ${url}.`, data.error);
+        } else {
+            if (done) done(data.items);
+        }
+    }, error => console.error(`GET: ${url}.`, error));
+}
+
 export function getDtDanhSachChuyenNganh(id, done) {
     return () => {
         const url = `/api/dao-tao/danh-sach-chuyen-nganh/item/${id}`;

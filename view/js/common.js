@@ -748,6 +748,15 @@ Array.prototype.groupBy = function (key) {
     );
 };
 
+Array.prototype.removeByValue = function (value) {
+    let tmp = this;
+    const index = tmp.indexOf(value);
+    if (index >= 0) {
+        tmp.splice(index, 1);
+    }
+    return tmp;
+};
+
 Date.prototype.getText = function () {
     return T.language.getMonth()[this.getMonth()] + ' ' + T.get2(this.getDate()) + ', ' + this.getFullYear() + ' ' + T.get2(this.getHours()) + ':' + T.get2(this.getMinutes());
 };
