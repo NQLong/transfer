@@ -25,16 +25,17 @@ module.exports = (cluster, isDebug) => {
     app.apiKeySendGrid = appConfig.email.apiKeySendGrid;
     app.defaultAdminEmail = appConfig.default.adminEmail;
     app.mailSentName = appConfig.email.from;
-    // app.defaultAdminPassword = appConfig.default.adminPassword;
-    app.assetPath = app.path.join(__dirname, '..', appConfig.path.asset);
+    app.tempPath = app.path.join(__dirname, '../.temp');
+    app.assetPath = app.path.join(__dirname, '../asset');
     app.bundlePath = app.path.join(app.assetPath, 'bundle');
-    app.viewPath = app.path.join(__dirname, '..', appConfig.path.view);
-    app.modulesPath = app.path.join(__dirname, '..', appConfig.path.modules);
-    app.publicPath = app.path.join(__dirname, '..', appConfig.path.public);
-    app.imagePath = app.path.join(appConfig.path.public, 'img');
-    app.uploadPath = app.path.join(__dirname, '..', appConfig.path.upload);
-    app.documentPath = app.path.join(__dirname, '..', appConfig.path.document);
-    app.faviconPath = app.path.join(__dirname, '..', appConfig.path.favicon);
+    app.viewPath = app.path.join(__dirname, '../view');
+    app.modulesPath = app.path.join(__dirname, '../modules');
+    app.servicesPath = app.path.join(__dirname, '../services');
+    app.publicPath = app.path.join(__dirname, '../public');
+    app.imagePath = app.path.join(app.publicPath, 'img');
+    app.faviconPath = app.path.join(app.imagePath, 'favicon.ico');
+    app.uploadPath = app.path.join(__dirname, '../asset/upload');
+    app.documentPath = app.path.join(__dirname, '../asset/document');
     app.database = {};
     app.model = {};
 
@@ -46,7 +47,7 @@ module.exports = (cluster, isDebug) => {
     require('./io')(app, server, appConfig);
     require('./packages')(app, server, appConfig);
     require('./authentication')(app);
-    require('./permission')(app);
+    require('./permission')(app, appConfig);
     require('./authentication.google')(app, appConfig);
 
     // Init -----------------------------------------------------------------------------------------------------------
@@ -68,8 +69,7 @@ module.exports = (cluster, isDebug) => {
                 else {
                     app.templates.unit(req, res);
                 }
-            }
-            else {
+            } else {
                 next();
             }
         });
