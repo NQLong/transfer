@@ -58,7 +58,7 @@ module.exports = app => {
                 chuyenNganhMapper = {};
             listChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
             const condition = { ...currentThoiGianMoMon, idDangKyMoMon };
-            const item = await app.model.dtDanhSachMonMo.getCurrent(app.stringify(condition));
+            const item = await app.model.dtDanhSachMonMo.getCurrent(app.utils.stringify(condition));
             res.send({
                 danhSachMonMo: item.rows.map(row => {
                     ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(key => {

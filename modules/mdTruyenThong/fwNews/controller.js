@@ -175,7 +175,7 @@ module.exports = app => {
             }
 
             if (donViConditionText) {
-                pageCondition.statement += (pageCondition.statement .length ? ' AND ' : '') + donViConditionText;
+                pageCondition.statement += (pageCondition.statement.length ? ' AND ' : '') + donViConditionText;
                 pageCondition.parameter.maDonVi = maDonVi;
             }
 
@@ -694,7 +694,7 @@ module.exports = app => {
     }));
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(
+    app.fs.createFolder(
         app.path.join(app.publicPath, '/img/draft'),
         app.path.join(app.publicPath, '/img/draft/news'),
         app.path.join(app.publicPath, '/img/news'),
@@ -731,7 +731,7 @@ module.exports = app => {
         app.permission.has(req, () => uploadNewsDraftAvatar(req, fields, files, params, done), done));
     //TODO: lack of permisstion
 
-    app.createFolder(app.path.join(app.publicPath, '/img/draftUnitNews'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/draftUnitNews'));
 
     const uploadUnitNewsDraftAvatar = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('draftUnitNews:') && files.UnitNewsDraftImage && files.UnitNewsDraftImage.length > 0) {

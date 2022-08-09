@@ -38,7 +38,7 @@ module.exports = app => {
         });
     });
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/content'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/content'));
     app.uploadHooks.add('uploadContentCkEditor', (req, fields, files, params, done) => {
         let permissions = req.session.user.permissions;
         if (permissions.includes('website:write') || permissions.includes('website:manage') || permissions.includes('component:write'))

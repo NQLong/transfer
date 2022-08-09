@@ -37,7 +37,7 @@ module.exports = app => {
                 if (user.staff?.maDonVi) donVi = user.maDonVi;
                 else throw 'Permission denied!';
             }
-            filter = app.stringify(app.clone(filter, { donVi }));
+            filter = app.utils.stringify(app.clone(filter, { donVi }));
 
             let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
 

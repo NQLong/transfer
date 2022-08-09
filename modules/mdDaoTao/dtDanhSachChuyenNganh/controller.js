@@ -33,7 +33,7 @@ module.exports = app => {
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/page/:pageNumber/:pageSize', checkDaoTaoPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
-        let filter = app.stringify({ ...req.query.filter, maNganh: req.query.maNganh, nam: req.query.namHoc }),
+        let filter = app.utils.stringify({ ...req.query.filter, maNganh: req.query.maNganh, nam: req.query.namHoc }),
             searchTerm = req.query.searchTerm || '';
         app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;

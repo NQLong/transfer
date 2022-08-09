@@ -75,7 +75,7 @@ module.exports = (app) => {
                 res.send({ error, item });
             else {
                 let { id } = item;
-                app.createFolder(app.path.join(app.assetPath, `/congVanDen/${id}`));
+                app.fs.createFolder(app.path.join(app.assetPath, `/congVanDen/${id}`));
                 try {
                     createChiDaoFromList(chiDao, id, ({ error }) => {
                         if (error)
@@ -149,7 +149,7 @@ module.exports = (app) => {
                     if (error) done && done({ error });
                     else
                         app.model.hcthCongVanDen.delete({ id }, error => {
-                            app.deleteFolder(app.assetPath + '/congVanDen/' + id);
+                            app.fs.deleteFolder(app.assetPath + '/congVanDen/' + id);
                             done && done({ error });
                         });
                 });
@@ -296,7 +296,7 @@ module.exports = (app) => {
         }
     });
 
-    app.createFolder(app.path.join(app.assetPath, '/congVanDen'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/congVanDen'));
 
 
     app.uploadHooks.add('hcthCongVanDenFile', (req, fields, files, params, done) =>
@@ -320,9 +320,9 @@ module.exports = (app) => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
-                app.createFolder(
+                app.fs.createFolder(
                     app.path.join(app.assetPath, '/congVanDen/' + (isNew ? '/new' : '/' + id))
                 );
                 app.fs.rename(srcPath, destPath, error => {
@@ -350,7 +350,7 @@ module.exports = (app) => {
             }
             else {
                 if (app.fs.existsSync(filePath))
-                    app.deleteFile(filePath);
+                    app.fs.deleteFile(filePath);
                 res.send({ error: null });
             }
         });

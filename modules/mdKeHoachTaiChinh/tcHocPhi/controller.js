@@ -45,7 +45,7 @@ module.exports = app => {
             if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
         }
         const { namHoc, hocKy } = filter;
-        filter = app.stringify(filter, '');
+        filter = app.utils.stringify(filter, '');
         let mssv = '';
         if (!req.session.user.permissions.includes('tcHocPhi:read')) mssv = req.session.user.data.mssv;
 
@@ -217,7 +217,7 @@ module.exports = app => {
             let workbook = app.excel.create();
             workbook = await app.excel.readFile(srcPath);
             if (workbook) {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 worksheet = workbook.getWorksheet(1);
                 if (worksheet) {
                     const items = [];
@@ -301,14 +301,14 @@ module.exports = app => {
 
     app.get('/api/finance/hoc-phi/download-excel', app.permission.check('tcHocPhi:manage'), async (req, res) => {
         try {
-            let filter = app.parse(req.query.filter, {});
+            let filter = app.utils.parse(req.query.filter, {});
             const settings = await getSettings();
 
             if (!filter.namHoc || !filter.hocKy) {
                 if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
                 if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
             }
-            filter = app.stringify(filter, '');
+            filter = app.utils.stringify(filter, '');
             let data = await app.model.tcHocPhi.searchPage(1, 1000000, '', '', filter);
             const list = data.rows;
             const workBook = app.excel.create();
@@ -444,14 +444,14 @@ module.exports = app => {
     //Statistic -------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/finance/statistic', app.permission.check('tcHocPhi:write'), async (req, res) => {
         try {
-            let filter = app.parse(req.query.filter, {});
+            let filter = app.utils.parse(req.query.filter, {});
             const settings = await getSettings();
 
             if (!filter.namHoc || !filter.hocKy) {
                 if (!filter.namHoc) filter.namHoc = settings.hocPhiNamHoc;
                 if (!filter.hocKy) filter.hocKy = settings.hocPhiHocKy;
             }
-            filter = app.stringify(filter);
+            filter = app.utils.stringify(filter);
             const data = await app.model.tcHocPhi.getStatistic(filter);
 
             let dataByStudents = data.rows,

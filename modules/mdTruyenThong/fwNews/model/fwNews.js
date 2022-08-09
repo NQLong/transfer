@@ -61,7 +61,7 @@ module.exports = app => {
                                 done(error);
                             } else {
                                 // if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
-                                app.deleteImage(news.image);
+                                app.fs.deleteImage(news.image);
                                 app.model.fwNews.delete(condition, done);
                             }
                         });
@@ -75,7 +75,7 @@ module.exports = app => {
                                         done(error);
                                     } else {
                                         // if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
-                                        app.deleteImage(news.image);
+                                        app.fs.deleteImage(news.image);
                                         app.model.fwNews.delete(condition, done);
                                     }
                                 });
