@@ -41,8 +41,7 @@ module.exports = app => {
             const page = await app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm);
             if (!page) {
                 throw { message: 'Lấy danh sách chuyên ngành bị lỗi.' };
-            }
-            else {
+            } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
                 const pageCondition = searchTerm;
                 res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });

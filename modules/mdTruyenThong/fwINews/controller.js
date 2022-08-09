@@ -89,7 +89,7 @@ module.exports = app => {
 
     app.delete('/api/inewsItem', app.permission.check('inews:delete'), (req, res) => {
         const { item } = req.body;
-        item.type === 'image' && app.deleteImage(item.payload);
+        item.type === 'image' && app.fs.deleteImage(item.payload);
         app.model.fwInewsItem.delete({ id: item.id }, error => {
             res.send({ error });
         });
@@ -102,7 +102,7 @@ module.exports = app => {
     });
 
     // Upload hook
-    app.createFolder(app.path.join(app.publicPath, '/img/iNews'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/iNews'));
     const uploadINewsImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('iNews:') && files.INewsImage && files.INewsImage.length > 0) {
             console.log('Hook: uploadINewsImage => iNews image upload');

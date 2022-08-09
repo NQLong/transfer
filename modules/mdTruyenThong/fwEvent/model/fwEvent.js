@@ -60,7 +60,7 @@ module.exports = app => {
                                 done(error);
                             } else {
                                 // if (app.data && app.data.numberOfEvent) app.data.numberOfEvent--;
-                                app.deleteImage(event.image);
+                                app.fs.deleteImage(event.image);
                                 app.model.fwEvent.delete(condition, done);
                             }
                         });
@@ -74,7 +74,7 @@ module.exports = app => {
                                         done(error);
                                     } else {
                                         // if (app.data && app.data.numberOfEvent) app.data.numberOfEvent--;
-                                        app.deleteImage(event.image);
+                                        app.fs.deleteImage(event.image);
                                         app.model.fwEvent.delete(condition, done);
                                     }
                                 });

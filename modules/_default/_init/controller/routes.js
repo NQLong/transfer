@@ -73,7 +73,7 @@ module.exports = app => {
                 if (app.isDebug) data.isDebug = true;
                 if (req.session.user) data.user = req.session.user;
                 while (!(app.database.oracle.connected && app.model && app.model.fwMenu && app.model.fwSubmenu)) {
-                    await app.waiting(500);
+                    await app.utils.waiting(500);
                 }
 
                 if (template == 'home' || template == 'unit') {
@@ -253,7 +253,7 @@ module.exports = app => {
             try {
                 if (fields.userData == 'logo') {
                     const oldImage = await app.state.get(fields.userData);
-                    oldImage && app.deleteImage(oldImage);
+                    oldImage && app.fs.deleteImage(oldImage);
                     let destPath = `/img/favicon${app.path.extname(srcPath)}`;
                     app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), async error => {
                         if (error == null) {
@@ -270,7 +270,7 @@ module.exports = app => {
                     });
                 } else if (['footer', 'map', 'header'].includes(fields.userData.toString())) {
                     const oldImage = await app.state.get(fields.userData);
-                    oldImage && app.deleteImage(oldImage);
+                    oldImage && app.fs.deleteImage(oldImage);
                     let destPath = `/img/${fields.userData}${app.path.extname(srcPath)}`;
                     app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), async error => {
                         if (error == null) {
@@ -286,7 +286,7 @@ module.exports = app => {
                         }
                     });
                 } else {
-                    app.deleteImage(srcPath);
+                    app.fs.deleteImage(srcPath);
                 }
             } catch (error) {
                 done({ error });

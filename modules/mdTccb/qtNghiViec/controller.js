@@ -26,7 +26,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = req.query.condition || '';
-        let filter = app.stringify(req.query.filter || {});
+        let filter = app.utils.stringify(req.query.filter || {});
         app.model.qtNghiViec.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

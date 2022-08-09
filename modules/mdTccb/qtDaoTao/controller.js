@@ -41,7 +41,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = req.query.condition || '';
-        let filter = app.stringify(req.query.filter || {});
+        let filter = app.utils.stringify(req.query.filter || {});
         app.model.qtDaoTao.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -57,7 +57,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = req.query.condition || '';
-        let filter = app.stringify(req.query.filter || {});
+        let filter = app.utils.stringify(req.query.filter || {});
         app.model.qtDaoTao.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -170,7 +170,7 @@ module.exports = app => {
         res.send('Không tìm thấy tập tin');
     });
 
-    app.createFolder(app.path.join(app.assetPath, '/minhChungHocVi'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/minhChungHocVi'));
 
     app.uploadHooks.add('minhChungHocVi', (req, fields, files, params, done) =>
         app.permission.has(req, () => minhChungHocVi(req, fields, files, params, done), done, 'staff:login'));
@@ -187,9 +187,9 @@ module.exports = app => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
-                app.createFolder(
+                app.fs.createFolder(
                     app.path.join(app.assetPath, '/minhChungHocVi/' + shcc)
                 );
                 app.fs.rename(srcPath, destPath, error => {

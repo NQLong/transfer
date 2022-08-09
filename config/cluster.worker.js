@@ -33,7 +33,7 @@ module.exports = (cluster, isDebug) => {
     app.servicesPath = app.path.join(__dirname, '../services');
     app.publicPath = app.path.join(__dirname, '../public');
     app.imagePath = app.path.join(app.publicPath, 'img');
-    app.faviconPath = app.path.join(app.imagePath, 'favicon.ico');
+    app.faviconPath = app.path.join(app.imagePath, 'favicon.png');
     app.uploadPath = app.path.join(__dirname, '../asset/upload');
     app.documentPath = app.path.join(__dirname, '../asset/document');
     app.database = {};

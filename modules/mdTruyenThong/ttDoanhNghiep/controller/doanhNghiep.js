@@ -193,7 +193,7 @@ module.exports = app => {
                     if (error) {
                         res.send({ error: 'Không tìm thấy doanh nghiệp' });
                     } else {
-                        if (item.image) app.deleteImage(item.image);
+                        if (item.image) app.fs.deleteImage(item.image);
                         app.model.dnDoanhNghiep.delete({ id: req.body.id }, (error) => {
                             res.send({ error });
                         });
@@ -204,7 +204,7 @@ module.exports = app => {
     });
 
     //Upload Hook-------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, 'img', 'dnDoanhNghiep'));
+    app.fs.createFolder(app.path.join(app.publicPath, 'img', 'dnDoanhNghiep'));
 
     const uploadDoanhNghiepLogo = (req, fields, files, param, done) => {
         if (fields.userData && fields.userData[0].startsWith('dnDoanhNghiep:') && files.doanhNghiepLogo && files.doanhNghiepLogo.length > 0) {

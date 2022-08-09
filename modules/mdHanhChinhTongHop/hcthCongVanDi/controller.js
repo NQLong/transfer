@@ -33,7 +33,7 @@ module.exports = app => {
     app.get('/user/hcth/van-ban-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login','developer:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -129,7 +129,7 @@ module.exports = app => {
                 res.send({ error, item });
             } else {
                 let { id } = item;
-                app.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
+                app.fs.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
                 try {
                     updateListFile(fileList, id, ({ error }) => {
                         if (error) {
@@ -203,7 +203,7 @@ module.exports = app => {
             if (error) done && done({ error });
             else
                 app.model.hcthCongVanDi.delete({ id }, (error) => {
-                    app.deleteFolder(app.assetPath + '/congVanDi/' + id);
+                    app.fs.deleteFolder(app.assetPath + '/congVanDi/' + id);
                     done && done({ error });
                 });
         });
@@ -334,7 +334,7 @@ module.exports = app => {
     });
 
     // Upload API  -----------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.assetPath, '/congVanDi'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/congVanDi'));
 
     app.uploadHooks.add('hcthCongVanDiFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
@@ -363,9 +363,9 @@ module.exports = app => {
 
                 if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                     done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 } else {
-                    await app.createFolder(
+                    await app.fs.createFolder(
                         app.path.join(app.assetPath, '/congVanDi/' + (isNew ? '/new' : '/' + id))
                     );
                     await app.fs.rename(srcPath, destPath);
@@ -408,7 +408,7 @@ module.exports = app => {
 
                 if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                     done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 } else {
                     await app.fs.rename(srcPath, destPath);
                     const newFile = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id, tenFile: generatedFileName, capNhatFileId: originFileId, nguoiTao: req.session.user.shcc });
@@ -455,7 +455,7 @@ module.exports = app => {
             }
 
             if (app.fs.existsSync(filePath))
-                await app.deleteFile(filePath);
+                await app.fs.deleteFile(filePath);
 
             // xoa cac file cap nhat
             const checkUpdateFile = await app.model.hcthFile.get({ ma: congVan, capNhatFileId: fileId });
@@ -464,7 +464,7 @@ module.exports = app => {
                 const listUpdateFile = await app.model.hcthFile.getAll({ ma: congVan, capNhatFileId: fileId });
                 await app.model.hcthFile.delete({ ma: congVan, capNhatFileId: fileId });
                 listUpdateFile.forEach(file => {
-                    if (app.fs.existsSync(path + file)) app.deleteFile(path + file);
+                    if (app.fs.existsSync(path + file)) app.fs.deleteFile(path + file);
                 });
 
                 const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan: updateFileId, congVan });

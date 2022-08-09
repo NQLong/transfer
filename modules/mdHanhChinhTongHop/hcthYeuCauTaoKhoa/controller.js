@@ -26,7 +26,7 @@ module.exports = app => {
             const filter = req.query.filter || {};
             const shcc = req.session.user.shcc;
             filter.canBoTao = shcc;
-            const filterData = app.stringify(filter);
+            const filterData = app.utils.stringify(filter);
             const pageCondition = req.query.searchTerm;
             const page = await app.model.hcthYeuCauTaoKhoa.searchPage(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), pageCondition, filterData);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
@@ -194,7 +194,7 @@ module.exports = app => {
     app.get('/api/hcth/yeu-cau-tao-khoa/page/:pageNumber/:pageSize', app.permission.check('hcthYeuCauTaoKhoa:read'), async (req, res) => {
         try {
             const filter = req.query.filter || {};
-            const filterData = app.stringify(filter);
+            const filterData = app.utils.stringify(filter);
             const pageCondition = req.query.searchTerm;
             const page = await app.model.hcthYeuCauTaoKhoa.searchPage(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), pageCondition, filterData);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
