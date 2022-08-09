@@ -5327,7 +5327,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 100
+                    "size": 300
                 },
                 "LINK": {
                     "value": "link",
@@ -15031,7 +15031,8 @@
             "moduleName": "tcHocPhiTransactionInvoice",
             "modelName": "tcHocPhiTransactionInvoice",
             "methods": {
-                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage"
+                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage",
+                "TC_HOC_PHI_TRANSACTION_INVOICE_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
@@ -16172,6 +16173,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "SO_TIEN_MAC_DINH": {
+                    "value": "soTienMacDinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
