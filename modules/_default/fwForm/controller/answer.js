@@ -91,7 +91,7 @@ module.exports = app => {
     const importRegistration = (req, srcPath, sendResponse) => {
         const workbook = app.excel.create();
         workbook.xlsx.readFile(srcPath).then(() => {
-            app.deleteFile(srcPath);
+            app.fs.deleteFile(srcPath);
             const worksheet = workbook.getWorksheet(1);
             let index = 1, participants = [];
             while (true) {

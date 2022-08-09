@@ -19,7 +19,7 @@ module.exports = app => {
         run: () => {
             app.model.fwUser.count({}, (error, numberOfUser) => {
                 if (error == null) {
-                    numberOfUser = Number(numberOfUser);
+                    numberOfUser = Number(numberOfUser.rows[0]['COUNT(*)']);
                     app.model.setting.setValue({ numberOfUser: isNaN(numberOfUser) ? 0 : Number(numberOfUser) });
                 }
             });
@@ -275,7 +275,7 @@ module.exports = app => {
             if (error) {
                 res.send({ error: 'System has error!' });
             } else if (user) {
-                if (user.image) app.deleteFile(app.path.join(app.publicPath, '/img/user', user.image));
+                if (user.image) app.fs.deleteFile(app.path.join(app.publicPath, '/img/user', user.image));
                 app.model.fwUser.delete({ email: req.body.email }, error => res.send({ error }));
             } else {
                 res.send({ error: 'Invalid email!' });
@@ -284,7 +284,7 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/user'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/user'));
 
 
     // app.uploadHooks.add('uploadYourImage', (req, fields, files, params, done) =>
@@ -299,7 +299,7 @@ module.exports = app => {
                 if (error || item == null) {
                     done({ error: error ? error : 'Invalid email!' });
                 } else {
-                    app.deleteImage(item.image);
+                    app.fs.deleteImage(item.image);
                     let srcPath = files.UserImage[0].path,
                         image = '/img/user/' + app.path.basename(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {

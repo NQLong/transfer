@@ -35,7 +35,7 @@ module.exports = app => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
                 const newData = {
                     nameDisplay: body.nameDisplay,
@@ -49,7 +49,7 @@ module.exports = app => {
                     app.model.fwStorage.create(newData, (error, item) => {
                         if (error || !item) {
                             done && done({ error });
-                            app.deleteFile(srcPath);
+                            app.fs.deleteFile(srcPath);
                         } else {
                             const path = item.id + app.path.extname(srcPath);
                             app.fs.rename(srcPath, app.path.join(app.assetPath, 'document', path), error => {
@@ -66,7 +66,7 @@ module.exports = app => {
                 } else {
 
                     app.model.fwStorage.get({ id: id }, (error, item) => {
-                        app.deleteFile(app.path.join(app.assetPath, 'document', item.path));
+                        app.fs.deleteFile(app.path.join(app.assetPath, 'document', item.path));
 
                         const path = id + app.path.extname(srcPath);
                         app.fs.rename(srcPath, app.path.join(app.assetPath, 'document', path), error => {
@@ -146,7 +146,7 @@ module.exports = app => {
         });
         app.model.fwStorage.delete({ id: req.body.id }, error => {
             if (app.fs.existsSync(pathDeleteFile))
-                app.deleteFile(pathDeleteFile);
+                app.fs.deleteFile(pathDeleteFile);
             res.send({ error });
         });
     });

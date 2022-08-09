@@ -196,7 +196,7 @@ module.exports = app => {
     });
 
     // Hook upload images ----------------------------------------------------------------------------------------------
-    app.createFolder(
+    app.fs.createFolder(
         app.path.join(app.publicPath, '/img/form'),
         app.path.join(app.publicPath, '/img/question')
     );

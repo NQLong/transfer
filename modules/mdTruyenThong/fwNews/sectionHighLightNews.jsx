@@ -2,24 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getNewsByCategory } from './redux';
-const text = {
-    vi: {
-        noNewsTitle: <h3> </h3>,
-        newsTitle: 'THÔNG BÁO',
-        view: 'Lượt xem',
-        viewAll: 'Xem tất cả'
-    },
-    en: {
-        noNewsTitle: <h3>No latest notification!</h3>,
-        newsTitle: 'NOTIFICATION',
-        view: 'View',
-        viewAll: 'View All'
-    }
-};
+
 class SectionHighLightNews extends React.Component {
-    state = {
-        list: [], category: { vi: ' ', en: ' ' }, linkSeeAll: ''
-    }
+    state = { list: [], category: { vi: ' ', en: ' ' }, linkSeeAll: '' }
+
     componentDidMount() {
         if (this.props.item && this.props.item.viewId) {
             let category = { vi: ' ', en: ' ' }, linkSeeAll;
@@ -35,10 +21,11 @@ class SectionHighLightNews extends React.Component {
         }
     }
     render() {
-        const language = T.language(this.state.category);
-        let notification = <span className='text-center w-100'>{language.noNewsTitle}</span>;
-        const notificationList = this.state.list,
-            viewAll = T.language(text).viewAll;
+        const title = T.language(this.state.category);
+        const notificationList = this.state.list;
+        let languageText = this.props.system && this.props.system.languageText || {};
+        const newLanguage = T.language(languageText);
+        let notification = <span className='text-center w-100'>{languageText.khongTinTuc}</span>;
         if (notificationList.length !== 0) {
             notification = (
                 <>
@@ -60,7 +47,7 @@ class SectionHighLightNews extends React.Component {
                         })}
                     </div>
                     <div className='col-12 d-flex justify-content-center'>
-                        <Link to={this.state.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{viewAll}</Link>
+                        <Link to={`${this.state.linkSeeAll}?${T.language.getLanguage()}`} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{newLanguage.xemTatCa}</Link>
                     </div>
                 </>
             );
@@ -68,7 +55,7 @@ class SectionHighLightNews extends React.Component {
         return (
             <section data-aos='fade-up' className='row p-3'>
                 <div className='col-12 homeBorderLeft'>
-                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0 }}><strong>{language}</strong></h3>
+                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0 }}><strong>{title}</strong></h3>
                 </div>
                 {notification}
             </section>);

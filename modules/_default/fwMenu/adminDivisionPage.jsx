@@ -5,7 +5,6 @@ import { divisionMenuGetAll, createDivisionMenu, updateDivisionMenuPriorities, u
 import { getDvWebsite, updateDvWebsite } from 'modules/_default/websiteDonVi/redux';
 import ImageBox from 'view/component/ImageBox';
 
-
 class adminDivisionPage extends React.Component {
     state = { showHeaderTitle: 0 };
     imageBox = React.createRef();
@@ -23,9 +22,9 @@ class adminDivisionPage extends React.Component {
         const route = T.routeMatcher('/user/menu/:divisionId'),
             divisionId = route.parse(window.location.pathname).divisionId;
         this.props.getDvWebsite(divisionId, (item) => {
-            $('#headerViTitle').val(item.headerTitle ? T.language.parse(item.headerTitle, true).vi : ''),
-                $('#headerEnTitle').val(item.headerTitle ? T.language.parse(item.headerTitle, true).en : ''),
-                $('#headerLink').val(item.headerLink ? item.headerLink : '');
+            $('#headerViTitle').val(item.headerTitle ? T.language.parse(item.headerTitle, true).vi : '');
+            $('#headerEnTitle').val(item.headerTitle ? T.language.parse(item.headerTitle, true).en : '');
+            $('#headerLink').val(item.headerLink ? item.headerLink : '');
             this.props.divisionMenuGetAll(item.maDonVi, item.shortname);
             this.imageBox.current.setData('divisionHeader:' + item.shortname);
             this.imageBox2.current.setData('divisionHeaderMobile:' + item.shortname);
@@ -93,7 +92,7 @@ class adminDivisionPage extends React.Component {
                 headerLink: link,
                 showHeaderTitle: this.state.showHeaderTitle ? 1 : 0
             };
-            this.props.updateDvWebsite(this.state.shortname, payload, () => this.getData());
+            this.props.updateDvWebsite(this.state.id, payload, () => this.getData());
         }
     }
 
@@ -103,8 +102,7 @@ class adminDivisionPage extends React.Component {
                 <Link to={'/user/menu/edit/' + this.state.id + '/' + menu.id} style={{ color: menu.active ? '#009688' : 'gray' }}>
                     {T.language.parse(menu.title, true).vi}
                 </Link>&nbsp;
-                {menu.link ? <p>(<a href={menu.link}
-                    target='_blank' style={{ color: 'blue' }} rel="noreferrer">
+                {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel='noreferrer'>
                     {menu.link.length > 60 ? menu.link.slice(0, 60) + '...' : menu.link}
                 </a>)</p> : null}
 
@@ -203,14 +201,12 @@ class adminDivisionPage extends React.Component {
                 </button>
 
                 {currentPermissions.includes('component:read') ?
-                    <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: '66px', bottom: '10px' }}
-                        onClick={() => this.props.history.push('/user/component')}>
+                    <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: '66px', bottom: '10px' }} onClick={() => this.props.history.push('/user/component')}>
                         <i className='fa fa-lg fa-cogs' />
                     </button> : null}
 
                 {hasCreate ?
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}
-                        onClick={this.create}>
+                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.create}>
                         <i className='fa fa-lg fa-plus' />
                     </button> : null}
             </main>

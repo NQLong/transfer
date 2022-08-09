@@ -875,10 +875,14 @@ export class CirclePageButton extends React.Component {
         } else if (type == 'custom') {
             result = <button {...properties} className={'btn btn-circle ' + customClassName}><i className={'fa fa-lg ' + customIcon} /></button>;
         } else {
-            result = (
-                <Link to={to} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>);
+            if (typeof to == 'string') {
+                result = (
+                    <Link to={to} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }}>
+                        <i className='fa fa-lg fa-reply' />
+                    </Link>);
+            } else {
+                result = <button style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }} onClick={to} className='btn btn-circle btn-secondary'><i className='fa fa-lg fa-reply' /></button>;
+            }
         }
         return tooltip ?
             <Tooltip title={tooltip} arrow placement='top'>{result}</Tooltip> :

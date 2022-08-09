@@ -16,15 +16,15 @@ module.exports = app => {
     app.get('/user/danh-muc/don-vi/upload', app.permission.check('dmDonVi:write'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/don-vi/page/:pageNumber/:pageSize', (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.dmDonVi.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
-            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-            const pageCondition = searchTerm;
-            res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-        });
+    app.get('/api/danh-muc/don-vi/page/:pageNumber/:pageSize', async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = await app.model.dmDonVi.searchPage(_pageNumber, _pageSize, searchTerm);
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition: searchTerm, list } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/danh-muc/don-vi/all', app.permission.check('user:login'), (req, res) => {
@@ -51,7 +51,7 @@ module.exports = app => {
     app.get('/api/danh-muc/don-vi/item/:ma', app.permission.check('user:login'), (req, res) => {
         if (req.params.ma == 0) res.send({
             item: {
-                ma: 0, ten: 'Trường ĐH Khoa học Xã hội và Nhân văn - TPHCM'
+                ma: 0, ten: 'Trường ĐH Khoa học Xã hội và Nhân văn - TPHCM', homeLanguage: 'vi,en'
             }
         });
         else app.model.dmDonVi.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
@@ -64,7 +64,7 @@ module.exports = app => {
                 imageLink = '/img/dmDonVi/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath),
                 destPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, destPath, () => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 data.image = imageLink;
                 app.model.dmDonVi.create(data, (error, item) => res.send({ error, item }));
             });
@@ -108,8 +108,8 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/dmDonVi'));
-    app.createFolder(app.path.join(app.publicPath, '/img/dmDonViImage'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/dmDonVi'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/dmDonViImage'));
 
 
     const uploadDmDonViImage = (req, fields, files, params, done) => {
@@ -132,8 +132,8 @@ module.exports = app => {
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (donVi) {
-                        app.deleteFile(srcPath);
-                        if (donVi.imageDisplay) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplay));
+                        app.fs.deleteFile(srcPath);
+                        if (donVi.imageDisplay) app.fs.deleteFile(app.path.join(app.publicPath, donVi.imageDisplay));
                         app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplay: image }, (error,) => done({ error, image: image }));
                     }
                 });
@@ -153,8 +153,8 @@ module.exports = app => {
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (donVi) {
-                        app.deleteFile(srcPath);
-                        if (donVi.imageDisplayTa) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplayTa));
+                        app.fs.deleteFile(srcPath);
+                        if (donVi.imageDisplayTa) app.fs.deleteFile(app.path.join(app.publicPath, donVi.imageDisplayTa));
                         app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplayTa: image }, (error,) => done({ error, image: image }));
                     }
                 });

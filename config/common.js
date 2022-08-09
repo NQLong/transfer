@@ -1,5 +1,4 @@
 module.exports = (app, appConfig) => {
-    const fse = require('fs-extra');
     app.adminRole = {};
     app.clone = function () {
         const length = arguments.length;
@@ -18,23 +17,6 @@ module.exports = (app, appConfig) => {
         }
         return result;
     };
-
-    app.fs.renameSync = (oldPath, newPath) => {
-        fse.copySync(oldPath, newPath);
-        fse.removeSync(oldPath);
-    };
-
-    app.fs.rename = (oldPath, newPath, done) => {
-        try {
-            fse.copySync(oldPath, newPath);
-            fse.removeSync(oldPath);
-            done && done();
-        } catch (error) {
-            done && done(error);
-        }
-    };
-
-    // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
     app.templates = {};
@@ -64,16 +46,6 @@ module.exports = (app, appConfig) => {
                 }
             };
         }
-    };
-
-    // Upload Hook ----------------------------------------------------------------------------------------------------------------------------------
-    const uploadHooksList = {};
-    app.uploadHooks = {
-        add: (name, hook) => uploadHooksList[name] = hook,
-        remove: name => uploadHooksList[name] = null,
-
-        run: (req, fields, files, params, sendResponse) =>
-            Object.keys(uploadHooksList).forEach(name => uploadHooksList[name] && uploadHooksList[name](req, fields, files, params, data => data && sendResponse(data))),
     };
 
     // Parent menu ----------------------------------------------------------------------------------------------------------------------------------
@@ -141,48 +113,6 @@ module.exports = (app, appConfig) => {
         }
     };
 
-    // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------
-    const readyHookContainer = {};
-    let readyHooksId = null;
-    app.readyHooks = {
-        add: (name, hook) => {
-            readyHookContainer[name] = hook;
-            app.readyHooks.waiting();
-        },
-        remove: name => {
-            readyHookContainer[name] = null;
-            app.readyHooks.waiting();
-        },
-
-        waiting: () => {
-            if (readyHooksId) clearTimeout(readyHooksId);
-            readyHooksId = setTimeout(app.readyHooks.run, 2000);
-        },
-
-        run: () => {
-            let hookKeys = Object.keys(readyHookContainer),
-                ready = true;
-
-            // Check all hooks
-            for (let i = 0; i < hookKeys.length; i++) {
-                const hook = readyHookContainer[hookKeys[i]];
-                if (!hook.ready()) {
-                    ready = false;
-                    console.log(hookKeys[i]);
-                    break;
-                }
-            }
-
-            if (ready) {
-                hookKeys.forEach(hookKey => readyHookContainer[hookKey].run());
-                console.log(` - #${process.pid}${app.primaryWorker ? ' (primary)' : ''}: The system is ready!`);
-            } else {
-                app.readyHooks.waiting();
-            }
-        }
-    };
-    app.readyHooks.waiting();
-
     // Load modules ---------------------------------------------------------------------------------------------------------------------------------
     app.loadModules = (loadController = true) => {
         const modulePaths = app.fs.readdirSync(app.modulesPath, { withFileTypes: true }).filter(item => item.isDirectory()).map(item => app.modulesPath + '/' + item.name),
@@ -217,163 +147,107 @@ module.exports = (app, appConfig) => {
         if (loadController) controllerPaths.forEach(path => require(path)(app, appConfig));
     };
 
-    //Utils-----------------------------------------------------------------------------------------------------------------------
-    app.stringify = (value, defaultValue = '') => {
-        try {
-            return JSON.stringify(value);
-        } catch (exception) {
-            return defaultValue;
-        }
-    };
-
-    app.parse = (value, defaultValue = {}) => {
-        try {
-            return JSON.parse(value);
-        } catch (exception) {
-            return defaultValue;
-        }
-    };
-
-    app.toIsoString = (date) => {
-        let tzo = -date.getTimezoneOffset(),
-            dif = tzo >= 0 ? '+' : '-',
-            pad = function (num) {
-                return (num < 10 ? '0' : '') + num;
-            };
-
-        return date.getFullYear() +
-            '-' + pad(date.getMonth() + 1) +
-            '-' + pad(date.getDate()) +
-            'T' + pad(date.getHours()) +
-            ':' + pad(date.getMinutes()) +
-            ':' + pad(date.getSeconds()) +
-            dif + pad(Math.floor(Math.abs(tzo) / 60)) +
-            ':' + pad(Math.abs(tzo) % 60);
-    };
-
-    app.numberToVnText = (so) => {
-        const doc1so = (so) => {
-            let arr_chuhangdonvi = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
-            let resualt = '';
-            resualt = arr_chuhangdonvi[so];
-            return resualt;
-        };
-
-        const doc2so = (so) => {
-            so = so.replace(' ', '');
-            let arr_chubinhthuong = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
-            let arr_chuhangdonvi = ['mươi', 'mốt', 'hai', 'ba', 'bốn', 'lăm', 'sáu', 'bảy', 'tám', 'chín'];
-            let arr_chuhangchuc = ['', 'mười', 'hai mươi', 'ba mươi', 'bốn mươi', 'năm mươi', 'sáu mươi', 'bảy mươi', 'tám mươi', 'chín mươi'];
-            let resualt = '';
-            let sohangchuc = so.substr(0, 1);
-            let sohangdonvi = so.substr(1, 1);
-            resualt += arr_chuhangchuc[sohangchuc];
-            if (sohangchuc == 1 && sohangdonvi == 1)
-                resualt += ' ' + arr_chubinhthuong[sohangdonvi];
-            else if (sohangchuc == 1 && sohangdonvi > 1)
-                resualt += ' ' + arr_chuhangdonvi[sohangdonvi];
-            else if (sohangchuc > 1 && sohangdonvi > 0)
-                resualt += ' ' + arr_chuhangdonvi[sohangdonvi];
-
-            return resualt;
-        };
-
-        const doc3so = (so) => {
-            let resualt = '';
-            let arr_chubinhthuong = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
-            let sohangtram = so.substr(0, 1);
-            let sohangchuc = so.substr(1, 1);
-            let sohangdonvi = so.substr(2, 1);
-            resualt = arr_chubinhthuong[sohangtram] + ' trăm';
-            if (sohangchuc == 0 && sohangdonvi != 0)
-                resualt += ' linh ' + arr_chubinhthuong[sohangdonvi];
-            else if (sohangchuc != 0)
-                resualt += ' ' + doc2so(sohangchuc + ' ' + sohangdonvi);
-            return resualt;
-        };
-
-        const docsonguyen = (so) => {
-            let result = '';
-            if (so != undefined) {
-                let arr_So = [{ ty: '' }, { trieu: '' }, { nghin: '' }, { tram: '' }];
-                let sochuso = so.length;
-                for (let i = (sochuso - 1); i >= 0; i--) {
-                    if ((sochuso - i) <= 3) {
-                        if (arr_So['tram'] != undefined)
-                            arr_So['tram'] = so.substr(i, 1) + arr_So['tram'];
-                        else arr_So['tram'] = so.substr(i, 1);
-
-                    }
-                    else if ((sochuso - i) > 3 && (sochuso - i) <= 6) {
-                        if (arr_So['nghin'] != undefined)
-                            arr_So['nghin'] = so.substr(i, 1) + arr_So['nghin'];
-                        else arr_So['nghin'] = so.substr(i, 1);
-                    }
-                    else if ((sochuso - i) > 6 && (sochuso - i) <= 9) {
-                        if (arr_So['trieu'] != undefined)
-                            arr_So['trieu'] = so.substr(i, 1) + arr_So['trieu'];
-                        else arr_So['trieu'] = so.substr(i, 1);
-                    }
-                    else {
-                        if (arr_So.ty != undefined)
-                            arr_So.ty = so.substr(i, 1) + arr_So.ty;
-                        else arr_So.ty = so.substr(i, 1);
-                    }
+    // Load services --------------------------------------------------------------------------------------------------
+    const axios = require('axios'),
+        axiosRequest = async (type, url, data, requestConfig) => {
+            try {
+                if (!data) data = {};
+                if (!requestConfig) requestConfig = {};
+                if (type == 'get') {
+                    const params = new URLSearchParams(data).toString();
+                    if (params.length) url = url + (url.includes('?') ? '&' : '?') + params;
+                    data = {};
+                } else if (type == 'delete') {
+                    data = { data };
                 }
+                const response = await axios[type](url, data, requestConfig);
+                return response ? response.data : null;
+            } catch (error) {
+                return { error };
+            }
+        };
+    app.service = {
+        url: (url, serviceConfig) => {
+            if (!app.isDebug) {
+                return `http://${serviceConfig.host}:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
+            } else if (serviceConfig.isDebug) {
+                return `http://localhost:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
+            } else {
+                return `http://localhost:${app.port}` + url + '?t=' + new Date().getTime();
+            }
+        },
 
-                if (arr_So['ty'] > 0)
-                    result += doc(arr_So['ty']) + ' tỷ';
-                if (arr_So['trieu'] > 0) {
-                    if (arr_So['trieu'].length >= 3 || arr_So['ty'] > 0)
-                        result += ' ' + doc3so(arr_So['trieu']) + ' triệu';
-                    else if (arr_So['trieu'].length >= 2)
-                        result += ' ' + doc2so(arr_So['trieu']) + ' triệu';
-                    else result += ' ' + doc1so(arr_So['trieu']) + ' triệu';
-                }
-                if (arr_So['nghin'] > 0) {
-                    if (arr_So['nghin'].length >= 3 || arr_So['trieu'] > 0)
-                        result += ' ' + doc3so(arr_So['nghin']) + ' nghìn';
-                    else if (arr_So['nghin'].length >= 2)
-                        result += ' ' + doc2so(arr_So['nghin']) + ' nghìn';
-                    else result += ' ' + doc1so(arr_So['nghin']) + ' nghìn';
-                }
-                if (arr_So['tram'] > 0) {
-                    if (arr_So['tram'].length >= 3 || arr_So['nghin'] > 0)
-                        result += ' ' + doc3so(arr_So['tram']);
-                    else if (arr_So['tram'].length >= 2)
-                        result += ' ' + doc2so(arr_So['tram']);
-                    else result += ' ' + doc1so(arr_So['tram']);
+        clusterGetAll: async (serviceName, done) => {
+            const serviceConfig = appConfig.services[serviceName],
+                url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
+                response = await app.service.get(url);
+            done && done(response);
+            return response;
+        },
+        clusterCreate: async (serviceName, done) => {
+            const serviceConfig = appConfig.services[serviceName],
+                url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
+                response = await app.service.post(url);
+            done && done(response);
+            return response;
+        },
+        clusterReset: async (serviceName, id, done) => {
+            const serviceConfig = appConfig.services[serviceName],
+                url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
+                response = await app.service.put(url, { id });
+            done && done(response);
+            return response;
+        },
+        clusterDelete: async (serviceName, id, done) => {
+            const serviceConfig = appConfig.services[serviceName],
+                url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
+                response = await app.service.delete(url, { id });
+            done && done(response);
+            return response;
+        },
+
+        clusterImageApply: async (serviceName, filename, done) => {
+            const serviceConfig = appConfig.services[serviceName],
+                url = app.service.url(`/api/cluster/service/image/${serviceName}`, serviceConfig),
+                response = await app.service.put(url, { filename });
+            done && done(response);
+            return response;
+        },
+        clusterImageDelete: async (serviceName, filename, done) => {
+            const serviceConfig = appConfig.services[serviceName],
+                url = app.service.url(`/api/cluster/service/image/${serviceName}`, serviceConfig),
+                response = await app.service.delete(url, { filename });
+            done && done(response);
+            return response;
+        },
+    };
+    ['get', 'post', 'put', 'delete'].forEach(type => app.service[type] = async (url, data, requestConfig) => await axiosRequest(type, url, data, requestConfig));
+    if (app.isDebug) {
+        app.service.main = {};
+        ['get', 'post', 'put', 'delete'].forEach(type => app.service.main[type] = async (url, data, requestConfig) => await axiosRequest(type, `http://localhost:${appConfig.port}${url}`, data, requestConfig));
+    }
+
+    app.loadServices = () => {
+        app.fs.readdirSync(app.servicesPath, { withFileTypes: true }).forEach(serviceDirectory => {
+            if (serviceDirectory.isDirectory() && serviceDirectory.name != 'config') {
+                const serviceConfig = appConfig.services[serviceDirectory.name] || {};
+                serviceConfig.name = serviceDirectory.name;
+                if (!serviceConfig.isDebug) serviceConfig.isDebug = false;
+
+                const mainPath = app.path.join(app.servicesPath, serviceDirectory.name, 'main.js');
+                const servicePath = app.path.join(app.servicesPath, serviceDirectory.name, 'service.js');
+                if (app.fs.existsSync(mainPath)) {
+                    if (app.isDebug) {
+                        if (serviceConfig.isDebug) {
+                            console.log(` - Debug service ${serviceConfig.name} on ${serviceConfig.host ? 'http://' + serviceConfig.host + ':' + serviceConfig.port : 'Service app!'}`);
+                        } else {
+                            console.log(` - Debug service ${serviceConfig.name} on Main app!`);
+                            if (app.fs.existsSync(servicePath)) require(servicePath)(app, serviceConfig);
+                        }
+                    }
+                    app.fs.existsSync(mainPath) && require(mainPath)(app, serviceConfig);
                 }
             }
-            return result;
-        };
-
-        const doc = (so) => {
-            let kytuthapphan = ',';
-            let result = '';
-            if (so != undefined) {
-                so = ' ' + so + ' ';
-                so = so.trim();
-                let cautrucso = so.split(kytuthapphan);
-                if (cautrucso[0] != undefined) {
-                    result += docsonguyen(cautrucso[0]);
-                }
-                if (cautrucso[1] != undefined) {
-                    result += ' phẩy ' + docsonguyen(cautrucso[1]);
-                }
-            }
-
-            return result;
-        };
-
-        return doc(so);
-    };
-
-    app.arrayToChunk = (array, chunkSize = 10) => {
-        const list = [];
-        for (let i = 0; i < array.length; i += chunkSize) {
-            list.push(array.slice(i, i + chunkSize));
-        }
-        return list;
+        });
     };
 };

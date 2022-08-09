@@ -129,21 +129,15 @@ export function deleteFooterItem(id, done) {
 
 export function getSystemState(done) {
     return dispatch => {
-        const url = '/api/state',
-            hostname = window.location.href;
-        if (hostname.includes('/en') || hostname.includes('/news-en') || hostname.includes('/article')) {
-            T.cookie('language', 'en');
-        } else {
-            T.cookie('language', 'vi');
-        }
-        T.get(url, data => {
-            if (data) {
-                dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
-            }
-            if (done) done(data);
+        const url = '/api/state';
+        const path = window.location.pathname, link = path.endsWith('/') && path.length > 1 ? path.substring(0, path.length - 1) : path;
+        const maDonVi = $('meta[property=donVi]').attr('content');
+        T.get(url, { template: T.template, link, maDonVi }, data => {
+            data && dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
+            done && done(data);
         }, () => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
-            if (done) done();
+            done && done();
         });
     };
 }
@@ -224,6 +218,7 @@ export function getValueFwSetting(keys, done) {
         });
     };
 }
+
 export function updateFwSetting(changes, done) {
     return () => {
         const url = '/api/fw-setting';
@@ -239,7 +234,6 @@ export function updateFwSetting(changes, done) {
     };
 }
 
-
 // AJAX ---------------------------------------------------------------------------------------------------------------
 export function register(data, done) {
     T.post('/register', data, res => {
@@ -254,7 +248,6 @@ export function register(data, done) {
 export function forgotPassword(email, onSuccess, onError) {
     T.put('/forgot-password', { email }, onSuccess, onError);
 }
-
 
 export function getSystemEmails(done) {
     T.get('/api/email/all', done, () => T.notify('Lấy thông tin email bị lỗi!', 'danger'));

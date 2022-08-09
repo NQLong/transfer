@@ -3909,7 +3909,8 @@
             "moduleName": "websiteDonVi",
             "modelName": "dvWebsite",
             "methods": {
-                "DV_WEBSITE_SEARCH_PAGE": "searchPage"
+                "DV_WEBSITE_SEARCH_PAGE": "searchPage",
+                "DV_WEBSITE_SEARCH_PAGE_DON_VI": "searchPageDonVi"
             },
             "columns": {
                 "ID": {
@@ -7889,7 +7890,7 @@
             "modelName": "qtHopDongLaoDong",
             "methods": {
                 "QT_HOP_DONG_LAO_DONG_SEARCH_PAGE": "searchPage",
-                "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
+             ,   "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
                 "QT_HOP_DONG_LAO_DONG_GROUP_PAGE": "groupPage",
                 "DOWNLOAD_EXCEL_QT_HOP_DONG_LAO_DONG": "downloadExcel",
                 "QT_HOP_DONG_GET_MAX_SHCC_BY_DON_VI": "getMaxShccByDonVi"
@@ -13835,7 +13836,8 @@
                 "TC_HOC_PHI_GET_INVOICE_INFO": "getInvoiceInfo",
                 "TC_HOC_PHI_GET_INVOICE_LIST": "getInvoiceList",
                 "TC_HOC_PHI_STATISTIC": "getStatistic",
-                "TC_HOC_PHI_GET_DETAIL": "getDetail"
+                "TC_HOC_PHI_GET_DETAIL": "getDetail",
+                "TC_HOC_PHI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "MSSV": {
@@ -14965,6 +14967,9 @@
             "active": true,
             "moduleName": "hcthYeuCauTaoKhoa",
             "modelName": "hcthYeuCauTaoKhoa",
+            "methods": {
+                "HCTH_YEU_CAU_TAO_KHOA_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -16116,9 +16121,12 @@
             "active": true,
             "moduleName": "tcDinhMucHocPhi",
             "modelName": "tcDinhMucHocPhi",
+            "methods": {
+                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
-                "NAM_HOC": {
-                    "value": "namHoc",
+                "NAM_BAT_DAU": {
+                    "value": "namBatDau",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -16158,9 +16166,18 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_156781\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "NAM_KET_THUC": {
+                    "value": "namKetThuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
                 }
             },
-            "primaryKeys": [],
+            "primaryKeys": [
+                "MA"
+            ],
             "foreignKeys": [],
             "type": "table"
         }

@@ -68,7 +68,7 @@ module.exports = app => {
                 done(error);
             } else {
                 for (const item of items) {
-                    item.type === 'image' && app.deleteImage(item.payload);
+                    item.type === 'image' && app.fs.deleteImage(item.payload);
                 }
 
                 app.model.fwInewsItem.delete({ inewsId: id }, error => {

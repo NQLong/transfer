@@ -134,7 +134,7 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/sinhVien'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/sinhVien'));
 
     const uploadSinhVienImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('SinhVienImage:') && files.SinhVienImage && files.SinhVienImage.length) {
@@ -196,7 +196,7 @@ module.exports = app => {
             data.image = '';
             const qrCode = require('qrcode');
             let qrCodeImage = app.path.join(app.assetPath, '/qr-syll', data.mssv + '.png');
-            app.createFolder(app.path.join(app.assetPath, '/qr-syll'));
+            app.fs.createFolder(app.path.join(app.assetPath, '/qr-syll'));
             await qrCode.toFile(qrCodeImage, JSON.stringify({ mssv: data.mssv, updatedAt: data.lastModified }));
             data.qrCode = qrCodeImage;
             app.docx.generateFileHasImage(source, data, async (error, buffer) => {
@@ -205,7 +205,7 @@ module.exports = app => {
                 else {
                     const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
-                    app.deleteFile(qrCodeImage);
+                    app.fs.deleteFile(qrCodeImage);
                     let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, defaultEmail, defaultPassword } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
                     app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, data.emailCaNhan, ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
                         // Success callback

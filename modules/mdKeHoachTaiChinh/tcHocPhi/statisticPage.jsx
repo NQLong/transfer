@@ -44,6 +44,11 @@ export default class StatisticModal extends AdminPage {
                             <button className='btn btn-primary' onClick={e => e.preventDefault() || this.props.history.push('/user/finance/hoc-phi')}><i className='fa fa-lg fa-child' />Trang học viên</button>
                             <button className='btn btn-success' onClick={e => e.preventDefault() || this.props.history.push('/user/finance/danh-sach-giao-dich')}><i className='fa fa-lg fa-money' />Trang giao dịch</button>
                         </div>
+
+                        <div className='d-flex justify-content-center' style={{ gap: 10, marginTop: '10px' }}>
+                            <button className='btn btn-info' onClick={e => e.preventDefault() || T.download(`/api/finance/danh-sach-giao-dich/download-psc?filter=${T.stringify({})}`)}><i className='fa fa-lg fa-download' />Danh sách giao dịch</button>
+                            <button className='btn btn-info' onClick={e => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify({})}`)}><i className='fa fa-lg fa-download' />Quản lý học phí</button>
+                        </div>
                     </div>
                 </div>
                 <ChartArea className='col-lg-4' title='Tổng quan' chartType='doughnut' data={{

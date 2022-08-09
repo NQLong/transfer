@@ -118,7 +118,7 @@ module.exports = (app, appConfig) => {
                 password: db.password,
             }), timeoutPromise()]).then(connection => {
                 if (connection) {
-                    console.log(` - #${process.pid}: The Oracle connection succeeded.`);
+                    console.log(` - #${process.pid}: The Oracle connection ${db.username} succeeded.`);
                     app.database.oracle.connection[dbName] = connection;
                     app.database.oracle.connected = true;
 
