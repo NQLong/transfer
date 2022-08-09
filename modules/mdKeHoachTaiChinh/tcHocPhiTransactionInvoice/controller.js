@@ -23,7 +23,8 @@ module.exports = app => {
         login: '/auth/token',
         hsmPublish: '/code/itg/invoicepublishing/publishhsm',
         view: '/invoicepublished/linkview',
-        download: '/code/itg/invoicepublished/downloadinvoice'
+        download: '/code/itg/invoicepublished/downloadinvoice',
+        cancel: '/code/itg/invoicepublished/cancel',
     };
 
     app.get('/user/finance/invoice', app.permission.check('tcInvoice:read'), app.templates.admin);
@@ -210,12 +211,18 @@ module.exports = app => {
                 throw { message: 'Tạo hóa đơn lỗi', error: data[0].ErrorCode };
             }
             const invoices = await Promise.all(data.map(async invoice => {
-                return await app.model.tcHocPhiTransactionInvoice.create({
-                    transactionId: 'transaction.transId',
+                const refId = invoice.RefID;
+                const [mssv, namHoc, hocKy, ngayPhatHanh] = refId.split('-');
+                const newInvoice = await app.model.tcHocPhiTransactionInvoice.create({
+                    refId,
                     invoiceTransactionId: invoice.TransactionID,
                     invoiceNumber: invoice.InvNo,
-                    mssv: hocPhi.mssv, hocKy: hocPhi.hocKy, namHoc: hocPhi.namHoc
+                    mssv, namHoc, hocKy, ngayPhatHanh
                 });
+                const emails = await getMailConfig();
+                const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
+                sendSinhVienInvoice(newInvoice, null, null, email);
+                return newInvoice;
             }));
             res.send({ items: invoices });
         } catch (error) {
@@ -241,13 +248,13 @@ module.exports = app => {
                 if (invoice.ErrorCode)
                     return null;
                 const refId = invoice.RefID;
-                const [mssv, namHoc, hocKy] = refId.split('-');
+                const [mssv, namHoc, hocKy, ngayPhatHanh] = refId.split('-');
                 try {
                     const item = await app.model.tcHocPhiTransactionInvoice.create({
-                        transactionId: 'transaction.transId',
+                        refId: refId,
                         invoiceTransactionId: invoice.TransactionID,
                         invoiceNumber: invoice.InvNo,
-                        mssv: mssv, hocKy: hocKy, namHoc: namHoc
+                        mssv, hocKy, namHoc, ngayPhatHanh
                     });
                     sendSinhVienInvoice(item, null, config, email);
                     return item;
@@ -385,4 +392,30 @@ module.exports = app => {
             res.send({ error });
         }
     });
+
+    app.post('/api/finance/invoice/cancel/:id', app.permission.check('tcInvoice:write'), async (req, res) => {
+        try {
+            const id = parseInt(req.params.id), lyDo = req.body.lyDo;
+            if (!id || !lyDo) throw 'Dữ liệu không hợp lệ';
+            const invoice = await app.model.tcHocPhiTransactionInvoice.get({ id });
+            if (!invoice) throw 'Không tìm được hóa đơn';
+            else if (invoice.lyDoHuy) throw 'Hóa đơn đã bị hủy';
+            const invoiceDate = new Date(invoice.ngayPhatHanh);
+            const instance = await app.getMisaAxiosInstance();
+            const response = await instance.post(url.cancel, {
+                TransactionID: invoice.invoiceTransactionId,
+                InvNo: invoice.invoiceNumber,
+                // RefDate: `${invoiceDate.getFullYear()}-${invoiceDate.getMonth() + 1}-${invoiceDate.getDate()}`,
+                RefDate: app.toIsoString(invoiceDate).slice(0, 10),
+                CancelReason: lyDo,
+            });
+            if (response.ErrorCode)
+                throw 'Lỗi hệ thống';
+            await app.model.tcHocPhiTransactionInvoice.update({ id }, { lyDoHuy: lyDo });
+            res.send({});
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
 };
