@@ -43,3 +43,21 @@ export function sendInvoiceMail(id, done) {
         }, () => T.notify('Gửi mail hóa đơn lỗi!', 'danger'));
     };
 }
+
+export function cancelInvoice(id, lyDo, done, onError) {
+    return dispatch => {
+        const url = `/api/finance/invoice/cancel/${id}`;
+        T.post(url, { lyDo }, res => {
+            if (res.error) {
+                T.notify('Hủy hóa đơn lỗi. ' + (res.error.message && typeof res.error.message === 'string' ? res.error.message : ''), 'danger');
+                console.error(`POST: ${url}.`, res.error);
+                onError && onError();
+            }
+            else {
+                T.notify('Hủy hóa đơn thành công', 'success');
+                dispatch(getInvoicePage());
+                done && done();
+            }
+        }, () => T.notify('Hủy hóa đơn lỗi', 'danger'));
+    };
+} 
