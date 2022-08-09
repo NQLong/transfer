@@ -22,7 +22,7 @@ module.exports = (cluster, isDebug) => {
     app.database = {};
     app.model = {};
     if (!app.isDebug && app.fs.existsSync('./asset/config.json')) appConfig = Object.assign({}, appConfig, require('../asset/config.json'));
-    app.createFolder(app.assetPath, app.bundlePath, app.uploadPath);
+    app.fs.createFolder(app.assetPath, app.bundlePath, app.uploadPath);
 
     // Worker ---------------------------------------------------------------------------------------------------------
     app.worker = {

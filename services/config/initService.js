@@ -56,21 +56,21 @@ module.exports = (app, serviceConfig) => {
                     mainCodeFilename = require(destPath + '/package.json').main;
                 if (app.isDebug) {
                     destPath = app.bundlePath + '/dest';
-                    app.deleteFolder(destPath);
-                    app.createFolder(destPath);
+                    app.fs.deleteFolder(destPath);
+                    app.fs.createFolder(destPath);
                 }
 
                 app.fs.renameSync(extractPath + '/' + mainCodeFilename, destPath + '/' + mainCodeFilename);
                 app.fs.renameSync(extractPath + '/package.json', destPath + '/package.json');
-                app.deleteFolder(destPath + '/config');
-                app.deleteFolder(destPath + '/models');
-                app.deleteFolder(destPath + '/services');
+                app.fs.deleteFolder(destPath + '/config');
+                app.fs.deleteFolder(destPath + '/models');
+                app.fs.deleteFolder(destPath + '/services');
 
                 app.fs.renameSync(extractPath + '/config', destPath + '/config');
                 app.fs.renameSync(extractPath + '/models', destPath + '/models');
                 app.fs.existsSync(extractPath + '/services') && app.fs.renameSync(extractPath + '/services', destPath + '/services');
 
-                app.deleteFolder(extractPath);
+                app.fs.deleteFolder(extractPath);
                 const imageInfoPath = app.path.join(destPath, 'imageInfo.txt');
                 app.fs.writeFileSync(imageInfoPath, app.path.basename(imageFile));
                 res.send({});
@@ -88,7 +88,7 @@ module.exports = (app, serviceConfig) => {
             const filepath = app.path.join(app.bundlePath, filename),
                 state = app.fs.statSync(filepath);
             if (filepath.startsWith(app.bundlePath + '/') && app.fs.existsSync(filepath) && state.isFile()) {
-                app.deleteFile(filepath);
+                app.fs.deleteFile(filepath);
                 res.send({});
             } else {
                 res.send({ error: 'Invalid filename!' });
