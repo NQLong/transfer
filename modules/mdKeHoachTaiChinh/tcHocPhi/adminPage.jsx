@@ -293,7 +293,7 @@ class TcHocPhiAdminPage extends AdminPage {
                             </button>
                         </Tooltip>
                         {item.invoiceId ? <Tooltip title='Xem hóa đơn' arrow>
-                            <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.invoiceId}`}>
+                            <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.invoiceId}`}>
                                 <i className='fa fa-lg fa-credit-card' />
                             </a>
                         </Tooltip> :
