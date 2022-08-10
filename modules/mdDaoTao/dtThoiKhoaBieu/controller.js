@@ -111,8 +111,34 @@ module.exports = app => {
                     }
                 }
             }
-            // console.log(promiseList);
-            // await Promise.all(promiseList);
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/create-multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let { data, settings } = req.body;
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index],
+                    maNganh = item.maNganh,
+                    chuyenNganh = item.chuyenNganh || [],
+                    soBuoiTuan = item.soBuoiTuan;
+                for (let buoi = 1; buoi <= parseInt(soBuoiTuan); buoi++) {
+                    const tkbItem = await app.model.dtThoiKhoaBieu.create(app.clone(item, settings, { nhom: index + 1 }));
+                    for (const nganhItem of maNganh) {
+                        if (chuyenNganh.length) {
+                            for (const chuyenNganhItem of chuyenNganh) {
+                                let idNganh = chuyenNganhItem ? `${nganhItem}&&${chuyenNganhItem}` : nganhItem;
+                                await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh });
+                            }
+                        } else {
+                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh: nganhItem });
+                        }
+                    }
+                }
+            }
             res.end();
         } catch (error) {
             console.log(error);
@@ -222,11 +248,12 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
     // Export xlsx
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {
-            let filter = app.parse(req.query.filter || {});
-            filter = app.stringify(filter, '');
+            let filter = app.utils.parse(req.query.filter || {});
+            filter = app.utils.stringify(filter, '');
             let data = await app.model.dtThoiKhoaBieu.searchPage(1, 1000000, filter, '');
             const workBook = app.excel.create();
             const ws = workBook.addWorksheet('Thoi khoa bieu');
@@ -265,7 +292,7 @@ module.exports = app => {
                 ws.addRow({
                     stt: index + 1,
                     ma: item.maMonHoc,
-                    monHoc: `${app.parse(item.tenMonHoc).vi}`,
+                    monHoc: `${app.utils.parse(item.tenMonHoc).vi}`,
                     tuChon: item.loaiMonHoc ? 'x' : '',
                     lop: item.nhom,
                     tongTiet: item.tongTiet,

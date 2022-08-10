@@ -894,6 +894,10 @@ export class AdminModal extends React.Component {
     state = { display: '' };
     _data = {};
 
+    disabledClickOutside = () => {
+        $(this.modal).modal({ backdrop: 'static', keyboard: false, show: false });
+    }
+
     componentWillUnmount() {
         this.hide();
     }
@@ -938,7 +942,7 @@ export class AdminModal extends React.Component {
         }
     }
 
-    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {} }) => {
+    renderModal = ({ title, body, size, buttons, postButtons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {}, showCloseButton = true }) => {
         const { readOnly = false } = this.props;
         return (
             <div className='modal fade' role='dialog' ref={e => this.modal = e} style={style}>
@@ -953,9 +957,10 @@ export class AdminModal extends React.Component {
                         <div className='modal-body'>{body}</div>
                         <div className='modal-footer'>
                             {buttons}
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>
+                            <button type='button' className='btn btn-secondary' data-dismiss='modal' style={{ display: showCloseButton ? '' : 'none' }}>
                                 <i className='fa fa-fw fa-lg fa-times' />Đóng
                             </button>
+                            {postButtons}
                             {!isShowSubmit || readOnly == true || !this.onSubmit ? null :
                                 <button type='submit' className='btn btn-primary' disabled={isLoading}>
                                     {isLoading ? <i className='fa fa-spin fa-lg fa-spinner' /> : <i className='fa fa-fw fa-lg fa-save' />} {submitText}

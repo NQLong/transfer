@@ -36,7 +36,7 @@ module.exports = app => {
                 pageSize = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.searchTerm === 'string' ? req.query.searchTerm : '';
 
-            let filter = app.stringify(req.query.filter || {});
+            let filter = app.utils.stringify(req.query.filter || {});
 
             const page = await app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm);
             if (!page) {
@@ -49,6 +49,13 @@ module.exports = app => {
         } catch (error) {
             res.send({ error });
         }
+    });
+
+    app.get('/api/dao-tao/danh-sach-chuyen-nganh/all/:maNganh/:nam', app.permission.check('dtNganhDaoTao:read'), (req, res) => {
+        app.model.dtDanhSachChuyenNganh.getAll({
+            namHoc: req.params.nam,
+            nganh: req.params.maNganh,
+        }, (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/dao-tao/danh-sach-chuyen-nganh/item/:id', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
