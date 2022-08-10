@@ -7890,7 +7890,7 @@
             "modelName": "qtHopDongLaoDong",
             "methods": {
                 "QT_HOP_DONG_LAO_DONG_SEARCH_PAGE": "searchPage",
-             ,   "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
+                "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
                 "QT_HOP_DONG_LAO_DONG_GROUP_PAGE": "groupPage",
                 "DOWNLOAD_EXCEL_QT_HOP_DONG_LAO_DONG": "downloadExcel",
                 "QT_HOP_DONG_GET_MAX_SHCC_BY_DON_VI": "getMaxShccByDonVi"
