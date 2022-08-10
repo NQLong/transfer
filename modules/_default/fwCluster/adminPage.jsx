@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getClusterAll, createCluster, resetCluster, deleteCluster, getSystemImageAll, applySystemImage, deleteSystemImage } from './redux';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage } from './redux';
+import { AdminPage, FormTabs, TableCell, renderTable } from 'view/component/AdminPage';
 
 const parseImageFilename = (filename) => {
     const texts = filename.split('-');
@@ -15,133 +15,141 @@ const parseImageFilename = (filename) => {
 };
 
 class ClusterPage extends AdminPage {
+    state = { selectedServiceName: 'main' };
     componentDidMount() {
-        T.ready('/user/settings');
-        this.props.getSystemImageAll();
+        T.ready();
         this.props.getClusterAll();
-        T.socket.on('workers-changed', () => this.props.getClusterAll());
+        T.socket.on('services-changed', () => this.props.getClusterAll());
     }
 
     componentWillUnmount() {
-        T.socket.off('workers-changed');
+        T.socket.off('services-changed');
     }
 
-    createCluster = (e) => e.preventDefault() || this.props.createCluster();
-    resetCluster = (e, item) => e.preventDefault() || T.confirm('Reset cluster', `Are you sure you want to reset cluster ${item.pid}?`, true, isConfirm =>
-        isConfirm && this.props.resetCluster(item.pid));
-    deleteCluster = (e, item) => e.preventDefault() || T.confirm('Delete cluster', `Are you sure you want to delete cluster ${item.pid}?`, true, isConfirm =>
-        isConfirm && this.props.deleteCluster(item.pid));
-    resetAllClusters = (e) => e.preventDefault() || T.confirm('Delete cluster', 'Are you sure you want to reset all clusters?', true, isConfirm =>
-        isConfirm && this.props.resetCluster());
+    onServiceTabChanged = (data, serviceNames) => data && data.tabIndex != null && serviceNames[data.tabIndex] &&
+        this.setState({ selectedServiceName: serviceNames[data.tabIndex] });
 
-    refreshSystemImages = (e) => e.preventDefault() || this.props.getSystemImageAll();
-    applySystemImage = (e, item) => {
+    resetCluster = (e, serviceName, item) => e.preventDefault() || T.confirm('Reset cluster', `Are you sure you want to reset cluster ${serviceName}:${item.pid}?`, true, isConfirm =>
+        isConfirm && this.props.resetCluster(serviceName, item.pid));
+    deleteCluster = (e, serviceName, item) => e.preventDefault() || T.confirm('Delete cluster', `Are you sure you want to delete cluster ${serviceName}:${item.pid}?`, true, isConfirm =>
+        isConfirm && this.props.deleteCluster(serviceName, item.pid));
+
+    onRefresh = (e) => e.preventDefault() || this.props.getClusterAll();
+
+    applyServiceImage = (e, serviceName, item) => {
         e.preventDefault();
         let applyButton = $(e.target);
         if (applyButton.is('i')) applyButton = applyButton.parent();
         const deleteButton = applyButton.next();
-        T.confirm('Apply cluster', `Are you sure you want to apply image ${item.filename}?`, true, isConfirm => {
+        T.confirm('Apply cluster', `Are you sure you want to apply image ${serviceName}:${item.filename}?`, true, isConfirm => {
             if (isConfirm) {
                 applyButton.fadeOut();
                 deleteButton.fadeOut();
-                this.props.applySystemImage(item.filename, () => {
+                this.props.applyServiceImage(serviceName, item.filename, () => {
                     applyButton.fadeIn();
                     deleteButton.fadeIn();
                 });
             }
         });
     }
-    deleteSystemImage = (e, item) => e.preventDefault() || T.confirm('Delete image', `Are you sure you want to delete image ${item.filename}?`, true,
-        isConfirm => isConfirm && this.props.deleteSystemImage(item.filename));
+    deleteServiceImage = (e, serviceName, item) => e.preventDefault() || T.confirm('Delete image', `Are you sure you want to delete image ${serviceName}:${item.filename}?`, true,
+        isConfirm => isConfirm && this.props.deleteServiceImage(serviceName, item.filename));
+
+
+    renderServiceClusters = (permission, service, serviceName) => renderTable({
+        getDataSource: () => (service.clusters || []).sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()),
+        renderHead: () => (
+            <tr>
+                <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                <th style={{ width: 'auto', textAlign: 'center' }}>Id</th>
+                <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
+                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Primary</th>
+                {/* <th style={{ width: 'auto' }} nowrap='true'>Image filename</th> */}
+                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Image date</th>
+                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Start date</th>
+                <th style={{ width: 'auto', textAlign: 'center' }}>Status</th>
+                <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
+            </tr>),
+        renderRow: (item, index) => (
+            <tr key={index}>
+                <TableCell type='number' content={index + 1} />
+                <TableCell type='text' style={{ textAlign: 'center' }} content={item.pid} />
+                <TableCell type='text' style={{ textAlign: 'center' }} content={item.version} />
+                <TableCell type='text' style={{ textAlign: 'center' }} className='text-danger' content={item.primaryWorker ? <i className='fa fa-star' /> : ''} />
+                {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.imageInfo} /> */}
+                <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={parseImageFilename(item.imageInfo).date} />
+                <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={new Date(item.createdDate).getShortText()} />
+                <TableCell type='text' className={item.status == 'running' ? 'text-primary' : 'text-danger'} content={item.status} />
+                <TableCell type='buttons' content={item} style={{ textAlign: 'center' }} permission={permission} onDelete={e => this.deleteCluster(e, serviceName, item)}>
+                    {permission.write &&
+                        <a className='btn btn-success' href='#' onClick={e => this.resetCluster(e, serviceName, item)}>
+                            <i className='fa fa-lg fa-refresh' />
+                        </a>}
+                </TableCell>
+            </tr>),
+    });
+
+    renderServiceImages = (permission, service, serviceName) => renderTable({
+        getDataSource: () => (service.images || []).sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()),
+        renderHead: () => (
+            <tr>
+                <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
+                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>File</th>
+                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Created date</th>
+                <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
+            </tr>),
+        renderRow: (item, index) => (
+            <tr key={index}>
+                <TableCell type='number' content={index + 1} />
+                <TableCell type='text' style={{ textAlign: 'center' }} content={parseImageFilename(item.filename).version} />
+                <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.filename} />
+                <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={new Date(item.createdDate).getShortText()} />
+                <TableCell type='buttons' content={item} style={{ textAlign: 'center' }} permission={permission} onDelete={e => this.deleteServiceImage(e, serviceName, item)}>
+                    {permission.write &&
+                        <a className='btn btn-success' href='#' onClick={e => this.applyServiceImage(e, serviceName, item)}>
+                            <i className='fa fa-lg fa-arrow-up' />
+                        </a>}
+                </TableCell>
+            </tr>),
+    });
 
     render() {
         const permission = this.getUserPermission('cluster');
-        const clusterTable = renderTable({
-            getDataSource: () => this.props.cluster && this.props.cluster.clusters && this.props.cluster.clusters.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()),
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Id</th>
-                    <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Primary</th>
-                    {/* <th style={{ width: 'auto' }} nowrap='true'>Image filename</th> */}
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Image date</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Start date</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Status</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='number' content={index + 1} />
-                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.pid} />
-                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.version} />
-                    <TableCell type='text' style={{ textAlign: 'center' }} className='text-danger' content={item.primaryWorker ? <i className='fa fa-star' /> : ''} />
-                    {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.imageInfo} /> */}
-                    <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={parseImageFilename(item.imageInfo).date} />
-                    <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={new Date(item.createdDate).getShortText()} />
-                    <TableCell type='text' className={item.status == 'running' ? 'text-primary' : 'text-danger'} content={item.status} />
-                    <TableCell type='buttons' content={item} style={{ textAlign: 'center' }} permission={permission} onDelete={this.deleteCluster}>
-                        {permission.write &&
-                            <a className='btn btn-success' href='#' onClick={e => this.resetCluster(e, item)}>
-                                <i className='fa fa-lg fa-refresh' />
-                            </a>}
-                    </TableCell>
-                </tr>),
-        });
-        const imageTable = renderTable({
-            getDataSource: () => this.props.cluster && this.props.cluster.images && this.props.cluster.images.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()),
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>File</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Created date</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='number' content={index + 1} />
-                    <TableCell type='text' style={{ textAlign: 'center' }} content={parseImageFilename(item.filename).version} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.filename} />
-                    <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={new Date(item.createdDate).getShortText()} />
-                    <TableCell type='buttons' content={item} style={{ textAlign: 'center' }} permission={permission} onDelete={this.deleteSystemImage}>
-                        {permission.write &&
-                            <a className='btn btn-success' href='#' onClick={e => this.applySystemImage(e, item)}>
-                                <i className='fa fa-lg fa-arrow-up' />
-                            </a>}
-                    </TableCell>
-                </tr>),
+        const services = (this.props.cluster || {});
+        const serviceNames = [];
+        Object.keys(services).sort((a, b) => a > b ? +1 : -1).forEach(serviceName => serviceName != 'main' && serviceNames.push(serviceName));
+        services.main && serviceNames.unshift('main');
+
+        const tabs = serviceNames.map(serviceName => {
+            const service = services[serviceName],
+                title = serviceName.upFirstChar(),
+                component = (
+                    <div className='tile'>
+                        <h3 className='tile-title'>Clusters</h3>
+                        <div className='tile-body'>
+                            {this.renderServiceClusters(permission, service, serviceName)}
+                        </div>
+
+                        <h3 className='tile-title mt-4'>Images</h3>
+                        <div className='tile-body'>
+                            {this.renderServiceImages(permission, service, serviceName)}
+                        </div>
+                    </div>);
+            return { title, component };
         });
 
         return this.renderPage({
             icon: 'fa fa-braille',
             title: 'Cluster',
             breadcrumb: ['Cluster'],
-            content: <>
-                <div className='tile'>
-                    <h3 className='tile-title'>Clusters</h3>
-                    <div className='tile-body'>{clusterTable}</div>
-                    <div style={{ textAlign: 'right' }}>
-                        {permission.write && <button className='btn btn-primary' type='button' onClick={this.createCluster}>
-                            <i className='fa fa-fw fa-lg fa-plus' />Add
-                        </button>}
-                    </div>
-                </div>
-
-                <div className='tile'>
-                    <h3 className='tile-title'>System Images</h3>
-                    <div className='tile-body'>{imageTable}</div>
-                    <div style={{ textAlign: 'right' }}>
-                        {permission.write && <button className='btn btn-warning' type='button' onClick={this.refreshSystemImages}>
-                            <i className='fa fa-fw fa-lg fa-refresh' />Refresh
-                        </button>}
-                    </div>
-                </div>
-            </>,
+            content: <FormTabs id='clusterTab' tabs={tabs} onChange={data => this.onServiceTabChanged(data, serviceNames)} />,
+            onCreate: () => permission.write && this.state.selectedServiceName ? this.props.createCluster(this.state.selectedServiceName) : null,
+            onRefresh: permission.write ? this.onRefresh : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, cluster: state.framework.cluster });
-const mapActionsToProps = { getClusterAll, createCluster, resetCluster, deleteCluster, getSystemImageAll, applySystemImage, deleteSystemImage };
+const mapActionsToProps = { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage };
 export default connect(mapStateToProps, mapActionsToProps)(ClusterPage);
