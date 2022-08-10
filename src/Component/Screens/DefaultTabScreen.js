@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CongVanDenPage from './hcth/hcthCongVanDen/CongVanDenPage';
+import CongVanTrinhKyPage from './hcth/hcthCongVanTrinhKy/CongVanTrinhKyPage';
 import User from './User/User';
 import Notification from './notification/Notification';
 import { useTheme, Badge } from 'react-native-paper';
@@ -36,7 +37,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
 
     return (
         <Tab.Navigator
-            initialRouteName="congVanDenPage"
+            initialRouteName="congVanTrinhKy"
             screenOptions={{
                 tabBarActiveTintColor: colors.primary,
                 headerStyle: { backgroundColor: colors.primary },
@@ -57,9 +58,21 @@ export default DefaultScreenTabs = ({ navigation }) => {
                             <Ionicons name='search-outline' color='white' style={{ fontSize: 25 }} />
                         </TouchableOpacity>
                     ),
-
                 }}
             />
+
+            <Tab.Screen
+                name="congVanTrinhKyPage"
+                component={CongVanTrinhKyPage}
+                options={{
+                    headerTitle: 'Công văn trình ký',
+                    tabBarLabel: 'Công văn trình ký',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="reader-outline" color={color} size={size} />
+                    )
+                }}
+            />
+
             <Tab.Screen
                 name="user"
                 component={User}

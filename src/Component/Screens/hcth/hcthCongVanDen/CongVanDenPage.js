@@ -95,7 +95,7 @@ const CongVanDenPage = (props) => {
     const renderCongVanDenItem = (item, index) => {
         let statusObj = Object.values(statusList).reduce((acc, ele) => ({ ...acc, [ele.id]: ele }), {});
         return (
-            <Card elevation={4} key={item.id} style={{ ...styles.cardItem, borderLeftColor: statusObj[item.trangThai]?.color || 'black'}} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
+            <Card elevation={4} key={index} style={{ ...styles.cardItem, borderLeftColor: statusObj[item.trangThai]?.color || 'black'}} onPress={() => navigation.navigate('CongVanDen', { congVanDenId: item.id })}>
                 <Card.Title title={item.soCongVan || 'Chưa có'} titleStyle={styles.cardTitle} subtitle={item.trichYeu}
                     right={(props) => <Text {...props} style={styles.dateLabel}>{T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</Text>}
                     rightStyle={styles.rightSide}
