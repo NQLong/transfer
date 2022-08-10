@@ -123,7 +123,7 @@ class DanhSachHoaDon extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcInvoice && this.props.tcInvoice.page ? this.props.tcInvoice.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-        const permission = this.getUserPermission('tcInvoice');
+        const permission = this.getUserPermission('tcInvoice', ['export']);
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -203,7 +203,7 @@ class DanhSachHoaDon extends AdminPage {
                     </div>
                 </div>
             </div>),
-            onExport: permission.write ? (e) => e.preventDefault() || T.download(`/api/finance/invoice/download-excel?filter=${T.stringify({ ...this.state.filter, ...{ namHoc: this.year.value(), hocKy: this.term.value() } })}`, 'DANHSACHGIAODICH.xlsx') : null,
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/invoice/download-excel?filter=${T.stringify({ ...this.state.filter, ...{ namHoc: this.year.value(), hocKy: this.term.value() } })}`, 'DANHSACHGIAODICH.xlsx') : null,
         });
     }
 }

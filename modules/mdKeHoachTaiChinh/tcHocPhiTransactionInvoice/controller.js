@@ -8,7 +8,7 @@ module.exports = app => {
     const request = require('request');
     const axios = require('axios');
 
-    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete');
+    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete', 'tcInvoice:export');
     const misaChunkSize = 30;
 
     app.permissionHooks.add('staff', 'addRolesTcInvoice', (user, staff) => new Promise(resolve => {
@@ -419,7 +419,7 @@ module.exports = app => {
     });
 
     // download excel
-    app.get('/api/finance/invoice/download-excel', app.permission.check('tcInvoice:read'), async (req, res) => {
+    app.get('/api/finance/invoice/download-excel', app.permission.check('tcInvoice:export'), async (req, res) => {
         try {
             let filter = app.utils.parse(req.query.filter, {});
             let data = await app.model.tcHocPhiTransactionInvoice.downloadExcel('', app.utils.stringify({
@@ -456,9 +456,8 @@ module.exports = app => {
                     nganh: item.tenNganh,
                     bac: item.tenBacDaoTao,
                     he: item.tenLoaiHinhDaoTao,
-                    ngayPhatHanh: item.ngayPhatHanh ? app.date.dateTimeFormat(new Date(Number(item.ngayPhatHanh)), 'dd/mm/yyyy') : '',
+                    ngayPhatHanh: item.ngayPhatHanh ? app.date.viDateFormat(new Date(Number(item.ngayPhatHanh))) : '',
                 }, 'i');
-
             });
             const fileName = `DANH_SACH_GIAO_DICH_${filter.namHoc}_HK0${filter.hocKy}.xlsx`;
             app.excel.attachment(workBook, res, fileName);
