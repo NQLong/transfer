@@ -91,8 +91,7 @@ class DanhSachHoaDon extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             nganHang = this.nganHang?.value().toString();
 
-        const pageFilter = (isInitial || isReset) ? {} : { namHoc, hocKy, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, nganHang };
-        this.setState({ filter: pageFilter }, () => {
+            const pageFilter = (isInitial || isReset) ? { namHoc, hocKy } : { namHoc, hocKy, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, nganHang };        this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 this.setFilter(page, isInitial);
             });
@@ -171,7 +170,6 @@ class DanhSachHoaDon extends AdminPage {
                     </Tooltip>}
                 </TableCell>
             </tr>),
-            
         });
         return this.renderPage({
             title: 'Danh sách giao dịch',

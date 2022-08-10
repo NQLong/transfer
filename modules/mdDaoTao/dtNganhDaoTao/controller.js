@@ -51,14 +51,20 @@ module.exports = app => {
         }, '*', 'khoa', (error, items) => res.send({ error, items }));
     });
 
+    app.get('/api/dao-tao/nganh-dao-tao/all', app.permission.check('dtNganhDaoTao:read'), (req, res) => {
+        app.model.dtNganhDaoTao.getAll({ kichHoat: 1 }, (error, items) => res.send({ error, items }));
+
+    });
+
     app.get('/api/dao-tao/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'student:login'), (req, res) => {
         app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
     });
 
     app.get('/api/dao-tao/nganh-dao-tao/filter', app.permission.orCheck('dtNganhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        const MA_PDT = 33;
         app.model.dtNganhDaoTao.getAll(
             {
-                statement: '(:khoa IS NULL OR khoa = :khoa) AND (lower(tenNganh) LIKE :searchText OR lower(maNganh) LIKE :searchText)',
+                statement: `(:khoa IS NULL OR khoa = :khoa OR :khoa = ${MA_PDT}) AND (lower(tenNganh) LIKE :searchText OR lower(maNganh) LIKE :searchText)`,
                 parameter: {
                     khoa: req.query.donVi,
                     searchText: `%${req.query.condition || ''}%`

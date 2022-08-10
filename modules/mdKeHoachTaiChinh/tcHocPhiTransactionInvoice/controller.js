@@ -8,7 +8,7 @@ module.exports = app => {
     const request = require('request');
     const axios = require('axios');
 
-    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete', 'tcInvoice:export');
+    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete');
     const misaChunkSize = 30;
 
     app.permissionHooks.add('staff', 'addRolesTcInvoice', (user, staff) => new Promise(resolve => {
@@ -445,13 +445,11 @@ module.exports = app => {
             ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
             ws.getRow(1).font = { name: 'Times New Roman' };
 
-            let index = 1;
             const get2 = (x) => ('0' + x).slice(-2);
-            list.forEach((item) => {
-                if (item.lyDoHuy) return;
+            list.forEach((item, index) => {
                 let date = new Date(Number(item.ngayPhatHanh));
                 ws.addRow({
-                    stt: index++,
+                    stt: index + 1,
                     hocKy: `${item.namHoc} - HK0${item.hocKy}`,
                     mssv: item.mssv,
                     hoTen: `${item.ho?.toUpperCase() || ''} ${item.ten?.toUpperCase() || ''}`,
