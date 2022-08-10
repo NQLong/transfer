@@ -372,8 +372,8 @@ module.exports = app => {
             });
 
             // Sheet thống kê học phí
-            filter = app.parse(filter, {});
-            let dataTransaction = await app.model.tcHocPhi.downloadExcel(app.stringify({
+            filter = app.utils.parse(filter, {});
+            let dataTransaction = await app.model.tcHocPhi.downloadExcel(app.utils.stringify({
                 namHoc: filter.namHoc,
                 hocKy: filter.hocKy
             }, ''));

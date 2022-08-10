@@ -36,7 +36,7 @@ module.exports = app => {
                 pageSize = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.searchTerm === 'string' ? req.query.searchTerm : '';
 
-            let filter = app.stringify(req.query.filter || {});
+            let filter = app.utils.stringify(req.query.filter || {});
 
             const page = await app.model.dtDanhSachChuyenNganh.searchPage(pageNumber, pageSize, filter, searchTerm);
             if (!page) {

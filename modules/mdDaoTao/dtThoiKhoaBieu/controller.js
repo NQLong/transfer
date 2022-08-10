@@ -28,13 +28,6 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
         try {
-            // app.messageQueue.send('Test queue', 'Alo');
-
-            // app.messageQueue.consume('Test queue', (message) => {
-            //     console.log(message);
-            // });
-
-
             const _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -53,6 +46,7 @@ module.exports = app => {
             const pageCondition = searchTerm;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
         } catch (error) {
+            console.log('LLLLLL', error);
             res.send({ error });
         }
     });
@@ -259,8 +253,8 @@ module.exports = app => {
     // Export xlsx
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {
-            let filter = app.parse(req.query.filter || {});
-            filter = app.stringify(filter, '');
+            let filter = app.utils.parse(req.query.filter || {});
+            filter = app.utils.stringify(filter, '');
             let data = await app.model.dtThoiKhoaBieu.searchPage(1, 1000000, filter, '');
             const workBook = app.excel.create();
             const ws = workBook.addWorksheet('Thoi khoa bieu');
@@ -299,7 +293,7 @@ module.exports = app => {
                 ws.addRow({
                     stt: index + 1,
                     ma: item.maMonHoc,
-                    monHoc: `${app.parse(item.tenMonHoc).vi}`,
+                    monHoc: `${app.utils.parse(item.tenMonHoc).vi}`,
                     tuChon: item.loaiMonHoc ? 'x' : '',
                     lop: item.nhom,
                     tongTiet: item.tongTiet,

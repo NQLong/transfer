@@ -144,6 +144,8 @@ class AddingModal extends AdminModal {
                 maMonHoc: getValue(this.maMonHoc),
                 tenMonHoc: this.maMonHoc.data().text,
                 khoaDangKy: getValue(this.khoaDangKy),
+                soTietLyThuyet: this.state.soTietLyThuyet,
+                soTietThucHanh: this.state.soTietThucHanh,
                 maNganh: this.maNganh.value(),
                 khoaSinhVien: getValue(this.khoaSinhVien),
                 soLop: getValue(this.soLop),
@@ -179,6 +181,11 @@ class AddingModal extends AdminModal {
 
     handleNam = (value) => {
         this.setState({ nam: value.id });
+    }
+
+    handleMonHoc = value => {
+        let { tietLt: soTietLyThuyet, tietTh: soTietThucHanh } = value?.item || {};
+        this.setState({ soTietLyThuyet, soTietThucHanh });
     }
 
     showThongTinChung = (e) => {
@@ -235,7 +242,7 @@ class AddingModal extends AdminModal {
                         <FormSelect ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-2' required />
                         <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className={hideNganhSelect ? 'col-md-12' : 'col-md-6'} label='Đơn vị phụ trách môn' onChange={this.handleDonVi} required />
                         <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoFilter(this.state.khoaDangKy || null)} style={{ display: hideNganhSelect ? 'none' : 'block' }} className='col-md-6' label='Ngành' required={!hideNganhSelect} />
-                        <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' required />
+                        <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' required onChange={this.handleMonHoc} />
                         <FormCheckbox ref={e => this.loaiMonHoc = e} label='Tự chọn' style={{ marginBottom: '0' }} className='col-md-2' />
                         <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' required />
                         <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' required />
