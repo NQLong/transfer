@@ -152,7 +152,7 @@ class DanhSachHoaDon extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maNganh}: ${item.tenNganh}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenBacDaoTao} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiHinhDaoTao} />
-                <TableCell style={{ whiteSpace: 'nowrap' }} type='checkbox' content={!item.lyDoHuy?.length} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} type='checkbox' content={item.lyDoHuy?.length} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
                     <Tooltip title='Xem hóa đơn' arrow>
                         <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.id}`}>
