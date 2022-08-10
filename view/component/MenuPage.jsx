@@ -13,8 +13,8 @@ export default class MenuPage extends React.Component {
     componentDidMount() {
         T.get('/api/menu', { language: T.language() }, res => {
             if (res.error) {
-                // this.props.history.push('/');
-                window.open('/', '_self');
+                console.log(res.error);
+                // window.open('/', '_self');
             } else {
                 this.setState({ component: res });
             }
