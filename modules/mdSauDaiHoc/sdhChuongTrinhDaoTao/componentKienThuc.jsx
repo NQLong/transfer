@@ -64,10 +64,6 @@ class ComponentKienThuc extends AdminPage {
                 });
             };
             addRow(0, data[0]);
-
-            // for (let item of data) {
-            //     this.addRow
-            // }
         }
 
     }

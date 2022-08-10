@@ -95,19 +95,6 @@ export function getSdhChuongTrinhDaoTao(maKhungDaoTao, done) {
     };
 }
 
-export function getItemSdhKhungDaoTao(id, done) {
-    return () => {
-        const url = `/api/sau-dai-hoc/khung-dao-tao/item/${id}`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy dữ liệu bị lỗi!', 'danger');
-                console.error(`GET ${url}. ${data.error}`);
-            } else {
-                if (done) done(data);
-            }
-        });
-    };
-}
 export function getSdhKhungDaoTao(id, done) {
     return () => {
         const url = `/api/sau-dai-hoc/khung-dao-tao/${id}`;
