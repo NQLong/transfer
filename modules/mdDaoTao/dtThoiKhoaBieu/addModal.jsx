@@ -119,17 +119,6 @@ class AddingModal extends AdminModal {
         this.disabledClickOutside();
     }
     onShow = () => {
-        //Start for test: 
-        this.loaiHinhDaoTao.value('CQ');
-        this.nam.value(41);
-        this.hocKy.value(1);
-        this.maMonHoc.value('DAI028');
-        this.soLop.value(10);
-        this.soTiet.value(4);
-        this.soBuoi.value(1);
-        this.soLuongDuKien.value(100);
-        this.khoaSinhVien.value(2022);
-        //End for test;
         this.bacDaoTao.value('DH');
         this.khoaDangKy.value(MA_PDT);
     }
