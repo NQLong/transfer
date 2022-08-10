@@ -46,7 +46,6 @@ module.exports = app => {
             const pageCondition = searchTerm;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
         } catch (error) {
-            console.log('LLLLLL', error);
             res.send({ error });
         }
     });
