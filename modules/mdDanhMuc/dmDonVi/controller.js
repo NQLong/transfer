@@ -94,7 +94,7 @@ module.exports = app => {
         };
         if (req.query.condition) {
             condition = {
-                statement: '( ((maPl = 1 OR ma = 33 OR ma = 32) AND kichHoat = 1) AND (lower(ten) LIKE :searchTerm)',
+                statement: '((maPl = 1 OR ma = 33 OR ma = 32) AND kichHoat = 1) AND (lower(ten) LIKE :searchText)',
                 parameter: {
                     searchText: `%${req.query.condition.toLowerCase()}%`
                 },

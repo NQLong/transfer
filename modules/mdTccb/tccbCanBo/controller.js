@@ -160,7 +160,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/staff/get-giang-vien', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/staff/get-giang-vien', app.permission.check('dtThoiKhoaBieu:read'), (req, res) => {
         let searchTerm = req.query.searchTerm || '';
         app.model.canBo.getGiangVien(searchTerm, (error, items) => res.send({ items: items.rows }));
     });
