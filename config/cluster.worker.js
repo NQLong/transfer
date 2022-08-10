@@ -49,10 +49,12 @@ module.exports = (cluster, isDebug) => {
     require('./authentication')(app);
     require('./permission')(app, appConfig);
     require('./authentication.google')(app, appConfig);
+    require('./rabbitmq')(app, appConfig);
 
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');
     app.loadModules();
+    app.loadServices();
     app.get('/user', app.permission.check(), app.templates.admin);
 
     let hasUpdate = new Set(); //Mỗi lần nodemon restart nó chỉ updateSessionUser 1 lần
@@ -88,12 +90,11 @@ module.exports = (cluster, isDebug) => {
     // Listen from MASTER ---------------------------------------------------------------------------------------------
     process.on('message', message => {
         if (message.type == 'workersChanged') {
-            app.io && app.io.emit('workers-changed', message.workers);
+            app.io && app.io.to('cluster').emit('services-changed');
             app.worker.items = message.workers;
         } else if (message.type == 'resetWorker') {
             server.close();
             process.exit(1);
-            // isDebug ? process.exit(1) : setTimeout(() => process.exit(1), 1 * 60 * 1000); // Waiting 1 minutes...
         } else if (message.type == 'shutdownWorker') {
             process.exit(4);
         } else if (message.type == 'setPrimaryWorker') {
