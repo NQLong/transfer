@@ -1,4 +1,4 @@
-package com.hcmussh;
+package vn.edu.hcmussh;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

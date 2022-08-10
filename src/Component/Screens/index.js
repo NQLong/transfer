@@ -10,17 +10,30 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from 'react-native-paper';
 import Scan from './Scan';
-import HomeScreen from './HomeScreen';
+import HomeScreen from './HomeScreen/HomeScreen'
+import DefaultTabScreen from './DefaultTabScreen';
+import CongVanDen from './hcth/hcthCongVanDen/CongVanDen';
+import ReadFile from './ReadFile/ReadFile';
+import CongVanDenFilter from './hcth/hcthCongVanDen/CongVanDenFilter';
 
-const TuyenSinh = createStackNavigator();
+const Stack = createStackNavigator();
 
 const DefaultScreen: () => Node = ({ navigation, route }) => {
     const { colors } = useTheme();
     return (
-        <TuyenSinh.Navigator initialRouteName='Home' tabBarOptions={{ tabStyle: { height: 0 }, style: { backgroundColor: 'transparent' } }} screenOptions={{ headerShown: false, tabBarVisible: false }}>
-            <TuyenSinh.Screen name='Home' component={HomeScreen} />
-            <TuyenSinh.Screen name='Scanner' component={Scan} />
-        </TuyenSinh.Navigator>
+        <Stack.Navigator initialRouteName='Home' tabBarOptions={{ tabStyle: { height: 200 }, style: { backgroundColor: 'red' } }} screenOptions={{
+            tabBarVisible: true, tabBarActiveTintColor: colors.primary,
+            headerStyle: { backgroundColor: colors.primary },
+            headerTitleStyle: { color: colors.white },
+            headerTintColor: 'white',
+            headerBackTitle: 'Trở lại'
+        }}>
+            <Stack.Screen options={{ headerShown: false }} name='Home' component={HomeScreen} />
+            <Stack.Screen options={{ headerShown: false }} name='TabScreen' component={DefaultTabScreen} />
+            <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='CongVanDen' component={CongVanDen} />
+            <Stack.Screen options={{ headerTitle: '' }} name='ReadFile' component={ReadFile} />
+            <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='FilterCongVanDen' component={CongVanDenFilter} />
+        </Stack.Navigator>
     )
 }
 

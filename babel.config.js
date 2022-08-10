@@ -10,6 +10,7 @@ module.exports = {
           '@': './src'
         }
       }
-    ]
+    ],
+    'react-native-reanimated/plugin',
   ]
 };
