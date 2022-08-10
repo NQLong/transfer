@@ -9,7 +9,6 @@ import User from './User/User';
 import Notification from './notification/Notification';
 import { useTheme, Badge } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
 import { addNotification } from './notification/redux';
 import commonStyles from '../../Asset/Styles/styles';
 
@@ -85,7 +84,6 @@ export default DefaultScreenTabs = ({ navigation }) => {
                     ),
                 }}
             />
-            
             <Tab.Screen
                 name="notification"
                 component={Notification}
