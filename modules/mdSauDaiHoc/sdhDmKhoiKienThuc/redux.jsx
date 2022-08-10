@@ -58,6 +58,18 @@ export function getSdhDmKhoiKienThucPage(pageNumber, pageSize, pageCondition, do
     };
 }
 
+export function getSdhKhoiKienThucAll(done) {
+    return () => {
+        const url = '/api/sau-dai-hoc/khoi-kien-thuc/all';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin khối kiến thức bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else done && done(data.items);
+        });
+
+    };
+}
 export function getSdhDmKhoiKienThuc(ma, done) {
     return () => {
         const url = `/api/sau-dai-hoc/khoi-kien-thuc/item/${ma}`;
@@ -104,10 +116,10 @@ export function deleteSdhDmKhoiKienThuc(ma) {
     };
 }
 
-export function updateSdhDmKhoiKienThuc(id, changes, done) {
+export function updateSdhDmKhoiKienThuc(ma, changes, done) {
     return dispatch => {
         const url = '/api/sau-dai-hoc/khoi-kien-thuc';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify(data.error.message || 'Cập nhật thông tin khối kiến thức bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);

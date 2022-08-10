@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.sdh,
+        parentMenu: app.parentMenu.category,
         menus: {
-            7502: { title: 'Danh mục Ngành', link: '/user/sau-dai-hoc/danh-sach-nganh' },
+            4106: { title: 'Danh mục Ngành SĐH', link: '/user/sau-dai-hoc/danh-sach-nganh' },
         },
     };
     app.permission.add(
