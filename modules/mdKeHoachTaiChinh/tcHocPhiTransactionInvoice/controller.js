@@ -445,9 +445,7 @@ module.exports = app => {
             ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
             ws.getRow(1).font = { name: 'Times New Roman' };
 
-            const get2 = (x) => ('0' + x).slice(-2);
             list.forEach((item, index) => {
-                let date = new Date(Number(item.ngayPhatHanh));
                 ws.addRow({
                     stt: index + 1,
                     hocKy: `${item.namHoc} - HK0${item.hocKy}`,
@@ -458,7 +456,7 @@ module.exports = app => {
                     nganh: item.tenNganh,
                     bac: item.tenBacDaoTao,
                     he: item.tenLoaiHinhDaoTao,
-                    ngayPhatHanh: item.ngayPhatHanh ? date.getFullYear() + '/' + get2(date.getMonth() + 1) + '/' + get2(date.getDate()) : '',
+                    ngayPhatHanh: item.ngayPhatHanh ? app.date.dateTimeFormat(new Date(Number(item.ngayPhatHanh)), 'dd/mm/yyyy') : '',
                 }, 'i');
 
             });
