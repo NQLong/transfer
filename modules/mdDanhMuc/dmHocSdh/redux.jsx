@@ -51,7 +51,7 @@ T.initPage(PageName);
 export function getDmHocSdhPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage(PageName, pageNumber, pageSize, pageCondition);
     return (dispatch) => {
-        const url = `/api/danh-muc/hoc-sdh/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/danh-muc/bac-sdh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, (data) => {
             if (data.error) {
                 T.notify('Lấy danh sách học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -67,7 +67,7 @@ export function getDmHocSdhPage(pageNumber, pageSize, pageCondition, done) {
 
 export function getDmHocSdhAll(done) {
     return (dispatch) => {
-        const url = '/api/danh-muc/hoc-sdh/all';
+        const url = '/api/danh-muc/bac-sdh/all';
         T.get(url, (data) => {
             if (data.error) {
                 T.notify('Lấy danh sách học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -82,7 +82,7 @@ export function getDmHocSdhAll(done) {
 
 export function getDmHocSdh(ma, done) {
     return () => {
-        const url = `/api/danh-muc/hoc-sdh/item/${ma}`;
+        const url = `/api/danh-muc/bac-sdh/item/${ma}`;
         T.get(url, (data) => {
             if (data.error) {
                 T.notify('Lấy thông tin học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -96,7 +96,7 @@ export function getDmHocSdh(ma, done) {
 
 export function createDmHocSdh(changes, done) {
     return (dispatch) => {
-        const url = '/api/danh-muc/hoc-sdh';
+        const url = '/api/danh-muc/bac-sdh';
         T.post(url, { changes }, (data) => {
             if (data.error) {
                 T.notify('Tạo học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -112,7 +112,7 @@ export function createDmHocSdh(changes, done) {
 
 export function updateDmHocSdh(ma, changes, done) {
     return (dispatch) => {
-        const url = '/api/danh-muc/hoc-sdh';
+        const url = '/api/danh-muc/bac-sdh';
         T.put(url, { ma, changes }, (data) => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -129,7 +129,7 @@ export function updateDmHocSdh(ma, changes, done) {
 
 export function deleteDmHocSdh(ma) {
     return (dispatch) => {
-        const url = '/api/danh-muc/hoc-sdh';
+        const url = '/api/danh-muc/bac-sdh';
         T.delete(url, { ma }, (data) => {
             if (data.error) {
                 T.notify('Xóa danh mục học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -148,7 +148,7 @@ export function changeDmHocSdh(item) {
 
 export function createDmHocSdhByUpload(item, done) {
     return (dispatch) => {
-        const url = '/api/danh-muc/hoc-sdh/createFromFile';
+        const url = '/api/danh-muc/bac-sdh/createFromFile';
         T.post(url, { item }, (data) => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -161,7 +161,7 @@ export function createDmHocSdhByUpload(item, done) {
 
 export const SelectAdapter_DmHocSdh = {
     ajax: true,
-    url: '/api/danh-muc/hoc-sdh/page/1/20',
+    url: '/api/danh-muc/bac-sdh/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
     getOne: getDmHocSdh,
@@ -170,8 +170,8 @@ export const SelectAdapter_DmHocSdh = {
 
 export const SelectAdapter_DmHocSdhVer2 = {
     ajax: true,
-    url: '/api/danh-muc/hoc-sdh/page/1/20',
-    data: params => ({ condition: params.term}),
+    url: '/api/danh-muc/bac-sdh/page/1/20',
+    data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (id, done) => (getDmHocSdh(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
 };

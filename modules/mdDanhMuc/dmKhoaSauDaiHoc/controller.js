@@ -11,9 +11,14 @@ module.exports = app => {
         { name: 'dmKhoaSdh:delete' },
     );
     app.get('/user/danh-muc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:read'), app.templates.admin);
-
+    app.permissionHooks.add('staff', 'addRoleKhoaSdh', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '37') {
+            app.permissionHooks.pushUserPermission(user, 'dmKhoaSdh:read', 'dmKhoaSdh:write', 'dmKhoaSdh:delete');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/khoa-sau-dai-hoc/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/khoa-sau-dai-hoc/page/:pageNumber/:pageSize', app.permission.check('dmKhoaSdh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -36,12 +41,12 @@ module.exports = app => {
         app.model.dmKhoaSauDaiHoc.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/khoa-sau-dai-hoc/all', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/khoa-sau-dai-hoc/all', app.permission.check('dmKhoaSdh:read'), (req, res) => {
         app.model.dmKhoaSauDaiHoc.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/khoa-sau-dai-hoc/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmKhoaSauDaiHoc.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
+    app.get('/api/danh-muc/khoa-sau-dai-hoc/item/:ma', app.permission.check('dmKhoaSdh:read'), (req, res) => {
+        app.model.dmKhoaSauDaiHoc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:write'), (req, res) => {

@@ -15032,7 +15032,8 @@
             "moduleName": "tcHocPhiTransactionInvoice",
             "modelName": "tcHocPhiTransactionInvoice",
             "methods": {
-                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage"
+                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage",
+                "TC_HOC_PHI_TRANSACTION_INVOICE_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
@@ -15808,6 +15809,9 @@
             "active": true,
             "moduleName": "sdhCauTrucKhungDaoTao",
             "modelName": "sdhKhungDaoTao",
+            "methods": {
+                "SDH_KHUNG_DAO_TAO_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "NAM_DAO_TAO": {
                     "value": "namDaoTao",
