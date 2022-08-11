@@ -71,6 +71,20 @@ export function getDmSvLoaiHinhDaoTao(ma, done) {
     };
 }
 
+export function getDmSvLoaiHinhDaoTaoAll(done) {
+    return () => {
+        const url = '/api/danh-muc/loai-hinh-dao-tao/all';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách loại hình bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.items);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
 export function createDmSvLoaiHinhDaoTao(item, done) {
     return dispatch => {
         const url = '/api/danh-muc/loai-hinh-dao-tao';

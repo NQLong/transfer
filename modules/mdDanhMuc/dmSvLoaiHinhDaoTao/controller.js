@@ -48,9 +48,16 @@ module.exports = app => {
         res.send({ items });
     });
 
+    app.get('/api/danh-muc/loai-hinh-dao-tao/all', app.permission.check('user:login'), (req, res) => {
+        app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1}, (error, items) => {
+            res.send({ error, items });
+        });
+    });
+
     app.get('/api/danh-muc/loai-hinh-dao-tao/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmSvLoaiHinhDaoTao.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
+    
 
     app.post('/api/danh-muc/loai-hinh-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:write'), (req, res) => {
         let data = req.body.data;

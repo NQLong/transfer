@@ -457,7 +457,7 @@ export class FormTextBox extends React.Component {
         if (arguments.length) {
             if (this.props.type == 'number' || this.props.type == 'year') {
                 this.input.value(text);
-            } else {
+            } else { 
                 this.setState({ value: text });
             }
         } else {
