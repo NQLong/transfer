@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.sdh,
+        parentMenu: app.parentMenu.category,
         menus: {
-            7504: {
+            41057: {
                 title: 'Danh mục Khối kiến thức', icon: 'fa-crosshairs', link: '/user/sau-dai-hoc/khoi-kien-thuc', groupIndex: '2', backgroundColor: '#1B9CC6'
             }
         }
@@ -37,7 +37,6 @@ module.exports = app => {
     });
 
     app.get('/api/sau-dai-hoc/khoi-kien-thuc/all', app.permission.check('sdhDmKhoiKienThuc:read'), (req, res) => {
-        console.log('Alo');
         let searchTerm = `%${req.query.condition || ''}%`,
             khoiCha = req.query.khoiCha;
         app.model.sdhDmKhoiKienThuc.getAll({
@@ -57,8 +56,13 @@ module.exports = app => {
     app.post('/api/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:write'), (req, res) =>
         app.model.sdhDmKhoiKienThuc.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:write'), (req, res) =>
-        app.model.sdhDmKhoiKienThuc.update({ ma: req.body.ma }, req.body.changes || {}, (error, item) => res.send({ error, item })));
+    app.put('/api/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:write'), (req, res) => {
+        let changes = req.body.changes;
+        delete changes.ma;
+        console.log(changes, req.body.ma);
+        app.model.sdhDmKhoiKienThuc.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
+    }
+    );
 
     app.delete('/api/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:delete'), (req, res) =>
         app.model.sdhDmKhoiKienThuc.delete({ ma: req.body.ma }, error => res.send({ error })));

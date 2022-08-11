@@ -43,7 +43,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật Học sau đại học' : 'Tạo mới Học sau đại học',
+            title: this.state.ma ? 'Cập nhật Bậc sau đại học' : 'Tạo mới Bậc sau đại học',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-sm-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} placeholder='Mã' required />
                 <FormTextBox type='text' className='col-sm-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
@@ -71,10 +71,10 @@ class dmHocSdhPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa Học sau đại học', `Bạn có chắc bạn muốn xóa Học sau đại học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+        T.confirm('Xóa Bậc sau đại học', `Bạn có chắc bạn muốn xóa Bậc sau đại học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
             isConfirm && this.props.deleteDmHocSdh(item.ma, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá Học sau đại học ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá Học sau đại học ${item.ten} thành công!`, 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : `Xoá Bậc sau đại học ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá Bậc sau đại học ${item.ten} thành công!`, 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -86,7 +86,7 @@ class dmHocSdhPage extends AdminPage {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } =
             this.props.dmHocSdh && this.props.dmHocSdh.page ?
                 this.props.dmHocSdh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] };
-        let table = 'Không có dữ liệu Học sau đại học!';
+        let table = 'Không có dữ liệu Bậc sau đại học!';
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,
@@ -112,10 +112,10 @@ class dmHocSdhPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Học sau đại học',
+            title: 'Bậc sau đại học',
             breadcrumb: [
                 <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Học sau đại học'
+                'Bậc sau đại học'
             ],
             content: <>
                 <div className='tile'>{table}</div>
