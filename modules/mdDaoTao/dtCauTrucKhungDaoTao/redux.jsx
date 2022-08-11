@@ -80,7 +80,7 @@ export function getDtCauTrucKhungDaoTaoPage(pageNumber, pageSize, pageCondition,
 
 export function getDtCauTrucKhungDaoTao(id, done) {
     return () => {
-        const url = `/api/dao-tao/cau-truc-khung-dao-tao/${id}`;
+        const url = `/api/dao-tao/cau-truc-khung-dao-tao/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy cấu trúc khung đào tạo bị lỗi!', 'danger');
@@ -138,15 +138,15 @@ export function createDtCauTrucKhungDaoTao(item, done) {
 }
 
 export function deleteDtCauTrucKhungDaoTao(id, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/dao-tao/cau-truc-khung-dao-tao';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa cấu trúc khung đào tạo bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
-                done && done(data.error);
             } else {
                 T.alert('Cấu trúc khung đào tạo đã xóa thành công!', 'success', false, 800);
+                dispatch(getDtCauTrucKhungDaoTaoPage());
                 done && done();
             }
         }, () => T.notify('Xóa cấu trúc khung đào tạo bị lỗi!', 'danger'));

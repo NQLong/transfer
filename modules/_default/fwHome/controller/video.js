@@ -49,7 +49,7 @@ module.exports = app => {
     app.delete('/api/video', app.permission.check('component:write'), (req, res) => {
         app.model.homeVideo.get({ id: req.body.id }, (err, item) => {
             if (err == null) {
-                app.deleteImage(item.image);
+                app.fs.deleteImage(item.image);
             }
         });
         app.model.homeVideo.delete({ id: req.body.id }, error => res.send({ error }));
@@ -61,7 +61,7 @@ module.exports = app => {
 
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    app.createFolder(app.path.join(app.publicPath, '/img/video'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/video'));
 
     const uploadVideo = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('video:') && files.VideoImage && files.VideoImage.length > 0) {
@@ -78,7 +78,7 @@ module.exports = app => {
             let imageLink = app.path.join('/img/video', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, sessionPath, error => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -90,14 +90,14 @@ module.exports = app => {
                         sendResponse({ error: 'Invalid Id!' });
                     } else {
                         if (dataItem.image != '/public/avatar.png') {
-                            app.deleteImage(dataItem.image);
+                            app.fs.deleteImage(dataItem.image);
                         }
                         dataItem.image = '/img/' + dataName + '/' + dataItem.id + app.path.extname(srcPath);
                         app.fs.copyFile(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
                             if (error) {
                                 sendResponse({ error });
                             } else {
-                                app.deleteFile(srcPath);
+                                app.fs.deleteFile(srcPath);
                                 dataItem.image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 let changes = {};
                                 if (dataItem.title && dataItem.title != '') changes.title = dataItem.title;
@@ -120,7 +120,7 @@ module.exports = app => {
                 const image = '/img/' + dataName + '/' + dataId + app.path.extname(srcPath);
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     sendResponse({ error, image });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 });
             }
         }

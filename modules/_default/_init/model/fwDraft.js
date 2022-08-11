@@ -46,7 +46,7 @@ module.exports = app => {
                 done(error);
             } else {
                 // if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
-                app.deleteImage(draft.image);
+                app.fs.deleteImage(draft.image);
                 app.model.fwDraft.delete(condition, done);
             }
         });

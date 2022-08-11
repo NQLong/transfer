@@ -160,7 +160,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/staff/get-giang-vien', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/staff/get-giang-vien', app.permission.check('dtThoiKhoaBieu:read'), (req, res) => {
         let searchTerm = req.query.searchTerm || '';
         app.model.canBo.getGiangVien(searchTerm, (error, items) => res.send({ items: items.rows }));
     });
@@ -654,7 +654,7 @@ module.exports = app => {
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/user'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/user'));
 
     const uploadCanBoImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('CanBoImage:') && files.CanBoImage && files.CanBoImage.length) {
@@ -663,7 +663,7 @@ module.exports = app => {
                 if (error || item == null) {
                     done({ error: 'Id không hợp lệ!' });
                 } else {
-                    app.deleteImage(item.image);
+                    app.fs.deleteImage(item.image);
                     let srcPath = files.CanBoImage[0].path,
                         image = '/img/user/' + app.path.basename(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {

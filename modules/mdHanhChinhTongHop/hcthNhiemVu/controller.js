@@ -272,7 +272,7 @@ module.exports = (app) => {
             const nhiemVu = await app.model.hcthNhiemVu.create({ ...data, trangThai: trangThaiNhiemVu.MO.id });
             await app.model.hcthDonViNhan.createFromList(donViNhan, nhiemVu.id, NHIEM_VU);
             await updateCanBoNhan(canBoNhan, nhiemVu.id);
-            app.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
+            app.fs.createFolder(app.path.join(app.assetPath, `/nhiemVu/${nhiemVu.id}`));
             await updateListFile(fileList, nhiemVu.id);
             await app.model.hcthHistory.create({ loai: NHIEM_VU, key: nhiemVu.id, shcc: req.session.user.shcc, hanhDong: action.CREATE });
             if (canBoNhan.length > 0) {
@@ -330,7 +330,7 @@ module.exports = (app) => {
 
     app.delete('/api/hcth/nhiem-vu', app.permission.check('hcthGiaoNhiemVu:delete'), (req, res) => {
         app.model.hcthNhiemVu.delete({ id: req.body.id }, errors => {
-            app.deleteFolder(app.assetPath + '/congVanDen/' + req.body.id);
+            app.fs.deleteFolder(app.assetPath + '/congVanDen/' + req.body.id);
             res.send({ errors });
         });
     });
@@ -376,7 +376,7 @@ module.exports = (app) => {
 
     });
 
-    app.createFolder(app.path.join(app.assetPath, '/nhiemVu'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/nhiemVu'));
 
 
     app.uploadHooks.add('hcthNhiemVuFile', (req, fields, files, params, done) =>
@@ -400,9 +400,9 @@ module.exports = (app) => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
-                app.createFolder(
+                app.fs.createFolder(
                     app.path.join(app.assetPath, '/nhiemVu/' + (isNew ? '/new' : '/' + id))
                 );
                 app.fs.rename(srcPath, destPath, error => {
@@ -646,7 +646,7 @@ module.exports = (app) => {
             }
             else {
                 if (app.fs.existsSync(filePath))
-                    app.deleteFile(filePath);
+                    app.fs.deleteFile(filePath);
                 res.send({ error: null });
             }
         });

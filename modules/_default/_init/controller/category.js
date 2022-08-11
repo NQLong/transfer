@@ -79,7 +79,7 @@ module.exports = app => {
 
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/category'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/category'));
 
     const uploadCategoryImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('newsCategoryImage:') && files.CategoryImage && files.CategoryImage.length > 0) {

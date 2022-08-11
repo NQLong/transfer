@@ -1,15 +1,11 @@
 import T from 'view/js/common';
 
 const ClusterGetAll = 'ClusterGetAll';
-const SystemImageGetAll = 'SystemImageGetAll';
 
-export default function clusterReducer(state = null, data) {
+export default function clusterReducer(state = {}, data) {
     switch (data.type) {
         case ClusterGetAll:
-            return Object.assign({}, state, { clusters: data.items });
-
-        case SystemImageGetAll:
-            return Object.assign({}, state, { images: data.items });
+            return Object.assign({}, state, data.state);
 
         default:
             return state;
@@ -25,35 +21,28 @@ export function getClusterAll() {
                 T.notify('Lấy cluster bị lỗi!', 'danger');
                 console.error(`GET: ${url}. ${data.error}`);
             } else {
-                dispatch({ type: ClusterGetAll, items: data.items });
+                dispatch({ type: ClusterGetAll, state: data.services || {} });
             }
         }, error => console.error(error) || T.notify('Lấy cluster bị lỗi!', 'danger'));
     };
 }
 
-export function getCluster(clusterId, done) {
-    return () => {
-        const url = `/api/cluster/item/${clusterId}`;
-        T.get(url, data => done(data), error => done({ error }));
-    };
-}
-
-export function createCluster(done) {
+export function createCluster(serviceName, done) {
     return dispatch => {
         const url = '/api/cluster';
-        T.post(url, data => {
+        T.post(url, { serviceName }, data => {
             if (data.error) {
                 T.notify('Tạo cluster bị lỗi!', 'danger');
                 console.error(`POST: ${url}. ${data.error}`);
             } else {
-                dispatch(getClusterAll());
+                dispatch();
                 done && done(data);
             }
         }, error => console.error(error) || T.notify('Tạo cluster bị lỗi!', 'danger'));
     };
 }
 
-export function resetCluster(id, done) {
+export function resetCluster(serviceName, id, done) {
     return dispatch => {
         if (id) {
             if (typeof id == 'function') {
@@ -63,53 +52,40 @@ export function resetCluster(id, done) {
         }
 
         const url = '/api/cluster';
-        T.put(url, { id }, data => {
+        T.put(url, { serviceName, id }, data => {
             if (data.error) {
                 T.notify('Cập nhật cluster bị lỗi!', 'danger');
                 console.error(`PUT: ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật cluster thành công!', 'success');
-                dispatch(getClusterAll());
+                dispatch();
                 done && done();
             }
         }, error => console.error(error) || T.notify('Cập nhật cluster bị lỗi!', 'danger'));
     };
 }
 
-export function deleteCluster(id) {
+export function deleteCluster(serviceName, id) {
     return dispatch => {
         const url = '/api/cluster';
-        T.delete(url, { id }, data => {
+        T.delete(url, { serviceName, id }, data => {
             if (data.error) {
                 T.notify('Xóa cluster bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}. ${data.error}`);
             } else {
                 T.alert('Xóa cluster thành công!', 'error', false, 800);
-                dispatch(getClusterAll());
+                dispatch();
             }
         }, error => console.error(error) || T.notify('Xóa cluster bị lỗi!', 'danger'));
     };
 }
 
-export function getSystemImageAll() {
-    return dispatch => {
-        const url = '/api/cluster/image/all';
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy image bị lỗi!', 'danger');
-                console.error(`GET: ${url}. ${data.error}`);
-            } else {
-                dispatch({ type: SystemImageGetAll, items: data.items });
-            }
-        }, error => console.error(error) || T.notify('Lấy image bị lỗi!', 'danger'));
-    };
-}
 
-export function applySystemImage(filename, done) {
+export function applyServiceImage(serviceName, filename, done) {
     return () => {
         const url = '/api/cluster/image';
-        T.put(url, { filename }, data => {
+        T.put(url, { serviceName, filename }, data => {
             if (data.error) {
                 T.notify('Triển khai image bị lỗi!', 'danger');
                 console.error(`PUT: ${url}. ${data.error}`);
@@ -122,16 +98,16 @@ export function applySystemImage(filename, done) {
     };
 }
 
-export function deleteSystemImage(filename) {
+export function deleteServiceImage(serviceName, filename) {
     return dispatch => {
         const url = '/api/cluster/image';
-        T.delete(url, { filename }, data => {
+        T.delete(url, { serviceName, filename }, data => {
             if (data.error) {
                 T.notify('Xóa image bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}. ${data.error}`);
             } else {
                 T.alert('Xóa image thành công!', 'error', false, 800);
-                dispatch(getSystemImageAll());
+                dispatch();
             }
         }, error => console.error(error) || T.notify('Xóa image bị lỗi!', 'danger'));
     };

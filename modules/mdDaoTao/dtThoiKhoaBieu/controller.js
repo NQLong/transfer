@@ -11,8 +11,9 @@ module.exports = app => {
     app.permission.add(
         { name: 'dtThoiKhoaBieu:read', menu },
         { name: 'dtThoiKhoaBieu:manage', menu },
-        { name: 'dtThoiKhoaBieu:write' },
-        { name: 'dtThoiKhoaBieu:delete' }
+        'dtThoiKhoaBieu:write',
+        'dtThoiKhoaBieu:delete',
+        'dtThoiKhoaBieu:export',
     );
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
@@ -37,7 +38,7 @@ module.exports = app => {
                 if (user.staff?.maDonVi) donVi = user.maDonVi;
                 else throw 'Permission denied!';
             }
-            filter = app.stringify(app.clone(filter, { donVi }));
+            filter = app.utils.stringify(app.clone(filter, { donVi }));
 
             let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
 
@@ -110,8 +111,34 @@ module.exports = app => {
                     }
                 }
             }
-            // console.log(promiseList);
-            // await Promise.all(promiseList);
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/create-multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let { data, settings } = req.body;
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index],
+                    maNganh = item.maNganh,
+                    chuyenNganh = item.chuyenNganh || [],
+                    soBuoiTuan = item.soBuoiTuan;
+                for (let buoi = 1; buoi <= parseInt(soBuoiTuan); buoi++) {
+                    const tkbItem = await app.model.dtThoiKhoaBieu.create(app.clone(item, settings, { nhom: index + 1 }));
+                    for (const nganhItem of maNganh) {
+                        if (chuyenNganh.length) {
+                            for (const chuyenNganhItem of chuyenNganh) {
+                                let idNganh = chuyenNganhItem ? `${nganhItem}&&${chuyenNganhItem}` : nganhItem;
+                                await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh });
+                            }
+                        } else {
+                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh: nganhItem });
+                        }
+                    }
+                }
+            }
             res.end();
         } catch (error) {
             console.log(error);
@@ -219,6 +246,82 @@ module.exports = app => {
         app.model.dtThoiKhoaBieu.getCalendar(phong, thoiGianMoMon.nam, thoiGianMoMon.hocKy, (error, items) => {
             res.send({ error, items: items?.rows || [], listNgayLe });
         });
+    });
+
+    app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
+    // Export xlsx
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
+        try {
+            let filter = app.utils.parse(req.query.filter || {});
+            filter = app.utils.stringify(filter, '');
+            let data = await app.model.dtThoiKhoaBieu.searchPage(1, 1000000, filter, '');
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet('Thoi khoa bieu');
+
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 5 },
+                { header: 'MÃ', key: 'ma', width: 10 },
+                { header: 'MÔN HỌC', key: 'monHoc', width: 40 },
+                { header: 'TỰ CHỌN', key: 'tuChon', width: 10 },
+                { header: 'LỚP', key: 'lop', width: 10 },
+                { header: 'TỔNG TIẾT', key: 'tongTiet', width: 10 },
+                { header: 'PHÒNG', key: 'phong', width: 10 },
+                { header: 'THỨ', key: 'thu', width: 10 },
+                { header: 'TIẾT BẮT ĐẦU', key: 'tietBatDau', width: 10 },
+                { header: 'SỐ TIẾT', key: 'soTiet', width: 10 },
+                { header: 'SLDK', key: 'sldk', width: 10 },
+                { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 20 },
+                { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 20 },
+                { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 30 },
+                { header: 'MÃ NGÀNH', key: 'maNganh', width: 20 },
+                { header: 'NGÀNH', key: 'nganh', width: 20 },
+                { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 }
+            ];
+            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+            ws.getRow(1).font = { name: 'Times New Roman' };
+            // ws.getRow(1).font = {
+            //     name: 'Times New Roman',
+            //     family: 4,
+            //     size: 12,
+            //     bold: true,
+            //     color: { argb: 'FF000000' }
+            // };
+
+            const list = data.rows;
+            list.forEach((item, index) => {
+                ws.addRow({
+                    stt: index + 1,
+                    ma: item.maMonHoc,
+                    monHoc: `${app.utils.parse(item.tenMonHoc).vi}`,
+                    tuChon: item.loaiMonHoc ? 'x' : '',
+                    lop: item.nhom,
+                    tongTiet: item.tongTiet,
+                    phong: item.phong,
+                    thu: item.thu,
+                    tietBatDau: item.tietBatDau,
+                    soTiet: item.soTiet,
+                    sldk: item.soLuongDuKien,
+                    ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
+                    ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
+                    khoa: item.tenKhoaDangKy,
+                    maNganh: item.maNganh,
+                    nganh: item.tenNganh,
+                    giangVien: item.tenGiangVien,
+                }, index === 0 ? 'n' : 'i');
+
+                if (index === 0) {
+                    ws.getRow(2).alignment = { ...ws.getRow(2).alignment, vertical: 'middle', wrapText: true };
+                    ws.getRow(2).font = { name: 'Times New Roman' };
+                    // ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
+                }
+            });
+
+            let fileName = 'THOI_KHOA_BIEU.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
     });
 
     //Quyền của đơn vị------------------------------------------------------------------------------------------

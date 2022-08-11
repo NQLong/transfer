@@ -296,7 +296,7 @@ module.exports = app => {
     }));
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    app.createFolder(
+    app.fs.createFolder(
         app.path.join(app.publicPath, '/img/draft'),
         app.path.join(app.publicPath, '/img/draft/event'),
         app.path.join(app.publicPath, '/img/event'),

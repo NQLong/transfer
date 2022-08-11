@@ -104,7 +104,7 @@ module.exports = app => {
                 const handleUpload = (index = 2) => {
                     const value = worksheet.getRow(index).values;
                     if (value.length == 0 || index == totalRow + 1) {
-                        app.deleteFile(srcPath);
+                        app.fs.deleteFile(srcPath);
                         done({ element });
                     } else {
                         let data = {
@@ -118,7 +118,7 @@ module.exports = app => {
                 };
                 handleUpload();
             } else {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 done({ error: 'Error' });
             }
         }

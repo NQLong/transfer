@@ -25,16 +25,17 @@ module.exports = (cluster, isDebug) => {
     app.apiKeySendGrid = appConfig.email.apiKeySendGrid;
     app.defaultAdminEmail = appConfig.default.adminEmail;
     app.mailSentName = appConfig.email.from;
-    // app.defaultAdminPassword = appConfig.default.adminPassword;
-    app.assetPath = app.path.join(__dirname, '..', appConfig.path.asset);
+    app.tempPath = app.path.join(__dirname, '../.temp');
+    app.assetPath = app.path.join(__dirname, '../asset');
     app.bundlePath = app.path.join(app.assetPath, 'bundle');
-    app.viewPath = app.path.join(__dirname, '..', appConfig.path.view);
-    app.modulesPath = app.path.join(__dirname, '..', appConfig.path.modules);
-    app.publicPath = app.path.join(__dirname, '..', appConfig.path.public);
-    app.imagePath = app.path.join(appConfig.path.public, 'img');
-    app.uploadPath = app.path.join(__dirname, '..', appConfig.path.upload);
-    app.documentPath = app.path.join(__dirname, '..', appConfig.path.document);
-    app.faviconPath = app.path.join(__dirname, '..', appConfig.path.favicon);
+    app.viewPath = app.path.join(__dirname, '../view');
+    app.modulesPath = app.path.join(__dirname, '../modules');
+    app.servicesPath = app.path.join(__dirname, '../services');
+    app.publicPath = app.path.join(__dirname, '../public');
+    app.imagePath = app.path.join(app.publicPath, 'img');
+    app.faviconPath = app.path.join(app.imagePath, 'favicon.png');
+    app.uploadPath = app.path.join(__dirname, '../asset/upload');
+    app.documentPath = app.path.join(__dirname, '../asset/document');
     app.database = {};
     app.model = {};
 
@@ -46,12 +47,14 @@ module.exports = (cluster, isDebug) => {
     require('./io')(app, server, appConfig);
     require('./packages')(app, server, appConfig);
     require('./authentication')(app);
-    require('./permission')(app);
+    require('./permission')(app, appConfig);
     require('./authentication.google')(app, appConfig);
+    require('./rabbitmq')(app, appConfig);
 
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');
     app.loadModules();
+    app.loadServices();
     app.get('/user', app.permission.check(), app.templates.admin);
 
     let hasUpdate = new Set(); //Mỗi lần nodemon restart nó chỉ updateSessionUser 1 lần
@@ -68,8 +71,7 @@ module.exports = (cluster, isDebug) => {
                 else {
                     app.templates.unit(req, res);
                 }
-            }
-            else {
+            } else {
                 next();
             }
         });
@@ -77,9 +79,6 @@ module.exports = (cluster, isDebug) => {
 
     // Worker ---------------------------------------------------------------------------------------------------------
     app.worker = {
-        refreshStateData: () => process.send({ type: 'refreshStateData', workerId: process.pid }),
-        refreshStateMenus: () => process.send({ type: 'refreshStateMenus', workerId: process.pid }),
-
         create: () => process.send({ type: 'createWorker' }),
         reset: (workerId) => process.send({ type: 'resetWorker', workerId, primaryWorker: app.primaryWorker }),
         shutdown: (workerId) => process.send({ type: 'shutdownWorker', workerId, primaryWorker: app.primaryWorker }),
@@ -88,12 +87,11 @@ module.exports = (cluster, isDebug) => {
     // Listen from MASTER ---------------------------------------------------------------------------------------------
     process.on('message', message => {
         if (message.type == 'workersChanged') {
-            app.io && app.io.emit('workers-changed', message.workers);
+            app.io && app.io.to('cluster').emit('services-changed');
             app.worker.items = message.workers;
         } else if (message.type == 'resetWorker') {
             server.close();
             process.exit(1);
-            // isDebug ? process.exit(1) : setTimeout(() => process.exit(1), 1 * 60 * 1000); // Waiting 1 minutes...
         } else if (message.type == 'shutdownWorker') {
             process.exit(4);
         } else if (message.type == 'setPrimaryWorker') {

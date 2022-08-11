@@ -41,7 +41,7 @@ module.exports = app => {
         app.model.dtCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dao-tao/cau-truc-khung-dao-tao/:id', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
+    app.get('/api/dao-tao/cau-truc-khung-dao-tao/item/:id', app.permission.orCheck('dtCauTrucKhungDaoTao:read', 'dtChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
         app.model.dtCauTrucKhungDaoTao.get({ id: req.params.id }, '*', 'id ASC', (error, item) => res.send({ error, item }));
     });
 

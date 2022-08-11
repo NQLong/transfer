@@ -191,7 +191,7 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/dvWebsiteGioiThieu'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/dvWebsiteGioiThieu'));
 
     const uploadDvWebsiteGioiThieuImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('DvWebsiteGioiThieu:') && files.DvWebsiteGioiThieuImage && files.DvWebsiteGioiThieuImage.length > 0) {
@@ -273,7 +273,7 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    app.createFolder(
+    app.fs.createFolder(
         app.path.join(app.publicPath, '/img/dvWebsite'),
         app.path.join(app.publicPath, '/img/dvWebsiteHinh')
     );
@@ -294,7 +294,7 @@ module.exports = app => {
             let imageLink = '/img/' + dataName + '/' + app.path.basename(srcPath),
                 sessionPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, sessionPath, error => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -305,7 +305,7 @@ module.exports = app => {
                     if (error || dataItem == null) {
                         sendResponse({ error: 'Invalid Id!' });
                     } else {
-                        // app.deleteImage(dataItem.image);
+                        // app.fs.deleteImage(dataItem.image);
                         dataItem.image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                         app.fs.copyFile(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
                             if (error) {
@@ -313,7 +313,7 @@ module.exports = app => {
                             } else {
                                 dataItem.image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 delete dataItem.ma;
-                                app.deleteFile(srcPath);
+                                app.fs.deleteFile(srcPath);
                                 sendResponse({
                                     item: dataItem,
                                     image: dataItem.image,
@@ -326,7 +326,7 @@ module.exports = app => {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     sendResponse({ error, image });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 });
             }
         }

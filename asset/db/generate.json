@@ -11783,7 +11783,8 @@
             "modelName": "dtThoiKhoaBieu",
             "methods": {
                 "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage",
-                "DT_CALENDAR": "getCalendar"
+                "DT_CALENDAR": "getCalendar",
+                "DT_THOI_KHOA_BIEU_GET_FREE": "getFree"
             },
             "columns": {
                 "ID": {
@@ -13835,7 +13836,8 @@
                 "TC_HOC_PHI_GET_INVOICE_INFO": "getInvoiceInfo",
                 "TC_HOC_PHI_GET_INVOICE_LIST": "getInvoiceList",
                 "TC_HOC_PHI_STATISTIC": "getStatistic",
-                "TC_HOC_PHI_GET_DETAIL": "getDetail"
+                "TC_HOC_PHI_GET_DETAIL": "getDetail",
+                "TC_HOC_PHI_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "MSSV": {
@@ -15932,59 +15934,29 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "SV_DM_LOP_SINH_VIEN": {
+        "DT_THOI_KHOA_BIEU_NGANH": {
             "active": true,
-            "moduleName": "svDmLopSinhVien",
-            "modelName": "svDmLopSinhVien",
+            "moduleName": "dtThoiKhoaBieu",
+            "modelName": "dtThoiKhoaBieuNganh",
             "columns": {
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 10
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                },
-                "KHOA": {
-                    "value": "khoa",
+                "ID_THOI_KHOA_BIEU": {
+                    "value": "idThoiKhoaBieu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
                 },
-                "MA_KHUNG_DAO_TAO": {
-                    "value": "maKhungDaoTao",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "MA_NGANH": {
-                    "value": "maNganh",
+                "ID_NGANH": {
+                    "value": "idNganh",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 10
-                },
-                "NIEN_KHOA": {
-                    "value": "nienKhoa",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 10
+                    "size": 500
                 }
             },
             "primaryKeys": [
-                "KHOA",
-                "MA",
-                "MA_NGANH",
-                "NIEN_KHOA"
+                "ID_NGANH",
+                "ID_THOI_KHOA_BIEU"
             ],
             "foreignKeys": [],
             "type": "table"
@@ -16011,33 +15983,6 @@
             },
             "primaryKeys": [
                 "KEY"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "DT_THOI_KHOA_BIEU_NGANH": {
-            "active": true,
-            "moduleName": "dtThoiKhoaBieuNganh",
-            "modelName": "dtThoiKhoaBieuNganh",
-            "columns": {
-                "ID_THOI_KHOA_BIEU": {
-                    "value": "idThoiKhoaBieu",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "ID_NGANH": {
-                    "value": "idNganh",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 500
-                }
-            },
-            "primaryKeys": [
-                "ID_NGANH",
-                "ID_THOI_KHOA_BIEU"
             ],
             "foreignKeys": [],
             "type": "table"
@@ -16111,6 +16056,63 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_DM_LOP_SINH_VIEN": {
+            "active": true,
+            "moduleName": "svDmLopSinhVien",
+            "modelName": "svDmLopSinhVien",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "KHOA": {
+                    "value": "khoa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_KHUNG_DAO_TAO": {
+                    "value": "maKhungDaoTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "NIEN_KHOA": {
+                    "value": "nienKhoa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "KHOA",
+                "MA",
+                "MA_NGANH",
+                "NIEN_KHOA"
             ],
             "foreignKeys": [],
             "type": "table"

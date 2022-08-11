@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.185",
+    "version": "1.0.192",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -17,6 +17,20 @@
         "lint:fix": "npm run lint --  --fix",
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
+    "services": {
+        "emailService": {
+            "mainUrl": "http://localhost:7012",
+            "host": "localhost",
+            "port": "7016",
+            "isDebug": false
+        },
+        "bankService": {
+            "mainUrl": "http://localhost:7012",
+            "host": "localhost",
+            "port": "7014",
+            "isDebug": false
+        }
+    },
     "db": {
         "main": {
             "owner": "DEV_HCMUSSH",
@@ -25,6 +39,13 @@
             "username": "dev_hcmussh",
             "password": "2x$@!zXBm<Z{5%."
         }
+    },
+    "rabbitMQ": {
+        "ip": "localhost"
+    },
+    "redisDB": {
+        "host": "localhost",
+        "port": 6379
     },
     "keywords": [
         "Khoa hoc xa hoi va nhan van",
@@ -48,16 +69,6 @@
     "default": {
         "adminEmail": "thanhtung@hcmut.edu.vn",
         "adminPassword": "---"
-    },
-    "path": {
-        "view": "view",
-        "modules": "modules",
-        "asset": "asset",
-        "temp": "asset/temp",
-        "upload": "asset/upload",
-        "document": "asset/document",
-        "public": "public",
-        "favicon": "public/img/favicon.png"
     },
     "author": "Nguyen Thanh Tung",
     "license": "ISC",
@@ -109,7 +120,9 @@
         "@emotion/styled": "^11.8.1",
         "@mui/material": "^5.6.1",
         "@sendgrid/mail": "^7.2.6",
+        "amqplib": "^0.10.2",
         "archiver": "^3.0.0",
+        "axios": "^0.27.2",
         "basic-auth": "^2.0.1",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
@@ -125,6 +138,7 @@
         "express": "^4.17.1",
         "express-session": "^1.17.1",
         "file-saver": "^2.0.5",
+        "form-data": "^4.0.0",
         "fs-extra": "^10.0.1",
         "google-auth-library": "^8.0.3",
         "helmet": "^3.22.0",
