@@ -79,9 +79,6 @@ module.exports = (cluster, isDebug) => {
 
     // Worker ---------------------------------------------------------------------------------------------------------
     app.worker = {
-        refreshStateData: () => process.send({ type: 'refreshStateData', workerId: process.pid }),
-        refreshStateMenus: () => process.send({ type: 'refreshStateMenus', workerId: process.pid }),
-
         create: () => process.send({ type: 'createWorker' }),
         reset: (workerId) => process.send({ type: 'resetWorker', workerId, primaryWorker: app.primaryWorker }),
         shutdown: (workerId) => process.send({ type: 'shutdownWorker', workerId, primaryWorker: app.primaryWorker }),

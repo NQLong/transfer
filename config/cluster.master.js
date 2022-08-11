@@ -42,9 +42,7 @@ module.exports = (cluster, isDebug) => {
     // Listen from WORKER ---------------------------------------------------------------------------------------------
     cluster.on('online', (worker) => {
         worker.on('message', message => {
-            if (message.type == 'refreshStateData' || message.type == 'refreshStateMenus') {
-                Object.values(workers).forEach(worker => worker.process.pid != message.workerId && worker.send(message));
-            } else if (message.type == 'createWorker') {
+            if (message.type == 'createWorker') {
                 const targetWorker = cluster.fork();
                 targetWorker.primaryWorker = false;
                 targetWorker.status = 'running';
