@@ -123,7 +123,7 @@ class DanhSachHoaDon extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcInvoice && this.props.tcInvoice.page ? this.props.tcInvoice.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-        // let permission = this.getUserPermission('tcInvoice');
+        const permission = this.getUserPermission('tcInvoice', ['export']);
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -155,7 +155,7 @@ class DanhSachHoaDon extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='checkbox' content={!item.lyDoHuy?.length} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
                     <Tooltip title='Xem hóa đơn' arrow>
-                        <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.id}`}>
+                        <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.id}`}>
                             <i className='fa fa-lg fa-eye' />
                         </a>
                     </Tooltip>
@@ -171,7 +171,6 @@ class DanhSachHoaDon extends AdminPage {
                     </Tooltip>}
                 </TableCell>
             </tr>),
-
         });
         return this.renderPage({
             title: 'Danh sách giao dịch',
@@ -204,6 +203,7 @@ class DanhSachHoaDon extends AdminPage {
                     </div>
                 </div>
             </div>),
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/invoice/download-excel?filter=${T.stringify({ ...this.state.filter, ...{ namHoc: this.year.value(), hocKy: this.term.value() } })}`, 'DANHSACHGIAODICH.xlsx') : null,
         });
     }
 }

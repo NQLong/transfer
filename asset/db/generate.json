@@ -15032,7 +15032,8 @@
             "moduleName": "tcHocPhiTransactionInvoice",
             "modelName": "tcHocPhiTransactionInvoice",
             "methods": {
-                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage"
+                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage",
+                "TC_HOC_PHI_TRANSACTION_INVOICE_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
