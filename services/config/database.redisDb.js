@@ -2,7 +2,10 @@ module.exports = (app, appConfig) => {
     // Connect RedisDB ------------------------------------------------------------------------------------------------------------------------------
     const redisDB = appConfig.redisDB;
     const redis = require('redis');
-    app.database.redis = redis.createClient(redisDB);
+    app.database.redis = app.isDebug ?
+        redis.createClient() :
+        redis.createClient({ host: redisDB.host, port: redisDB.port, password: redisDB.auth });
+
     app.database.redis.on('connect', () => {
         console.log(` - #${process.pid}: The Redis connection succeeded.`);
     });

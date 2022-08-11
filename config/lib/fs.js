@@ -1,69 +1,69 @@
 module.exports = app => {
-  const fse = require('fs-extra');
+    const fse = require('fs-extra');
 
-  // Download file (http / https)
-  app.fs.downloadFile = (url, path) => {
-    let network = require(url.startsWith('http') ? 'http' : 'https'),
-      file = app.fs.createWriteStream(path);
-    network.get(url, response => response.pipe(file));
-  };
+    // Download file (http / https)
+    app.fs.downloadFile = (url, path) => {
+        let network = require(url.startsWith('http') ? 'http' : 'https'),
+            file = app.fs.createWriteStream(path);
+        network.get(url, response => response.pipe(file));
+    };
 
-  app.fs.createFolder = function () {
-    for (let i = 0; i < arguments.length; i++) {
-      !app.fs.existsSync(arguments[i]) && app.fs.mkdirSync(arguments[i]);
-    }
-  };
-
-  app.fs.deleteFolder = path => {
-    if (app.fs.existsSync(path)) {
-      app.fs.readdirSync(path).forEach(file => {
-        const curPath = path + '/' + file;
-        if (app.fs.lstatSync(curPath).isDirectory()) {
-          app.fs.deleteFolder(curPath);
-        } else {
-          app.fs.unlinkSync(curPath);
+    app.fs.createFolder = function () {
+        for (let i = 0; i < arguments.length; i++) {
+            !app.fs.existsSync(arguments[i]) && app.fs.mkdirSync(arguments[i]);
         }
-      });
-      app.fs.rmdirSync(path);
-    }
-  };
+    };
 
-  app.fs.deleteImage = (image, done) => {
-    if (image && image !== '') {
-      let imagePath = app.path.join(app.publicPath, image),
-        imageIndex = imagePath.indexOf('?t=');
-      if (imageIndex != -1) {
-        imagePath = imagePath.substring(0, imageIndex);
-      }
+    app.fs.deleteFolder = path => {
+        if (app.fs.existsSync(path)) {
+            app.fs.readdirSync(path).forEach(file => {
+                const curPath = path + '/' + file;
+                if (app.fs.lstatSync(curPath).isDirectory()) {
+                    app.fs.deleteFolder(curPath);
+                } else {
+                    app.fs.unlinkSync(curPath);
+                }
+            });
+            app.fs.rmdirSync(path);
+        }
+    };
 
-      if (app.fs.existsSync(imagePath)) {
-        app.fs.unlinkSync(imagePath);
-      }
-    }
-    if (done) done();
-  };
+    app.fs.deleteImage = (image, done) => {
+        if (image && image !== '') {
+            let imagePath = app.path.join(app.publicPath, image),
+                imageIndex = imagePath.indexOf('?t=');
+            if (imageIndex != -1) {
+                imagePath = imagePath.substring(0, imageIndex);
+            }
 
-  app.fs.deleteFile = (path, done) => {
-    if (path && path !== '') {
-      const index = path.indexOf('?t=');
-      if (index != -1) path = path.substring(0, index);
-      if (app.fs.existsSync(path)) app.fs.unlinkSync(path);
-    }
-    if (done) done();
-  };
+            if (app.fs.existsSync(imagePath)) {
+                app.fs.unlinkSync(imagePath);
+            }
+        }
+        if (done) done();
+    };
 
-  app.fs.renameSync = (oldPath, newPath) => {
-    fse.copySync(oldPath, newPath);
-    fse.removeSync(oldPath);
-  };
+    app.fs.deleteFile = (path, done) => {
+        if (path && path !== '') {
+            const index = path.indexOf('?t=');
+            if (index != -1) path = path.substring(0, index);
+            if (app.fs.existsSync(path)) app.fs.unlinkSync(path);
+        }
+        if (done) done();
+    };
 
-  app.fs.rename = (oldPath, newPath, done) => {
-    try {
-      fse.copySync(oldPath, newPath);
-      fse.removeSync(oldPath);
-      done && done();
-    } catch (error) {
-      done && done(error);
-    }
-  };
+    app.fs.renameSync = (oldPath, newPath) => {
+        fse.copySync(oldPath, newPath);
+        fse.removeSync(oldPath);
+    };
+
+    app.fs.rename = (oldPath, newPath, done) => {
+        try {
+            fse.copySync(oldPath, newPath);
+            fse.removeSync(oldPath);
+            done && done();
+        } catch (error) {
+            done && done(error);
+        }
+    };
 };

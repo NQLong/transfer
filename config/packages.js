@@ -1,4 +1,18 @@
 module.exports = (app, http, config) => {
+    // Libraries
+    require('./lib/utils')(app);
+    require('./lib/fs')(app);
+    require('./lib/string')(app);
+    require('./lib/date')(app);
+    require('./lib/array')(app);
+    require('./lib/email')(app);
+    require('./lib/excel')(app);
+    require('./lib/schedule')(app);
+    require('./lib/language')(app);
+    require('./lib/docx')(app);
+    require('./lib/sms')(app);
+    require('./lib/hooks')(app);
+
     app.url = require('url');
 
     // Protect your app from some well-known web vulnerabilities by setting HTTP headers appropriately
@@ -126,18 +140,4 @@ module.exports = (app, http, config) => {
 
     // Image processing library
     app.jimp = require('jimp');
-
-    // Libraries
-    require('./lib/utils')(app);
-    require('./lib/fs')(app);
-    require('./lib/string')(app);
-    require('./lib/date')(app);
-    require('./lib/array')(app);
-    require('./lib/email')(app);
-    require('./lib/excel')(app);
-    require('./lib/schedule')(app);
-    require('./lib/language')(app);
-    require('./lib/docx')(app);
-    require('./lib/sms')(app);
-    require('./lib/hooks')(app);
 };
