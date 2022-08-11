@@ -124,7 +124,7 @@ class EditModal extends AdminModal {
                     {this.renderListLoaiDaoTao(loaiDaoTao)}
                 </div> : ''}
             </>,
-            submitText: this.state.showDetail ? 'Lưu' : 'Tiếp theo'
+            submitText: this.state.showDetail ? 'Lưu' : 'Chi tiết'
         });
     }
 }
