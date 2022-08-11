@@ -57,11 +57,10 @@ module.exports = app => {
         app.model.sdhDmKhoiKienThuc.create(req.body.data, (error, item) => res.send({ error, item })));
 
     app.put('/api/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:write'), (req, res) => {
-        let changes = req.body.changes;
-        delete changes.ma;
-        console.log(changes, req.body.ma);
-        app.model.sdhDmKhoiKienThuc.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
-    }
+            let changes = req.body.changes;
+            delete changes.ma;
+            app.model.sdhDmKhoiKienThuc.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
+        }
     );
 
     app.delete('/api/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:delete'), (req, res) =>

@@ -351,7 +351,7 @@ class AdminEditPage extends AdminPage {
             soCongVan: this.soCongVan?.value() || null,
             trangThai: this.state.trangThai
         };
-        console.log(changes);
+
         if (changes.loaiCongVan == loaiCongVan.TRUONG.id) changes.laySoTuDong = 1;
         if (!changes.donViGui) {
             T.notify('Đơn vị gửi bị trống', 'danger');
@@ -760,7 +760,6 @@ class AdminEditPage extends AdminPage {
         if (this.canCheckRead()) {
             buttons.push({ className: 'btn-success', icon: 'fa-solid fa-eye', onClick: this.onReadCvDi });
         }
-        console.log(this.state);
 
         const listFile = this.state.listFile;
 

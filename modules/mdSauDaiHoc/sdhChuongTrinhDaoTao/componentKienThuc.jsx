@@ -131,7 +131,6 @@ class ComponentKienThuc extends AdminPage {
         const permission = this.getUserPermission(this.props.prefixPermission || 'sdhChuongTrinhDaoTao', ['write', 'manage']);
         if (permission.write || permission.manage) {
             let curData = this.rows[idx].maMonHoc.value();
-            console.log(curData);
             this.props.removeMonHoc(oldData);
             if (this.props.pushMonHocChosen(curData)) {
                 const curEdit = this.state.datas[idx].edit;
@@ -174,9 +173,7 @@ class ComponentKienThuc extends AdminPage {
     }
 
     setMonHoc = (idx, value, childId, childText) => {
-        const id = value.id,
-            { tcLyThuyet, tcThucHanh } = value.item;
-        console.log(value);
+        const id = value.id, { tcLyThuyet, tcThucHanh } = value.item;
         let preIdx, nextIdx;
         if (childId !== null && childId >= 0) {
             const arr = idx.split('_');

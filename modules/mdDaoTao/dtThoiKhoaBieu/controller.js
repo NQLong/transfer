@@ -141,7 +141,6 @@ module.exports = app => {
             }
             res.end();
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
