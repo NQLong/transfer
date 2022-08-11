@@ -61,7 +61,7 @@ module.exports = app => {
     });
 
     app.get('/api/sau-dai-hoc/mon-hoc/item/:ma', app.permission.check('dmMonHocSdh:read'), (req, res) => {
-        app.model.dmMonHocSdh.get({ maNganh: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.dmMonHocSdh.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {

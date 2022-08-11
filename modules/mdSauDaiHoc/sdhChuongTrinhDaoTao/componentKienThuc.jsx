@@ -131,7 +131,6 @@ class ComponentKienThuc extends AdminPage {
         const permission = this.getUserPermission(this.props.prefixPermission || 'sdhChuongTrinhDaoTao', ['write', 'manage']);
         if (permission.write || permission.manage) {
             let curData = this.rows[idx].maMonHoc.value();
-            console.log(curData);
             this.props.removeMonHoc(oldData);
             if (this.props.pushMonHocChosen(curData)) {
                 const curEdit = this.state.datas[idx].edit;
@@ -140,8 +139,8 @@ class ComponentKienThuc extends AdminPage {
                 const childText = this.state.datas[idx].childText;
                 const childId = this.state.datas[idx].childId;
                 this.setEditState(idx, childId, childText, !curEdit, id, isDeleted, () => {
-                    // this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
-                    // this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
+                    this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
+                    this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
                 });
             } else {
                 this.rows[idx].maMonHoc.focus();
@@ -176,7 +175,6 @@ class ComponentKienThuc extends AdminPage {
     setMonHoc = (idx, value, childId, childText) => {
         const id = value.id,
             { tcLyThuyet, tcThucHanh } = value.item;
-        console.log(value);
         let preIdx, nextIdx;
         if (childId !== null && childId >= 0) {
             const arr = idx.split('_');
