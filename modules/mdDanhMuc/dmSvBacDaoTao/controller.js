@@ -42,7 +42,7 @@ module.exports = app => {
         app.model.dmSvBacDaoTao.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/bac-dao-tao/item/:maBac', app.permission.orCheck('dmSvBacDaoTao:read', 'dtSvBacDaoTao:read'), (req, res) => {
+    app.get('/api/danh-muc/bac-dao-tao/item/:maBac', app.permission.orCheck('staff:login', 'dtSvBacDaoTao:read'), (req, res) => {
         app.model.dmSvBacDaoTao.get({ maBac: req.params.maBac }, (error, item) => res.send({ error, item }));
     });
 

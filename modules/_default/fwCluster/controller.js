@@ -207,7 +207,9 @@ module.exports = (app, appConfig) => {
         ready: () => app.io && app.io.addSocketListener,
         run: () => app.io.addSocketListener('cluster', socket => {
             const user = app.io.getSessionUser(socket);
-            user && user.permissions.includes('cluster:manage') && socket.join('cluster');
+            if (user && user.permissions.includes('cluster:manage')) {
+                socket.join('cluster');
+            }
         }),
     });
 };

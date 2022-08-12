@@ -56,7 +56,12 @@ module.exports = (app, http, config) => {
     if (config && app.database.redis) {
         const redisStore = require('connect-redis')(session);
         sessionOptions.store = new redisStore({ client: app.database.redis, prefix: sessionIdPrefix });
-        app.use(session(sessionOptions));
+    }
+
+    const sessionMiddleware = session(sessionOptions);
+    app.use(sessionMiddleware);
+    if (app.io) {
+        app.io.use((socket, next) => sessionMiddleware(socket.request, sessionOptions, next));
     }
 
     app.session = {
