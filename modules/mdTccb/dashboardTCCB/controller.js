@@ -2,12 +2,12 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3001: { title: 'Dashboard', link: '/user/tccb/dashboard', icon: 'fa-bar-chart', backgroundColor: '#f5c842', pin: true },
-        },
+            3001: { title: 'Dashboard', link: '/user/tccb/dashboard', icon: 'fa-bar-chart', backgroundColor: '#f5c842', pin: true }
+        }
     };
 
     app.permission.add(
-        { name: 'tccbDashboard:manage', menu },
+        { name: 'tccbDashboard:manage', menu }
     );
 
     app.permissionHooks.add('staff', 'addRoleDashboardTccb', (user, staff) => new Promise(resolve => {
@@ -27,7 +27,6 @@ module.exports = app => {
             else {
                 let soLieu = item.rows[0],
                     { nhanSuDonVi = [], nhanSuCongTac = [], qtDiNuocNgoai = [], qtCongTacTrongNuoc = [], qtNghiPhep = [], qtNghiThaiSan = [] } = item;
-                console.log(qtNghiPhep, qtNghiThaiSan);
                 app.model.dmDonVi.getAll({ kichHoat: 1 }, 'ma,maPl', 'maPl', (error, listDonVi) => {
                     if (error) res.send({ error });
                     else {

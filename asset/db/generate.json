@@ -15039,7 +15039,8 @@
             "moduleName": "tcHocPhiTransactionInvoice",
             "modelName": "tcHocPhiTransactionInvoice",
             "methods": {
-                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage"
+                "TC_HOC_PHI_TRANSACTION_INVOICE_SEARCH_PAGE": "searchPage",
+                "TC_HOC_PHI_TRANSACTION_INVOICE_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {
@@ -16162,6 +16163,9 @@
             "active": true,
             "moduleName": "svNhapHoc",
             "modelName": "svNhapHoc",
+            "methods": {
+                "SV_NHAP_HOC_GET_DATA": "getData"
+            },
             "columns": {
                 "ID": {
                     "value": "id",

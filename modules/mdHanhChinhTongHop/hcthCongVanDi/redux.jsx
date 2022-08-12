@@ -223,14 +223,11 @@ export const SelectAdapter_CongVanDi = {
 export function updateStatus(data, done) {
     return () => {
         const url = '/api/hcth/van-ban-di/status';
-        // console.log('hello');
         T.put(url, { data }, res => {
             if (res.error) {
-                console.log('hello1');
                 T.notify('Cập nhật trạng thái văn bản bị lỗi,1', 'danger');
                 console.error('PUT: ' + url + '. ' + res.error);
             } else {
-                console.log('hello2');
                 T.notify('Cập nhật trạng thái văn bản thành công', 'success');
                 done && done(data);
             }

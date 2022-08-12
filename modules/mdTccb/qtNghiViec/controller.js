@@ -2,14 +2,14 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3030: { title: 'Cán bộ Nghỉ việc', link: '/user/tccb/qua-trinh/nghi-viec', icon: 'fa-user-times', backgroundColor: '#2a99b8', groupIndex: 0 },
-        },
+            3030: { title: 'Cán bộ Nghỉ việc', link: '/user/tccb/qua-trinh/nghi-viec', icon: 'fa-user-times', backgroundColor: '#2a99b8', groupIndex: 0 }
+        }
     };
     app.permission.add(
         { name: 'qtNghiViec:read', menu },
         { name: 'qtNghiViec:write' },
         { name: 'qtNghiViec:delete' },
-        { name: 'qtNghiViec:export' },
+        { name: 'qtNghiViec:export' }
     );
     app.get('/user/tccb/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghi-viec/create-list', app.permission.check('qtNghiViec:read'), app.templates.admin);
@@ -61,7 +61,6 @@ module.exports = app => {
     app.put('/api/qua-trinh/nghi-viec', app.permission.check('qtNghiViec:write'), (req, res) => {
         let changes = req.body.changes;
         app.model.qtNghiViec.update({ ma: req.body.ma }, changes, (error, item) => {
-            // console.log(item);
             if (item.shcc) {
                 app.model.canBo.get({ shcc: item.shcc }, (error, canBo) => {
                     if (error || !canBo) res.send({ error, item });
@@ -71,8 +70,7 @@ module.exports = app => {
                         });
                     }
                 });
-            }
-            else res.send({ error, item });
+            } else res.send({ error, item });
         });
     });
 
@@ -105,7 +103,7 @@ module.exports = app => {
                         { cell: 'K1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
                         { cell: 'L1', value: 'NỘI DUNG', bold: true, border: '1234' },
                         { cell: 'M1', value: 'NGÀY NGHỈ', bold: true, border: '1234' },
-                        { cell: 'N1', value: 'GHI CHÚ', bold: true, border: '1234' },
+                        { cell: 'N1', value: 'GHI CHÚ', bold: true, border: '1234' }
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -189,7 +187,7 @@ module.exports = app => {
                                                         ngaySinh: item.ngaySinh,
                                                         phai: item.phai,
                                                         dienNghi: item.ngayBienChe ? 1 : 2,
-                                                        trinhDoPhoThong: item.trinhDoPhoThong,
+                                                        trinhDoPhoThong: item.trinhDoPhoThong
                                                     };
                                                     items.push(dataAdd);
                                                     solve(index + 1);
@@ -219,7 +217,7 @@ module.exports = app => {
                 shcc: item.shcc,
                 noiDung: 'QĐ về việc nghỉ việc hưởng chế độ hưu trí',
                 lyDoNghi: 'H',
-                dienNghi: item.dienNghi,
+                dienNghi: item.dienNghi
             };
             app.model.qtNghiViec.create(data, (error) => {
                 if (error) errorList.push(error);
@@ -231,7 +229,6 @@ module.exports = app => {
 
     app.get('/api/tccb/qua-trinh/download-nghi-huu-du-kien', app.permission.check('qtNghiViec:export'), (req, res) => {
         const yearCalc = req.query.year;
-        console.log(yearCalc);
         const endYear = new Date(yearCalc, 11, 31, 23, 59, 59, 999);
         // 1419120000000 = 45 * 365 * 24 * 3600 * 10000 (45 năm)
         app.model.canBo.getAll({
@@ -239,16 +236,15 @@ module.exports = app => {
             parameter: { year: endYear.getTime() }
         }, 'shcc,ho,ten,phai,ngach,hocVi,chucDanh,maDonVi,ngaySinh,trinhDoPhoThong,ngayBienChe', 'chucDanh', async (error, data) => {
             if (error) {
-                res.send({ error, items: null });
-                return;
+                return res.send({ error, items: null });
             }
+
             let items = [];
             let getDataNghiHuu = () => new Promise(resolve => {
                 const init = (index = 0) => {
                     if (index == data.length) {
                         resolve(items);
-                    }
-                    else {
+                    } else {
                         const item = data[index];
                         app.model.dmNghiHuu.getTuoiNghiHuu({ phai: item.phai, ngaySinh: new Date(item.ngaySinh) }, (error, data) => {
                             if (data) {
@@ -284,7 +280,7 @@ module.exports = app => {
                                                                 ngaySinh: item.ngaySinh,
                                                                 phai: item.phai,
                                                                 dienNghi: item.ngayBienChe ? 1 : 2,
-                                                                trinhDoPhoThong: item.trinhDoPhoThong,
+                                                                trinhDoPhoThong: item.trinhDoPhoThong
                                                             };
                                                             items.push(dataAdd);
                                                             init(index + 1);
@@ -317,7 +313,7 @@ module.exports = app => {
                         { cell: 'H1', value: 'Chức vụ', bold: true, border: '1234' },
                         { cell: 'I1', value: 'Đơn vị công tác', bold: true, border: '1234' },
                         { cell: 'J1', value: 'Ngày đủ tuổi nghỉ hưu', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'Nghỉ hưu từ', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Nghỉ hưu từ', bold: true, border: '1234' }
                     ];
                     dataNghiHuu.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
