@@ -66,79 +66,79 @@ module.exports = app => {
         app.model.sdhCauTrucKhungDaoTao.getAllNamDaoTao(condition, 'id, namDaoTao', 'namDaoTao ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-mon-hoc', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
-        try {
-            let { khoaSv, maNganh, loaiHinhDaoTao, bacDaoTao } = req.query.condition;
-            let thoiGianMoMon = await app.model.sdhThoiGianMoMon.getActive();
-            //Lấy tất cả CTDT của ngành đó trong năm (e.g, Ngành Báo chí có 2 chuyên ngành vào năm 2022: Báo điện tử, Báo chính thống --> Lấy hết)
-            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
-            let item = await app.model.sdhCauTrucKhungDaoTao.get({ khoa: khoaSv });
-            const items = await app.model.sdhKhungDaoTao.getAll({ namDaoTao: item.id, maNganh, loaiHinhDaoTao, bacDaoTao });
-            if (!items.length) throw 'Không có chương trình đào tạo nào của hệ này';
-            let listPromise = items.map(item => {
-                return new Promise(resolve =>
-                    app.model.sdhChuongTrinhDaoTao.getAll({
-                        statement: 'maKhungDaoTao = :maKhungDaoTao AND khoa != 33 AND khoa != 32',
-                        parameter: { maKhungDaoTao: item.id }
-                    }, (error, listMonHocCtdt) => {
-                        listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
-                        resolve(listMonHocCtdt || []);
-                    }));
-            });
-            const danhSachMonMo = await app.model.dtDanhSachMonMo.getAll({ nam: item.id, maNganh, hocKy: thoiGianMoMon.hocKy });
-            let danhSachMonMoChung = danhSachMonMo.filter(item => !item.chuyenNganh || item.chuyenNganh == '');
-            // danhSachMonMoChuyenNganh = danhSachMonMo.filter(item => item.chuyenNganh && item.chuyenNganh != '');
-            // const danhSachChuyenNganh = await app.model.dtDanhSachChuyenNganh.getAll({ namHoc: item.id });
-            // let chuyenNganhMapper = {};
-            // danhSachChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
+    // app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-mon-hoc', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
+    //     try {
+    //         let { khoaSv, maNganh, loaiHinhDaoTao, bacDaoTao } = req.query.condition;
+    //         let thoiGianMoMon = await app.model.sdhThoiGianMoMon.getActive();
+    //         //Lấy tất cả CTDT của ngành đó trong năm (e.g, Ngành Báo chí có 2 chuyên ngành vào năm 2022: Báo điện tử, Báo chính thống --> Lấy hết)
+    //         thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+    //         let item = await app.model.sdhCauTrucKhungDaoTao.get({ khoa: khoaSv });
+    //         const items = await app.model.sdhKhungDaoTao.getAll({ namDaoTao: item.id, maNganh, loaiHinhDaoTao, bacDaoTao });
+    //         if (!items.length) throw 'Không có chương trình đào tạo nào của hệ này';
+    //         let listPromise = items.map(item => {
+    //             return new Promise(resolve =>
+    //                 app.model.sdhChuongTrinhDaoTao.getAll({
+    //                     statement: 'maKhungDaoTao = :maKhungDaoTao AND khoa != 33 AND khoa != 32',
+    //                     parameter: { maKhungDaoTao: item.id }
+    //                 }, (error, listMonHocCtdt) => {
+    //                     listMonHocCtdt.forEach(monHocCTDT => monHocCTDT.chuyenNganh = item.chuyenNganh);
+    //                     resolve(listMonHocCtdt || []);
+    //                 }));
+    //         });
+    //         const danhSachMonMo = await app.model.dtDanhSachMonMo.getAll({ nam: item.id, maNganh, hocKy: thoiGianMoMon.hocKy });
+    //         let danhSachMonMoChung = danhSachMonMo.filter(item => !item.chuyenNganh || item.chuyenNganh == '');
+    //         // danhSachMonMoChuyenNganh = danhSachMonMo.filter(item => item.chuyenNganh && item.chuyenNganh != '');
+    //         // const danhSachChuyenNganh = await app.model.dtDanhSachChuyenNganh.getAll({ namHoc: item.id });
+    //         // let chuyenNganhMapper = {};
+    //         // danhSachChuyenNganh.forEach(item => chuyenNganhMapper[item.id] = item.ten);
 
-            Promise.all(listPromise).then(listMonHocCtdt => {
-                let listMonHoc = listMonHocCtdt.flat().map(item => {
-                    item.maNganh = maNganh;
-                    return item;
-                });
-                let listMonHocChung = listMonHoc.filter((value, index, self) =>
-                    index === self.findIndex((t) => (
-                        t.maMonHoc === value.maMonHoc && t.tinhChatMon === 0
-                    ))
-                ).map(item => {
-                    item.isMo = danhSachMonMoChung.map(item => item.maMonHoc).includes(item.maMonHoc);
-                    if (item.isMo) {
-                        ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = danhSachMonMoChung.find(monChung => monChung.maMonHoc == item.maMonHoc)[textBox]);
-                    }
-                    item.chuyenNganh = '';
-                    return item;
-                });
-                // let monTheoChuyenNganh = listMonHoc
-                //     .filter(item => item.tinhChatMon == 1)
-                //     .map(item => {
-                //         item.isMo = danhSachMonMoChuyenNganh.map(item => item.maMonHoc).includes(item.maMonHoc);
-                //         // item.tenChuyenNganh = chuyenNganhMapper[item.chuyenNganh];
-                //         if (item.isMo) {
-                //             ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)[textBox]));
-                //             item.currentCn = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)['chuyenNganh']);
-                //         }
-                //         return item;
-                //     });
-                // let tmp = monTheoChuyenNganh.reduce((prev, curr) => {
-                //     delete curr.id;
-                //     if (prev.some(item => item.maMonHoc == curr.maMonHoc)) {
-                //         let element = prev.find(item => item.maMonHoc == curr.maMonHoc);
-                //         element.chuyenNganh = [...element.chuyenNganh, curr.chuyenNganh];
-                //         element.tenChuyenNganh = [...element.tenChuyenNganh, curr.tenChuyenNganh];
-                //     } else {
-                //         curr.chuyenNganh = [curr.chuyenNganh];
-                //         curr.tenChuyenNganh = [curr.tenChuyenNganh];
-                //         prev.push(curr);
-                //     }
-                //     return prev;
-                // }, []);
-                res.send({ listMonHocChung });
-            });
-        } catch (error) {
-            res.send({ error });
-        }
-    });
+    //         Promise.all(listPromise).then(listMonHocCtdt => {
+    //             let listMonHoc = listMonHocCtdt.flat().map(item => {
+    //                 item.maNganh = maNganh;
+    //                 return item;
+    //             });
+    //             let listMonHocChung = listMonHoc.filter((value, index, self) =>
+    //                 index === self.findIndex((t) => (
+    //                     t.maMonHoc === value.maMonHoc && t.tinhChatMon === 0
+    //                 ))
+    //             ).map(item => {
+    //                 item.isMo = danhSachMonMoChung.map(item => item.maMonHoc).includes(item.maMonHoc);
+    //                 if (item.isMo) {
+    //                     ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = danhSachMonMoChung.find(monChung => monChung.maMonHoc == item.maMonHoc)[textBox]);
+    //                 }
+    //                 item.chuyenNganh = '';
+    //                 return item;
+    //             });
+    //             // let monTheoChuyenNganh = listMonHoc
+    //             //     .filter(item => item.tinhChatMon == 1)
+    //             //     .map(item => {
+    //             //         item.isMo = danhSachMonMoChuyenNganh.map(item => item.maMonHoc).includes(item.maMonHoc);
+    //             //         // item.tenChuyenNganh = chuyenNganhMapper[item.chuyenNganh];
+    //             //         if (item.isMo) {
+    //             //             ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => item[textBox] = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)[textBox]));
+    //             //             item.currentCn = JSON.parse(danhSachMonMoChuyenNganh.find(monChuyenNganh => monChuyenNganh.maMonHoc == item.maMonHoc)['chuyenNganh']);
+    //             //         }
+    //             //         return item;
+    //             //     });
+    //             // let tmp = monTheoChuyenNganh.reduce((prev, curr) => {
+    //             //     delete curr.id;
+    //             //     if (prev.some(item => item.maMonHoc == curr.maMonHoc)) {
+    //             //         let element = prev.find(item => item.maMonHoc == curr.maMonHoc);
+    //             //         element.chuyenNganh = [...element.chuyenNganh, curr.chuyenNganh];
+    //             //         element.tenChuyenNganh = [...element.tenChuyenNganh, curr.tenChuyenNganh];
+    //             //     } else {
+    //             //         curr.chuyenNganh = [curr.chuyenNganh];
+    //             //         curr.tenChuyenNganh = [curr.tenChuyenNganh];
+    //             //         prev.push(curr);
+    //             //     }
+    //             //     return prev;
+    //             // }, []);
+    //             res.send({ listMonHocChung });
+    //         });
+    //     } catch (error) {
+    //         res.send({ error });
+    //     }
+    // });
 
 
     app.get('/api/sau-dai-hoc/khung-dao-tao/:ma', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
@@ -248,87 +248,77 @@ module.exports = app => {
     //     resolve();
     // }));
 
-    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/download-word/:id', app.permission.check('sdhChuongTrinhDaoTao:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/download-word/:id', app.permission.check('sdhChuongTrinhDaoTao:read'), async (req, res) => {
         if (req.params && req.params.id) {
             const id = req.params.id;
-            app.model.sdhKhungDaoTao.get({ id }, '*', 'id ASC', (error, kdt) => {
-                if (error) {
-                    res.send({ error });
-                    return;
-                }
-                const { maNganh, tenNganh, trinhDoDaoTao,
-                    loaiHinhDaoTao, thoiGianDaoTao, tenVanBang, namDaoTao
-                } = kdt;
-                app.model.sdhCauTrucKhungDaoTao.get({ id: namDaoTao }, '*', 'id ASC', (error, ctkdt) => {
-                    if (error) {
-                        res.send({ error });
-                        return;
+            let kdt = await app.model.sdhKhungDaoTao.get({ id }, '*', 'id ASC');
+            const { maNganh, tenNganh, trinhDoDaoTao,
+                bacDaoTao, thoiGianDaoTao, tenVanBang, namDaoTao, maKhoa
+            } = kdt;
+            let khoa = await app.model.dmKhoaSauDaiHoc.get({ ma: maKhoa });
+            let bac = await app.model.dmHocSdh.get({ ma: bacDaoTao });
+            let ctkdt = await app.model.sdhCauTrucKhungDaoTao.get({ id: namDaoTao }, '*', 'id ASC');
+            const mucCha = JSON.parse(ctkdt.mucCha || '{}');
+            const mucCon = JSON.parse(ctkdt.mucCon || '{}');
+            const chuongTrinhDaoTao = { parents: mucCha?.chuongTrinhDaoTao, childs: mucCon?.chuongTrinhDaoTao };
+            const ctdt = [];
+            let monHocs = await app.model.sdhChuongTrinhDaoTao.getAll({ maKhungDaoTao: id }, '*', 'id ASC');
+            let sumLt = monHocs.map(item => item.tinChiLyThuyet).reduce((prev, cur) => prev + cur, 0),
+                sumTh = monHocs.map(item => item.tinChiThucHanh).reduce((prev, cur) => prev + cur, 0),
+                sumTong = sumLt + sumTh;
+            const pushMhToObj = (idKkt, idKhoi, obj) => {
+                monHocs.forEach(monHoc => {
+                    if ((idKkt && idKhoi && monHoc.maKhoiKienThucCon == idKkt && monHoc.maKhoiKienThuc == idKhoi) || (idKhoi && !idKkt && monHoc.maKhoiKienThuc == idKhoi)) {
+                        const { maMonHoc, tenMonHoc, loaiMonHoc, tinChiLyThuyet, tinChiThucHanh } = monHoc;
+                        const loaiMonHocStr = loaiMonHoc == 0 ? 'Bắt buộc' : 'Tự chọn';
+                        obj.mh.push({ maMonHoc, tenMonHoc, loaiMonHoc: loaiMonHocStr, tinChiLyThuyet, tinChiThucHanh, tongTinChi: tinChiLyThuyet + tinChiThucHanh });
                     }
-                    const mucCha = JSON.parse(ctkdt.mucCha || '{}');
-                    const mucCon = JSON.parse(ctkdt.mucCon || '{}');
-                    const chuongTrinhDaoTao = { parents: mucCha?.chuongTrinhDaoTao, childs: mucCon?.chuongTrinhDaoTao };
-                    const ctdt = [];
-                    app.model.sdhChuongTrinhDaoTao.getAll({ maKhungDaoTao: id }, '*', 'id ASC', (error, monHocs) => {
-                        if (error) {
-                            res.send({ error });
-                            return;
-                        }
-                        const pushMhToObj = (idKkt, idKhoi, obj) => {
-                            monHocs.forEach(monHoc => {
-                                if ((idKkt && idKhoi && monHoc.maKhoiKienThucCon == idKkt && monHoc.maKhoiKienThuc == idKhoi) || (idKhoi && !idKkt && monHoc.maKhoiKienThuc == idKhoi)) {
-                                    const { maMonHoc, tenMonHoc, loaiMonHoc, tongSoTiet, soTietLyThuyet, soTietThucHanh } = monHoc;
-                                    const loaiMonHocStr = loaiMonHoc == 0 ? 'Bắt buộc' : 'Tự chọn';
-                                    obj.mh.push({ maMonHoc, tenMonHoc, loaiMonHoc: loaiMonHocStr, tongSoTiet, soTietLyThuyet, soTietThucHanh });
-                                }
-                            });
-                        };
-                        Object.keys(chuongTrinhDaoTao.parents).forEach((key, idx) => {
-                            const khoi = chuongTrinhDaoTao.parents[key];
-                            const { id: idKhoi, text } = khoi;
-                            const tmpCtdt = {
-                                stt: idx + 1,
-                                name: text,
-                                mh: [],
-                            };
-                            if (chuongTrinhDaoTao.childs[key]) {
-                                ctdt.push(tmpCtdt);
-                                chuongTrinhDaoTao.childs[key].forEach(kkt => {
-                                    const { id: idKkt, value } = kkt;
-                                    const tmpCtdt = {
-                                        stt: '',
-                                        name: value.text,
-                                        mh: [],
-                                    };
-                                    pushMhToObj(idKkt, idKhoi, tmpCtdt);
-                                    ctdt.push(tmpCtdt);
-                                });
-                            } else {
-                                pushMhToObj(null, idKhoi, tmpCtdt);
-                                ctdt.push(tmpCtdt);
-                            }
-                        });
-                        const source = app.path.join(__dirname, 'resource', 'ctdt_word.docx');
-                        new Promise(resolve => {
-                            const data = {
-                                tenNganhVi: JSON.parse(tenNganh).vi,
-                                tenNganhEn: JSON.parse(tenNganh).en,
-                                maNganh,
-                                trinhDoDaoTao,
-                                loaiHinhDaoTao,
-                                thoiGianDaoTao,
-                                tenVanBangVi: JSON.parse(tenVanBang).vi,
-                                tenVanBangEn: JSON.parse(tenVanBang).en,
-                                ctdt: ctdt,
-                            };
-                            resolve(data);
-                        }).then((data) => {
-                            app.docx.generateFile(source, data, (error, data) => {
-                                res.send({ error, data });
-                            });
-                        });
-                    });
                 });
-
+            };
+            Object.keys(chuongTrinhDaoTao.parents).forEach((key, idx) => {
+                const khoi = chuongTrinhDaoTao.parents[key];
+                const { id: idKhoi, text } = khoi;
+                const tmpCtdt = {
+                    stt: idx + 1,
+                    name: text,
+                    mh: [],
+                };
+                if (chuongTrinhDaoTao.childs[key]) {
+                    ctdt.push(tmpCtdt);
+                    chuongTrinhDaoTao.childs[key].forEach(kkt => {
+                        const { id: idKkt, value } = kkt;
+                        const tmpCtdt = {
+                            stt: '',
+                            name: value.text,
+                            mh: [],
+                        };
+                        pushMhToObj(idKkt, idKhoi, tmpCtdt);
+                        ctdt.push(tmpCtdt);
+                    });
+                } else {
+                    pushMhToObj(null, idKhoi, tmpCtdt);
+                    ctdt.push(tmpCtdt);
+                }
+            });
+            const source = app.path.join(__dirname, 'resource', 'ctdt_word.docx');
+            new Promise(resolve => {
+                const data = {
+                    tenNganhVi: JSON.parse(tenNganh).vi,
+                    tenNganhEn: JSON.parse(tenNganh).en,
+                    maNganh,
+                    trinhDoDaoTao,
+                    bacDaoTao: bac.ten,
+                    tenKhoa: khoa.ten,
+                    thoiGianDaoTao, sumLt, sumTh, sumTong,
+                    tenVanBangVi: JSON.parse(tenVanBang).vi,
+                    tenVanBangEn: JSON.parse(tenVanBang).en,
+                    ctdt,
+                };
+                resolve(data);
+            }).then((data) => {
+                app.docx.generateFile(source, data, (error, data) => {
+                    res.send({ error, data });
+                });
             });
         } else {
             res.send({ error: 'No permission' });
