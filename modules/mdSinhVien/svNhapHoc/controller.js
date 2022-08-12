@@ -3,6 +3,12 @@ module.exports = app => {
         mySecretPassword = 'ctsv#2022';
 
     app.permission.add({ name: 'ctsvNhapHoc:write' });
+    app.permissionHooks.add('staff', 'addRoleCtsvNhapHoc', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == 32) {
+            app.permissionHooks.pushUserPermission(user, 'ctsvNhapHoc:write');
+            resolve();
+        } else resolve();
+    }));
 
     app.post('/api/ctsv/nhap-hoc/login', async (req, res) => {
         try {
