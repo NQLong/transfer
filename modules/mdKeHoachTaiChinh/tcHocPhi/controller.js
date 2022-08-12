@@ -540,18 +540,22 @@ module.exports = app => {
 
             let dataByStudents = data.rows,
                 dataTransactions = data.transactions;
-            let dataByDate = dataTransactions.map(item => ({ ...item, 'date': app.date.viDateFormat(new Date(Number(item.ngayDong))) }));
+            let dataByDate = dataTransactions.map(item => ({ ...item, 'date': app.date.viDateFormat(new Date(Number(item.ngayDong))) })),
+                dataInvoiceByDate = data.invoice.map(item => ({ ...item, date: app.date.viDateFormat(new Date(Number(item.ngayPhatHanh))) }));
             let totalStudents = dataByStudents.length,
                 totalByDate = countGroupBy(dataByDate, 'date'),
                 totalTransactions = dataTransactions.length,
                 totalCurrentMoney = dataTransactions.reduce((sum, item) => sum + parseInt(item.khoanDong), 0),
+                totalInvoices = data.invoice.length,
+                totalInvoiceByDate = countGroupBy(dataInvoiceByDate, 'date'),
+                totalCancelInvoices = dataInvoiceByDate.reduce((total, item) => item.lydoHuy ? total + 1 : total, 0),
                 amountByDepartment = countGroupBy(dataTransactions, 'tenNganh'),
                 amountByBank = countGroupBy(dataTransactions, 'nganHang'),
                 amountByEduLevel = countGroupBy(dataByStudents, 'tenBacDaoTao'),
                 amountByEduMethod = countGroupBy(dataByStudents, 'loaiHinhDaoTao'),
                 amountPaid = dataByStudents.filter(item => item.congNo == 0).length,
                 amountNotPaid = totalStudents - amountPaid;
-            const statistic = { totalStudents, totalTransactions, amountByBank, amountByEduLevel, amountByEduMethod, amountPaid, amountNotPaid, totalCurrentMoney, amountByDepartment, totalByDate };
+            const statistic = { totalStudents, totalTransactions, totalInvoices, amountByBank, amountByEduLevel, amountByEduMethod, amountPaid, amountNotPaid, totalCurrentMoney, amountByDepartment, totalByDate, totalInvoiceByDate, totalCancelInvoices };
             res.send({ statistic, settings });
         } catch (error) {
             res.send({ error });
