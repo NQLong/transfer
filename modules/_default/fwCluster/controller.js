@@ -7,14 +7,14 @@ module.exports = (app, appConfig) => {
             1006: { title: 'Cluster', link: '/user/cluster', icon: 'fa-braille', backgroundColor: '#4db6ac' }
         }
     };
-    app.permission.add({ name: 'cluster:read', menu }, { name: 'cluster:write' }, { name: 'cluster:delete' });
+    app.permission.add({ name: 'cluster:manage', menu }, { name: 'cluster:write' }, { name: 'cluster:delete' });
 
-    app.get('/user/cluster', app.permission.check('cluster:read'), app.templates.admin);
+    app.get('/user/cluster', app.permission.check('cluster:manage'), app.templates.admin);
 
     // Cluster APIs ---------------------------------------------------------------------------------------------------------------------------------
     const socketIoEmit = (error) => !error && setTimeout(() => app.io.to('cluster').emit('services-changed'), 1000);
 
-    app.get('/api/cluster/all', app.permission.check('cluster:read'), async (req, res) => {
+    app.get('/api/cluster/all', app.permission.check('cluster:manage'), async (req, res) => {
         const services = {},
             serviceNames = Object.keys(appConfig.services);
         for (let i = 0; i < serviceNames.length; i++) {
@@ -207,7 +207,7 @@ module.exports = (app, appConfig) => {
         ready: () => app.io && app.io.addSocketListener,
         run: () => app.io.addSocketListener('cluster', socket => {
             const user = app.io.getSessionUser(socket);
-            user && user.permissions.includes('cluster:read') && socket.join('cluster');
+            user && user.permissions.includes('cluster:manage') && socket.join('cluster');
         }),
     });
 };

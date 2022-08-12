@@ -71,10 +71,7 @@ class ComponentTrinhDo extends AdminPage {
                 <h3 className='tile-title'>Thông tin về trình độ</h3>
                 <div className='tile-body row'>
                     <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' placeholder='Nhập trình độ phổ thông (Ví dụ: 12/12)' className='form-group col-md-4' readOnly={readOnly} />
-
-                    <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành (Học vị)' className='form-group col-md-4' readOnly={readOnly} />
-                    <FormSelect ref={e => this.hocViNoiTotNghiep = e} label='Quốc gia tốt nghiệp (Học vị)' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} readOnly={readOnly} />
-
+                    <div className='form-group col-md-8' />
 
                     <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: Number(value) })} className='form-group col-md-12' readOnly={readOnly} />
                     <DaoTaoDetail hocVi='Cử nhân' shcc={this.props.shcc} style={{ display: this.state.cuNhan ? 'block' : 'none' }} permission={permission} canEdit={canEdit} />
@@ -85,9 +82,12 @@ class ComponentTrinhDo extends AdminPage {
                     <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' readOnly={readOnly} />
                     <DaoTaoDetail hocVi='Tiến sĩ' shcc={this.props.shcc} style={{ display: this.state.tienSi ? 'block' : 'none' }} permission={permission} />
 
+                    <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành (Học vị)' className='form-group col-md-6' readOnly={readOnly} />
+                    <FormSelect ref={e => this.hocViNoiTotNghiep = e} label='Quốc gia tốt nghiệp (Học vị)' className='form-group col-md-6' data={SelectAdapter_DmQuocGia} readOnly={readOnly} />
+
                     <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '02', text: 'Phó giáo sư' }, { id: '01', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear readOnly={readOnly} />
-                    <FormTextBox ref={e => this.chuyenNganhChucDanh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' readOnly={readOnly} />
-                    <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận chức danh' className='form-group col-md-3' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.chuyenNganhChucDanh = e} label='Chuyên ngành (chức danh)' className='form-group col-md-3' readOnly={readOnly} />
+                    <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận (chức danh)' className='form-group col-md-3' readOnly={readOnly} />
                     <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' readOnly={readOnly} />
                     <div className='form-group col-md-12' />
                     <label className='form-group col-md-12'>Ngoại ngữ: </label>

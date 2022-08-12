@@ -76,9 +76,7 @@ module.exports = app => {
             toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
         }
 
-        const dataFilter = { canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status };
-        console.log(dataFilter);
-
+        // const dataFilter = { canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status };
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -289,9 +287,6 @@ module.exports = app => {
                                             if (trangThaiBefore == trangThaiCongVanDi.TRA_LAI_HCTH.id && trangThaiAfter == trangThaiCongVanDi.CHO_PHAN_PHOI.id) {
                                                 hanhDong = action.SEND;
                                             }
-                                            console.log('1' + trangThaiBefore);
-                                            console.log('2' + trangThaiAfter);
-
 
                                             app.model.hcthHistory.create({
                                                 key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: hanhDong, thoiGian: new Date().getTime(),
@@ -906,14 +901,11 @@ module.exports = app => {
                 }
                 if (trangThai == trangThaiCongVanDi.CHO_KY.id) {
                     const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ congVan: id });
-                    console.log(congVanTrinhKy);
                     if (!congVanTrinhKy) {
-                        console.log('ok');
                         trangThai = trangThaiCongVanDi.DA_PHAN_PHOI.id;
                     }
                 }
 
-                // const newCongVan = await updateCongVanDi(id, { trangThai });
                 await app.model.hcthHistory.create({
                     key: id,
                     loai: CONG_VAN_DI_TYPE,
@@ -921,12 +913,12 @@ module.exports = app => {
                     shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
+
                 const canBoTao = congVan.nguoiTao;
                 const newCongVan = await updateCongVanDi(id, { trangThai });
                 if (canBoTao) {
                     await onStatusChange(congVan, congVan.trangThai, trangThai, canBoTao);
                 }
-                console.log(trangThai);
                 res.send({ newCongVan });
             }
         } catch (error) {

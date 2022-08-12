@@ -58,7 +58,6 @@ class PageCompany extends React.Component {
         $(document).ready(() => {
             let hiddenShortName = this.props.match.params.hiddenShortName;
             this.props.homeGetCompanyDoiTac(hiddenShortName, company => {
-                console.log(company);
                 this.setState({ company });
             });
         });

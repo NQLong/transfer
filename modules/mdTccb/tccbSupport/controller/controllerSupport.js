@@ -3,12 +3,12 @@ module.exports = app => {
         { QT_MAPPER, ACTIONS } = constant;
 
     const EMAIL_OF_SUPPORTERS = [
-        'doanthihong@hcmussh.edu.vn'
+        'tan.nn@hcmussh.edu.vn'
     ];
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3049: { title: 'Yêu cầu hỗ trợ thông tin', link: '/user/tccb/support', icon: 'fa-universal-access', backgroundColor: '#FE894F', pin: true },
+            3049: { title: 'Xử lý yêu cầu thông tin', link: '/user/tccb/support', icon: 'fa-universal-access', backgroundColor: '#5cb85c', pin: true },
         },
     };
 
@@ -28,6 +28,13 @@ module.exports = app => {
 
     app.get('/user/tccb/support', app.permission.check('tccbSupport:manage'), app.templates.admin);
     app.get('/user/support', app.permission.check('staff:login'), app.templates.admin);
+
+    app.permissionHooks.add('staff', 'addRoleSupport', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '30') {
+            app.permissionHooks.pushUserPermission(user, 'tccbSupport:manage', 'tccbSupport:write', 'tccbSupport:delete');
+            resolve();
+        } else resolve();
+    }));
 
     //APIs-------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/support/page/:pageNumber/:pageSize', app.permission.orCheck('tccbSupport:manage', 'staff:login'), (req, res) => {

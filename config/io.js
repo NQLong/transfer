@@ -1,9 +1,8 @@
-module.exports = (app, http, appConfig) => {
+module.exports = (app, http) => {
     app.io = require('socket.io')(http);
     app.onRedisConnect = () => {
-        const redis = require('socket.io-redis');
-        app.io.adapter(redis(appConfig.redisDB));
-
+        const { createAdapter } = require('socket.io-redis');
+        app.io.adapter(createAdapter({ pubClient: app.database.redis, subClient: app.database.redis.duplicate() }));
         const socketListeners = {};
         app.io.addSocketListener = (name, listener) => socketListeners[name] = listener;
         // app.io.addSocketListener('someListener', (socket) => { });
