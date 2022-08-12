@@ -87,8 +87,8 @@ class ComponentKienThuc extends AdminPage {
         this.setEditState(idx, childId, childText, editFlag, id, isDeleted, () => {
             // this.rows[idx].ten = item ? item?.tenMonHoc : '';
             this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
-            this.rows[idx].tcLyThuyet.value(item ? (item.tcLyThuyet || 0).toString() : '0');
-            this.rows[idx].tcThucHanh.value(item ? (item.tcThucHanh || 0).toString() : '0');
+            this.rows[idx].tcLyThuyet.value(item ? (item.tinChiLyThuyet || 0).toString() : '0');
+            this.rows[idx].tcThucHanh.value(item ? (item.tinChiThucHanh || 0).toString() : '0');
             // this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
             // this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
             // id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
@@ -139,8 +139,8 @@ class ComponentKienThuc extends AdminPage {
                 const childText = this.state.datas[idx].childText;
                 const childId = this.state.datas[idx].childId;
                 this.setEditState(idx, childId, childText, !curEdit, id, isDeleted, () => {
-                    // this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
-                    // this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
+                    this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
+                    this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
                 });
             } else {
                 this.rows[idx].maMonHoc.focus();
@@ -173,7 +173,8 @@ class ComponentKienThuc extends AdminPage {
     }
 
     setMonHoc = (idx, value, childId, childText) => {
-        const id = value.id, { tcLyThuyet, tcThucHanh } = value.item;
+        const id = value.id,
+            { tcLyThuyet, tcThucHanh } = value.item;
         let preIdx, nextIdx;
         if (childId !== null && childId >= 0) {
             const arr = idx.split('_');
@@ -236,10 +237,11 @@ class ComponentKienThuc extends AdminPage {
             const item = {
                 id: id,
                 maMonHoc: this.rows[key].maMonHoc?.value(),
+                tenMonHoc: this.rows[key].maMonHoc?.data()?.text.split(': ')[1] || '',
                 loaiMonHoc: Number(this.rows[key].loaiMonHoc?.value()),
                 maKhoiKienThuc: this.props.khoiKienThucId,
-                tcLyThuyet: Number(this.rows[key].tcLyThuyet?.value()),
-                tcThucHanh: Number(this.rows[key].tcThucHanh?.value()),
+                tinChiLyThuyet: Number(this.rows[key].tcLyThuyet?.value()),
+                tinChiThucHanh: Number(this.rows[key].tcThucHanh?.value()),
                 // tenKhoa: this.rows[key].khoa?.data()?.text,
                 // khoa: this.rows[key].khoa?.value(),
                 maKhoiKienThucCon: childId

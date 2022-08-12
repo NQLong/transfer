@@ -268,7 +268,7 @@ module.exports = app => {
                                 if ((idKkt && idKhoi && monHoc.maKhoiKienThucCon == idKkt && monHoc.maKhoiKienThuc == idKhoi) || (idKhoi && !idKkt && monHoc.maKhoiKienThuc == idKhoi)) {
                                     const { maMonHoc, tenMonHoc, loaiMonHoc, tongSoTiet, soTietLyThuyet, soTietThucHanh } = monHoc;
                                     const loaiMonHocStr = loaiMonHoc == 0 ? 'Bắt buộc' : 'Tự chọn';
-                                    obj.mh.push({ maMonHoc, tenMonHoc, loaiMonHoc: loaiMonHocStr, tongSoTiet, soTietLyThuyet, soTietThucHanh });
+                                    obj.mh.push({ maMonHoc, tenMonHoc, loaiMonHoc: loaiMonHocStr, tongSoTiet: parseInt(tongSoTiet / 15), soTietLyThuyet: parseInt(soTietLyThuyet / 15), soTietThucHanh: parseInt(soTietThucHanh / 15) });
                                 }
                             });
                         };
@@ -306,6 +306,7 @@ module.exports = app => {
                                 trinhDoDaoTao,
                                 loaiHinhDaoTao,
                                 thoiGianDaoTao,
+                                tenKhoa: '',
                                 tenVanBangVi: JSON.parse(tenVanBang).vi,
                                 tenVanBangEn: JSON.parse(tenVanBang).en,
                                 ctdt: ctdt,

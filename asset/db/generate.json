@@ -6919,6 +6919,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "NGOAI_NGU": {
+                    "value": "ngoaiNgu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2
                 }
             },
             "primaryKeys": [
@@ -15741,48 +15748,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 500
-                },
-                "TEN_KHOA": {
-                    "value": "tenKhoa",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 200
-                },
-                "TONG_SO_TIET": {
-                    "value": "tongSoTiet",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
-                },
-                "SO_TIET_LY_THUYET": {
-                    "value": "soTietLyThuyet",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
-                },
-                "SO_TIET_THUC_HANH": {
-                    "value": "soTietThucHanh",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
-                },
-                "SO_TIN_CHI": {
-                    "value": "soTinChi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
-                },
-                "KHOA": {
-                    "value": "khoa",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
                 },
                 "MA_KHOI_KIEN_THUC_CON": {
                     "value": "maKhoiKienThucCon",
