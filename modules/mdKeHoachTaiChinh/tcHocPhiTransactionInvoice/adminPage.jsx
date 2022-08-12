@@ -174,7 +174,7 @@ class DanhSachHoaDon extends AdminPage {
 
         });
         return this.renderPage({
-            title: 'Danh sách giao dịch',
+            title: 'Danh sách hóa đơn',
             icon: 'fa fa-money',
             header: <>
                 <FormSelect ref={e => this.year = e} style={{ width: '100px', marginBottom: '0', marginRight: 10 }} placeholder='Năm học' data={yearDatas()} onChange={() => this.changeAdvancedSearch()} />
