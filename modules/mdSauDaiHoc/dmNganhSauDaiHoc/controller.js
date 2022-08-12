@@ -15,7 +15,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesMonHocSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:manage', 'dmNganhSdh:write', 'dmNganhSdh:delete');
+            app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:read', 'dmNganhSdh:write', 'dmNganhSdh:delete');
             resolve();
         } else resolve();
     }));

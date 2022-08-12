@@ -4998,10 +4998,13 @@ CREATE OR REPLACE FUNCTION HCTH_HO_SO_SEARCH_PAGE(
 BEGIN
     SELECT COUNT(*)
     INTO totalItem
-    FROM HCTH_HO_SO hs;
-    --     WHERE (
---
---               )
+    FROM HCTH_HO_SO hs
+    WHERE (
+              (
+                          ST = ''
+                      OR LOWER(hs.TIEU_DE) LIKE ST
+                  )
+              );
     IF pageNumber < 1 THEN
         pageNumber := 1;
     end if;
@@ -5024,6 +5027,12 @@ BEGIN
 
               FROM HCTH_HO_SO hs
                        LEFT JOIN TCHC_CAN_BO cbt ON cbt.SHCC = hs.NGUOI_TAO
+              WHERE (
+                        (
+                                    ST = ''
+                                OR LOWER(hs.TIEU_DE) LIKE ST
+                            )
+                        )
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
         ORDER BY 'id' DESC;
@@ -5054,10 +5063,12 @@ BEGIN
                hcthcvden.NGAY_CONG_VAN as "ngayCongVan",
                hcthcvden.SO_DEN        as "soDen",
 
+               hcthcvdi.NGAY_TAO       AS "ngayTaoDi",
                hcthcvdi.TRICH_YEU      as "trichYeuDi"
         FROM HCTH_LIEN_KET lk
                  LEFT JOIN HCTH_CONG_VAN_DEN hcthcvden ON hcthcvden.ID = lk.KEY_B and lk.LOAI_B = 'CONG_VAN_DEN'
-                 LEFT JOIN HCTH_CONG_VAN_DI hcthcvdi ON hcthcvdi.ID = lk.KEY_B and lk.LOAI_B = 'CONG_VAN_DI'
+                 LEFT JOIN HCTH_CONG_VAN_DI hcthcvdi
+                           ON hcthcvdi.ID = lk.KEY_B and (lk.LOAI_B = 'CONG_VAN_DI' OR lk.LOAI_B = 'VAN_BAN_DI')
         WHERE (targetA is null or lk.KEY_A = targetA)
           and (targetTypeA is null or lk.LOAI_A = targetTypeA)
           and (targetB is null or lk.KEY_B = targetB)
