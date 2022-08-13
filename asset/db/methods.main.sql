@@ -1148,7 +1148,7 @@ begin
     SELECT JSON_VALUE(config, '$.hocKy') INTO hocKy FROM DUAL;
     SELECT JSON_VALUE(config, '$.now') INTO now FROM DUAL;
 
-    SELECT LISTAGG(TMP.ID_THOI_KHOA_BIEU, ',') WITHIN GROUP ( ORDER BY TMP.ID_THOI_KHOA_BIEU)
+    SELECT LISTAGG(TMP.ID_THOI_KHOA_BIEU, ',') WITHIN GROUP (ORDER BY TMP.ID_THOI_KHOA_BIEU)
     INTO listIdHocPhan
     FROM (SELECT DISTINCT TKBN.ID_THOI_KHOA_BIEU
           FROM DT_THOI_KHOA_BIEU_NGANH TKBN
@@ -1158,8 +1158,18 @@ begin
                  connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null)) TMP;
 
     open hocPhanTheoIdNganh FOR
-        SELECT TKBN.ID_NGANH          AS "idNganh",
-               TKBN.ID_THOI_KHOA_BIEU AS "idThoiKhoaBieu"
+        SELECT DISTINCT TKBN.ID_NGANH                    AS "idNganh",
+                        (SELECT LISTAGG(DTTKB.ID, ',') WITHIN GROUP (ORDER BY DTTKB.ID)
+                         FROM DT_THOI_KHOA_BIEU DTTKB
+                                  LEFT JOIN DT_THOI_KHOA_BIEU_NGANH DTTKBN ON DTTKB.ID = DTTKBN.ID_THOI_KHOA_BIEU
+                         WHERE DTTKBN.ID_NGANH = TKBN.ID_NGANH
+                           AND TKB.IS_MO = 1
+                           AND TKB.BAC_DAO_TAO = bac
+                           AND TKB.LOAI_HINH_DAO_TAO = he
+                           AND TKB.KHOA_SINH_VIEN = khoaSv
+                           AND TKB.NAM = namHoc
+                           AND TKB.HOC_KY = hocKy
+                           AND TKB.LOAI_MON_HOC IS NULL) AS "idThoiKhoaBieu"
         FROM DT_THOI_KHOA_BIEU_NGANH TKBN
                  LEFT JOIN DT_THOI_KHOA_BIEU TKB ON TKB.ID = TKBN.ID_THOI_KHOA_BIEU
         WHERE TKB.IS_MO = 1
@@ -1168,10 +1178,10 @@ begin
           AND TKB.KHOA_SINH_VIEN = khoaSv
           AND TKB.NAM = namHoc
           AND TKB.HOC_KY = hocKy
+          AND TKB.LOAI_MON_HOC IS NULL
           AND TKBN.ID_NGANH IN (SELECT regexp_substr(listIdNganh, '[^,]+', 1, level)
                                 from dual
                                 connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null);
-
     open hocPhanDaXep FOR
         SELECT TKB.ID                                  AS "id",
                TKB.MA_MON_HOC                          AS "maMonHoc",
@@ -1190,6 +1200,7 @@ begin
           AND TKB.IS_MO = 1
           AND TKB.KHOA_SINH_VIEN = khoaSv
           AND TKB.NAM = namHoc
+          AND TKB.LOAI_MON_HOC IS NULL
           AND TKB.HOC_KY = hocKy;
 
     open my_cursor for
@@ -4438,8 +4449,8 @@ BEGIN
                      )
                     )
             ) --filter
-      and (fromTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI > fromTime))
-      AND (toTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI < toTime))
+      and (fromTime is null or (hcthcvd.NGAY_TAO is not null and hcthcvd.NGAY_TAO > fromTime))
+      AND (toTime is null or (hcthcvd.NGAY_TAO is not null and hcthcvd.NGAY_TAO < toTime))
       AND (
                 sT is null
             OR LOWER(hcthcvd.TRICH_YEU) LIKE sT
@@ -4469,6 +4480,7 @@ BEGIN
                      dvg.TEN               AS                     "tenDonViGui",
                      hcthcvd.TRICH_YEU     AS                     "trichYeu",
                      hcthcvd.TRANG_THAI    AS                     "trangThai",
+                     hcthcvd.NGAY_TAO      AS                     "ngayTao",
 
                      ROW_NUMBER() OVER (ORDER BY hcthcvd.ID DESC) R
               FROM HCTH_CONG_VAN_DI hcthcvd
@@ -4516,8 +4528,8 @@ BEGIN
                                )
                               )
                       ) --filter
-                and (fromTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI > fromTime))
-                AND (toTime is null or (hcthcvd.NGAY_GUI is not null and hcthcvd.NGAY_GUI < toTime))
+                and (fromTime is null or (hcthcvd.NGAY_TAO is not null and hcthcvd.NGAY_TAO > fromTime))
+                AND (toTime is null or (hcthcvd.NGAY_TAO is not null and hcthcvd.NGAY_TAO < toTime))
                 AND (
                           sT is null
                       OR LOWER(hcthcvd.TRICH_YEU) LIKE sT
