@@ -2,8 +2,8 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9006: {
-                title: 'Danh sách Khối kiến thức', icon: 'fa-crosshairs', link: '/user/dao-tao/khoi-kien-thuc', groupIndex: '2', backgroundColor: '#1B9CC6'
+            7013: {
+                title: 'Khối kiến thức', link: '/user/dao-tao/khoi-kien-thuc', groupIndex: '2',
             }
         }
     };

@@ -8,7 +8,7 @@ module.exports = app => {
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9009: { title: 'Bậc đào tạo ', link: '/user/dao-tao/bac-dao-tao', groupIndex: 2, icon: 'fa fa-list-alt' },
+            7017: { title: 'Bậc đào tạo ', link: '/user/dao-tao/bac-dao-tao', groupIndex: 2 },
         },
     };
     app.permission.add(
