@@ -44,7 +44,7 @@ T.initPage('pageDmSvLoaiHinhDaoTao');
 export function getDmSvLoaiHinhDaoTaoPage(pageNumber, pageSize, done) {
     const page = T.updatePage('pageDmSvLoaiHinhDaoTao', pageNumber, pageSize);
     return dispatch => {
-        const url = `/api/danh-muc/loai-hinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/danh-muc/he-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hình bị lỗi!', 'danger');
@@ -59,7 +59,7 @@ export function getDmSvLoaiHinhDaoTaoPage(pageNumber, pageSize, done) {
 
 export function getDmSvLoaiHinhDaoTao(ma, done) {
     return () => {
-        const url = `/api/danh-muc/loai-hinh-dao-tao/item/${ma}`;
+        const url = `/api/danh-muc/he-dao-tao/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin loại hình bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmSvLoaiHinhDaoTao(ma, done) {
 
 export function createDmSvLoaiHinhDaoTao(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao';
+        const url = '/api/danh-muc/he-dao-tao';
         T.post(url, { data: item }, data => {
             if (data.error) {
                 T.notify(data.error.message || 'Tạo loại hình bị lỗi', 'danger');
@@ -90,7 +90,7 @@ export function createDmSvLoaiHinhDaoTao(item, done) {
 
 export function deleteDmSvLoaiHinhDaoTao(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao';
+        const url = '/api/danh-muc/he-dao-tao';
         T.delete(url, { ma: ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục loại hình bị lỗi!', 'danger');
@@ -105,7 +105,7 @@ export function deleteDmSvLoaiHinhDaoTao(ma) {
 
 export function updateDmSvLoaiHinhDaoTao(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao';
+        const url = '/api/danh-muc/he-dao-tao';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify(data.error.message || 'Cập nhật thông tin loại hình bị lỗi', 'danger');
@@ -126,7 +126,7 @@ export function changeDmSvLoaiHinhDaoTao(item) {
 
 export const SelectAdapter_DmSvLoaiHinhDaoTao = {
     ajax: true,
-    url: '/api/danh-muc/loai-hinh-dao-tao/page/1/20',
+    url: '/api/danh-muc/he-dao-tao/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmSvLoaiHinhDaoTao(ma, item => done && done({ id: item.ma, text: item.ten })))()
@@ -135,7 +135,7 @@ export const SelectAdapter_DmSvLoaiHinhDaoTao = {
 
 export const SelectAdapter_DmSvLoaiHinhDaoTaoFilter = {
     ajax: true,
-    url: '/api/danh-muc/loai-hinh-dao-tao/filter',
+    url: '/api/danh-muc/he-dao-tao/filter',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmSvLoaiHinhDaoTao(ma, item => done && done({ id: item.ma, text: item.ten })))()

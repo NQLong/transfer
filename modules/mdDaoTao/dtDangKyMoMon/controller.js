@@ -15,7 +15,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesDtDangKyMoMon', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete', 'quanLyDaoTao:manager');
             resolve();
         } else resolve();
     }));

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9007: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/dao-tao/mon-hoc', groupIndex: 2, backgroundColor: '#9DE7BE', icon: 'fa-leanpub', color: '#000' },
+            7015: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/dao-tao/mon-hoc', groupIndex: 1 },
         },
     };
     app.permission.add(

@@ -88,7 +88,7 @@ module.exports = (app, appConfig) => {
         },
         daoTao: {
             index: 7000, title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-diamond',
-            subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'DANH SÁCH']
+            subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'DANH MỤC']
         },
         sdh: {
             index: 7500, title: 'Sau đại học', link: '/user/sau-dai-hoc', icon: 'fa-graduation-cap ',
