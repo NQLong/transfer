@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.sdh,
+        parentMenu: app.parentMenu.category,
         menus: {
-            7502: { title: 'Danh mục Ngành', link: '/user/sau-dai-hoc/danh-sach-nganh' },
+            4106: { title: 'Danh mục Ngành SĐH', link: '/user/sau-dai-hoc/danh-sach-nganh' },
         },
     };
     app.permission.add(
@@ -15,7 +15,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesMonHocSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:manage', 'dmNganhSdh:write', 'dmNganhSdh:delete');
+            app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:read', 'dmNganhSdh:write', 'dmNganhSdh:delete');
             resolve();
         } else resolve();
     }));
@@ -104,7 +104,7 @@ module.exports = app => {
                 const handleUpload = (index = 2) => {
                     const value = worksheet.getRow(index).values;
                     if (value.length == 0 || index == totalRow + 1) {
-                        app.deleteFile(srcPath);
+                        app.fs.deleteFile(srcPath);
                         done({ element });
                     } else {
                         let data = {
@@ -118,7 +118,7 @@ module.exports = app => {
                 };
                 handleUpload();
             } else {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 done({ error: 'Error' });
             }
         }

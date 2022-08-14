@@ -2,8 +2,8 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7002: { title: 'Danh sách môn học mở trong học kỳ', link: '/user/dao-tao/dang-ky-mo-mon', icon: 'fa-paper-plane-o', backgroundColor: '#8E9763', groupIndex: 1 },
-        },
+            7002: { title: 'Danh sách môn học mở trong học kỳ', link: '/user/dao-tao/dang-ky-mo-mon', icon: 'fa-paper-plane-o', backgroundColor: '#8E9763', groupIndex: 1 }
+        }
     };
     app.permission.add(
         { name: 'dtDangKyMoMon:read', menu },
@@ -15,7 +15,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesDtDangKyMoMon', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete', 'quanLyDaoTao:manager');
             resolve();
         } else resolve();
     }));
@@ -71,10 +71,10 @@ module.exports = app => {
                 throw 'Không thuộc thời gian đăng ký hiện tại';
             } else {
                 let item = await app.model.dtDangKyMoMon.get({
-                    nam, hocKy, maNganh: data.maNganh, loaiHinhDaoTao: settings.loaiHinhDaoTao, bacDaoTao: settings.bacDaoTao
+                    nam, hocKy, maNganh: data.maNganh, ...settings
                 });
                 if (item) throw `Mã ngành ${data.maNganh} đã được tạo trong HK${hocKy} - năm ${nam}`;
-                item = await app.model.dtDangKyMoMon.create(data);
+                item = await app.model.dtDangKyMoMon.create({ ...data, ...settings });
                 res.send({ item });
             }
         } catch (error) {
@@ -130,7 +130,8 @@ module.exports = app => {
     app.permissionHooks.add('staff', 'AllPermissionDaoTao', (user, staff) => new Promise((resolve) => {
         if (staff.maDonVi == 33 && staff.donViQuanLy.length) {
             app.permissionHooks.pushUserPermission(user, 'quanLyDaoTao:manager');
-        } resolve();
+        }
+        resolve();
     }));
 
     app.permissionHooks.add('staff', 'checkRoleDTDangKyMoMon', (user, staff) => new Promise(resolve => {

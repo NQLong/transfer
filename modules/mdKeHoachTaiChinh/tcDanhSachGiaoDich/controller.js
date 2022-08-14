@@ -26,7 +26,7 @@ module.exports = app => {
             const hocKy = filter.hocKy || settings.hocPhiHocKy;
             filter.tuNgay = filter.tuNgay || '';
             filter.denNgay = filter.denNgay || '';
-            const filterData = app.stringify({ ...filter, namHoc, hocKy });
+            const filterData = app.utils.stringify({ ...filter, namHoc, hocKy });
             const pageCondition = req.query.searchTerm;
             const page = await app.model.tcHocPhiTransaction.searchPage(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), pageCondition, filterData);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
@@ -52,7 +52,7 @@ module.exports = app => {
 
     app.get('/api/finance/danh-sach-giao-dich/download-psc', app.permission.check('tcGiaoDich:export'), async (req, res) => {
         try {
-            let filter = app.parse(req.query.filter, {});
+            let filter = app.utils.parse(req.query.filter, {});
             const settings = await getSettings();
 
             if (!filter.namHoc || !filter.hocKy) {
@@ -62,7 +62,7 @@ module.exports = app => {
 
             const tuNgay = filter.tuNgay && parseInt(filter.tuNgay),
                 denNgay = filter.denNgay && parseInt(filter.denNgay);
-            filter = app.stringify(filter, '');
+            filter = app.utils.stringify(filter, '');
             let data = await app.model.tcHocPhiTransaction.downloadPsc(filter);
             const list = data.rows;
             const workBook = app.excel.create();
@@ -93,7 +93,7 @@ module.exports = app => {
                 ws.getRow(index + 2).font = { name: 'Times New Roman' };
                 ws.getCell('A' + (index + 2)).value = index + 1;
                 ws.getCell('B' + (index + 2)).value = item.mssv;
-                ws.getCell('C' + (index + 2)).value = `${item.ho.toUpperCase()} ${item.ten.toUpperCase()}`.trim();
+                ws.getCell('C' + (index + 2)).value = `${item.ho?.toUpperCase() || ''} ${item.ten?.toUpperCase() || ''}`.trim();
                 ws.getCell('D' + (index + 2)).value = ngayDong ? app.date.dateTimeFormat(ngayDong, 'dd/mm/yyyy') : '';
                 ws.getCell('E' + (index + 2)).value = item.khoanDong.toString().numberDisplay();
                 ws.getCell('F' + (index + 2)).value = `${item.nganHang}/${ngayDong ? `${('0' + (ngayDong.getMonth() + 1)).slice(-2)}${ngayDong.getFullYear().toString().slice(-2)}` : ''}`;
@@ -134,8 +134,8 @@ module.exports = app => {
                 email: req.session.user.email,
                 thaoTac: 'c',
                 ngay: timeStamp,
-                duLieuCu: app.stringify({}),
-                duLieuMoi: app.stringify({ hocPhi: `${soTien}`, transId: manualTransid })
+                duLieuCu: app.utils.stringify({}),
+                duLieuMoi: app.utils.stringify({ hocPhi: `${soTien}`, transId: manualTransid })
             });
 
             res.send();

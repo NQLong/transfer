@@ -18,4 +18,3 @@ module.exports = (app, express) => {
     app.use('/', express.static(app.publicPath, { maxAge: oneYear }));
     app.use('/static/document/', express.static(app.documentPath, { maxAge: oneYear }));
 };
-

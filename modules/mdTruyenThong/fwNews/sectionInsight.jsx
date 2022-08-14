@@ -2,24 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getNewsByCategory } from './redux';
-const text = {
-    vi: {
-        noNewsTitle: <h3> </h3>,
-        newsTitle: 'THÔNG BÁO',
-        view: 'Lượt xem',
-        viewAll: 'Xem tất cả'
-    },
-    en: {
-        noNewsTitle: <h3>No latest news!</h3>,
-        newsTitle: 'news',
-        view: 'View',
-        viewAll: 'View All'
-    }
-};
+
 class SectionInsight extends React.Component {
-    state = {
-        list: [], category: { vi: ' ', en: ' ' }, linkSeeAll: ''
-    }
+    state = { list: [], category: { vi: ' ', en: ' ' }, linkSeeAll: '' }
+
     componentDidMount() {
         if (this.props.item && this.props.item.viewId) {
             let category = { vi: ' ', en: ' ' }, linkSeeAll;
@@ -35,11 +21,11 @@ class SectionInsight extends React.Component {
         }
     }
     render() {
-        const language = T.language(this.state.category),
-            width = $(window).width();
-        let news = <span className='text-center w-100'>{language.noNewsTitle}</span>;
-        const newsList = this.state.list,
-            viewAll = T.language(text).viewAll;
+        const title = T.language(this.state.category), width = $(window).width();
+        let languageText = this.props.system && this.props.system.languageText || {};
+        const newLanguage = T.language(languageText);
+        let news = <span className='text-center w-100'>{newLanguage.khongTinTuc}</span>;
+        const newsList = this.state.list;
         if (newsList.length == 5) {
             news = (
                 <>
@@ -96,17 +82,14 @@ class SectionInsight extends React.Component {
                             })}
                         </div>}
                     <div className='col-12 d-flex justify-content-center'>
-                        <Link to={this.state.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{viewAll}</Link>
+                        <Link to={`${this.state.linkSeeAll}?${T.language.getLanguage()}`} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{newLanguage.xemTatCa}</Link>
                     </div>
                 </>
             );
         }
         return (
             <section data-aos='fade-up' className='row p-3'>
-                {!!language && <div className='col-12 homeBorderLeft'>
-                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0 }}><strong>{language}</strong></h3>
-                </div>}
-
+                {!!title && <div className='col-12 homeBorderLeft'><h3 className='homeTitle' style={{ color: '#0139A6', margin: 0 }}><strong>{title}</strong></h3></div>}
                 {news}
             </section>);
     }

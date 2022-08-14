@@ -14,7 +14,7 @@ export default function DtDanhSachChuyenNganhReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDtDanhSachChuyenNganh');
-export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition, filter) {
+export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition, filter, done) {
     const page = T.updatePage('pageDtDanhSachChuyenNganh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/dao-tao/danh-sach-chuyen-nganh/page/${page.pageNumber}/${page.pageSize}`;
@@ -27,9 +27,22 @@ export function getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 dispatch({ type: DtDanhSachChuyenNganhGetPage, page: data.page });
+                done && done(data.page);
             }
         }, () => T.notify('Lấy danh sách chuyên ngành bị lỗi!', 'danger'));
     };
+}
+
+export function getDtDanhSachChuyenNganhFilter(maNganh, nam, done) {
+    const url = `/api/dao-tao/danh-sach-chuyen-nganh/all/${maNganh}/${nam}`;
+    T.get(url, data => {
+        if (data.error) {
+            T.notify('Lấy thông tin chuyên ngành bị lỗi!', 'danger');
+            console.error(`GET: ${url}.`, data.error);
+        } else {
+            if (done) done(data.items);
+        }
+    }, error => console.error(`GET: ${url}.`, error));
 }
 
 export function getDtDanhSachChuyenNganh(id, done) {
@@ -48,6 +61,8 @@ export function getDtDanhSachChuyenNganh(id, done) {
 
 export function createDtDanhSachChuyenNganh(item, done) {
     return dispatch => {
+        const cookie = T.updatePage('pageDtDanhSachChuyenNganh');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/danh-sach-chuyen-nganh';
         T.post(url, { data: item }, data => {
             if (data.error) {
@@ -56,7 +71,7 @@ export function createDtDanhSachChuyenNganh(item, done) {
                 if (done) done(data.error);
             } else {
                 T.notify('Tạo mới thông tin chuyên ngành thành công!', 'success');
-                dispatch(getDtDanhSachChuyenNganhPage());
+                dispatch(getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition, filter));
                 if (done) done(data.item);
             }
         }, () => T.notify('Tạo chuyên ngành bị lỗi!', 'danger'));
@@ -65,6 +80,8 @@ export function createDtDanhSachChuyenNganh(item, done) {
 
 export function deleteDtDanhSachChuyenNganh(id) {
     return dispatch => {
+        const cookie = T.updatePage('pageDtDanhSachChuyenNganh');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/danh-sach-chuyen-nganh';
         T.delete(url, { id: id }, data => {
             if (data.error) {
@@ -72,7 +89,7 @@ export function deleteDtDanhSachChuyenNganh(id) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa chuyên ngành thành công!', 'success', false, 800);
-                dispatch(getDtDanhSachChuyenNganhPage());
+                dispatch(getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition, filter));
             }
         }, () => T.notify('Xóa chuyên chuyên ngành bị lỗi!', 'danger'));
     };
@@ -80,6 +97,8 @@ export function deleteDtDanhSachChuyenNganh(id) {
 
 export function updateDtDanhSachChuyenNganh(id, changes, done) {
     return dispatch => {
+        const cookie = T.updatePage('pageDtDanhSachChuyenNganh');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/danh-sach-chuyen-nganh';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
@@ -88,7 +107,7 @@ export function updateDtDanhSachChuyenNganh(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin chuyên ngành thành công!', 'success');
-                dispatch(getDtDanhSachChuyenNganhPage());
+                dispatch(getDtDanhSachChuyenNganhPage(pageNumber, pageSize, pageCondition, filter));
                 if (done) done();
             }
         }, () => T.notify('Cập nhật thông tin chuyên ngành bị lỗi!', 'danger'));
@@ -100,7 +119,7 @@ export const SelectAdapter_DtDanhSachChuyenNganh = (maNganh = '', namHoc = '') =
         ajax: true,
         url: '/api/dao-tao/danh-sach-chuyen-nganh/page/1/20',
         data: params => ({ searchTerm: params.term, maNganh, namHoc }),
-        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
-        fetchOne: (id, done) => (getDtDanhSachChuyenNganh(id, item => done && done({ id: item.id, text: item.ten })))(),
+        processResults: response => ({ results: response.page && response.page.list && response.page.list.length ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
+        fetchOne: (id, done) => (getDtDanhSachChuyenNganh(id, item => done && done({ id: item?.id || '', text: item?.ten || '' })))(),
     };
 };

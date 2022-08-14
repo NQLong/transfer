@@ -4,7 +4,8 @@ import { createDmDonVi, getDmDonViPage, updateDmDonVi, deleteDmDonVi } from './r
 import { getDmLoaiDonViAll, SelectAdapter_DmLoaiDonVi } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormImageBox, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormImageBox, FormSelect, getValue } from 'view/component/AdminPage';
+import { SelectAdapter_DmNgonNgu } from 'modules/mdDanhMuc/dmNgonNguTruyenThong/redux';
 
 class EditModal extends AdminModal {
     state = { active: true };
@@ -16,7 +17,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { ma, ten, tenTiengAnh, tenVietTat, qdThanhLap, qdXoaTen, maPl, ghiChu, kichHoat, duongDan, image, imageDisplay, imageDisplayTa, preShcc } = item ? item : { ma: null, ten: '', tenTiengAnh: '', tenVietTat: '', qdThanhLap: '', qdXoaTen: '', maPl: '', ghiChu: '', kichHoat: true, duongDan: '', image: null, imageDisplay: null, imageDisplayTa: null, preShcc: null };
+        let { ma, ten, tenTiengAnh, tenVietTat, qdThanhLap, qdXoaTen, maPl, ghiChu, kichHoat, duongDan, image, imageDisplay, imageDisplayTa, preShcc, homeLanguage } = item ? item : { ma: null, ten: '', tenTiengAnh: '', tenVietTat: '', qdThanhLap: '', qdXoaTen: '', maPl: '', ghiChu: '', kichHoat: true, duongDan: '', image: null, imageDisplay: null, imageDisplayTa: null, preShcc: null, homeLanguage: 'vi,en' };
+        if (!homeLanguage) homeLanguage = 'vi,en';
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
@@ -29,6 +31,7 @@ class EditModal extends AdminModal {
         this.kichHoat.value(kichHoat);
         this.duongDan.value(duongDan ? duongDan : '');
         this.preShcc.value(preShcc || '');
+        this.homeLanguage.value(homeLanguage.split(','));
         this.imageBox.setData('dmDonVi:' + (ma ? ma : 'new'), image ? image : '/img/avatar.png');
         this.imageBox1.setData('dmDonViImage:' + (ma ? ma : 'new'), imageDisplay ? imageDisplay : '/img/avatar.png');
         this.imageBox2.setData('dmDonViImageTA:' + (ma ? ma : 'new'), imageDisplayTa ? imageDisplayTa : '/img/avatar.png');
@@ -46,6 +49,7 @@ class EditModal extends AdminModal {
             kichHoat: this.kichHoat.value() ? 1 : 0,
             duongDan: this.duongDan.value(),
             preShcc: this.preShcc.value(),
+            homeLanguage: getValue(this.homeLanguage).join(',')
         };
         if (changes.ma == '') {
             T.notify('Mã đơn vị bị trống!', 'danger');
@@ -74,18 +78,15 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật đơn vị' : 'Tạo mới đơn vị',
             size: 'elarge',
             body: <div className='row'>
-                <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã đơn vị'
-                    readOnly={this.state.ma ? true : readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
-                    readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên đơn vị'
-                    readOnly={readOnly} required />
+                <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã đơn vị' readOnly={this.state.ma ? true : readOnly} required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên đơn vị' readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenVietTat = e} label='Tên viết tắt' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
                 <FormSelect ref={e => this.loaiDonVi = e} className='col-md-6' data={SelectAdapter_DmLoaiDonVi} label='Loại đơn vị' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.homeLanguage = e} label='Ngôn ngữ truyền thông' data={SelectAdapter_DmNgonNgu} readOnly={readOnly} multiple />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.duongDan = e} label='Đường dẫn' readOnly={readOnly} />
                 <FormImageBox className='col-12' ref={e => this.imageBox = e}
                     postUrl='/user/upload' uploadType='DmDonViImage' label='Logo' />
@@ -143,10 +144,9 @@ class DmDonViPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
-                            onClick={() => this.modal.show(item)} />
-                        <TableCell type='text' content={item.ten ? item.ten : ''} />
-                        <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} />
+                        <TableCell type='link' content={item.ten ? item.ten : ''} onClick={() => this.modal.show(item)} />
+                        <TableCell type='link' content={item.tenTiengAnh ? item.tenTiengAnh : ''} onClick={() => this.modal.show(item)}  />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiDonVi ? item.tenLoaiDonVi.normalizedName() : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />

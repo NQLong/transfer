@@ -875,10 +875,14 @@ export class CirclePageButton extends React.Component {
         } else if (type == 'custom') {
             result = <button {...properties} className={'btn btn-circle ' + customClassName}><i className={'fa fa-lg ' + customIcon} /></button>;
         } else {
-            result = (
-                <Link to={to} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>);
+            if (typeof to == 'string') {
+                result = (
+                    <Link to={to} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }}>
+                        <i className='fa fa-lg fa-reply' />
+                    </Link>);
+            } else {
+                result = <button style={{ position: 'fixed', bottom: '10px', zIndex: 500, ...style }} onClick={to} className='btn btn-circle btn-secondary'><i className='fa fa-lg fa-reply' /></button>;
+            }
         }
         return tooltip ?
             <Tooltip title={tooltip} arrow placement='top'>{result}</Tooltip> :
@@ -889,6 +893,10 @@ export class CirclePageButton extends React.Component {
 export class AdminModal extends React.Component {
     state = { display: '' };
     _data = {};
+
+    disabledClickOutside = () => {
+        $(this.modal).modal({ backdrop: 'static', keyboard: false, show: false });
+    }
 
     componentWillUnmount() {
         this.hide();
@@ -934,7 +942,7 @@ export class AdminModal extends React.Component {
         }
     }
 
-    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {} }) => {
+    renderModal = ({ title, body, size, buttons, postButtons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {}, showCloseButton = true }) => {
         const { readOnly = false } = this.props;
         return (
             <div className='modal fade' role='dialog' ref={e => this.modal = e} style={style}>
@@ -949,9 +957,10 @@ export class AdminModal extends React.Component {
                         <div className='modal-body'>{body}</div>
                         <div className='modal-footer'>
                             {buttons}
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>
+                            <button type='button' className='btn btn-secondary' data-dismiss='modal' style={{ display: showCloseButton ? '' : 'none' }}>
                                 <i className='fa fa-fw fa-lg fa-times' />Đóng
                             </button>
+                            {postButtons}
                             {!isShowSubmit || readOnly == true || !this.onSubmit ? null :
                                 <button type='submit' className='btn btn-primary' disabled={isLoading}>
                                     {isLoading ? <i className='fa fa-spin fa-lg fa-spinner' /> : <i className='fa fa-fw fa-lg fa-save' />} {submitText}

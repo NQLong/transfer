@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/danh-muc/hoc-sdh',
+            path: '/user/danh-muc/bac-sdh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

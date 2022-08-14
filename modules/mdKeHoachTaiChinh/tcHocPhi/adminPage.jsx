@@ -99,7 +99,7 @@ class InvoiceModal extends AdminModal {
 
 class InvoiceResultModal extends AdminModal {
     onShow = (data) => {
-        this.tongHoaDon.value(data.totalInvoice || '');
+        this.tongHoaDon.value(data.totalInvoice.toString());
         this.thanhCong.value(`${data.success}/${data.totalInvoice}` || '');
     }
 
@@ -293,7 +293,7 @@ class TcHocPhiAdminPage extends AdminPage {
                             </button>
                         </Tooltip>
                         {item.invoiceId ? <Tooltip title='Xem hóa đơn' arrow>
-                            <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.invoiceId}`}>
+                            <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.invoiceId}`}>
                                 <i className='fa fa-lg fa-credit-card' />
                             </a>
                         </Tooltip> :
@@ -351,7 +351,7 @@ class TcHocPhiAdminPage extends AdminPage {
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
             onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
             buttons: buttons,
-                // { type: 'danger', icon: 'fa-reply-all', tooltip: 'Gửi mail nhắc nhở', onClick: this.sendEmailNhacNho }
+            // { type: 'danger', icon: 'fa-reply-all', tooltip: 'Gửi mail nhắc nhở', onClick: this.sendEmailNhacNho }
         });
     }
 }

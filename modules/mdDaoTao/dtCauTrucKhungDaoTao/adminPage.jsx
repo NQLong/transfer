@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDtCauTrucKhungDaoTaoPage } from './redux';
+import { getDtCauTrucKhungDaoTaoPage, deleteDtCauTrucKhungDaoTao } from './redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
@@ -44,20 +44,23 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>STT</th>
-                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm đào tạo</th>
-                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Bắt đầu đăng ký</th>
-                    <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Kết thúc đăng ký</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm đào tạo</th>
+                    <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
+                    <th style={{ width: '40%', textAlign: 'center', whiteSpace: 'nowrap' }}>Bắt đầu đăng ký</th>
+                    <th style={{ width: '40%', textAlign: 'center', whiteSpace: 'nowrap' }}>Kết thúc đăng ký</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell type='link' url={`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`} style={{ textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell style={{ textAlign: 'center' }} content={item.tenBacDaoTao} />
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.batDauDangKy} />
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ketThucDangKy} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`) : null}
+                        onDelete={this.delete}
                     >
                         <Tooltip title='Sao chép' arrow>
                             <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || permission.write ? this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`) : T.notify('Vui lòng liên hệ người quản lý đào tạo!', 'danger')}>
@@ -96,5 +99,5 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtCauTrucKhungDaoTao: state.daoTao.dtCauTrucKhungDaoTao });
-const mapActionsToProps = { getDtCauTrucKhungDaoTaoPage, getDmDonViAll };
+const mapActionsToProps = { getDtCauTrucKhungDaoTaoPage, getDmDonViAll, deleteDtCauTrucKhungDaoTao };
 export default connect(mapStateToProps, mapActionsToProps)(DtCauTrucKhungDaoTaoPage);

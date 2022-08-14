@@ -281,10 +281,10 @@ export function homeMenuGet(link, done) {
     };
 }
 
-export function homeMenuGet2(link, maDonVi, language, done) {
+export function homeMenuGet2(link, maDonVi, done) {
     return () => {
         const url = '/home/menu';
-        T.get(url, { link, maDonVi, language }, data => {
+        T.get(url, { link, maDonVi, language: T.language() }, data => {
             if (data.error) {
                 T.notify('Lấy menu bị lỗi!', 'danger');
                 console.error(`GET: ${url}. ${data.error}`);

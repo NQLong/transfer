@@ -20,20 +20,20 @@ module.exports = app => {
 
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/website/page/:pageNumber/:pageSize', app.permission.check('website:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let user = req.session.user, condition = {};
-        if (user.permissions && !user.permissions.includes('website:manage')) {
-            condition.maDonVi = user.maDonVi;
-        }
-        app.model.dvWebsite.getPage(pageNumber, pageSize, condition, '*', '', (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                res.send({ error, page });
+    app.get('/api/website/page/:pageNumber/:pageSize', app.permission.check('website:read'), async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize);
+            let user = req.session.user, condition = {};
+            if (user.permissions && !user.permissions.includes('website:manage')) {
+                condition.maDonVi = user.maDonVi;
             }
-        });
+
+            const page = await app.model.dvWebsite.searchPageDonVi(_pageNumber, _pageSize, !user.permissions.includes('website:manage') ? user.maDonVi : '');
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/website/all', (req, res) => {
@@ -41,22 +41,50 @@ module.exports = app => {
         app.model.dvWebsite.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/website/item/:id', (req, res) => {
-        app.model.dvWebsite.get({ id: req.params.id }, (error, item) => {
-            res.send({ error, item });
-        });
+    app.get('/api/website/item/:id', async (req, res) => {
+        try {
+            const condition = req.query.condition;
+            const item = await app.model.dvWebsite.get(condition ? condition : { id: req.params.id });
+            if (item.maDonVi) item.donVi = await app.model.dmDonVi.get({ ma: item.maDonVi }, 'ma, ten, tenTiengAnh, tenVietTat, homeLanguage');
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
-    app.post('/api/website', app.permission.check('website:read'), (req, res) => {
-        const item = req.body.item;
-        if (item.shortname) item.shortname = item.shortname.toLowerCase();
-        app.model.dvWebsite.create(item, (error, item) => res.send({ error, item }));
+    app.post('/api/website', app.permission.check('website:read'), async (req, res) => {
+        try {
+            const data = req.body.item;
+            if (data.shortname) data.shortname = data.shortname.toLowerCase();
+            const checkItem = await app.model.dvWebsite.get({ shortname: data.shortname });
+            if (checkItem) {
+                res.send({ error: 'Tên viết tắt đã được sử dụng!' });
+            } else {
+                const item = await app.model.dvWebsite.create(data);
+                res.send({ item });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
-    app.put('/api/website', app.permission.check('website:read'), (req, res) => {
-        let item = req.body.changes;
-        if (item.shortname) item.shortname = item.shortname.toLowerCase();
-        app.model.dvWebsite.update({ shortname: item.shortname }, item, (error, item) => res.send({ error, item }));
+    app.put('/api/website', app.permission.check('website:read'), async (req, res) => {
+        try {
+            let changes = req.body.changes, id = req.body.id;
+            if (changes.shortname) {
+                changes.shortname = changes.shortname.toLowerCase();
+                // Check duplicate
+                const checkItem = await app.model.dvWebsite.get({ shortname: changes.shortname });
+                if (checkItem && checkItem.id != id) {
+                    return res.send({ error: 'Tên viết tắt đã được sử dụng!' });
+                }
+            }
+
+            const item = await app.model.dvWebsite.update({ id }, changes);
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.delete('/api/website', app.permission.check('website:read'), (req, res) => {
@@ -163,7 +191,7 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/dvWebsiteGioiThieu'));
+    app.fs.createFolder(app.path.join(app.publicPath, '/img/dvWebsiteGioiThieu'));
 
     const uploadDvWebsiteGioiThieuImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('DvWebsiteGioiThieu:') && files.DvWebsiteGioiThieuImage && files.DvWebsiteGioiThieuImage.length > 0) {
@@ -245,7 +273,7 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------s
-    app.createFolder(
+    app.fs.createFolder(
         app.path.join(app.publicPath, '/img/dvWebsite'),
         app.path.join(app.publicPath, '/img/dvWebsiteHinh')
     );
@@ -266,7 +294,7 @@ module.exports = app => {
             let imageLink = '/img/' + dataName + '/' + app.path.basename(srcPath),
                 sessionPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, sessionPath, error => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -277,7 +305,7 @@ module.exports = app => {
                     if (error || dataItem == null) {
                         sendResponse({ error: 'Invalid Id!' });
                     } else {
-                        // app.deleteImage(dataItem.image);
+                        // app.fs.deleteImage(dataItem.image);
                         dataItem.image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                         app.fs.copyFile(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
                             if (error) {
@@ -285,7 +313,7 @@ module.exports = app => {
                             } else {
                                 dataItem.image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 delete dataItem.ma;
-                                app.deleteFile(srcPath);
+                                app.fs.deleteFile(srcPath);
                                 sendResponse({
                                     item: dataItem,
                                     image: dataItem.image,
@@ -298,7 +326,7 @@ module.exports = app => {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     sendResponse({ error, image });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 });
             }
         }

@@ -55,6 +55,18 @@ export function getDtNganhDaoTaoPage(pageNumber, pageSize, pageCondition) {
     };
 }
 
+export function getDtNganhDaoTaoAll(done) {
+    const url = '/api/dao-tao/nganh-dao-tao/all';
+    T.get(url, data => {
+        if (data.error) {
+            T.notify('Lấy danh sách ngành bị lỗi!', 'danger');
+            console.error(`GET: ${url}.`, data.error);
+        } else {
+            done(data.items);
+        }
+    }, () => T.notify('Lấy danh sách ngành bị lỗi!', 'danger'));
+}
+
 export function getDtNganhDaoTao(maNganh, done) {
     return () => {
         const url = `/api/dao-tao/nganh-dao-tao/item/${maNganh}`;

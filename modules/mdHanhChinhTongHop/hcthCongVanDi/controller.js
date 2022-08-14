@@ -27,13 +27,13 @@ module.exports = app => {
         { name: 'hcth:manage' }
     );
 
-    app.get('/user/van-ban-di', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/van-ban-di/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/van-ban-di', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
+    app.get('/user/van-ban-di/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/hcth/van-ban-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
     app.get('/user/hcth/van-ban-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -76,9 +76,7 @@ module.exports = app => {
             toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
         }
 
-        const dataFilter = { canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status };
-        console.log(dataFilter);
-
+        // const dataFilter = { canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status };
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -98,7 +96,7 @@ module.exports = app => {
         return permission;
     };
 
-    app.get('/api/hcth/van-ban-di/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/all', app.permission.orCheck('hcthCongVanDi:read', 'developer:login'), (req, res) => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
 
@@ -129,7 +127,7 @@ module.exports = app => {
                 res.send({ error, item });
             } else {
                 let { id } = item;
-                app.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
+                app.fs.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
                 try {
                     updateListFile(fileList, id, ({ error }) => {
                         if (error) {
@@ -203,14 +201,14 @@ module.exports = app => {
             if (error) done && done({ error });
             else
                 app.model.hcthCongVanDi.delete({ id }, (error) => {
-                    app.deleteFolder(app.assetPath + '/congVanDi/' + id);
+                    app.fs.deleteFolder(app.assetPath + '/congVanDi/' + id);
                     done && done({ error });
                 });
         });
     };
 
     // Cần sửa lại
-    app.put('/api/hcth/van-ban-di', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/van-ban-di', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { fileList, donViNhan, donViNhanNgoai, ...changes } = req.body.changes;
         const { isSend = false } = changes;
 
@@ -289,9 +287,6 @@ module.exports = app => {
                                             if (trangThaiBefore == trangThaiCongVanDi.TRA_LAI_HCTH.id && trangThaiAfter == trangThaiCongVanDi.CHO_PHAN_PHOI.id) {
                                                 hanhDong = action.SEND;
                                             }
-                                            console.log('1' + trangThaiBefore);
-                                            console.log('2' + trangThaiAfter);
-
 
                                             app.model.hcthHistory.create({
                                                 key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: hanhDong, thoiGian: new Date().getTime(),
@@ -316,7 +311,7 @@ module.exports = app => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    app.get('/api/hcth/van-ban-di/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -334,7 +329,7 @@ module.exports = app => {
     });
 
     // Upload API  -----------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.assetPath, '/congVanDi'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/congVanDi'));
 
     app.uploadHooks.add('hcthCongVanDiFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
@@ -363,9 +358,9 @@ module.exports = app => {
 
                 if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                     done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 } else {
-                    await app.createFolder(
+                    await app.fs.createFolder(
                         app.path.join(app.assetPath, '/congVanDi/' + (isNew ? '/new' : '/' + id))
                     );
                     await app.fs.rename(srcPath, destPath);
@@ -408,7 +403,7 @@ module.exports = app => {
 
                 if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                     done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                 } else {
                     await app.fs.rename(srcPath, destPath);
                     const newFile = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id, tenFile: generatedFileName, capNhatFileId: originFileId, nguoiTao: req.session.user.shcc });
@@ -455,7 +450,7 @@ module.exports = app => {
             }
 
             if (app.fs.existsSync(filePath))
-                await app.deleteFile(filePath);
+                await app.fs.deleteFile(filePath);
 
             // xoa cac file cap nhat
             const checkUpdateFile = await app.model.hcthFile.get({ ma: congVan, capNhatFileId: fileId });
@@ -464,7 +459,7 @@ module.exports = app => {
                 const listUpdateFile = await app.model.hcthFile.getAll({ ma: congVan, capNhatFileId: fileId });
                 await app.model.hcthFile.delete({ ma: congVan, capNhatFileId: fileId });
                 listUpdateFile.forEach(file => {
-                    if (app.fs.existsSync(path + file)) app.deleteFile(path + file);
+                    if (app.fs.existsSync(path + file)) app.fs.deleteFile(path + file);
                 });
 
                 const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan: updateFileId, congVan });
@@ -482,7 +477,7 @@ module.exports = app => {
 
     });
 
-    app.get('/api/hcth/van-ban-di/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -553,7 +548,7 @@ module.exports = app => {
     };
 
 
-    app.get('/api/hcth/van-ban-di/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id)) {
@@ -597,7 +592,7 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login', 'developer:login'), (req, res) => {
         const { canBoGui, noiDung, key, ngayTao, loai } = req.body.data;
 
         const newPhanHoi = {
@@ -637,7 +632,7 @@ module.exports = app => {
 
 
 
-    app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
@@ -799,7 +794,7 @@ module.exports = app => {
     }));
 
 
-    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber);
         const pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -894,7 +889,7 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/hcth/van-ban-di/status', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/status', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             let { id, trangThai, donViGui } = req.body.data;
             const congVan = await app.model.hcthCongVanDi.get({ id });
@@ -906,14 +901,11 @@ module.exports = app => {
                 }
                 if (trangThai == trangThaiCongVanDi.CHO_KY.id) {
                     const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ congVan: id });
-                    console.log(congVanTrinhKy);
                     if (!congVanTrinhKy) {
-                        console.log('ok');
                         trangThai = trangThaiCongVanDi.DA_PHAN_PHOI.id;
                     }
                 }
 
-                // const newCongVan = await updateCongVanDi(id, { trangThai });
                 await app.model.hcthHistory.create({
                     key: id,
                     loai: CONG_VAN_DI_TYPE,
@@ -921,12 +913,12 @@ module.exports = app => {
                     shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
+
                 const canBoTao = congVan.nguoiTao;
                 const newCongVan = await updateCongVanDi(id, { trangThai });
                 if (canBoTao) {
                     await onStatusChange(congVan, congVan.trangThai, trangThai, canBoTao);
                 }
-                console.log(trangThai);
                 res.send({ newCongVan });
             }
         } catch (error) {
@@ -934,7 +926,7 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/hcth/van-ban-di/read/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/read/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         const { id, shcc } = req.body.data;
         // check permission
         const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
@@ -956,7 +948,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_DI_TYPE);
@@ -966,7 +958,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/yeu-cau-ky/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/yeu-cau-ky/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
 
@@ -984,7 +976,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
         let donViXem = '', canBoXem = '';
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -1169,7 +1161,7 @@ module.exports = app => {
 
 
     //api chuyển từ giai đoạn soạn thảo sang phát hành
-    app.put('/api/hcth/van-ban-di/publishing/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.put('/api/hcth/van-ban-di/publishing/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         // TODO: viết cho trường hợp có cán bộ ký
         try {
             const id = Number(req.params.id);

@@ -1,6 +1,6 @@
-// Table name: DT_THOI_KHOA_BIEU { id, maMonHoc, nhom, hocKy, thu, phong, ngayBatDau, giangVien, nam, tietBatDau, soTietBuoi, chuyenNganh, khoaDangKy, soLuongDuKien, sucChua, buoi, maNganh, loaiMonHoc, isMo, soBuoiTuan, soTietLyThuyet, soTietThucHanh, ngayKetThuc, loaiHinhDaoTao, bacDaoTao, khoaSinhVien }
+// Table name: DT_THOI_KHOA_BIEU { id, maMonHoc, nhom, hocKy, thu, phong, ngayBatDau, giangVien, nam, tietBatDau, soTietBuoi, khoaDangKy, soLuongDuKien, sucChua, buoi, loaiMonHoc, isMo, soBuoiTuan, soTietLyThuyet, soTietThucHanh, ngayKetThuc, loaiHinhDaoTao, bacDaoTao, khoaSinhVien }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'nhom': 'NHOM', 'hocKy': 'HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'giangVien': 'GIANG_VIEN', 'nam': 'NAM', 'tietBatDau': 'TIET_BAT_DAU', 'soTietBuoi': 'SO_TIET_BUOI', 'chuyenNganh': 'CHUYEN_NGANH', 'khoaDangKy': 'KHOA_DANG_KY', 'soLuongDuKien': 'SO_LUONG_DU_KIEN', 'sucChua': 'SUC_CHUA', 'buoi': 'BUOI', 'maNganh': 'MA_NGANH', 'loaiMonHoc': 'LOAI_MON_HOC', 'isMo': 'IS_MO', 'soBuoiTuan': 'SO_BUOI_TUAN', 'soTietLyThuyet': 'SO_TIET_LY_THUYET', 'soTietThucHanh': 'SO_TIET_THUC_HANH', 'ngayKetThuc': 'NGAY_KET_THUC', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO', 'khoaSinhVien': 'KHOA_SINH_VIEN' };
+const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'nhom': 'NHOM', 'hocKy': 'HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'giangVien': 'GIANG_VIEN', 'nam': 'NAM', 'tietBatDau': 'TIET_BAT_DAU', 'soTietBuoi': 'SO_TIET_BUOI', 'khoaDangKy': 'KHOA_DANG_KY', 'soLuongDuKien': 'SO_LUONG_DU_KIEN', 'sucChua': 'SUC_CHUA', 'buoi': 'BUOI', 'loaiMonHoc': 'LOAI_MON_HOC', 'isMo': 'IS_MO', 'soBuoiTuan': 'SO_BUOI_TUAN', 'soTietLyThuyet': 'SO_TIET_LY_THUYET', 'soTietThucHanh': 'SO_TIET_THUC_HANH', 'ngayKetThuc': 'NGAY_KET_THUC', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO', 'khoaSinhVien': 'KHOA_SINH_VIEN' };
 
 module.exports = app => {
     app.model.dtThoiKhoaBieu = {
@@ -232,6 +232,19 @@ module.exports = app => {
         getCalendar: (room, idnam, hocky, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=dt_calendar(:room, :idnam, :hocky); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, room, idnam, hocky }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        getFree: (config, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_get_free(:config, :hocphantheoidnganh, :hocphandaxep); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, config, hocphantheoidnganh: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, hocphandaxep: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

@@ -1,12 +1,12 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
-        menus: { 4063: { title: 'Quan hệ gia đình', link: '/user/danh-muc/quan-he-gia-dinh' } },
+        menus: { 4063: { title: 'Quan hệ gia đình', link: '/user/danh-muc/quan-he-gia-dinh' } }
     };
     app.permission.add(
         { name: 'dmQuanHeGiaDinh:read', menu },
         { name: 'dmQuanHeGiaDinh:write' },
-        { name: 'dmQuanHeGiaDinh:delete' },
+        { name: 'dmQuanHeGiaDinh:delete' }
     );
 
     app.get('/user/danh-muc/quan-he-gia-dinh', app.permission.check('dmQuanHeGiaDinh:read'), app.templates.admin);
@@ -19,7 +19,7 @@ module.exports = app => {
         if (req.query.condition) {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
             };
         }
         app.model.dmQuanHeGiaDinh.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
@@ -57,26 +57,24 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/quan-he-gia-dinh/filter/:loai', app.permission.check('user:login'), (req, res) => {
-        let loai = Number(req.params.loai),
-            condition = {};
-        console.log(loai);
+        let loai = Number(req.params.loai), condition = {};
         if (req.query.condition) {
             if (loai != -1) {
                 condition = {
                     statement: 'lower(ten) LIKE :searchText AND loai = :loai',
-                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%`, loai },
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%`, loai }
                 };
             } else {
                 condition = {
                     statement: 'lower(ten) LIKE :searchText',
-                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
                 };
             }
         } else {
             if (loai != -1) {
                 condition = {
                     statement: 'loai = :loai',
-                    parameter: { loai },
+                    parameter: { loai }
                 };
             }
         }

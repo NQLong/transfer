@@ -66,11 +66,11 @@ class Footer extends React.Component {
             // qrcode = 'https://hcmussh.edu.vn/static/document/qrcode-tuyensinh.png',
             width = $(window).width();
 
-        let { facebook, youtube, mobile, address, address2 } =
-                this.props.system ? this.props.system : { logo: '', todayViews: 0, allViews: 0, address2: '', youtube: '' },
-            footerList = [];
+        let { facebook, youtube, mobile, address, address2 } = this.props.system ? this.props.system : { logo: '', todayViews: 0, allViews: 0, address2: '', youtube: '' }, footerList = [];
         address = T.language.parse(address);
         address2 = address2 && T.language.parse(address2);
+        let languageText = this.props.system && this.props.system.languageText || {};
+        const newLanguage = T.language(languageText);
         if (this.state.footerData && this.state.footerData.length > 0) {
             footerList = this.state.footerData.map((item, index) => {
                 const link = item.link.includes('http://') || item.link.includes('https://') ?
@@ -104,7 +104,7 @@ class Footer extends React.Component {
             footerList.push([
                 <div className='col-sm' key={'13'}>
                     <div className='footer-link'>
-                        <h3>{language.connect} <i className='fa fa-angle-down d-md-none' /></h3>
+                        <h3>{newLanguage.ketNoi} <i className='fa fa-angle-down d-md-none' /></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
                             <img src={'/img/logo-footer.png?t=4000'} onClick={() => window.open('https://hcmussh.edu.vn/', '_blank')} style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
@@ -267,7 +267,7 @@ class Footer extends React.Component {
                         </ul>
                     </div>
                 </div>;
-            } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en')) {
+            } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en') || (T.language() == 'en' && (hostname.includes('/tin-tuc') || hostname.includes('/news')))) {
                 footerList[0] = <div className='col-sm' key={'1'}>
                     <div className='footer-link'>
                         <h3>{'TRAINING PROGRAMS'} <i className='fa fa-angle-down d-md-none'></i></h3>
@@ -361,7 +361,6 @@ class Footer extends React.Component {
                         <div id='fb-root' />
                         <div id='fb-customer-chat' className='fb-customerchat' />
                     </div> : null}
-
                 </div>
             </footer>
         );

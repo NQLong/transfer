@@ -11,13 +11,14 @@ module.exports = app => {
     app.permission.add(
         { name: 'dtThoiKhoaBieu:read', menu },
         { name: 'dtThoiKhoaBieu:manage', menu },
-        { name: 'dtThoiKhoaBieu:write' },
-        { name: 'dtThoiKhoaBieu:delete' }
+        'dtThoiKhoaBieu:write',
+        'dtThoiKhoaBieu:delete',
+        'dtThoiKhoaBieu:export',
     );
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:delete', 'dtThoiKhoaBieu:export');
             resolve();
         } else resolve();
     }));
@@ -25,27 +26,28 @@ module.exports = app => {
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const user = req.session.user, permissions = user.permissions;
-        let filter = req.query.filter || {},
-            donVi = filter.donVi;
-        if (!permissions.includes('dtThoiKhoaBieu:read')) {
-            if (user.staff?.maDonVi) donVi = user.maDonVi;
-            else return res.send({ error: 'Permission denied!' });
-        }
-        filter = app.stringify(app.clone(filter, { donVi }));
-        app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
+    app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber),
+                _pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            const user = req.session.user, permissions = user.permissions;
+            let filter = req.query.filter || {},
+                donVi = filter.donVi || '';
+            if (!permissions.includes('dtThoiKhoaBieu:read')) {
+                if (user.staff?.maDonVi) donVi = user.maDonVi;
+                else throw 'Permission denied!';
             }
-        });
+            filter = app.utils.stringify(app.clone(filter, { donVi }));
+
+            let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
+
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
+            const pageCondition = searchTerm;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/dao-tao/thoi-khoa-bieu/all', app.permission.check('user:login'), (req, res) => {
@@ -56,6 +58,91 @@ module.exports = app => {
 
     app.get('/api/dao-tao/thoi-khoa-bieu/item/:id', app.permission.check('user:login'), (req, res) => {
         app.model.dtThoiKhoaBieu.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let item = req.body.item || [],
+                settings = req.body.settings;
+            let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
+                { loaiHinhDaoTao, bacDaoTao, maNganh } = settings;
+            thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
+            let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
+            for (let index = 0; index < item.length; index++) {
+                let monHoc = item[index];
+                delete monHoc.id;
+                let { maMonHoc, loaiMonHoc, khoaSv, chuyenNganh, soTietBuoi, soBuoiTuan, soLuongDuKien, soLop } = monHoc;
+                ['chuyenNganh', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => delete monHoc[key]);
+                const tkb = await app.model.dtThoiKhoaBieu.get({ maMonHoc, loaiMonHoc, khoaSinhVien: khoaSv, maNganh, loaiHinhDaoTao, bacDaoTao });
+                if (!tkb) {
+                    if (chuyenNganh) {
+                        if (Array.isArray(chuyenNganh) && chuyenNganh.every(item => typeof item == 'object')) {
+                            for (let index = 0; index < parseInt(chuyenNganh.length); index++) {
+                                let soTiet = parseInt(soTietBuoi[index]), soBuoi = parseInt(soBuoiTuan[index]), sldk = parseInt(soLuongDuKien[index]), chNg = chuyenNganh[index];
+                                if (soBuoi > 1) {
+                                    for (let buoi = 1; buoi <= parseInt(soBuoi); buoi++) {
+                                        app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi, nam, hocKy, soTietBuoi: soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                    }
+                                } else {
+                                    app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi: 1, nam, hocKy, soTietBuoi: soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                }
+                            }
+                        } else {
+                            soLop = parseInt(soLop);
+                            for (let nhom = 1; nhom <= parseInt(soLop); nhom++) {
+                                let soBuoi = parseInt(soBuoiTuan);
+                                if (soBuoi > 1) {
+                                    for (let buoi = 1; buoi <= parseInt(soBuoi); buoi++) {
+                                        app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                    }
+                                } else app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                            }
+                        }
+                    } else {
+                        soLop = parseInt(soLop);
+                        for (let nhom = 1; nhom <= soLop; nhom++) {
+                            let soBuoi = parseInt(soBuoiTuan);
+                            if (soBuoi > 1) {
+                                for (let buoi = 1; buoi <= soBuoi; buoi++) {
+                                    app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                }
+                            } else app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                        }
+                    }
+                }
+            }
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/create-multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let { data, settings } = req.body;
+            for (let index = 0; index < data.length; index++) {
+                let item = data[index],
+                    maNganh = item.maNganh,
+                    chuyenNganh = item.chuyenNganh || [],
+                    soBuoiTuan = item.soBuoiTuan;
+                for (let buoi = 1; buoi <= parseInt(soBuoiTuan); buoi++) {
+                    const tkbItem = await app.model.dtThoiKhoaBieu.create(app.clone(item, settings, { nhom: index + 1 }));
+                    for (const nganhItem of maNganh) {
+                        if (chuyenNganh.length) {
+                            for (const chuyenNganhItem of chuyenNganh) {
+                                let idNganh = chuyenNganhItem ? `${nganhItem}&&${chuyenNganhItem}` : nganhItem;
+                                await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh });
+                            }
+                        } else {
+                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh: nganhItem });
+                        }
+                    }
+                }
+            }
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
@@ -72,13 +159,13 @@ module.exports = app => {
                     resolve(m);
                     return;
                 }
-                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet, loaiHinhDaoTao, bacDaoTao, khoaSinhVien: m.khoaSinhVien }, (error, tkb) => {
+                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTietBuoi: m.soTietBuoi, loaiHinhDaoTao, bacDaoTao, khoaSinhVien: m.khoaSinhVien }, (error, tkb) => {
                     if (error) reject(error);
                     else if (!tkb) {
                         m.nhom = i;
                         delete m.id;
                         for (let i = 1; i <= m.soBuoiTuan; i++) {
-                            app.model.dtThoiKhoaBieu.create({ ...m, nam, hocKy, soTiet: m.soTietBuoi, buoi: i, loaiHinhDaoTao, bacDaoTao }, (error, item) => {
+                            ({ ...m, nam, hocKy, soTietBuoi: m.soTietBuoi, buoi: i, loaiHinhDaoTao, bacDaoTao }, (error, item) => {
                                 if (error || !item) reject(error);
                             });
                         }
@@ -97,11 +184,11 @@ module.exports = app => {
     app.put('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
         let changes = req.body.changes, id = req.body.id;
         if (changes.thu) {
-            let { tietBatDau, thu, soTiet, phong } = changes;
+            let { tietBatDau, thu, soTietBuoi, phong } = changes;
             let condition = {
                 tietBatDau,
                 day: thu,
-                soTiet
+                soTietBuoi
             };
             app.model.dtThoiKhoaBieu.get({ id }, (error, item) => {
                 if (error) {
@@ -120,7 +207,7 @@ module.exports = app => {
                                 return;
                             } else {
                                 if (app.model.dtThoiKhoaBieu.isAvailabledRoom(changes.phong, items, condition)) app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
-                                else res.send({ error: `Phòng ${changes.phong} không trống vào thứ ${changes.thu}, tiết ${changes.tietBatDau} - ${changes.tietBatDau + changes.soTiet - 1}` });
+                                else res.send({ error: `Phòng ${changes.phong} không trống vào thứ ${changes.thu}, tiết ${changes.tietBatDau} - ${changes.tietBatDau + changes.soTietBuoi - 1}` });
                             }
                         });
                     }
@@ -130,16 +217,28 @@ module.exports = app => {
         else app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), (req, res) => {
-        let { condition, changes } = req.body;
-        if (typeof condition == 'number') app.model.dtThoiKhoaBieu.update(condition, changes, (error, item) => res.send({ error, item }));
-        else if (typeof condition == 'object') {
-            let { nam, hocKy, maMonHoc, loaiHinhDaoTao, bacDaoTao } = condition;
-            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, loaiHinhDaoTao, bacDaoTao }, changes, (error, item) => {
-                res.send({ error, item });
-            });
+    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), async (req, res) => {
+        try {
+            let { condition, changes } = req.body;
+            if (!isNaN(condition)) {
+                let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
+                if (changes.maNganh && changes.maNganh.length) {
+                    await app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: condition });
+                    for (let idNganh of changes.maNganh) {
+                        await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: condition, idNganh });
+                    }
+                }
+                res.send({ item });
+            }
+            else if (typeof condition == 'object') {
+                let { nam, hocKy, maMonHoc, loaiHinhDaoTao, bacDaoTao, khoaSinhVien } = condition;
+                let item = await app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, loaiHinhDaoTao, bacDaoTao, khoaSinhVien }, changes);
+                res.send({ item });
+            }
+        } catch (error) {
+            res.send({ error });
         }
-        else app.model.dtThoiKhoaBieu.update({ id: condition }, changes, (error, item) => res.send({ error, item }));
+
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
@@ -160,6 +259,82 @@ module.exports = app => {
         });
     });
 
+    app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
+    // Export xlsx
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
+        try {
+            let filter = app.utils.parse(req.query.filter || {});
+            filter = app.utils.stringify(filter, '');
+            let data = await app.model.dtThoiKhoaBieu.searchPage(1, 1000000, filter, '');
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet('Thoi khoa bieu');
+
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 5 },
+                { header: 'MÃ', key: 'ma', width: 10 },
+                { header: 'MÔN HỌC', key: 'monHoc', width: 40 },
+                { header: 'TỰ CHỌN', key: 'tuChon', width: 10 },
+                { header: 'LỚP', key: 'lop', width: 10 },
+                { header: 'TỔNG TIẾT', key: 'tongTiet', width: 10 },
+                { header: 'PHÒNG', key: 'phong', width: 10 },
+                { header: 'THỨ', key: 'thu', width: 10 },
+                { header: 'TIẾT BẮT ĐẦU', key: 'tietBatDau', width: 10 },
+                { header: 'SỐ TIẾT', key: 'soTiet', width: 10 },
+                { header: 'SLDK', key: 'sldk', width: 10 },
+                { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 20 },
+                { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 20 },
+                { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 30 },
+                { header: 'MÃ NGÀNH', key: 'maNganh', width: 20 },
+                { header: 'NGÀNH', key: 'nganh', width: 20 },
+                { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 }
+            ];
+            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+            ws.getRow(1).font = { name: 'Times New Roman' };
+            // ws.getRow(1).font = {
+            //     name: 'Times New Roman',
+            //     family: 4,
+            //     size: 12,
+            //     bold: true,
+            //     color: { argb: 'FF000000' }
+            // };
+
+            const list = data.rows;
+            list.forEach((item, index) => {
+                ws.addRow({
+                    stt: index + 1,
+                    ma: item.maMonHoc,
+                    monHoc: `${app.utils.parse(item.tenMonHoc).vi}`,
+                    tuChon: item.loaiMonHoc ? 'x' : '',
+                    lop: item.nhom,
+                    tongTiet: item.tongTiet,
+                    phong: item.phong,
+                    thu: item.thu,
+                    tietBatDau: item.tietBatDau,
+                    soTiet: item.soTiet,
+                    sldk: item.soLuongDuKien,
+                    ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
+                    ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
+                    khoa: item.tenKhoaDangKy,
+                    maNganh: item.maNganh,
+                    nganh: item.tenNganh,
+                    giangVien: item.tenGiangVien,
+                }, index === 0 ? 'n' : 'i');
+
+                if (index === 0) {
+                    ws.getRow(2).alignment = { ...ws.getRow(2).alignment, vertical: 'middle', wrapText: true };
+                    ws.getRow(2).font = { name: 'Times New Roman' };
+                    // ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
+                }
+            });
+
+            let fileName = 'THOI_KHOA_BIEU.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
     //Quyền của đơn vị------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('daoTao', { id: 'dtThoiKhoaBieu:manage', text: 'Đào tạo: Phân công giảng dạy' });
 
@@ -169,4 +344,5 @@ module.exports = app => {
         }
         resolve();
     }));
+
 };

@@ -1,5 +1,5 @@
 module.exports = app => {
-    app.createFolder(
+    app.fs.createFolder(
         app.assetPath, app.uploadPath, app.publicPath, app.documentPath,
         app.path.join(app.publicPath, '/img/staff'),
     );
@@ -118,7 +118,7 @@ module.exports = app => {
             let imageLink = app.path.join('/img/draft', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, sessionPath, error => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -136,7 +136,7 @@ module.exports = app => {
                             if (error) {
                                 sendResponse({ error });
                             } else {
-                                app.deleteFile(srcPath);
+                                app.fs.deleteFile(srcPath);
                                 image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 delete dataItem.ma;
                                 model.update(conditions, { image }, (error,) => {
@@ -159,7 +159,7 @@ module.exports = app => {
             } else {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                     sendResponse({ error, image });
                 });
             }
@@ -203,7 +203,7 @@ module.exports = app => {
 
     app.uploadGuestFile = (req, srcPath, sendResponse) => {
         app.excel.readFile(srcPath, workbook => {
-            app.deleteFile(srcPath);
+            app.fs.deleteFile(srcPath);
             if (workbook) {
                 const worksheet = workbook.getWorksheet(1), guests = [], totalRow = worksheet.lastRow.number;
                 const handleUpload = (index = 2) => {
@@ -251,7 +251,7 @@ module.exports = app => {
             let imageLink = app.path.join('/img/draft', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
             app.fs.copyFile(srcPath, sessionPath, error => {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 res.send({ error, image: imageLink });
             });
@@ -263,13 +263,13 @@ module.exports = app => {
                     if (error || dataItem == null) {
                         res.send({ error: 'Invalid Id!' });
                     } else {
-                        // app.deleteImage(dataItem.image);
+                        // app.fs.deleteImage(dataItem.image);
                         let image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                         app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                             if (error) {
                                 res.send({ error });
                             } else {
-                                app.deleteFile(srcPath);
+                                app.fs.deleteFile(srcPath);
                                 image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 dataItem.image = image;
                                 model.update(conditions, dataItem, (error,) => {
@@ -288,7 +288,7 @@ module.exports = app => {
             } else {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                 app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
-                    app.deleteFile(srcPath);
+                    app.fs.deleteFile(srcPath);
                     res.send({ error, image });
                 });
             }
@@ -332,38 +332,27 @@ module.exports = app => {
             });
         }),
 
-        get: (...params) => {
-            const n = params.length,
-                prefixKeyLength = app.state.prefixKey.length;
-            if (n >= 1 && typeof params[n - 1] == 'function') {
-                const done = params.pop(); // done(error, values)
-                const keys = n == 1 ? app.state.keys : params.map(key => `${app.appName}_state:${key}`); // get chỉ có done => đọc hết app.state
-                app.database.redis.mget(keys, (error, values) => {
-                    if (error || values == null) {
-                        done(error || 'Error when get Redis value!');
-                    } else if (n == 2) {
-                        done(null, values[0]);
-                    } else {
-                        const state = {};
-                        keys.forEach((key, index) => state[key.substring(prefixKeyLength)] = values[index]);
-                        done(null, state);
-                    }
-                });
-            } else {
-                console.log('Error when get app.state');
-            }
-        },
+        get: (...params) => new Promise((resolve, reject) => {
+            const n = params.length, prefixKeyLength = app.state.prefixKey.length;
+            const keys = n == 0 ? app.state.keys : params.map(key => `${app.appName}_state:${key}`); // get chỉ có done => đọc hết app.state
+            app.database.redis.mget(keys, (error, values) => {
+                if (error || values == null) {
+                    reject(error || 'Error when get Redis value!');
+                } else if (n == 1) { // Get 1 value
+                    resolve(values[0]);
+                } else {
+                    const state = {};
+                    keys.forEach((key, index) => state[key.substring(prefixKeyLength)] = values[index]);
+                    resolve(state);
+                }
+            });
+        }),
 
-        set: (...params) => {
+        set: (...params) => new Promise((resolve, reject) => {
             const n = params.length;
-            if (n >= 1 && typeof params[n - 1] == 'function') {
-                const done = (n % 2) ? params.pop() : null;
-                for (let i = 0; i < n - 1; i += 2) params[i] = app.state.prefixKey + params[i];
-                n == 1 ? done() : app.database.redis.mset(params, error => done && done(error));
-            } else {
-                console.log('Error when set app.state');
-            }
-        },
+            for (let i = 0; i < n - 1; i += 2) params[i] = app.state.prefixKey + params[i];
+            app.database.redis.mset(params, error => error ? reject(error) : resolve());
+        }),
     };
     app.state.keys = Object.keys(app.state.initState).map(key => app.state.prefixKey + key);
 

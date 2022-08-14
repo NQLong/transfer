@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.sdh,
+        parentMenu: app.parentMenu.category,
         menus: {
-            7503: { title: 'Danh mục Môn học', link: '/user/sau-dai-hoc/mon-hoc' },
+            4105: { title: 'Danh mục Môn học SĐH', link: '/user/sau-dai-hoc/mon-hoc' },
         },
     };
     app.permission.add(
@@ -61,7 +61,7 @@ module.exports = app => {
     });
 
     app.get('/api/sau-dai-hoc/mon-hoc/item/:ma', app.permission.check('dmMonHocSdh:read'), (req, res) => {
-        app.model.dmMonHocSdh.get({ maNganh: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.dmMonHocSdh.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {
@@ -116,7 +116,7 @@ module.exports = app => {
                 const handleUpload = (index = 2) => {
                     const value = worksheet.getRow(index).values;
                     if (value.length == 0 || index == totalRow + 1) {
-                        app.deleteFile(srcPath);
+                        app.fs.deleteFile(srcPath);
                         done({ element });
                     } else {
                         let data = {
@@ -133,7 +133,7 @@ module.exports = app => {
                 };
                 handleUpload();
             } else {
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
                 done({ error: 'Error' });
             }
         }

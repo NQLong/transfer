@@ -1,20 +1,57 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
-import { getInvoicePage } from './redux';
+import { getInvoicePage, sendInvoiceMail, cancelInvoice } from './redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
 import { Tooltip } from '@mui/material';
 
+
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
 };
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
+
+class CancelModal extends AdminModal {
+
+    state = { isLoading: false, id: null }
+
+    onShow = (id) => {
+        this.setState({ isLoading: false, id });
+        this.lyDoHuy.value('');
+    }
+
+    onSubmit = () => {
+        const lyDo = this.lyDoHuy.value();
+        if (!lyDo) {
+            T.notify('Vui lòng nhập lý do hủy hóa đơn', 'danger');
+            this.lyDoHuy.focus();
+        } else {
+            this.setState({ isLoading: true }, () => {
+                this.props.cancel(this.state.id, lyDo, () => {
+                    this.hide();
+                });
+            }, () => this.setState({ isLoading: false }));
+        }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Hủy hóa đơn',
+            size: 'large',
+            body: <div className='rows'>
+                <FormTextBox className='col-md-12' label='Lý do hủy' required ref={e => this.lyDoHuy = e} />
+            </div>,
+            isLoading: this.state.isLoading,
+        });
+    }
+}
+
 
 class DanhSachHoaDon extends AdminPage {
     state = {
@@ -72,11 +109,21 @@ class DanhSachHoaDon extends AdminPage {
         this.changeAdvancedSearch();
     }
 
+    onSendMail = (e, item) => {
+        e.preventDefault();
+        this.props.sendInvoiceMail(item.id);
+    }
+
+    onCancelInvoicie = (e, item) => {
+        e.preventDefault();
+        this.cancelModal.show(item.id);
+    }
+
     render() {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcInvoice && this.props.tcInvoice.page ? this.props.tcInvoice.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-        // let permission = this.getUserPermission('tcInvoice');
+        const permission = this.getUserPermission('tcInvoice', ['export']);
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -92,6 +139,7 @@ class DanhSachHoaDon extends AdminPage {
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đã hủy</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (<tr key={index}>
@@ -104,18 +152,28 @@ class DanhSachHoaDon extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maNganh}: ${item.tenNganh}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenBacDaoTao} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiHinhDaoTao} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} type='checkbox' content={!item.lyDoHuy?.length} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
                     <Tooltip title='Xem hóa đơn' arrow>
-                        <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.id}`}>
+                        <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.id}`}>
                             <i className='fa fa-lg fa-eye' />
                         </a>
                     </Tooltip>
+                    <Tooltip title='Mail hóa đơn' arrow>
+                        <button className='btn btn-success' onClick={(e) => this.onSendMail(e, item)} >
+                            <i className='fa fa-lg fa-envelope' />
+                        </button>
+                    </Tooltip>
+                    {!item.lyDoHuy && <Tooltip title='Hủy hóa đơn' arrow>
+                        <button className='btn btn-danger' onClick={(e) => this.onCancelInvoicie(e, item)} >
+                            <i className='fa fa-lg fa-times' />
+                        </button>
+                    </Tooltip>}
                 </TableCell>
             </tr>),
-
         });
         return this.renderPage({
-            title: 'Danh sách giao dịch',
+            title: 'Danh sách hóa đơn',
             icon: 'fa fa-money',
             header: <>
                 <FormSelect ref={e => this.year = e} style={{ width: '100px', marginBottom: '0', marginRight: 10 }} placeholder='Năm học' data={yearDatas()} onChange={() => this.changeAdvancedSearch()} />
@@ -139,15 +197,17 @@ class DanhSachHoaDon extends AdminPage {
                 <div className='col-md-12'>
                     <div className='tile'>
                         {table}
+                        <CancelModal ref={e => this.cancelModal = e} cancel={this.props.cancelInvoice} />
                         <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                             getPage={this.getPage} />
                     </div>
                 </div>
             </div>),
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/invoice/download-excel?filter=${T.stringify({ ...this.state.filter, ...{ namHoc: this.year.value(), hocKy: this.term.value() } })}`, 'DANHSACHGIAODICH.xlsx') : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcInvoice: state.finance.tcInvoice });
-const mapActionsToProps = { getInvoicePage };
+const mapActionsToProps = { getInvoicePage, sendInvoiceMail, cancelInvoice };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachHoaDon);

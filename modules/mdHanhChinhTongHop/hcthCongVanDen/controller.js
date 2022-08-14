@@ -29,17 +29,17 @@ module.exports = (app) => {
         } else resolve();
     }));
 
-    app.get('/user/van-ban-den', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/van-ban-den/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/van-ban-den', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
+    app.get('/user/van-ban-den/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/hcth/van-ban-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
     app.get('/user/hcth/van-ban-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
 
     //api
-    app.get('/api/hcth/van-ban-den/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/all', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/van-ban-den/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -75,7 +75,7 @@ module.exports = (app) => {
                 res.send({ error, item });
             else {
                 let { id } = item;
-                app.createFolder(app.path.join(app.assetPath, `/congVanDen/${id}`));
+                app.fs.createFolder(app.path.join(app.assetPath, `/congVanDen/${id}`));
                 try {
                     createChiDaoFromList(chiDao, id, ({ error }) => {
                         if (error)
@@ -149,7 +149,7 @@ module.exports = (app) => {
                     if (error) done && done({ error });
                     else
                         app.model.hcthCongVanDen.delete({ id }, error => {
-                            app.deleteFolder(app.assetPath + '/congVanDen/' + id);
+                            app.fs.deleteFolder(app.assetPath + '/congVanDen/' + id);
                             done && done({ error });
                         });
                 });
@@ -243,7 +243,7 @@ module.exports = (app) => {
 
 
 
-    app.get('/api/hcth/van-ban-den/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         try {
             const
                 obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' },
@@ -296,7 +296,7 @@ module.exports = (app) => {
         }
     });
 
-    app.createFolder(app.path.join(app.assetPath, '/congVanDen'));
+    app.fs.createFolder(app.path.join(app.assetPath, '/congVanDen'));
 
 
     app.uploadHooks.add('hcthCongVanDenFile', (req, fields, files, params, done) =>
@@ -320,9 +320,9 @@ module.exports = (app) => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
-                app.createFolder(
+                app.fs.createFolder(
                     app.path.join(app.assetPath, '/congVanDen/' + (isNew ? '/new' : '/' + id))
                 );
                 app.fs.rename(srcPath, destPath, error => {
@@ -350,13 +350,13 @@ module.exports = (app) => {
             }
             else {
                 if (app.fs.existsSync(filePath))
-                    app.deleteFile(filePath);
+                    app.fs.deleteFile(filePath);
                 res.send({ error: null });
             }
         });
     });
 
-    app.get('/api/hcth/van-ban-den/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id, fileName } = req.params;
             const congVan = await app.model.hcthCongVanDen.get({ id });
@@ -381,7 +381,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/api/hcth/van-ban-den/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-den/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthPhanHoi.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
 
@@ -426,7 +426,7 @@ module.exports = (app) => {
         return lichSuDoc;
     };
 
-    app.get('/api/hcth/van-ban-den/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             if (isNaN(id))
@@ -488,7 +488,7 @@ module.exports = (app) => {
     });
 
 
-    app.get('/api/hcth/van-ban-den/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, req.query.historySortType, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
@@ -631,7 +631,7 @@ module.exports = (app) => {
     });
 
 
-    app.get('/api/hcth/van-ban-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE);
@@ -642,7 +642,7 @@ module.exports = (app) => {
         }
     });
 
-    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.check('staff:login'), async (req, res) => {
+    app.get('/api/hcth/van-ban-den/chi-dao/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
@@ -950,7 +950,7 @@ module.exports = (app) => {
     };
 
 
-    app.get('/api/hcth/van-ban-den/selector/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -1033,7 +1033,7 @@ module.exports = (app) => {
 
     // Download Template ---------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/hcth/van-ban-den/download-excel/:filter', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/van-ban-den/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status, sortBy, sortType } = req.params.filter ? JSON.parse(req.params.filter) : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null, tab: 0, status: null, sortBy: '', sortType: '' };
 
         const obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' };

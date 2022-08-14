@@ -8,6 +8,7 @@ import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
+import { getSvSettingKeys } from '../svSetting/redux';
 // import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 // import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
@@ -27,8 +28,11 @@ class SinhVienPage extends AdminPage {
                 if (data.error) {
                     T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
                 } else {
-                    this.setState({ item: data.item, isNhapHoc: !data.item.ngayNhapHoc || data.item.ngayNhapHoc == '' });
-                    this.setVal(data.item);
+                    this.props.getSvSettingKeys('choPhepEdit', items => {
+                        this.setState({ item: data.item, pending: data.item.ngayNhapHoc && data.item.ngayNhapHoc == -1, edit: items.choPhepEdit == 'true', daNhapHoc: data.item.ngayNhapHoc && data.item.ngayNhapHoc != -1 });
+                        this.setVal(data.item);
+                    });
+
                 }
             });
         });
@@ -208,7 +212,7 @@ class SinhVienPage extends AdminPage {
         T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường', 'info', true, isConfirm => {
             if (isConfirm) {
                 T.download('/api/students-download-syll');
-                this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime(), isNhapHoc: false }));
+                this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime(), pending: true }));
             }
         });
     }
@@ -216,9 +220,12 @@ class SinhVienPage extends AdminPage {
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
-        let isNhapHoc = this.state.isNhapHoc,
-            readOnly = !isNhapHoc;
-
+        let pending = this.state.pending,
+            daNhapHoc = this.state.daNhapHoc,
+            readOnly = pending || daNhapHoc;
+        if (daNhapHoc) readOnly = !this.state.edit;
+        else if (pending) readOnly = true;
+        else readOnly = false;
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
             title: 'Lý lịch cá nhân sinh viên',
@@ -243,12 +250,12 @@ class SinhVienPage extends AdminPage {
                             />
                             <div className='form-group col-md-9'>
                                 <div className='row'>
-                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-6' readOnly={readOnly} onChange={e => this.ho.value(e.target.value.toUpperCase())} required />
-                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly={readOnly} onChange={e => this.ten.value(e.target.value.toUpperCase())} required />
+                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-6' readOnly onChange={e => this.ho.value(e.target.value.toUpperCase())} required />
+                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly onChange={e => this.ten.value(e.target.value.toUpperCase())} required />
                                     <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} required />
-                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-6' readOnly={readOnly} required />
-                                    <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly={readOnly} required />
-                                    <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-5' required readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-6' readOnly required />
+                                    <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly required />
+                                    <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-5' required readOnly />
                                     <FormSelect className='col-md-7' ref={e => this.noiSinhMaTinh = e} data={ajaxSelectTinhThanhPho} readOnly={readOnly} label='Nơi sinh' required />
                                     {/* <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-5' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnly} /> */}
 
@@ -263,10 +270,6 @@ class SinhVienPage extends AdminPage {
                                 </div>
                             </div>
                             <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
-                            {/* {!readOnly && <p className='form-group col-md-12'>
-                                Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
-                            </p>} */}
-                            {/* <ComponentDiaDiem ref={e => this.lienLac = e} label='Nơi ở hiện tại' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} /> */}
 
                             <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='col-md-4' required readOnly={readOnly} />
                             <FormDatePicker type='date-mask' ref={e => this.cmndNgayCap = e} label='Ngày cấp' className='col-md-4' required readOnly={readOnly} />
@@ -276,11 +279,11 @@ class SinhVienPage extends AdminPage {
                             <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-4' data={SelectAdapter_DmTonGiaoV2} required readOnly={readOnly} />
                             <FormTextBox ref={e => this.dienThoaiCaNhan = e} label='Điện thoại cá nhân' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.doiTuongTuyenSinh = e} label='Đối tượng tuyển sinh' className='col-md-6' data={SelectAdapter_DmSvDoiTuongTs} required readOnly={readOnly} />
-                            <FormSelect ref={e => this.khuVucTuyenSinh = e} label='Khu vực tuyển sinh' className='col-md-6' data={['KV1', 'KV2', 'KV2-NT', 'KV3']} readOnly={readOnly} required />
-                            <FormSelect ref={e => this.phuongThucTuyenSinh = e} label='Phương thức tuyển sinh' className='col-md-6' data={SelectAdapter_DmPhuongThucTuyenSinh} readOnly={readOnly} required />
-                            <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' type='number' readOnly={readOnly} />
-                            <FormTextBox ref={e => this.doiTuongChinhSach = e} label='Đối tượng chính sách' placeholder='Ghi rõ đối tượng chính sách, nếu không thuộc diện này thì ghi là Không' className='col-md-12' readOnly={readOnly} required />
+                            <FormSelect ref={e => this.doiTuongTuyenSinh = e} label='Đối tượng tuyển sinh' className='col-md-6' data={SelectAdapter_DmSvDoiTuongTs} required readOnly />
+                            <FormSelect ref={e => this.khuVucTuyenSinh = e} label='Khu vực tuyển sinh' className='col-md-6' data={['KV1', 'KV2', 'KV2-NT', 'KV3']} readOnly required />
+                            <FormSelect ref={e => this.phuongThucTuyenSinh = e} label='Phương thức tuyển sinh' className='col-md-6' data={SelectAdapter_DmPhuongThucTuyenSinh} readOnly required />
+                            <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' type='number' readOnly />
+                            <FormTextBox ref={e => this.doiTuongChinhSach = e} label='Đối tượng chính sách' placeholder='Ghi rõ đối tượng chính sách, nếu không thuộc diện này thì ghi là Không' className='col-md-12' readOnly required />
                             <FormTextBox ref={e => this.tenCha = e} label='Họ và tên cha' className='form-group col-md-6' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.sdtCha = e} label='Số điện thoại' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
                             <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly={readOnly} />
@@ -297,26 +300,26 @@ class SinhVienPage extends AdminPage {
                             <FormDatePicker label='Ngày vào đoàn' className='col-md-9' style={{ display: this.state.isDoanVien ? 'block' : 'none' }} required={this.state.isDoanVien} ref={e => this.ngayVaoDoan = e} readOnly={readOnly} />
                             <FormTextBox ref={e => this.hoTenNguoiLienLac = e} label='Họ và tên người liên lạc' className='form-group col-md-6' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.sdtNguoiLienLac = e} label='Số điện thoại' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
-                            <ComponentDiaDiem ref={e => this.thuongTruNguoiLienLac = e} label='Địa chỉ thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
+                            <ComponentDiaDiem ref={e => this.thuongTruNguoiLienLac = e} label='Địa chỉ liên lạc' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
                         </div>
                     </div>
                 </div>
             </>,
             backRoute: '/user',
-            buttons: this.state.isNhapHoc ? [
-                {
+            buttons: [
+                !readOnly && {
                     icon: 'fa-save', className: 'btn-success', onClick: this.save
                 },
-                {
-                    icon: 'fa-file-word-o', className: 'btn-primary', onClick: this.downloadWord
+                (!pending && !daNhapHoc) && {
+                    icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord
                 }
-            ] : null
+            ]
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
 const mapActionsToProps = {
-    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord
+    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord, getSvSettingKeys
 };
 export default connect(mapStateToProps, mapActionsToProps)(SinhVienPage);

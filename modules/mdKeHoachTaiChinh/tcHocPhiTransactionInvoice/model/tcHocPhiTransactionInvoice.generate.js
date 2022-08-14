@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_TRANSACTION_INVOICE { id, transactionId, invoiceTransactionId, invoiceNumber, mssv, hocKy, namHoc }
+// Table name: TC_HOC_PHI_TRANSACTION_INVOICE { id, refId, invoiceTransactionId, invoiceNumber, mssv, hocKy, namHoc, lyDoHuy, ngayPhatHanh }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'transactionId': 'TRANSACTION_ID', 'invoiceTransactionId': 'INVOICE_TRANSACTION_ID', 'invoiceNumber': 'INVOICE_NUMBER', 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC' };
+const obj2Db = { 'id': 'ID', 'refId': 'REF_ID', 'invoiceTransactionId': 'INVOICE_TRANSACTION_ID', 'invoiceNumber': 'INVOICE_NUMBER', 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'lyDoHuy': 'LY_DO_HUY', 'ngayPhatHanh': 'NGAY_PHAT_HANH' };
 
 module.exports = app => {
     app.model.tcHocPhiTransactionInvoice = {
@@ -219,6 +219,19 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, searchterm, filter, done) => new Promise((resolve, reject) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_transaction_invoice_search_page(:pagenumber, :pagesize, :searchterm, :filter, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, filter, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
+
+        downloadExcel: (searchterm, filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_transaction_invoice_download_excel(:searchterm, :filter); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, searchterm, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

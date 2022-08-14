@@ -12,6 +12,8 @@ import Loading from 'view/component/Loading';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import T from 'view/js/common';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
+import { SelectAdapter_DtDmThoiGianDaoTaoAll } from '../dtDmThoiGianDaoTao/redux';
+
 
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
@@ -67,6 +69,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         id && this.props.getDtKhungDaoTao(id, (data) => {
             this.khoa.value(data.maKhoa);
             this.maNganh.value(data.maNganh);
+            this.setState({ chuyenNganh: data?.chuyenNganh || '' });
             this.chuyenNganh.value(data.chuyenNganh);
             this.setState({ maNganh: data.maNganh });
             this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
@@ -188,14 +191,11 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         if (!this.ma) return;
         const namDaoTao = this.validation(this.namDaoTao);
         const maNganh = this.validation(this.maNganh);
-        const chuyenNganh = this.validation(this.chuyenNganh);
+        const chuyenNganh = this.chuyenNganh.data()?.text || '';
         SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(namDaoTao, res => {
             const { text: textNamDaoTao } = res;
-            SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc).fetchOne(chuyenNganh, res => {
-                const { text: textChuyenNganh } = res;
-                this.props.downloadWord(this.ma, data => {
-                    T.FileSaver(new Blob([new Uint8Array(data.data)]), textNamDaoTao + '_' + maNganh + '_' + textChuyenNganh + '.docx');
-                });
+            this.props.downloadWord(this.ma, data => {
+                T.FileSaver(new Blob([new Uint8Array(data.data)]), textNamDaoTao + '_' + maNganh + '_' + chuyenNganh + '.docx');
             });
         });
 
@@ -227,7 +227,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                             <FormSelect ref={e => this.namDaoTao = e} label='Năm học' data={SelectAdapter_DtCauTrucKhungDaoTao} className='col-md-4' required readOnly={readOnly} onChange={value => this.setNamDaoTao(value)} />
 
                             <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Mã ngành' className='col-md-4' onChange={this.handleNganh} required />
-                            <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' />
+                            <FormSelect ref={e => this.chuyenNganh = e} data={SelectAdapter_DtDanhSachChuyenNganh(this.state.maNganh, this.state.namHoc)} label='Chuyên ngành' className='col-md-4' onChange={value => this.setState({ chuyenNganh: value?.text || '' })} />
                             <div style={{ marginBottom: '0' }} className='form-group col-md-12'>
                                 <FormTabs tabs={[
                                     {
@@ -241,13 +241,9 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                 ]} />
                             </div>
 
-
                             <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-4' required readOnly={readOnly} />
-                            <FormSelect data={[
-                                { id: 4, text: '4 năm' },
-                                { id: 3.5, text: '3,5 năm' }
-                            ]} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect data={SelectAdapter_DtDmThoiGianDaoTaoAll} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
                             <div className='form-group col-md-12'>
                                 <label>Tên văn bằng sau khi tốt nghiệp: </label>
                                 <FormTabs tabs={[

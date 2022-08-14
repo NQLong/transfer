@@ -68,19 +68,8 @@ class DtDsMonMoEditPage extends AdminPage {
         this.id = route.id;
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
-                let { danhSachMonMo, thoiGianMoMon } = data,
-                    danhSachTheoKhoaSV = danhSachMonMo.groupBy('khoaSv');
-                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao } });
-                [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach(khoaSv => {
-                    let list = danhSachTheoKhoaSV[khoaSv];
-                    list?.forEach((item, index) => {
-                        let { soLop, soTietBuoi, soBuoiTuan, soLuongDuKien } = item;
-                        this.soLop[khoaSv][index].value(soLop || 1);
-                        this.soTiet[khoaSv][index].value(soTietBuoi || 5);
-                        this.soBuoi[khoaSv][index].value(soBuoiTuan || 1);
-                        this.soLuongDuKien[khoaSv][index].value(soLuongDuKien || 50);
-                    });
-                });
+                let { thoiGianMoMon, thongTinKhoaNganh } = data;
+                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao, maNganh: thongTinKhoaNganh.maNganh }, nam: thoiGianMoMon.nam });
             });
         });
 
@@ -111,13 +100,9 @@ class DtDsMonMoEditPage extends AdminPage {
 
     create = (khoaSv) => {
         let currentDanhSachCuaKhoa = this.props.dtDanhSachMonMo.danhSachMonMo.groupBy('khoaSv')[khoaSv];
-        currentDanhSachCuaKhoa?.map((item, index) => {
+        currentDanhSachCuaKhoa?.map((item) => {
             item.loaiHinhDaoTao = this.state.loaiHinhDaoTao;
             item.bacDaoTao = this.state.bacDaoTao;
-            item.soLop = this.soLop[khoaSv][index].value() || 0;
-            item.soBuoiTuan = this.soBuoi[khoaSv][index].value() || 0;
-            item.soTietBuoi = this.soTiet[khoaSv][index].value() || 0;
-            item.soLuongDuKien = this.soLuongDuKien[khoaSv][index].value() || 0;
             item.khoaSinhVien = khoaSv;
         });
         return currentDanhSachCuaKhoa || [];
@@ -127,18 +112,17 @@ class DtDsMonMoEditPage extends AdminPage {
         e.preventDefault();
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
-        this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
-            this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
-                // location.reload();
-            });
+        this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
+            // location.reload();
         });
+        // this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
+        //     this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
+        //         // location.reload();
+        //     });
+        // });
     }
 
     renderMonHocTable = (yearth, data) => {
-        this.soLop[yearth] = [];
-        this.soBuoi[yearth] = [];
-        this.soTiet[yearth] = [];
-        this.soLuongDuKien[yearth] = [];
         return renderTable({
             getDataSource: () => data,
             stickyHead: false,
@@ -165,32 +149,33 @@ class DtDsMonMoEditPage extends AdminPage {
                 </>
             ),
             renderRow: (item, index) => {
-                this.soLop[yearth][index] = '';
-                this.soTiet[yearth][index] = '';
-                this.soBuoi[yearth][index] = '';
-                this.soLuongDuKien[yearth][index] = '';
+                let rowSpan = Array.isArray(item.soTietBuoi) ? item.soTietBuoi.length + 1 : 1, isCN = rowSpan > 1;
                 return (
-                    <tr key={index}>
-                        <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
-                        <TableCell style={{ width: 'auto' }} content={<>{item.tenMonHoc} <br /><i className='text-primary'>{item.tenChuyenNganh || ''}</i></>} />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.loaiMonHoc ? 'x' : ''} />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTietLyThuyet} />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTietThucHanh} />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soLop[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
-                        } />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soTiet[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} min={1} max={5} />
-                        } />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soBuoi[yearth][index] = e} style={{ marginBottom: '0' }} readOnly={this.isDuyet} />
-                        } />
-                        <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
-                            <FormTextBox type='number' ref={e => this.soLuongDuKien[yearth][index] = e} style={{ marginBottom: '0', width: '100px' }} readOnly={this.isDuyet} />
-                        } />
-                        {!(this.state.expired || this.isDuyet) && <TableCell type='buttons' style={{ textAlign: 'center' }} permission={{ delete: true }} onDelete={e => e.preventDefault() || this.deleteRow(item, index)} />}
-                    </tr>
+                    <React.Fragment key={index}>
+                        <tr>
+                            <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} rowSpan={rowSpan} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} rowSpan={rowSpan} />
+                            <TableCell style={{ width: 'auto' }} content={<><b>{item.tenMonHoc}</b> <br /> <div style={{ color: 'blue' }}>{typeof item.tenChuyenNganh == 'string' ? item.tenChuyenNganh : ''}</div></>} rowSpan={rowSpan} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.loaiMonHoc ? 'x' : ''} rowSpan={rowSpan} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTietLyThuyet} rowSpan={rowSpan} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTietThucHanh} rowSpan={rowSpan} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soLop} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={isCN ? '' : item.soTietBuoi} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={isCN ? '' : item.soBuoiTuan} />
+                            <TableCell style={{ width: 'auto', textAlign: 'center' }} content={isCN ? '' : item.soLuongDuKien} />
+                            {!(this.state.expired || this.isDuyet) && <TableCell type='buttons' style={{ textAlign: 'center' }} permission={{ delete: true }} onDelete={e => e.preventDefault() || this.deleteRow(item, index)} />}
+                        </tr>
+                        {Array.isArray(item.soTietBuoi) && Array.from({ length: item.soTietBuoi.length }, (_, i) => i).map(i => {
+                            return (
+                                <tr key={i}>
+                                    <TableCell style={{ textAlign: 'center' }} content={<b>{item.maMonHoc}_{i + 1}</b>} />
+                                    <TableCell style={{ textAlign: 'center' }} content={item.soTietBuoi[i]} />
+                                    <TableCell style={{ textAlign: 'center' }} content={item.soBuoiTuan[i]} />
+                                    <TableCell style={{ textAlign: 'center' }} content={item.soLuongDuKien[i]} />
+                                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenChuyenNganh[i].map(ten => <div key={ten}>{ten}</div>)} />
+                                </tr>);
+                        })}
+                    </React.Fragment>
                 );
             }
         });
@@ -204,9 +189,9 @@ class DtDsMonMoEditPage extends AdminPage {
                 {this.renderMonHocTable(khoaSv, item)}
                 <div className='tile-footer' />
                 {(!this.state.expired && !this.isDuyet) ? <div style={{ textAlign: 'right' }}>
-                    <Tooltip title='Thêm môn học' arrow>
-                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.monHocCtdt.show({ khoaSv, thongTinKhoaNganh: this.props.dtDanhSachMonMo.thongTinKhoaNganh, maDangKy: this.id })}>
-                            <i className='fa fa-lg fa-plus' /> Bổ sung môn học
+                    <Tooltip title='Điều chỉnh' arrow>
+                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.monHocCtdt.show({ khoaSv, thongTinKhoaNganh: this.props.dtDanhSachMonMo.thongTinKhoaNganh, maDangKy: this.id, nam: this.state.nam })}>
+                            <i className='fa fa-lg fa-plus' /> Điều chỉnh môn học
                         </button>
                     </Tooltip>
                 </div> : null}

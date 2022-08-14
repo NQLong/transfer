@@ -134,41 +134,7 @@ module.exports = app => {
                 req.session.user = null;
                 req.session.today = null;
             }
-            res.send({ error: null, user: req.session.user });
+            res.end();
         }
     });
-
-
-    // app.loginUserOnMobile = (req, res) => {
-    //     const auth = require('basic-auth');
-    //     const credentials = auth(req);
-    //     if (credentials) {
-    //         //TODO: auth => credentials.name, credentials.pass
-    //     } else {
-    //         res.send({ error: 'Invalid parameters!' });
-    //     }
-    // };
-    // app.logoutUserOnMobile = (req, res) => {
-    // };
-    // app.getUserOnMobile = (req, res) => {
-    //     const auth = require('basic-auth');
-    //     const credentials = auth(req);
-    //     if (credentials) {
-    //         app.tokenAuth.verify(credentials.pass, (error, decoded) => {
-    //             if (error || decoded == null || credentials.name != decoded.email) {
-    //                 res.send({ error: 'Invalid token!' });
-    //             } else {
-    //                 app.model.fwUser.get({ email: credentials.name }, (error, user) => {
-    //                     if (error || user == null || user._id != decoded._id) {
-    //                         res.send({ error: 'Invalid token!' });
-    //                     } else {
-    //                         //TODO: res.send ???
-    //                     }
-    //                 });
-    //             }
-    //         });
-    //     } else {
-    //         res.send({ error: 'Invalid parameters!' });
-    //     }
-    // }
 };

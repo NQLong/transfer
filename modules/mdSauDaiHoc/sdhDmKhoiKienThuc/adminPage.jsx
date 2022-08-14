@@ -119,7 +119,7 @@ class SdhDmKhoiKienThucPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getSdhDmKhoiKienThucPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createSdhDmKhoiKienThuc} update={this.props.updateSdhDmKhoiKienThuc} />
             </>,
-            backRoute: '/user/dao-tao',
+            backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

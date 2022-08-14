@@ -81,7 +81,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtNghiPhep.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -98,7 +98,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtNghiPhep.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -114,7 +114,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = app.stringify(req.query.filter);
+        const filter = app.utils.stringify(req.query.filter);
         app.model.qtNghiPhep.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -206,7 +206,7 @@ module.exports = app => {
     };
 
     app.get('/api/qua-trinh/nghi-phep/download-excel/:filter', app.permission.check('qtNghiPhep:export'), (req, res) => {
-        let objFilter = app.parse(req.params.filter);
+        let objFilter = app.utils.parse(req.params.filter);
         let batDau = objFilter && objFilter.batDau ? objFilter.batDau : null;
         if (batDau) {
             let batDauDate = new Date(batDau);

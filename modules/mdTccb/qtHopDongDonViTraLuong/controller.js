@@ -30,8 +30,9 @@ module.exports = app => {
         try {
             filter = JSON.stringify(req.query.filter || {});
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
+
         app.model.qtHopDongDonViTraLuong.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -51,7 +52,7 @@ module.exports = app => {
         try {
             filter = JSON.stringify(req.query.filter || {});
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
         app.model.qtHopDongDonViTraLuong.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {

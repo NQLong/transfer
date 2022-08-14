@@ -38,7 +38,6 @@ export class DaoTaoModal extends AdminModal {
         //data for adminPage, daoTaoDetail: data: { item: }
         //data for support: data: { data: {}, qtId }
         let item = data?.item || data?.data || null;
-        // console.log(item.hinhThuc);
         data.item && this.setState({ shcc: item.shcc, dataBanDau: item });
         let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenTruong, hinhThuc, loaiBangCap, minhChung, shcc } = item || {
             id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
@@ -159,7 +158,6 @@ export class DaoTaoModal extends AdminModal {
     };
 
     onChangeViewMode = (value) => {
-        // console.log(this.state.item);
         if (value) {
             this.onShow({ item: this.state.oldData });
         } else this.onShow({ data: this.state.item, qtId: this.state.qtId, type: this.state.type, oldData: this.state.oldData });

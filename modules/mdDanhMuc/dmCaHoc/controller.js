@@ -8,7 +8,7 @@ module.exports = app => {
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7010: { title: 'Giờ học', link: '/user/dao-tao/ca-hoc', groupIndex: 2, icon: 'fa-clock-o', backgroundColor: '#D9C692', color: '#000' },
+            7010: { title: 'Giờ học', link: '/user/dao-tao/ca-hoc', groupIndex: 2 },
         },
     };
     app.permission.add(

@@ -9,7 +9,8 @@ const T = {
         document.title = title && title != '' ? `${document.notification || ''} ${title} | USSH-VNUHCM` : 'USSH-VNUHCM';
     },
     FileSaver,
-    rootUrl: window.location.protocol + '//' + window.location.hostname, // rootUrl: 'https://hcmussh.edu.vn',
+    // rootUrl: window.location.protocol + '//' + window.location.hostname, // rootUrl: 'https://hcmussh.edu.vn',
+    rootUrl: window.location.origin,
     sexes: ['Nam', 'Nữ'],
     component: { '<empty>': null },
     pageTypes: [
@@ -337,15 +338,10 @@ const T = {
         });
     },
     linkNewsDetail: (item) => {
-        const language = T.language();
-        if (language == 'vi' && item.link) {
-            return ('/tin-tuc/' + item.link);
-        } else if (language == 'vi' && !item.link) {
-            return ('/news/item/' + item.id);
-        } else if (language == 'en' && item.linkEn) {
-            return ('/article/' + item.linkEn);
-        } else if (language == 'en' && !item.linkEn) {
-            return ('/news-en/item/' + item.id);
+        if (item.link) {
+            return `/tin-tuc/${item.link}?${T.language.getLanguage()}`;
+        } else {
+            return `/news/item/${item.id}?${T.language.getLanguage()}`;
         }
     },
 
@@ -368,6 +364,8 @@ const T = {
             return defaultValue;
         }
     },
+
+    isObject: (value) => value && value.constructor == ({}).constructor,
 
     // TIME Operation ----------------------------------
     monthDiff: (d1, d2) => { //Difference in Months between two dates
@@ -420,38 +418,67 @@ const T = {
 
 T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 
+// Language
+let languages = ['vi', 'en'];
 T.language = texts => {
-    let lg = window.location.pathname.includes('/en')
-        || window.location.pathname.includes('/news-en')
-        || window.location.pathname.includes('/nvduc/de')
-        || window.location.pathname.includes('/article') ? 'en' : 'vi';
+    let lg = 'vi', pathname = window.location.pathname, query = new URLSearchParams(window.location.search);
+    const lang = query.get('lang');
 
-    if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
+    if (pathname.endsWith('/en') || pathname.startsWith('/news-en') || pathname.startsWith('/article')) {
+        lg = 'en';
+    } else if (lang && languages.includes(lang.toLowerCase())) {
+        lg = lang.toLowerCase();
+    } else {
+        for (let _lang of languages) {
+            if (pathname.includes('/' + _lang + '/') || pathname.endsWith('/' + _lang)) {
+                lg = _lang;
+            }
+        }
+    }
+
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
+
+T.language.setLanguages = _languages => {
+    languages = _languages && Array.isArray(_languages) && _languages.length ? _languages : ['vi', 'en'];
+};
+
 T.language.next = () => {
-    let language = window.location.pathname.includes('/en')
-        || window.location.pathname.includes('/news-en')
-        || window.location.pathname.includes('/article') ? 'en' : 'vi';
-    // const language = T.cookie('language');
-    return (language == null || language == 'en') ? 'vi' : 'en';
+    const lg = T.language();
+    if (!lg) return languages[0];
+    let index = languages.indexOf(lg);
+    if (index == -1) index = 0; // No language
+    else index++; // Next language
+    if (index >= languages.length) index -= languages.length; // If larger than length, reset
+    return languages[index];
 };
+
+T.language.getLanguage = () => T.language.current() == 'vi' ? '' : `lang=${T.language.current()}`;
+
 T.language.current = () => {
-    const language = T.cookie('language');
-    return (language == null || language == 'en') ? 'en' : 'vi';
+    const lg = T.language();
+    return lg ? lg : languages[0];
 };
+
 T.language.switch = () => {
     const language = T.language.next();
-    T.cookie('language', language);
     return { language };
 };
-T.language.parse = (text, getAll) => {
+
+T.language.parse = (text, getAll, parseLanguages) => {
     let obj = {};
-    try { obj = JSON.parse(text) } catch { };
-    if (obj.vi == null) obj.vi = text;
-    if (obj.en == null) obj.en = text;
-    return getAll ? obj : obj[T.language()];
+    try { obj = JSON.parse(text); } catch (e) { obj = {}; }
+    const objLength = Object.keys(obj).length;
+    (parseLanguages && Array.isArray(parseLanguages) ? parseLanguages : languages).forEach(language => {
+        if (obj[language] == null && !objLength) obj[language] = text;
+    });
+    if (typeof getAll == 'string' && (parseLanguages && Array.isArray(parseLanguages) ? parseLanguages : languages).includes(getAll)) {
+        return obj[getAll];
+    } else {
+        return getAll ? obj : obj[T.language()];
+    }
 };
+
 T.language.getMonth = () => ({
     vi: ['Tháng một', 'Tháng hai', 'Tháng ba', 'Tháng tư', 'Tháng năm', 'Tháng sáu', 'Tháng bảy', 'Tháng tám', 'Tháng chín', 'Tháng mười', 'Tháng mười một', 'Tháng mười hai'],
     en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -746,6 +773,15 @@ Array.prototype.groupBy = function (key) {
         }),
         {},
     );
+};
+
+Array.prototype.removeByValue = function (value) {
+    let tmp = this;
+    const index = tmp.indexOf(value);
+    if (index >= 0) {
+        tmp.splice(index, 1);
+    }
+    return tmp;
 };
 
 Date.prototype.getText = function () {
