@@ -130,7 +130,7 @@ module.exports = app => {
                     for (const nganhItem of maNganh) {
                         if (chuyenNganh.length) {
                             for (const chuyenNganhItem of chuyenNganh) {
-                                let idNganh = chuyenNganhItem ? `${nganhItem}&&${chuyenNganhItem}` : nganhItem;
+                                let idNganh = chuyenNganhItem ? `${nganhItem}##${chuyenNganhItem}` : nganhItem;
                                 await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh });
                             }
                         } else {
