@@ -4,7 +4,7 @@ module.exports = app => {
         menus: {
             4107: {
                 title: 'Khối kiến thức',
-                icon: 'fa-crosshairs', link: '/user/sau-dai-hoc/khoi-kien-thuc',
+                link: '/user/sau-dai-hoc/khoi-kien-thuc',
                 subTitle: 'Sau đại học'
             }
         }
