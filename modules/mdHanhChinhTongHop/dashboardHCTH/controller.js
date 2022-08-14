@@ -15,20 +15,15 @@ module.exports = app => {
     //API------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/hcth/dashboard/get-data', app.permission.check('hcth:login'), async (req, res) => {
         try {
-            // console.log('ok')
             let time = req.query.time || null;
             const item = await app.model.hcthCongVanDi.dashboardGetData(time);
-            // console.log(item);
             let soLieu = item.rows,
                 { hcthCongVanDen = [], hcthCongVanDi = [], vanBanDenNam = [], vanBanDiNam = [] } = item;
-            console.log(hcthCongVanDen, hcthCongVanDi);
             res.send({ data: { soLieu, hcthCongVanDen, hcthCongVanDi, vanBanDenNam, vanBanDiNam } });
 
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
-
     });
 
 

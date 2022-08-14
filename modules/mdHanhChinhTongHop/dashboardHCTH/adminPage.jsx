@@ -25,14 +25,6 @@ const listThoiGian = [
     { id: new Date(thisYear - 20, thisMonthIndex, thisDate).getTime(), text: 'Trong 20 năm' },
 ];
 
-// const start = new Date().getFullYear(),
-//     end = 1900,
-//     yearSelector = [...Array(start - end + 1).keys()].map(i => ({
-//         id: start - i,
-//         text: start - i
-//     }));
-
-
 class DashboardIcon extends React.Component {
     componentDidMount() {
         setTimeout(() => {
@@ -121,10 +113,6 @@ class Dashboard extends AdminPage {
                     item.tenVt = item.tenDonVi.getFirstLetters();
                     return item;
                 }), 'tenVt', DefaultColors.navy),
-                // xetDonVi: 1,
-                // listCv: this.setUp(soLieu.map(item => {
-                //     item
-                // }))
             }, () => this.setState({ isLoading: false }));
         });
     }
@@ -183,7 +171,6 @@ class Dashboard extends AdminPage {
         let { vanBanDen = 0, vanBanDi = 0, fromTime = null,
             listVanBanDi = {}, listVanBanDen = {}, listDonViNhan = {}, soLieu = {}
         } = this.state;
-        // console.log(this.state)
         return this.renderPage({
             icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng HCTH',
@@ -213,9 +200,6 @@ class Dashboard extends AdminPage {
                     {<FormSelect data={listThoiGian} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '250px', marginBottom: '0' }} allowClear onChange={value => {
                         this.initData(value?.id || null);
                     }} />}
-                    {/* <FormSelect data={yearSelector} ref={e => {
-                        return this.congVanYear = e;
-                    }} style={{ width: '250px', marginBottom: '0', marginRight: '40' }} placeholder='Năm' allowClear /> */}
                 </>
         });
     }
