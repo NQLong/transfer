@@ -4,14 +4,10 @@ import { AdminModal, AdminPage, FormSelect, renderTable, TableCell, FormTextBox 
 import { SelectAdapter_CongVanDi } from '../hcthCongVanDi/redux';
 import { getHoSoSearchPage, createHoSo } from './redux';
 import Pagination from 'view/component/Pagination';
-// const { loaiCongVan } = require('../constant');
-
-
 class CreateModal extends AdminModal {
     onShow = () => {
         this.tieuDe.value('');
         this.vanBan.value('');
-        // console.log(this.props);
     }
 
     onSubmit = (e) => {
@@ -22,11 +18,7 @@ class CreateModal extends AdminModal {
         };
         if (!data.tieuDe) {
             T.notify('Tiêu đề hồ sơ bị trống', 'danger');
-            console.log(data.vanBan);
             this.tieuDe.focus();
-        } else if (data.vanBan.length == 0) {
-            T.notify('Văn bản bị trống', 'danger');
-            this.vanBan.focus();
         } else {
             this.props.create(data, () => {
                 this.props.getPage(this.props.pageNumber, this.props.pageSize, '', () => this.hide());
@@ -40,7 +32,7 @@ class CreateModal extends AdminModal {
             size: 'elarge',
             body: <div className="row">
                 <FormTextBox ref={e => this.tieuDe = e} className="col-md-12" label='Tiêu đề' type='text' required />
-                <FormSelect multiple={true} ref={e => this.vanBan = e} data={SelectAdapter_CongVanDi} label='Văn bản đi' className='col-md-12' required />
+                <FormSelect multiple={true} ref={e => this.vanBan = e} data={SelectAdapter_CongVanDi} label='Văn bản đi' className='col-md-12' />
             </div>
         });
     }
@@ -65,7 +57,7 @@ class HcthHoSo extends AdminPage {
         let { pageNumber, pageSize } = this.props && this.props.hcthHoSo && this.props.hcthHoSo.page ? this.props.hcthHoSo.page : { pageNumber: 1, pageSize: 50 };
         let pageFilter = isInitial ? {} : {};
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', () => { });
+            this.getPage(pageNumber, pageSize, '');
         });
     }
 
@@ -114,7 +106,6 @@ class HcthHoSo extends AdminPage {
             onCreate: (e) => {
                 e.preventDefault();
                 this.createModal.show(null);
-                // this.getPage(pageNumber, pageSize, '');
             }
         });
     }

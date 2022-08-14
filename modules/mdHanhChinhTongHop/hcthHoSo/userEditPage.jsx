@@ -1,9 +1,10 @@
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
+import T from 'view/js/common';
 import { AdminPage, FormDatePicker, FormRichTextBox, FormSelect, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
-import { getHoSo, deleteVanBan } from './redux';
-
+import { getHoSo, deleteVanBan, getVanBanDiSelector, addVanBan, getVanBan } from './redux';
+import { ThemVanBanModal } from './component';
 
 class HcthHoSoEdit extends AdminPage {
     state = { id: null, isLoading: true };
@@ -24,7 +25,6 @@ class HcthHoSoEdit extends AdminPage {
     }
 
     setData = (data = null) => {
-        // console.log(data);
         let { ngayTao, tieuDe, nguoiTao } = data ? data : { ngayTao: '', tieuDe: '', nguoiTao: '' };
         this.ngayTao.value(ngayTao);
         this.nguoiTao.value(nguoiTao);
@@ -33,7 +33,6 @@ class HcthHoSoEdit extends AdminPage {
 
     deleteVanBan = (e, item) => {
         e.preventDefault();
-
         T.confirm('Xoá văn bản', 'Bạn có chắc muốn xoá văn bản này ra khỏi hồ sơ hay không?', 'warning', true, isConfirm =>
             isConfirm && this.props.deleteVanBan(this.state.id, item.id)
         );
@@ -45,18 +44,19 @@ class HcthHoSoEdit extends AdminPage {
         renderHead: () => {
             return <tr>
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} >#</th>
-                <th style={{ width: '55%', whiteSpace: 'nowrap' }} >Văn bản</th>
-                <th style={{ width: '45%', whiteSpace: 'nowrap' }} >Thời gian tạo</th>
+                <th style={{ width: '30%', whiteSpace: 'nowrap' }} >Văn bản</th>
+                <th style={{ width: '20%', whiteSpace: 'nowrap' }} >Thời gian tạo</th>
+                <th style={{ width: '50%', whiteSpace: 'nowrap' }} >Trích yếu</th>
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} >Thao tác</th>
 
             </tr>;
         },
         renderRow: (item, index) => {
-            console.log(item);
             return <tr key={item.id}>
                 <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                 <TableCell type='link' contentClassName='multiple-lines' content={`Văn bản đi: ${item.keyB}`} url={`/user/hcth/van-ban-di/${item.keyB}`} />
-                <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayTaoDi, 'dd/mm/yyyy')} />
+                <TableCell contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.trichYeuDi} />
                 <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ delete: true }} onDelete={e => this.deleteVanBan(e, item)} />
             </tr>;
         }
@@ -80,9 +80,16 @@ class HcthHoSoEdit extends AdminPage {
                 <div className="tile-body row">
                     <div className="col-md-12 form-group">
                         {this.tableList(item?.vanBan)}
+                        <div className="d-flex justify-content-end">
+                            <button className='btn btn-primary' type='submit' onClick={e => { e.preventDefault(); this.themVanBanModal.show(); }}>
+                                Thêm văn bản
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <ThemVanBanModal ref={e => this.themVanBanModal = e} hoSoId={this.state.id} {...this.props} getData={this.getData} />
         </>;
     }
 
@@ -97,5 +104,5 @@ class HcthHoSoEdit extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthHoSo: state.hcth.hcthHoSo });
-const mapActionsToProps = { getHoSo, deleteVanBan };
+const mapActionsToProps = { getHoSo, deleteVanBan, getVanBanDiSelector, addVanBan, getVanBan };
 export default connect(mapStateToProps, mapActionsToProps)(HcthHoSoEdit);

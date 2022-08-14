@@ -15,18 +15,11 @@ module.exports = app => {
 
     app.get('/api/hcth/ho-so/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), async (req, res) => {
         try {
-            console.log('test');
             const pageNumber1 = parseInt(req.params.pageNumber),
                 pageSize1 = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
 
-            // const user = req.session.user;
-            // const permissions = user.permissions;
-
-            let filterParam = '{}';
-
-            const page = await app.model.hcthHoSo.searchPage(pageNumber1, pageSize1, filterParam, searchTerm);
-
+            const page = await app.model.hcthHoSo.searchPage(pageNumber1, pageSize1, searchTerm);
 
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
 
@@ -79,15 +72,62 @@ module.exports = app => {
         }
     });
 
-    app.delete('/api/hcth/ho-so', app.permission.check('staff:login'), async (req, res) => {
+    app.delete('/api/hcth/ho-so/van-ban', app.permission.check('staff:login'), async (req, res) => {
         try {
-            console.log('pokemon');
             const { vanBanId } = req.body;
-            await app.model.hcthLienKet.delete({ vanBanId });
+            await app.model.hcthLienKet.delete({ id: vanBanId });
             res.send({ error: null });
         } catch (error) {
             res.send({ error });
         }
     });
 
+    app.put('/api/hcth/ho-so/add', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = parseInt(req.body.id);
+
+            const { vanBan } = req.body.changes;
+
+            const checkVanBan = await app.model.hcthLienKet.get({ loaiA: 'HO_SO', keyA: id, loaiB: 'VAN_BAN_DI', keyB: vanBan });
+
+            if (checkVanBan) {
+                throw { message: 'Văn bản đã được thêm vào hồ sơ này!' };
+            } else {
+                await app.model.hcthLienKet.create({ loaiA: 'HO_SO', keyA: id, loaiB: 'VAN_BAN_DI', keyB: vanBan });
+            }
+            res.send({ error: null });
+
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/hcth/ho-so/add-van-ban', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const { id, vanBan } = req.body;
+            await app.model.hcthLienKet.createFromList(vanBan.map(item => ({
+                loaiA: 'HO_SO', keyA: id,
+                loaiB: 'VAN_BAN_DI', keyB: item
+            })));
+
+            res.send({ error: null });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+
+    app.get('/api/hcth/ho-so/van-ban/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = parseInt(req.params.id);
+            const vanBan = await app.model.hcthLienKet.getAllFrom(id, 'HO_SO', null, null);
+
+            res.send({
+                item: vanBan?.rows || [],
+            });
+
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };
