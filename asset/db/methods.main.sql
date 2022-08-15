@@ -4062,6 +4062,7 @@ BEGIN
                         hcthCVD.LOAI_CONG_VAN AS                     "loaiCongVan",
                         hcthCVD.SO_CONG_VAN   AS                     "soCongVan",
                         hcthCVD.LOAI_VAN_BAN  AS                     "loaiVanBan",
+                        hcthCVD.NGAY_TAO      AS                     "ngayTao",
                         dvg.MA                AS                     "maDonViGui",
                         dvg.TEN               AS                     "tenDonViGui",
                         lvb.TEN               AS                     "tenLoaiVanBan",
@@ -4819,9 +4820,9 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION HCTH_DASHBOARD_GET_DATA(
-    time IN NUMBER,
-    HCTH_CONG_VAN_DEN OUT SYS_REFCURSOR,
-    HCTH_CONG_VAN_DI OUT SYS_REFCURSOR,
+    timeSelect IN NUMBER,
+    TOTAL_VAN_BAN_DEN OUT SYS_REFCURSOR,
+    TOTAL_VAN_BAN_DI OUT SYS_REFCURSOR,
     VAN_BAN_DEN_NAM OUT SYS_REFCURSOR,
     VAN_BAN_DI_NAM OUT SYS_REFCURSOR
 ) RETURN SYS_REFCURSOR
@@ -4831,30 +4832,30 @@ AS
 BEGIN
     select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
 
-    OPEN HCTH_CONG_VAN_DEN FOR
+    OPEN TOTAL_VAN_BAN_DEN FOR
         SELECT COUNT(*) AS "tongVanBanDen"
 
         FROM HCTH_CONG_VAN_DEN cvden
         WHERE cvden.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvden.NGAY_NHAN >= time));
+          AND (timeSelect IS NULL OR (cvden.NGAY_NHAN >= timeSelect));
 
-    OPEN HCTH_CONG_VAN_DI FOR
+    OPEN TOTAL_VAN_BAN_DI FOR
         SELECT COUNT(*) AS "tongVanBanDi"
         FROM HCTH_CONG_VAN_DI cvdi
         WHERE cvdi.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvdi.NGAY_TAO >= time));
+          AND (timeSelect IS NULL OR (cvdi.NGAY_TAO >= timeSelect));
 
     OPEN VAN_BAN_DEN_NAM FOR
         SELECT *
         FROM HCTH_CONG_VAN_DEN cvden
         WHERE cvden.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvden.NGAY_NHAN >= time));
+          AND (timeSelect IS NULL OR (cvden.NGAY_NHAN >= timeSelect));
 
     OPEN VAN_BAN_DI_NAM FOR
         SELECT *
         FROM HCTH_CONG_VAN_DI cvdi
         WHERE cvdi.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvdi.NGAY_TAO >= time));
+          AND (timeSelect IS NULL OR (cvdi.NGAY_TAO >= timeSelect));
 
     OPEN DATA_VB FOR
         select "numOfDocument",
@@ -4873,9 +4874,9 @@ BEGIN
                           LEFT JOIN HCTH_CONG_VAN_DI cvdi on (dvn.MA = cvdi.ID AND dvn.LOAI = 'DI')
                  WHERE dvn.DON_VI_NHAN_NGOAI = 0
                    AND (
-                         ((cvden.NGAY_NHAN >= time) AND (dvn.LOAI = 'DEN'))
-                         OR ((cvdi.NGAY_TAO >= time) AND (dvn.LOAI = 'DI'))
-                       OR (time IS NULL AND(dvn.LOAI = 'DEN' OR dvn.LOAI = 'DI'))
+                         ((cvden.NGAY_NHAN >= timeSelect) AND (dvn.LOAI = 'DEN'))
+                         OR ((cvdi.NGAY_TAO >= timeSelect) AND (dvn.LOAI = 'DI'))
+                       OR (timeSelect IS NULL AND(dvn.LOAI = 'DEN' OR dvn.LOAI = 'DI'))
                      )
                  group by dvn.DON_VI_NHAN
                  ORDER BY dvn.DON_VI_NHAN asc
