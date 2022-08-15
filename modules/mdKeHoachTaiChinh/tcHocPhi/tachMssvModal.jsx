@@ -1,10 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, FormFileBox } from 'view/component/AdminPage';
-import T from 'view/js/common';
 
 class TachMssvModal extends AdminModal {
-    onShow = () => {
+    componentDidMount() {
         this.fileBox.setData('TachMssv');
     }
     onSuccess = (data) => {
