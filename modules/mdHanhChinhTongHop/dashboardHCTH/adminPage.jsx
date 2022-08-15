@@ -94,12 +94,12 @@ class Dashboard extends AdminPage {
 
     initData = (value) => {
         this.props.getDashboardData(value, data => {
-            let { hcthCongVanDen = [], hcthCongVanDi = [], vanBanDenNam = [], vanBanDiNam = [], soLieu = [] } = data;
+            let { totalVanBanDen = [], totalVanBanDi = [], vanBanDenNam = [], vanBanDiNam = [], soLieu = [] } = data;
 
             this.setState({
                 soLieu,
-                vanBanDen: hcthCongVanDen[0].tongVanBanDen,
-                vanBanDi: hcthCongVanDi[0].tongVanBanDi,
+                vanBanDen: totalVanBanDen[0].tongVanBanDen,
+                vanBanDi: totalVanBanDi[0].tongVanBanDi,
                 fromTime: value,
                 listVanBanDen: this.setUp(vanBanDenNam.map(item => {
                     item.namNhan = new Date(item.NGAY_NHAN)?.getFullYear() || null;

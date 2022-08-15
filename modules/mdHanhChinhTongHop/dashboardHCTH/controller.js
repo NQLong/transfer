@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            505: { title: 'Dashboard', link: '/user/hcth/dashboard', icon: 'fa-bar-chart', backgroundColor: '#f5c842', pin: true },
+            509: { title: 'Dashboard', link: '/user/hcth/dashboard', icon: 'fa-bar-chart', backgroundColor: '#f5c842', pin: true },
         },
     };
 
@@ -18,8 +18,8 @@ module.exports = app => {
             let time = req.query.time || null;
             const item = await app.model.hcthCongVanDi.dashboardGetData(time);
             let soLieu = item.rows,
-                { hcthCongVanDen = [], hcthCongVanDi = [], vanBanDenNam = [], vanBanDiNam = [] } = item;
-            res.send({ data: { soLieu, hcthCongVanDen, hcthCongVanDi, vanBanDenNam, vanBanDiNam } });
+                { totalVanBanDen = [], totalVanBanDi = [], vanBanDenNam = [], vanBanDiNam = [] } = item;
+            res.send({ data: { soLieu, totalVanBanDen, totalVanBanDi, vanBanDenNam, vanBanDiNam } });
 
         } catch (error) {
             res.send({ error });
