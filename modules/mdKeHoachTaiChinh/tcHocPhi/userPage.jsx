@@ -35,7 +35,9 @@ class ThanhToanModal extends AdminModal {
             </button>,
             body: <div>
                 <section className='row justify-content-center' style={{ display: this.state.vcb || this.state.agri ? 'none' : '' }}>
-                    <ButtonBank title='BIDV' imgSrc='/img/logo/logo_bidv.png' />
+                    <ButtonBank title='BIDV' imgSrc='/img/logo/logo_bidv.png' onClick={() => {
+                        window.open('/sample/BIDV-2022.pdf', '_blank');
+                    }} />
                     <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
                     {/* <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} /> */}
                 </section>
