@@ -291,7 +291,7 @@ module.exports = app => {
         if (fields.userData && fields.userData[0] && fields.userData[0] == 'TachMssv' && files.TachMssv && files.TachMssv.length) {
             app.fs.createFolder(app.assetPath, 'tempTcHocPhiTachMssv');
             const srcPath = files.TachMssv[0].path,
-                fileName = srcPath.substring(srcPath.lastIndexOf('/') + 1),
+                fileName = app.path.basename(srcPath),
                 newPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);
             let workbook = await app.excel.readFile(srcPath);
 
