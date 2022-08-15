@@ -204,7 +204,7 @@ module.exports = app => {
         res.download(srcPath, 'TACH_MSSV_BIDV.xlsx');
     });
 
-    app.readyHooks.add('deleteTempFolder', {
+    app.readyHooks.add('TcHocPhi:deleteTempFolder', {
         ready: () => app.database && app.assetPath,
         run: () => {
             app.primaryWorker && app.schedule('0 0 * * *', () => {
