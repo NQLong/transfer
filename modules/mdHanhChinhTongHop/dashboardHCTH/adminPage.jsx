@@ -8,22 +8,22 @@ import { Link } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
-const thisDate = new Date().getDate(),
-    thisMonthIndex = new Date().getMonth(),
-    thisYear = new Date().getFullYear();
 
-const listThoiGian = [
-    { id: new Date(thisYear, thisMonthIndex - 1, thisDate).getTime(), text: 'Trong 1 tháng' },
-    { id: new Date(thisYear, thisMonthIndex - 3, thisDate).getTime(), text: 'Trong 3 tháng' },
-    { id: new Date(thisYear, thisMonthIndex - 6, thisDate).getTime(), text: 'Trong 6 tháng' },
-    { id: new Date(thisYear - 1, thisMonthIndex, thisDate).getTime(), text: 'Trong 1 năm' },
-    { id: new Date(thisYear - 2, thisMonthIndex, thisDate).getTime(), text: 'Trong 2 năm' },
-    { id: new Date(thisYear - 3, thisMonthIndex, thisDate).getTime(), text: 'Trong 3 năm' },
-    { id: new Date(thisYear - 5, thisMonthIndex, thisDate).getTime(), text: 'Trong 5 năm' },
-    { id: new Date(thisYear - 10, thisMonthIndex, thisDate).getTime(), text: 'Trong 10 năm' },
-    { id: new Date(thisYear - 15, thisMonthIndex, thisDate).getTime(), text: 'Trong 15 năm' },
-    { id: new Date(thisYear - 20, thisMonthIndex, thisDate).getTime(), text: 'Trong 20 năm' },
-];
+const getListThoiGian = (thisDate, thisMonthIndex, thisYear) => {
+    const listThoiGian = [
+        { id: new Date(thisYear, thisMonthIndex - 1, thisDate).getTime(), text: 'Trong 1 tháng' },
+        { id: new Date(thisYear, thisMonthIndex - 3, thisDate).getTime(), text: 'Trong 3 tháng' },
+        { id: new Date(thisYear, thisMonthIndex - 6, thisDate).getTime(), text: 'Trong 6 tháng' },
+        { id: new Date(thisYear - 1, thisMonthIndex, thisDate).getTime(), text: 'Trong 1 năm' },
+        { id: new Date(thisYear - 2, thisMonthIndex, thisDate).getTime(), text: 'Trong 2 năm' },
+        { id: new Date(thisYear - 3, thisMonthIndex, thisDate).getTime(), text: 'Trong 3 năm' },
+        { id: new Date(thisYear - 5, thisMonthIndex, thisDate).getTime(), text: 'Trong 5 năm' },
+        { id: new Date(thisYear - 10, thisMonthIndex, thisDate).getTime(), text: 'Trong 10 năm' },
+        { id: new Date(thisYear - 15, thisMonthIndex, thisDate).getTime(), text: 'Trong 15 năm' },
+        { id: new Date(thisYear - 20, thisMonthIndex, thisDate).getTime(), text: 'Trong 20 năm' },
+    ];
+    return listThoiGian;
+};
 
 class DashboardIcon extends React.Component {
     componentDidMount() {
@@ -171,6 +171,10 @@ class Dashboard extends AdminPage {
         let { vanBanDen = 0, vanBanDi = 0, fromTime = null,
             listVanBanDi = {}, listVanBanDen = {}, listDonViNhan = {}, soLieu = {}
         } = this.state;
+
+        const thisDate = new Date().getDate(),
+            thisMonthIndex = new Date().getMonth(),
+            thisYear = new Date().getFullYear();
         return this.renderPage({
             icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng HCTH',
@@ -197,7 +201,7 @@ class Dashboard extends AdminPage {
             ],
             header:
                 <>
-                    {<FormSelect data={listThoiGian} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '250px', marginBottom: '0' }} allowClear onChange={value => {
+                    {<FormSelect data={getListThoiGian(thisDate, thisMonthIndex, thisYear)} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '250px', marginBottom: '0' }} allowClear onChange={value => {
                         this.initData(value?.id || null);
                     }} />}
                 </>
