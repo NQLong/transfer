@@ -198,9 +198,28 @@ module.exports = app => {
         return congNo;
     };
 
+    app.get('/api/finance/download-excel-tach-mssv/:fileName', app.permission.check('tcHocPhi:write'), (req, res) => {
+        let fileName = req.params.fileName;
+        const srcPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);
+        res.download(srcPath, 'TACH_MSSV_BIDV.xlsx');
+    });
+
+    app.readyHooks.add('TcHocPhi:deleteTempFolder', {
+        ready: () => app.database && app.assetPath,
+        run: () => {
+            app.primaryWorker && app.schedule('0 0 * * *', () => {
+                app.fs.deleteFolder(app.path.join(app.assetPath, 'tempTcHocPhiTachMssv'));
+            });
+        },
+    });
+
     //Hook upload -----------------------------------------------------------------------------------------------------------------------------------
     app.uploadHooks.add('TcHocPhiData', (req, fields, files, params, done) =>
         app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
+    );
+
+    app.uploadHooks.add('TachMssv', (req, fields, files, params, done) =>
+        app.permission.has(req, () => tcHocPhiTransactionTachMssv(fields, files, done), done, 'tcHocPhi:write')
     );
 
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
@@ -263,6 +282,45 @@ module.exports = app => {
                 } else {
                     done({ error: 'No worksheet!' });
                 }
+            } else done({ error: 'No workbook!' });
+        }
+    };
+
+    const tcHocPhiTransactionTachMssv = async (fields, files, done) => {
+        let worksheet = null;
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'TachMssv' && files.TachMssv && files.TachMssv.length) {
+            app.fs.createFolder(app.assetPath, 'tempTcHocPhiTachMssv');
+            const srcPath = files.TachMssv[0].path,
+                fileName = app.path.basename(srcPath),
+                newPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);
+            let workbook = await app.excel.readFile(srcPath);
+
+            if (workbook) {
+                app.fs.deleteFile(srcPath);
+                // app.fs.renameSync(srcPath, newPath);
+                worksheet = workbook.getWorksheet(1);
+                if (worksheet) {
+                    let index = 14;
+                    try {
+                        while (true) {
+                            if (!worksheet.getCell('G' + index).value) {
+                                await workbook.xlsx.writeFile(newPath);
+                                done({ srcPath: fileName });
+                                break;
+                            } else {
+                                let data = worksheet.getCell('G' + index).text,
+                                    regex = /_96234(.*)_/,
+                                    mssv = data.match(regex) ? data.match(regex)[1].substring(0, 10) : '';
+                                worksheet.getCell('I' + index).value = mssv;
+                                index++;
+                            }
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                        done({ error });
+                    }
+                } else done({ error: 'No worksheet!' });
             } else done({ error: 'No workbook!' });
         }
     };

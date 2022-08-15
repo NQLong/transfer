@@ -7,15 +7,15 @@ import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, 
 
 class ButtonBank extends React.Component {
     render = () => {
-        let styleLogo = { width: '60%', height: '80%', margin: '15%' };
+        let styleLogo = { width: '70%', margin: '15%' };
         const { title, onClick, imgSrc } = this.props;
         return (
             <div className='form-group col-md-4'>
-                <Tooltip title={title} arrow placement='top'>
-                    <button className='btn' onClick={e => e.preventDefault() || onClick()}>
-                        <div className='row' style={{ justifyContent: 'center' }}>
+                <Tooltip title={title} arrow placement='bottom'>
+                    <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || onClick()}>
+                        <div className='row' style={{ justifyContent: 'center', height: '150px', alignItems: 'center' }}>
                             <img src={`${imgSrc}?t=${new Date().getTime()}`} style={styleLogo} />
-                            <h5>{title}</h5>
+                            {/* <h5>{title}</h5> */}
                         </div>
                     </button>
                 </Tooltip>
@@ -33,9 +33,9 @@ class ThanhToanModal extends AdminModal {
             </button>,
             body: <div>
                 <section className='row' style={{ display: this.state.vcb || this.state.agri ? 'none' : '' }}>
-                    <ButtonBank title='Qua BIDV' imgSrc='/img/logo/logo_bidv.png' />
-                    <ButtonBank title='Qua VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
-                    <ButtonBank title='Qua Agribank-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
+                    <ButtonBank title='BIDV' imgSrc='/img/logo/logo_bidv.png' />
+                    <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
+                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                 </section>
                 <section className='row' style={{ display: this.state.vcb ? '' : 'none', justifyContent: 'center' }}>
                     <ButtonBank title='Bằng tài khoản VCB' imgSrc='/img/logo/vcb.png' onClick={() => this.props.vnPayGoToTransaction('vnpay-vcb', link => {
@@ -46,14 +46,14 @@ class ThanhToanModal extends AdminModal {
                     })} />
                 </section>
 
-                {/* <section className='row' style={{ display: this.state.agri ? '' : 'none', justifyContent: 'center' }}>
+                <section className='row' style={{ display: this.state.agri ? '' : 'none', justifyContent: 'center' }}>
                     <ButtonBank title='Bằng tài khoản Agribank' imgSrc='/img/logo/agribank.png' onClick={() => this.props.vnPayGoToTransaction('vnpay-agri', link => {
                         window.location.href = link;
                     })} />
                     <ButtonBank title='Tài khoản khác Agribank' imgSrc='/img/logo/vnpay.png' onClick={() => this.props.vnPayGoToTransaction('agri', link => {
                         window.location.href = link;
                     })} />
-                </section> */}
+                </section>
             </div>
         });
     }
@@ -99,7 +99,7 @@ class UserPage extends AdminPage {
         });
     }
     renderTableHocPhi = (data) => {
-        const style = (width = 'auto', textAlign = 'left') => ({ width, textAlign, whiteSpace: 'nowrap', backgroundColor: '#1b489f', color: '#fff' });
+        const style = (width = 'auto', textAlign = 'left') => ({ width, textAlign, whiteSpace: 'nowrap', backgroundColor: '#0275d8', color: '#fff' });
         return renderTable({
             emptyTable: 'Không có dữ liệu học phí',
             header: 'thead-light',
@@ -136,7 +136,7 @@ class UserPage extends AdminPage {
                             {
                                 current.congNo ?
                                     (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
-                                        <button className='btn btn-success' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                        <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                             Thanh toán
                                         </button>
                                     </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
