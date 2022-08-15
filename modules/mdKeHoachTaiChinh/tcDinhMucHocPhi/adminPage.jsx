@@ -7,9 +7,9 @@ import { SelectAdapter_TcLoaiPhi } from 'modules/mdKeHoachTaiChinh/tcLoaiPhi/red
 import { getDmSvLoaiHinhDaoTaoAll } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 const dataHocKy = [
-    { id: 1, text: 'Học kỳ 1'},
-    { id: 2, text: 'Học kỳ 2'},
-    { id: 3, text: 'Học kỳ 3'}
+    { id: 1, text: 'Học kỳ 1' },
+    { id: 2, text: 'Học kỳ 2' },
+    { id: 3, text: 'Học kỳ 3' }
 ];
 
 class EditModal extends AdminModal {
@@ -22,7 +22,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { namBatDau, namKetThuc, hocKy, loaiPhi, soTienMacDinh } = item ? item : { namBatDau: '', namKetThuc: '', hocKy: null, loaiPhi: null, soTienMacDinh: ''};
+        let { namBatDau, namKetThuc, hocKy, loaiPhi, soTienMacDinh } = item ? item : { namBatDau: '', namKetThuc: '', hocKy: null, loaiPhi: null, soTienMacDinh: '' };
 
         this.namBatDau.value(namBatDau);
         this.namKetThuc.value(namKetThuc);
@@ -34,7 +34,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        
+
 
         if (this.state.showDetail) {
             const changes = {
@@ -45,14 +45,14 @@ class EditModal extends AdminModal {
                 soTienMacDinh: this.soTien.value()
             };
             let loaiDaoTao = [],
-                listDinhMuc = this.state.listDinhMuc ? this.state.listDinhMuc : [], 
+                listDinhMuc = this.state.listDinhMuc ? this.state.listDinhMuc : [],
                 dinhMucMapping = {};
             listDinhMuc.forEach(item => dinhMucMapping[item.loaiDaoTao] = item.ma);
-            
+
             this.props.loaiDaoTao.forEach(item => {
                 loaiDaoTao.push({
                     ma: dinhMucMapping[item.ma],
-                    loaiDaoTao: item.ma, 
+                    loaiDaoTao: item.ma,
                     soTien: this[item.ma].value()
                 });
             });
@@ -76,11 +76,11 @@ class EditModal extends AdminModal {
             }
         } else {
             let soTienMacDinh = this.soTien.value();
-            if (!soTienMacDinh || soTienMacDinh == '') { 
+            if (!soTienMacDinh || soTienMacDinh == '') {
                 T.notify('Số tiền mặc định trống!', 'danger');
                 this.soTien.focus();
             } else {
-                let listDinhMuc = this.state.listDinhMuc ? this.state.listDinhMuc : [], 
+                let listDinhMuc = this.state.listDinhMuc ? this.state.listDinhMuc : [],
                     dinhMucMapping = {};
                 listDinhMuc.forEach(item => dinhMucMapping[item.loaiDaoTao] = item.soTien);
                 this.setState({ showDetail: true }, () => {
@@ -90,7 +90,7 @@ class EditModal extends AdminModal {
                 });
             }
         }
-        
+
     };
 
     renderListLoaiDaoTao = (loaiDaoTao) => {
@@ -98,7 +98,7 @@ class EditModal extends AdminModal {
             <div key={index} className='col-6'>
                 <div className='row'>
                     <div className='col-6'>{item.ten}</div>
-                    <FormTextBox type='number' className='col-md-6' ref={e => this[item.ma] = e} label='' placeholder='Số tiền (VNĐ)'/>
+                    <FormTextBox type='number' className='col-md-6' ref={e => this[item.ma] = e} label='' placeholder='Số tiền (VNĐ)' />
                 </div>
             </div>
         ));
@@ -113,18 +113,18 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <>
                 <div className='row'>
-                    <FormTextBox type='year' className='col-md-4' ref={e => this.namBatDau = e} label='Năm bắt đầu' placeholder='Năm bắt đầu' min={1} max={9999} readOnly={readOnly} required />
-                    <FormTextBox type='year' className='col-md-4' ref={e => this.namKetThuc = e} label='Năm kết thúc' placeholder='Năm kết thúc' min={1} max={9999} readOnly={readOnly} required />
-                    <FormSelect className='col-md-4' ref={e => this.hocKy = e} label='Học kỳ' data={dataHocKy} required/>
-                    <FormSelect className='col-md-4' ref={e => this.loaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi} required/>
-                    <FormTextBox type='number' className='col-md-4' ref={e => this.soTien = e} label='Số tiền mặc định (VNĐ)' required/>
+                    <FormTextBox type='year' className='col-md-4' ref={e => this.namBatDau = e} label='Năm học (bắt đầu)' readOnly={readOnly} required />
+                    <FormTextBox type='year' className='col-md-4' ref={e => this.namKetThuc = e} label='Năm học (kết thúc)' readOnly={readOnly} required />
+                    <FormSelect className='col-md-4' ref={e => this.hocKy = e} label='Học kỳ' data={dataHocKy} required />
+                    <FormSelect className='col-md-4' ref={e => this.loaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi} required />
+                    <FormTextBox type='number' className='col-md-4' ref={e => this.soTien = e} label='Số tiền mặc định (VNĐ)' required />
                 </div>
                 {this.state.showDetail ? <div className='row'>
                     <h5 className='col-12'>Định mức cho từng loại hình đào tạo (VNĐ)</h5>
                     {this.renderListLoaiDaoTao(loaiDaoTao)}
                 </div> : ''}
             </>,
-            submitText: this.state.showDetail ? 'Lưu' : 'Chi tiết'
+            submitText: this.state.showDetail ? 'Lưu' : 'Tiếp theo'
         });
     }
 }
@@ -205,13 +205,13 @@ class TcDinhMucHocPhiAdminPage extends AdminPage {
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell content={pageSize*(pageNumber - 1) + index + 1} />
-                    <TableCell type='link' style={{ whiteSpace: 'nowrap'}} content={`${item.namBatDau} - ${item.namKetThuc}`} onClick={() => this.modal.show(item)} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap'}} content={`Học kì ${item.hocKy}`} />
+                    <TableCell content={pageSize * (pageNumber - 1) + index + 1} />
+                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={`${item.namBatDau} - ${item.namKetThuc}`} onClick={() => this.modal.show(item)} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={`Học kì ${item.hocKy}`} />
                     <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenLoaiPhi} />
                     <TableCell type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
-                </tr>
+                </tr >
             )
 
         });
@@ -227,18 +227,18 @@ class TcDinhMucHocPhiAdminPage extends AdminPage {
                 <div className='row'>
                     <FormTextBox type='year' className='col-md-3' ref={e => this.searchNamBatDau = e} label='Năm bắt đầu' placeholder='Năm bắt đầu' />
                     <FormTextBox type='year' className='col-md-3' ref={e => this.searchNamKetThuc = e} label='Năm kết thúc' placeholder='Năm kết thúc' />
-                    <FormSelect className='col-md-4' ref={e => this.searchHocKy = e} label='Học kỳ' data={dataHocKy}/>
-                    <FormSelect className='col-md-4' ref={e => this.searchLoaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi}/>
+                    <FormSelect className='col-md-4' ref={e => this.searchHocKy = e} label='Học kỳ' data={dataHocKy} />
+                    <FormSelect className='col-md-4' ref={e => this.searchLoaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi} />
                     <div className='col-12 text-right'>
                         <button className='btn btn-primary' onClick={() => this.changeAdvancedSearch()}>Tìm kiếm</button>
                     </div>
-                </div>
+                </div >
             </>,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getTcDinhMucHocPhiPage} />
                 <EditModal ref={e => this.modal = e}
-                    create={this.props.createTcDinhMucHocPhi} update={this.props.updateTcDinhMucHocPhi} readOnly={!permission.write} loaiDaoTao={this.state.loaiDaoTao}/>
+                    create={this.props.createTcDinhMucHocPhi} update={this.props.updateTcDinhMucHocPhi} readOnly={!permission.write} loaiDaoTao={this.state.loaiDaoTao} />
             </>,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
