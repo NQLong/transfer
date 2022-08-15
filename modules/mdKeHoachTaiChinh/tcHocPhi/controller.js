@@ -296,8 +296,8 @@ module.exports = app => {
             let workbook = await app.excel.readFile(srcPath);
 
             if (workbook) {
-                // app.fs.deleteFile(srcPath);
-                app.fs.renameSync(srcPath, newPath);
+                app.fs.deleteFile(srcPath);
+                // app.fs.renameSync(srcPath, newPath);
                 worksheet = workbook.getWorksheet(1);
                 if (worksheet) {
                     let index = 14;
