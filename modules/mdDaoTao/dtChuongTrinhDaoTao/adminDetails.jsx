@@ -12,6 +12,8 @@ import Loading from 'view/component/Loading';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import T from 'view/js/common';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
+import { SelectAdapter_DtDmThoiGianDaoTaoAll } from '../dtDmThoiGianDaoTao/redux';
+
 
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
@@ -239,13 +241,9 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                 ]} />
                             </div>
 
-
                             <FormSelect ref={e => this.trinhDoDaoTao = e} label='Trình độ đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' required readOnly />
                             <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-4' required readOnly={readOnly} />
-                            <FormSelect data={[
-                                { id: 4, text: '4 năm' },
-                                { id: 3.5, text: '3,5 năm' }
-                            ]} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
+                            <FormSelect data={SelectAdapter_DtDmThoiGianDaoTaoAll} ref={e => this.thoiGianDaoTao = e} label='Thời gian đào tạo' className='col-md-4' required readOnly={readOnly} />
                             <div className='form-group col-md-12'>
                                 <label>Tên văn bằng sau khi tốt nghiệp: </label>
                                 <FormTabs tabs={[

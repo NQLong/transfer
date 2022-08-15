@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            4093: { title: 'Loại hình đào tạo', subTitle: 'Đào tạo', link: '/user/danh-muc/loai-hinh-dao-tao' },
+            4093: { title: 'Hệ đào tạo', subTitle: 'Đào tạo', link: '/user/danh-muc/he-dao-tao' },
         },
     };
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9010: { title: 'Loại hình đào tạo', link: '/user/dao-tao/loai-hinh-dao-tao', groupIndex: 2, icon: 'fa-tasks' },
+            7018: { title: 'Hệ đào tạo', link: '/user/dao-tao/he-dao-tao', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -25,17 +25,17 @@ module.exports = app => {
         } else resolve();
     }));
 
-    app.get('/user/danh-muc/loai-hinh-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:read'), app.templates.admin);
-    app.get('/user/dao-tao/loai-hinh-dao-tao', app.permission.check('dtSvLoaiHinhDaoTao:read'), app.templates.admin);
+    app.get('/user/danh-muc/he-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:read'), app.templates.admin);
+    app.get('/user/dao-tao/he-dao-tao', app.permission.check('dtSvLoaiHinhDaoTao:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/loai-hinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/he-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmSvLoaiHinhDaoTao.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/loai-hinh-dao-tao/filter', app.permission.orCheck('dmSvLoaiHinhDaoTao:read', 'dtSvLoaiHinhDaoTao:read'), async (req, res) => {
+    app.get('/api/danh-muc/he-dao-tao/filter', app.permission.orCheck('dmSvLoaiHinhDaoTao:read', 'dtSvLoaiHinhDaoTao:read'), async (req, res) => {
         let permissions = req.session.user.permissions;
         let listLoaiHinhDaoTao = permissions.filter(item => item.includes('quanLyDaoTao')).map(item => item.split(':')[1]);
         let items = [];
@@ -48,18 +48,11 @@ module.exports = app => {
         res.send({ items });
     });
 
-    app.get('/api/danh-muc/loai-hinh-dao-tao/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1}, (error, items) => {
-            res.send({ error, items });
-        });
-    });
-
-    app.get('/api/danh-muc/loai-hinh-dao-tao/item/:ma', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/he-dao-tao/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmSvLoaiHinhDaoTao.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
-    
 
-    app.post('/api/danh-muc/loai-hinh-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:write'), (req, res) => {
+    app.post('/api/danh-muc/he-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:write'), (req, res) => {
         let data = req.body.data;
         app.model.dmSvLoaiHinhDaoTao.get({ ma: data.ma }, (error, item) => {
             if (!error && item) {
@@ -70,12 +63,12 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/danh-muc/loai-hinh-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:write'), (req, res) => {
+    app.put('/api/danh-muc/he-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:write'), (req, res) => {
         const changes = req.body.changes || {};
         app.model.dmSvLoaiHinhDaoTao.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/danh-muc/loai-hinh-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:delete'), (req, res) => {
+    app.delete('/api/danh-muc/he-dao-tao', app.permission.check('dmSvLoaiHinhDaoTao:delete'), (req, res) => {
         app.model.dmSvLoaiHinhDaoTao.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 };

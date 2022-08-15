@@ -16,6 +16,7 @@ import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLo
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import AutoGenSchedModal from './autoGenSchedModal';
 import AddingModal from './addModal';
+import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     dataHocKy = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
@@ -114,6 +115,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
     check = {}
     state = { page: null, isEdit: {}, sucChua: {}, filter: {}, idNamDaoTao: '', hocKy: '' }
     componentDidMount() {
+        getDtNganhDaoTaoAll(items => {
+            let dataNganh = items.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
+            this.setState({ dataNganh });
+        });
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(true);
@@ -211,6 +216,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ width: '70px', marginBottom: '0' }} />
             } />
 
+            <TableCell content={
+                <FormSelect ref={e => this.maNganh = e} style={{ marginBottom: '0' }} data={this.state.dataNganh} multiple />
+            } />
+
         </>
     );
 
@@ -220,21 +229,23 @@ class DtThoiKhoaBieuPage extends AdminPage {
             thu: this.thu.value(),
             tietBatDau: this.tietBatDau.value(),
             soTietBuoi: this.soTiet.value(),
-            soLuongDuKien: this.soLuongDuKien.value()
+            soLuongDuKien: this.soLuongDuKien.value(),
+            maNganh: this.maNganh.value()
         };
-        this.props.updateDtThoiKhoaBieu(item.id, curData, () => {
-            T.notify('Thay đổi thành công!', 'success');
+        this.props.updateDtThoiKhoaBieuCondition(item.id, curData, () => {
             this.setState({ editId: null });
         });
     }
 
     handleEdit = (item) => {
         this.setState({ editId: item.id }, () => {
+            let maNganh = item.tenNganh.split('&&').map(nganh => nganh.split('%')[0]);
             this.phong.value(item.phong);
             this.thu.value(item.thu);
             this.tietBatDau.value(item.tietBatDau);
             this.soTiet.value(item.soTiet);
             this.soLuongDuKien.value(item.soLuongDuKien);
+            this.maNganh.value(maNganh);
         });
     }
 
@@ -246,36 +257,38 @@ class DtThoiKhoaBieuPage extends AdminPage {
             getDataSource: () => list, stickyHead: true,
             header: 'thead-light',
             renderHead: () => (
-                <>
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto' }}>Mở</th>
-                        <th style={{ width: '25%', textAlign: 'center' }}>Mã</th>
-                        <th style={{ width: '50%', }}>Môn học</th>
-                        <th style={{ width: 'auto' }}>Tự chọn</th>
-                        {/* <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Lớp</th> */}
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Tổng tiết</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phòng</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thứ</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Tiết bắt đầu</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Số tiết</th>
-                        <th style={{ width: 'auto' }}>SLDK</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Ngày bắt đầu</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Ngày kết thúc</th>
-                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Khoa <br />Bộ môn</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Ngành</th>
-                        <th style={{ width: 'auto' }}>Giảng viên</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Bậc</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Hệ</th>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>Khoá SV</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Năm học</th>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>Học kỳ</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>
-                </>),
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto' }}>Mở</th>
+                    <th style={{ width: '25%', textAlign: 'center' }}>Mã</th>
+                    <th style={{ width: '50%', }}>Môn học</th>
+                    <th style={{ width: 'auto' }}>Tự chọn</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Tổng tiết</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phòng</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thứ</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Tiết bắt đầu</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Số tiết</th>
+                    <th style={{ width: 'auto' }}>SLDK</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Ngành</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Ngày bắt đầu</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Ngày kết thúc</th>
+                    <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Khoa <br />Bộ môn</th>
+                    <th style={{ width: 'auto' }}>Giảng viên</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Bậc</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Hệ</th>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>Khoá SV</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Năm học</th>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>Học kỳ</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                </tr>),
             renderRow: (item, index) => {
                 let indexOfItem = (pageNumber - 1) * pageSize + index + 1;
-                let official = item.ngayBatDau && item.ngayKetThuc;
+                let official = item.ngayBatDau && item.ngayKetThuc,
+                    nganhTenNganh = item.tenNganh || '';
+                if (item.tenChuyenNganh) {
+                    let chuyenNganh = item.tenChuyenNganh.split('%');
+                    nganhTenNganh += `&&${chuyenNganh[0]}_${chuyenNganh[1].getFirstLetters()}%${chuyenNganh[1]}`;
+                }
                 return (
                     <tr key={index} >
                         <TableCell style={{ textAlign: 'right' }} content={indexOfItem} />
@@ -296,7 +309,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         } />
                         {official ? <TableCell style={{ textAlign: 'center' }} content={item.loaiMonHoc ? 'x' : ''} />
                             : <TableCell type='checkbox' onChanged={value => this.handleCheckLoaiMonHoc(value, item)} content={item.loaiMonHoc} permission={permission} />}
-                        {/* <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={`${item.nhom}${item.buoi > 1 ? ` (${item.buoi})` : ''} `} /> */}
+
                         <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tongTiet} />
                         {
                             this.state.editId == item.id ? this.elementEdit() : <>
@@ -305,12 +318,12 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                 <TableCell type='number' content={item.tietBatDau} />
                                 <TableCell type='number' content={item.soTiet} />
                                 <TableCell type='number' content={item.soLuongDuKien} />
+                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={nganhTenNganh.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < nganhTenNganh.split('&&').length - 1 ? ', ' : '.')}</span>)} />
                             </>
                         }
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayBatDau} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayKetThuc} />
                         <TableCell style={{ textAlign: 'center' }} content={item.tenKhoaDangKy?.getFirstLetters().toUpperCase()} />
-                        <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={item.tenNganh.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh.split('&&').length - 1 ? ', ' : '.')}</span>)} />
                         <TableCell style={{}} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
                         <TableCell style={{ textAlign: 'center' }} content={item.bacDaoTao} />
                         <TableCell style={{ textAlign: 'center' }} content={item.loaiHinhDaoTao} />

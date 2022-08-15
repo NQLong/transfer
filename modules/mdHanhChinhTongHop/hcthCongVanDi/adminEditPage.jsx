@@ -10,8 +10,13 @@ import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, 
 import FileBox from 'view/component/FileBox';
 import { YeuCauKy, YeuCauKyModal } from '../hcthCongVanTrinhKy/component';
 import { createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy } from '../hcthCongVanTrinhKy/redux';
+import { createHoSo, updateHoSo } from '../hcthHoSo/redux';
+import { TaoHoSoModal, ThemVaoHoSoModal } from '../hcthHoSo/component';
 import { FileHistoryModal } from './component';
 import { createHcthCongVanDi, createPhanHoi, deleteFile, deleteHcthCongVanDi, getCongVanDi, getHcthCongVanDiAll, getHcthCongVanDiPage, getHcthCongVanDiSearchPage, getHistory, getPhanHoi, getYeuCauKy, publishingCongVanDi, readCongVanDi, updateHcthCongVanDi, updateStatus } from './redux';
+
+import { SelectAdapter_DmNgoaiNguV2 } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
+
 const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
 
 const listTrangThai = {
@@ -245,13 +250,15 @@ class AdminEditPage extends AdminPage {
     }
 
     setData = (data = null) => {
-        let { trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi, laySoTuDong = true, soCongVan = '' } = data ? data :
-            { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai: '', trangThai: '', loaiVanBan: '', loaiCongVan: 'TRUONG', soDi: '' };
+        let { trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi, laySoTuDong = true, soCongVan = '', ngoaiNgu, banLuu } = data ? data :
+            { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai: '', trangThai: '', loaiVanBan: '', loaiCongVan: 'TRUONG', soDi: '', ngoaiNgu: '10', banLuu: '29' };
 
         this.trichYeu.value(trichYeu);
         this.ngayGui.value(ngayGui);
         this.ngayKy.value(ngayKy);
         this.donViGui.value(donViGui);
+
+        this.banLuu.value(banLuu);
 
         this.loaiVanBan.value(loaiVanBan);
         this.phanHoi?.value('');
@@ -290,6 +297,8 @@ class AdminEditPage extends AdminPage {
             canBoNhan = canBoNhan.split(',');
             this.canBoNhan.value(canBoNhan ? canBoNhan : '');
         }
+
+        this.ngoaiNgu.value(ngoaiNgu);
     }
 
     onSuccess = (response) => {
@@ -349,9 +358,11 @@ class AdminEditPage extends AdminPage {
             fileList: this.state.listFile || [],
             laySoTuDong: Number(this.laySoTuDong?.value()),
             soCongVan: this.soCongVan?.value() || null,
-            trangThai: this.state.trangThai
+            trangThai: this.state.trangThai,
+            banLuu: this.getValue(this.banLuu) ? this.banLuu.value() : [],
+            ngoaiNgu: this.ngoaiNgu.value() || null,
         };
-        console.log(changes);
+
         if (changes.loaiCongVan == loaiCongVan.TRUONG.id) changes.laySoTuDong = 1;
         if (!changes.donViGui) {
             T.notify('Đơn vị gửi bị trống', 'danger');
@@ -364,6 +375,10 @@ class AdminEditPage extends AdminPage {
         } else if (!changes.soCongVan && !changes.laySoTuDong) {
             T.notify('Số văn bản trống', 'danger');
             this.soCongVan?.focus();
+        } else if (!changes.banLuu.includes('29')) {
+            T.notify('Bản lưu phải có phòng HCTH', 'danger');
+            changes.banLuu.push('29');
+            this.banLuu.value(changes.banLuu);
         }
         else return changes;
         return null;
@@ -760,7 +775,6 @@ class AdminEditPage extends AdminPage {
         if (this.canCheckRead()) {
             buttons.push({ className: 'btn-success', icon: 'fa-solid fa-eye', onClick: this.onReadCvDi });
         }
-        console.log(this.state);
 
         const listFile = this.state.listFile;
 
@@ -818,7 +832,21 @@ class AdminEditPage extends AdminPage {
                             }
                         </span>)} placeholder='Chọn đơn vị nhận bên ngoài' ref={e => this.donViNhanNgoai = e} data={SelectAdapter_DmDonViGuiCongVan} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có đơn vị nhận' />
                         <FormSelect multiple={true} className='col-md-12' label='Cán bộ nhận' placeholder='Cán bộ nhận' ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có cán bộ nhận' />
+
+                        <FormSelect multiple={true} className='col-md-12' label='Bản lưu' placeholder='Chọn bản lưu' ref={e => this.banLuu = e} data={SelectAdapter_DmDonVi} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có bản lưu' />
+
+                        <FormSelect className='col-md-12' label='Ngôn ngữ' placeholder='Chọn ngôn ngữ' ref={e => this.ngoaiNgu = e} readOnly={this.canReadOnly()} readOnlyEmptyText='Chưa có ngôn ngữ' data={SelectAdapter_DmNgoaiNguV2} />
+
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={this.canReadOnly()} required readOnlyEmptyText=': Chưa có trích yếu' />
+
+                        {this.state.id && <div className="col-md-12" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <button type='submit' className='btn btn-primary mr-2' onClick={e => { e.preventDefault(); this.taoHoSoModal.show(); }}>
+                                Tạo hồ sơ
+                            </button>
+                            <button type='submit' className='btn btn-success mr-2' onClick={e => { e.preventDefault(); this.themVaoHoSoModal.show(); }}>
+                                Thêm vào hồ sơ
+                            </button>
+                        </div>}
                     </div>
                 </div>
 
@@ -868,6 +896,11 @@ class AdminEditPage extends AdminPage {
 
                 <EditModal ref={e => this.donViGuiNhanModal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonViNhanNgoai} />
                 <YeuCauKyModal ref={e => this.yeuCauKyModal = e} create={this.props.createCongVanTrinhKy} update={this.props.updateCongVanTrinhKy} {...this.props} congVanId={this.state.id} onSubmitCallback={() => { this.props.getHistory(this.state.id, { historySortType: this.state.historySortType }); }} />
+
+
+                <TaoHoSoModal ref={e => this.taoHoSoModal = e} create={this.props.createHoSo} />
+
+                <ThemVaoHoSoModal ref={e => this.themVaoHoSoModal = e} add={this.props.updateHoSo} vanBanId={this.state.id} />
                 <FileBox ref={this.updateFileRef} postUrl='/user/upload'
                     uploadType='hcthCongVanDiUpdateFile'
                     userData={`hcthCongVanDiUpdateFile:${this.state.id}:${this.state.originFileId}:${this.state.updateFileId}`} style={{ display: 'none' }}
@@ -882,5 +915,5 @@ class AdminEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi, phanHoi: state.hcth.hcthPhanHoi });
-const mapActionsToProps = { getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, createDmDonViGuiCv, readCongVanDi, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, publishingCongVanDi, getYeuCauKy };
+const mapActionsToProps = { getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, createDmDonViGuiCv, readCongVanDi, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, publishingCongVanDi, getYeuCauKy, createHoSo, updateHoSo };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

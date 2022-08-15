@@ -163,7 +163,7 @@ export const SelectAdapter_DmNganhSdh = (maKhoaSdh) => {
         ajax: true,
         url: '/api/sau-dai-hoc/danh-sach-nganh/page/1/50',
         data: params => ({ condition: params.term, kichHoat: 1, maKhoaSdh }),
-        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-        fetchOne: (id, done) => (getDmNganhSdh(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.ten}`, name: item.ten })) : [] }),
+        fetchOne: (id, done) => (getDmNganhSdh(id, item => item && done && done({ id: item.maNganh, text: `${item.maNganh}: ${item.ten}` })))(),
     };
 };

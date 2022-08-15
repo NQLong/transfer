@@ -17,7 +17,49 @@ const MA_PDT = '33', MA_CTSV = '32';
 const dataKhoaSinhVien = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
 class RenderListMon extends React.Component {
     ref = {}
+    dataNganh = []
     state = { listSelected: [], listNganh: [] }
+    componentDidMount() {
+        let data = this.props.data,
+            { soLop, loaiHinhDaoTao } = data;
+        getDtNganhDaoTaoAll(items => {
+            let dataNganh = items.filter(item => loaiHinhDaoTao == 'CLC' ? item.tenNganh.toUpperCase().includes('CLC') : !item.tenNganh.toUpperCase().includes('CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
+            this.setState({ dataNganh, soLop }, () => this.init());
+        });
+    }
+
+
+    componentDidUpdate(prev) {
+        if (T.stringify(prev.data) != T.stringify(this.props.data)) this.init();
+    }
+
+    init = () => {
+        let data = this.props.data,
+            { khoaDangKy, maNganh, nam, soLop } = data;
+        if (khoaDangKy == MA_PDT) {
+            let spliceLength = parseInt(this.state.dataNganh.length / soLop);
+            Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
+                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
+            });
+            let dataNganh = this.state.dataNganh.map(item => item.id);
+
+            for (let nhom = 1; nhom <= soLop && dataNganh.length; nhom++) {
+                let value = dataNganh.splice(0, spliceLength);
+                this.ref.maNganh[nhom]?.value([...this.ref.maNganh[nhom]?.value(), ...value]);
+                this.ref.chuyenNganh[nhom]?.value('');
+                if (nhom == soLop && dataNganh.length > 0) { nhom = 0; spliceLength = 1; }
+            }
+        } else {
+            getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
+                Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
+                    ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
+                    this.ref.chuyenNganh[nhom].value(items.map(item => item.id));
+                    this.ref.maNganh[nhom].value([maNganh]);
+                });
+            });
+
+        }
+    }
 
     getData = () => {
         let data = [];
@@ -36,43 +78,6 @@ class RenderListMon extends React.Component {
         }
     }
 
-    componentDidUpdate(prev) {
-        if (T.stringify(prev.data) != T.stringify(this.props.data)) this.init();
-    }
-
-    init = () => {
-        let data = this.props.data,
-            { khoaDangKy, maNganh, nam, soLop } = data;
-        if (khoaDangKy == MA_PDT) {
-            getDtNganhDaoTaoAll(items => {
-                this.setState({ listSelected: items.map(item => item.maNganh), listNganhDaoTao: items.map(item => item.maNganh), soLop }, () => {
-                    let spliceLength = parseInt(items.length / data.soLop) + 1;
-                    Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
-                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
-                    });
-                    Array.from({ length: data.soLop + 1 }, (_, i) => i).forEach(nhom => {
-                        let value = this.state.listNganhDaoTao.splice(0, spliceLength);
-                        this.ref.maNganh[nhom + 1]?.value(value);
-                        this.ref.chuyenNganh[nhom]?.value('');
-                    });
-                });
-            });
-        } else {
-            this.setState({ soLop });
-            getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
-                Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
-                    ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
-                    this.ref.chuyenNganh[nhom].value(items.map(item => item.id));
-                    this.ref.maNganh[nhom].value([maNganh]);
-                });
-            });
-
-        }
-    }
-
-    componentDidMount() {
-        this.init();
-    }
 
     handleSelectNganh = (value) => {
         if (value && value.selected) {
@@ -85,7 +90,7 @@ class RenderListMon extends React.Component {
     }
 
     render() {
-        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, soTietBuoi, khoaDangKy } = this.props.data;
+        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, soTietBuoi } = this.props.data;
         tenMonHoc = tenMonHoc.split(':')[1];
         return Array.from({ length: soLop }, (_, i) => i + 1).map(nhom => {
             this.ref = {
@@ -101,7 +106,7 @@ class RenderListMon extends React.Component {
                 <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-1' placeholder='Số tiết /buổi' required defaulValue={soTietBuoi} />
                 <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-1' placeholder='Số buổi /tuần' required />
                 <FormTextBox type='number' ref={e => this.ref.soLuongDuKien[nhom] = e} className='col-md-1' placeholder='SLDK' required multiple />
-                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={SelectAdapter_DtNganhDaoTaoFilter(khoaDangKy)} placeholder='Ngành' multiple className='col-md-6' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
+                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-6' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
                 <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-6' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
                 <FormSelect ref={e => this.ref.giangVien[nhom] = e} data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' className='col-md-3' />
                 {nhom != soLop && <hr className='col-md-12' />}

@@ -162,7 +162,7 @@ export const SelectAdapter_DmMonHocSdh = (maKhoaSdh) => {
         ajax: true,
         url: '/api/sau-dai-hoc/mon-hoc/page/1/20',
         data: params => ({ condition: params.term, kichHoat: 1, maKhoaSdh }),
-        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.tenTiengViet })) : [] }),
-        fetchOne: (id, done) => (getDmMonHocSdh(id, item => item && done && done({ id: item.ma, text: item.tenTiengViet })))(),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.tenTiengViet}`, item })) : [] }),
+        fetchOne: (id, done) => (getDmMonHocSdh(id, item => item && done && done({ id: item.ma, text: `${item.ma}: ${item.tenTiengViet}`, item })))(),
     };
 };

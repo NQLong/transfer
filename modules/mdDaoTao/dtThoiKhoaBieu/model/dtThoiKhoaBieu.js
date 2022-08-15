@@ -73,7 +73,6 @@ module.exports = app => {
             // Section 1: Gen thời gian.
             const dataScheduleAuto = await getDataGenerateSchedule(config, thuTietMo);
             const currentStatus = await app.model.dtThoiKhoaBieu.getCurrentStatusRooms();
-
             const currentYear = new Date().getFullYear();
             let listNgayLe = await app.model.dmNgayLe.getAll({
                 statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
@@ -105,18 +104,15 @@ module.exports = app => {
     const getDataGenerateSchedule = async (config, thuTietMo) => {
         // 1.1: Config data theo loại hình, bậc.
         let dataFree = await app.model.dtThoiKhoaBieu.getFree(JSON.stringify(config));
-
         let { rows: dataCanGen, hocphandaxep: dataCurrent, hocphantheoidnganh: hocPhanTheoIdNganh } = dataFree;
         let hocPhanDaXep = {};
         dataCurrent.forEach(hocPhan => {
             hocPhanDaXep[hocPhan.id] = hocPhan;
         });
-
-        // 1.2: Config data phòng, thứ, tiết.
+        // 1.2: Config data thứ, tiết.
         let dataTiet = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
         dataTiet = dataTiet.map(item => parseInt(item.ten));
         const dataThu = [2, 3, 4, 5, 6, 7];
-
         const dataTietThu = [], fullDataTietThu = [];
         dataTiet.forEach(tiet => {
             dataThu.forEach(thu => {
@@ -126,27 +122,24 @@ module.exports = app => {
         });
 
         // 1.3: Config ngày rảnh của ID ngành (dành cho môn bắt buộc).
-        hocPhanTheoIdNganh.forEach(hocPhan => {
-            hocPhan.available = dataTietThu;
-            if (hocPhanDaXep[hocPhan.idThoiKhoaBieu]) {
-                let { thu, tietBatDau, soTietBuoi } = hocPhanDaXep[hocPhan.idThoiKhoaBieu], dataDaXep = new Set();
-                Array.from({ length: parseInt(soTietBuoi) }, (_, i) => i).forEach(i => dataDaXep.add(`${thu}_${tietBatDau + i}`));
-                hocPhan.available = dataTietThu.filter(item => !dataDaXep.has(item));
-            }
+        hocPhanTheoIdNganh.forEach(idNganh => {
+            idNganh.available = dataTietThu;
+            dataCurrent.forEach(hocPhan => {
+                if (idNganh.idThoiKhoaBieu.includes(hocPhan.id)) {
+                    let { thu, tietBatDau, soTietBuoi } = hocPhan, dataDaXep = new Set();
+                    Array.from({ length: parseInt(soTietBuoi) }, (_, i) => i).forEach(i => dataDaXep.add(`${thu}_${tietBatDau + i}`));
+                    idNganh.available = dataTietThu.filter(item => !dataDaXep.has(item));
+                }
+            });
         });
 
-        let hocPhanTheoId = {},
-            // maMonHocGlobal = '',
-            dataReturn = {};
-        hocPhanTheoId = hocPhanTheoIdNganh.groupBy('idThoiKhoaBieu');
-
+        let dataReturn = {};
         hocPhanLoop: for (let hocPhan of dataCanGen) {
             let { id, loaiMonHoc, soTietBuoi } = hocPhan;
-            // maMonHocGlobal = maMonHoc;
             if (!loaiMonHoc) {
                 // Môn bắt buộc
-                let listIndexOfIdNganhCurrent = hocPhanTheoIdNganh.filter(item => item.idThoiKhoaBieu == id).map(item => hocPhanTheoIdNganh.indexOf(item));
-                const thoiGianRanhChung = intersectMany(hocPhanTheoId[id].map(item => item.available));
+                let listNganh = hocPhanTheoIdNganh.filter(item => item.idThoiKhoaBieu.includes(id));
+                const thoiGianRanhChung = intersectMany(listNganh.map(item => item.available));
                 thuTietLoop: for (const thuTiet of thoiGianRanhChung) {
                     if (!thuTiet) {
                         continue hocPhanLoop;
@@ -160,7 +153,9 @@ module.exports = app => {
                             thu = parseInt(thu);
                             dataReturn[id] = { thu, tietBatDau, ...hocPhan };
                             let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
-                            listIndexOfIdNganhCurrent.forEach(index => hocPhanTheoIdNganh[index].available = hocPhanTheoIdNganh[index].available.filter(tietThu => !toRemove.has(tietThu)));
+                            for (let idNganh of listNganh) {
+                                idNganh.available = idNganh.available.filter(tietThu => !toRemove.has(tietThu));
+                            }
                             break thuTietLoop;
                         }
                     }

@@ -68,7 +68,7 @@ export function getDmNgoaiNguPage(pageNumber, pageSize, pageCondition, done) {
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);                     
+                if (done) done(data.page);
                 dispatch({ type: DmNgoaiNguGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
@@ -147,4 +147,14 @@ export const SelectAdapter_DmNgoaiNgu = {
     getAll: getDmNgoaiNguAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmNgoaiNguV2 = {
+    ajax: true,
+    url: '/api/danh-muc/ngoai-ngu/page/1/20',
+    data: () => ({ kichHoat: 1 }),
+    processResults: response => {
+        return ({ results: response ? (response.page.list.map(item => ({ id: item.ma, text: item.ten }))) : [] });
+    },
+    fetchOne: (id, done) => (getDmNgoaiNgu(id, item => done && done({ id: item.ma, text: item.ten })))(),
 };

@@ -1,6 +1,6 @@
-// Table name: SDH_KHUNG_DAO_TAO { namDaoTao, maKhoa, maNganh, tenNganh, trinhDoDaoTao, loaiHinhDaoTao, thoiGianDaoTao, tenVanBang, userModified, lastModified, mucTieu, chuyenNganh }
-const keys = [''];
-const obj2Db = { 'namDaoTao': 'NAM_DAO_TAO', 'maKhoa': 'MA_KHOA', 'maNganh': 'MA_NGANH', 'tenNganh': 'TEN_NGANH', 'trinhDoDaoTao': 'TRINH_DO_DAO_TAO', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'thoiGianDaoTao': 'THOI_GIAN_DAO_TAO', 'tenVanBang': 'TEN_VAN_BANG', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'mucTieu': 'MUC_TIEU', 'chuyenNganh': 'CHUYEN_NGANH' };
+// Table name: SDH_KHUNG_DAO_TAO { namDaoTao, maKhoa, maNganh, tenNganh, trinhDoDaoTao, bacDaoTao, thoiGianDaoTao, tenVanBang, userModified, lastModified, mucTieu, id }
+const keys = ['ID'];
+const obj2Db = { 'namDaoTao': 'NAM_DAO_TAO', 'maKhoa': 'MA_KHOA', 'maNganh': 'MA_NGANH', 'tenNganh': 'TEN_NGANH', 'trinhDoDaoTao': 'TRINH_DO_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO', 'thoiGianDaoTao': 'THOI_GIAN_DAO_TAO', 'tenVanBang': 'TEN_VAN_BANG', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'mucTieu': 'MUC_TIEU', 'id': 'ID' };
 
 module.exports = app => {
     app.model.sdhKhungDaoTao = {
@@ -214,6 +214,19 @@ module.exports = app => {
                     resolve(result);
                 }
             });
+        }),
+
+        searchPage: (pagenumber, pagesize, searchterm, filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=sdh_khung_dao_tao_search_page(:pagenumber, :pagesize, :searchterm, :filter, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, filter, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
         }),
     };
 };

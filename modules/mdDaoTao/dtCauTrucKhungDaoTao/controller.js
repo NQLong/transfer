@@ -3,7 +3,7 @@ module.exports = app => {
         parentMenu: app.parentMenu.daoTao,
         menus: {
             7012: {
-                title: 'Cấu trúc khung CTĐT', pin: true,
+                title: 'Khung chung Chương trình đào tạo', pin: true,
                 link: '/user/dao-tao/cau-truc-khung-dao-tao', icon: 'fa-cogs', backgroundColor: '#A84A48'
             },
         },

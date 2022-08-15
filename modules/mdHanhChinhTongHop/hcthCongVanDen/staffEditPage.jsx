@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, renderTimeline, TableCell } from 'view/component/AdminPage';
 import { duyetCongVan, createChiDao, createHcthCongVanDen, createPhanHoi, deleteFile, getChiDao, getCongVanDen, getHistory, getPhanHoi, updateHcthCongVanDen, updateStatus, updateQuyenChiDao } from './redux';
 
+import { SelectAdapter_DmNgoaiNguV2 } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
+
 const { action, MA_BAN_GIAM_HIEU, MA_CHUC_VU_HIEU_TRUONG, trangThaiSwitcher } = require('../constant.js');
 
 
@@ -298,8 +300,8 @@ class StaffEditPage extends AdminPage {
 
 
     setData = (data = null) => {
-        let { ngayCongVan, ngayNhan, ngayHetHan, soCongVan, donViGui, donViNhan, canBoNhan, trichYeu, listFile = [], quyenChiDao, danhSachChiDao = [], trangThai = 0, history = [], soDen = '' } = data ? data :
-            { ngayCongVan: '', ngayNhan: '', ngayHetHan: '', soCongVan: '', donViGui: '', donViNhan: '', canBoNhan: '', trichYeu: '', quyenChiDao: '' };
+        let { ngayCongVan, ngayNhan, ngayHetHan, soCongVan, donViGui, donViNhan, canBoNhan, trichYeu, listFile = [], quyenChiDao, danhSachChiDao = [], trangThai = 0, history = [], soDen = '', ngoaiNgu } = data ? data :
+            { ngayCongVan: '', ngayNhan: '', ngayHetHan: '', soCongVan: '', donViGui: '', donViNhan: '', canBoNhan: '', trichYeu: '', quyenChiDao: '', ngoaiNgu: '10' };
         if (donViNhan) {
             donViNhan = donViNhan.split(',');
         }
@@ -321,6 +323,7 @@ class StaffEditPage extends AdminPage {
         this.trichYeu.value(trichYeu || '');
         this.soDen.value(soDen || '');
         this.chiDao?.value('');
+        this.ngoaiNgu?.value(ngoaiNgu ? ngoaiNgu : '');
 
         this.setState({ listFile, chiDao: danhSachChiDao, trangThai, history, needConduct }, () => {
             listFile.map((item) => this.listFileRefs[item.id]?.value(item.viTri || ''));
@@ -432,6 +435,7 @@ class StaffEditPage extends AdminPage {
             chiDao: this.state.newChiDao,
             fileList: this.state.listFile || [],
             trangThai: this.state.trangThai,
+            ngoaiNgu: this.ngoaiNgu.value(),
         };
 
         if (!this.state.needConduct)
@@ -747,6 +751,9 @@ class StaffEditPage extends AdminPage {
                         {this.state.id && <span className='form-group col-md-12'>Tình trạng: <b style={{ color: criticalStatus.includes(this.state.trangThai) ? 'red' : 'blue' }}>{getTrangThaiText(this.state.trangThai)}</b></span>}
                         <FormSelect multiple={true} className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vị nhận văn bản' data={SelectAdapter_DmDonVi} readOnly={readOnly} readOnlyEmptyText='Chưa có đơn vị nhận' />
                         <FormSelect multiple={true} className='col-md-12' ref={e => this.canBoNhan = e} label='Cán bộ nhận văn bản' data={SelectAdapter_FwCanBo} readOnly={readOnly} readOnlyEmptyText='Chưa có cán bộ nhận' />
+
+                        <FormSelect className='col-md-12' label='Ngôn ngữ' placeholder='Chọn ngôn ngữ' ref={e => this.ngoaiNgu = e} readOnly={readOnly} readOnlyEmptyText='Chưa có ngôn ngữ' data={SelectAdapter_DmNgoaiNguV2} />
+
                         <FormCheckbox readOnly={readChiDao} isSwitch ref={e => this.needConduct = e} onChange={this.onChangeNeedConduct} label='Văn bản cần chỉ đạo' className='col-md-12' style={{ paddingTop: '5px' }} />
                         {this.state.needConduct && (<>
                             {/* <span className='col-md-12 form-group'>Cán bộ chỉ đạo :</span> */}

@@ -18,7 +18,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:delete', 'dtThoiKhoaBieu:export');
             resolve();
         } else resolve();
     }));
@@ -130,7 +130,7 @@ module.exports = app => {
                     for (const nganhItem of maNganh) {
                         if (chuyenNganh.length) {
                             for (const chuyenNganhItem of chuyenNganh) {
-                                let idNganh = chuyenNganhItem ? `${nganhItem}&&${chuyenNganhItem}` : nganhItem;
+                                let idNganh = chuyenNganhItem ? `${nganhItem}##${chuyenNganhItem}` : nganhItem;
                                 await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: tkbItem.id, idNganh });
                             }
                         } else {
@@ -141,7 +141,6 @@ module.exports = app => {
             }
             res.end();
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
@@ -218,16 +217,28 @@ module.exports = app => {
         else app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), (req, res) => {
-        let { condition, changes } = req.body;
-        if (typeof condition == 'number') app.model.dtThoiKhoaBieu.update(condition, changes, (error, item) => res.send({ error, item }));
-        else if (typeof condition == 'object') {
-            let { nam, hocKy, maMonHoc, loaiHinhDaoTao, bacDaoTao } = condition;
-            app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, loaiHinhDaoTao, bacDaoTao }, changes, (error, item) => {
-                res.send({ error, item });
-            });
+    app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), async (req, res) => {
+        try {
+            let { condition, changes } = req.body;
+            if (!isNaN(condition)) {
+                let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
+                if (changes.maNganh && changes.maNganh.length) {
+                    await app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: condition });
+                    for (let idNganh of changes.maNganh) {
+                        await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: condition, idNganh });
+                    }
+                }
+                res.send({ item });
+            }
+            else if (typeof condition == 'object') {
+                let { nam, hocKy, maMonHoc, loaiHinhDaoTao, bacDaoTao, khoaSinhVien } = condition;
+                let item = await app.model.dtThoiKhoaBieu.update({ maMonHoc, nam, hocKy, loaiHinhDaoTao, bacDaoTao, khoaSinhVien }, changes);
+                res.send({ item });
+            }
+        } catch (error) {
+            res.send({ error });
         }
-        else app.model.dtThoiKhoaBieu.update({ id: condition }, changes, (error, item) => res.send({ error, item }));
+
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {

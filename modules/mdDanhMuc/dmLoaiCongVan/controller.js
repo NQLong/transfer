@@ -59,8 +59,7 @@ module.exports = app => {
         if (ten) putData.ten = ten;
         if (tenVietTat) putData.tenVietTat = tenVietTat;
 
-        app.model.dmLoaiCongVan.update({ id: req.body.id }, putData, (error, items) => { 
-            console.log(error);
+        app.model.dmLoaiCongVan.update({ id: req.body.id }, putData, (error, items) => {
             res.send({ error, items }); 
         });
     });
