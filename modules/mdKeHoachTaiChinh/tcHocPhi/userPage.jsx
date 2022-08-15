@@ -7,19 +7,21 @@ import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, 
 
 class ButtonBank extends React.Component {
     render = () => {
-        let styleLogo = { width: '70%', margin: '15%' };
         const { title, onClick, imgSrc } = this.props;
         return (
-            <div className='form-group col-md-4'>
-                <Tooltip title={title} arrow placement='bottom'>
-                    <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || onClick()}>
-                        <div className='row' style={{ justifyContent: 'center', height: '150px', alignItems: 'center' }}>
-                            <img src={`${imgSrc}?t=${new Date().getTime()}`} style={styleLogo} />
-                            {/* <h5>{title}</h5> */}
-                        </div>
-                    </button>
-                </Tooltip>
-            </div>
+            <Tooltip title={title} arrow placement='bottom'>
+                <div className='col-md-3' >
+                    <div style={{
+                        backgroundImage: `url(${imgSrc}?t=${new Date().getTime()})`,
+                        backgroundPosition: 'center center',
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat',
+                        height: '100px', width: '100%',
+                        // border: '2px solid #78d5ef',
+                        cursor: 'pointer'
+                    }} onClick={e => e.preventDefault() || onClick()} />
+                </div>
+            </Tooltip>
         );
     }
 }
@@ -32,7 +34,7 @@ class ThanhToanModal extends AdminModal {
                 <i className='fa fa-fw fa-lg fa-undo' />Quay lại
             </button>,
             body: <div>
-                <section className='row' style={{ display: this.state.vcb || this.state.agri ? 'none' : '' }}>
+                <section className='row justify-content-center' style={{ display: this.state.vcb || this.state.agri ? 'none' : '' }}>
                     <ButtonBank title='BIDV' imgSrc='/img/logo/logo_bidv.png' />
                     <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
                     <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />

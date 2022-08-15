@@ -7,9 +7,9 @@ import { SelectAdapter_TcLoaiPhi } from 'modules/mdKeHoachTaiChinh/tcLoaiPhi/red
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 const dataHocKy = [
-    { id: 1, text: 'Học kỳ 1'},
-    { id: 2, text: 'Học kỳ 2'},
-    { id: 3, text: 'Học kỳ 3'}
+    { id: 1, text: 'Học kỳ 1' },
+    { id: 2, text: 'Học kỳ 2' },
+    { id: 3, text: 'Học kỳ 3' }
 ];
 
 class EditModal extends AdminModal {
@@ -67,11 +67,11 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật định mức học phí' : 'Tạo mới định mức học phí',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox type='year' className='col-md-3' ref={e => this.namBatDau = e} label='Năm bắt đầu' placeholder='Năm bắt đầu' min={1} max={9999} readOnly={readOnly} required />
-                <FormTextBox type='year' className='col-md-3' ref={e => this.namKetThuc = e} label='Năm kết thúc' placeholder='Năm kết thúc' min={1} max={9999} readOnly={readOnly} required />
-                <FormSelect className='col-md-4' ref={e => this.hocKy = e} label='Học kỳ' data={dataHocKy} required/>
-                <FormSelect className='col-md-4' ref={e => this.loaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi} required/>
-                <FormSelect className='col-md-4' ref={e => this.loaiDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} required/>
+                <FormTextBox type='year' className='col-md-3' ref={e => this.namBatDau = e} label='Năm học (bắt đầu)' readOnly={readOnly} required />
+                <FormTextBox type='year' className='col-md-3' ref={e => this.namKetThuc = e} label='Năm học (kết thúc)' readOnly={readOnly} required />
+                <FormSelect className='col-md-4' ref={e => this.hocKy = e} label='Học kỳ' data={dataHocKy} required />
+                <FormSelect className='col-md-4' ref={e => this.loaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi} required />
+                <FormSelect className='col-md-4' ref={e => this.loaiDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} required />
                 <FormTextBox className='col-md-4' ref={e => this.soTien = e} label='Số tiền (VNĐ)' />
             </div>
         });
@@ -156,9 +156,9 @@ class TcDinhMucHocPhiAdminPage extends AdminPage {
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell content={pageSize*(pageNumber - 1) + index + 1} />
-                    <TableCell type='link' style={{ whiteSpace: 'nowrap'}} content={`${item.namBatDau} - ${item.namKetThuc}`} onClick={() => this.modal.show(item)} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap'}} content={`Học kì ${item.hocKy}`} />
+                    <TableCell content={pageSize * (pageNumber - 1) + index + 1} />
+                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={`${item.namBatDau} - ${item.namKetThuc}`} onClick={() => this.modal.show(item)} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={`Học kì ${item.hocKy}`} />
                     <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenLoaiDaoTao} />
                     <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenLoaiPhi} />
                     <TableCell type='text' style={{ textAlign: 'center' }} content={item.soTien} />
@@ -180,9 +180,9 @@ class TcDinhMucHocPhiAdminPage extends AdminPage {
                 <div className='row'>
                     <FormTextBox type='year' className='col-md-3' ref={e => this.searchNamBatDau = e} label='Năm bắt đầu' placeholder='Năm bắt đầu' />
                     <FormTextBox type='year' className='col-md-3' ref={e => this.searchNamKetThuc = e} label='Năm kết thúc' placeholder='Năm kết thúc' />
-                    <FormSelect className='col-md-4' ref={e => this.searchHocKy = e} label='Học kỳ' data={dataHocKy}/>
-                    <FormSelect className='col-md-4' ref={e => this.searchLoaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi}/>
-                    <FormSelect className='col-md-4' ref={e => this.searchLoaiDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao}/>
+                    <FormSelect className='col-md-4' ref={e => this.searchHocKy = e} label='Học kỳ' data={dataHocKy} />
+                    <FormSelect className='col-md-4' ref={e => this.searchLoaiPhi = e} label='Loại phí' data={SelectAdapter_TcLoaiPhi} />
+                    <FormSelect className='col-md-4' ref={e => this.searchLoaiDaoTao = e} label='Loại hình đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} />
                     <div className='col-12 text-right'>
                         <button className='btn btn-primary' onClick={() => this.changeAdvancedSearch()}>Tìm kiếm</button>
                     </div>
