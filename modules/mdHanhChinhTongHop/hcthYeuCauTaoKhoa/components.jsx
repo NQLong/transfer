@@ -38,8 +38,8 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isUpload, setIsUpload] = useState(false);
-  const [imgUrl, setImgUrl] = useState(null);
+  const [isUpload] = useState(false);
+  const [imgUrl] = useState(null);
 
   const uploadFileRef = useRef(null);
 
@@ -97,8 +97,28 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
   const onSuccess = (response) => {
     if (response.error) T.notify(response.error, 'danger');
     else if (response.item) {
-      setIsUpload(true);
-      setImgUrl(response.item.path);
+      const base64Str = 'data:image/png;base64,' + response.item.content;
+      console.log(base64Str);
+      const img = new Image();
+      img.src = base64Str;
+      const resizeCanvas = document.createElement('CANVAS');
+      const width = img.width / 3;
+      const height = img.height / 2;
+      resizeCanvas.width = width;
+      resizeCanvas.height = height;
+      const ctx = resizeCanvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      console.log(resizeCanvas.toDataURL());
+
+      onChangeSigData(resizeCanvas.toDataURL());
+
+      // const base_image = new Image();
+      // base_image.src = response.item.content
+      // // setIsUpload(true);
+      // // setImgUrl('data:image/png;base64,' + response.item.content);
+      // contextRef.current.drawImage(base_image, 0, 0);
+      // onChangeSigData('data:image/png;base64,' + response.item.content);
     }
   };
 
@@ -114,7 +134,10 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
         <div style={{ textAlign: 'center'}}>
             {
               isUpload ?
-              <img src={imgUrl} width={width} height={height} /> :
+              <div style={{ width: width, height: height}}>
+                 <img src={imgUrl} style={{ maxWidth: '100%', maxHeight: '100%'}}/> 
+              </div>
+              :
               <canvas
                 ref={canvasRef}
                 width={width}
