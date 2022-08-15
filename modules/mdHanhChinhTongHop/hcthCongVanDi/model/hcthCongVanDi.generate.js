@@ -332,5 +332,18 @@ module.exports = app => {
                     }
                 });
         }),
+
+        dashboardGetData: (time, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_dashboard_get_data(:time, :hcthCongVanDen, :hcthCongVanDi, :vanBanDenNam, :vanBanDiNam); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, time, hcthCongVanDen: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, hcthCongVanDi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDenNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDiNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
     };
 };
