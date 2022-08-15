@@ -201,7 +201,7 @@ module.exports = app => {
     app.get('/api/finance/download-excel-tach-mssv/:fileName', app.permission.check('tcHocPhi:write'), (req, res) => {
         let fileName = req.params.fileName;
         const srcPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);
-        res.download(srcPath, 'TACH.xlsx');
+        res.download(srcPath, 'TACH_MSSV_BIDV.xlsx');
     });
 
     app.readyHooks.add('deleteTempFolder', {
