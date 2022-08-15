@@ -283,7 +283,12 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 </tr>),
             renderRow: (item, index) => {
                 let indexOfItem = (pageNumber - 1) * pageSize + index + 1;
-                let official = item.ngayBatDau && item.ngayKetThuc;
+                let official = item.ngayBatDau && item.ngayKetThuc,
+                    nganhTenNganh = item.tenNganh || '';
+                if (item.tenChuyenNganh) {
+                    let chuyenNganh = item.tenChuyenNganh.split('%');
+                    nganhTenNganh += `&&${chuyenNganh[0]}_${chuyenNganh[1].getFirstLetters()}%${chuyenNganh[1]}`;
+                }
                 return (
                     <tr key={index} >
                         <TableCell style={{ textAlign: 'right' }} content={indexOfItem} />
@@ -313,7 +318,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                 <TableCell type='number' content={item.tietBatDau} />
                                 <TableCell type='number' content={item.soTiet} />
                                 <TableCell type='number' content={item.soLuongDuKien} />
-                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={item.tenNganh.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh.split('&&').length - 1 ? ', ' : '.')}</span>)} />
+                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={nganhTenNganh.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < nganhTenNganh.split('&&').length - 1 ? ', ' : '.')}</span>)} />
                             </>
                         }
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayBatDau} />
