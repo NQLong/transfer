@@ -48,6 +48,10 @@ module.exports = app => {
         res.send({ items });
     });
 
+    app.get('/api/danh-muc/he-dao-tao/all',app.permission.check('user:login'), (req, res) => {
+        app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1 }, (error, items) => res.send({ error, items }));
+    });
+
     app.get('/api/danh-muc/he-dao-tao/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmSvLoaiHinhDaoTao.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });

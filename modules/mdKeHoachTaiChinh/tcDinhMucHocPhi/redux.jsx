@@ -112,10 +112,10 @@ export function createTcDinhMucHocPhi(item, done) {
     };
 }
 
-export function deleteTcDinhMucHocPhi(ma) {
+export function deleteTcDinhMucHocPhi(listMa) {
     return dispatch => {
         const url = '/api/finance/dinh-muc-hoc-phi';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { listMa }, data => {
             if (data.error) {
                 T.notify('Xóa định mức học phí bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);

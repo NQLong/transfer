@@ -6791,6 +6791,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "NGOAI_NGU": {
+                    "value": "ngoaiNgu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2
                 }
             },
             "primaryKeys": [
@@ -15763,6 +15770,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152486\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -16207,6 +16221,9 @@
             "active": true,
             "moduleName": "hcthHoSo",
             "modelName": "hcthHoSo",
+            "methods": {
+                "HCTH_HO_SO_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -16239,6 +16256,32 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SDH_DM_THOI_GIAN_DAO_TAO": {
+            "active": true,
+            "moduleName": "sdhDmThoiGianDaoTao",
+            "modelName": "sdhDmThoiGianDaoTao",
+            "columns": {
+                "SO_NAM": {
+                    "value": "soNam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "SO_NAM"
             ],
             "foreignKeys": [],
             "type": "table"

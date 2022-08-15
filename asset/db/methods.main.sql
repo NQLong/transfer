@@ -1332,46 +1332,57 @@ BEGIN
 
     OPEN my_cursor FOR
         SELECT *
-        FROM (SELECT TKB.ID                                                                    AS "id",
-                     TKB.PHONG                                                                 AS "phong",
-                     TKB.THU                                                                   AS "thu",
-                     TKB.TIET_BAT_DAU                                                          AS "tietBatDau",
-                     TKB.SO_TIET_BUOI                                                          AS "soTiet",
-                     TKB.HOC_KY                                                                AS "hocKy",
-                     TKB.NAM                                                                   AS "nam",
-                     TKB.MA_MON_HOC                                                            AS "maMonHoc",
-                     TKB.NGAY_BAT_DAU                                                          AS "ngayBatDau",
-                     TKB.NGAY_KET_THUC                                                         AS "ngayKetThuc",
-                     TKB.LOAI_MON_HOC                                                          AS "loaiMonHoc",
-                     TKB.NHOM                                                                  AS "nhom",
-                     TKB.SO_LUONG_DU_KIEN                                                      AS "soLuongDuKien",
-                     DV.TEN                                                                    AS "tenKhoaBoMon",
-                     DV.MA                                                                     AS "maKhoaBoMon",
-                     DMMH.TEN                                                                  AS "tenMonHoc",
-                     DMMH.TONG_TIET                                                            AS "tongTiet",
-                     TKB.KHOA_DANG_KY                                                          AS "khoaDangKy",
-                     DV1.TEN                                                                   AS "tenKhoaDangKy",
-                     CB.HO                                                                     AS "hoGiangVien",
-                     CB.TEN                                                                    AS "tenGiangVien",
-                     TKB.GIANG_VIEN                                                            as "giangVien",
-                     TD.VIET_TAT                                                               AS "trinhDo",
-                     TKB.SUC_CHUA                                                              AS "sucChua",
-                     TKB.BUOI                                                                  AS "buoi",
-                     TKB.IS_MO                                                                 AS "isMo",
-                     CTKDT.NAM_DAO_TAO                                                         AS "namDaoTao",
-                     TKB.BAC_DAO_TAO                                                           AS "bacDaoTao",
-                     TKB.LOAI_HINH_DAO_TAO                                                     AS "loaiHinhDaoTao",
+        FROM (SELECT TKB.ID                   AS          "id",
+                     TKB.PHONG                AS          "phong",
+                     TKB.THU                  AS          "thu",
+                     TKB.TIET_BAT_DAU         AS          "tietBatDau",
+                     TKB.SO_TIET_BUOI         AS          "soTiet",
+                     TKB.HOC_KY               AS          "hocKy",
+                     TKB.NAM                  AS          "nam",
+                     TKB.MA_MON_HOC           AS          "maMonHoc",
+                     TKB.NGAY_BAT_DAU         AS          "ngayBatDau",
+                     TKB.NGAY_KET_THUC        AS          "ngayKetThuc",
+                     TKB.LOAI_MON_HOC         AS          "loaiMonHoc",
+                     TKB.NHOM                 AS          "nhom",
+                     TKB.SO_LUONG_DU_KIEN     AS          "soLuongDuKien",
+                     DV.TEN                   AS          "tenKhoaBoMon",
+                     DV.MA                    AS          "maKhoaBoMon",
+                     DMMH.TEN                 AS          "tenMonHoc",
+                     DMMH.TONG_TIET           AS          "tongTiet",
+                     TKB.KHOA_DANG_KY         AS          "khoaDangKy",
+                     DV1.TEN                  AS          "tenKhoaDangKy",
+                     CB.HO                    AS          "hoGiangVien",
+                     CB.TEN                   AS          "tenGiangVien",
+                     TKB.GIANG_VIEN           as          "giangVien",
+                     TD.VIET_TAT              AS          "trinhDo",
+                     TKB.SUC_CHUA             AS          "sucChua",
+                     TKB.BUOI                 AS          "buoi",
+                     TKB.IS_MO                AS          "isMo",
+                     CTKDT.NAM_DAO_TAO        AS          "namDaoTao",
+                     TKB.BAC_DAO_TAO          AS          "bacDaoTao",
+                     TKB.LOAI_HINH_DAO_TAO    AS          "loaiHinhDaoTao",
                      (SELECT LISTAGG((TO_CHAR(sNDT.MA_NGANH) || '%' || sNDT.TEN_NGANH), '&&') WITHIN GROUP (
                          order by sTKB.ID
                          )
                       FROM DT_THOI_KHOA_BIEU sTKB
-                               LEFT OUTER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
+                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
+                               INNER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
+                      WHERE sTKB.ID = TKB.ID) AS          "tenNganh",
+
+                     (SELECT LISTAGG(TO_CHAR(sCN.NGANH  ) || '%' || sCN.TEN, '&&') WITHIN GROUP (
+                         order by sTKB.ID
+                         )
+                      FROM DT_THOI_KHOA_BIEU sTKB
+                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
                                LEFT OUTER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
-                      WHERE  sTKB.ID = TKB.ID) AS "tenNganh",
+                               INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
+                                          ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
+                      WHERE sTKB.ID = TKB.ID) AS          "tenChuyenNganh",
+
 --                      NDT.TEN_NGANH         AS             "tenNganh",
 --                      CN.TEN                AS             "tenChuyenNganh",
-                     TKB.KHOA_SINH_VIEN                                                        AS "khoaSinhVien",
-                     ROW_NUMBER() OVER (ORDER BY TKB.THU)                                         R
+                     TKB.KHOA_SINH_VIEN       AS          "khoaSinhVien",
+                     ROW_NUMBER() OVER (ORDER BY TKB.THU) R
               FROM DT_THOI_KHOA_BIEU TKB
                        LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
                        LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
@@ -4051,6 +4062,7 @@ BEGIN
                         hcthCVD.LOAI_CONG_VAN AS                     "loaiCongVan",
                         hcthCVD.SO_CONG_VAN   AS                     "soCongVan",
                         hcthCVD.LOAI_VAN_BAN  AS                     "loaiVanBan",
+                        hcthCVD.NGAY_TAO      AS                     "ngayTao",
                         dvg.MA                AS                     "maDonViGui",
                         dvg.TEN               AS                     "tenDonViGui",
                         lvb.TEN               AS                     "tenLoaiVanBan",
@@ -4808,9 +4820,9 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION HCTH_DASHBOARD_GET_DATA(
-    time IN NUMBER,
-    HCTH_CONG_VAN_DEN OUT SYS_REFCURSOR,
-    HCTH_CONG_VAN_DI OUT SYS_REFCURSOR,
+    timeSelect IN NUMBER,
+    TOTAL_VAN_BAN_DEN OUT SYS_REFCURSOR,
+    TOTAL_VAN_BAN_DI OUT SYS_REFCURSOR,
     VAN_BAN_DEN_NAM OUT SYS_REFCURSOR,
     VAN_BAN_DI_NAM OUT SYS_REFCURSOR
 ) RETURN SYS_REFCURSOR
@@ -4820,30 +4832,30 @@ AS
 BEGIN
     select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
 
-    OPEN HCTH_CONG_VAN_DEN FOR
+    OPEN TOTAL_VAN_BAN_DEN FOR
         SELECT COUNT(*) AS "tongVanBanDen"
 
         FROM HCTH_CONG_VAN_DEN cvden
         WHERE cvden.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvden.NGAY_NHAN >= time));
+          AND (timeSelect IS NULL OR (cvden.NGAY_NHAN >= timeSelect));
 
-    OPEN HCTH_CONG_VAN_DI FOR
+    OPEN TOTAL_VAN_BAN_DI FOR
         SELECT COUNT(*) AS "tongVanBanDi"
         FROM HCTH_CONG_VAN_DI cvdi
         WHERE cvdi.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvdi.NGAY_TAO >= time));
+          AND (timeSelect IS NULL OR (cvdi.NGAY_TAO >= timeSelect));
 
     OPEN VAN_BAN_DEN_NAM FOR
         SELECT *
         FROM HCTH_CONG_VAN_DEN cvden
         WHERE cvden.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvden.NGAY_NHAN >= time));
+          AND (timeSelect IS NULL OR (cvden.NGAY_NHAN >= timeSelect));
 
     OPEN VAN_BAN_DI_NAM FOR
         SELECT *
         FROM HCTH_CONG_VAN_DI cvdi
         WHERE cvdi.TRICH_YEU IS NOT NULL
-          AND (time IS NULL OR (cvdi.NGAY_TAO >= time));
+          AND (timeSelect IS NULL OR (cvdi.NGAY_TAO >= timeSelect));
 
     OPEN DATA_VB FOR
         select "numOfDocument",
@@ -4862,9 +4874,9 @@ BEGIN
                           LEFT JOIN HCTH_CONG_VAN_DI cvdi on (dvn.MA = cvdi.ID AND dvn.LOAI = 'DI')
                  WHERE dvn.DON_VI_NHAN_NGOAI = 0
                    AND (
-                         ((cvden.NGAY_NHAN >= time) AND (dvn.LOAI = 'DEN'))
-                         OR ((cvdi.NGAY_TAO >= time) AND (dvn.LOAI = 'DI'))
-                       OR (time IS NULL AND(dvn.LOAI = 'DEN' OR dvn.LOAI = 'DI'))
+                         ((cvden.NGAY_NHAN >= timeSelect) AND (dvn.LOAI = 'DEN'))
+                         OR ((cvdi.NGAY_TAO >= timeSelect) AND (dvn.LOAI = 'DI'))
+                       OR (timeSelect IS NULL AND(dvn.LOAI = 'DEN' OR dvn.LOAI = 'DI'))
                      )
                  group by dvn.DON_VI_NHAN
                  ORDER BY dvn.DON_VI_NHAN asc
@@ -4999,7 +5011,7 @@ END;
 CREATE OR REPLACE FUNCTION HCTH_HO_SO_SEARCH_PAGE(
     pageNumber IN OUT NUMBER,
     pageSize IN OUT NUMBER,
-    filterParam IN STRING,
+--     filterParam IN STRING,
     searchTerm IN STRING,
     totalItem OUT NUMBER,
     pageTotal OUT NUMBER

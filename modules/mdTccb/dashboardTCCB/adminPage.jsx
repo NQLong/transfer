@@ -9,23 +9,25 @@ import { Tooltip } from '@mui/material';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmNgachCdnnV3 } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 
-const thisDate = new Date().getDate(),
-    thisMonthIndex = new Date().getMonth(),
-    thisYear = new Date().getFullYear();
+
 
 const listHocVi = ['Cử nhân', 'Thạc sĩ', 'Tiến sĩ'];
-const listThoiGian = [
-    { id: new Date(thisYear, thisMonthIndex - 1, thisDate).getTime(), text: 'Trong 1 tháng' },
-    { id: new Date(thisYear, thisMonthIndex - 3, thisDate).getTime(), text: 'Trong 3 tháng' },
-    { id: new Date(thisYear, thisMonthIndex - 6, thisDate).getTime(), text: 'Trong 6 tháng' },
-    { id: new Date(thisYear - 1, thisMonthIndex, thisDate).getTime(), text: 'Trong 1 năm' },
-    { id: new Date(thisYear - 2, thisMonthIndex, thisDate).getTime(), text: 'Trong 2 năm' },
-    { id: new Date(thisYear - 3, thisMonthIndex, thisDate).getTime(), text: 'Trong 3 năm' },
-    { id: new Date(thisYear - 5, thisMonthIndex, thisDate).getTime(), text: 'Trong 5 năm' },
-    { id: new Date(thisYear - 10, thisMonthIndex, thisDate).getTime(), text: 'Trong 10 năm' },
-    { id: new Date(thisYear - 15, thisMonthIndex, thisDate).getTime(), text: 'Trong 15 năm' },
-    { id: new Date(thisYear - 20, thisMonthIndex, thisDate).getTime(), text: 'Trong 20 năm' },
-];
+
+const getListThoiGian = (thisDate, thisMonthIndex, thisYear) => {
+    const listThoiGian = [
+        { id: new Date(thisYear, thisMonthIndex - 1, thisDate).getTime(), text: 'Trong 1 tháng' },
+        { id: new Date(thisYear, thisMonthIndex - 3, thisDate).getTime(), text: 'Trong 3 tháng' },
+        { id: new Date(thisYear, thisMonthIndex - 6, thisDate).getTime(), text: 'Trong 6 tháng' },
+        { id: new Date(thisYear - 1, thisMonthIndex, thisDate).getTime(), text: 'Trong 1 năm' },
+        { id: new Date(thisYear - 2, thisMonthIndex, thisDate).getTime(), text: 'Trong 2 năm' },
+        { id: new Date(thisYear - 3, thisMonthIndex, thisDate).getTime(), text: 'Trong 3 năm' },
+        { id: new Date(thisYear - 5, thisMonthIndex, thisDate).getTime(), text: 'Trong 5 năm' },
+        { id: new Date(thisYear - 10, thisMonthIndex, thisDate).getTime(), text: 'Trong 10 năm' },
+        { id: new Date(thisYear - 15, thisMonthIndex, thisDate).getTime(), text: 'Trong 15 năm' },
+        { id: new Date(thisYear - 20, thisMonthIndex, thisDate).getTime(), text: 'Trong 20 năm' },
+    ];
+    return listThoiGian;
+};
 class DashboardIcon extends React.Component {
     componentDidMount() {
         setTimeout(() => {
@@ -196,6 +198,10 @@ class Dashboard extends AdminPage {
         let { nhanSuCongTac = [], tongCB = 0, soLuongDonVi = 0, listDonVi = [],
             // listStaffGender = {}, listCongTacTrongNuoc = {}, listDiNuocNgoai = {}, 
             listHocHam = {}, dataLevelByGender = {}, nhanSuKhoaBM = {}, nhanSuPhongBan = {}, nhanSuTrungTam = {}, nhanSuDoanThe = {}, listNgach = {}, listNhanSuTuyenDung = {}, fromTime = null, soLuongCacQuaTrinh = {} } = this.state;
+
+        const thisDate = new Date().getDate(),
+            thisMonthIndex = new Date().getMonth(),
+            thisYear = new Date().getFullYear();
         return this.renderPage({
             icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng Tổ chức - Cán bộ',
@@ -258,7 +264,7 @@ class Dashboard extends AdminPage {
                 <Link key={0} to='/user/tccb'>Tổ chức - Cán bộ</Link>,
                 'Dashboard'
             ],
-            header: <FormSelect data={listThoiGian} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '300px', marginBottom: '0' }} onChange={value => this.initData(value?.id || null)} allowClear />
+            header: <FormSelect data={getListThoiGian(thisDate, thisMonthIndex, thisYear)} ref={e => this.giaiDoan = e} placeholder='Giai đoạn' style={{ marginRight: '40', width: '300px', marginBottom: '0' }} onChange={value => this.initData(value?.id || null)} allowClear />
         });
     }
 }
