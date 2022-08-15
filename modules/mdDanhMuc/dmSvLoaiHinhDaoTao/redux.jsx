@@ -73,7 +73,7 @@ export function getDmSvLoaiHinhDaoTao(ma, done) {
 
 export function getDmSvLoaiHinhDaoTaoAll(done) {
     return () => {
-        const url = '/api/danh-muc/loai-hinh-dao-tao/all';
+        const url = '/api/danh-muc/he-dao-tao/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hình bị lỗi!', 'danger');

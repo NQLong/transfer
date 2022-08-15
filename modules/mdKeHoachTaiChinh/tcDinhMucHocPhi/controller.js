@@ -28,22 +28,18 @@ module.exports = (app) => {
             let page = await app.model.tcDinhMucHocPhi.searchPage(pageNumber, pageSize, namBatDau, namKetThuc, hocKy, loaiPhi, searchTerm);
             let list = page.rows;
 
-            const handleListDinhMuc = (index = 0) => {
+            for(let index = 0;index <list.length; index++) {
                 let item = list[index];
-                if (index < list.length) {
-                    app.model.tcDinhMucHocPhi.getAll({ namBatDau: item.namBatDau, namKetThuc: item.namKetThuc, hocKy: item.hocKy, loaiPhi: item.loaiPhi }, (error, listDinhMuc) => {
-                        list[index].loaiDaoTao = listDinhMuc?.map(dmItem => ({ ma: dmItem.ma, loaiDaoTao: dmItem.loaiDaoTao, soTien: dmItem.soTien }));
-                        handleListDinhMuc(index+1);
-                    }); 
-                } else {
-                    const pageCondition = searchTerm;
-                    res.send({
-                        page: { totalItem: page.totalitem, pageSize: page.pagesize, pageTotal: page.pagetotal, pageNumber: page.pagenumber, pageCondition, list }
-                    });
-                }
-            };
+                await app.model.tcDinhMucHocPhi.getAll({ namBatDau: item.namBatDau, namKetThuc: item.namKetThuc, hocKy: item.hocKy, loaiPhi: item.loaiPhi }, (error, listDinhMuc) => {
+                    list[index].loaiDaoTao = listDinhMuc?.map(dmItem => ({ ma: dmItem.ma, loaiDaoTao: dmItem.loaiDaoTao, soTien: dmItem.soTien }));
+                }); 
+            }
 
-            handleListDinhMuc();
+            const pageCondition = searchTerm;
+            res.send({
+                page: { totalItem: page.totalitem, pageSize: page.pagesize, pageTotal: page.pagetotal, pageNumber: page.pagenumber, pageCondition, list }
+            });
+
         } catch (error) {
             res.send({ error });
         }
@@ -75,25 +71,22 @@ module.exports = (app) => {
                 res.send({ error: 'Định mức đã tồn tại' });
             } else {
                 let items = [];
-                const handleUpdate = async (index = 0) => {
-                    if (index < data.loaiDaoTao.length) {
-                        let newData = {
-                            namBatDau: data.namBatDau,
-                            namKetThuc: data.namKetThuc,
-                            hocKy: data.hocKy,
-                            soTienMacDinh: data.soTienMacDinh,
-                            loaiPhi: data.loaiPhi,
-                            loaiDaoTao: data.loaiDaoTao[index].loaiDaoTao,
-                            soTien: data.loaiDaoTao[index].soTien
-                        };
-                        let newItem = await app.model.tcDinhMucHocPhi.create(newData);
-                        items.push(newItem);
-                        handleUpdate(index+1);
-                    } else {
-                        res.send({ items });
-                    }
-                };
-                handleUpdate();
+
+                for(let index = 0;index < data.loaiDaoTao.length; index++) {
+                    let newData = {
+                        namBatDau: data.namBatDau,
+                        namKetThuc: data.namKetThuc,
+                        hocKy: data.hocKy,
+                        soTienMacDinh: data.soTienMacDinh,
+                        loaiPhi: data.loaiPhi,
+                        loaiDaoTao: data.loaiDaoTao[index].loaiDaoTao,
+                        soTien: data.loaiDaoTao[index].soTien
+                    };
+                    let newItem = await app.model.tcDinhMucHocPhi.create(newData);
+                    items.push(newItem);
+                }
+
+                res.send({ items });
             }
         } catch (error) {
             res.send({ error });
@@ -104,25 +97,22 @@ module.exports = (app) => {
         try {
             const changes = req.body.changes;
             let items = [];
-            const handleUpdate = async (index = 0) => {
-                if (index < changes.loaiDaoTao.length) {
-                    let newData = {
-                        namBatDau: changes.namBatDau,
-                        namKetThuc: changes.namKetThuc,
-                        hocKy: changes.hocKy,
-                        soTienMacDinh: changes.soTienMacDinh,
-                        loaiPhi: changes.loaiPhi,
-                        loaiDaoTao: changes.loaiDaoTao[index].loaiDaoTao,
-                        soTien: changes.loaiDaoTao[index].soTien
-                    };
-                    let newItem = await app.model.tcDinhMucHocPhi.update({ ma: changes.loaiDaoTao[index].ma }, newData);
-                    items.push(newItem);
-                    handleUpdate(index+1);
-                } else {
-                    res.send({ items });
-                }
-            };
-            handleUpdate();
+
+            for(let index = 0;index < changes.loaiDaoTao.length; index++) {
+                let newData = {
+                    namBatDau: changes.namBatDau,
+                    namKetThuc: changes.namKetThuc,
+                    hocKy: changes.hocKy,
+                    soTienMacDinh: changes.soTienMacDinh,
+                    loaiPhi: changes.loaiPhi,
+                    loaiDaoTao: changes.loaiDaoTao[index].loaiDaoTao,
+                    soTien: changes.loaiDaoTao[index].soTien
+                };
+                let newItem = await app.model.tcDinhMucHocPhi.update({ ma: changes.loaiDaoTao[index].ma }, newData);
+                items.push(newItem);
+            }
+
+            res.send({ items });
         } catch (error) {
             res.send({ error });
         }
