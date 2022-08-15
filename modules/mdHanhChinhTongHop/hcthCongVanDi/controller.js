@@ -107,7 +107,7 @@ module.exports = app => {
                     donViNhan: donViNhan.id,
                     ma: congVanId,
                     donViNhanNgoai: donViNhan.donViNhanNgoai,
-                    loai: 'DI',
+                    loai: donViNhan.loai,
                 },
                 (error, item) => {
                     if (error) reject(error);
@@ -121,7 +121,7 @@ module.exports = app => {
     };
 
     app.post('/api/hcth/van-ban-di', (req, res) => {
-        const { fileList, donViNhan, donViNhanNgoai, ...data } = req.body.data;
+        const { fileList, donViNhan, donViNhanNgoai, banLuu, ...data } = req.body.data;
         app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user?.staff?.shcc }, (error, item) => {
             if (error) {
                 res.send({ error, item });
@@ -135,14 +135,19 @@ module.exports = app => {
                         } else {
                             let listDonViNhan = [];
                             let listDonViNhanNgoai = [];
+                            let listBanLuu = [];
                             if (donViNhanNgoai && donViNhanNgoai.length > 0) {
-                                listDonViNhanNgoai = donViNhanNgoai.map((id) => ({ id: id, donViNhanNgoai: 1 }));
+                                listDonViNhanNgoai = donViNhanNgoai.map((id) => ({ id: id, donViNhanNgoai: 1, loai: 'DI' }));
                             }
                             if (donViNhan && donViNhan.length > 0) {
-                                listDonViNhan = donViNhan.map((id) => ({ id: id, donViNhanNgoai: 0 }));
+                                listDonViNhan = donViNhan.map((id) => ({ id: id, donViNhanNgoai: 0, loai: 'DI' }));
                             }
 
-                            createListDonViNhan([...listDonViNhan, ...listDonViNhanNgoai], id, ({ error }) => {
+                            if (banLuu && banLuu.length > 0) {
+                                listBanLuu = banLuu.map((id) => ({ id: id, donViNhanNgoai: 0, loai: 'BAN_LUU' }));
+                            }
+
+                            createListDonViNhan([...listDonViNhan, ...listDonViNhanNgoai, ...listBanLuu], id, ({ error }) => {
                                 if (error) {
                                     throw error;
                                 } else {
@@ -556,6 +561,8 @@ module.exports = app => {
             }
             const congVan = await app.model.hcthCongVanDi.get({ id });
             const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
+
+            const banLuu = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'BAN_LUU' }, 'id, donViNhan', 'id');
             if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
@@ -582,6 +589,7 @@ module.exports = app => {
                     donViNhan: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 0).map((item) => item.donViNhan) : []).toString(),
                     donViNhanNgoai: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 1).map((item) => item.donViNhan) : []
                     ).toString(),
+                    banLuu: banLuu ? banLuu.map(item => item.donViNhan) : [],
                     yeuCauKy: vanBanTrinhKyWithListCanBo,
                     listFile: files || [],
                     history: history?.rows || [],
