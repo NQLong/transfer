@@ -233,7 +233,7 @@ class TcHocPhiAdminPage extends AdminPage {
         const buttons = [];
 
         invoicePermission.write && buttons.push({
-            className: 'btn-info', icon: 'fa-print', tooltip: 'Export', onClick: (e) => {
+            className: 'btn-info', icon: 'fa-print', tooltip: 'Xuất hóa đơn', onClick: (e) => {
                 e.preventDefault();
                 this.invoiceModal.show({
                     tuNgay: this.tuNgay?.value(),
