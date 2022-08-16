@@ -894,10 +894,6 @@ export class AdminModal extends React.Component {
     state = { display: '' };
     _data = {};
 
-    disabledClickOutside = () => {
-        $(this.modal).modal({ backdrop: 'static', keyboard: false, show: false });
-    }
-
     componentWillUnmount() {
         this.hide();
     }
@@ -940,6 +936,10 @@ export class AdminModal extends React.Component {
                 input.focus();
             }
         }
+    }
+
+    disabledClickOutside = () => {
+        $(this.modal).modal({ backdrop: 'static', keyboard: false, show: false });
     }
 
     renderModal = ({ title, body, size, buttons, postButtons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {}, showCloseButton = true }) => {

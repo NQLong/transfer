@@ -14688,6 +14688,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "KHONG_TUYEN_SINH": {
+                    "value": "khongTuyenSinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [

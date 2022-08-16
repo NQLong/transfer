@@ -4,17 +4,14 @@ import { getNewsByNews, getNewsByCategory } from './redux';
 import { Link } from 'react-router-dom';
 
 class SectionNews extends React.Component {
-    state = {
-        list: [], category: { vi: ' ', en: ' ' }
-    }
+    state = { list: [], category: '' }
 
     componentDidMount() {
         if (this.props.item && this.props.item.viewId) {
             this.props.getNewsByCategory(1, 5, this.props.item.viewId, data => {
-                let category = { vi: ' ', en: ' ' };
+                let category = '';
                 if (this.props.item && this.props.item.detail) {
-                    category.vi = JSON.parse(this.props.item.detail).valueTitleCom;
-                    category.en = JSON.parse(this.props.item.detail).valueTitleCom;
+                    category = JSON.parse(this.props.item.detail).valueTitleCom;
                 }
                 if (data.list) this.setState({ ...data, category });
             });
@@ -27,7 +24,7 @@ class SectionNews extends React.Component {
     }
 
     render() {
-        const category = T.language(this.state.category);
+        const category = this.state.category;
         const newsList = this.state.list, detail = this.props.item && this.props.item.detail ? JSON.parse(this.props.item.detail) : {};
         let languageText = this.props.system && this.props.system.languageText || {};
         const newLanguage = T.language(languageText);

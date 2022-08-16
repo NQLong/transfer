@@ -15,6 +15,7 @@ module.exports = app => {
                 tapTinDinhKem: 'Tập tin đính kèm',
                 khongTinTuc: 'Không có tin tức!',
                 ketNoi: 'KẾT NỐI VỚI USSH-VNUHCM',
+                khongTuyenSinh: 'Không có tin tuyển sinh!'
             };
             await app.model.dmNgonNguTruyenThong.create(newViData);
         }
@@ -33,6 +34,7 @@ module.exports = app => {
                 tapTinDinhKem: 'Attachment files',
                 khongTinTuc: 'No latest news!',
                 ketNoi: 'CONNECT US',
+                khongTuyenSinh: 'No admission news!'
             };
             await app.model.dmNgonNguTruyenThong.create(newEnData);
         }
@@ -52,6 +54,7 @@ module.exports = app => {
                     tapTinDinhKem: item.tapTinDinhKem || '',
                     khongTinTuc: item.khongTinTuc || '',
                     ketNoi: item.ketNoi || '',
+                    khongTuyenSinh: item.khongTuyenSinh || ''
                 };
             });
         }

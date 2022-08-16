@@ -4,15 +4,14 @@ import { connect } from 'react-redux';
 import { getNewsByCategory } from './redux';
 
 class SectionHighLightNews extends React.Component {
-    state = { list: [], category: { vi: ' ', en: ' ' }, linkSeeAll: '' }
+    state = { list: [], category: '', linkSeeAll: '' }
 
     componentDidMount() {
         if (this.props.item && this.props.item.viewId) {
             let category = { vi: ' ', en: ' ' }, linkSeeAll;
             if (this.props.item && this.props.item.detail) {
                 const detail = JSON.parse(this.props.item.detail);
-                category.vi = detail.valueTitleCom;
-                category.en = detail.valueTitleCom;
+                category = detail.valueTitleCom;
                 linkSeeAll = detail.linkSeeAll;
             }
             this.props.getNewsByCategory(1, 6, this.props.item.viewId, data => {
@@ -21,11 +20,11 @@ class SectionHighLightNews extends React.Component {
         }
     }
     render() {
-        const title = T.language(this.state.category);
+        const title = this.state.category;
         const notificationList = this.state.list;
         let languageText = this.props.system && this.props.system.languageText || {};
         const newLanguage = T.language(languageText);
-        let notification = <span className='text-center w-100'>{languageText.khongTinTuc}</span>;
+        let notification = <span className='text-center w-100'>{newLanguage.khongTinTuc}</span>;
         if (notificationList.length !== 0) {
             notification = (
                 <>
