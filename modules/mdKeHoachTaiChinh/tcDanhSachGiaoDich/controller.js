@@ -69,10 +69,14 @@ module.exports = app => {
             const ws = workBook.addWorksheet(`${settings.hocPhiNamHoc}_${settings.hocPhiHocKy}`);
             ws.columns = [
                 { header: 'STT', key: 'stt', width: 10 },
-                { header: 'MSSV', key: 'mssv', width: 15 },
-                { header: 'HỌ TÊN', key: 'ho', width: 30 },
-                { header: 'Ngày hóa đơn', key: 'ngatHoaDon', width: 30 },
+                { header: 'Mssv', key: 'mssv', width: 15 },
+                { header: 'Họ Tên', key: 'hoTen', width: 30 },
+                { header: 'Ngày hóa đơn', key: 'ngayHoaDon', width: 30 },
                 { header: 'Số tiền', key: 'soTien', width: 30 },
+                { header: 'Khoa', key: 'khoa', width: 30 },
+                { header: 'Hệ', key: 'he', width: 30 },
+                { header: 'Ngành', key: 'nganh', width: 30 },
+                { header: 'Khóa', key: 'khoas', width: 30 },
                 { header: 'Số series', key: 'soSeries', width: 30 },
                 { header: 'Số hóa đơn', key: 'soHoaDon', width: 30 },
                 { header: 'Học kỳ', key: 'hocKy', width: 30 },
@@ -96,16 +100,20 @@ module.exports = app => {
                 ws.getCell('C' + (index + 2)).value = `${item.ho?.toUpperCase() || ''} ${item.ten?.toUpperCase() || ''}`.trim();
                 ws.getCell('D' + (index + 2)).value = ngayDong ? app.date.dateTimeFormat(ngayDong, 'dd/mm/yyyy') : '';
                 ws.getCell('E' + (index + 2)).value = item.khoanDong.toString().numberDisplay();
-                ws.getCell('F' + (index + 2)).value = `${item.nganHang}/${ngayDong ? `${('0' + (ngayDong.getMonth() + 1)).slice(-2)}${ngayDong.getFullYear().toString().slice(-2)}` : ''}`;
-                ws.getCell('G' + (index + 2)).value = ('000000' + item.R).slice(-7);
-                ws.getCell('H' + (index + 2)).value = 'HK0' + settings.hocPhiHocKy;
-                ws.getCell('I' + (index + 2)).value = `${settings.hocPhiNamHoc} - ${parseInt(settings.hocPhiNamHoc) + 1}`;
-                ws.getCell('J' + (index + 2)).value = `Tạm thu học phí học kỳ 1 NH${settings.hocPhiNamHoc}-${parseInt(settings.hocPhiNamHoc) + 1}`;
+                ws.getCell('F' + (index + 2)).value = item.tenKhoa;
+                ws.getCell('G' + (index + 2)).value = item.tenLoaiHinhDaoTao;
+                ws.getCell('H' + (index + 2)).value = item.tenNganh;
+                ws.getCell('I' + (index + 2)).value = item.namTuyenSinh || '';
+                ws.getCell('J' + (index + 2)).value = `${item.nganHang}/${ngayDong ? `${('0' + (ngayDong.getMonth() + 1)).slice(-2)}${ngayDong.getFullYear().toString().slice(-2)}` : ''}`;
+                ws.getCell('K' + (index + 2)).value = ('000000' + item.R).slice(-7);
+                ws.getCell('L' + (index + 2)).value = 'HK0' + settings.hocPhiHocKy;
+                ws.getCell('M' + (index + 2)).value = `${settings.hocPhiNamHoc} - ${parseInt(settings.hocPhiNamHoc) + 1}`;
+                ws.getCell('N' + (index + 2)).value = `Tạm thu học phí học kỳ 1 NH${settings.hocPhiNamHoc}-${parseInt(settings.hocPhiNamHoc) + 1}`;
             });
             let fileName = `HOC_PHI_NH_${settings.hocPhiNamHoc}_${parseInt(settings.hocPhiNamHoc) + 1}_HK${settings.hocPhiHocKy}.xlsx`;
             app.excel.attachment(workBook, res, fileName);
         } catch (error) {
-            res.send({ error });
+            res.status(401).send({ error });
         }
     });
 
