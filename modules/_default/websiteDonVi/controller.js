@@ -22,13 +22,13 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/website/page/:pageNumber/:pageSize', app.permission.check('website:read'), async (req, res) => {
         try {
-            const _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize);
+            const _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize), searchTerm = req.query.condition || '';
             let user = req.session.user, condition = {};
             if (user.permissions && !user.permissions.includes('website:manage')) {
                 condition.maDonVi = user.maDonVi;
             }
 
-            const page = await app.model.dvWebsite.searchPageDonVi(_pageNumber, _pageSize, !user.permissions.includes('website:manage') ? user.maDonVi : '');
+            const page = await app.model.dvWebsite.searchPageDonVi(_pageNumber, _pageSize, !user.permissions.includes('website:manage') ? user.maDonVi : '', searchTerm);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, list } });
         } catch (error) {

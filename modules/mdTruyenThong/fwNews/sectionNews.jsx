@@ -40,8 +40,8 @@ class SectionNews extends React.Component {
                         <div className='col-lg-6 col-12'>
                             <Link to={T.linkNewsDetail(newsList[0])} className='block-20 block-50' style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}/>
                             <div className='text py-4 d-block w-100 text-justify'>
-                                <Link to={T.linkNewsDetail(newsList[0])}><h4 className='homeHeading' style={{ color: '#626262' }}><b>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].title) : T.language.parse(newsList[0].title, true)[newsList[0].language]}</b></h4></Link>
-                                <h6 className='homeBody' style={{ color: '#626262', fontWeight: 'normal' }}>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].abstract) : T.language.parse(newsList[0].abstract, true)[newsList[0].language]}</h6>
+                                <Link to={T.linkNewsDetail(newsList[0])}><h4 className='homeHeading' style={{ color: '#626262' }}><b>{T.language.parse(newsList[0].title || '')}</b></h4></Link>
+                                <h6 className='homeBody' style={{ color: '#626262', fontWeight: 'normal' }}>{T.language.parse(newsList[0].abstract || '')}</h6>
                             </div>
                         </div>
                         <div className='col-lg-6 col-12 row'>
@@ -50,9 +50,8 @@ class SectionNews extends React.Component {
                                     <div className='col-lg-6 col-12' key={index}>
                                         <Link to={T.linkNewsDetail(item)} className='block-20' style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', borderRadius: '5px' }}/>
                                         <div className='text py-3 d-block w-100 text-justify'>
-                                            <Link to={T.linkNewsDetail(item)}><h6 className='homeBody' style={{ color: '#626262' }}>
-                                                <b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}
-                                                </b></h6>
+                                            <Link to={T.linkNewsDetail(item)}>
+                                                <h6 className='homeBody' style={{ color: '#626262' }}><b>{T.language.parse(item.title || '')}</b></h6>
                                             </Link>
                                         </div>
                                     </div>

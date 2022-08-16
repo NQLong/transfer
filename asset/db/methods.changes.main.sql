@@ -1,69 +1,85 @@
-CREATE OR REPLACE FUNCTION HCTH_DASHBOARD_GET_DATA(
-    timeSelect IN NUMBER,
-    TOTAL_VAN_BAN_DEN OUT SYS_REFCURSOR,
-    TOTAL_VAN_BAN_DI OUT SYS_REFCURSOR,
-    VAN_BAN_DEN_NAM OUT SYS_REFCURSOR,
-    VAN_BAN_DI_NAM OUT SYS_REFCURSOR
-) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION DV_WEBSITE_SEARCH_PAGE_DON_VI(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, maDonVi IN STRING,
+                                              searchTerm IN STRING, totalItem OUT NUMBER,
+                                              pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
-    DATA_VB SYS_REFCURSOR;
-    today   NUMBER(20);
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(502) := '%' || lower(searchTerm) || '%';
 BEGIN
-    select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM DV_WEBSITE WS
+    WHERE (searchTerm = '' OR lower(WS.SHORTNAME) LIKE sT OR lower(WS.WEBSITE) LIKE sT)
+      AND (maDonVi = '' OR maDonVi IS NULL
+        OR maDonVi LIKE WS.MA_DON_VI);
 
-    OPEN TOTAL_VAN_BAN_DEN FOR
-        SELECT COUNT(*) AS "tongVanBanDen"
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
 
-        FROM HCTH_CONG_VAN_DEN cvden
-        WHERE cvden.TRICH_YEU IS NOT NULL
-          AND (timeSelect IS NULL OR (cvden.NGAY_NHAN >= timeSelect));
-
-    OPEN TOTAL_VAN_BAN_DI FOR
-        SELECT COUNT(*) AS "tongVanBanDi"
-        FROM HCTH_CONG_VAN_DI cvdi
-        WHERE cvdi.TRICH_YEU IS NOT NULL
-          AND (timeSelect IS NULL OR (cvdi.NGAY_TAO >= timeSelect));
-
-    OPEN VAN_BAN_DEN_NAM FOR
+    OPEN my_cursor FOR
         SELECT *
-        FROM HCTH_CONG_VAN_DEN cvden
-        WHERE cvden.TRICH_YEU IS NOT NULL
-          AND (timeSelect IS NULL OR (cvden.NGAY_NHAN >= timeSelect));
-
-    OPEN VAN_BAN_DI_NAM FOR
-        SELECT *
-        FROM HCTH_CONG_VAN_DI cvdi
-        WHERE cvdi.TRICH_YEU IS NOT NULL
-          AND (timeSelect IS NULL OR (cvdi.NGAY_TAO >= timeSelect));
-
-    OPEN DATA_VB FOR
-        select "numOfDocument",
-               "maDonVi",
-               "numOfDen",
-               "numOfDi",
-               dv.TEN          as "tenDonVi",
-               dv.TEN_VIET_TAT as "tenVietTat"
-        from (
-                 SELECT COUNT(dvn.ID)   as "numOfDocument",
-                        dvn.DON_VI_NHAN as "maDonVi",
-                        COUNT(case when dvn.LOAI = 'DI' then 1 END) as "numOfDi",
-                        COUNT(case when dvn.LOAI = 'DEN' then 1 end) as "numOfDen"
-                 FROM HCTH_DON_VI_NHAN dvn
-                          left join HCTH_CONG_VAN_DEN cvden on (dvn.MA = cvden.ID AND dvn.LOAI = 'DEN')
-                          LEFT JOIN HCTH_CONG_VAN_DI cvdi on (dvn.MA = cvdi.ID AND dvn.LOAI = 'DI')
-                 WHERE dvn.DON_VI_NHAN_NGOAI = 0
-                   AND (
-                         ((cvden.NGAY_NHAN >= timeSelect) AND (dvn.LOAI = 'DEN'))
-                         OR ((cvdi.NGAY_TAO >= timeSelect) AND (dvn.LOAI = 'DI'))
-                       OR (timeSelect IS NULL AND(dvn.LOAI = 'DEN' OR dvn.LOAI = 'DI'))
-                     )
-                 group by dvn.DON_VI_NHAN
-                 ORDER BY dvn.DON_VI_NHAN asc
+        FROM (
+                 SELECT WS.ID        AS                    "id",
+                        WS.SHORTNAME AS                    "shortname",
+                        WS.KICH_HOAT AS                    "kichHoat",
+                        WS.MA_DON_VI AS                    "maDonVi",
+                        DDV.TEN      AS                    "tenDonVi",
+                        WS.WEBSITE   AS                    "website",
+                        ROW_NUMBER() OVER (ORDER BY WS.ID) R
+                 FROM DV_WEBSITE WS
+                          LEFT JOIN DM_DON_VI DDV on WS.MA_DON_VI = DDV.MA
+                 WHERE (searchTerm = '' OR lower(WS.SHORTNAME) LIKE sT OR lower(WS.WEBSITE) LIKE sT)
+                   AND (maDonVi = ''
+                     OR maDonVi IS NULL
+                     OR maDonVi LIKE WS.MA_DON_VI)
              )
-                 LEFT JOIN DM_DON_VI dv on "maDonVi" = dv.MA;
-
-    RETURN DATA_VB;
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
 END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION TC_HOC_PHI_TRANSACTION_DOWNLOAD_PSC(filter IN STRING) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    namHoc    NUMBER(4);
+    hocKy     NUMBER(1);
+BEGIN
+    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
+
+    OPEN my_cursor FOR
+        SELECT FS.MSSV          AS                          "mssv",
+               FS.HO            AS                          "ho",
+               FS.TEN           AS                          "ten",
+               THPT.HOC_KY      AS                          "hocKy",
+               THPT.BANK        as                          "nganHang",
+               THPT.NAM_HOC     AS                          "namHoc",
+               THPT.AMOUNT      AS                          "khoanDong",
+               FS.MA_NGANH      AS                          "maNganh",
+               NDT.TEN_NGANH    AS                          "tenNganh",
+               DV.TEN           AS                          "tenKhoa",
+               LHDT.TEN         AS                          "tenLoaiHinhDaoTao",
+               BDT.TEN_BAC      AS                          "tenBacDaoTao",
+               THPT.TRANS_DATE  AS                          "ngayDong",
+               FS.NAM_TUYEN_SINH AS                          "namTuyenSinh",
+
+               ROW_NUMBER() OVER (ORDER BY THPT.TRANS_DATE) R
+        FROM TC_HOC_PHI_TRANSACTION THPT
+                 LEFT JOIN FW_STUDENT FS
+                           on THPT.CUSTOMER_ID = FS.MSSV
+                 LEFT JOIN DT_NGANH_DAO_TAO NDT on FS.MA_NGANH = NDT.MA_NGANH
+                 LEFT JOIN DM_DON_VI DV ON DV.MA = NDT.KHOA
+                 LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
+                 LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
+        where THPT.NAM_HOC = namHoc
+          and THPT.HOC_KY = hocKy
+          and THPT.STATUS = 1;
+
+    RETURN my_cursor;
+END ;
 
 /
 --EndMethod--
