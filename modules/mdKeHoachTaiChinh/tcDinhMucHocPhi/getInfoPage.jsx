@@ -20,8 +20,9 @@ class GetInfoPageDinhMuc extends AdminPage {
         try {
             const data = {
                 namHoc: getValue(this.namHoc),
-                // hocKy: getValue(this.hocKy)
             };
+            let [start, end] = data.namHoc.split(' - ');
+            if (isNaN(start) || isNaN(end)) throw this.namHoc;
             this.setState({ data });
             this.props.getTcDinhMucHocPhiBy(data, item => {
                 this.setState({ tcDinhMucHocPhi: item }, () => {
