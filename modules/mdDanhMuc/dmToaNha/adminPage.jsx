@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDmToaNhaAll, createDmToaNha, updateDmToaNha, deleteDmToaNha } from './redux';
-import { getDmCoSoAll } from 'modules/mdDanhMuc/dmCoSo/redux';
+import { getDmCoSoAll, SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormSelect, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
 
@@ -49,7 +49,7 @@ class EditModal extends AdminModal {
             title: 'Danh sách tòa nhà',
             body: <div className='row'>
                 <FormTextBox ref={e => this.ten = e} label='Tên' className='col-md-6' />
-                <FormSelect ref={e => this.coSo = e} label='Cơ sở' className='col-md-6' data={[1, 2]} />
+                <FormSelect ref={e => this.coSo = e} label='Cơ sở' className='col-md-6' data={SelectAdapter_DmCoSo} />
                 <FormRichTextBox ref={e => this.moTa = e} label='Mô tả' className='col-md-12' />
                 <FormCheckbox ref={e => this.kichHoat = e} label='Kích hoạt' className='col-md-12' onChanged={value => this.changeKichHoat(value)} />
             </div>
@@ -87,7 +87,7 @@ class DmToaNhaPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '50%' }} nowrap='true'>tòa nhà</th>
+                    <th style={{ width: '50%' }} nowrap='true'>Tòa nhà</th>
                     <th style={{ width: '50%' }} nowrap='true'>Cơ sở</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Mô tả</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>

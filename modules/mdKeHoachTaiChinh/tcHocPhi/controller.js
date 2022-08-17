@@ -289,7 +289,7 @@ module.exports = app => {
     const tcHocPhiTransactionTachMssv = async (fields, files, done) => {
         let worksheet = null;
         if (fields.userData && fields.userData[0] && fields.userData[0] == 'TachMssv' && files.TachMssv && files.TachMssv.length) {
-            app.fs.createFolder(app.assetPath, 'tempTcHocPhiTachMssv');
+            app.fs.createFolder(app.path.join(app.assetPath, 'tempTcHocPhiTachMssv'));
             const srcPath = files.TachMssv[0].path,
                 fileName = app.path.basename(srcPath),
                 newPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);

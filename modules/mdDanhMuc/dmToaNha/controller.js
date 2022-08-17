@@ -23,7 +23,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesToaNha', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtToaNha:read');
+            app.permissionHooks.pushUserPermission(user, 'dtToaNha:read', 'dmToaNha:write', 'dmToaNha:delete');
             resolve();
         } else resolve();
     }));
