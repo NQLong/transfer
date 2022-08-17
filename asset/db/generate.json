@@ -16042,7 +16042,8 @@
             "moduleName": "tcDinhMucHocPhi",
             "modelName": "tcDinhMucHocPhi",
             "methods": {
-                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage"
+                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage",
+                "TC_DINH_MUC_HOC_PHI_GET_ITEM_BY": "getItemBy"
             },
             "columns": {
                 "NAM_HOC": {

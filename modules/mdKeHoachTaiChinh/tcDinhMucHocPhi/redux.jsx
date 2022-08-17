@@ -4,9 +4,12 @@ import T from 'view/js/common';
 const TcDinhMucHocPhiGetAll = 'TcDinhMucHocPhi:GetAll';
 const TcDinhMucHocPhiGetPage = 'TcDinhMucHocPhi:GetPage';
 const TcDinhMucHocPhiUpdate = 'TcDinhMucHocPhi:Update';
+const TcDinhMucHocPhiBy = 'TcDinhMucHocPhi:GetBy';
 
 export default function TcDinhMucHocPhiReducer(state = null, data) {
     switch (data.type) {
+        case TcDinhMucHocPhiBy:
+            return Object.assign({}, state, { item: data.item });
         case TcDinhMucHocPhiGetAll:
             return Object.assign({}, state, { items: data.items });
         case TcDinhMucHocPhiGetPage:
@@ -67,6 +70,21 @@ export function getTcDinhMucHocPhiPage(pageNumber, pageSize, pageCondition, filt
     };
 }
 
+export function getTcDinhMucHocPhiBy(filter, done) {
+    return dispatch => {
+        const url = '/api/finance/dinh-muc-hoc-phi/get-item';
+        T.get(url, { filter }, result => {
+            if (result.error) {
+                T.notify('Lấy dữ liệu lỗi', 'danger');
+                console.error(result.error);
+            } else {
+                dispatch({ type: TcDinhMucHocPhiBy, item: result.item });
+                done && done(result.item);
+            }
+        });
+    };
+}
+
 export function getTcDinhMucHocPhiAll(condition, done) {
     return dispatch => {
         const url = '/api/finance/dinh-muc-hoc-phi/all';
@@ -96,17 +114,16 @@ export function getTcDinhMucHocPhi(ma, done) {
     };
 }
 
-export function createTcDinhMucHocPhi(item, done) {
-    return dispatch => {
-        const url = '/api/finance/dinh-muc-hoc-phi';
-        T.post(url, { data: item }, data => {
-            if (data.error) {
-                T.notify('Tạo định mức học phí bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`POST: ${url}.`, data.error);
+export function createTcDinhMucHocPhiMultiple(data, done) {
+    return () => {
+        const url = '/api/finance/dinh-muc-hoc-phi/multiple';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify('Tạo định mức học phí bị lỗi', 'danger');
+                console.error(`POST: ${url}.`, result.error);
             } else {
-                T.notify('Tạo thông tin định mức học phí thành công!', 'success');
-                dispatch(getTcDinhMucHocPhiPage());
-                if (done) done(data);
+                T.notify('Tạo định mức học phí thành công!', 'success');
+                done && done(result);
             }
         }, (error) => T.notify('Tạo định mức học phí bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };

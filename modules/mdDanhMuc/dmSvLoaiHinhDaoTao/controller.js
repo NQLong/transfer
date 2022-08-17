@@ -29,7 +29,7 @@ module.exports = app => {
     app.get('/user/dao-tao/he-dao-tao', app.permission.check('dtSvLoaiHinhDaoTao:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/he-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/he-dao-tao/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmSvLoaiHinhDaoTao.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
@@ -48,7 +48,7 @@ module.exports = app => {
         res.send({ items });
     });
 
-    app.get('/api/danh-muc/he-dao-tao/all',app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/he-dao-tao/all', app.permission.check('user:login'), (req, res) => {
         app.model.dmSvLoaiHinhDaoTao.getAll({ kichHoat: 1 }, (error, items) => res.send({ error, items }));
     });
 

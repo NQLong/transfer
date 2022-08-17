@@ -39,7 +39,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/bac-sdh/all', app.permission.check('dmHocSdh:read'), (req, res) => {
+    app.get('/api/danh-muc/bac-sdh/all', app.permission.check('staff:login'), (req, res) => {
         app.model.dmHocSdh.getAll((error, items) => res.send({ error, items }));
     });
 
