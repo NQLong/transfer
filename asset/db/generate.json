@@ -16035,15 +16035,16 @@
             "moduleName": "tcDinhMucHocPhi",
             "modelName": "tcDinhMucHocPhi",
             "methods": {
-                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage"
+                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage",
+                "TC_DINH_MUC_HOC_PHI_GET_ITEM_BY": "getItemBy"
             },
             "columns": {
-                "NAM_BAT_DAU": {
-                    "value": "namBatDau",
-                    "dataType": "NUMBER",
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
+                    "size": 11
                 },
                 "HOC_KY": {
                     "value": "hocKy",
@@ -16080,19 +16081,12 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "NAM_KET_THUC": {
-                    "value": "namKetThuc",
-                    "dataType": "NUMBER",
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
-                },
-                "SO_TIEN_MAC_DINH": {
-                    "value": "soTienMacDinh",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
+                    "size": 5
                 }
             },
             "primaryKeys": [

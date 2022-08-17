@@ -11,7 +11,7 @@ export default {
     routes: [
         {
             path: '/user/finance/dinh-muc-hoc-phi',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+            component: Loadable({ loading: Loading, loader: () => import('./getInfoPage') })
         },
     ],
 };
