@@ -135,9 +135,6 @@ module.exports = app => {
             });
         });
 
-        // console.log(hocPhanTheoIdNganh);
-
-
         let dataReturn = {};
         hocPhanLoop: for (let hocPhan of dataCanGen) {
             let { id, loaiMonHoc, soTietBuoi } = hocPhan;
@@ -157,14 +154,12 @@ module.exports = app => {
                         }//TODO: Reset nếu vẫn đang trong scope maMonHocGlobal
                         else {
                             let [thu, tietBatDau] = thuTiet.split('_');
-                            console.log(thuTiet, thu, tietBatDau);
                             if (isValidPeriod(tietBatDau, soTietBuoi) == undefined) continue hocPhanLoop;
                             else if (isValidPeriod(tietBatDau, soTietBuoi) == false) continue thuTietLoop;
                             else {
                                 tietBatDau = parseInt(tietBatDau);
                                 thu = parseInt(thu);
                                 dataReturn[id] = { ...hocPhan, thu, tietBatDau };
-                                console.log(dataReturn);
                                 let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
                                 for (let idNganh of listNganh) {
                                     idNganh.available = idNganh.available.filter(tietThu => !toRemove.has(tietThu));
