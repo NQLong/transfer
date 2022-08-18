@@ -44,36 +44,41 @@ const T = {
 
     isHCMUSSH: email => email.endsWith('@hcmussh.edu.vn'),
 
-    ready: (pathname, done) => $(document).ready(() => setTimeout(() => {
-        if (pathname == undefined) {
-            done = null;
-            pathname = window.location.pathname;
-        } else if (typeof pathname == 'function') {
-            done = pathname;
-            pathname = window.location.pathname;
-        }
+    ready: (pathname, done) => $(document).ready(() => {
+        T.clearSearchBox && T.clearSearchBox();
+        T.hideSearchBox && T.hideSearchBox();
 
-        done && done();
+        setTimeout(() => {
+            if (pathname == undefined) {
+                done = null;
+                pathname = window.location.pathname;
+            } else if (typeof pathname == 'function') {
+                done = pathname;
+                pathname = window.location.pathname;
+            }
 
-        $('ul.app-menu > li').removeClass('is-expanded');
-        $('ul.app-menu a.active').removeClass('active');
-        let menuItem = $(`a.app-menu__item[href='${pathname}']`);
-        if (menuItem.length != 0) {
-            menuItem.addClass('active');
-            // setTimeout(() => $('.app-sidebar').animate({ scrollTop: menuItem.offset().top - menuItem.parent().parent().offset().top }), 200);
-        } else {
-            menuItem = $(`a.treeview-item[href='${pathname}']`);
+            done && done();
+
+            $('ul.app-menu > li').removeClass('is-expanded');
+            $('ul.app-menu a.active').removeClass('active');
+            let menuItem = $(`a.app-menu__item[href='${pathname}']`);
             if (menuItem.length != 0) {
                 menuItem.addClass('active');
-                menuItem.parent().parent().parent().addClass('is-expanded');
                 // setTimeout(() => $('.app-sidebar').animate({ scrollTop: menuItem.offset().top - menuItem.parent().parent().offset().top }), 200);
+            } else {
+                menuItem = $(`a.treeview-item[href='${pathname}']`);
+                if (menuItem.length != 0) {
+                    menuItem.addClass('active');
+                    menuItem.parent().parent().parent().addClass('is-expanded');
+                    // setTimeout(() => $('.app-sidebar').animate({ scrollTop: menuItem.offset().top - menuItem.parent().parent().offset().top }), 200);
+                }
             }
-        }
-        // Update user url
-        const userUrl = window.location.pathname;
-        if (userUrl.startsWith('/user')) T.cookie('userUrl', userUrl);
+            // Update user url
+            const userUrl = window.location.pathname;
+            if (userUrl.startsWith('/user')) T.cookie('userUrl', userUrl);
 
-    }, 500)),
+        }, 500)
+    }),
 
     url: (url) => url + (url.indexOf('?') === -1 ? '?t=' : '&t=') + new Date().getTime(),
 

@@ -2,7 +2,11 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            4106: { title: 'Danh mục Ngành SĐH', link: '/user/sau-dai-hoc/danh-sach-nganh' },
+            4106: {
+                title: 'Ngành đào tạo',
+                subTitle: 'Sau đại học',
+                link: '/user/sau-dai-hoc/danh-sach-nganh'
+            },
         },
     };
     app.permission.add(
@@ -13,7 +17,7 @@ module.exports = app => {
     app.get('/user/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:read'), app.templates.admin);
     app.get('/user/sau-dai-hoc/danh-sach-nganh/upload', app.permission.check('dmNganhSdh:write'), app.templates.admin);
 
-    app.permissionHooks.add('staff', 'addRolesMonHocSdh', (user, staff) => new Promise(resolve => {
+    app.permissionHooks.add('staff', 'addRolesNganhSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
             app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:read', 'dmNganhSdh:write', 'dmNganhSdh:delete');
             resolve();

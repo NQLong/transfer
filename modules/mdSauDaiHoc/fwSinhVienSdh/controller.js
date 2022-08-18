@@ -17,7 +17,7 @@ module.exports = app => {
     app.get('/user/sv-sdh/item/:mssv', app.permission.check('svSdh:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRoleStudentSdh', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && ['34', '37'].includes(staff.maDonVi)) {
+        if (staff.maDonVi && ['37'].includes(staff.maDonVi)) {
             app.permissionHooks.pushUserPermission(user, 'svSdh:manage', 'svSdh:write', 'svSdh:delete');
             resolve();
         } else resolve();

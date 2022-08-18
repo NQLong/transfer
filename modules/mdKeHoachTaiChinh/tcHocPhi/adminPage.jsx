@@ -13,7 +13,7 @@ import CountUp from 'view/js/countUp';
 import Detail from './modal/DetailModal';
 import { EditModal } from './modal/EditModal';
 import { createInvoice, createInvoiceList, createMultipleHocPhi, getHocPhi, getTcHocPhiPage, updateHocPhi } from './redux';
-
+import TachMssvModal from './tachMssvModal';
 export class NumberIcon extends React.Component {
     componentDidMount() {
         setTimeout(() => {
@@ -49,7 +49,6 @@ export class NumberIcon extends React.Component {
         return this.props.link ? <Link to={this.props.link} style={{ textDecoration: 'none' }}>{content}</Link> : content;
     }
 }
-
 
 class InvoiceModal extends AdminModal {
     state = { isSubmitting: false }
@@ -234,7 +233,7 @@ class TcHocPhiAdminPage extends AdminPage {
         const buttons = [];
 
         invoicePermission.write && buttons.push({
-            className: 'btn-info', icon: 'fa-print', onClick: (e) => {
+            className: 'btn-info', icon: 'fa-print', tooltip: 'Xuất hóa đơn', onClick: (e) => {
                 e.preventDefault();
                 this.invoiceModal.show({
                     tuNgay: this.tuNgay?.value(),
@@ -242,6 +241,11 @@ class TcHocPhiAdminPage extends AdminPage {
                     hocKy: this.term.value(),
                     namHoc: this.year.value(),
                 });
+            }
+        }, {
+            className: 'btn-primary', icon: 'fa-scissors', tooltip: 'Tách MSSV', onClick: (e) => {
+                e.preventDefault();
+                this.tachMssvModal.show();
             }
         });
 
@@ -347,6 +351,8 @@ class TcHocPhiAdminPage extends AdminPage {
                     </div>
                     <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} />
                     <InvoiceResultModal ref={e => this.resultModal = e} />
+
+                    <TachMssvModal ref={e => this.tachMssvModal = e} />
                 </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
             onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,

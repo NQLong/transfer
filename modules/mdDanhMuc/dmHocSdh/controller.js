@@ -1,7 +1,13 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
-        menus: { 4027: { title: 'Bậc đào tạo sau đại học', link: '/user/danh-muc/bac-sdh' } },
+        menus: {
+            4027: {
+                title: 'Bậc đào tạo',
+                subTitle: 'Sau đại học',
+                link: '/user/danh-muc/bac-sdh'
+            }
+        },
     };
     app.permission.add(
         { name: 'dmHocSdh:read', menu },
@@ -33,7 +39,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/bac-sdh/all', app.permission.check('dmHocSdh:read'), (req, res) => {
+    app.get('/api/danh-muc/bac-sdh/all', app.permission.check('staff:login'), (req, res) => {
         app.model.dmHocSdh.getAll((error, items) => res.send({ error, items }));
     });
 

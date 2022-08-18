@@ -6791,6 +6791,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "NGOAI_NGU": {
+                    "value": "ngoaiNgu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2
                 }
             },
             "primaryKeys": [
@@ -6812,7 +6819,8 @@
                 "hcth_cong_van_di_search_selector": "searchSelector",
                 "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel",
                 "HCTH_CONG_VAN_DI_GET_SIGN_STAFF": "getSignStaff",
-                "HCTH_CONG_VAN_DI_VALIDATE_SO_CONG_VAN": "validateSoCongVan"
+                "HCTH_CONG_VAN_DI_VALIDATE_SO_CONG_VAN": "validateSoCongVan",
+                "HCTH_DASHBOARD_GET_DATA": "dashboardGetData"
             },
             "columns": {
                 "ID": {
@@ -14680,6 +14688,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "KHONG_TUYEN_SINH": {
+                    "value": "khongTuyenSinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [
@@ -15762,6 +15777,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152486\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -16020,15 +16042,16 @@
             "moduleName": "tcDinhMucHocPhi",
             "modelName": "tcDinhMucHocPhi",
             "methods": {
-                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage"
+                "TC_DINH_MUC_HOC_PHI_SEARCH_PAGE": "searchPage",
+                "TC_DINH_MUC_HOC_PHI_GET_ITEM_BY": "getItemBy"
             },
             "columns": {
-                "NAM_BAT_DAU": {
-                    "value": "namBatDau",
-                    "dataType": "NUMBER",
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
+                    "size": 11
                 },
                 "HOC_KY": {
                     "value": "hocKy",
@@ -16065,19 +16088,12 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "NAM_KET_THUC": {
-                    "value": "namKetThuc",
-                    "dataType": "NUMBER",
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
-                },
-                "SO_TIEN_MAC_DINH": {
-                    "value": "soTienMacDinh",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -16206,6 +16222,9 @@
             "active": true,
             "moduleName": "hcthHoSo",
             "modelName": "hcthHoSo",
+            "methods": {
+                "HCTH_HO_SO_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -16238,6 +16257,32 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SDH_DM_THOI_GIAN_DAO_TAO": {
+            "active": true,
+            "moduleName": "sdhDmThoiGianDaoTao",
+            "modelName": "sdhDmThoiGianDaoTao",
+            "columns": {
+                "SO_NAM": {
+                    "value": "soNam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "SO_NAM"
             ],
             "foreignKeys": [],
             "type": "table"

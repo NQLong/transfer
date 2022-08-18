@@ -332,5 +332,18 @@ module.exports = app => {
                     }
                 });
         }),
+
+        dashboardGetData: (timeselect, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_dashboard_get_data(:timeselect, :totalVanBanDen, :totalVanBanDi, :vanBanDenNam, :vanBanDiNam); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, timeselect, totalVanBanDen: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, totalVanBanDi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDenNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDiNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
+        }),
     };
 };

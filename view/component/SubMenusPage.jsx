@@ -98,6 +98,11 @@ class SubMenusPage extends AdminPage {
         });
     }
 
+    componentWillUnmount() {
+        T.onSearch = null;
+        T.onAdvanceSearchHide = null;
+    }
+
     search = (searchValue) => {
         const menus = this.state.menus.slice();
         for (let i = 0; i < menus.length; i++) {
