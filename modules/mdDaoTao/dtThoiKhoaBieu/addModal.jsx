@@ -28,7 +28,6 @@ class RenderListMon extends React.Component {
         });
     }
 
-
     componentDidUpdate(prev) {
         if (T.stringify(prev.data) != T.stringify(this.props.data)) this.init();
     }
@@ -37,18 +36,17 @@ class RenderListMon extends React.Component {
         let data = this.props.data,
             { khoaDangKy, maNganh, nam, soLop } = data;
         if (khoaDangKy == MA_PDT) {
-            let spliceLength = parseInt(this.state.dataNganh.length / soLop);
             Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
                 ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
             });
-            let dataNganh = this.state.dataNganh.map(item => item.id);
-
-            for (let nhom = 1; nhom <= soLop && dataNganh.length; nhom++) {
-                let value = dataNganh.splice(0, spliceLength);
-                this.ref.maNganh[nhom]?.value([...this.ref.maNganh[nhom]?.value(), ...value]);
-                this.ref.chuyenNganh[nhom]?.value('');
-                if (nhom == soLop && dataNganh.length > 0) { nhom = 0; spliceLength = 1; }
-            }
+            // let dataNganh = this.state.dataNganh.map(item => item.id);
+            // let spliceLength = parseInt(this.state.dataNganh.length / soLop);
+            // for (let nhom = 1; nhom <= soLop && dataNganh.length; nhom++) {
+            //     let value = dataNganh.splice(0, spliceLength);
+            //     this.ref.maNganh[nhom]?.value([...this.ref.maNganh[nhom]?.value(), ...value]);
+            //     this.ref.chuyenNganh[nhom]?.value('');
+            //     if (nhom == soLop && dataNganh.length > 0) { nhom = 0; spliceLength = 1; }
+            // }
         } else {
             getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
                 Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
@@ -66,7 +64,7 @@ class RenderListMon extends React.Component {
         try {
             Array.from({ length: this.state.soLop }, (_, i) => i + 1).forEach(nhom => {
                 let eachData = {};
-                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh', 'maNganh', 'giangVien'].forEach(key => {
+                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'tietBatDau', 'chuyenNganh', 'maNganh', 'giangVien'].forEach(key => {
                     eachData[key] = this.ref[key][nhom] ? getValue(this.ref[key][nhom]) : '';
                 });
                 data.push(eachData);
@@ -97,6 +95,7 @@ class RenderListMon extends React.Component {
                 soTietBuoi: {},
                 soBuoiTuan: {},
                 soLuongDuKien: {},
+                tietBatDau: {},
                 maNganh: {},
                 chuyenNganh: {},
                 giangVien: {}
@@ -105,9 +104,10 @@ class RenderListMon extends React.Component {
                 <div className='form-group col-md-12' style={{ marginBottom: '0.5rem' }}><b>Lớp {maMonHoc}_{nhom}</b>: {tenMonHoc}</div>
                 <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-1' placeholder='Số tiết /buổi' required defaulValue={soTietBuoi} />
                 <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-1' placeholder='Số buổi /tuần' required />
+                <FormTextBox type='number' ref={e => this.ref.tietBatDau[nhom] = e} className='col-md-1' placeholder='Tiết bắt đầu' />
                 <FormTextBox type='number' ref={e => this.ref.soLuongDuKien[nhom] = e} className='col-md-1' placeholder='SLDK' required multiple />
-                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-6' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
-                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-6' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
+                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-5' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
+                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-5' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
                 <FormSelect ref={e => this.ref.giangVien[nhom] = e} data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' className='col-md-3' />
                 {nhom != soLop && <hr className='col-md-12' />}
             </React.Fragment>);
@@ -250,8 +250,9 @@ class AddingModal extends AdminModal {
                                 <div className='row' style={{ position: 'sticky', top: 0, zIndex: '1051', backgroundColor: '#0275d8', paddingBottom: '10px', paddingTop: '10px', textAlign: 'center', marginBottom: '15px' }}>
                                     <b className='col-md-1 text-white' >S.Tiết</b>
                                     <b className='col-md-1 text-white' >S.Buổi</b>
+                                    <b className='col-md-1 text-white' >T.bắt đầu</b>
                                     <b className='col-md-1 text-white' >SLDK</b>
-                                    <b className='col-md-6 text-white' >{this.state.data.maNganh ? 'Chuyên ngành' : 'Ngành đào tạo'}</b>
+                                    <b className='col-md-5 text-white' >{this.state.data.maNganh ? 'Chuyên ngành' : 'Ngành đào tạo'}</b>
                                     <b className='col-md-3 text-white' >Giảng viên</b>
                                 </div>
                                 <div className='row'>
