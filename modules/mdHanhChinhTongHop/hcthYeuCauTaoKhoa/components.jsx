@@ -14,7 +14,7 @@ export class DrawSignatureModal extends AdminModal {
       e.preventDefault();
       console.log(this.state.sigUrl);
       const { shcc  }= this.props.system.user;
-      this.props.createSignatureImg(shcc, this.state.sigUrl);
+      this.props.createSignatureImg(shcc, this.state.sigUrl, () => this.hide());
     }
 
     render = () => {
@@ -53,7 +53,7 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
 
     contextRef.current = context;
   
-  }, []);
+  }, [isDrawing]);
 
   const draw = ({ nativeEvent}) => {
     if (!isDrawing) return;
@@ -97,7 +97,7 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
       const canvas = canvasRef.current;
       contextRef.current.clearRect(0, 0, canvas.width, canvas.height);
     }
-    
+    onChangeSigData('');
   };
 
   const onSuccess = (response) => {
