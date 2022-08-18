@@ -22,7 +22,7 @@ export class DrawSignatureModal extends AdminModal {
             title: 'Vẽ chữ ký',
             size: 'large',
             body: <div>
-                    <Canvas lineWith={2} 
+                    <Canvas lineWith={8} 
                             style={{ border: '2px dotted #CCCCCC', borderRadius: 15, cursor: 'crosshair' }} 
                             sigUrl={this.state.sigUrl} 
                             onChangeSigData={(data) => this.setState({ sigUrl: data})} 
@@ -38,8 +38,8 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isUpload] = useState(false);
-  const [imgUrl] = useState(null);
+  const [isUpload, setIsUpload] = useState(false);
+  const [imgUrl, setImgUrl] = useState(null);
 
   const uploadFileRef = useRef(null);
 
@@ -79,52 +79,38 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
     const { width, height } = canvas;
 
     const resizeCanvas = document.createElement('CANVAS');
-    resizeCanvas.width = 100;
-    resizeCanvas.height = 100;
+    resizeCanvas.width = 300;
+    resizeCanvas.height = 300;
     let ctx = resizeCanvas.getContext('2d');
 
-    ctx.drawImage(canvas, 0, 0, width, height, 0, 0, 100, 100);
+    ctx.drawImage(canvas, 0, 0, width, height, 0, 0, 300, 300);
 
     const data = resizeCanvas.toDataURL('image/png', 1.0);
     onChangeSigData(data);
   };
 
-  const clearDraw = () => {
-    const canvas = canvasRef.current;
-    contextRef.current.clearRect(0, 0, canvas.width, canvas.height);
+  const clearDraw = () => { 
+    if (isUpload) {
+      setImgUrl('');
+      setIsUpload(false);
+    } else {
+      const canvas = canvasRef.current;
+      contextRef.current.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
   };
 
   const onSuccess = (response) => {
     if (response.error) T.notify(response.error, 'danger');
     else if (response.item) {
-      const base64Str = 'data:image/png;base64,' + response.item.content;
-      console.log(base64Str);
-      const img = new Image();
-      img.src = base64Str;
-      const resizeCanvas = document.createElement('CANVAS');
-      const width = img.width / 3;
-      const height = img.height / 2;
-      resizeCanvas.width = width;
-      resizeCanvas.height = height;
-      const ctx = resizeCanvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-
-      console.log(resizeCanvas.toDataURL());
-
-      onChangeSigData(resizeCanvas.toDataURL());
-
-      // const base_image = new Image();
-      // base_image.src = response.item.content
-      // // setIsUpload(true);
-      // // setImgUrl('data:image/png;base64,' + response.item.content);
-      // contextRef.current.drawImage(base_image, 0, 0);
-      // onChangeSigData('data:image/png;base64,' + response.item.content);
+      setIsUpload(true);
+      setImgUrl('data:image/png;base64,' + response.item.content);
+      onChangeSigData('data:image/png;base64,' + response.item.content);
     }
   };
 
   const onUploadFile = (e) => {
     e.preventDefault();
-
     uploadFileRef.current.uploadInput.click();
   };
 

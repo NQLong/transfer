@@ -19,6 +19,7 @@ module.exports = app => {
 
     app.permission.add({ name: 'hcthYeuCauTaoKhoa:read', menu: staffMenu }, 'hcthYeuCauTaoKhoa:write', 'hcthYeuCauTaoKhoa:delete');
     app.permission.add({ name: 'manager:write', menu: menu });
+    app.permission.add({ name: 'rectors:login', menu: menu });
     app.get('/user/hcth/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
     app.get('/user/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
 
@@ -182,9 +183,9 @@ module.exports = app => {
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
             
-            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, 2000), { version: 33, errorCorrectionLevel: 'L',  });
+            const qrCode_1 = await qrCode.toDataURL(p12b64.slice(0, 2000), { version: 33, errorCorrectionLevel: 'L',  });
 
-            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L'});
+            const qrCode_2 = await qrCode.toDataURL(p12b64.slice(2000), { version: 30, errorCorrectionLevel: 'L'});
 
             await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? 'hieuquang2212@gmail.com' : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', 
             [{
@@ -329,7 +330,7 @@ module.exports = app => {
             if (signature) {
                 res.send({ item: signature });
             } else {
-                res.send({ item: {} });
+                res.send({ item: null });
             }
         } catch (error) {
             res.send({ error });

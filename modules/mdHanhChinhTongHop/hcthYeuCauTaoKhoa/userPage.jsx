@@ -60,7 +60,7 @@ class DownloadModal extends AdminModal {
             title: 'Tạo yêu cầu mới',
             size: 'large',
             body: <div className='row'>
-                <div classNane='col-md-12 form-group' style={{ color: 'red', padding: 20 }}>
+                <div className='col-md-12 form-group' style={{ color: 'red', padding: 20 }}>
                     *Lưu ý: Mật khẩu này không thể thay đổi đối với mỗi khóa và sẽ được yêu cầu mỗi khi ký điện tử
                 </div>
                 <FormTextBox className='col-md-12' ref={e => this.passphrase = e} label='Mật khẩu' type='password' />
