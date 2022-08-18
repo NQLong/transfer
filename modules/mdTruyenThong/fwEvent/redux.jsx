@@ -71,6 +71,24 @@ export function getEventInPage(pageNumber, pageSize, pageCondition, done) {
     };
 }
 
+T.initPage('pageEventDonVi');
+export function getEventDonVi(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageEventDonVi', pageNumber, pageSize, pageCondition);
+    return dispatch => {
+        const url = '/api/event-donvi/page/' + page.pageNumber + '/' + page.pageSize;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger');
+                console.error('GET: ' + url + '.', data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                dispatch({ type: EventGetPage, page: data.page });
+                if (done) done(data.page);
+            }
+        }, () => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
+    };
+}
+
 export function getEventByCategoryAdmin(category, pageNumber, pageSize, done) {
     // const page = T.updatePage('pageEventTuyenSinh', pageNumber, pageSize);
     return () => {
@@ -192,7 +210,7 @@ export function createDraftEvent(result, done) {
 }
 
 export function updateEvent(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/event';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -201,7 +219,7 @@ export function updateEvent(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin sự kiện thành công!', 'success');
-                dispatch(getEventInPage());
+                // dispatch(getEventInPage());
                 done && done();
             }
         }, () => T.notify('Cập nhật thông tin sự kiện bị lỗi!', 'danger'));
@@ -240,8 +258,8 @@ export function swapEvent(id, isMoveUp) {
     };
 }
 
-export function deleteEvent(id) {
-    return dispatch => {
+export function deleteEvent(id, done) {
+    return () => {
         const url = '/api/event';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -249,7 +267,7 @@ export function deleteEvent(id) {
                 console.error('DELETE: ' + url + '.', data.error);
             } else {
                 T.alert('Sự kiện được xóa thành công!', 'error', false, 800);
-                dispatch(getEventInPage());
+                done && done();
             }
         }, () => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
     };
