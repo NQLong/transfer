@@ -4787,6 +4787,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88945\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "LANGUAGES": {
+                    "value": "languages",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
