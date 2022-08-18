@@ -19,57 +19,6 @@ module.exports = app => {
         return sorted;
     }
 
-
-    app.get('/api/vnpay/start-thanh-toan/:bank', app.permission.check('student:login'), async (req, res) => {
-        try {
-            const student = req.session.user;
-            const bank = req.params.bank;
-            let { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl');
-            const bankMapper = {
-                'agri': vnp_TmnCodeAgribank,
-                'vnpay-agri': vnp_TmnCodeVnpayAgribank,
-                'vcb': vnp_TmnCodeVcb,
-                'vnpay-vcb': vnp_TmnCodeVnpayVcb
-            }, hashMapper = {
-                'agri': vnp_HashSecretAgribank,
-                'vnpay-agri': vnp_HashSecretAgribank,
-                'vcb': vnp_HashSecretVcb,
-                'vnpay-vcb': vnp_HashSecretVcb
-            };
-            if (!bank || !Object.keys(bankMapper).includes(bank)) throw 'Permission reject!';
-            if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
-            const mssv = student.data.mssv;
-            const ipAddr = req.headers['x-forwarded-for'] ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress;
-
-            const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
-            let { congNo } = dataHocPhi;
-            const vnp_OrderInfo = `USSH: Học phí SV ${mssv}, học kỳ ${hocKy} NH ${namHoc} - ${parseInt(namHoc) + 1}`;
-            const now = new Date(), vnp_CreateDate = dateFormat(now, 'yyyymmddHHmmss'),
-                vnp_IpAddr = ipAddr,
-                vnp_Locale = 'vn',
-                vnp_TxnRef = `${mssv}_${vnp_CreateDate}`;
-
-            const vnp_Amount = congNo * 100, vnp_TmnCode = bankMapper[bank], vnp_HashSecret = hashMapper[bank];
-
-            let params = { vnp_Version, vnp_Command, vnp_TmnCode, vnp_Locale, vnp_CurrCode, vnp_TxnRef, vnp_OrderInfo, vnp_Amount, vnp_ReturnUrl, vnp_IpAddr, vnp_CreateDate };
-            params = sortObject(params);
-
-            const signData = querystring.stringify(params, { encode: false });
-            const hmac = crypto.createHmac('sha512', vnp_HashSecret);
-
-            const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-            params = app.clone(params, { vnp_SecureHash });
-            const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
-            await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
-            res.send(urlRequest);
-        } catch (error) {
-            res.send({ error });
-        }
-    });
-
     app.get('/vnpay/ipn', async (req, res) => {
         try {
             let vnp_Params = req.query;
