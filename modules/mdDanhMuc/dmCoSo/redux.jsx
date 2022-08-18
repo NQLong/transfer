@@ -140,3 +140,11 @@ export function updateDmCoSo(ma, changes, done) {
 export function changeDmCoSo(item) {
     return { type: DmCoSoUpdate, item };
 }
+
+export const SelectAdapter_DmCoSo = {
+    ajax: true,
+    url: '/api/danh-muc/co-so/all',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: T.parse(item.ten).vi })) : [] }),
+    fetchOne: (ma, done) => (getDmCoSo(ma, item => item && done && done({ id: item.ma, text: T.parse(item.ten).vi })))(),
+};

@@ -243,8 +243,8 @@ module.exports = app => {
         }),
 
         getFree: (config, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_get_free(:config, :hocphantheoidnganh, :hocphandaxep); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, config, hocphantheoidnganh: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, hocphandaxep: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_get_free(:config, :hocphantheoidnganh, :hocphandaxep, :currentstatusroom); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, config, hocphantheoidnganh: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, hocphandaxep: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, currentstatusroom: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

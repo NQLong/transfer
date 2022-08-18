@@ -96,6 +96,7 @@ export function createDtThoiKhoaBieuMultiple(data, settings, done) {
             if (data.error) {
                 T.notify('Tạo lớp bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error.message}`);
+                done && done();
             } else {
                 T.notify('Tạo lớp thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
@@ -151,7 +152,7 @@ export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data);
             } else {
-                T.notify('Điều chỉnh thành công!', 'success');
+                // T.notify('Điều chỉnh thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
                 done && done(data);
             }
