@@ -13,7 +13,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1057: { title: 'Tạo khoá', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
+            1057: { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
         },
     };
 
