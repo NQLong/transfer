@@ -3,6 +3,7 @@ import T from 'view/js/common';
 export const HcthRequestGetUserRequest = 'HcthRequest:GetUserRequest';
 export const HcthRequestGetRequest = 'HcthRequest:GetRequest';
 export const HcthRequestGetKey = 'HcthRequest:GetKey';
+export const HcthRequestGetSignature = 'HcthRequest:GetSignature';
 
 export default function hcthYeuCauTaoKhoa(state = null, data) {
     switch (data.type) {
@@ -12,6 +13,8 @@ export default function hcthYeuCauTaoKhoa(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case HcthRequestGetKey:
             return Object.assign({}, state, { key: data.key });
+        case HcthRequestGetSignature:
+            return Object.assign({}, state, { signature: data.signature });
         default:
             return state;
     }
@@ -112,5 +115,37 @@ export function downloadKey(data, done) {
                 done && done();
             }
         }, () => T.notify('Tải khóa thất bại', 'danger'));
+    };
+}
+
+export function createSignatureImg(shcc, dataUrl, done) {
+    return (dispatch) => {
+        const url = '/api/hcth/chu-ky';
+        T.post(url, { shcc, dataUrl }, res => {
+            if (res.error) {
+                T.notify('Tạo chữ ký lỗi', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                T.notify('Tạo chữ ký thành công', 'success');
+                dispatch(getSignature());
+                done && done();
+            }
+        }, () => T.notify('Tạo chữ ký lỗi', 'danger'));
+    };
+}
+
+export function getSignature(done) {
+    return dispatch => {
+        const url = '/api/hcth/chu-ky';
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy chữ ký thất bại', 'danger');
+                console.error(`GET: ${url}.`, res.error);
+            } else {
+                T.notify('Lấy chữ ký thành công', 'success');
+                dispatch({ type: HcthRequestGetSignature, signature: res.item });
+                done && done(res.item);
+            }
+        }, () => T.notify('Lấy khóa thất bại', 'danger'));
     };
 }
