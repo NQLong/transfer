@@ -1,6 +1,5 @@
 module.exports = app => {
     const forge = require('node-forge');
-    const qrCode = require('qrcode');
     const { trangThaiRequest } = require('../constant');
 
     const staffMenu = {
@@ -182,25 +181,16 @@ module.exports = app => {
             if (khoa.publicKey) throw 'Khóa đã được gửi đến người dùng';
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
-            
-            const qrCode_1 = await qrCode.toDataURL(p12b64.slice(0, 2000), { version: 33, errorCorrectionLevel: 'L',  });
 
-            const qrCode_2 = await qrCode.toDataURL(p12b64.slice(2000), { version: 30, errorCorrectionLevel: 'L'});
-
-            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? 'hieuquang2212@gmail.com' : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', 
-            [{
-                filename: `${shcc}-${khoa.id}-1.png`,
-                content:  qrCode_1.replace('data:image/png;base64,', ''),
-                encoding: 'base64'
-            }, {
-                filename: `${shcc}-${khoa.id}-2.png`,
-                content: qrCode_2.replace('data:image/png;base64,', ''),
+            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', [{
+                filename: `${shcc}-${khoa.id}.p12`,
+                content: p12b64,
                 encoding: 'base64'
             }]);
+
             await app.model.hcthUserPublicKey.update({ id: khoa.id }, { publicKey });
             res.send({});
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
@@ -275,14 +265,9 @@ module.exports = app => {
         try {
             const { shcc, dataUrl } = req.body;
 
-            if (!app.fs.existsSync(
-                app.path.join(app.assetPath, 'key')
-            )) {
-                app.createFolder(app.path.join(app.assetPath, 'key'));
-            }
+            app.createFolder(app.path.join(app.assetPath, 'key'));
 
             const destPath = app.path.join(app.assetPath, 'key', `${shcc}.png`);
-            console.log(destPath);
 
             const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
 
@@ -303,26 +288,25 @@ module.exports = app => {
         app.permission.has(req, () => hcthSignatureFile(req, fields, files, params, done), done, 'staff:login'));
 
     const hcthSignatureFile = (req, fields, files, params, done) => {
-            if (
-                fields.userData &&
-                fields.userData[0] &&
-                fields.userData[0].startsWith('hcthSignatureFile') &&
-                files.hcthSignatureFile &&
-                files.hcthSignatureFile.length > 0) {
-                    const srcPath = files.hcthSignatureFile[0].path,
-                        validUploadFileType = ['.png', '.jpg', '.jpeg'],
-                        baseNamePath = app.path.extname(srcPath);
-                    if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-                        done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                        app.deleteFile(srcPath);
-                    } else {
-                        const content = app.fs.readFileSync(files.hcthSignatureFile[0].path);
-                        console.log(content.toString('base64'));
-                        done && done({ item: {...files.hcthSignatureFile[0], content: content.toString('base64') } });
-                    }
+        if (
+            fields.userData &&
+            fields.userData[0] &&
+            fields.userData[0].startsWith('hcthSignatureFile') &&
+            files.hcthSignatureFile &&
+            files.hcthSignatureFile.length > 0) {
+            const srcPath = files.hcthSignatureFile[0].path,
+                validUploadFileType = ['.png', '.jpg', '.jpeg'],
+                baseNamePath = app.path.extname(srcPath);
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done && done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                const content = app.fs.readFileSync(files.hcthSignatureFile[0].path);
+                done && done({ item: { ...files.hcthSignatureFile[0], content: content.toString('base64') } });
             }
-        };
-    
+        }
+    };
+
     app.get('/api/hcth/chu-ky', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc;
@@ -339,7 +323,6 @@ module.exports = app => {
 
     app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), (req, res) => {
         const shcc = req.session.user.shcc;
-        const dir = app.path.join(app.assetPath, '/key');
-        return res.sendFile(app.path.join(dir, `${shcc}.png`));
+        return res.sendFile(app.path.join(app.path.join(app.assetPath, '/key'), `${shcc}.png`));
     });
 };

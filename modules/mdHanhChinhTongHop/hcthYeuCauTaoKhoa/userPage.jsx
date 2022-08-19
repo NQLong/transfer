@@ -89,7 +89,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
             return key;
         },
         loadingOverlay: false,
-        emptyTable: 'Chưa có yêu cầu tạo khóa',
+        emptyTable: 'Chưa có yêu cầu tạo khoá',
         renderHead: () => <tr>
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày duyệt</th>
             <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Duyệt bởi</th>
@@ -120,7 +120,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
     renderTable = () => renderTable({
         getDataSource: () => this.props.hcthYeuCauTaoKhoa?.userPage?.list,
         loadingOverlay: false,
-        emptyTable: 'Chưa có yêu cầu tạo khóa',
+        emptyTable: 'Chưa có yêu cầu tạo khoá',
         renderHead: () => <tr>
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>#</th>
             <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Lý do</th>
@@ -158,12 +158,10 @@ export class UserYeuCauTaoKhoa extends AdminPage {
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
         </tr>,
         renderRow: (item, index) => {
-            const
-                linkFile = '/api/hcth/chu-ky/download';
             return <tr key={item.id}>
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.R || index + 1} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
-                    <a href={linkFile} download={`${item.shcc}.png`}>{item.shcc}.png</a>
+                    <a href='/api/hcth/chu-ky/download' download={`${item.shcc}.png`}>{item.shcc}.png</a>
                 </>} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ngayTao && T.dateToText(new Date(item.ngayTao), 'HH:MM dd/mm/yyyy')} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={<></>} />
@@ -172,7 +170,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
     });
 
     pageConfig = {
-        title: 'Yêu cầu tạo khóa',
+        title: 'Yêu cầu tạo khoá',
         ready: '/user',
         icon: 'fa fa-key'
     }
@@ -204,7 +202,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
                     </div>
                 </div>
                 <div className='tile row'>
-                    <h3 className='tile-header'>Lịch sử yêu cầu tạo khóa</h3>
+                    <h3 className='tile-header'>Lịch sử yêu cầu tạo khoá</h3>
                     <div className='tile-body col-md-12'>
                         {this.renderTable({})}
                     </div>

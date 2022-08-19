@@ -6,31 +6,30 @@ const defaultLineColor = '#000000'; // black
 
 export class DrawSignatureModal extends AdminModal {
 
-    state = {
-      sigUrl: '',
-    }
+  state = {
+    sigUrl: '',
+  }
 
-    onSubmit = (e) => {
-      e.preventDefault();
-      console.log(this.state.sigUrl);
-      const { shcc  }= this.props.system.user;
-      this.props.createSignatureImg(shcc, this.state.sigUrl, () => this.hide());
-    }
+  onSubmit = (e) => {
+    e.preventDefault();
+    const { shcc } = this.props.system.user;
+    this.props.createSignatureImg(shcc, this.state.sigUrl, () => this.hide());
+  }
 
-    render = () => {
-        return this.renderModal({
-            title: 'Vẽ chữ ký',
-            size: 'large',
-            body: <div>
-                    <Canvas lineWith={8} 
-                            style={{ border: '2px dotted #CCCCCC', borderRadius: 15, cursor: 'crosshair' }} 
-                            sigUrl={this.state.sigUrl} 
-                            onChangeSigData={(data) => this.setState({ sigUrl: data})} 
-                            shcc={this.props.shcc}
-                    />
-            </div>
-        });
-    }
+  render = () => {
+    return this.renderModal({
+      title: 'Vẽ chữ ký',
+      size: 'large',
+      body: <div>
+        <Canvas lineWith={8}
+          style={{ border: '2px dotted #CCCCCC', borderRadius: 15, cursor: 'crosshair' }}
+          sigUrl={this.state.sigUrl}
+          onChangeSigData={(data) => this.setState({ sigUrl: data })}
+          shcc={this.props.shcc}
+        />
+      </div>
+    });
+  }
 }
 
 const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLineColor, style = {}, onChangeSigData, shcc }) => {
@@ -44,6 +43,7 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
   const uploadFileRef = useRef(null);
 
   useEffect(() => {
+
     const canvas = canvasRef.current;
 
     const context = canvas.getContext('2d');
@@ -52,10 +52,12 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
     context.lineWidth = lineWith;
 
     contextRef.current = context;
-  
+
+    contextRef.current.clearRect(0, 0, canvas.width, canvas.height); // reset canvas
+    
   }, [isDrawing]);
 
-  const draw = ({ nativeEvent}) => {
+  const draw = ({ nativeEvent }) => {
     if (!isDrawing) return;
 
     const { offsetX, offsetY } = nativeEvent;
@@ -89,7 +91,7 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
     onChangeSigData(data);
   };
 
-  const clearDraw = () => { 
+  const clearDraw = () => {
     if (isUpload) {
       setImgUrl('');
       setIsUpload(false);
@@ -117,11 +119,11 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ textAlign: 'center'}}>
-            {
-              isUpload ?
-              <div style={{ width: width, height: height}}>
-                 <img src={imgUrl} style={{ maxWidth: '100%', maxHeight: '100%'}}/> 
+        <div style={{ textAlign: 'center' }}>
+          {
+            isUpload ?
+              <div style={{ width: width, height: height }}>
+                <img src={imgUrl} style={{ maxWidth: '100%', maxHeight: '100%' }} />
               </div>
               :
               <canvas
@@ -133,23 +135,23 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
                 onMouseMove={draw}
                 style={style}
               ></canvas>
-            }
-            
+          }
+
         </div>
         <div>
           <button type='button' className='btn btn-danger' onClick={clearDraw} style={{ width: '100%', marginBottom: 10 }}>
-            <i className="fa fa-refresh" style={{ marginRight: 10}}></i>Xoá
+            <i className="fa fa-refresh" style={{ marginRight: 10 }}></i>Xoá
           </button>
-          <button type='button' className='btn btn-primary' onClick={onUploadFile} style={{ width: '100%'}}>
-            <i className='fa fa-upload' style={{ marginRight: 10}}></i>Tải lên
+          <button type='button' className='btn btn-primary' onClick={onUploadFile} style={{ width: '100%' }}>
+            <i className='fa fa-upload' style={{ marginRight: 10 }}></i>Tải lên
           </button>
         </div>
       </div>
       <FileBox ref={uploadFileRef} postUrl='/user/upload'
-              uploadType='hcthSignatureFile'
-              userData={`hcthSignatureFile:${shcc}`}
-              style={{ display: 'none' }}
-              success={onSuccess} ajax={true} />
+        uploadType='hcthSignatureFile'
+        userData={`hcthSignatureFile:${shcc}`}
+        style={{ display: 'none' }}
+        success={onSuccess} ajax={true} />
     </>
   );
 };

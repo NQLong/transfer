@@ -126,11 +126,11 @@ export function createSignatureImg(shcc, dataUrl, done) {
                 T.notify('Tạo chữ ký lỗi', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
-                T.notify('Tao chu ky thanh cong', 'success');
+                T.notify('Tạo chữ ký thành công', 'success');
                 dispatch(getSignature());
                 done && done();
             }
-        }, () => T.notify('Tao chu ky loi', 'danger'));
+        }, () => T.notify('Tạo chữ ký lỗi', 'danger'));
     };
 }
 
