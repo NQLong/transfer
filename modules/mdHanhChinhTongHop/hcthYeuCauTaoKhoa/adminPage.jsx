@@ -33,12 +33,12 @@ export class YeuCauTaoKhoa extends AdminPage {
     }
 
     onAprroveRequest = (request) => {
-        T.confirm('Duyệt yêu cầu này', `Bạn có chắc muốn duyệt yêu cầu tạo khoá của ${`${request.ho} ${request.ten}`.trim().normalizedName()}?`, true,
+        T.confirm('Duyệt yêu cầu này', `Bạn có chắc muốn duyệt yêu cầu tạo chữ ký của ${`${request.ho} ${request.ten}`.trim().normalizedName()}?`, true,
             isConfirm => isConfirm && this.props.updateStatus(request.id, trangThaiRequest.DA_DUYET.id));
     }
 
     onRefuseRequest = (request) => {
-        T.confirm('Từ chối yêu cầu này', `Bạn có chắc muốn từ chối yêu cầu tạo khoá của ${`${request.ho} ${request.ten}`.trim().normalizedName()}?`, true,
+        T.confirm('Từ chối yêu cầu này', `Bạn có chắc muốn từ chối yêu cầu tạo chữ ký của ${`${request.ho} ${request.ten}`.trim().normalizedName()}?`, true,
             isConfirm => isConfirm && this.props.updateStatus(request.id, trangThaiRequest.TU_CHOI.id));
     }
 
@@ -48,7 +48,7 @@ export class YeuCauTaoKhoa extends AdminPage {
         loadingOverlay: false,
         loadingClassName: 'd-flex justify-content-center',
         stickyHead: true,
-        emptyTable: 'Chưa có yêu cầu tạo khoá',
+        emptyTable: 'Chưa có yêu cầu tạo chữ ký',
         renderHead: () => <tr>
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>#</th>
             <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Người yêu cầu</th>
@@ -82,7 +82,7 @@ export class YeuCauTaoKhoa extends AdminPage {
     });
 
     pageConfig = {
-        title: 'Yêu cầu tạo khoá',
+        title: 'Yêu cầu tạo chữ ký',
         ready: '/user/hcth/yeu-cau-tao-khoa',
         icon: 'fa fa-key'
     }

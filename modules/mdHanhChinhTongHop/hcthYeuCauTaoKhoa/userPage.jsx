@@ -61,7 +61,7 @@ class DownloadModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <div className='col-md-12 form-group' style={{ color: 'red', padding: 20 }}>
-                    *Lưu ý: Mật khẩu này không thể thay đổi đối với mỗi khóa và sẽ được yêu cầu mỗi khi ký điện tử
+                    *Lưu ý: Mật khẩu này không thể thay đổi đối với mỗi chữ ký và sẽ được yêu cầu mỗi khi cài đặt chữ ký trên thiết bị
                 </div>
                 <FormTextBox className='col-md-12' ref={e => this.passphrase = e} label='Mật khẩu' type='password' />
             </div>
@@ -114,7 +114,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
     })
 
     onDisableKey = () => {
-        //TODO: disable khoa
+        //TODO: Long disable khoa
     }
 
     renderTable = () => renderTable({
@@ -170,7 +170,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
     });
 
     pageConfig = {
-        title: 'Yêu cầu tạo khoá',
+        title: 'Chữ ký',
         ready: '/user',
         icon: 'fa fa-key'
     }
@@ -196,23 +196,23 @@ export class UserYeuCauTaoKhoa extends AdminPage {
             icon: this.pageConfig.icon,
             content: <>
                 <div className='tile row'>
-                    <h3 className='tile-header'>Khóa của bạn</h3>
+                    <h3 className='tile-header'>Chữ ký của bạn</h3>
                     <div className='col-md-12'>
                         {this.renderKey()}
                     </div>
                 </div>
                 <div className='tile row'>
-                    <h3 className='tile-header'>Lịch sử yêu cầu tạo khoá</h3>
-                    <div className='tile-body col-md-12'>
-                        {this.renderTable({})}
-                    </div>
-                </div>
-                <div className='tile row'>
-                    <h3 className='tile-header'>Chữ kí của bạn</h3>
+                    <h3 className='tile-header'>Chữ ký của bạn (hình ảnh)</h3>
                     <div className='tile-body col-md-12'>
                         {this.renderSignatureTable({})}
                     </div>
                 </div> 
+                <div className='tile row'>
+                    <h3 className='tile-header'>Lịch sử yêu cầu tạo chữ ký</h3>
+                    <div className='tile-body col-md-12'>
+                        {this.renderTable({})}
+                    </div>
+                </div>
                 <CreateModal ref={e => this.modal = e} create={this.props.createRequest} />
                 <DownloadModal ref={e => this.downloadModal = e} download={(data, done) => this.onDownloadKey(data, done)} />
                 <DrawSignatureModal ref={e => this.drawSignatureModal = e} {...this.props} shcc={this.props?.system?.user?.shcc} />
