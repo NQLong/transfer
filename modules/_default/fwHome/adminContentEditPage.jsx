@@ -50,23 +50,16 @@ class ContentEditPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('component:write') || currentPermissions.includes('website:write');
+        const currentPermissions = this.getCurrentPermissions();
+        const permissionWrite = currentPermissions.includes('component:write') || currentPermissions.includes('website:write');
         const title = this.state.title ? T.language.parse(this.state.title, true) : { en: '<empty>', vi: '<Trống>' };
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <div>
-                        <h1><i className='fa fa-image' /> Bài viết: Chỉnh sửa</h1>
-                        <p dangerouslySetInnerHTML={{ __html: title.vi }} />
-                    </div>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/component'>Thành phần giao diện</Link>
-                        &nbsp;/&nbsp;Chỉnh sửa
-                    </ul>
-                </div>
+
+        return this.renderPage({
+            icon: 'fa fa-image',
+            title: 'Bài viết: Chỉnh sửa',
+            subTitle: title.vi,
+            breadcrumb: [<Link key={0} to='/user/component'>Thành phần giao diện</Link>, 'Chỉnh sửa'],
+            content: <>
                 <div className='row'>
                     <div className='tile col-md-12'>
                         <div className='tile-body'>
@@ -112,15 +105,15 @@ class ContentEditPage extends AdminPage {
                     </div>
                 </div>
 
-                <Link to='/user/component' className='btn btn-secondary btn-circle' style={{ position: 'fixed', lefft: '10px', bottom: '10px' }}>
+                <Link to='/user/component' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                     <i className='fa fa-lg fa-reply' />
                 </Link>
                 {permissionWrite && (
                     <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                         <i className='fa fa-lg fa-save' />
                     </button>)}
-            </main>
-        );
+            </>
+        });
     }
 }
 
