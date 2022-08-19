@@ -51,10 +51,11 @@ module.exports = app => {
             const item = await app.model.fwStudents.get({ mssv });
             if (!item.image) {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
-                item.image = user.image;
+                item.image = user?.image;
             }
             res.send({ item });
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });

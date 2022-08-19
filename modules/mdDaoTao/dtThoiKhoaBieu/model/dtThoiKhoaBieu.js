@@ -69,9 +69,9 @@ module.exports = app => {
             // Section 1: Gen thời gian.
             let currentStatus = [];
             const dataScheduleAuto = await getDataGenerateSchedule(config, thuTietMo, currentStatus);
-            currentStatus = adjustCurrentStatusRoom(currentStatus);
+
             // Section 2: Auto gen phòng theo sức chứa và số lượng dự kiến, đồng thời tính toán ngày kết thúc
-            // const currentStatus = await app.model.dtThoiKhoaBieu.getCurrentStatusRooms();
+            currentStatus = adjustCurrentStatusRoom(currentStatus);
             const currentYear = new Date().getFullYear();
             let listNgayLe = await app.model.dmNgayLe.getAll({
                 statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
@@ -109,7 +109,7 @@ module.exports = app => {
             hocPhanDaXep[hocPhan.id] = hocPhan;
         });
         currentStatus.push(...currRoom);
-        // return { dataCanGen, dataCurrent, hocPhanTheoIdNganh, hocPhanDaXep };
+
         // 1.2: Config data thứ, tiết.
         let dataTiet = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
         dataTiet = dataTiet.map(item => parseInt(item.ten));
@@ -135,9 +135,6 @@ module.exports = app => {
             });
         });
 
-        // console.log(hocPhanTheoIdNganh);
-
-
         let dataReturn = {};
         hocPhanLoop: for (let hocPhan of dataCanGen) {
             let { id, loaiMonHoc, soTietBuoi } = hocPhan;
@@ -150,6 +147,10 @@ module.exports = app => {
                     let thuTiet = dataThoiGian.sample(),
                         [thu, tietBatDau] = thuTiet.split('_');
                     dataReturn[id] = { thu, tietBatDau, ...hocPhan };
+                    let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
+                    for (let idNganh of listNganh) {
+                        idNganh.available = idNganh.available.filter(tietThu => !toRemove.has(tietThu));
+                    }
                 } else {
                     thuTietLoop: for (const thuTiet of thoiGianRanhChung) {
                         if (!thuTiet) {
@@ -157,14 +158,12 @@ module.exports = app => {
                         }//TODO: Reset nếu vẫn đang trong scope maMonHocGlobal
                         else {
                             let [thu, tietBatDau] = thuTiet.split('_');
-                            console.log(thuTiet, thu, tietBatDau);
                             if (isValidPeriod(tietBatDau, soTietBuoi) == undefined) continue hocPhanLoop;
                             else if (isValidPeriod(tietBatDau, soTietBuoi) == false) continue thuTietLoop;
                             else {
                                 tietBatDau = parseInt(tietBatDau);
                                 thu = parseInt(thu);
                                 dataReturn[id] = { ...hocPhan, thu, tietBatDau };
-                                console.log(dataReturn);
                                 let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
                                 for (let idNganh of listNganh) {
                                     idNganh.available = idNganh.available.filter(tietThu => !toRemove.has(tietThu));
