@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { getContent, updateContent } from './redux/reduxContent';
 import { Link } from 'react-router-dom';
 import Editor from 'view/component/CkEditor4';
+import { AdminPage } from 'view/component/AdminPage';
 
-class ContentEditPage extends React.Component {
+class ContentEditPage extends AdminPage {
     state = { id: null, title: '', active: false, content: '' };
     viEditor = React.createRef();
     enEditor = React.createRef();
@@ -42,7 +43,7 @@ class ContentEditPage extends React.Component {
         const changes = {
             title: JSON.stringify({ vi: $('#cntViTitle').val(), en: $('#cntEnTitle').val() }),
             content: JSON.stringify({ vi: this.viEditor.current.html(), en: this.enEditor.current.html() }),
-            active: this.state.active ? 1 : 0,
+            active: this.state.active ? 1 : 0
         };
 
         this.props.updateContent(this.state.id, changes);
