@@ -24,6 +24,13 @@ module.exports = app => {
 
     app.get('/user/danh-muc/ngay-le/upload', app.permission.check('dmNgayLe:write'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRolesDmNgayLe', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtNgayLe:read', 'dmNgayLe:write', 'dmNgayLe:delete');
+            resolve();
+        } else resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/ngay-le/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
