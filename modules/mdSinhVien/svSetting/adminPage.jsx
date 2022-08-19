@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormEditor, FormTextBox } from 'view/component/AdminPage';
-import { getSvSettingKeys, updatSvSettingKeys } from './redux';
+import { getSvSettingKeys, updatSvSettingKeys, checkSinhVienNhapHoc, setSinhVienNhapHoc } from './redux';
 
 const listKeys = ['choPhepEdit', 'ctsvEmailXacNhanNhapHocTitle', 'ctsvEmailXacNhanNhapHocEditorText', 'ctsvEmailXacNhanNhapHocEditorHtml', 'ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail'];
 class SvSetting extends AdminPage {
@@ -45,6 +45,29 @@ class SvSetting extends AdminPage {
         arguments.length && this.props.updatSvSettingKeys(changes);
     }
 
+    checkMssv = () => {
+        let mssv = this.mssv.value();
+        if (mssv == '') {
+            T.notify('Chưa nhập mã số sinh viên', 'danger');
+            this.mssv.focus();
+        } else {
+            this.props.checkSinhVienNhapHoc(mssv, (data) => {
+                T.confirm3('Thông tin sinh viên', `Tình trạng: ${data.tinhTrang} <br/> Học phí: ${data.congNo == '0' ? 'Đã đóng học phí.' : 'Còn nợ học phí.'}`, 'warning', 'Chấp nhận', 'Từ chối',  isConfirm => {
+                    if (isConfirm != null) {
+                        let setData = {
+                            mssv: mssv,
+                            thaoTac: isConfirm ? 'D' : 'A'
+                        };
+                        
+                        if (!isConfirm) T.confirm('Chấp nhận nhập học', 'Bạn có chắc muốn chấp nhận học sinh này nhập học?', 'success', isAccept => {
+                            isAccept && this.props.setSinhVienNhapHoc(setData);
+                        }); else this.props.setSinhVienNhapHoc(setData);
+                    }
+                });
+            });
+        }
+    }
+
     render() {
         return this.renderPage({
             title: 'Cấu hình Phòng Công tác Sinh viên',
@@ -59,6 +82,18 @@ class SvSetting extends AdminPage {
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-success' type='button' onClick={() => this.save('choPhepEdit', 'defaultEmail')}>
                                 <i className='fa fa-fw fa-lg fa-save'></i>Lưu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='col-md-6'>
+                    <div className='tile'>
+                        <h3 className='tile-title'>Công tác nhập học</h3>
+                        <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' />
+                        <div style={{ textAlign: 'right' }}>
+                            <button className='btn btn-success' type='button' onClick={this.checkMssv}>
+                                <i className='fa fa-fw fa-lg fa-save'></i>Kiểm tra
                             </button>
                         </div>
                     </div>
@@ -106,6 +141,6 @@ class SvSetting extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = {
-    getSvSettingKeys, updatSvSettingKeys
+    getSvSettingKeys, updatSvSettingKeys, checkSinhVienNhapHoc, setSinhVienNhapHoc
 };
 export default connect(mapStateToProps, mapActionsToProps)(SvSetting);
