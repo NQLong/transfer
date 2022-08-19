@@ -32,3 +32,33 @@ export function updatSvSettingKeys(changes, done) {
         }, () => T.notify('Cập nhật thông tin cấu hình bị lỗi!', 'danger'));
     };
 }
+
+export function  checkSinhVienNhapHoc(mssv, done) {
+    return () => {
+        const url = '/api/ctsv/nhap-hoc/check-svnh-data';
+        T.post(url, { mssv }, data => {
+            if (data.error) {
+                T.notify('Hồ sơ không hợp lệ!', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                done && done(data.dataNhapHoc);
+            }
+        }, () => T.notify('Kiểm tra thống tin sinh viên bị lỗi!', 'danger'));
+    };
+}
+
+export function  setSinhVienNhapHoc(data, done) {
+    return () => {
+        const url = '/api/ctsv/nhap-hoc/set-svnh-data';
+        T.post(url, { data }, data => {
+            if (data.error) {
+                T.notify('Cập nhật thống tin nhập học sinh viên bị lỗi!', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
+                done && done(data.dataNhapHoc);
+            }
+        }, () => T.notify('Cập nhật thống tin nhập học sinh viên bị lỗi!', 'danger'));
+    };
+}
