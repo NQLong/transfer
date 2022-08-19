@@ -23,8 +23,8 @@ module.exports = app => {
         app.model.dmMucDanhGia.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmMucDanhGia.get({ ma: req.body.ma }, (error, item) => res.send({ error, item }));
+    app.get('/api/danh-muc/muc-danh-gia/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmMucDanhGia.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/muc-danh-gia', app.permission.check('dmMucDanhGia:write'), (req, res) => {
