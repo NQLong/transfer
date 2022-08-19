@@ -61,7 +61,9 @@ class SvSetting extends AdminPage {
                         
                         if (!isConfirm) T.confirm('Chấp nhận nhập học', 'Bạn có chắc muốn chấp nhận học sinh này nhập học?', 'success', isAccept => {
                             isAccept && this.props.setSinhVienNhapHoc(setData);
-                        }); else this.props.setSinhVienNhapHoc(setData);
+                        }); else T.confirm('Từ chối nhập học', 'Bạn có chắc muốn từ chối học sinh này nhập học?', 'warning', isDenial => {
+                            isDenial && this.props.setSinhVienNhapHoc(setData);
+                        });
                     }
                 });
             });
