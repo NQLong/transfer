@@ -2,17 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getContent, updateContent } from './redux/reduxContent';
 import { Link } from 'react-router-dom';
-import Editor from 'view/component/CkEditor4';
+import { AdminPage, FormCheckbox, FormTextBox, FormEditor } from 'view/component/AdminPage';
+import { getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { FormMultipleLanguage } from 'view/component/MultipleLanguageForm';
 
-class ContentEditPage extends React.Component {
-    state = { id: null, title: '', active: false, content: '' };
-    viEditor = React.createRef();
-    enEditor = React.createRef();
+class ContentEditPage extends AdminPage {
+    state = { id: null, title: '', homeLanguages: ['vi', 'en'] };
 
     componentDidMount() {
-        T.ready('/user/component', () => {
-            $('#cntViTitle').focus();
-
+        T.ready('/user/truyen-thong', () => {
             const route = T.routeMatcher('/user/content/edit/:contentId'),
                 params = route.parse(window.location.pathname);
             this.props.getContent(params.contentId, data => {
@@ -20,15 +18,19 @@ class ContentEditPage extends React.Component {
                     T.notify('Lấy bài viết bị lỗi!', 'danger');
                     this.props.history.push('/user/component');
                 } else if (data.item) {
-                    let { title, content } = data.item;
-                    title = T.language.parse(title || '', true);
-                    content = T.language.parse(content || '', true);
+                    let { id, title, content, active } = data.item;
 
-                    $('#cntViTitle').val(title.vi).focus();
-                    $('#cntEnTitle').val(title.en).focus();
-                    this.viEditor.current.html(content.vi);
-                    this.enEditor.current.html(content.en);
-                    this.setState(data.item);
+                    this.title.value(title);
+                    this.active.value(active);
+                    this.editor.value(content);
+                    this.setState({ id, title }, () => {
+                        if (data.item && data.item.hasOwnProperty('maDonVi')) {
+                            this.props.getDmDonVi(data.item.maDonVi, item => {
+                                const homeLanguages = item && item.homeLanguage ? item.homeLanguage.split(',') : ['vi', 'en'];
+                                this.setState({ homeLanguages });
+                            });
+                        }
+                    });
                 } else {
                     this.props.history.push('/user/component');
                 }
@@ -40,89 +42,38 @@ class ContentEditPage extends React.Component {
 
     save = () => {
         const changes = {
-            title: JSON.stringify({ vi: $('#cntViTitle').val(), en: $('#cntEnTitle').val() }),
-            content: JSON.stringify({ vi: this.viEditor.current.html(), en: this.enEditor.current.html() }),
-            active: this.state.active ? 1 : 0,
+            title: this.title.value(),
+            content: this.editor.value(),
+            active: Number(this.active.value())
         };
-
         this.props.updateContent(this.state.id, changes);
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('component:write') || currentPermissions.includes('website:write');
-        const title = this.state.title ? T.language.parse(this.state.title, true) : { en: '<empty>', vi: '<Trống>' };
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <div>
-                        <h1><i className='fa fa-image' /> Bài viết: Chỉnh sửa</h1>
-                        <p dangerouslySetInnerHTML={{ __html: title.vi }} />
-                    </div>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/component'>Thành phần giao diện</Link>
-                        &nbsp;/&nbsp;Chỉnh sửa
-                    </ul>
-                </div>
-                <div className='row'>
-                    <div className='tile col-md-12'>
-                        <div className='tile-body'>
-                            <ul className='nav nav-tabs'>
-                                <li className='nav-item'>
-                                    <a className='nav-link active show' data-toggle='tab' href='#contentViTab'>Việt Nam</a>
-                                </li>
-                                <li className='nav-item'>
-                                    <a className='nav-link' data-toggle='tab' href='#contentEnTab'>English</a>
-                                </li>
-                                <div className='form-group' style={{ whiteSpace: 'nowrap', position: 'absolute', right: '10px' }}>
-                                    <label className='control-label'>Kích hoạt: &nbsp;&nbsp;&nbsp;</label>
-                                    <label className='toggle'>
-                                        <input type='checkbox' checked={this.state.active} onChange={e => permissionWrite && this.changeActive(e)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </div>
-                            </ul>
+        const currentPermissions = this.getCurrentPermissions();
+        const permissionWrite = currentPermissions.includes('component:write') || currentPermissions.includes('website:write');
+        const title = this.state.title ? T.language.parse(this.state.title, 'vi') : '<Trống>';
 
-                            <div className='tab-content'>
-                                <div id='contentViTab' className='tab-pane fade show active'>
-                                    <div className='form-group'>
-                                        <label className='control-label'>Tiêu đề</label>
-                                        <input className='form-control' type='text' placeholder='Tiêu đề' id='cntViTitle' defaultValue={this.state.title} readOnly={!permissionWrite} />
-                                    </div>
-                                    <div className='form-group'>
-                                        <label className='control-label'>Nội dung</label>
-                                        <Editor ref={this.viEditor} placeholder='Nội dung bài biết' height='400px' uploadUrl='/user/upload?category=content' readOnly={!permissionWrite} />
-                                    </div>
-                                </div>
-                                <div id='contentEnTab' className='tab-pane fade'>
-                                    <div className='form-group'>
-                                        <label className='control-label'>Title</label>
-                                        <input className='form-control' type='text' placeholder='Title' id='cntEnTitle' defaultValue={this.state.title} readOnly={!permissionWrite} />
-                                    </div>
-                                    <div className='form-group'>
-                                        <label className='control-label'>Content</label>
-                                        <Editor ref={this.enEditor} placeholder='Content' height='400px' uploadUrl='/user/upload?category=content' readOnly={!permissionWrite} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        return this.renderPage({
+            icon: 'fa fa-image',
+            title: 'Bài viết: Chỉnh sửa',
+            subTitle: title,
+            breadcrumb: [<Link key={0} to='/user/component'>Thành phần giao diện</Link>, 'Chỉnh sửa'],
+            content: <>
+                <div className='tile'>
+                    <div className='tile-body'>
+                        <FormCheckbox ref={e => this.active = e} isSwitch style={{ position: 'absolute', right: '15px' }} label='Kích hoạt' readOnly={!permissionWrite} />
+                        <FormMultipleLanguage ref={e => this.title = e} tabRender title='Tiêu đề' languages={this.state.homeLanguages} FormElement={FormTextBox} readOnly={!permissionWrite} />
+                        <FormMultipleLanguage ref={e => this.editor = e} tabRender title='Nội dung' languages={this.state.homeLanguages} FormElement={FormEditor} formProps={{ uploadUrl: '/user/upload?category=content' }} readOnly={!permissionWrite} />
                     </div>
                 </div>
-
-                <Link to='/user/component' className='btn btn-secondary btn-circle' style={{ position: 'fixed', lefft: '10px', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-                {permissionWrite && (
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
-                        <i className='fa fa-lg fa-save' />
-                    </button>)}
-            </main>
-        );
+            </>,
+            backRoute: () => this.props.history.goBack(),
+            onSave: permissionWrite ? () => this.save() : null
+        });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, content: state.content });
-const mapActionsToProps = { getContent, updateContent };
+const mapActionsToProps = { getContent, updateContent, getDmDonVi };
 export default connect(mapStateToProps, mapActionsToProps)(ContentEditPage);

@@ -76,4 +76,41 @@ module.exports = app => {
             res.send({ error });
         }
     });
+
+    app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
+        try {
+            const mssv = req.body.mssv;
+            const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+            let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
+            dataNhapHoc = dataNhapHoc.rows ? dataNhapHoc.rows[0] : {};
+            if (dataNhapHoc.ngayNhapHoc === null) {
+                return res.send({ error: 'Hồ sơ không hợp lệ' });
+            } else if (dataNhapHoc.ngayNhapHoc == -1) {
+                dataNhapHoc.ngayNhapHoc = null;
+                dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
+            } else {
+                dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+            }
+
+            await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
+            res.send({ dataNhapHoc });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/ctsv/nhap-hoc/set-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
+        try {
+            const user = req.session.user;
+            let data = req.body.data;
+            let { mssv, thaoTac } = data, timeModified = new Date().getTime();
+            if (thaoTac == 'A' || thaoTac == 'D') {
+                await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+            }
+            await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };
