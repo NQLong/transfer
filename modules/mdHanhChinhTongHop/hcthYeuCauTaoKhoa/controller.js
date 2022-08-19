@@ -265,7 +265,7 @@ module.exports = app => {
         try {
             const { shcc, dataUrl } = req.body;
 
-            app.createFolder(app.path.join(app.assetPath, 'key'));
+            app.fs.createFolder(app.path.join(app.assetPath, 'key'));
 
             const destPath = app.path.join(app.assetPath, 'key', `${shcc}.png`);
 
@@ -299,7 +299,7 @@ module.exports = app => {
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                app.deleteFile(srcPath);
+                app.fs.deleteFile(srcPath);
             } else {
                 const content = app.fs.readFileSync(files.hcthSignatureFile[0].path);
                 done && done({ item: { ...files.hcthSignatureFile[0], content: content.toString('base64') } });
