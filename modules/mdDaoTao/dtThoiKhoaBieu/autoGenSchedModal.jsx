@@ -1,4 +1,5 @@
 import { rgbToHex } from '@mui/material';
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmPhongAll } from 'modules/mdDanhMuc/dmPhong/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
@@ -6,7 +7,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, FormDatePicker, FormSelect, getValue, renderTable } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
-import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { initSchedule, autoGenSched } from './redux';
 
 
@@ -38,7 +38,8 @@ class AutoGenModal extends AdminModal {
             nam: getValue(this.nam),
             hocKy: getValue(this.hocKy),
             khoaSinhVien: getValue(this.khoaSinhVien),
-            listIdNganh: getValue(this.maNganh).toString(),
+            // listIdNganh: getValue(this.maNganh).toString(),
+            khoaDangKy: getValue(this.khoaDangKy),
             ngayBatDau: getValue(this.ngayBatDau).getTime()
         },
             listConfig = {
@@ -63,8 +64,9 @@ class AutoGenModal extends AdminModal {
                 <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-3' label='Năm học' onChange={this.handleNam} required />
                 <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-3' required />
                 <FormSelect ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-3' required />
-                <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Ngành' className='col-md-6' required multiple minimumResultsForSearch={-1} />
-                <FormDatePicker ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' className='col-md-6' required />
+                {/* <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Ngành' className='col-md-6' required multiple minimumResultsForSearch={-1} /> */}
+                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị (Khoa, bộ môn, PĐT)' className='col-md-6' required />
+                <FormDatePicker type='date-mask' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' required className='col-md-6' />
                 <FormSelect ref={e => this.listPhongKhongSuDung = e} data={SelectAdapter_DmPhongAll} label={<>Chọn các phòng <b>không sử dụng</b></>} className='col-md-12' multiple={true} />
                 <div className='form-group col-md-12'>Chọn các tiết <b>không xếp thời khoá biểu</b> </div>
                 <div className='form-group col-md-12' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

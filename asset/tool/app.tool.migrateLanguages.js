@@ -5,9 +5,9 @@ const app = {
     isDebug: !__dirname.startsWith('/var/www/'),
     fs: require('fs'),
     path,
-    publicPath: path.join(__dirname, package.path.public),
-    assetPath: path.join(__dirname, ''),
-    modulesPath: path.join(__dirname, '../../' + package.path.modules),
+    publicPath: path.join(__dirname, '../../', 'public'),
+    assetPath: path.join(__dirname, '../'),
+    modulesPath: path.join(__dirname, '../../', 'modules'),
     database: {},
     model: {}
 };
@@ -16,6 +16,8 @@ if (!app.isDebug) package = Object.assign({}, package, require('../config.json')
 // Configure ==================================================================
 require('../../config/common')(app);
 require('../../config/lib/fs')(app);
+require('../../config/lib/hooks')(app);
+require('../../config/lib/utils')(app);
 require('../../config/lib/string')(app);
 require('../../config/database.oracleDB')(app, package);
 
@@ -24,7 +26,7 @@ app.loadModules(false);
 
 const run = async () => {
     try {
-        const items = await app.model.fwNews.getAll({}, 'id, isTranslate, language, languages', 'id asc');
+        const items = await app.model.fwEvent.getAll({}, 'id, isTranslate, language, languages', 'id asc');
         for (const item of items) {
             const changes = {};
             if (item.isTranslate) {
@@ -32,7 +34,7 @@ const run = async () => {
             } else {
                 changes.languages = item.language;
             }
-            await app.model.fwNews.update({ id: item.id }, changes);
+            await app.model.fwEvent.update({ id: item.id }, changes);
         }
         console.log(' - Migrate done!');
         process.exit(0);
@@ -43,6 +45,6 @@ const run = async () => {
 }
 
 app.readyHooks.add('Run tool.migrateLanguages.js', {
-    ready: () => app.database.oracle.connected && app.model && app.model.fwNews,
+    ready: () => app.database.oracle.connected && app.model && app.model.fwEvent,
     run,
 });

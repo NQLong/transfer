@@ -17,6 +17,7 @@ import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/red
 import AutoGenSchedModal from './autoGenSchedModal';
 import AddingModal from './addModal';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
+import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
 
 const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     dataHocKy = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
@@ -201,23 +202,26 @@ class DtThoiKhoaBieuPage extends AdminPage {
     elementEdit = () => (
         <>
             <TableCell style={{ whiteSpace: 'nowrap' }} content={
-                <FormSelect ref={e => this.phong = e} style={{ marginBottom: '0', width: '120px' }} data={SelectAdapter_DmPhong} placeholder='Phòng' />
+                <FormSelect ref={e => this.phong = e} style={{ marginBottom: '0' }} data={SelectAdapter_DmPhong} placeholder='Phòng' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
-                <FormSelect ref={e => this.thu = e} style={{ width: '70px', marginBottom: '0' }} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
+                <FormSelect ref={e => this.thu = e} style={{ marginBottom: '0' }} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
-                <FormSelect ref={e => this.tietBatDau = e} style={{ width: '70px', marginBottom: '0' }} data={dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
+                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0' }} data={dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
-                <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '50px', marginBottom: '0' }} />
+                <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '70px', marginBottom: '0', textAlign: 'right' }} />
             } />
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ width: '70px', marginBottom: '0' }} />
+                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ marginBottom: '0', width: '70px', }} />
             } />
 
             <TableCell content={
-                <FormSelect ref={e => this.maNganh = e} style={{ marginBottom: '0' }} data={this.state.dataNganh} multiple />
+                <>
+                    <FormSelect ref={e => this.maNganh = e} style={{ marginBottom: '0', width: '400px' }} data={this.state.dataNganh} multiple placeholder='Ngành' />
+                    <FormSelect ref={e => this.chuyenNganh = e} style={{ marginBottom: '0', width: '400px' }} data={SelectAdapter_DtDanhSachChuyenNganh()} multiple placeholder='Chuyên ngành' />
+                </>
             } />
 
         </>
@@ -239,13 +243,15 @@ class DtThoiKhoaBieuPage extends AdminPage {
 
     handleEdit = (item) => {
         this.setState({ editId: item.id }, () => {
-            let maNganh = item.tenNganh.split('&&').map(nganh => nganh.split('%')[0]);
+            // let maNganh = item.tenNganh.split('&&').map(nganh => nganh.split('%')[0]);
+            // let chuyenNganh = item.tenChuyenNganh.split('&&').map(cn => cn.split('%'))
             this.phong.value(item.phong);
             this.thu.value(item.thu);
             this.tietBatDau.value(item.tietBatDau);
             this.soTiet.value(item.soTiet);
             this.soLuongDuKien.value(item.soLuongDuKien);
-            this.maNganh.value(maNganh);
+            this.maNganh.value(item.maNganh ? item.maNganh.split(',') : '');
+            this.chuyenNganh.value(item.maChuyenNganh ? item.maChuyenNganh.split(',') : '');
         });
     }
 
@@ -256,6 +262,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
             emptyTable: 'Không có dữ liệu thời khóa biểu',
             getDataSource: () => list, stickyHead: true,
             header: 'thead-light',
+            className: 'table-fix-col',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -283,22 +290,11 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 </tr>),
             renderRow: (item, index) => {
                 let indexOfItem = (pageNumber - 1) * pageSize + index + 1;
-                let official = item.ngayBatDau && item.ngayKetThuc,
-                    nganhTenNganh = item.tenNganh || '';
-                if (item.tenChuyenNganh) {
-                    let chuyenNganh = item.tenChuyenNganh.split('%');
-                    nganhTenNganh += `&&${chuyenNganh[0]}_${chuyenNganh[1].getFirstLetters()}%${chuyenNganh[1]}`;
-                }
+                let official = item.ngayBatDau && item.ngayKetThuc;
                 return (
                     <tr key={index} >
                         <TableCell style={{ textAlign: 'right' }} content={indexOfItem} />
-                        {official ? <TableCell type='buttons' style={{ textAlign: 'center' }} content={item}>
-                            {(permission.write || permission.manage) && <Tooltip title='Điều chỉnh' arrow>
-                                <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
-                                    <i className='fa fa-lg fa-cog' />
-                                </button>
-                            </Tooltip>}
-                        </TableCell> :
+                        {official ? <TableCell type='text' style={{ textAlign: 'center' }} content={'x'} /> :
                             <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={permission} />}
 
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={`${item.maMonHoc}_${item.nhom}`} />
@@ -313,12 +309,15 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tongTiet} />
                         {
                             this.state.editId == item.id ? this.elementEdit() : <>
-                                <TableCell type='number' content={item.phong} />
+                                <TableCell content={item.phong} />
                                 <TableCell type='number' content={item.thu} />
                                 <TableCell type='number' content={item.tietBatDau} />
                                 <TableCell type='number' content={item.soTiet} />
                                 <TableCell type='number' content={item.soLuongDuKien} />
-                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={nganhTenNganh.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < nganhTenNganh.split('&&').length - 1 ? ', ' : '.')}</span>)} />
+                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={<>{
+                                    item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                                    {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{`${nganh.split('%')[0]}_${nganh.split('%')[1].getFirstLetters()}`}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                                </>} />
                             </>
                         }
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayBatDau} />
@@ -345,6 +344,11 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                         <i className='fa fa-lg fa-check' />
                                     </button>
                                 </Tooltip>}</>}
+                            {(permission.write || permission.manage) && (item.phong && item.thu && item.tietBatDau) && <Tooltip title='Điều chỉnh' arrow>
+                                <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
+                                    <i className='fa fa-lg fa-cog' />
+                                </button>
+                            </Tooltip>}
                             {(permission.write || permission.manage) && item.phong && <Tooltip title='Xóa' arrow>
                                 <button className='btn btn-danger' onClick={e => e.preventDefault() || this.delete(item)}>
                                     <i className='fa fa-lg fa-trash' />
@@ -363,7 +367,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 'Thời khoá biểu'
             ],
             content: <>
-                {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null}
+                {/* {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null} */}
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtThoiKhoaBieuPage} />

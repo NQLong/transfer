@@ -13,5 +13,9 @@ export default {
             path: '/user/danh-muc/co-so',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/dao-tao/co-so',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
     ],
 };
