@@ -2,10 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5101: { title: 'Danh mục sự kiện', link: '/user/event/category', groupIndex: 2, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
+            5101: { title: 'Danh mục sự kiện', link: '/user/event/category', groupIndex: 2, icon: 'fa-list-alt', backgroundColor: '#00b8d4' },
             5102: { title: 'Danh sách sự kiện', link: '/user/event/list', groupIndex: 2, icon: 'fa-file-o', backgroundColor: '#22e5b4' },
-            5103: { title: 'Chờ duyệt', link: '/user/event/draft', groupIndex: 2, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
-        },
+            5103: { title: 'Chờ duyệt', link: '/user/event/draft', groupIndex: 2, icon: 'fa-file-o', backgroundColor: '#a1cc1f' }
+        }
     };
     app.permission.add(
         { name: 'event:manage', menu },
@@ -15,7 +15,7 @@ module.exports = app => {
         { name: 'event:roller', menu },
         { name: 'event:import', menu },
         { name: 'event:export', menu },
-        { name: 'event:draft', menu },
+        { name: 'event:draft', menu }
     );
 
     ['/event/item/:eventId', '/su-kien/:link', '/event/registration/item/:eventId', '/su-kien/dangky/:link', '/event/list'].forEach(route => app.get(route, app.templates.home));
@@ -27,44 +27,61 @@ module.exports = app => {
     app.get('/user/event/draft/edit/:id', app.permission.check('event:draft'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/event/page/:pageNumber/:pageSize', (req, res) => {//TODO
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let condition = { statement: null };
+    app.get('/api/event/page/:pageNumber/:pageSize', app.permission.check('event:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize);
+        let condition = {
+            statement: 'maDonVi LIKE :maDonVi ',
+            parameter: { maDonVi: '0' }
+        };
+
         if (req.query.condition) {
-            if (typeof (req.query.condition) == 'object') {
-                if (req.query.condition.searchText) {
-                    condition = {
-                        statement: 'title LIKE :searchText ',
-                        parameter: { searchText: `%${req.query.condition.searchText}%` }
-                    };
-                }
-            } else {
-                condition = {
-                    statement: 'title LIKE :searchText',
-                    parameter: { searchText: `%${req.query.condition}%` }
-                };
-            }
+            condition.statement += 'AND lower(title) LIKE :searchText';
+            condition.parameter.searchText = `%${req.query.condition.toLowerCase()}%`;
         }
-        const permissions = req.session.user && req.session.user.permissions,
-            user = req.session.user;
-        if (permissions.includes('website:write') && !permissions.includes('event:write')) {
-            condition.maDonVi = user.maDonVi;
-            delete condition.condition;
-        }
-        app.model.fwEvent.getPage(pageNumber, pageSize, condition, '*', 'priority DESC', (error, page) => {
-            const response = {};
+
+        app.model.fwEvent.getPage(pageNumber, pageSize, condition, 'id, title, image, active, isInternal', 'priority DESC', (error, page) => {
             if (error || page == null) {
-                response.error = 'Danh sách sự kiện không sẵn sàng!';
+                res.send({ error: 'Danh sách sự kiện không sẵn sàng!' });
             } else {
-                let list = page.list.map(item => app.clone(item, { content: null }));
-                response.page = app.clone(page, { list });
+                res.send({ page });
             }
-            res.send(response);
         });
     });
 
-    app.get('/api/event-category/page/:pageNumber/:pageSize', app.permission.check('news:read'), (req, res) => {
+    app.get('/api/event-donvi/page/:pageNumber/:pageSize', app.permission.check('website:read'), async (req, res) => {
+        try {
+            let pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize), condition = req.query.condition;
+            const pageCondition = { statement: '', parameter: {} }, permissions = req.session.user.permissions;
+            let donViConditionText = '', maDonVi = '';
+            if (condition) {
+                if (condition.searchText) {
+                    pageCondition.statement += 'lower(title) LIKE :searchText';
+                    pageCondition.parameter.searchText = `%${condition.searchText.toLowerCase()}%`;
+                }
+                if (condition.maDonVi && permissions.includes('website:manage')) {
+                    donViConditionText = 'maDonVi LIKE :maDonVi';
+                    maDonVi = condition.maDonVi;
+                }
+            }
+
+            if (!permissions.includes('website:manage')) {
+                donViConditionText = 'maDonVi LIKE :maDonVi';
+                maDonVi = req.session.user.maDonVi;
+            }
+
+            if (donViConditionText) {
+                pageCondition.statement += (pageCondition.statement.length ? ' AND ' : '') + donViConditionText;
+                pageCondition.parameter.maDonVi = maDonVi;
+            }
+
+            const page = await app.model.fwEvent.getPage(pageNumber, pageSize, pageCondition, 'id, priority, title, image, link, active, isInternal, createdDate, startPost, maDonVi');
+            res.send({ page });
+        } catch (error) {
+            res.send({ error: 'Danh sách sự kiện không sẵn sàng!' });
+        }
+    });
+
+    app.get('/api/event-category/page/:pageNumber/:pageSize', app.permission.check('event:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             categoryType = req.query.category;
@@ -72,7 +89,7 @@ module.exports = app => {
             const response = {};
             if (error || page == null) {
                 console.error('error', error);
-                response.error = 'Danh sách bài viết không sẵn sàng!';
+                response.error = 'Danh sách sự kiện không sẵn sàng!';
             } else {
                 let list = page.list.map(item => app.clone(item, { content: null }));
                 response.page = app.clone(page, { list });
@@ -183,8 +200,7 @@ module.exports = app => {
             app.model.fwEvent.update({ id }, changes, (error) => {
                 if (error) {
                     res.send({ error });
-                }
-                else {
+                } else {
                     categories ? app.model.fwEventCategory.delete({ eventId: id }, (error) => {
                         if (categories.indexOf('-1') === -1 && categories.length) {
                             const data = categories.map(categoryId => ({ eventId: id, categoryId }));
@@ -338,7 +354,6 @@ module.exports = app => {
     app.uploadHooks.add('uploadEventAvatar', (req, fields, files, params, done) =>
         // app.permission.has(req, () => uploadEventAvatar(req, fields, files, params, done), done, 'event:write')
         app.permission.has(req, () => uploadEventAvatar(req, fields, files, params, done), done, 'staff:login')
-
     );
     const uploadEventDraftAvatar = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('event:') && files.EventDraftImage && files.EventDraftImage.length > 0) {
@@ -356,6 +371,6 @@ module.exports = app => {
         run: () => app.model.fwEvent.count((error, numberOfEvent) => {
             numberOfEvent = Number(numberOfEvent);
             app.model.setting.setValue({ numberOfEvent: isNaN(numberOfEvent) ? 0 : numberOfEvent });
-        }),
+        })
     });
 };

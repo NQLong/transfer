@@ -11,11 +11,6 @@ import { getDmNgonNguAll } from 'modules/mdDanhMuc/dmNgonNguTruyenThong/redux';
 class NewsEditPage extends AdminPage {
     state = { id: null, createdDate: '', title: '', displayCover: 1, categories: [], homeLanguages: ['vi', 'en'], languageAdapter: [] };
 
-    constructor(props) {
-        super(props);
-        this.language = React.createRef();
-    }
-
     componentDidMount() {
         T.ready('/user/truyen-thong', () => {
             this.getData(true);
@@ -48,9 +43,9 @@ class NewsEditPage extends AdminPage {
                     });
                 }
 
-                let categories = data.categories.map(item => ({ id: item.id, text: T.language.parse(item.text, 'vi') }));
+                let categories = (data.categories || []).map(item => ({ id: item.id, text: T.language.parse(item.text, 'vi') }));
                 if (data.item.link) {
-                    this.neNewsLink.value(data.item.link);
+                    this.neNewsLink.value(data.item.link || '');
                     $(this.newsLink).html(T.rootUrl + '/tin-tuc/' + data.item.link).attr('href', '/tin-tuc/' + data.item.link);
                 } else {
                     $(this.newsLink).html('').attr('');
@@ -61,7 +56,7 @@ class NewsEditPage extends AdminPage {
                 } else {
                     $(this.newsEnLink).html('').attr('');
                 }
-                data.image = data.item.image ? data.item.image : '/image/avatar.png';
+                data.image = data.item.image ? data.item.image : '/img/avatar.png';
                 this.imageBox.setData('news:' + (data.item.id ? data.item.id : 'new'), data.item.image);
                 this.active.value(data.item.active);
                 this.isInternal.value(data.item.isInternal);

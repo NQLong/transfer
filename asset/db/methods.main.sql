@@ -1127,20 +1127,20 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_GET_FREE(config IN STRING, hocPhanTheoIdNganh OUT SYS_REFCURSOR,
-                                           hocPhanDaXep OUT SYS_REFCURSOR)
+                                           hocPhanDaXep OUT SYS_REFCURSOR, currentStatusRoom OUT SYS_REFCURSOR)
     RETURN SYS_REFCURSOR
 AS
-    my_cursor     SYS_REFCURSOR;
-    listIdNganh   STRING(500);
-    bac           STRING(10);
-    he            STRING(10);
-    khoaSv        STRING(4);
-    namHoc        STRING(100);
-    hocKy         STRING(1);
-    now           STRING(20);
-    listIdHocPhan STRING(500);
+    my_cursor  SYS_REFCURSOR;
+    khoaDangKy STRING(500);
+    bac        STRING(10);
+    he         STRING(10);
+    khoaSv     STRING(4);
+    namHoc     STRING(100);
+    hocKy      STRING(1);
+    now        STRING(20);
+--     listIdHocPhan STRING(500);
 begin
-    SELECT JSON_VALUE(config, '$.listIdNganh') INTO listIdNganh FROM DUAL;
+    SELECT JSON_VALUE(config, '$.khoaDangKy') INTO khoaDangKy FROM DUAL;
     SELECT JSON_VALUE(config, '$.bacDaoTao') INTO bac FROM DUAL;
     SELECT JSON_VALUE(config, '$.loaiHinhDaoTao') INTO he FROM DUAL;
     SELECT JSON_VALUE(config, '$.khoaSinhVien') INTO khoaSv FROM DUAL;
@@ -1148,17 +1148,17 @@ begin
     SELECT JSON_VALUE(config, '$.hocKy') INTO hocKy FROM DUAL;
     SELECT JSON_VALUE(config, '$.now') INTO now FROM DUAL;
 
-    SELECT LISTAGG(TMP.ID_THOI_KHOA_BIEU, ',') WITHIN GROUP (ORDER BY TMP.ID_THOI_KHOA_BIEU)
-    INTO listIdHocPhan
-    FROM (SELECT DISTINCT TKBN.ID_THOI_KHOA_BIEU
-          FROM DT_THOI_KHOA_BIEU_NGANH TKBN
-          WHERE TKBN.ID_NGANH IN
-                (SELECT regexp_substr(listIdNganh, '[^,]+', 1, level)
-                 from dual
-                 connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null)) TMP;
+    --     SELECT LISTAGG(TMP.ID_THOI_KHOA_BIEU, ',') WITHIN GROUP (ORDER BY TMP.ID_THOI_KHOA_BIEU)
+--     INTO listIdHocPhan
+--     FROM (SELECT DISTINCT TKBN.ID_THOI_KHOA_BIEU
+--           FROM DT_THOI_KHOA_BIEU_NGANH TKBN
+--           WHERE TKBN.ID_NGANH IN
+--                 (SELECT regexp_substr(khoaDangKy, '[^,]+', 1, level)
+--                  from dual
+--                  connect by regexp_substr(khoaDangKy, '[^,]+', 1, level) is not null)) TMP;
 
     open hocPhanTheoIdNganh FOR
-        SELECT DISTINCT TKBN.ID_NGANH                    AS "idNganh",
+        SELECT DISTINCT TKBN.ID_NGANH                         AS "idNganh",
                         (SELECT LISTAGG(DTTKB.ID, ',') WITHIN GROUP (ORDER BY DTTKB.ID)
                          FROM DT_THOI_KHOA_BIEU DTTKB
                                   LEFT JOIN DT_THOI_KHOA_BIEU_NGANH DTTKBN ON DTTKB.ID = DTTKBN.ID_THOI_KHOA_BIEU
@@ -1169,7 +1169,8 @@ begin
                            AND TKB.KHOA_SINH_VIEN = khoaSv
                            AND TKB.NAM = namHoc
                            AND TKB.HOC_KY = hocKy
-                           AND TKB.LOAI_MON_HOC IS NULL) AS "idThoiKhoaBieu"
+                           AND TKB.LOAI_MON_HOC IS NULL
+                           AND TKB.KHOA_DANG_KY = khoaDangKy) AS "idThoiKhoaBieu"
         FROM DT_THOI_KHOA_BIEU_NGANH TKBN
                  LEFT JOIN DT_THOI_KHOA_BIEU TKB ON TKB.ID = TKBN.ID_THOI_KHOA_BIEU
         WHERE TKB.IS_MO = 1
@@ -1178,10 +1179,11 @@ begin
           AND TKB.KHOA_SINH_VIEN = khoaSv
           AND TKB.NAM = namHoc
           AND TKB.HOC_KY = hocKy
-          AND TKB.LOAI_MON_HOC IS NULL
-          AND TKBN.ID_NGANH IN (SELECT regexp_substr(listIdNganh, '[^,]+', 1, level)
-                                from dual
-                                connect by regexp_substr(listIdNganh, '[^,]+', 1, level) is not null);
+          AND TKB.KHOA_DANG_KY = khoaDangKy
+          AND TKB.LOAI_MON_HOC IS NULL;
+    --           AND TKBN.ID_NGANH IN (SELECT regexp_substr(khoaDangKy, '[^,]+', 1, level)
+--                                 from dual
+--                                 connect by regexp_substr(khoaDangKy, '[^,]+', 1, level) is not null);
     open hocPhanDaXep FOR
         SELECT TKB.ID                                  AS "id",
                TKB.MA_MON_HOC                          AS "maMonHoc",
@@ -1190,11 +1192,10 @@ begin
                TKB.SO_TIET_BUOI                        AS "soTietBuoi",
                TKB.TIET_BAT_DAU + TKB.SO_TIET_BUOI - 1 AS "tietKetThuc"
         FROM DT_THOI_KHOA_BIEU TKB
-        WHERE TKB.ID IN (SELECT regexp_substr(listIdHocPhan, '[^,]+', 1, level)
-                         from dual
-                         connect by regexp_substr(listIdHocPhan, '[^,]+', 1, level) is not null)
-          AND TKB.THU IS NOT NULL
+        WHERE TKB.THU IS NOT NULL
           AND TKB.TIET_BAT_DAU IS NOT NULL
+          AND TKB.PHONG IS NOT NULL
+          AND TKB.KHOA_DANG_KY = khoaDangKy
           AND TKB.BAC_DAO_TAO = bac
           AND TKB.LOAI_HINH_DAO_TAO = he
           AND TKB.IS_MO = 1
@@ -1202,7 +1203,22 @@ begin
           AND TKB.NAM = namHoc
           AND TKB.LOAI_MON_HOC IS NULL
           AND TKB.HOC_KY = hocKy;
-
+    --    AND TKB.ID IN (SELECT regexp_substr(listIdHocPhan, '[^,]+', 1, level)
+--                          from dual
+--                          connect by regexp_substr(listIdHocPhan, '[^,]+', 1, level) is not null);
+    open currentStatusRoom for
+        select
+            TKB.PHONG AS "phong",
+            TKB.THU AS "thu",
+            TKB.TIET_BAT_DAU AS "tietBatDau",
+            TKB.SO_TIET_BUOI AS "soTietBuoi"
+        from  DT_THOI_KHOA_BIEU TKB
+        WHERE TKB.PHONG IS NOT NULL
+          AND TKB.THU IS NOT NULL
+          AND TKB.TIET_BAT_DAU IS NOT NULL
+          AND TKB.IS_MO = 1
+          AND TKB.NAM = namHoc
+          AND TKB.HOC_KY = hocKy;
     open my_cursor for
         select TKB.ID                AS "id",
                TKB.MA_MON_HOC        AS "maMonHoc",
@@ -1213,19 +1229,21 @@ begin
                TKB.LOAI_MON_HOC      AS "loaiMonHoc",
                TKB.SO_LUONG_DU_KIEN  AS "soLuongDuKien",
                TKB.SO_TIET_LY_THUYET AS "soTietLyThuyet",
+               TKB.TIET_BAT_DAU      AS "tietBatDau",
                TKB.SO_BUOI_TUAN      AS "soBuoiTuan",
                TKB.SO_TIET_THUC_HANH AS "soTietThucHanh"
         From DT_THOI_KHOA_BIEU TKB
-        WHERE TKB.ID IN (SELECT regexp_substr(listIdHocPhan, '[^,]+', 1, level)
-                         from dual
-                         connect by regexp_substr(listIdHocPhan, '[^,]+', 1, level) is not null)
-          AND TKB.BAC_DAO_TAO = bac
+        WHERE TKB.BAC_DAO_TAO = bac
           AND TKB.LOAI_HINH_DAO_TAO = he
           AND TKB.PHONG IS NULL
           AND TKB.KHOA_SINH_VIEN = khoaSv
           AND TKB.IS_MO = 1
           AND TKB.NAM = namHoc
           AND TKB.HOC_KY = hocKy
+          AND TKB.KHOA_DANG_KY = khoaDangKy
+--     AND TKB.ID IN (SELECT regexp_substr(listIdHocPhan, '[^,]+', 1, level)
+--                          from dual
+--                          connect by regexp_substr(listIdHocPhan, '[^,]+', 1, level) is not null);
         ORDER BY TKB.SO_TIET_BUOI DESC;
     return my_cursor;
 end;
@@ -1361,6 +1379,14 @@ BEGIN
                      CTKDT.NAM_DAO_TAO        AS          "namDaoTao",
                      TKB.BAC_DAO_TAO          AS          "bacDaoTao",
                      TKB.LOAI_HINH_DAO_TAO    AS          "loaiHinhDaoTao",
+                     (SELECT LISTAGG(sNDT.MA_NGANH, ',') WITHIN GROUP (
+                         order by sTKB.ID
+                         )
+                      FROM DT_THOI_KHOA_BIEU sTKB
+                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
+                               INNER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
+                      WHERE sTKB.ID = TKB.ID) AS          "maNganh",
+
                      (SELECT LISTAGG((TO_CHAR(sNDT.MA_NGANH) || '%' || sNDT.TEN_NGANH), '&&') WITHIN GROUP (
                          order by sTKB.ID
                          )
@@ -1369,7 +1395,7 @@ BEGIN
                                INNER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
                       WHERE sTKB.ID = TKB.ID) AS          "tenNganh",
 
-                     (SELECT LISTAGG(TO_CHAR(sCN.NGANH  ) || '%' || sCN.TEN, '&&') WITHIN GROUP (
+                     (SELECT LISTAGG(TO_CHAR(sCN.NGANH) || '%' || sCN.TEN, '&&') WITHIN GROUP (
                          order by sTKB.ID
                          )
                       FROM DT_THOI_KHOA_BIEU sTKB
@@ -1378,6 +1404,16 @@ BEGIN
                                INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
                                           ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
                       WHERE sTKB.ID = TKB.ID) AS          "tenChuyenNganh",
+
+                     (SELECT LISTAGG(sCN.ID, ',') WITHIN GROUP (
+                         order by sTKB.ID
+                         )
+                      FROM DT_THOI_KHOA_BIEU sTKB
+                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
+                               LEFT OUTER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
+                               INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
+                                          ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
+                      WHERE sTKB.ID = TKB.ID) AS          "maChuyenNganh",
 
 --                      NDT.TEN_NGANH         AS             "tenNganh",
 --                      CN.TEN                AS             "tenChuyenNganh",
@@ -1419,7 +1455,7 @@ BEGIN
                   OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
                   OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm)
                   OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE sT)
-              ORDER BY TKB.THU, TKB.KHOA_DANG_KY)
+              ORDER BY TKB.THU NULLS FIRST, TKB.KHOA_DANG_KY)
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 END ;
