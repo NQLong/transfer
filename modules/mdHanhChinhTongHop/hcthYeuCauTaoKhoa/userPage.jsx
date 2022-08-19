@@ -2,7 +2,9 @@ import React from 'react';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { connect } from 'react-redux';
 import { createRequest, getUserRequest, getKey, downloadKey } from './redux';
+import { DrawSignatureModal } from './components';
 const { trangThaiRequest } = require('../constant');
+import { createSignatureImg, getSignature } from './redux';
 class CreateModal extends AdminModal {
 
     onShow = () => {
@@ -58,8 +60,8 @@ class DownloadModal extends AdminModal {
             title: 'Tạo yêu cầu mới',
             size: 'large',
             body: <div className='row'>
-                <div classNane='col-md-12 form-group' style={{ color: 'red', padding: 20 }}>
-                    *Lưu ý: Mật khẩu này không thể thay đổi đối với mỗi khóa và sẽ được yêu cầu mỗi khi ký điện tử
+                <div className='col-md-12 form-group' style={{ color: 'red', padding: 20 }}>
+                    *Lưu ý: Mật khẩu này không thể thay đổi đối với mỗi chữ ký và sẽ được yêu cầu mỗi khi cài đặt chữ ký trên thiết bị
                 </div>
                 <FormTextBox className='col-md-12' ref={e => this.passphrase = e} label='Mật khẩu' type='password' />
             </div>
@@ -74,6 +76,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
         T.ready(this.pageConfig.ready, () => {
             this.props.getUserRequest(0, 100);
             this.props.getKey();
+            this.props.getSignature();
         });
     }
 
@@ -86,7 +89,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
             return key;
         },
         loadingOverlay: false,
-        emptyTable: 'Chưa có yêu cầu tạo khóa',
+        emptyTable: 'Chưa có yêu cầu tạo khoá',
         renderHead: () => <tr>
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày duyệt</th>
             <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Duyệt bởi</th>
@@ -111,13 +114,13 @@ export class UserYeuCauTaoKhoa extends AdminPage {
     })
 
     onDisableKey = () => {
-        //TODO: disable khoa
+        //TODO: Long disable khoa
     }
 
     renderTable = () => renderTable({
         getDataSource: () => this.props.hcthYeuCauTaoKhoa?.userPage?.list,
         loadingOverlay: false,
-        emptyTable: 'Chưa có yêu cầu tạo khóa',
+        emptyTable: 'Chưa có yêu cầu tạo khoá',
         renderHead: () => <tr>
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>#</th>
             <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Lý do</th>
@@ -140,8 +143,34 @@ export class UserYeuCauTaoKhoa extends AdminPage {
         }
     });
 
+    renderSignatureTable = () => renderTable({
+        getDataSource: () => {
+            const signature = this.props.hcthYeuCauTaoKhoa?.signature;
+            if (signature) return [signature];
+            else return [];
+        },
+        loadingOverlay: false,
+        emptyTable: 'Chưa có chữ ký',
+        renderHead: () => <tr>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>#</th>
+            <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chữ ký</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày tạo</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
+        </tr>,
+        renderRow: (item, index) => {
+            return <tr key={item.id}>
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.R || index + 1} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={<>
+                    <a href='/api/hcth/chu-ky/download' download={`${item.shcc}.png`}>{item.shcc}.png</a>
+                </>} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ngayTao && T.dateToText(new Date(item.ngayTao), 'HH:MM dd/mm/yyyy')} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={<></>} />
+            </tr>;
+        }
+    });
+
     pageConfig = {
-        title: 'Yêu cầu tạo khóa',
+        title: 'Chữ ký',
         ready: '/user',
         icon: 'fa fa-key'
     }
@@ -152,33 +181,48 @@ export class UserYeuCauTaoKhoa extends AdminPage {
         });
     }
 
+    onShowDrawModal = () => {
+        this.drawSignatureModal.show();
+    }
 
     render() {
         const permissions = this.getCurrentPermissions();
+        const buttons = [];
+
+        buttons.push({ className: 'btn-success', icon: 'fa-pencil', onClick: this.onShowDrawModal });
+
         return this.renderPage({
             title: this.pageConfig.title,
             icon: this.pageConfig.icon,
             content: <>
                 <div className='tile row'>
-                    <h3 className='tile-header'>Khóa của bạn</h3>
+                    <h3 className='tile-header'>Chữ ký của bạn</h3>
                     <div className='col-md-12'>
                         {this.renderKey()}
                     </div>
                 </div>
                 <div className='tile row'>
-                    <h3 className='tile-header'>Lịch sử yêu cầu tạo khóa</h3>
+                    <h3 className='tile-header'>Chữ ký của bạn (hình ảnh)</h3>
+                    <div className='tile-body col-md-12'>
+                        {this.renderSignatureTable({})}
+                    </div>
+                </div> 
+                <div className='tile row'>
+                    <h3 className='tile-header'>Lịch sử yêu cầu tạo chữ ký</h3>
                     <div className='tile-body col-md-12'>
                         {this.renderTable({})}
                     </div>
                 </div>
                 <CreateModal ref={e => this.modal = e} create={this.props.createRequest} />
                 <DownloadModal ref={e => this.downloadModal = e} download={(data, done) => this.onDownloadKey(data, done)} />
+                <DrawSignatureModal ref={e => this.drawSignatureModal = e} {...this.props} shcc={this.props?.system?.user?.shcc} />
             </>,
-            onCreate: permissions.some(item => ['rectors:login', 'persident:login', 'manager:write'].includes(item)) ? () => this.modal.show() : null
+            onCreate: permissions.some(item => ['rectors:login', 'persident:login', 'manager:write'].includes(item)) ? () => this.modal.show() : null,
+            buttons
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, hcthYeuCauTaoKhoa: state.hcth.hcthYeuCauTaoKhoa });
-const mapActionsToProps = { createRequest, getUserRequest, getKey, downloadKey };
+const mapStateToProps = state => ({ system: state.system, hcthYeuCauTaoKhoa: state.hcth.hcthYeuCauTaoKhoa, hcthChuKy: state.hcth.hcthChuKy });
+const mapActionsToProps = { createRequest, getUserRequest, getKey, downloadKey, createSignatureImg, getSignature };
 export default connect(mapStateToProps, mapActionsToProps)(UserYeuCauTaoKhoa);
