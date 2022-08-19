@@ -323,6 +323,6 @@ module.exports = app => {
 
     app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), (req, res) => {
         const shcc = req.session.user.shcc;
-        return res.sendFile(app.path.join(app.path.join(app.assetPath, '/key'), `${shcc}.png`));
+        return res.sendFile(app.path.join(app.assetPath, `/key/${shcc}.png`));
     });
 };
