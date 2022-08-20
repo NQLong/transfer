@@ -177,7 +177,7 @@ module.exports = app => {
     app.post('/api/finance/invoice', app.permission.check('tcInvoice:write'), async (req, res) => {
         try {
             const { mssv, hocKy, namHoc } = req.body;
-            if (await app.model.tcHocPhiTransactionInvoice.get({ mssv, hocKy, namHoc })) {
+            if (await app.model.tcHocPhiTransactionInvoice.get({ mssv, hocKy, namHoc, lyDoHuy: null })) {
                 throw 'Hóa đơn đã tồn tại';
             }
             let hocPhi = await app.model.tcHocPhi.getInvoiceInfo(mssv, parseInt(namHoc), parseInt(hocKy));
@@ -217,7 +217,8 @@ module.exports = app => {
                     refId,
                     invoiceTransactionId: invoice.TransactionID,
                     invoiceNumber: invoice.InvNo,
-                    mssv, namHoc, hocKy, ngayPhatHanh
+                    mssv, namHoc, hocKy, ngayPhatHanh,
+                    serial: mauHoaDon.meinvoiceMauHoaDon,
                 });
                 const emails = await getMailConfig();
                 const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
@@ -254,7 +255,8 @@ module.exports = app => {
                         refId: refId,
                         invoiceTransactionId: invoice.TransactionID,
                         invoiceNumber: invoice.InvNo,
-                        mssv, hocKy, namHoc, ngayPhatHanh
+                        mssv, hocKy, namHoc, ngayPhatHanh,
+                        serial: meinvoiceMauHoaDon
                     });
                     sendSinhVienInvoice(item, null, config, email);
                     return item;
@@ -278,6 +280,16 @@ module.exports = app => {
         }
     };
 
+    app.post('/api/finance/invoice/list/length', app.permission.check('tcInvoice:write'), async (req, res) => {
+        try {
+            const { tuNgay, denNgay, namHoc, hocKy } = req.body;
+            const { rows: list } = await app.model.tcHocPhi.getInvoiceList(tuNgay, denNgay, hocKy, namHoc);
+            res.send({ length: list.length });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     app.post('/api/finance/invoice/list', app.permission.check('tcInvoice:write'), async (req, res) => {
         try {
             const { tuNgay, denNgay, namHoc, hocKy } = req.body;
@@ -293,7 +305,7 @@ module.exports = app => {
             };
             const emails = await getMailConfig();
             let mailList = [...emails];
-            const config = await app.model.tcSetting.getValue('meinvoiceMauHoaDon', 'hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
+            const config = await app.model.tcSetting.getValue('meinvoiceMauHoaDon', 'hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail', 'meinvoiceMaSoThue');
             for (let i = 0; i < chunkList.length; i++) {
                 if (!mailList)
                     mailList = [...emails];
@@ -310,13 +322,22 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/invoice/:id', app.permission.check('tcInvoice:write'), async (req, res) => {
+    app.get('/api/finance/invoice/:id', app.permission.orCheck('tcInvoice:write', 'student:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const instance = await app.getMisaAxiosInstance();
             const invoice = await app.model.tcHocPhiTransactionInvoice.get({ id });
             if (!invoice) throw 'Hóa đơn không tồn tại';
+            if (
+                req.session.user.permissions.includes('student:login') &&
+                !req.session.user.permissions.includes('developer:login') &&
+                invoice.mssv != req.session.user.studentId
+            ) {
+                return res.status(401).send({ error: 'permission denied' });
+            }
+
             const response = await instance.post(url.view, [invoice.invoiceTransactionId]);
+
             request(response.Data).pipe(res);
         } catch (error) {
             res.status(400).send({ error });
@@ -359,11 +380,11 @@ module.exports = app => {
 
     const sendSinhVienInvoice = async (invoice, sinhVien, config, email) => {
         sinhVien = sinhVien || await app.model.fwStudents.get({ mssv: invoice.mssv });
-        config = config || await app.model.tcSetting.getValue('hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
-        const url = `${app.isDebug ? app.debugUrl : app.rootUrl}/api/finance/invoice/${invoice.id}`;
-        const title = config.hocPhiEmailTraHoaDonTitle.replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc);
-        const html = config.hocPhiEmailTraHoaDonEditorHtml.replace('{link}', 'link').replace(/href=.*?>/, `href="${url}">`).replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim()).replace('{mssv}', sinhVien.mssv).replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail);
-        const text = config.hocPhiEmailTraHoaDonEditorText.replace('{link}', `dẫn ${url}`).replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim()).replace('{mssv}', sinhVien.mssv).replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail);
+        config = config || await app.model.tcSetting.getValue('hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail', 'meinvoiceMaSoThue');
+        const url = `${app.isDebug ? app.debugUrl : app.rootUrl}/user/hoc-phi`;
+        const title = config.hocPhiEmailTraHoaDonTitle.replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim());
+        const html = config.hocPhiEmailTraHoaDonEditorHtml.replace('{đ&acirc;y}', 'đây').replace(/href=.*?>/, `href="${url}">`).replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim()).replace('{mssv}', sinhVien.mssv).replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail).replace('{No.}', invoice.invoiceNumber).replace('{Serial}', invoice.serial).replace('{Date}', app.date.dateTimeFormat(new Date(invoice.ngayPhatHanh), 'dd/mm/yyyy')).replace('{Code}', config.meinvoiceMaSoThue);
+        const text = config.hocPhiEmailTraHoaDonEditorText.replace('{đây}', url).replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.trim()).replace('{mssv}', sinhVien.mssv).replace('{hoc_ky}', invoice.hocKy).replace('{nam_hoc}', invoice.namHoc).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail).replace('{No.}', invoice.invoiceNumber).replace('{Serial}', invoice.serial).replace('{Date}', app.date.dateTimeFormat(new Date(invoice.ngayPhatHanh), 'dd/mm/yyyy')).replace('{Code}', config.meinvoiceMaSoThue);
         if (!app.isDebug)
             await app.email.normalSendEmail(email.email, email.password, sinhVien.emailTruong, [], (app.isDebug ? 'TEST: ' : '') + title, text, html, []);
         else
@@ -374,7 +395,6 @@ module.exports = app => {
         try {
             const id = req.body.id;
             const invoice = await app.model.tcHocPhiTransactionInvoice.get({ id });
-            // console.log(invoice);
             // const instance = await app.getMisaAxiosInstance();
             // let response = await instance.post(url.download, [invoice.invoiceTransactionId], { params: { downloadDataType: 'pdf' } });
             // const invoiceArray = app.utils.parse(response.Data);
@@ -406,7 +426,7 @@ module.exports = app => {
                 TransactionID: invoice.invoiceTransactionId,
                 InvNo: invoice.invoiceNumber,
                 // RefDate: `${invoiceDate.getFullYear()}-${invoiceDate.getMonth() + 1}-${invoiceDate.getDate()}`,
-                RefDate: app.toIsoString(invoiceDate).slice(0, 10),
+                RefDate: app.utils.toIsoString(invoiceDate).slice(0, 10),
                 CancelReason: lyDo,
             });
             if (response.ErrorCode)

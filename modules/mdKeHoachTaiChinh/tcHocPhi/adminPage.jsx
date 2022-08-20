@@ -12,7 +12,7 @@ import T from 'view/js/common';
 import CountUp from 'view/js/countUp';
 import Detail from './modal/DetailModal';
 import { EditModal } from './modal/EditModal';
-import { createInvoice, createInvoiceList, createMultipleHocPhi, getHocPhi, getTcHocPhiPage, updateHocPhi } from './redux';
+import { createInvoice, createInvoiceList, createMultipleHocPhi, getHocPhi, getTcHocPhiPage, updateHocPhi, getPendingListInvoiceLength } from './redux';
 
 export class NumberIcon extends React.Component {
     componentDidMount() {
@@ -80,6 +80,22 @@ class InvoiceModal extends AdminModal {
         this.namHoc.value(data.namHoc || '');
         this.denNgay.value(data.denNgay || '');
         this.hocKy.value(data.hocKy || '');
+        this.onChangeValue();
+    }
+
+    onChangeValue = () => {
+        const data = {
+            ...getTimeFilter(this.tuNgay.value() || null, this.denNgay.value() || null),
+            namHoc: this.namHoc.value(),
+            hocKy: this.hocKy.value(),
+        };
+        if (data.namHoc && data.hocKy) {
+            this.props.getPendingListInvoiceLength(data, (invoicesLength) => {
+                this.setState({ invoicesLength }, () => {
+                    this.invoicesLength?.value(invoicesLength.toString());
+                });
+            });
+        }
     }
 
     render = () => {
@@ -88,10 +104,11 @@ class InvoiceModal extends AdminModal {
             size: 'large',
             isLoading: this.state.isSubmitting,
             body: <div className='row'>
-                <FormDatePicker disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' />
-                <FormDatePicker disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' />
-                <FormSelect disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.namHoc = e} data={yearDatas()} label='Năm học' />
-                <FormSelect disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' />
+                <FormSelect disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.namHoc = e} data={yearDatas()} label='Năm học' onChange={this.onChangeValue} />
+                <FormSelect disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' onChange={this.onChangeValue} />
+                <FormDatePicker disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' onChange={this.onChangeValue} />
+                <FormDatePicker disabled={this.state.isSubmitting} className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' onChange={this.onChangeValue} />
+                <FormTextBox readOnly className='col-md-12' style={Number.isInteger(this.state.invoicesLength) ? {} : { display: 'none' }} label='Số hóa đơn sẽ được tạo' ref={e => this.invoicesLength = e} />
             </div>
         });
     }
@@ -214,7 +231,7 @@ class TcHocPhiAdminPage extends AdminPage {
             return;
         }
         e.target.setAttribute('disabled', true);
-        this.props.createInvoice(item.mssv, item.hocKy, item.namHoc, () => this.getPage(), () => e.target.setAttribute('disabled', false));
+        T.confirm('Xuất hóa đơn', `Xuất hóa đơn cho sinh viên ${`${item.ho} ${item.ten}`.trim().normalizedName()}`, true, isCofirm => isCofirm && this.props.createInvoice(item.mssv, item.hocKy, item.namHoc, () => this.getPage(), () => e.target.setAttribute('disabled', false)));
     }
 
     onCreateInvoiceList = (data, done) => {
@@ -345,7 +362,7 @@ class TcHocPhiAdminPage extends AdminPage {
                             <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} readOnly={!permission.write} />
                         </div>
                     </div>
-                    <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} />
+                    <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} getPendingListInvoiceLength={this.props.getPendingListInvoiceLength}/>
                     <InvoiceResultModal ref={e => this.resultModal = e} />
                 </div>,
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
@@ -358,6 +375,6 @@ class TcHocPhiAdminPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList
+    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList, getPendingListInvoiceLength
 };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiAdminPage);
