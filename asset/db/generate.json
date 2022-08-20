@@ -16418,7 +16418,7 @@
                     "value": "nam",
                     "dataType": "NUMBER",
                     "dataDefault": "",
-                    "nullable": true,
+                    "nullable": false,
                     "size": "4,0"
                 },
                 "CONTENT": {
@@ -16427,13 +16427,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 4000
-                },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "1",
-                    "nullable": true,
-                    "size": "1,0"
                 },
                 "TIME_MODIFIED": {
                     "value": "timeModified",
