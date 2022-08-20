@@ -8,50 +8,57 @@ class MonHocCtdtModal extends AdminModal {
     monChung = {}
     monChuyenNganh = {}
     subChuyenNganh = {}
+    listMonHocChung = {}
+    listMonHocChuyenNganh = {}
     state = { listMonHocChonChung: [], listMonHocChonChuyenNganh: [] }
     onShow = (item) => {
         let { khoaSv, thongTinKhoaNganh, maDangKy, nam } = item;
         let { maNganh, khoaDangKy, loaiHinhDaoTao, bacDaoTao } = thongTinKhoaNganh;
         this.setState({ listMonHocChonChung: [], listMonHocChonChuyenNganh: [] });
         this.props.getDanhSachMonChuongTrinhDaoTao({ maNganh, khoaSv, loaiHinhDaoTao, bacDaoTao }, value => {
-
+            this.listMonHocChung = value.listMonHocChung || [];
+            this.listMonHocChuyenNganh = value.listMonHocChuyenNganh || [];
             this.setState({ listMonHocChung: value.listMonHocChung || [], listMonHocChuyenNganh: value.listMonHocChuyenNganh || [], khoaSv, maNganh, khoaDangKy, maDangKy, loaiHinhDaoTao, bacDaoTao, nam }, () => {
-                this.setState({ listMonHocChonChung: this.state.listMonHocChung.filter(item => item.isMo) }, () => {
-                    this.state.listMonHocChonChung.forEach(item => {
-                        ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                            this.monChung[textBox][item.maMonHoc].value(item[textBox]);
-                        });
-                    });
-                });
+                this.init();
+            });
+        });
+    }
 
-                this.setState({ listMonHocChonChuyenNganh: this.state.listMonHocChuyenNganh.filter(item => item.isMo) }, () => {
-                    for (let index = 0; index < this.state.listMonHocChonChuyenNganh.length; index++) {
-                        const item = this.state.listMonHocChonChuyenNganh[index];
-                        if (item.soLop && !isNaN(item.soLop)) {
-                            item.soLop = Number(item.soLop);
-                            if (item.soLop == 1 && item.chuyenNganh.length == 1) {
-                                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                                    this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
-                                });
-                            } else if (item.soLop > 1 && item.chuyenNganh.length > 1) {
-                                this.setState({ [`CN_${item.maMonHoc}`]: item.soLop }, () => {
-                                    this.monChuyenNganh.soLop[item.maMonHoc].value(item.soLop);
-                                    Array.from({ length: Number(item.soLop) }, (_, i) => i).forEach(i => {
-                                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
-                                            this.subChuyenNganh[item.maMonHoc][textBox][i + 1].value(item[textBox][i]);
-                                        });
-                                        this.subChuyenNganh[item.maMonHoc]['chuyenNganh'][i + 1].value(item.currentCn[i]);
-                                    });
-                                });
-                            } else {
-                                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(textBox => {
-                                    this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
-                                });
-                            }
-                        }
-                    }
+    init = () => {
+        this.setState({ listMonHocChonChung: this.state.listMonHocChung.filter(item => item.isMo) }, () => {
+            this.state.listMonHocChonChung.forEach(item => {
+                ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                    this.monChung[textBox][item.maMonHoc].value(item[textBox]);
                 });
             });
+        });
+
+        this.setState({ listMonHocChonChuyenNganh: this.state.listMonHocChuyenNganh.filter(item => item.isMo) }, () => {
+            for (let index = 0; index < this.state.listMonHocChonChuyenNganh.length; index++) {
+                const item = this.state.listMonHocChonChuyenNganh[index];
+                if (item.soLop && !isNaN(item.soLop)) {
+                    item.soLop = Number(item.soLop);
+                    if (item.soLop == 1 && item.chuyenNganh.length == 1) {
+                        ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                            this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
+                        });
+                    } else if (item.soLop > 1 && item.chuyenNganh.length > 1) {
+                        this.setState({ [`CN_${item.maMonHoc}`]: item.soLop }, () => {
+                            this.monChuyenNganh.soLop[item.maMonHoc].value(item.soLop);
+                            Array.from({ length: Number(item.soLop) }, (_, i) => i).forEach(i => {
+                                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(textBox => {
+                                    this.subChuyenNganh[item.maMonHoc][textBox][i + 1].value(item[textBox][i]);
+                                });
+                                this.subChuyenNganh[item.maMonHoc]['chuyenNganh'][i + 1].value(item.currentCn[i]);
+                            });
+                        });
+                    } else {
+                        ['soLop', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh'].forEach(textBox => {
+                            this.monChuyenNganh[textBox][item.maMonHoc].value(item[textBox]);
+                        });
+                    }
+                }
+            }
         });
     }
 
@@ -292,7 +299,7 @@ class MonHocCtdtModal extends AdminModal {
             title: `Chọn môn học từ Chương trình đào tạo khóa ${khoaSv || ''}`,
             size: 'elarge',
             isShowSubmit: listMonHocChung?.length && listMonHocChuyenNganh?.length,
-            body: <div>
+            body: <div >
                 <ul className='nav nav-tabs'>
                     <li className='nav-item'>
                         <a className='nav-link active show' data-toggle='tab' href='#monChung'>Chọn các môn cho toàn khóa {khoaSv || ''}</a>
@@ -303,9 +310,32 @@ class MonHocCtdtModal extends AdminModal {
                 </ul>
                 <div className='tab-content'>
                     <div className='tab-pane fade active show' id='monChung'>
+                        {<FormTextBox ref={e => this.searchBox = e} style={{ marginBottom: '0' }} placeholder='Tìm kiếm môn chung' onChange={e => {
+                            if (e && e.target && e.target.value) {
+                                let textSearch = e.target.value;
+                                this.setState({ listMonHocChung: this.state.listMonHocChung.filter(item => item.maMonHoc.includes(textSearch) || item.tenMonHoc.includes(textSearch)) }, () => {
+                                    this.init();
+
+                                });
+                            } else {
+                                this.setState({ listMonHocChung: this.listMonHocChung }, () => this.init);
+                            }
+                        }} />}
                         {this.renderMonHocChung(listMonHocChung)}
                     </div>
                     <div className='tab-pane fade' id='monChuyenNganh'>
+                        {<FormTextBox style={{ marginBottom: '0' }} placeholder='Tìm kiếm môn chuyên ngành' onChange={e => {
+                            if (e && e.target && e.target.value) {
+                                let textSearch = e.target.value;
+                                this.setState({ listMonHocChuyenNganh: this.state.listMonHocChuyenNganh.filter(item => item.maMonHoc.includes(textSearch) || item.tenMonHoc.includes(textSearch)) }, () => {
+                                    if (!this.state.listMonHocChuyenNganh.length) this.setState({ listMonHocChuyenNganh: this.listMonHocChuyenNganh });
+                                    this.init();
+
+                                });
+                            } else {
+                                this.setState({ listMonHocChuyenNganh: this.listMonHocChuyenNganh }, () => this.init);
+                            }
+                        }} />}
                         {this.renderMonHocChuyenNganh(listMonHocChuyenNganh)}
                     </div>
                 </div>
