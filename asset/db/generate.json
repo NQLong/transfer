@@ -16483,11 +16483,15 @@
                     "size": 4000
                 },
                 "MUC_CON": {
-                    "value": "mucCon",
+                    "value": "batDauDangKy",
                     "dataType": "CLOB",
                     "dataDefault": "",
                     "nullable": true,
+                    "size": 4000
+                },
+                "BAT_DAU_DANG_KY": {
                     "value": "batDauDangKy",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"

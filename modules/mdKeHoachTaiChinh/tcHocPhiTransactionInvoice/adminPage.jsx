@@ -156,7 +156,7 @@ class DanhSachHoaDon extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
                     {!item.lyDoHuy && <>
                         <Tooltip title='Xem hóa đơn' arrow>
-                            <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/${item.id}`}>
+                            <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.id}`}>
                                 <i className='fa fa-lg fa-eye' />
                             </a>
                         </Tooltip>

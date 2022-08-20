@@ -131,7 +131,7 @@ class UserPage extends AdminPage {
         e.target.setAttribute('disabled', true);
         setTimeout(() => e.target.removeAttribute('disabled', false), 4000);
         T.notify('Hệ thống đang chuẩn bị để tải xuống hóa đơn');
-        T.download(`/api/finance/invoice/${id}`);
+        T.download(`/api/finance/invoice/view/${id}`);
     }
 
     renderSection = (namHoc, hocPhiTrongNam) => {
