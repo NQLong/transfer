@@ -110,6 +110,10 @@ module.exports = (app, appConfig) => {
         hcth: {
             index: 500, title: 'Hành chính tổng hợp', link: '/user/hcth', icon: 'fa-book',
             subMenusRender: false,
+        },
+        danhGia: {
+            index: 9000, title: 'Đánh giá', link: '/user/danh-gia', icon: 'fa-book',
+            subMenusRender: false,
         }
     };
 

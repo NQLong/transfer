@@ -45,6 +45,10 @@ export default {
         {
             path: '/user/hcth',
             component: () => <SubMenusPage menuLink='/user/hcth' menuKey={500} headerIcon='fa-book' />
+        },
+        {
+            path: '/user/danh-gia',
+            component: () => <SubMenusPage menuLink='/user/danh-gia' menuKey={9000} headerIcon='fa-book' />
         }
     ]
 };

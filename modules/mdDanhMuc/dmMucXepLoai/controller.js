@@ -23,7 +23,7 @@ module.exports = app => {
         app.model.dmMucXepLoai.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/item/:ma', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/muc-xep-loai/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmMucXepLoai.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
