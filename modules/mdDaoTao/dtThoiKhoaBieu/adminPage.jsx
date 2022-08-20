@@ -211,7 +211,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0' }} data={dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
-                <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '70px', marginBottom: '0', textAlign: 'right' }} />
+                <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '70px', marginBottom: '0', textAlign: 'right' }} min={1} max={5} />
             } />
             <TableCell content={
                 <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ marginBottom: '0', width: '70px', }} />
@@ -236,6 +236,22 @@ class DtThoiKhoaBieuPage extends AdminPage {
             soLuongDuKien: this.soLuongDuKien.value(),
             maNganh: this.maNganh.value()
         };
+        let { tietBatDau, soTietBuoi } = curData;
+        if (tietBatDau && soTietBuoi) {
+            tietBatDau = parseInt(tietBatDau);
+            soTietBuoi = parseInt(soTietBuoi);
+            if (soTietBuoi == 5 && tietBatDau >= 2) {
+                T.notify(`Lỗi: Học từ tiết 5 tới tiết ${tietBatDau + soTietBuoi - 1}`, 'warning');
+                return this.tietBatDau.focus();
+            }
+            else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) {
+                T.notify('Thời gian học không hợp lệ!', 'danger');
+                return this.tietBatDau.focus();
+            } else if (soTietBuoi + tietBatDau - 1 >= 10) {
+                T.notify('Thời gian học không hợp lệ!', 'danger');
+                return this.tietBatDau.focus();
+            }
+        }
         this.props.updateDtThoiKhoaBieuCondition(item.id, curData, () => {
             this.setState({ editId: null });
         });

@@ -148,7 +148,7 @@ export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
         const url = '/api/dao-tao/thoi-khoa-bieu-condition';
         T.put(url, { condition, changes }, data => {
             if (data.error) {
-                T.alert(`Lỗi: ${data.error.message}`, 'error', false, 2000);
+                T.notify(`Lỗi: ${data.error.message}`, 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data);
             } else {
