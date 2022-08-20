@@ -24,6 +24,14 @@ class AutoGenModal extends AdminModal {
     state = { clicked: false }
     onShow = () => {
         this.bacDaoTao.value('DH');
+        let filter = this.props.filter;
+        if (filter && filter != {}) {
+            let { idNamDaoTao, hocKy, bacDaoTaoFilter, loaiHinhDaoTaoFilter } = filter;
+            this.nam.value(idNamDaoTao);
+            this.hocKy.value(hocKy);
+            this.bacDaoTao.value(bacDaoTaoFilter);
+            this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
+        }
     }
 
     onSubmit = () => {
