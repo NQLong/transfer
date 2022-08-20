@@ -15127,6 +15127,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "SERIAL": {
+                    "value": "serial",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -15936,7 +15943,7 @@
         },
         "DT_THOI_KHOA_BIEU_NGANH": {
             "active": true,
-            "moduleName": "dtThoiKhoaBieu",
+            "moduleName": "dtThoiKhoaBieuNganh",
             "modelName": "dtThoiKhoaBieuNganh",
             "columns": {
                 "ID_THOI_KHOA_BIEU": {
@@ -16407,13 +16414,6 @@
             "moduleName": "tccbKhungDanhGiaCanBo",
             "modelName": "tccbKhungDanhGiaCanBo",
             "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_160956\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
                 "NAM": {
                     "value": "nam",
                     "dataType": "NUMBER",
@@ -16428,13 +16428,6 @@
                     "nullable": true,
                     "size": 4000
                 },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "1",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "TIME_MODIFIED": {
                     "value": "timeModified",
                     "dataType": "NUMBER",
@@ -16448,6 +16441,74 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_160956\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_KHUNG_DANH_GIA_DON_VI": {
+            "active": true,
+            "moduleName": "tccbKhungDanhGiaDonVi",
+            "modelName": "tccbKhungDanhGiaDonVi",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_161452\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MUC_CHA": {
+                    "value": "mucCha",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "MUC_CON": {
+                    "value": "mucCon",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "BAT_DAU_DANG_KY": {
+                    "value": "batDauDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "KET_THUC_DANG_KY": {
+                    "value": "ketThucDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "MA_DON_VI": {
+                    "value": "maDonVi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 3
                 }
             },
             "primaryKeys": [

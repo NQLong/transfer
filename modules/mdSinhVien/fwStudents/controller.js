@@ -30,11 +30,8 @@ module.exports = app => {
     );
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
-            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete');
-            resolve();
-        } else if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage');
+        if (staff.maDonVi && staff.maDonVi == '32') {
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:delete');
             resolve();
         } else resolve();
     }));
