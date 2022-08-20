@@ -96,6 +96,7 @@ export function createDtThoiKhoaBieuMultiple(data, settings, done) {
             if (data.error) {
                 T.notify('Tạo lớp bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error.message}`);
+                done && done();
             } else {
                 T.notify('Tạo lớp thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
@@ -147,11 +148,11 @@ export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
         const url = '/api/dao-tao/thoi-khoa-bieu-condition';
         T.put(url, { condition, changes }, data => {
             if (data.error) {
-                T.alert(`Lỗi: ${data.error.message}`, 'error', false, 2000);
+                T.notify(`Lỗi: ${data.error.message}`, 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data);
             } else {
-                T.notify('Điều chỉnh thành công!', 'success');
+                // T.notify('Điều chỉnh thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
                 done && done(data);
             }

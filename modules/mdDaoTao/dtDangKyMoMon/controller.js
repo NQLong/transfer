@@ -2,8 +2,8 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7002: { title: 'Danh sách môn học mở trong học kỳ', link: '/user/dao-tao/dang-ky-mo-mon', icon: 'fa-paper-plane-o', backgroundColor: '#8E9763', groupIndex: 1 },
-        },
+            7002: { title: 'Danh sách môn học mở trong học kỳ', link: '/user/dao-tao/dang-ky-mo-mon', icon: 'fa-paper-plane-o', backgroundColor: '#8E9763', groupIndex: 1 }
+        }
     };
     app.permission.add(
         { name: 'dtDangKyMoMon:read', menu },
@@ -15,7 +15,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesDtDangKyMoMon', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtDangKyMoMon:read', 'dtDangKyMoMon:write', 'dtDangKyMoMon:delete', 'quanLyDaoTao:manager');
             resolve();
         } else resolve();
     }));
@@ -62,7 +62,6 @@ module.exports = app => {
         try {
             const now = Date.now();
             let { data, settings } = req.body;
-            console.log(data, settings);
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
             thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == settings.loaiHinhDaoTao && item.bacDaoTao == settings.bacDaoTao);
             if (now > thoiGianMoMon.ketThuc) throw 'Đã hết hạn đăng ký!';
@@ -79,11 +78,9 @@ module.exports = app => {
                 res.send({ item });
             }
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
-
     app.put('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
         try {
             let { data, id, isDuyet, settings } = req.body,
@@ -132,7 +129,8 @@ module.exports = app => {
     app.permissionHooks.add('staff', 'AllPermissionDaoTao', (user, staff) => new Promise((resolve) => {
         if (staff.maDonVi == 33 && staff.donViQuanLy.length) {
             app.permissionHooks.pushUserPermission(user, 'quanLyDaoTao:manager');
-        } resolve();
+        }
+        resolve();
     }));
 
     app.permissionHooks.add('staff', 'checkRoleDTDangKyMoMon', (user, staff) => new Promise(resolve => {

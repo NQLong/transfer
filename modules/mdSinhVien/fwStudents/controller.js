@@ -30,19 +30,16 @@ module.exports = app => {
     );
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
-            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete', 'student:manage');
-            resolve();
-        } else if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage');
+        if (staff.maDonVi && staff.maDonVi == '32') {
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:delete');
             resolve();
         } else resolve();
     }));
 
 
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
-    app.get('/user/students/list', app.permission.check('student:read'), app.templates.admin);
-    app.get('/user/students/item/:mssv', app.permission.check('student:write'), app.templates.admin);
+    app.get('/user/students/list', app.permission.check('student:manage'), app.templates.admin);
+    app.get('/user/students/item/:mssv', app.permission.check('student:manage'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
     app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), async (req, res) => {
@@ -51,15 +48,16 @@ module.exports = app => {
             const item = await app.model.fwStudents.get({ mssv });
             if (!item.image) {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
-                item.image = user.image;
+                item.image = user?.image;
             }
             res.send({ item });
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });
 
-    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:read'), (req, res) => {
+    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -75,7 +73,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/students/item/:mssv', app.permission.check('student:read'), (req, res) => {
+    app.get('/api/students/item/:mssv', app.permission.check('student:manage'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             res.send({ items: sinhVien, error });

@@ -47,7 +47,7 @@ class SectionVideo extends React.Component {
 
         return (
             <section data-aos='fade-up' className='h-100'>
-                <div className='row' className='p-3 h-100'>
+                <div className='p-3 h-100'>
                     <div className='col-12 homeBorderLeft'>
                         <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0 }}><strong>{this.state.title}</strong></h3>
                     </div>

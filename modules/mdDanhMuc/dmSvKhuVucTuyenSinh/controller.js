@@ -8,7 +8,7 @@ module.exports = app => {
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9014: { title: 'Khu vực tuyển sinh', link: '/user/dao-tao/khu-vuc-tuyen-sinh', groupIndex: 2, icon: 'fa fa-binoculars' },
+            7019: { title: 'Khu vực tuyển sinh', link: '/user/dao-tao/khu-vuc-tuyen-sinh', groupIndex: 2 },
         },
     };
 

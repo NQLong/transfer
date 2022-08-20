@@ -244,6 +244,31 @@
     }
   }
 }
+.table-fix-col {
+  th:last-child,
+  td:last-child {
+    position: -webkit-sticky;
+    position: sticky;
+    right: 0;
+    z-index: 500;
+  }
+  tr {
+    td:last-child {
+      background-color: darken(#e9ecef, 10%);
+    }
+  }
+
+  //   tr {
+  //     th:last-child {
+  //       background-color: #ffffff;
+  //     }
+  //   }
+
+  thead th:last-child {
+    z-index: 600;
+    background-color: darken(#e9ecef, 10%);
+  }
+}
 
 .notify-alert.alert-warning {
   color: #000;

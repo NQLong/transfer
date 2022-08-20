@@ -53,8 +53,8 @@ module.exports = app => {
             const namDaoTao = item?.namDaoTao;
             const ctKhungDt = await app.model.sdhCauTrucKhungDaoTao.get({ namDaoTao });
             if (!ctKhungDt) {
-                let item = await app.model.sdhCauTrucKhungDaoTao.create({ ...item, bacDaoTao: 'SDH' });
-                res.send({ item });
+                let newItem = await app.model.sdhCauTrucKhungDaoTao.create({ ...item, bacDaoTao: 'SDH' });
+                res.send({ item: newItem });
             } else throw `Năm ${namDaoTao} đã tồn tại!`;
         } catch (error) {
             res.send({ error });

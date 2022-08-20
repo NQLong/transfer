@@ -12,7 +12,7 @@ module.exports = (app) => {
 
     app.permissionHooks.add('staff', 'addRolesTcLoaiPhi', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcLoaiPhi:read', 'tcLoaiPhi:write', 'tcLoaiPhi:delete');
+            app.permissionHooks.pushUserPermission(user, 'tcLoaiPhi:read', 'tcLoaiPhi:write');
             resolve();
         } else resolve();
     }));

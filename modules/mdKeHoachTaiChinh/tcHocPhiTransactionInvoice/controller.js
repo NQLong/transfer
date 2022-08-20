@@ -8,7 +8,7 @@ module.exports = app => {
     const request = require('request');
     const axios = require('axios');
 
-    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete');
+    app.permission.add({ name: 'tcInvoice:read', menu }, 'tcInvoice:write', 'tcInvoice:delete', 'tcInvoice:export');
     const misaChunkSize = 30;
 
     app.permissionHooks.add('staff', 'addRolesTcInvoice', (user, staff) => new Promise(resolve => {
@@ -322,7 +322,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/invoice/:id', app.permission.orCheck('tcInvoice:write', 'student:login'), async (req, res) => {
+    app.get('/api/finance/invoice/view/:id', app.permission.orCheck('tcInvoice:write', 'student:login'), async (req, res) => {
         try {
             const id = req.params.id;
             const instance = await app.getMisaAxiosInstance();
@@ -438,4 +438,52 @@ module.exports = app => {
         }
     });
 
+    // download excel
+    app.get('/api/finance/invoice/download-excel', app.permission.check('tcInvoice:export'), async (req, res) => {
+        try {
+            let filter = app.utils.parse(req.query.filter, {});
+            let data = await app.model.tcHocPhiTransactionInvoice.downloadExcel('', app.utils.stringify({
+                namHoc: filter.namHoc,
+                hocKy: filter.hocKy,
+            }));
+
+            const list = data.rows;
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet(`${filter.namHoc}_${filter.hocKy}`);
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 10 },
+                { header: 'HỌC KỲ', key: 'hocKy', width: 20 },
+                { header: 'MSSV', key: 'mssv', width: 20 },
+                { header: 'HỌ VÀ TÊN', key: 'hoTen', width: 30 },
+                { header: 'SỐ HÓA ĐƠN', key: 'soHoaDon', width: 20 },
+                { header: 'KHOA', key: 'khoa', width: 30 },
+                { header: 'NGÀNH', key: 'nganh', width: 30 },
+                { header: 'BẬC', key: 'bac', width: 20 },
+                { header: 'HỆ ĐÀO TẠO', key: 'he', width: 20 },
+                { header: 'NGÀY PHÁT HÀNH', key: 'ngayPhatHanh', width: 20 },
+            ];
+            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+            ws.getRow(1).font = { name: 'Times New Roman' };
+
+            list.forEach((item, index) => {
+                ws.addRow({
+                    stt: index + 1,
+                    hocKy: `${item.namHoc} - HK0${item.hocKy}`,
+                    mssv: item.mssv,
+                    hoTen: `${item.ho?.toUpperCase() || ''} ${item.ten?.toUpperCase() || ''}`,
+                    soHoaDon: item.invoiceNumber,
+                    khoa: item.tenKhoa,
+                    nganh: item.tenNganh,
+                    bac: item.tenBacDaoTao,
+                    he: item.tenLoaiHinhDaoTao,
+                    ngayPhatHanh: item.ngayPhatHanh ? app.date.viDateFormat(new Date(Number(item.ngayPhatHanh))) : '',
+                }, 'i');
+            });
+            const fileName = `DANH_SACH_GIAO_DICH_${filter.namHoc}_HK0${filter.hocKy}.xlsx`;
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
 };

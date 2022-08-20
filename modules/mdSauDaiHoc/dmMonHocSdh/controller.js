@@ -1,16 +1,20 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.sdh,
+        parentMenu: app.parentMenu.category,
         menus: {
-            7503: { title: 'Danh mục Môn học', link: '/user/sau-dai-hoc/mon-hoc' },
+            4105: {
+                title: 'Môn học (trước 2022)',
+                subTitle: 'Sau đại học',
+                link: '/user/sau-dai-hoc/mon-hoc'
+            },
         },
     };
     app.permission.add(
-        { name: 'dmMonHocSdh:read', menu },
+        { name: 'dmMonHocSdh:manage', menu },
         { name: 'dmMonHocSdh:write' },
         { name: 'dmMonHocSdh:delete' },
     );
-    app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:manage'), app.templates.admin);
     app.get('/user/sau-dai-hoc/mon-hoc/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesMonHocSdh', (user, staff) => new Promise(resolve => {
@@ -21,7 +25,7 @@ module.exports = app => {
     }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdh:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdh:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -56,12 +60,12 @@ module.exports = app => {
         app.model.dmMonHocSdh.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/sau-dai-hoc/mon-hoc/all', app.permission.check('dmMonHocSdh:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/mon-hoc/all', app.permission.check('dmMonHocSdh:manage'), (req, res) => {
         app.model.dmMonHocSdh.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/mon-hoc/item/:ma', app.permission.check('dmMonHocSdh:read'), (req, res) => {
-        app.model.dmMonHocSdh.get({ maNganh: req.params.ma }, (error, item) => res.send({ error, item }));
+    app.get('/api/sau-dai-hoc/mon-hoc/item/:ma', app.permission.check('dmMonHocSdh:manage'), (req, res) => {
+        app.model.dmMonHocSdh.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {

@@ -2,9 +2,8 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9008: {
+            7016: {
                 title: 'Chuẩn đầu ra', groupIndex: 2,
-                icon: 'fa fa-graduation-cap', backgroundColor: '#00C2CB',
                 link: '/user/dao-tao/chuan-dau-ra'
             },
         },

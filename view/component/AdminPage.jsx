@@ -430,8 +430,13 @@ class FormYearBox extends React.Component {
         });
     }
 
+    mask = {
+        'year': '2099',
+        'scholastic': '2099 - 2099'
+    };
+
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, required = false } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, required = false, type = 'year' } = this.props,
             readOnlyText = this.state.value;
         let displayElement = '';
         if (label) {
@@ -443,7 +448,7 @@ class FormYearBox extends React.Component {
         return (
             <div className={'form-group ' + (className || '')} style={style}>
                 {displayElement}
-                <InputMask ref={e => this.input = e} className='form-control' mask={'2099'} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[089]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
+                <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[089]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
                 {smallText ? <small>{smallText}</small> : null}
             </div>);
     }
@@ -455,13 +460,13 @@ export class FormTextBox extends React.Component {
 
     value = function (text) {
         if (arguments.length) {
-            if (this.props.type == 'number' || this.props.type == 'year') {
+            if (this.props.type == 'number' || this.props.type == 'year' || this.props.type == 'scholastic') {
                 this.input.value(text);
             } else {
                 this.setState({ value: text });
             }
         } else {
-            if (this.props.type == 'number' || this.props.type == 'year') {
+            if (this.props.type == 'number' || this.props.type == 'year' || this.props.type == 'scholastic') {
                 return this.input.value();
             }
             return this.state.value;
@@ -477,7 +482,7 @@ export class FormTextBox extends React.Component {
         type = type.toLowerCase(); // type = text | number | email | password | phone | year
         if (type == 'number') {
             return <FormNumberBox ref={e => this.input = e} {...this.props} />;
-        } else if (type == 'year') {
+        } else if (type == 'year' || type == 'scholastic') {
             return <FormYearBox ref={e => this.input = e} {...this.props} />;
         } else {
             const properties = {
@@ -894,10 +899,6 @@ export class AdminModal extends React.Component {
     state = { display: '' };
     _data = {};
 
-    disabledClickOutside = () => {
-        $(this.modal).modal({ backdrop: 'static', keyboard: false, show: false });
-    }
-
     componentWillUnmount() {
         this.hide();
     }
@@ -940,6 +941,10 @@ export class AdminModal extends React.Component {
                 input.focus();
             }
         }
+    }
+
+    disabledClickOutside = () => {
+        $(this.modal).modal({ backdrop: 'static', keyboard: false, show: false });
     }
 
     renderModal = ({ title, body, size, buttons, postButtons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {}, showCloseButton = true }) => {

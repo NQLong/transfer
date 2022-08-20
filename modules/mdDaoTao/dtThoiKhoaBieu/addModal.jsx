@@ -17,23 +17,15 @@ const MA_PDT = '33', MA_CTSV = '32';
 const dataKhoaSinhVien = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
 class RenderListMon extends React.Component {
     ref = {}
+    dataNganh = []
     state = { listSelected: [], listNganh: [] }
-
-    getData = () => {
-        let data = [];
-        try {
-            Array.from({ length: this.state.soLop }, (_, i) => i + 1).forEach(nhom => {
-                let eachData = {};
-                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'chuyenNganh', 'maNganh', 'giangVien'].forEach(key => {
-                    eachData[key] = this.ref[key][nhom] ? getValue(this.ref[key][nhom]) : '';
-                });
-                data.push(eachData);
-            });
-            return data;
-        } catch (input) {
-            T.notify('Vui lòng điền đầy đủ dữ liệu', 'danger');
-            input.focus();
-        }
+    componentDidMount() {
+        let data = this.props.data,
+            { soLop, loaiHinhDaoTao } = data;
+        getDtNganhDaoTaoAll(items => {
+            let dataNganh = items.filter(item => loaiHinhDaoTao == 'CLC' ? item.tenNganh.toUpperCase().includes('CLC') : !item.tenNganh.toUpperCase().includes('CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
+            this.setState({ dataNganh, soLop }, () => this.init());
+        });
     }
 
     componentDidUpdate(prev) {
@@ -44,21 +36,18 @@ class RenderListMon extends React.Component {
         let data = this.props.data,
             { khoaDangKy, maNganh, nam, soLop } = data;
         if (khoaDangKy == MA_PDT) {
-            getDtNganhDaoTaoAll(items => {
-                this.setState({ listSelected: items.map(item => item.maNganh), listNganhDaoTao: items.map(item => item.maNganh), soLop }, () => {
-                    let spliceLength = parseInt(items.length / data.soLop) + 1;
-                    Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
-                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
-                    });
-                    Array.from({ length: data.soLop + 1 }, (_, i) => i).forEach(nhom => {
-                        let value = this.state.listNganhDaoTao.splice(0, spliceLength);
-                        this.ref.maNganh[nhom + 1]?.value(value);
-                        this.ref.chuyenNganh[nhom]?.value('');
-                    });
-                });
+            Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
+                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
             });
+            // let dataNganh = this.state.dataNganh.map(item => item.id);
+            // let spliceLength = parseInt(this.state.dataNganh.length / soLop);
+            // for (let nhom = 1; nhom <= soLop && dataNganh.length; nhom++) {
+            //     let value = dataNganh.splice(0, spliceLength);
+            //     this.ref.maNganh[nhom]?.value([...this.ref.maNganh[nhom]?.value(), ...value]);
+            //     this.ref.chuyenNganh[nhom]?.value('');
+            //     if (nhom == soLop && dataNganh.length > 0) { nhom = 0; spliceLength = 1; }
+            // }
         } else {
-            this.setState({ soLop });
             getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
                 Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
                     ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
@@ -70,9 +59,37 @@ class RenderListMon extends React.Component {
         }
     }
 
-    componentDidMount() {
-        this.init();
+    getData = () => {
+        let data = [];
+        try {
+            Array.from({ length: this.state.soLop }, (_, i) => i + 1).forEach(nhom => {
+                let eachData = {};
+                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'tietBatDau', 'chuyenNganh', 'maNganh', 'giangVien'].forEach(key => {
+                    eachData[key] = this.ref[key][nhom] ? getValue(this.ref[key][nhom]) : '';
+                });
+                let { soTietBuoi, tietBatDau } = eachData;
+                if (tietBatDau) {
+                    if (soTietBuoi == 5 && tietBatDau >= 2) {
+                        T.notify(`Lỗi: Học từ tiết 5 tới tiết ${tietBatDau + soTietBuoi - 1}`, 'warning');
+                        throw '';
+                    }
+                    else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) {
+                        T.notify('Thời gian học phần không hợp lệ!', 'danger');
+                        throw '';
+                    }
+                }
+                data.push(eachData);
+            });
+            return data;
+        } catch (input) {
+            if (input) {
+                T.notify('Vui lòng điền đầy đủ dữ liệu', 'danger');
+                input.focus();
+            }
+
+        }
     }
+
 
     handleSelectNganh = (value) => {
         if (value && value.selected) {
@@ -85,24 +102,26 @@ class RenderListMon extends React.Component {
     }
 
     render() {
-        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, soTietBuoi, khoaDangKy } = this.props.data;
+        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, soTietBuoi } = this.props.data;
         tenMonHoc = tenMonHoc.split(':')[1];
         return Array.from({ length: soLop }, (_, i) => i + 1).map(nhom => {
             this.ref = {
                 soTietBuoi: {},
                 soBuoiTuan: {},
                 soLuongDuKien: {},
+                tietBatDau: {},
                 maNganh: {},
                 chuyenNganh: {},
                 giangVien: {}
             };
             return (<React.Fragment key={nhom}>
                 <div className='form-group col-md-12' style={{ marginBottom: '0.5rem' }}><b>Lớp {maMonHoc}_{nhom}</b>: {tenMonHoc}</div>
-                <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-1' placeholder='Số tiết /buổi' required defaulValue={soTietBuoi} />
-                <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-1' placeholder='Số buổi /tuần' required />
+                <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-1' placeholder='Số tiết /buổi' required defaulValue={soTietBuoi} min={1} max={5} />
+                <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-1' placeholder='Số buổi /tuần' required min={1} max={3} />
+                <FormTextBox type='number' ref={e => this.ref.tietBatDau[nhom] = e} className='col-md-1' placeholder='Tiết bắt đầu' min={1} max={9} />
                 <FormTextBox type='number' ref={e => this.ref.soLuongDuKien[nhom] = e} className='col-md-1' placeholder='SLDK' required multiple />
-                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={SelectAdapter_DtNganhDaoTaoFilter(khoaDangKy)} placeholder='Ngành' multiple className='col-md-6' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
-                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-6' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
+                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-5' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
+                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-5' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
                 <FormSelect ref={e => this.ref.giangVien[nhom] = e} data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' className='col-md-3' />
                 {nhom != soLop && <hr className='col-md-12' />}
             </React.Fragment>);
@@ -121,6 +140,14 @@ class AddingModal extends AdminModal {
     onShow = () => {
         this.bacDaoTao.value('DH');
         this.khoaDangKy.value(MA_PDT);
+        let filter = this.props.filter;
+        if (filter && filter != {}) {
+            let { idNamDaoTao, hocKy, bacDaoTaoFilter, loaiHinhDaoTaoFilter } = filter;
+            this.nam.value(idNamDaoTao);
+            this.hocKy.value(hocKy);
+            this.bacDaoTao.value(bacDaoTaoFilter);
+            this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
+        }
     }
 
     saveThongTinChung = () => {
@@ -142,13 +169,19 @@ class AddingModal extends AdminModal {
                 soBuoiTuan: getValue(this.soBuoi),
                 soLuongDuKien: getValue(this.soLuongDuKien)
             };
+            if (data.soLuongDuKien >= 300) {
+                T.notify('Không có phòng đủ sức chứa!', 'danger');
+                throw '';
+            }
             this.setState({ data, savedThongTinChung: true }, () => {
                 this.showChiTiet();
             });
 
         } catch (input) {
-            T.notify(`${input.props.label} bị trống`, 'danger');
-            input.focus();
+            if (input) {
+                T.notify(`${input.props.label} bị trống`, 'danger');
+                input.focus();
+            }
             this.setState({ data: null, settings: null }, this.showThongTinChung);
         }
     }
@@ -156,10 +189,11 @@ class AddingModal extends AdminModal {
     onSubmit = (e) => {
         e?.preventDefault();
         let data = this.cpnMon.getData();
-        this.setState({ isCreating: true });
         if (data) {
-            this.props.createDtThoiKhoaBieuMultiple(data, this.state.data, () => {
-                this.setState({ isCreating: false });
+            this.setState({ isCreating: true }, () => {
+                this.props.createDtThoiKhoaBieuMultiple(data, this.state.data, () => {
+                    this.setState({ isCreating: false });
+                });
             });
         }
     }
@@ -233,9 +267,9 @@ class AddingModal extends AdminModal {
                         <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoFilter(this.state.khoaDangKy || null)} style={{ display: hideNganhSelect ? 'none' : 'block' }} className='col-md-6' label='Ngành' required={!hideNganhSelect} />
                         <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' required onChange={this.handleMonHoc} />
                         <FormCheckbox ref={e => this.loaiMonHoc = e} label='Tự chọn' style={{ marginBottom: '0' }} className='col-md-2' />
-                        <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' required />
-                        <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' required />
-                        <FormTextBox type='number' ref={e => this.soBuoi = e} className='col-md-3' label='Số buổi /tuần' required />
+                        <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' required min={1} max={15} />
+                        <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' required min={1} max={5} />
+                        <FormTextBox type='number' ref={e => this.soBuoi = e} className='col-md-3' label='Số buổi /tuần' required min={1} max={3} />
                         <FormTextBox type='number' ref={e => this.soLuongDuKien = e} className='col-md-3' label='SLDK' required />
                     </div>
                     <div id='2' style={{ height: '70vh', overflow: 'scroll', margin: '0 20 0 20' }}>
@@ -245,8 +279,9 @@ class AddingModal extends AdminModal {
                                 <div className='row' style={{ position: 'sticky', top: 0, zIndex: '1051', backgroundColor: '#0275d8', paddingBottom: '10px', paddingTop: '10px', textAlign: 'center', marginBottom: '15px' }}>
                                     <b className='col-md-1 text-white' >S.Tiết</b>
                                     <b className='col-md-1 text-white' >S.Buổi</b>
+                                    <b className='col-md-1 text-white' >T.bắt đầu</b>
                                     <b className='col-md-1 text-white' >SLDK</b>
-                                    <b className='col-md-6 text-white' >{this.state.data.maNganh ? 'Chuyên ngành' : 'Ngành đào tạo'}</b>
+                                    <b className='col-md-5 text-white' >{this.state.data.maNganh ? 'Chuyên ngành' : 'Ngành đào tạo'}</b>
                                     <b className='col-md-3 text-white' >Giảng viên</b>
                                 </div>
                                 <div className='row'>

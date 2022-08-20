@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao, laySoTuDong, nguoiTao }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao, laySoTuDong, nguoiTao, ngoaiNgu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO', 'laySoTuDong': 'LAY_SO_TU_DONG', 'nguoiTao': 'NGUOI_TAO' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO', 'laySoTuDong': 'LAY_SO_TU_DONG', 'nguoiTao': 'NGUOI_TAO', 'ngoaiNgu': 'NGOAI_NGU' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
@@ -331,6 +331,19 @@ module.exports = app => {
                         resolve(result);
                     }
                 });
+        }),
+
+        dashboardGetData: (timeselect, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_dashboard_get_data(:timeselect, :totalVanBanDen, :totalVanBanDi, :vanBanDenNam, :vanBanDiNam); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, timeselect, totalVanBanDen: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, totalVanBanDi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDenNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDiNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
         }),
     };
 };

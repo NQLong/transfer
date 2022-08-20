@@ -46,7 +46,14 @@ class ItemModal extends AdminModal {
 class adminPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/website', () => {
-            this.props.getDvWebsitePage();
+            const permission = this.getUserPermission('website', ['manage']);
+            if (permission.manage) {
+                T.onSearch = searchTerm => this.props.getDvWebsitePage(undefined, undefined, searchTerm);
+                T.showSearchBox();
+            }
+            this.props.getDvWebsitePage(undefined, undefined, undefined, page => {
+                if (page.pageCondition) T.setTextSearchBox(page.pageCondition);
+            });
         });
     }
 

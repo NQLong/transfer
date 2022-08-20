@@ -8,11 +8,14 @@ class EditModal extends AdminModal {
     state = { maCode: '' };
 
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => this.tenNgonNgu.focus()));
+        $(document).ready(() => {
+            this.onShown(() => this.tenNgonNgu.focus());
+            this.disabledClickOutside();
+        });
     }
 
     onShow = (item) => {
-        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, ketNoi } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '', ketNoi: '' };
+        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, ketNoi, khongTuyenSinh } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '', ketNoi: '', khongTuyenSinh: '' };
         this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenNgonNgu.value(tenNgonNgu || '');
@@ -24,6 +27,7 @@ class EditModal extends AdminModal {
         this.tapTinDinhKem.value(tapTinDinhKem || '');
         this.khongTinTuc.value(khongTinTuc || '');
         this.ketNoi.value(ketNoi || '');
+        this.khongTuyenSinh.value(khongTuyenSinh || '');
 
         maCode && this.imageBox.setData('nationFlag:' + maCode, '/img/flag/' + maCode + '.png');
     }
@@ -41,6 +45,7 @@ class EditModal extends AdminModal {
             tapTinDinhKem: getValue(this.tapTinDinhKem),
             khongTinTuc: getValue(this.khongTinTuc),
             ketNoi: getValue(this.ketNoi),
+            khongTuyenSinh: getValue(this.khongTuyenSinh)
         };
 
         if (changes.maCode == '') {
@@ -80,6 +85,11 @@ class EditModal extends AdminModal {
                         <FormTextBox ref={e => this.xemTatCa = e} label='Xem tất cả' className='col-md-6' required />
                         <FormTextBox ref={e => this.tapTinDinhKem = e} label='Tập tin đính kèm' className='col-md-6' required />
                         <FormTextBox ref={e => this.khongTinTuc = e} label='Không có tin tức' className='col-md-6' required />
+                    </div>
+
+                    <h6 className='tile-title'>Tuyển sinh</h6>
+                    <div className='row'>
+                        <FormTextBox ref={e => this.khongTuyenSinh = e} label='Không có tin tuyển sinh' className='col-md-6' required />
                     </div>
 
                     <h6 className='tile-title'>Footer</h6>

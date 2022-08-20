@@ -9,7 +9,7 @@ module.exports = app => {
     const menuDaoTao = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7009: { title: 'Tòa nhà', link: '/user/dao-tao/toa-nha', groupIndex: 2, backgroundColor: '#5A4C7D', icon: 'fa-building' },
+            7009: { title: 'Tòa nhà', link: '/user/dao-tao/toa-nha', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -21,6 +21,12 @@ module.exports = app => {
     app.get('/user/danh-muc/toa-nha', app.permission.check('dmToaNha:read'), app.templates.admin);
     app.get('/user/dao-tao/toa-nha', app.permission.check('dtToaNha:read'), app.templates.admin);
 
+    app.permissionHooks.add('staff', 'addRolesToaNha', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == '33') {
+            app.permissionHooks.pushUserPermission(user, 'dtToaNha:read', 'dmToaNha:write', 'dmToaNha:delete');
+            resolve();
+        } else resolve();
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/toa-nha/page/:pageNumber/:pageSize', app.permission.orCheck('dmToaNha:read', 'dtToaNha:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),

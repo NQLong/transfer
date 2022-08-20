@@ -22,7 +22,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesTcHocPhi', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcHocPhi:manage', 'tcHocPhi:write', 'tcHocPhi:delete', 'tcHocPhi:read');
+            app.permissionHooks.pushUserPermission(user, 'tcHocPhi:manage', 'tcHocPhi:write', 'tcHocPhi:delete', 'tcHocPhi:read', 'tcHocPhi:export');
             resolve();
         } else resolve();
     }));
@@ -198,9 +198,28 @@ module.exports = app => {
         return congNo;
     };
 
+    app.get('/api/finance/download-excel-tach-mssv/:fileName', app.permission.check('tcHocPhi:write'), (req, res) => {
+        let fileName = req.params.fileName;
+        const srcPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);
+        res.download(srcPath, 'TACH_MSSV_BIDV.xlsx');
+    });
+
+    app.readyHooks.add('TcHocPhi:deleteTempFolder', {
+        ready: () => app.database && app.assetPath,
+        run: () => {
+            app.primaryWorker && app.schedule('0 0 * * *', () => {
+                app.fs.deleteFolder(app.path.join(app.assetPath, 'tempTcHocPhiTachMssv'));
+            });
+        },
+    });
+
     //Hook upload -----------------------------------------------------------------------------------------------------------------------------------
     app.uploadHooks.add('TcHocPhiData', (req, fields, files, params, done) =>
         app.permission.has(req, () => tcHocPhiImportData(fields, files, done), done, 'tcHocPhi:write')
+    );
+
+    app.uploadHooks.add('TachMssv', (req, fields, files, params, done) =>
+        app.permission.has(req, () => tcHocPhiTransactionTachMssv(fields, files, done), done, 'tcHocPhi:write')
     );
 
     const getSettings = async () => await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy', 'hocPhiHuongDan');
@@ -263,6 +282,45 @@ module.exports = app => {
                 } else {
                     done({ error: 'No worksheet!' });
                 }
+            } else done({ error: 'No workbook!' });
+        }
+    };
+
+    const tcHocPhiTransactionTachMssv = async (fields, files, done) => {
+        let worksheet = null;
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'TachMssv' && files.TachMssv && files.TachMssv.length) {
+            app.fs.createFolder(app.path.join(app.assetPath, 'tempTcHocPhiTachMssv'));
+            const srcPath = files.TachMssv[0].path,
+                fileName = app.path.basename(srcPath),
+                newPath = app.path.join(app.assetPath, 'tempTcHocPhiTachMssv', fileName);
+            let workbook = await app.excel.readFile(srcPath);
+
+            if (workbook) {
+                app.fs.deleteFile(srcPath);
+                // app.fs.renameSync(srcPath, newPath);
+                worksheet = workbook.getWorksheet(1);
+                if (worksheet) {
+                    let index = 14;
+                    try {
+                        while (true) {
+                            if (!worksheet.getCell('G' + index).value) {
+                                await workbook.xlsx.writeFile(newPath);
+                                done({ srcPath: fileName });
+                                break;
+                            } else {
+                                let data = worksheet.getCell('G' + index).text,
+                                    regex = /_96234(.*)_/,
+                                    mssv = data.match(regex) ? data.match(regex)[1].substring(0, 10) : '';
+                                worksheet.getCell('I' + index).value = mssv;
+                                index++;
+                            }
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                        done({ error });
+                    }
+                } else done({ error: 'No worksheet!' });
             } else done({ error: 'No workbook!' });
         }
     };
@@ -540,22 +598,97 @@ module.exports = app => {
 
             let dataByStudents = data.rows,
                 dataTransactions = data.transactions;
-            let dataByDate = dataTransactions.map(item => ({ ...item, 'date': app.date.viDateFormat(new Date(Number(item.ngayDong))) }));
+            let dataByDate = dataTransactions.map(item => ({ ...item, 'date': app.date.viDateFormat(new Date(Number(item.ngayDong))) })),
+                dataInvoiceByDate = data.invoice.map(item => ({ ...item, date: app.date.viDateFormat(new Date(Number(item.ngayPhatHanh))) }));
             let totalStudents = dataByStudents.length,
                 totalByDate = countGroupBy(dataByDate, 'date'),
                 totalTransactions = dataTransactions.length,
                 totalCurrentMoney = dataTransactions.reduce((sum, item) => sum + parseInt(item.khoanDong), 0),
+                totalInvoices = data.invoice.length,
+                totalInvoiceByDate = countGroupBy(dataInvoiceByDate, 'date'),
+                totalCancelInvoices = dataInvoiceByDate.reduce((total, item) => item.lydoHuy ? total + 1 : total, 0),
                 amountByDepartment = countGroupBy(dataTransactions, 'tenNganh'),
                 amountByBank = countGroupBy(dataTransactions, 'nganHang'),
                 amountByEduLevel = countGroupBy(dataByStudents, 'tenBacDaoTao'),
                 amountByEduMethod = countGroupBy(dataByStudents, 'loaiHinhDaoTao'),
                 amountPaid = dataByStudents.filter(item => item.congNo == 0).length,
                 amountNotPaid = totalStudents - amountPaid;
-            const statistic = { totalStudents, totalTransactions, amountByBank, amountByEduLevel, amountByEduMethod, amountPaid, amountNotPaid, totalCurrentMoney, amountByDepartment, totalByDate };
+            const statistic = { totalStudents, totalTransactions, totalInvoices, amountByBank, amountByEduLevel, amountByEduMethod, amountPaid, amountNotPaid, totalCurrentMoney, amountByDepartment, totalByDate, totalInvoiceByDate, totalCancelInvoices };
             res.send({ statistic, settings });
         } catch (error) {
             res.send({ error });
         }
     });
 
+    // Bank ----------------------
+    const dateFormat = require('dateformat');
+    const querystring = require('qs');
+    const crypto = require('crypto');
+
+    function sortObject(obj) {
+        let sorted = {};
+        let str = [];
+        let key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                str.push(encodeURIComponent(key));
+            }
+        }
+        str.sort();
+        for (key = 0; key < str.length; key++) {
+            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
+        }
+        return sorted;
+    }
+
+
+    app.get('/api/vnpay/start-thanh-toan/:bank', app.permission.check('student:login'), async (req, res) => {
+        try {
+            const student = req.session.user;
+            const bank = req.params.bank;
+            let { vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_HashSecretAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb, vnp_HashSecretVcb, vnp_Version, vnp_Command, vnp_CurrCode, vnp_ReturnUrl, hocPhiHocKy: hocKy, hocPhiNamHoc: namHoc, vnpayUrl } = await app.model.tcSetting.getValue('vnp_TmnCodeAgribank', 'vnp_TmnCodeVnpayAgribank', 'vnp_HashSecretAgribank', 'vnp_TmnCodeVcb', 'vnp_TmnCodeVnpayVcb', 'vnp_HashSecretVcb', 'vnp_Version', 'vnp_Command', 'vnp_CurrCode', 'vnp_ReturnUrl', 'hocPhiHocKy', 'hocPhiNamHoc', 'vnpayUrl');
+            const bankMapper = {
+                'agri': vnp_TmnCodeAgribank,
+                'vnpay-agri': vnp_TmnCodeVnpayAgribank,
+                'vcb': vnp_TmnCodeVcb,
+                'vnpay-vcb': vnp_TmnCodeVnpayVcb
+            }, hashMapper = {
+                'agri': vnp_HashSecretAgribank,
+                'vnpay-agri': vnp_HashSecretAgribank,
+                'vcb': vnp_HashSecretVcb,
+                'vnpay-vcb': vnp_HashSecretVcb
+            };
+            if (!bank || !Object.keys(bankMapper).includes(bank)) throw 'Permission reject!';
+            if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
+            const mssv = student.data.mssv;
+            const ipAddr = req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress;
+
+            const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
+            let { congNo } = dataHocPhi;
+            const vnp_OrderInfo = `USSH: Học phí SV ${mssv}, học kỳ ${hocKy} NH ${namHoc} - ${parseInt(namHoc) + 1}`;
+            const now = new Date(), vnp_CreateDate = dateFormat(now, 'yyyymmddHHmmss'),
+                vnp_IpAddr = ipAddr,
+                vnp_Locale = 'vn',
+                vnp_TxnRef = `${mssv}_${vnp_CreateDate}`;
+
+            const vnp_Amount = congNo * 100, vnp_TmnCode = bankMapper[bank], vnp_HashSecret = hashMapper[bank];
+
+            let params = { vnp_Version, vnp_Command, vnp_TmnCode, vnp_Locale, vnp_CurrCode, vnp_TxnRef, vnp_OrderInfo, vnp_Amount, vnp_ReturnUrl, vnp_IpAddr, vnp_CreateDate };
+            params = sortObject(params);
+
+            const signData = querystring.stringify(params, { encode: false });
+            const hmac = crypto.createHmac('sha512', vnp_HashSecret);
+
+            const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+            params = app.clone(params, { vnp_SecureHash });
+            const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
+            await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
+            res.send(urlRequest);
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };
