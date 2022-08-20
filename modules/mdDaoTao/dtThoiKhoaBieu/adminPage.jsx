@@ -211,7 +211,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0' }} data={dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
-                <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '70px', marginBottom: '0', textAlign: 'right' }} />
+                <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '70px', marginBottom: '0', textAlign: 'right' }} min={1} max={5} />
             } />
             <TableCell content={
                 <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ marginBottom: '0', width: '70px', }} />
@@ -236,6 +236,22 @@ class DtThoiKhoaBieuPage extends AdminPage {
             soLuongDuKien: this.soLuongDuKien.value(),
             maNganh: this.maNganh.value()
         };
+        let { tietBatDau, soTietBuoi } = curData;
+        if (tietBatDau && soTietBuoi) {
+            tietBatDau = parseInt(tietBatDau);
+            soTietBuoi = parseInt(soTietBuoi);
+            if (soTietBuoi == 5 && tietBatDau >= 2) {
+                T.notify(`Lỗi: Học từ tiết 5 tới tiết ${tietBatDau + soTietBuoi - 1}`, 'warning');
+                return this.tietBatDau.focus();
+            }
+            else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) {
+                T.notify('Thời gian học không hợp lệ!', 'danger');
+                return this.tietBatDau.focus();
+            } else if (soTietBuoi + tietBatDau - 1 >= 10) {
+                T.notify('Thời gian học không hợp lệ!', 'danger');
+                return this.tietBatDau.focus();
+            }
+        }
         this.props.updateDtThoiKhoaBieuCondition(item.id, curData, () => {
             this.setState({ editId: null });
         });
@@ -315,15 +331,15 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                 <TableCell type='number' content={item.soTiet} />
                                 <TableCell type='number' content={item.soLuongDuKien} />
                                 <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={<>{
-                                    item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{nganh.split('%')[0]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
-                                    {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[1]} arrow><span>{`${nganh.split('%')[0]}_${nganh.split('%')[1].getFirstLetters()}`}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                                    item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[0]} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                                    {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={`${nganh.split('%')[0]}_${nganh.split('%')[1].getFirstLetters()}`} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
                                 </>} />
                             </>
                         }
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayBatDau} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayKetThuc} />
                         <TableCell style={{ textAlign: 'center' }} content={item.tenKhoaDangKy?.getFirstLetters().toUpperCase()} />
-                        <TableCell style={{}} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
+                        <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
                         <TableCell style={{ textAlign: 'center' }} content={item.bacDaoTao} />
                         <TableCell style={{ textAlign: 'center' }} content={item.loaiHinhDaoTao} />
                         <TableCell style={{ textAlign: 'right' }} content={item.khoaSinhVien} />
@@ -374,9 +390,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <AdjustModal ref={e => this.modal = e} quanLyKhoa={permission.manage}
                     update={this.props.updateDtThoiKhoaBieuCondition}
                 />
-                <AutoGenSchedModal ref={e => this.autoGen = e} permission={permission} />
+                <AutoGenSchedModal ref={e => this.autoGen = e} permission={permission} filter={this.state.filter} />
                 <ThoiGianPhanCongGiangDay ref={e => this.thoiGianModal = e} create={this.props.createDtThoiGianPhanCong} />
-                <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} disabledClickOutside />
+                <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} disabledClickOutside filter={this.state.filter} />
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
                     || this.autoGen.show()} style={{ marginRight: '180px' }} />}
                 {permission.write && <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-thumb-tack' tooltip='Tạo thời gian phân công giảng dạy' onClick={e => e.preventDefault()

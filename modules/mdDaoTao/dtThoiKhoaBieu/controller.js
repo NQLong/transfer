@@ -249,8 +249,54 @@ module.exports = app => {
 
     app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), async (req, res) => {
         try {
-            let { condition, changes } = req.body;
+            let { condition, changes } = req.body,
+                { tietBatDau, soTietBuoi, thu } = changes;
+            tietBatDau = parseInt(tietBatDau);
+            soTietBuoi = parseInt(soTietBuoi);
+            thu = parseInt(thu);
             if (!isNaN(condition)) {
+                let nganh = await app.model.dtThoiKhoaBieuNganh.get({ idThoiKhoaBieu: condition }),
+                    idNganh = nganh.idNganh;
+
+                // Check xem id ngành có trống hay không.
+                let listIdTkb = await app.model.dtThoiKhoaBieuNganh.getAll({ idNganh });
+                listIdTkb = listIdTkb.filter(item => item.idThoiKhoaBieu != condition).map(item => item.idThoiKhoaBieu);
+                if (listIdTkb.length) {
+                    let listHocPhanNganh = await app.model.dtThoiKhoaBieu.getAll({
+                        statement: 'id IN (:listIdTkb)',
+                        parameter: { listIdTkb }
+                    }, 'thu,tietBatDau,soTietBuoi,phong');
+                    if (listHocPhanNganh.some(item => item.thu == thu
+                        && (
+                            (tietBatDau <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1)
+                                && tietBatDau >= parseInt(item.tietBatDau)) ||
+                            ((tietBatDau + soTietBuoi - 1) >= parseInt(item.tietBatDau)
+                                && (tietBatDau + soTietBuoi - 1) <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1))
+                        )
+                    )) {
+                        throw 'Trùng thời gian môn khác của ngành/chuyên ngành';
+                    }
+                }
+                if (changes.phong) {
+                    let hocPhan = await app.model.dtThoiKhoaBieu.get({ id: condition }),
+                        { nam, hocKy } = hocPhan;
+
+                    let listCurrentRoom = await app.model.dtThoiKhoaBieu.getAll({
+                        statement: 'nam = :nam AND hocKy = :hocKy AND phong = :phong AND thu IS NOT NULL AND tietBatDau IS NOT NULL',
+                        parameter: { nam, hocKy, phong: changes.phong }
+                    });
+                    if (listCurrentRoom.length && listCurrentRoom.some(item => item.thu == thu
+                        && (
+                            (tietBatDau <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1)
+                                && tietBatDau >= parseInt(item.tietBatDau)) ||
+                            ((tietBatDau + soTietBuoi - 1) >= parseInt(item.tietBatDau)
+                                && (tietBatDau + soTietBuoi - 1) <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1))
+                        )
+                    )) {
+                        throw `Phòng ${changes.phong} bị trùng giờ`;
+                    }
+                }
+
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
                 if (changes.maNganh && changes.maNganh.length) {
                     await app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: condition });
@@ -266,6 +312,7 @@ module.exports = app => {
                 res.send({ item });
             }
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
 
