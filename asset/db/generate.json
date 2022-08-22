@@ -16406,6 +16406,9 @@
             "active": true,
             "moduleName": "tccbKhungDanhGiaCanBo",
             "modelName": "tccbKhungDanhGiaCanBo",
+            "methods": {
+                "TCCB_KHUNG_DANH_GIA_CAN_BO_GAN_THU_TU": "updateThuTu"
+            },
             "columns": {
                 "NAM": {
                     "value": "nam",
@@ -16467,6 +16470,7 @@
             "active": true,
             "moduleName": "tccbKhungDanhGiaDonVi",
             "modelName": "tccbKhungDanhGiaDonVi",
+            
             "columns": {
                 "ID": {
                     "value": "id",
