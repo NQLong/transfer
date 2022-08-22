@@ -350,7 +350,7 @@ module.exports = app => {
 
     });
 
-    app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), async (req, res) => {
+    app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
         app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: req.body.id }, () => {
             app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => { 
                 res.send({ errors });
