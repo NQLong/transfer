@@ -126,6 +126,14 @@ class UserPage extends AdminPage {
         });
     }
 
+    downloadHoaDon = (e, id) => {
+        e.preventDefault();
+        e.target.setAttribute('disabled', true);
+        setTimeout(() => e.target.removeAttribute('disabled', false), 4000);
+        T.notify('Hệ thống đang chuẩn bị để tải xuống hóa đơn');
+        T.download(`/api/finance/invoice/view/${id}`);
+    }
+
     renderSection = (namHoc, hocPhiTrongNam) => {
         const { dataDetailTrongNam, dataTrongNam } = hocPhiTrongNam;
         const dataHocKy = dataTrongNam.groupBy('hocKy');
@@ -137,14 +145,23 @@ class UserPage extends AdminPage {
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }} >
                             <i style={{ fontSize: '16px' }}>Học kỳ {hocKy}</i>
-                            {
-                                current.congNo ?
-                                    (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
-                                        <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
-                                            Thanh toán
-                                        </button>
-                                    </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
-                            }
+                            <div className='d-flex justify-content-center align-items-center' style={{ gap: 10 }}>
+
+                                {current.idHoaDon &&
+                                    <button className='btn btn-warning' onClick={(e) => this.downloadHoaDon(e, current.idHoaDon)}>
+                                        <i className='fa fa-lg fa-download' /> Chuyển thành hóa đơn giấy
+                                    </button>
+                                }
+
+                                {
+                                    current.congNo ?
+                                        (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
+                                            <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                                Thanh toán
+                                            </button>
+                                        </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
+                                }
+                            </div>
                         </div>
                         <div className='tile-footer' style={{ padding: '0', marginBottom: '10px', marginTop: '0' }} />
                         {this.renderTableHocPhi(dataDetailTrongNam.filter(item => item.hocKy == hocKy))}
@@ -163,8 +180,9 @@ class UserPage extends AdminPage {
                         <ThanhToanModal ref={e => this.thanhToanModal = e} vnPayGoToTransaction={this.props.vnPayGoToTransaction} />
                     </div>);
                 }
-                )}
-            </div>
+                )
+                }
+            </div >
         );
     }
     render() {

@@ -111,7 +111,7 @@ class DanhSachHoaDon extends AdminPage {
 
     onSendMail = (e, item) => {
         e.preventDefault();
-        this.props.sendInvoiceMail(item.id);
+        T.confirm('Gửi email hóa đơn', `Gửi email hóa đơn tới sinh viên ${`${item.ho} ${item.ten}`.normalizedName().trim()}`, true, isConfirm => isConfirm && this.props.sendInvoiceMail(item.id));
     }
 
     onCancelInvoicie = (e, item) => {
@@ -152,23 +152,26 @@ class DanhSachHoaDon extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maNganh}: ${item.tenNganh}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenBacDaoTao} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiHinhDaoTao} />
-                <TableCell style={{ whiteSpace: 'nowrap' }} type='checkbox' content={!item.lyDoHuy?.length} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} type='checkbox' content={item.lyDoHuy?.length} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='buttons' >
-                    <Tooltip title='Xem hóa đơn' arrow>
-                        <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.id}`}>
-                            <i className='fa fa-lg fa-eye' />
-                        </a>
-                    </Tooltip>
-                    <Tooltip title='Mail hóa đơn' arrow>
-                        <button className='btn btn-success' onClick={(e) => this.onSendMail(e, item)} >
-                            <i className='fa fa-lg fa-envelope' />
-                        </button>
-                    </Tooltip>
-                    {!item.lyDoHuy && <Tooltip title='Hủy hóa đơn' arrow>
-                        <button className='btn btn-danger' onClick={(e) => this.onCancelInvoicie(e, item)} >
-                            <i className='fa fa-lg fa-times' />
-                        </button>
-                    </Tooltip>}
+                    {!item.lyDoHuy && <>
+                        <Tooltip title='Xem hóa đơn' arrow>
+                            <a className='btn btn-info' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.id}`}>
+                                <i className='fa fa-lg fa-eye' />
+                            </a>
+                        </Tooltip>
+                        <Tooltip title='Mail hóa đơn' arrow>
+                            <button className='btn btn-success' onClick={(e) => this.onSendMail(e, item)} >
+                                <i className='fa fa-lg fa-envelope' />
+                            </button>
+                        </Tooltip>
+                        <Tooltip title='Hủy hóa đơn' arrow>
+                            <button className='btn btn-danger' onClick={(e) => this.onCancelInvoicie(e, item)} >
+                                <i className='fa fa-lg fa-times' />
+                            </button>
+                        </Tooltip>
+                    </>
+                    }
                 </TableCell>
             </tr>),
         });
