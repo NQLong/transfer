@@ -136,6 +136,8 @@ module.exports = app => {
                         'DiscountAmount': null,
                         'AmountOC': detail.soTien,
                         'Amount': detail.soTien,
+                        'AmountWithoutVATOC': parseInt(detail.soTien),
+                        'AmountWithoutVAT': parseInt(detail.soTien),
                         // 'VATRateName': '10%',
                         // 'VATAmountOC': 15000.0,
                         // 'VATAmount': 15000.0

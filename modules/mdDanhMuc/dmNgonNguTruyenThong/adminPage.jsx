@@ -15,7 +15,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, ketNoi, khongTuyenSinh } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '', ketNoi: '', khongTuyenSinh: '' };
+        let { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, khongSuKien, ketNoi, ketNoiVnu, khongTuyenSinh } = item ? item : { maCode: '', tenNgonNgu: '', timKiem: '', trangCaNhan: '', dangNhap: '', dangXuat: '', xemTatCa: '', tapTinDinhKem: '', khongTinTuc: '', khongSuKien: '', ketNoi: '', ketNoiVnu: '', khongTuyenSinh: '' };
         this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenNgonNgu.value(tenNgonNgu || '');
@@ -26,7 +26,9 @@ class EditModal extends AdminModal {
         this.xemTatCa.value(xemTatCa || '');
         this.tapTinDinhKem.value(tapTinDinhKem || '');
         this.khongTinTuc.value(khongTinTuc || '');
+        this.khongSuKien.value(khongSuKien || '');
         this.ketNoi.value(ketNoi || '');
+        this.ketNoiVnu.value(ketNoiVnu || '');
         this.khongTuyenSinh.value(khongTuyenSinh || '');
 
         maCode && this.imageBox.setData('nationFlag:' + maCode, '/img/flag/' + maCode + '.png');
@@ -44,7 +46,9 @@ class EditModal extends AdminModal {
             xemTatCa: getValue(this.xemTatCa),
             tapTinDinhKem: getValue(this.tapTinDinhKem),
             khongTinTuc: getValue(this.khongTinTuc),
+            khongSuKien: getValue(this.khongSuKien),
             ketNoi: getValue(this.ketNoi),
+            ketNoiVnu: getValue(this.ketNoiVnu),
             khongTuyenSinh: getValue(this.khongTuyenSinh)
         };
 
@@ -85,6 +89,7 @@ class EditModal extends AdminModal {
                         <FormTextBox ref={e => this.xemTatCa = e} label='Xem tất cả' className='col-md-6' required />
                         <FormTextBox ref={e => this.tapTinDinhKem = e} label='Tập tin đính kèm' className='col-md-6' required />
                         <FormTextBox ref={e => this.khongTinTuc = e} label='Không có tin tức' className='col-md-6' required />
+                        <FormTextBox ref={e => this.khongSuKien = e} label='Không có sự kiện' className='col-md-6' required />
                     </div>
 
                     <h6 className='tile-title'>Tuyển sinh</h6>
@@ -95,6 +100,7 @@ class EditModal extends AdminModal {
                     <h6 className='tile-title'>Footer</h6>
                     <div className='row'>
                         <FormTextBox ref={e => this.ketNoi = e} label='Kết nối với USSH' className='col-md-6' required />
+                        <FormTextBox ref={e => this.ketNoiVnu = e} label='Kết nối với VNUHCM' className='col-md-6' required />
                     </div>
                 </div>
             </div>

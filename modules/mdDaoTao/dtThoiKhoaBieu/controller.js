@@ -397,12 +397,8 @@ module.exports = app => {
                 { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 20 },
                 { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 20 },
                 { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 30 },
-                { header: 'MÃ NGÀNH', key: 'maNganh', width: 20 },
-                { header: 'NGÀNH', key: 'nganh', width: 20 },
                 { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 }
             ];
-            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
-            ws.getRow(1).font = { name: 'Times New Roman' };
             // ws.getRow(1).font = {
             //     name: 'Times New Roman',
             //     family: 4,
@@ -428,16 +424,8 @@ module.exports = app => {
                     ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
                     ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
                     khoa: item.tenKhoaDangKy,
-                    maNganh: item.maNganh,
-                    nganh: item.tenNganh,
                     giangVien: item.tenGiangVien,
                 }, index === 0 ? 'n' : 'i');
-
-                if (index === 0) {
-                    ws.getRow(2).alignment = { ...ws.getRow(2).alignment, vertical: 'middle', wrapText: true };
-                    ws.getRow(2).font = { name: 'Times New Roman' };
-                    // ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                }
             });
 
             let fileName = 'THOI_KHOA_BIEU.xlsx';

@@ -349,6 +349,13 @@ const T = {
             return `/news/item/${item.id}?${T.language.getLanguage()}`;
         }
     },
+    linkEventsDetail: (item) => {
+        if (item.link) {
+            return `/su-kien/${item.link}?${T.language.getLanguage()}`;
+        } else {
+            return `/event/item/${item.id}?${T.language.getLanguage()}`;
+        }
+    },
 
 
     //JSON Operate---------------------------------------------------------------------------------------------

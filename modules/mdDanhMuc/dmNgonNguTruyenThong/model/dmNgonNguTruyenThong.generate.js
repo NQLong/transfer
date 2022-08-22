@@ -1,6 +1,6 @@
-// Table name: DM_NGON_NGU_TRUYEN_THONG { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, ketNoi, khongTuyenSinh }
+// Table name: DM_NGON_NGU_TRUYEN_THONG { maCode, tenNgonNgu, timKiem, trangCaNhan, dangNhap, dangXuat, xemTatCa, tapTinDinhKem, khongTinTuc, ketNoi, khongTuyenSinh, khongSuKien, ketNoiVnu }
 const keys = ['MA_CODE'];
-const obj2Db = { 'maCode': 'MA_CODE', 'tenNgonNgu': 'TEN_NGON_NGU', 'timKiem': 'TIM_KIEM', 'trangCaNhan': 'TRANG_CA_NHAN', 'dangNhap': 'DANG_NHAP', 'dangXuat': 'DANG_XUAT', 'xemTatCa': 'XEM_TAT_CA', 'tapTinDinhKem': 'TAP_TIN_DINH_KEM', 'khongTinTuc': 'KHONG_TIN_TUC', 'ketNoi': 'KET_NOI', 'khongTuyenSinh': 'KHONG_TUYEN_SINH' };
+const obj2Db = { 'maCode': 'MA_CODE', 'tenNgonNgu': 'TEN_NGON_NGU', 'timKiem': 'TIM_KIEM', 'trangCaNhan': 'TRANG_CA_NHAN', 'dangNhap': 'DANG_NHAP', 'dangXuat': 'DANG_XUAT', 'xemTatCa': 'XEM_TAT_CA', 'tapTinDinhKem': 'TAP_TIN_DINH_KEM', 'khongTinTuc': 'KHONG_TIN_TUC', 'ketNoi': 'KET_NOI', 'khongTuyenSinh': 'KHONG_TUYEN_SINH', 'khongSuKien': 'KHONG_SU_KIEN', 'ketNoiVnu': 'KET_NOI_VNU' };
 
 module.exports = app => {
     app.model.dmNgonNguTruyenThong = {
