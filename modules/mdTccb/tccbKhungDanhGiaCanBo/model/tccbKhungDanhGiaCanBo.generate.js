@@ -215,5 +215,18 @@ module.exports = app => {
                 }
             });
         }),
+
+        updateThuTu: (pId, pThuTu, pIsUp, pNam, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN tccb_khung_danh_gia_can_bo_gan_thu_tu(:pId, :pThuTu, :pIsUp, :pNam); END;',
+                { pId, pThuTu, pIsUp, pNam }, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                });
+        })
     };
 };
