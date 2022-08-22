@@ -13,11 +13,18 @@ module.exports = app => {
     app.get('/user/danh-gia/cau-truc-khung-danh-gia-can-bo/:nam', app.permission.check('tccbKhungDanhGiaCanBo:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-gia/cau-truc-khung-danh-gia-can-bo/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            condition = req.query.condition;
-        app.model.tccbKhungDanhGiaCanBo.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+    app.get('/api/danh-gia/cau-truc-khung-danh-gia-can-bo/page/:pageNumber/:pageSize', app.permission.check('user:login'), async (req, res) => {
+        try {
+            const pageNumber = parseInt(req.params.pageNumber),
+                pageSize = parseInt(req.params.pageSize),
+                condition = req.query.condition;
+            let page = await app.model.tccbKhungDanhGiaCanBo.getPage(pageNumber, pageSize, condition);
+            res.send({ page });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+
     });
 
     app.get('/api/danh-gia/cau-truc-khung-danh-gia-can-bo/all', app.permission.check('user:login'), (req, res) => {
