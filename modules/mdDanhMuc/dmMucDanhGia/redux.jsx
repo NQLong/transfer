@@ -76,7 +76,6 @@ export function getDmMucDanhGiaPage(pageNumber, pageSize, done) {
 }
 
 export function getDmMucDanhGia(ma, done) {
-    console.log(ma);
     return () => {
         const url = `/api/danh-muc/muc-danh-gia/item/${ma}`;
         T.get(url, data => {

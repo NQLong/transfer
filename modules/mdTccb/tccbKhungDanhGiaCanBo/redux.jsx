@@ -66,7 +66,7 @@ export function getTccbKhungDanhGiaCanBoPage(pageNumber, pageSize, pageCondition
     const page = T.updatePage('pageTccbKhungDanhGiaCanBo', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-gia/cau-truc-khung-danh-gia-can-bo/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter }, data => {
+        T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cấu trúc khung đánh giá cán bộ bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -142,7 +142,21 @@ export function updateTccbKhungDanhGiaCanBo(id, changes, done) {
     };
 }
 
-
+export function deleteTccbKhungDanhGiaCanBoAll(nam, done) {
+    return dispatch => {
+        const url = `/api/danh-gia/cau-truc-khung-danh-gia-can-bo/${nam}`;
+        T.put(url, { nam }, data => {
+            if (data.error) {
+                T.notify('Xóa khung đánh giá cán bộ bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('Khung đánh giá cán bộ đã xóa thành công!', 'success', false, 800);
+                dispatch(getTccbKhungDanhGiaCanBoPage());
+                done && done();
+            }
+        }, () => T.notify('Xoá khung đánh giá cán bộ bị lỗi!', 'danger'));
+    };
+}
 
 export function changeTccbKhungDanhGiaCanBo(item) {
     return { type: TccbKhungDanhGiaCanBoUpdate, item };

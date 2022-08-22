@@ -69,8 +69,6 @@ export class ComponentDGCB extends AdminPage {
     };
 
     getValue = () => {
-        console.log(this.rows);
-        console.log(this.state.items);
         const keys = Object.keys(this.rows);
         const datas = { items: [] };
         keys.forEach((key) => {
