@@ -41,7 +41,6 @@ module.exports = app => {
             filter = app.utils.stringify(app.clone(filter, { donVi }));
 
             let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
-
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
             const pageCondition = searchTerm;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
@@ -297,7 +296,40 @@ module.exports = app => {
                     }
                 }
 
+                let giangVien, troGiang;
+                if (changes.giangVien) {
+                    giangVien = changes.giangVien;
+                    delete changes.giangVien;
+                }
+                if (changes.troGiang) {
+                    troGiang = changes.troGiang;
+                    delete changes.troGiang;
+                }
+                
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
+
+                let allGvItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'GV' });
+                for (let exitsGvItem of allGvItem) {
+                    if (!giangVien.includes(exitsGvItem.giangVien)) app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: item.id, giangVien: exitsGvItem.giangVien, type: 'GV' });
+                    else giangVien.splice(giangVien.indexOf(exitsGvItem.giangVien), 1);
+                }
+                if (giangVien && giangVien.length > 0) {
+                    for (let gvItem of giangVien) {
+                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: gvItem, type: 'GV'});
+                    }
+                }
+
+                let allTgItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'TG' });
+                for (let exitsTgItem of allTgItem) {
+                    if (!troGiang.includes(exitsTgItem.giangVien)) app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: item.id, giangVien: exitsTgItem.giangVien, type: 'TG' });
+                    else troGiang.splice(troGiang.indexOf(exitsTgItem.giangVien), 1);
+                }
+                if (troGiang && troGiang.length > 0) {
+                    for (let tgItem of troGiang) {
+                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: tgItem, type: 'TG'});
+                    }
+                }
+
                 if (changes.maNganh && changes.maNganh.length) {
                     await app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: condition });
                     for (let idNganh of changes.maNganh) {
@@ -319,7 +351,11 @@ module.exports = app => {
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
-        app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: req.body.id }, () => {
+            app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => { 
+                res.send({ errors });
+            });
+        });
     });
 
     app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
@@ -361,12 +397,8 @@ module.exports = app => {
                 { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 20 },
                 { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 20 },
                 { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 30 },
-                { header: 'MÃ NGÀNH', key: 'maNganh', width: 20 },
-                { header: 'NGÀNH', key: 'nganh', width: 20 },
                 { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 }
             ];
-            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
-            ws.getRow(1).font = { name: 'Times New Roman' };
             // ws.getRow(1).font = {
             //     name: 'Times New Roman',
             //     family: 4,
@@ -392,16 +424,8 @@ module.exports = app => {
                     ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
                     ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
                     khoa: item.tenKhoaDangKy,
-                    maNganh: item.maNganh,
-                    nganh: item.tenNganh,
                     giangVien: item.tenGiangVien,
                 }, index === 0 ? 'n' : 'i');
-
-                if (index === 0) {
-                    ws.getRow(2).alignment = { ...ws.getRow(2).alignment, vertical: 'middle', wrapText: true };
-                    ws.getRow(2).font = { name: 'Times New Roman' };
-                    // ws.getCell('D' + 2).alignment = { ...ws.getRow(2).alignment, horizontal: 'center' };
-                }
             });
 
             let fileName = 'THOI_KHOA_BIEU.xlsx';

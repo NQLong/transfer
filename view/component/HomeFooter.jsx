@@ -134,7 +134,7 @@ class Footer extends React.Component {
                 </div>,
                 <div className='col-sm' key={'14'}>
                     <div className='footer-link'>
-                        <h3>KẾT NỐI VỚI VNUHCM <i className='fa fa-angle-down d-md-none' /></h3>
+                        <h3>{newLanguage.ketNoiVnu} <i className='fa fa-angle-down d-md-none' /></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
                             <a href={'https://vnuhcm.edu.vn/'} target='_blank' rel='noreferrer'> <img src={'/img/logo-vnu.png?t=4000'} style={{
                                 width: width < 700 ? '90%' : '82%', paddingTop: 10, maxWidth: 450, cursor: 'pointer',
@@ -230,17 +230,17 @@ class Footer extends React.Component {
                 footerList[1] =
                     <div className='col-sm' key={'12'}>
                         <div className='footer-link'>
-                            <h3>{'BỘ PHẬN QUẢN LÝ KHOA HỌC'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                            <h3>{'BỘ PHẬN QUẢN LÝ KHOA HỌC'} <i className='fa fa-angle-down d-md-none' /></h3>
                             <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
-                                <li><i className='fa fa-map-marker'></i><span className='ml-1' style={{ paddingLeft: '10px', fontWeight: 'bold' }}>{'Phòng B.111,Số 10 - 12 đường Đinh Tiên Hoàng, phường Bến Nghé, Quận 1, Thành phố Hồ Chí Minh'}</span></li>
-                                <li><i className='fa fa fa-phone'></i>
+                                <li><i className='fa fa-map-marker' /><span className='ml-1' style={{ paddingLeft: '10px', fontWeight: 'bold' }}>{'Phòng B.111,Số 10 - 12 đường Đinh Tiên Hoàng, phường Bến Nghé, Quận 1, Thành phố Hồ Chí Minh'}</span></li>
+                                <li><i className='fa fa fa-phone' />
                                     <span target='_blank' className='ml-1' style={{ paddingLeft: '10px' }}>
                                         <a href={'tel:02838293828'}> {'028 38293828, số nội bộ: 122'}</a>
                                     </span></li>
-                                <li><i className='fa fa fa-envelope'></i><span target='_blank' className='ml-1' style={{ paddingLeft: '10px' }}>
+                                <li><i className='fa fa fa-envelope' /><span target='_blank' className='ml-1' style={{ paddingLeft: '10px' }}>
                                     <a href='mailto:qlkh_da@hcmussh.edu.vn'>qlkh_da@hcmussh.edu.vn</a>
                                 </span></li>
-                                <li><i className='icon-facebook-square'></i><span className='ml-1' style={{ paddingLeft: '10px' }}>
+                                <li><i className='icon-facebook-square' /><span className='ml-1' style={{ paddingLeft: '10px' }}>
                                     <a href='https://www.facebook.com/232430870759910' target='_blank' rel='noreferrer'>
                                         www.facebook.com/232430870759910
                                     </a>
@@ -253,7 +253,7 @@ class Footer extends React.Component {
             } else if (hostname.includes('thuvien')) {
                 footerList[1] = <div className='col-sm' key={'12'}>
                     <div className='footer-link'>
-                        <h3>{'LIÊN HỆ'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <h3>LIÊN HỆ <i className='fa fa-angle-down d-md-none' /></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
                                 <a target='_blank' href='https://www.facebook.com/Libussh' rel='noreferrer'>Fanpage Thư viện</a>
@@ -270,7 +270,7 @@ class Footer extends React.Component {
             } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en') || (T.language() == 'en' && (hostname.includes('/tin-tuc') || hostname.includes('/news')))) {
                 footerList[0] = <div className='col-sm' key={'1'}>
                     <div className='footer-link'>
-                        <h3>{'TRAINING PROGRAMS'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <h3>TRAINING PROGRAMS <i className='fa fa-angle-down d-md-none' /></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
                                 <a target='_blank' href='https://hcmussh.edu.vn/en/undergraduate-programs' rel='noreferrer'>Undergraduate Programs</a>
@@ -289,7 +289,7 @@ class Footer extends React.Component {
                 </div>;
                 footerList[1] = <div className='col-sm' key={'2'}>
                     <div className='footer-link'>
-                        <h3>{'Student Life'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <h3>Student Life <i className='fa fa-angle-down d-md-none' /></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
                                 <a target='_blank' href='https://hcmussh.edu.vn/en/future-students' rel='noreferrer'>Future Students</a>

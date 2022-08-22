@@ -14,7 +14,9 @@ module.exports = app => {
                 xemTatCa: 'Xem tất cả',
                 tapTinDinhKem: 'Tập tin đính kèm',
                 khongTinTuc: 'Không có tin tức!',
+                khongSuKien: 'Không có sự kiện!',
                 ketNoi: 'KẾT NỐI VỚI USSH-VNUHCM',
+                ketNoiVnu: 'KẾT NỐI VỚI VNUHCM',
                 khongTuyenSinh: 'Không có tin tuyển sinh!'
             };
             await app.model.dmNgonNguTruyenThong.create(newViData);
@@ -33,7 +35,9 @@ module.exports = app => {
                 xemTatCa: 'View all',
                 tapTinDinhKem: 'Attachment files',
                 khongTinTuc: 'No latest news!',
+                khongSuKien: 'No latest events!',
                 ketNoi: 'CONNECT US',
+                ketNoiVnu: 'CONNECT WITH VNUHCM',
                 khongTuyenSinh: 'No admission news!'
             };
             await app.model.dmNgonNguTruyenThong.create(newEnData);
@@ -53,7 +57,9 @@ module.exports = app => {
                     xemTatCa: item.xemTatCa || '',
                     tapTinDinhKem: item.tapTinDinhKem || '',
                     khongTinTuc: item.khongTinTuc || '',
+                    khongSuKien: item.khongSuKien || '',
                     ketNoi: item.ketNoi || '',
+                    ketNoiVnu: item.ketNoiVnu || '',
                     khongTuyenSinh: item.khongTuyenSinh || ''
                 };
             });
