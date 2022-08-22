@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_TRANSACTION_INVOICE { id, refId, invoiceTransactionId, invoiceNumber, mssv, hocKy, namHoc, lyDoHuy, ngayPhatHanh, serial }
+// Table name: TC_HOC_PHI_TRANSACTION_INVOICE { id, refId, invoiceTransactionId, invoiceNumber, mssv, hocKy, namHoc, lyDoHuy, ngayPhatHanh, serial, mailBy }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'refId': 'REF_ID', 'invoiceTransactionId': 'INVOICE_TRANSACTION_ID', 'invoiceNumber': 'INVOICE_NUMBER', 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'lyDoHuy': 'LY_DO_HUY', 'ngayPhatHanh': 'NGAY_PHAT_HANH', 'serial': 'SERIAL' };
+const obj2Db = { 'id': 'ID', 'refId': 'REF_ID', 'invoiceTransactionId': 'INVOICE_TRANSACTION_ID', 'invoiceNumber': 'INVOICE_NUMBER', 'mssv': 'MSSV', 'hocKy': 'HOC_KY', 'namHoc': 'NAM_HOC', 'lyDoHuy': 'LY_DO_HUY', 'ngayPhatHanh': 'NGAY_PHAT_HANH', 'serial': 'SERIAL', 'mailBy': 'MAIL_BY' };
 
 module.exports = app => {
     app.model.tcHocPhiTransactionInvoice = {

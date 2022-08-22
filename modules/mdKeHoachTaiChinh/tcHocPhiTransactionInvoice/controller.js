@@ -210,6 +210,8 @@ module.exports = app => {
             if (!data || !data.length || data[0].ErrorCode) {
                 throw { message: 'Tạo hóa đơn lỗi', error: data[0].ErrorCode };
             }
+            const emails = await getMailConfig();
+            const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
             const invoices = await Promise.all(data.map(async invoice => {
                 const refId = invoice.RefID;
                 const [mssv, namHoc, hocKy, ngayPhatHanh] = refId.split('-');
@@ -219,9 +221,8 @@ module.exports = app => {
                     invoiceNumber: invoice.InvNo,
                     mssv, namHoc, hocKy, ngayPhatHanh,
                     serial: mauHoaDon.meinvoiceMauHoaDon,
+                    mailBy: email.email
                 });
-                const emails = await getMailConfig();
-                const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
                 sendSinhVienInvoice(newInvoice, null, null, email);
                 return newInvoice;
             }));
@@ -256,7 +257,8 @@ module.exports = app => {
                         invoiceTransactionId: invoice.TransactionID,
                         invoiceNumber: invoice.InvNo,
                         mssv, hocKy, namHoc, ngayPhatHanh,
-                        serial: meinvoiceMauHoaDon
+                        serial: meinvoiceMauHoaDon,
+                        mailBy: email.email
                     });
                     sendSinhVienInvoice(item, null, config, email);
                     return item;
@@ -405,6 +407,7 @@ module.exports = app => {
             const mailData = await app.model.tcSetting.getValue('hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
             const emails = await getMailConfig();
             const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
+            await app.model.tcHocPhiTransactionInvoice.update({id: invoice.id}, {mailBy: email.email});
             await sendSinhVienInvoice(invoice, sinhVien, mailData, email);
             res.send();
         } catch (error) {
