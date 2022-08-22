@@ -16421,15 +16421,15 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "FROM": {
-                    "value": "from",
+                "TU": {
+                    "value": "tu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
                 },
-                "TO": {
-                    "value": "to",
+                "DEN": {
+                    "value": "den",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
