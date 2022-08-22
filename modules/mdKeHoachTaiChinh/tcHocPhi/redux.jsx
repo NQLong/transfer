@@ -221,6 +221,22 @@ export function createInvoiceList(data, done, onError) {
     };
 }
 
+export function getPendingListInvoiceLength(data, done, onError) {
+    return () => {
+        const url = '/api/finance/invoice/list/length';
+        T.post(url, data, res => {
+            if (res.error) {
+                T.notify('Lấy số hóa đơn lỗi', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+                onError && onError();
+            }
+            else {
+                done && done(res.length);
+            }
+        }, () => T.notify('Lấy số hóa đơn lỗi', 'danger'));
+    };
+}
+
 export function getStudentHocPhi(mssv, namHoc, hocKy, done) {
     return () => {
         const url = `/api/finance/hoc-phi/${mssv}`;
