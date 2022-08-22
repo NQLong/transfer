@@ -87,13 +87,27 @@ class AdjustModal extends AdminModal {
             T.notify('Vui lòng chọn tiết bắt đầu', 'danger');
             this.tietBatDau.focus();
         } else {
-            data.giangVien = this.giangVien.value();
-            data.troGiang = this.troGiang.value();
-            this.props.update(this.state.id, data, (result) => {
-                if (result.item) {
-                    this.hide();
-                }
-            });
+            let giangVien = this.giangVien.value(), gvData = this.giangVien.data(),
+                troGiang = this.troGiang.value(), tgData = this.troGiang.data(),
+                duplicateGv = [];
+            gvData.filter(v => troGiang.includes(v.id)).forEach(item => !duplicateGv.includes(item.text) && duplicateGv.push(item.text));
+            tgData.filter(v => giangVien.includes(v.id)).forEach(item => !duplicateGv.includes(item.text) && duplicateGv.push(item.text));
+
+            if (duplicateGv.length > 0) {
+                T.confirm('Trùng giảng viên và trợ giảng', 'Giảng viên <b>' + duplicateGv.join(', ') +'</b> này có vừa là giảng viên vừa là trợ giảng. Bạn có muốn tiếp tục cập nhật thông tin?', 'warning', 'true', isConfirm => { 
+                    if (isConfirm) {
+                        data.giangVien = this.giangVien.value();
+                        data.troGiang = this.troGiang.value();
+
+                        this.props.update(this.state.id, data, (result) => {
+                            if (result.item) {
+                                this.hide();
+                            }
+                        });
+                    }
+                });
+            }
+            
         }
     }
 
