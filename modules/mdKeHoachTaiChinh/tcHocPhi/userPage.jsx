@@ -39,7 +39,7 @@ class ThanhToanModal extends AdminModal {
                         window.open('/sample/BIDV-2022.pdf', '_blank');
                     }} />
                     <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
-                    {/* <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} /> */}
+                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                 </section>
                 <section className='row' style={{ display: this.state.vcb ? '' : 'none', justifyContent: 'center' }}>
                     <ButtonBank title='Bằng tài khoản VCB' imgSrc='/img/logo/vcb.png' onClick={() => this.props.vnPayGoToTransaction('vnpay-vcb', link => {

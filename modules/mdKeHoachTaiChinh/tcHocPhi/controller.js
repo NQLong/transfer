@@ -658,6 +658,7 @@ module.exports = app => {
                 'vcb': vnp_HashSecretVcb,
                 'vnpay-vcb': vnp_HashSecretVcb
             };
+
             if (!bank || !Object.keys(bankMapper).includes(bank)) throw 'Permission reject!';
             if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
             const mssv = student.data.mssv;
@@ -686,6 +687,7 @@ module.exports = app => {
             params = app.clone(params, { vnp_SecureHash });
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
+
             res.send(urlRequest);
         } catch (error) {
             res.send({ error });
