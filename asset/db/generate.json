@@ -12297,6 +12297,13 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": 20
+                },
+                "MA_NGANH_CU": {
+                    "value": "maNganhCu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [
@@ -14702,6 +14709,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "KHONG_SU_KIEN": {
+                    "value": "khongSuKien",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "KET_NOI_VNU": {
+                    "value": "ketNoiVnu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [
@@ -16390,7 +16411,7 @@
                     "value": "nam",
                     "dataType": "NUMBER",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": "4,0"
                 },
                 "ID": {
