@@ -123,8 +123,6 @@ class CanBoTheoDonVi extends AdminPage {
         quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
         daoTaoPermission && nhomRoles.push('daoTao');
 
-        console.log(ctsvNhapHocPermissions);
-
         const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};
         let table = renderTable({
             emptyTable: 'Đơn vị chưa có cán bộ',
