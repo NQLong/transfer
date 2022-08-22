@@ -16293,6 +16293,41 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "DT_THOI_KHOA_BIEU_GIANG_VIEN": {
+            "active": true,
+            "moduleName": "dtThoiKhoaBieuGiangVien",
+            "modelName": "dtThoiKhoaBieuGiangVien",
+            "columns": {
+                "ID_THOI_KHOA_BIEU": {
+                    "value": "idThoiKhoaBieu",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "GIANG_VIEN": {
+                    "value": "giangVien",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "TYPE": {
+                    "value": "type",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "GIANG_VIEN",
+                "ID_THOI_KHOA_BIEU",
+                "TYPE"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }

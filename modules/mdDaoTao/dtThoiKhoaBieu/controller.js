@@ -41,7 +41,6 @@ module.exports = app => {
             filter = app.utils.stringify(app.clone(filter, { donVi }));
 
             let page = await app.model.dtThoiKhoaBieu.searchPage(_pageNumber, _pageSize, filter, searchTerm);
-
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list, thoigianphancong } = page;
             const pageCondition = searchTerm;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list, thoiGianPhanCong: thoigianphancong } });
@@ -221,7 +220,39 @@ module.exports = app => {
         try {
             let { condition, changes } = req.body;
             if (!isNaN(condition)) {
+                let giangVien, troGiang;
+                if (changes.giangVien) {
+                    giangVien = changes.giangVien;
+                    delete changes.giangVien;
+                }
+                if (changes.troGiang) {
+                    troGiang = changes.troGiang;
+                    delete changes.troGiang;
+                }
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
+
+                let allGvItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'GV' });
+                for (let exitsGvItem of allGvItem) {
+                    if (!giangVien.includes(exitsGvItem.giangVien)) app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: item.id, giangVien: exitsGvItem.giangVien, type: 'GV' });
+                    else giangVien.splice(giangVien.indexOf(exitsGvItem.giangVien), 1);
+                }
+                if (giangVien && giangVien.length > 0) {
+                    for (let gvItem of giangVien) {
+                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: gvItem, type: 'GV'});
+                    }
+                }
+
+                let allTgItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'TG' });
+                for (let exitsTgItem of allTgItem) {
+                    if (!troGiang.includes(exitsTgItem.giangVien)) app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: item.id, giangVien: exitsTgItem.giangVien, type: 'TG' });
+                    else troGiang.splice(troGiang.indexOf(exitsTgItem.giangVien), 1);
+                }
+                if (troGiang && troGiang.length > 0) {
+                    for (let tgItem of troGiang) {
+                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: tgItem, type: 'TG'});
+                    }
+                }
+
                 if (changes.maNganh && changes.maNganh.length) {
                     await app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: condition });
                     for (let idNganh of changes.maNganh) {
@@ -241,8 +272,12 @@ module.exports = app => {
 
     });
 
-    app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
-        app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => res.send({ errors }));
+    app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), async (req, res) => {
+        app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: req.body.id }, () => {
+            app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => { 
+                res.send({ errors });
+            });
+        });
     });
 
     app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {

@@ -58,15 +58,16 @@ class ThoiGianPhanCongGiangDay extends AdminModal {
 }
 class AdjustModal extends AdminModal {
     onShow = (item) => {
-        let { id, giangVien, maMonHoc, tenMonHoc, nhom, tenKhoaBoMon, phong, thu, tietBatDau, soTiet } = item;
+        let { id, maMonHoc, tenMonHoc, nhom, tenKhoaBoMon, phong, thu, tietBatDau, soTiet, listGiangVien, listTroGiang } = item;
         this.setState({ id, soTiet });
-        this.giangVien.value(giangVien);
         this.monHoc.value(maMonHoc + ': ' + T.parse(tenMonHoc, { vi: '' }).vi);
         this.nhom.value(nhom);
         this.khoa.value(tenKhoaBoMon);
         this.phong.value(phong);
         this.thu.value(thu);
         this.tietBatDau.value(tietBatDau);
+        this.giangVien.value(listGiangVien?.split(',').map(item => item.split('_')[0]));
+        this.troGiang.value(listTroGiang?.split(',').map(item => item.split('_')[0]));
     }
     onSubmit = (e) => {
         e.preventDefault();
@@ -74,8 +75,7 @@ class AdjustModal extends AdminModal {
             phong: this.phong.value(),
             thu: this.thu.value(),
             tietBatDau: this.tietBatDau.value(),
-            soTiet: this.state.soTiet,
-            giangVien: this.giangVien.value()
+            soTiet: this.state.soTiet
         };
         if (!data.phong) {
             T.notify('Vui lòng chọn phòng', 'danger');
@@ -87,6 +87,8 @@ class AdjustModal extends AdminModal {
             T.notify('Vui lòng chọn tiết bắt đầu', 'danger');
             this.tietBatDau.focus();
         } else {
+            data.giangVien = this.giangVien.value();
+            data.troGiang = this.troGiang.value();
             this.props.update(this.state.id, data, (result) => {
                 if (result.item) {
                     this.hide();
@@ -107,7 +109,8 @@ class AdjustModal extends AdminModal {
                 <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={quanLyKhoa} />
                 <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={quanLyKhoa} />
                 <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={dataTiet} readOnly={quanLyKhoa} />
-                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' readOnly={!quanLyKhoa} />
+                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' multiple={true} readOnly={!quanLyKhoa} />
+                <FormSelect ref={e => this.troGiang = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn trợ giảng' multiple={true} readOnly={!quanLyKhoa} />
             </div>
         });
     }
@@ -281,6 +284,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }}>Ngày kết thúc</th>
                     <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Khoa <br />Bộ môn</th>
                     <th style={{ width: 'auto' }}>Giảng viên</th>
+                    <th style={{ width: 'auto' }}>Trợ giảng</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Bậc</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Hệ</th>
                     <th style={{ width: 'auto', textAlign: 'right' }}>Khoá SV</th>
@@ -323,7 +327,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayBatDau} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayKetThuc} />
                         <TableCell style={{ textAlign: 'center' }} content={item.tenKhoaDangKy?.getFirstLetters().toUpperCase()} />
-                        <TableCell style={{}} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
+                        <TableCell style={{ whiteSpace: 'pre' }} content={item.listGiangVien?.split(',').map(gvItem => gvItem.split('_')[1]).join('\n')} />
+                        <TableCell style={{ whiteSpace: 'pre' }} content={item.listTroGiang?.split(',').map(tgItem => tgItem.split('_')[1]).join('\n')} />
                         <TableCell style={{ textAlign: 'center' }} content={item.bacDaoTao} />
                         <TableCell style={{ textAlign: 'center' }} content={item.loaiHinhDaoTao} />
                         <TableCell style={{ textAlign: 'right' }} content={item.khoaSinhVien} />
