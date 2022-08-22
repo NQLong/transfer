@@ -658,6 +658,7 @@ module.exports = app => {
                 'vcb': vnp_HashSecretVcb,
                 'vnpay-vcb': vnp_HashSecretVcb
             };
+
             if (!bank || !Object.keys(bankMapper).includes(bank)) throw 'Permission reject!';
             if (!student || !student.data || !student.data.mssv) throw 'Permission reject!';
             const mssv = student.data.mssv;
@@ -668,7 +669,7 @@ module.exports = app => {
 
             const dataHocPhi = await app.model.tcHocPhi.get({ mssv, hocKy, namHoc });
             let { congNo } = dataHocPhi;
-            const vnp_OrderInfo = `USSH: Học phí SV ${mssv}, học kỳ ${hocKy} NH ${namHoc} - ${parseInt(namHoc) + 1}`;
+            const vnp_OrderInfo = `USSH: Học phi SV ${mssv}, HK ${hocKy} NH ${namHoc} - ${parseInt(namHoc) + 1}`;
             const now = new Date(), vnp_CreateDate = dateFormat(now, 'yyyymmddHHmmss'),
                 vnp_IpAddr = ipAddr,
                 vnp_Locale = 'vn',
@@ -685,7 +686,9 @@ module.exports = app => {
             const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
             params = app.clone(params, { vnp_SecureHash });
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
+
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
+            console.log(urlRequest);
             res.send(urlRequest);
         } catch (error) {
             res.send({ error });
