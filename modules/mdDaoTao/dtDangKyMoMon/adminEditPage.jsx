@@ -69,7 +69,7 @@ class DtDsMonMoEditPage extends AdminPage {
         T.ready('/user/dao-tao', () => {
             this.props.getDtDanhSachMonMoCurrent(this.id, data => {
                 let { thoiGianMoMon, thongTinKhoaNganh } = data;
-                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao, maNganh: thongTinKhoaNganh.maNganh }, nam: thoiGianMoMon.nam });
+                this.setState({ settings: { bacDaoTao: thoiGianMoMon.bacDaoTao, loaiHinhDaoTao: thoiGianMoMon.loaiHinhDaoTao, maNganh: thongTinKhoaNganh.maNganh, idMoMon: this.id }, nam: thoiGianMoMon.nam });
             });
         });
 
@@ -113,13 +113,8 @@ class DtDsMonMoEditPage extends AdminPage {
         let data = [];
         [this.khoa, this.khoa - 1, this.khoa - 2, this.khoa - 3].forEach((khoaSv) => data = [...data, this.create(khoaSv)].flat());
         this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
-            // location.reload();
+            location.reload();
         });
-        // this.props.saveDangKyMoMon(this.id, this.state.settings, { isDuyet: 1, data }, () => {
-        //     this.props.createDtThoiKhoaBieu(data, this.state.settings, () => {
-        //         // location.reload();
-        //     });
-        // });
     }
 
     renderMonHocTable = (yearth, data) => {
@@ -231,7 +226,7 @@ class DtDsMonMoEditPage extends AdminPage {
                 />}
                 <SubjectModal ref={e => this.addMonHoc = e} create={this.props.createDtDanhSachMonMo} maDangKy={this.id} />
                 <MonHocCtdtModal ref={e => this.monHocCtdt = e} reinit={this.init} />
-                {(permission.write && !this.state.isDuyet) ? <CirclePageButton type='custom' tooltip='Phòng Đào Tạo xác nhận' customIcon='fa-check-square-o' style={{ marginRight: '65px' }} onClick={e => this.duyetDangKy(e)} /> : null}
+                {(permission.write && !this.isDuyet) ? <CirclePageButton type='custom' tooltip='Phòng Đào Tạo xác nhận' customIcon='fa-check-square-o' style={{ marginRight: '65px' }} onClick={e => this.duyetDangKy(e)} /> : null}
             </>,
             backRoute: '/user/dao-tao/dang-ky-mo-mon',
             onSave: (this.state.expired || this.isDuyet) ? null : ((e) => e.preventDefault() || this.onSave())

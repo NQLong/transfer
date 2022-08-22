@@ -30,11 +30,8 @@ module.exports = app => {
     );
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && ['34', '33', '32'].includes(staff.maDonVi)) {
-            app.permissionHooks.pushUserPermission(user, 'student:read', 'student:write', 'student:delete');
-            resolve();
-        } else if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage');
+        if (staff.maDonVi && staff.maDonVi == '32') {
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:delete');
             resolve();
         } else resolve();
     }));
@@ -51,10 +48,11 @@ module.exports = app => {
             const item = await app.model.fwStudents.get({ mssv });
             if (!item.image) {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
-                item.image = user.image;
+                item.image = user?.image;
             }
             res.send({ item });
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });

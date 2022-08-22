@@ -81,7 +81,6 @@ module.exports = app => {
             res.send({ error });
         }
     });
-
     app.put('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
         try {
             let { data, id, isDuyet, settings } = req.body,

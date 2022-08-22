@@ -110,7 +110,7 @@ class Dashboard extends AdminPage {
                     return item;
                 }), 'namKy', DefaultColors.orange),
                 listDonViNhan: this.state.xetDonVi ? this.handleCongVan(soLieu, this.state.xetDonVi) : this.setUp(soLieu.map(item => {
-                    item.tenVt = item.tenDonVi.getFirstLetters();
+                    item.tenVt = item.tenDonVi?.getFirstLetters();
                     return item;
                 }), 'tenVt', DefaultColors.navy),
             }, () => this.setState({ isLoading: false }));
@@ -159,7 +159,7 @@ class Dashboard extends AdminPage {
         } else {
             this.setState({
                 listDonViNhan: this.setUp(soLieu.map(item => {
-                    item.tenVt = item.tenDonVi.getFirstLetters();
+                    item.tenVt = item.tenDonVi?.getFirstLetters();
                     return item;
                 }), 'tenVt', DefaultColors.navy),
                 xetDonVi: null

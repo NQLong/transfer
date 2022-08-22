@@ -64,13 +64,13 @@ module.exports = app => {
             let item = req.body.item || [],
                 settings = req.body.settings;
             let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
-                { loaiHinhDaoTao, bacDaoTao, maNganh } = settings;
+                { loaiHinhDaoTao, bacDaoTao } = settings;
             thoiGianMoMon = thoiGianMoMon.find(item => item.loaiHinhDaoTao == loaiHinhDaoTao && item.bacDaoTao == bacDaoTao);
             let { nam, hocKy } = (item.nam && item.hocKy) ? item : thoiGianMoMon;
             for (let index = 0; index < item.length; index++) {
                 let monHoc = item[index];
                 delete monHoc.id;
-                let { maMonHoc, loaiMonHoc, khoaSv, chuyenNganh, soTietBuoi, soBuoiTuan, soLuongDuKien, soLop } = monHoc;
+                let { maMonHoc, loaiMonHoc, khoaSv, chuyenNganh, soTietBuoi, soBuoiTuan, soLuongDuKien, soLop, maNganh } = monHoc;
                 ['chuyenNganh', 'soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => delete monHoc[key]);
                 const tkb = await app.model.dtThoiKhoaBieu.get({ maMonHoc, loaiMonHoc, khoaSinhVien: khoaSv, maNganh, loaiHinhDaoTao, bacDaoTao });
                 if (!tkb) {
@@ -80,10 +80,22 @@ module.exports = app => {
                                 let soTiet = parseInt(soTietBuoi[index]), soBuoi = parseInt(soBuoiTuan[index]), sldk = parseInt(soLuongDuKien[index]), chNg = chuyenNganh[index];
                                 if (soBuoi > 1) {
                                     for (let buoi = 1; buoi <= parseInt(soBuoi); buoi++) {
-                                        app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi, nam, hocKy, soTietBuoi: soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                        let item = await app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi, nam, hocKy, soTietBuoi: soTiet, soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                        if (item) {
+                                            for (const nganh of chNg) {
+                                                let idNganh = `${maNganh}##${nganh}`;
+                                                await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: item.id, idNganh });
+                                            }
+                                        }
                                     }
                                 } else {
-                                    app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi: 1, nam, hocKy, soTietBuoi: soTiet, chuyenNganh: chNg.toString(), soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                    let item = await app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom: index + 1, buoi: 1, nam, hocKy, soTietBuoi: soTiet, soLuongDuKien: sldk, loaiHinhDaoTao, bacDaoTao, soBuoiTuan: soBuoi });
+                                    if (item) {
+                                        for (const nganh of chNg) {
+                                            let idNganh = `${maNganh}##${nganh}`;
+                                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: item.id, idNganh });
+                                        }
+                                    }
                                 }
                             }
                         } else {
@@ -92,9 +104,17 @@ module.exports = app => {
                                 let soBuoi = parseInt(soBuoiTuan);
                                 if (soBuoi > 1) {
                                     for (let buoi = 1; buoi <= parseInt(soBuoi); buoi++) {
-                                        app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                        let item = await app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                        if (item) {
+                                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: item.id, idNganh: `${maNganh}##${chuyenNganh}` });
+                                        }
                                     }
-                                } else app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                } else {
+                                    let item = await app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), chuyenNganh: chuyenNganh.toString(), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                    if (item) {
+                                        await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: item.id, idNganh: `${maNganh}##${chuyenNganh}` });
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -103,15 +123,25 @@ module.exports = app => {
                             let soBuoi = parseInt(soBuoiTuan);
                             if (soBuoi > 1) {
                                 for (let buoi = 1; buoi <= soBuoi; buoi++) {
-                                    app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                    let item = await app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                    if (item) {
+                                        await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: item.id, idNganh: maNganh });
+                                    }
                                 }
-                            } else app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                            } else {
+                                let item = await app.model.dtThoiKhoaBieu.create({ ...monHoc, nhom, buoi: 1, nam, hocKy, soTietBuoi: parseInt(soTietBuoi), soLuongDuKien: parseInt(soLuongDuKien), loaiHinhDaoTao, bacDaoTao, soBuoiTuan: parseInt(soBuoiTuan) });
+                                if (item) {
+                                    await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: item.id, idNganh: maNganh });
+                                }
+                            }
                         }
                     }
                 }
             }
+            await app.model.dtDangKyMoMon.update({ id: settings.idMoMon }, { isDuyet: 1, thoiGian: new Date().getTime() });
             res.end();
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });
@@ -218,8 +248,54 @@ module.exports = app => {
 
     app.put('/api/dao-tao/thoi-khoa-bieu-condition', app.permission.orCheck('dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:manage'), async (req, res) => {
         try {
-            let { condition, changes } = req.body;
+            let { condition, changes } = req.body,
+                { tietBatDau, soTietBuoi, thu } = changes;
+            tietBatDau = parseInt(tietBatDau);
+            soTietBuoi = parseInt(soTietBuoi);
+            thu = parseInt(thu);
             if (!isNaN(condition)) {
+                let nganh = await app.model.dtThoiKhoaBieuNganh.get({ idThoiKhoaBieu: condition }),
+                    idNganh = nganh.idNganh;
+
+                // Check xem id ngành có trống hay không.
+                let listIdTkb = await app.model.dtThoiKhoaBieuNganh.getAll({ idNganh });
+                listIdTkb = listIdTkb.filter(item => item.idThoiKhoaBieu != condition).map(item => item.idThoiKhoaBieu);
+                if (listIdTkb.length) {
+                    let listHocPhanNganh = await app.model.dtThoiKhoaBieu.getAll({
+                        statement: 'id IN (:listIdTkb)',
+                        parameter: { listIdTkb }
+                    }, 'thu,tietBatDau,soTietBuoi,phong');
+                    if (listHocPhanNganh.some(item => item.thu == thu
+                        && (
+                            (tietBatDau <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1)
+                                && tietBatDau >= parseInt(item.tietBatDau)) ||
+                            ((tietBatDau + soTietBuoi - 1) >= parseInt(item.tietBatDau)
+                                && (tietBatDau + soTietBuoi - 1) <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1))
+                        )
+                    )) {
+                        throw 'Trùng thời gian môn khác của ngành/chuyên ngành';
+                    }
+                }
+                if (changes.phong) {
+                    let hocPhan = await app.model.dtThoiKhoaBieu.get({ id: condition }),
+                        { nam, hocKy } = hocPhan;
+
+                    let listCurrentRoom = await app.model.dtThoiKhoaBieu.getAll({
+                        statement: 'nam = :nam AND hocKy = :hocKy AND phong = :phong AND thu IS NOT NULL AND tietBatDau IS NOT NULL',
+                        parameter: { nam, hocKy, phong: changes.phong }
+                    });
+                    if (listCurrentRoom.length && listCurrentRoom.some(item => item.thu == thu
+                        && (
+                            (tietBatDau <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1)
+                                && tietBatDau >= parseInt(item.tietBatDau)) ||
+                            ((tietBatDau + soTietBuoi - 1) >= parseInt(item.tietBatDau)
+                                && (tietBatDau + soTietBuoi - 1) <= (parseInt(item.tietBatDau) + parseInt(item.soTietBuoi) - 1))
+                        )
+                    )) {
+                        throw `Phòng ${changes.phong} bị trùng giờ`;
+                    }
+                }
+
                 let giangVien, troGiang;
                 if (changes.giangVien) {
                     giangVien = changes.giangVien;
@@ -229,6 +305,7 @@ module.exports = app => {
                     troGiang = changes.troGiang;
                     delete changes.troGiang;
                 }
+                
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
 
                 let allGvItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'GV' });
@@ -267,6 +344,7 @@ module.exports = app => {
                 res.send({ item });
             }
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
 
