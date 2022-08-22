@@ -16529,14 +16529,14 @@ BEGIN
                      TCDM.LOAI_PHI         AS                  "loaiPhi",
                      TCLP.TEN              AS                  "tenLoaiPhi",
                      TCDM.NAM_HOC          AS                  "namBatDau",
-                     TCDM.NAM_KET_THUC     AS                  "namKetThuc",
+--                      TCDM.NAM_KET_THUC     AS                  "namKetThuc",
                      BDT.TEN_BAC           AS                  "tenBacDaoTao",
                      BDT.MA_BAC            AS                  "bacDaoTao",
                      LHDT.MA               AS                  "heDaoTaoDh",
                      DHS.MA                AS                  "heDaoTaoSdh",
                      LHDT.TEN              AS                  "tenHeDh",
                      DHS.TEN               AS                  "tenHeSdh",
-                     TCDM.SO_TIEN_MAC_DINH AS                  "soTienMacDinh",
+--                      TCDM.SO_TIEN_MAC_DINH AS                  "soTienMacDinh",
                      ROW_NUMBER() OVER (ORDER BY TCDM.NAM_HOC) R
               FROM TC_DINH_MUC_HOC_PHI TCDM
                        LEFT JOIN TC_LOAI_PHI TCLP ON TCLP.ID = TCDM.LOAI_PHI

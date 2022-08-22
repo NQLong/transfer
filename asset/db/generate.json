@@ -16421,15 +16421,15 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "FROM": {
-                    "value": "from",
+                "TU": {
+                    "value": "tu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
                 },
-                "TO": {
-                    "value": "to",
+                "DEN": {
+                    "value": "den",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -16615,6 +16615,60 @@
                 },
                 "TIME_MODIFIED": {
                     "value": "timeModified",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_NAM": {
+            "active": true,
+            "moduleName": "tccbDanhGiaNam",
+            "modelName": "tccbDanhGiaNam",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_162763\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "DON_VI_BAT_DAU_DANG_KY": {
+                    "value": "donViBatDauDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DON_VI_KET_THUC_DANG_KY": {
+                    "value": "donViKetThucDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "GIANG_VIEN_BAT_DAU_DANG_KY": {
+                    "value": "giangVienBatDauDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "GIANG_VIEN_KET_THUC_DANG_KY": {
+                    "value": "giangVienKetThucDangKy",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
