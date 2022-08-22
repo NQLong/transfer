@@ -25,6 +25,7 @@ module.exports = app => {
         view: '/invoicepublished/linkview',
         download: '/code/itg/invoicepublished/downloadinvoice',
         cancel: '/code/itg/invoicepublished/cancel',
+        convert: '/code/itg/invoicepublished/voucher-paper'
     };
 
     app.get('/user/finance/invoice', app.permission.check('tcInvoice:read'), app.templates.admin);
@@ -409,7 +410,7 @@ module.exports = app => {
             const mailData = await app.model.tcSetting.getValue('hocPhiEmailTraHoaDonEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'tcPhone', 'tcAddress', 'tcSupportPhone', 'tcEmail');
             const emails = await getMailConfig();
             const email = emails.splice(Math.floor(Math.random() * emails.length), 1).pop();
-            await app.model.tcHocPhiTransactionInvoice.update({id: invoice.id}, {mailBy: email.email});
+            await app.model.tcHocPhiTransactionInvoice.update({ id: invoice.id }, { mailBy: email.email });
             await sendSinhVienInvoice(invoice, sinhVien, mailData, email);
             res.send();
         } catch (error) {
@@ -489,6 +490,38 @@ module.exports = app => {
         } catch (error) {
             console.error(error);
             res.send({ error });
+        }
+    });
+
+    app.get('/api/finance/invoice/paper/download/:id', app.permission.orCheck('tcInvoice:write', 'student:login'), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const name = req.query.converter || `${req.session.user.lastName || ''} ${req.session.user.firstName || ''}`;
+            const instance = await app.getMisaAxiosInstance();
+            const invoice = await app.model.tcHocPhiTransactionInvoice.get({ id });
+            if (!invoice) throw 'Hóa đơn không tồn tại';
+            if (
+                req.session.user.permissions.includes('student:login') &&
+                !req.session.user.permissions.includes('developer:login') &&
+                invoice.mssv != req.session.user.studentId
+            ) {
+                return res.status(401).send({ error: 'permission denied' });
+            }
+            const response = await instance.post(url.convert, {
+                'Converter': name,
+                'ConvertDate': app.utils.toIsoString(new Date()).slice(0, 10),
+                'TransactionIDList': [invoice.invoiceTransactionId]
+            });
+            let data = app.utils.parse(response.Data);
+            if (!data.length) throw 'invalid response';
+            let item = data[0];
+            if (item.ErrorCode) throw data.ErrorCode;
+            const file = item.Data;
+            res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${invoice.mssv}-${invoice.namHoc}-${invoice.hocKy}.pdf`]]);
+            res.end(Buffer.from(file, 'base64'));
+            // request(response.Data).pipe(res);
+        } catch (error) {
+            res.status(400).send({ error });
         }
     });
 };
