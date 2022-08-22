@@ -25,20 +25,24 @@ class SectionEvent extends React.Component {
         list: [], typeView: 1, title: 'SỰ KIỆN',
     }
     componentDidMount() {
-        if (this.props.item && this.props.item.view) {
-            this.props.getEventInPageByCategory(1, 6, this.props.item.view.id, data => {
+        const item = this.props.item;
+        if (item && item.view) {
+            this.props.getEventInPageByCategory(1, 6, item.view.id, data => {
                 data.page.title = 'SỰ KIỆN';
-                if (this.props.item.detail && JSON.parse(this.props.item.detail).valueTitleCom) {
-                    data.page.title = JSON.parse(this.props.item.detail).valueTitleCom;
+                if (item.detail && JSON.parse(item.detail).valueTitleCom) {
+                    data.page.title = JSON.parse(item.detail).valueTitleCom;
                 }
-                if (this.props.item.detail && JSON.parse(this.props.item.detail).viewTypeDisplay == 'Template 2')
+                if (item.detail && JSON.parse(item.detail).viewTypeDisplay == 'Template 2') {
                     data.page.typeView = 2;
+                }
+
                 this.setState(data.page);
             });
-        } else
+        } else {
             this.props.getEventInPageByUser(1, 6, data => {
                 this.setState(data.page);
             });
+        }
     }
 
     componentDidUpdate() {
