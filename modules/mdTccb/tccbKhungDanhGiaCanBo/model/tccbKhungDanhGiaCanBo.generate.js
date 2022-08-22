@@ -1,6 +1,6 @@
-// Table name: TCCB_KHUNG_DANH_GIA_CAN_BO { nam, content, timeModified, userModified, id }
+// Table name: TCCB_KHUNG_DANH_GIA_CAN_BO { nam, content, kichHoat, timeModified, userModified, id }
 const keys = ['ID'];
-const obj2Db = { 'nam': 'NAM', 'content': 'CONTENT', 'timeModified': 'TIME_MODIFIED', 'userModified': 'USER_MODIFIED', 'id': 'ID' };
+const obj2Db = { 'nam': 'NAM', 'content': 'CONTENT', 'kichHoat': 'KICH_HOAT', 'timeModified': 'TIME_MODIFIED', 'userModified': 'USER_MODIFIED', 'id': 'ID' };
 
 module.exports = app => {
     app.model.tccbKhungDanhGiaCanBo = {

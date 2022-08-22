@@ -1379,6 +1379,8 @@ BEGIN
                      CTKDT.NAM_DAO_TAO        AS          "namDaoTao",
                      TKB.BAC_DAO_TAO          AS          "bacDaoTao",
                      TKB.LOAI_HINH_DAO_TAO    AS          "loaiHinhDaoTao",
+                     LISTGV.LISTGV            AS          "listGiangVien",
+                     LISTTG.LISTTG            AS          "listTroGiang",
                      (SELECT LISTAGG(sNDT.MA_NGANH, ',') WITHIN GROUP (
                          order by sTKB.ID
                          )
@@ -1427,6 +1429,22 @@ BEGIN
                        LEFT JOIN TCHC_CAN_BO CB on TKB.GIANG_VIEN = CB.SHCC
                        LEFT JOIN DM_NGACH_CDNN NGACH on CB.NGACH = NGACH.MA
                        LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
+                       LEFT JOIN (SELECT GV.ID_THOI_KHOA_BIEU ID,LISTAGG(GV.GIANG_VIEN || '_' || TD.VIET_TAT || CB.HO || ' ' || CB.TEN, ',')
+                            WITHIN GROUP (ORDER BY GV.GIANG_VIEN) LISTGV
+                            FROM DT_THOI_KHOA_BIEU_GIANG_VIEN GV
+                                LEFT JOIN TCHC_CAN_BO CB on GV.GIANG_VIEN = CB.SHCC
+                                LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
+                            WHERE TYPE = 'GV'
+                            GROUP BY GV.ID_THOI_KHOA_BIEU
+                            ORDER BY GV.ID_THOI_KHOA_BIEU) LISTGV on LISTGV.ID = TKB.ID
+                       LEFT JOIN (SELECT GV.ID_THOI_KHOA_BIEU ID,LISTAGG(GV.GIANG_VIEN || '_'|| TD.VIET_TAT || CB.HO || ' ' || CB.TEN, ',')
+                            WITHIN GROUP (ORDER BY GV.GIANG_VIEN) LISTTG
+                            FROM DT_THOI_KHOA_BIEU_GIANG_VIEN GV
+                                LEFT JOIN TCHC_CAN_BO CB on GV.GIANG_VIEN = CB.SHCC
+                                LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
+                            WHERE TYPE = 'TG'
+                            GROUP BY GV.ID_THOI_KHOA_BIEU
+                            ORDER BY GV.ID_THOI_KHOA_BIEU) LISTTG on LISTTG.ID = TKB.ID
 --                        LEFT JOIN DT_THOI_KHOA_BIEU_NGANH TKBN ON TKB.ID = TKBN.ID_THOI_KHOA_BIEU
 --                        LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = TKBN.ID_NGANH
 --                        LEFT OUTER JOIN DT_DANH_SACH_CHUYEN_NGANH CN ON (CN.NGANH + '&&' + TO_CHAR(CN.ID)) = TKBN.ID_NGANH
@@ -4745,6 +4763,7 @@ BEGIN
                cbk.HO as "hoNguoiTao",
                cbk.TEN as "tenNguoiTao",
                hcthFile.TEN as "ten",
+               hcthFile.TEN_FILE as "tenGoc",
                 (SELECT LISTAGG(
                     CASE
                         WHEN cbk.HO IS NULL THEN cbk.TEN
@@ -5460,10 +5479,10 @@ BEGIN
                  LEFT JOIN QT_CHUC_VU qtcv ON cb.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
                  LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
                  LEFT JOIN FW_USER usr on usr.SHCC = cb.shcc
-                 LEFT JOIN HCTH_FILE fi on fi.LOAI = 'PHAN_HOI' and fi.MA = ph.id
+                 LEFT JOIN HCTH_FILE fi on (fi.LOAI = 'PHAN_HOI' OR fi.LOAI = 'PH_DI') and fi.MA = ph.ID
 
 
-        WHERE (target is not null and ph.KEY = target and ph.loai is not null and targetType = ph.loai)
+        WHERE (target is not null and ph.KEY = target and ph.loai is not null and (targetType = ph.loai OR targetType = 'PH_DI'))
         ORDER BY NGAY_TAO;
     RETURN my_cursor;
 END;
@@ -15421,10 +15440,14 @@ BEGIN
         SELECT stu.MSSV                                AS "mssv",
                (stu.HO || ' ' || stu.TEN)              AS "hoTen",
                (NDT.MA_NGANH || ': ' || NDT.TEN_NGANH) AS "nganhHoc",
+               stu.LOAI_HINH_DAO_TAO                   AS "loaiHinhDaoTao",
+               lHDT.TEN                                AS "heDaoTao",
+               stu.NAM_TUYEN_SINH                      AS "namTuyenSinh",
                HP.CONG_NO                              AS "congNo",
                stu.NGAY_NHAP_HOC                       AS "ngayNhapHoc"
         FROM FW_STUDENT STU
                  LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH = STU.MA_NGANH
+                 LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON lHDT.MA = STU.LOAI_HINH_DAO_TAO
                  LEFT JOIN TC_HOC_PHI HP ON HP.MSSV = STU.MSSV AND HP.NAM_HOC = namHoc AND HP.HOC_KY = hocKy
         WHERE STU.MSSV = pMssv;
 
@@ -16778,22 +16801,27 @@ BEGIN
                HPD.NAM_HOC  AS "namHoc",
                HPD.SO_TIEN  AS "soTien",
                LP.TEN       AS "tenLoaiPhi"
+
         FROM TC_HOC_PHI_DETAIL HPD
                  LEFT JOIN FW_STUDENT ST ON HPD.MSSV = ST.MSSV
                  LEFT JOIN TC_LOAI_PHI LP ON LP.ID = HPD.LOAI_PHI
                  LEFT JOIN DM_DON_VI DV ON DV.MA = ST.KHOA
+
         WHERE HPD.MSSV = iMssv
-        ORDER BY NAM_HOC DESC, HOC_KY DESC;
+        ORDER BY HPD.NAM_HOC DESC, HPD.HOC_KY DESC;
 
     OPEN my_cursor FOR
         SELECT HP.MSSV    AS "mssv",
                HP.NAM_HOC as "namHoc",
                HP.HOC_KY  as "hocKy",
                hp.HOC_PHI as "hocPhi",
-               hp.CONG_NO as "congNo"
+               hp.CONG_NO as "congNo",
+               THPTI.ID   AS "idHoaDon"
         FROM TC_HOC_PHI HP
+                 LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE THPTI
+                           on HP.MSSV = THPTI.MSSV and THPTI.NAM_HOC = HP.NAM_HOC and THPTI.HOC_KY = HP.HOC_KY and THPTI.LY_DO_HUY is null
         WHERE HP.MSSV = iMssv
-        ORDER BY NAM_HOC DESC, HOC_KY DESC;
+        ORDER BY HP.NAM_HOC DESC, HP.HOC_KY DESC;
 
     RETURN my_cursor;
 END ;
@@ -16893,7 +16921,7 @@ BEGIN
                  LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                  LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
                  LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE HPI
-                           on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY
+                           on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY and HPI.LY_DO_HUY is null
                  LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
             AND HP.NAM_HOC = THPT.NAM_HOC
             AND HP.MSSV = THPT.CUSTOMER_ID
