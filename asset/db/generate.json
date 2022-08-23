@@ -6805,6 +6805,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 2
+                },
+                "LOAI_VAN_BAN": {
+                    "value": "loaiVanBan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
                 }
             },
             "primaryKeys": [
@@ -16496,40 +16503,26 @@
                     "nullable": true,
                     "size": "22,0"
                 },
-                "MUC_CHA": {
-                    "value": "mucCha",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
-                },
-                "MUC_CON": {
-                    "value": "batDauDangKy",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
-                },
-                "BAT_DAU_DANG_KY": {
-                    "value": "batDauDangKy",
+                "PARENT_ID": {
+                    "value": "parentId",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "20,0"
+                    "size": "5,0"
                 },
-                "KET_THUC_DANG_KY": {
-                    "value": "ketThucDangKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "MA_DON_VI": {
-                    "value": "maDonVi",
+                "NOI_DUNG": {
+                    "value": "noiDung",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 3
+                    "size": 255
+                },
+                "THU_TU": {
+                    "value": "thuTu",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
                 }
             },
             "primaryKeys": [
