@@ -1,32 +1,36 @@
-let appConfig = require('../../package');
+let package = require('../../package');
 const path = require('path');
 // Variables ==================================================================
 const app = {
-    model: {},
-    isDebug: !path.join(__dirname, '../../').startsWith('/var/www/'),
-    fs: require('fs'), path,
+    isDebug: !__dirname.startsWith('/var/www/'),
+    fs: require('fs'),
+    path,
+    publicPath: path.join(__dirname, '../../', 'public'),
+    assetPath: path.join(__dirname, '../'),
+    modulesPath: path.join(__dirname, '../../', 'modules'),
     database: {},
-    publicPath: path.join(__dirname, 'public'),
-    modulesPath: path.join(__dirname, '../../modules')
+    model: {}
 };
 
-if (!app.isDebug) appConfig = Object.assign({}, appConfig, require('../../asset/config.json'));
-
+if (!app.isDebug) package = Object.assign({}, package, require('../config.json'));
 // Configure ==================================================================
-require('../../config/database.oracleDB')(app, appConfig);
 require('../../config/common')(app);
-require('../../config/io')(app);
-require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
+require('../../config/lib/excel')(app);
+require('../../config/lib/hooks')(app);
+require('../../config/lib/utils')(app);
 require('../../config/lib/string')(app);
+require('../../config/database.oracleDB')(app, package);
 
+// Init =======================================================================
+app.loadModules(false);
 
 // Init =======================================================================
 
 app.loadModules(false);
 const errorList = [];
 
-const run = () => app.excel.readFile(app.path.join(__dirname, 'danhMucMonHoc.xlsx'), workbook => {
+const run = () => app.excel.readFile(app.path.join(__dirname, 'monHoc2022.xlsx'), workbook => {
     if (workbook) {
         let errors = '';
         const worksheet = workbook.getWorksheet(1),
@@ -50,7 +54,7 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'danhMucMonHoc.xls
                 const record = {
                     ma: getVal('A', 'text'),
                     tenVi: getVal('B', 'text'),
-                    tenEn: getVal('L', 'text'),
+                    tenEn: getVal('G', 'text'),
                     tongTinChi: getVal('C', 'text', 0),
                     tongTiet: getVal('D', 'text', 0),
                     tietLt: getVal('E', 'text', 0),
@@ -58,7 +62,7 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'danhMucMonHoc.xls
                     tinChiLt: Number(getVal('E', 'text', 0)) / 15,
                     tinChiTh: Number(getVal('F', 'text', 0)) / 30,
                     // tenTiengAnh: getVal('L', 'text', ''),
-                    donVi: getVal('M'),
+                    donVi: getVal('H'),
                     khoa: '',
                     ten: ''
                 }
@@ -72,9 +76,9 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'danhMucMonHoc.xls
                             en: record.tenEn || ''
                         });
                         app.model.dmDonVi.get({
-                            statement: 'lower(ten) LIKE :tenDonVi',
+                            statement: 'lower(ten) LIKE :tenDonVi AND (maPl = 1 OR ma = 32 or ma = 33)',
                             parameter: {
-                                tenDonVi: record.donVi.toLowerCase().trim()
+                                tenDonVi: `%${record.donVi.toLowerCase().trim()}%`
                             }
                         }, (error, item) => {
                             if (error || !item) {
@@ -104,7 +108,7 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'danhMucMonHoc.xls
 
             }
         if (worksheet) {
-            // app.model.dmMonHoc.delete({});
+            app.model.dmMonHoc.delete({});
             solve();
         }
 
