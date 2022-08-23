@@ -16068,6 +16068,20 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": 10
+                },
+                "LOAI_HINH_DAO_TAO": {
+                    "value": "loaiHinhDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "BAC_DAO_TAO": {
+                    "value": "bacDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -16669,6 +16683,67 @@
                 },
                 "GIANG_VIEN_KET_THUC_DANG_KY": {
                     "value": "giangVienKetThucDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_DANG_KY_SO": {
+            "active": true,
+            "moduleName": "hcthDangKySo",
+            "modelName": "hcthDangKySo",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_162767\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SO_CONG_VAN": {
+                    "value": "soCongVan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "SO_DI": {
+                    "value": "soDi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "LOAI_CONG_VAN": {
+                    "value": "loaiCongVan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "LOAI_VAN_BAN": {
+                    "value": "loaiVanBan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "DON_VI_GUI": {
+                    "value": "donViGui",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,

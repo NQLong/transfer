@@ -5479,10 +5479,10 @@ BEGIN
                  LEFT JOIN QT_CHUC_VU qtcv ON cb.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
                  LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
                  LEFT JOIN FW_USER usr on usr.SHCC = cb.shcc
-                 LEFT JOIN HCTH_FILE fi on (fi.LOAI = 'PHAN_HOI' OR fi.LOAI = 'PH_DI') and fi.MA = ph.ID
+                 LEFT JOIN HCTH_FILE fi on (fi.LOAI = 'PHAN_HOI') and fi.MA = ph.ID
 
 
-        WHERE (target is not null and ph.KEY = target and ph.loai is not null and (targetType = ph.loai OR targetType = 'PH_DI'))
+        WHERE (target is not null and ph.KEY = target and ph.loai is not null and (targetType = ph.loai))
         ORDER BY NGAY_TAO;
     RETURN my_cursor;
 END;
@@ -16114,6 +16114,22 @@ BEGIN
                (CB.NGAY_BAT_DAU_CONG_TAC >= time));
 
     RETURN DATA_CAN_BO;
+END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE PROCEDURE tccb_khung_danh_gia_can_bo_gan_thu_tu(p_id in NUMBER, p_thu_tu in number, p_is_up in number,
+                                                             p_nam in NUMBER)
+    IS
+BEGIN
+    IF p_is_up = 1 THEN
+        UPDATE TCCB_KHUNG_DANH_GIA_CAN_BO SET thu_tu=thu_tu + 1 WHERE thu_tu >= p_thu_tu AND p_nam = NAM;
+    ELSE
+        UPDATE TCCB_KHUNG_DANH_GIA_CAN_BO SET thu_tu=thu_tu - 1 WHERE thu_tu <= p_thu_tu AND p_nam = NAM;
+    END IF;
+    UPDATE TCCB_KHUNG_DANH_GIA_CAN_BO SET thu_tu=p_thu_tu WHERE id = p_id;
+    commit;
 END;
 
 /
