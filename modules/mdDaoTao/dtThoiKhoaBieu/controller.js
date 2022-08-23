@@ -305,7 +305,7 @@ module.exports = app => {
                     troGiang = changes.troGiang;
                     delete changes.troGiang;
                 }
-                
+
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
 
                 let allGvItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'GV' });
@@ -315,7 +315,7 @@ module.exports = app => {
                 }
                 if (giangVien && giangVien.length > 0) {
                     for (let gvItem of giangVien) {
-                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: gvItem, type: 'GV'});
+                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: gvItem, type: 'GV' });
                     }
                 }
 
@@ -326,7 +326,7 @@ module.exports = app => {
                 }
                 if (troGiang && troGiang.length > 0) {
                     for (let tgItem of troGiang) {
-                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: tgItem, type: 'TG'});
+                        await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: tgItem, type: 'TG' });
                     }
                 }
 
@@ -352,7 +352,7 @@ module.exports = app => {
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
         app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: req.body.id }, () => {
-            app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => { 
+            app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => {
                 res.send({ errors });
             });
         });
@@ -384,8 +384,13 @@ module.exports = app => {
 
             ws.columns = [
                 { header: 'STT', key: 'stt', width: 5 },
+                { header: 'BẬC', key: 'bacDaoTao', width: 5 },
+                { header: 'HỆ', key: 'loaiHinhDaoTao', width: 5 },
+                { header: 'KHOÁ SV', key: 'khoaSinhVien', width: 7 },
+                { header: 'NĂM HỌC', key: 'namDaoTao', width: 10 },
+                { header: 'HK', key: 'hocKy', width: 5 },
                 { header: 'MÃ', key: 'ma', width: 10 },
-                { header: 'MÔN HỌC', key: 'monHoc', width: 40 },
+                { header: 'MÔN HỌC', key: 'monHoc', width: 30 },
                 { header: 'TỰ CHỌN', key: 'tuChon', width: 10 },
                 { header: 'LỚP', key: 'lop', width: 10 },
                 { header: 'TỔNG TIẾT', key: 'tongTiet', width: 10 },
@@ -397,7 +402,9 @@ module.exports = app => {
                 { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 20 },
                 { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 20 },
                 { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 30 },
-                { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 }
+                { header: 'NGÀNH', key: 'tenNganh', width: 50 },
+                { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 },
+                { header: 'TRỢ GIẢNG', key: 'giangVien', width: 30 },
             ];
             // ws.getRow(1).font = {
             //     name: 'Times New Roman',
@@ -410,8 +417,9 @@ module.exports = app => {
             const list = data.rows;
             list.forEach((item, index) => {
                 ws.addRow({
+                    ...item,
                     stt: index + 1,
-                    ma: item.maMonHoc,
+                    ma: `${item.maMonHoc}_${item.nhom}`,
                     monHoc: `${app.utils.parse(item.tenMonHoc).vi}`,
                     tuChon: item.loaiMonHoc ? 'x' : '',
                     lop: item.nhom,
@@ -424,7 +432,9 @@ module.exports = app => {
                     ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
                     ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
                     khoa: item.tenKhoaDangKy,
-                    giangVien: item.tenGiangVien,
+                    giangVien: item.listGiangVien?.split(',').map(gvItem => gvItem.split('_')[1]).join('\n'),
+                    troGiang: item.listTroGiang?.split(',').map(tgItem => tgItem.split('_')[1]).join('\n'),
+                    tenNganh: item.tenNganh.replaceAll('&&', '\n').replaceAll('%', ': ')
                 }, index === 0 ? 'n' : 'i');
             });
 

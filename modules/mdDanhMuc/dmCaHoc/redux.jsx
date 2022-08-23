@@ -74,6 +74,18 @@ export function getDmCaHocAll(done) {
     };
 }
 
+export function getDmCaHocAllCondition(maCoSo, done) {
+    const url = '/api/danh-muc/ca-hoc/all-condition';
+    T.get(url, { maCoSo }, data => {
+        if (data.error) {
+            T.notify('Lấy danh sách ca học bị lỗi!', 'danger');
+            console.error(`GET: ${url}.`, data.error);
+        } else {
+            if (done) done(data.items);
+        }
+    }, () => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
+}
+
 export function getDmCaHoc(_id, done) {
     return () => {
         const url = `/api/danh-muc/ca-hoc/item/${_id}`;
