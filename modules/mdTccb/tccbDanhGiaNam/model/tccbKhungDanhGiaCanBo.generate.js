@@ -227,6 +227,6 @@ module.exports = app => {
                         resolve(result);
                     }
                 });
-        })
+        }),
     };
 };
