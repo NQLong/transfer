@@ -221,6 +221,20 @@ class SinhVienPage extends AdminPage {
         });
     }
 
+    handleMienDongBhyt = value => {
+        this.setState({
+            checkMienBhyt: value,
+        }, () => {
+            if (value) {
+                this.setState({ check12ThangBhyt: !value, check15ThangBhyt: !value });
+                this.check12ThangBhyt.value(0);
+                this.check15ThangBhyt.value(0);
+                this.mienBhytFront.setData('MienBHYTFront', '');
+                this.mienBhytBehind.setData('MienBHYTBehind', '');
+            }
+        });
+    }
+
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
@@ -309,21 +323,13 @@ class SinhVienPage extends AdminPage {
                     </div>
                 </div>
                 <div className='tile'>
-                    <h3 className='tile-title'>Bảo hiểm Y tế</h3>
+                    <h3 className='tile-title text-primary'>Bảo hiểm y tế</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <h5 className='col-md-12 text-primary'>Vui lòng chọn mức đóng Bảo hiểm y tế</h5>
+                            {/* <h5 className='col-md-12 text-primary'>Vui lòng chọn mức đóng Bảo hiểm y tế</h5> */}
                             <div className='col-md-4'>
                                 <div className='row'>
-                                    <FormCheckbox className='col-md-12' ref={e => this.checkMienBhyt = e} label='Miễn đóng BHYT' onChange={value => this.setState({
-                                        checkMienBhyt: value,
-                                    }, () => {
-                                        if (value) {
-                                            this.setState({ check12ThangBhyt: !value, check15ThangBhyt: !value });
-                                            this.check12ThangBhyt.value(0);
-                                            this.check15ThangBhyt.value(0);
-                                        }
-                                    })} />
+                                    <FormCheckbox className='col-md-12' ref={e => this.checkMienBhyt = e} label='Miễn đóng BHYT' onChange={this.handleMienDongBhyt} />
                                     <FormCheckbox className='col-md-12' ref={e => this.check12ThangBhyt = e} label='Đóng BHYT 12 tháng' onChange={value => this.setState({
                                         check12ThangBhyt: value,
                                     }, () => {

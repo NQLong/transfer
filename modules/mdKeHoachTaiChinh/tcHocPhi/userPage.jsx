@@ -4,7 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
 import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent } from './redux';
-
+import { getSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
+import BaoHiemYTeModal from './BaoHiemYTeModal';
 class ButtonBank extends React.Component {
     render = () => {
         const { title, onClick, imgSrc } = this.props;
@@ -98,8 +99,18 @@ class UserPage extends AdminPage {
 
         T.ready('/user/hoc-phi', () => {
             this.props.getHocPhi();
-            this.props.getAllHocPhiStudent();
+            this.props.getAllHocPhiStudent('', () => {
+                this.props.getSvBaoHiemYTe(item => {
+                    if (!item) {
+                        this.baoHiemModal.show();
+                        this.setState({ chuaDongBhyt: true });
+                    } else {
+                        this.setState({ chuaDongBhyt: false });
+                    }
+                });
+            });
             this.props.getTcHocPhiHuongDan();
+
         });
     }
     renderTableHocPhi = (data) => {
@@ -152,11 +163,13 @@ class UserPage extends AdminPage {
                                         <i className='fa fa-lg fa-download' /> Chuyển thành hóa đơn giấy
                                     </button>
                                 }
-
+                                {
+                                    this.state.chuaDongBhyt ? <a href='#'>Chọn diện BHYT</a> : ''
+                                }
                                 {
                                     current.congNo ?
                                         (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
-                                            <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                            <button disabled={this.state.chuaDongBhyt} className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                                 Thanh toán
                                             </button>
                                         </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
@@ -203,6 +216,7 @@ class UserPage extends AdminPage {
                     dataTrongNam: hocPhiAll[namHoc],
                     dataDetailTrongNam: hocPhiDetailAll[namHoc]
                 }))}
+                <BaoHiemYTeModal ref={e => this.baoHiemModal = e} />
             </> : loadSpinner()
         });
     }
@@ -210,6 +224,6 @@ class UserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent, getSvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);
