@@ -111,7 +111,7 @@ module.exports = app => {
     });
 
     const password = 'ctsvussh@2022';
-    app.post('/api/students-login-test', app.permission.check('student:write'), async (req, res) => {
+    app.post('/api/students-login-test', app.permission.orCheck('student:write', 'tcSetting:write'), async (req, res) => {
         try {
             let data = req.body.data;
             if (data.pass != password) throw 'Sai mật khẩu!';

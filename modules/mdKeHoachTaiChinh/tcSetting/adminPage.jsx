@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys } from './redux';
 import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 // import { getTcThongTin } from '../tcThongTin/redux';
+import { loginStudentForTest } from 'modules/mdSinhVien/fwStudents/redux';
+import { LoginToTestModal } from 'modules/mdSinhVien/fwStudents/adminPage';
 
 const listKeys = ['hocPhiNamHoc', 'hocPhiHocKy', 'email', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiEmailPhatSinhTitle', 'hocPhiEmailPhatSinhEditorText', 'hocPhiEmailPhatSinhEditorHtml', 'hocPhiEmailHoanTraTitle', 'hocPhiEmailHoanTraEditorText', 'hocPhiEmailHoanTraEditorHtml', 'hocPhiSmsDong', 'hocPhiSmsPhatSinh', 'hocPhiSmsHoanTra', 'hocPhiEmailNhacNhoTitle', 'hocPhiEmailNhacNhoEditorText', 'hocPhiEmailNhacNhoEditorHtml', 'hocPhiEmailTraHoaDonEditorText', 'hocPhiEmailTraHoaDonTitle', 'hocPhiEmailTraHoaDonEditorHtml'];
 class TcSettingAdminPage extends AdminPage {
@@ -260,11 +262,16 @@ class TcSettingAdminPage extends AdminPage {
                             </div> */}
                         </div>
                     </div>
+                    <LoginToTestModal ref={e => this.loginModal = e} loginStudentForTest={this.props.loginStudentForTest} />
+
                 </div>,
+            buttons: [
+                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null
+            ]
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, TcSetting: state.finance.TcSetting });
-const mapActionsToProps = { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys };
+const mapActionsToProps = { loginStudentForTest, getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys };
 export default connect(mapStateToProps, mapActionsToProps)(TcSettingAdminPage);
