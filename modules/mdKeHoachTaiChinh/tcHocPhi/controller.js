@@ -659,7 +659,7 @@ module.exports = app => {
                 'vnpay-vcb': vnp_HashSecretVcb
             },
                 bankCodeMapper = {
-                    'agri': 'AGRIBANKMC',
+                    'agri': 'VNBANK',
                     'vnpay-agri': 'AGRIBANKMC',
                     'vcb': 'VNBANK',
                     'vnpay-vcb': 'VIETCOMBANK'
