@@ -28,6 +28,10 @@ class SinhVienPage extends AdminPage {
                 if (data.error) {
                     T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
                 } else {
+                    let user = this.props.system.user;
+                    if (user.isStudent && !user.ngayNhapHoc) {
+                        T.notify('Chào mừng tân sinh viên!', 'info');
+                    }
                     this.props.getSvSettingKeys('choPhepEdit', items => {
                         this.setState({ item: data.item, pending: data.item.ngayNhapHoc && data.item.ngayNhapHoc == -1, edit: items.choPhepEdit == 'true', daNhapHoc: data.item.ngayNhapHoc && data.item.ngayNhapHoc != -1 });
                         this.setVal(data.item);
@@ -217,6 +221,20 @@ class SinhVienPage extends AdminPage {
         });
     }
 
+    handleMienDongBhyt = value => {
+        this.setState({
+            checkMienBhyt: value,
+        }, () => {
+            if (value) {
+                this.setState({ check12ThangBhyt: !value, check15ThangBhyt: !value });
+                this.check12ThangBhyt.value(0);
+                this.check15ThangBhyt.value(0);
+                this.mienBhytFront.setData('MienBHYTFront', '');
+                this.mienBhytBehind.setData('MienBHYTBehind', '');
+            }
+        });
+    }
+
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
@@ -301,6 +319,45 @@ class SinhVienPage extends AdminPage {
                             <FormTextBox ref={e => this.hoTenNguoiLienLac = e} label='Họ và tên người liên lạc' className='form-group col-md-6' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.sdtNguoiLienLac = e} label='Số điện thoại' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
                             <ComponentDiaDiem ref={e => this.thuongTruNguoiLienLac = e} label='Địa chỉ liên lạc' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
+                        </div>
+                    </div>
+                </div>
+                <div className='tile'>
+                    <h3 className='tile-title text-primary'>Bảo hiểm y tế</h3>
+                    <div className='tile-body'>
+                        <div className='row'>
+                            {/* <h5 className='col-md-12 text-primary'>Vui lòng chọn mức đóng Bảo hiểm y tế</h5> */}
+                            <div className='col-md-4'>
+                                <div className='row'>
+                                    <FormCheckbox className='col-md-12' ref={e => this.checkMienBhyt = e} label='Miễn đóng BHYT' onChange={this.handleMienDongBhyt} />
+                                    <FormCheckbox className='col-md-12' ref={e => this.check12ThangBhyt = e} label='Đóng BHYT 12 tháng' onChange={value => this.setState({
+                                        check12ThangBhyt: value,
+                                    }, () => {
+                                        if (value) {
+                                            this.setState({ checkMienBhyt: !value, check15ThangBhyt: !value });
+                                            this.check15ThangBhyt.value(0);
+                                            this.checkMienBhyt.value(0);
+                                        }
+                                    })} />
+                                    <FormCheckbox className='col-md-12' ref={e => this.check15ThangBhyt = e} label='Đóng BHYT 15 tháng' onChange={value => this.setState({
+                                        check15ThangBhyt: value,
+                                    }, () => {
+                                        if (value) {
+                                            this.setState({ checkMienBhyt: !value, check12ThangBhyt: !value });
+                                            this.checkMienBhyt.value(0);
+                                            this.check12ThangBhyt.value(0);
+                                        }
+                                    })} />
+                                </div>
+                            </div>
+                            <div className='col-md-8'>
+                                {this.state.checkMienBhyt && <div className='row'>
+                                    <FormTextBox type='number' label='Nhập số BHXH hiện tại' className='col-md-12' smallText='10 chữ số cuối cùng trên thẻ BHYT' />
+                                    <FormImageBox className='col-md-6' ref={e => this.mienBhytFront = e} label='Ảnh MẶT TRƯỚC thẻ BHYT hiện tại' uploadType='MienBHYTFront' userData='MienBHYTFront' />
+
+                                    <FormImageBox className='col-md-6' ref={e => this.mienBhytBehind = e} label='Ảnh MẶT SAU thẻ BHYT hiện tại' uploadType='MienBHYTBehind' userData='MienBHYTBehind' />
+                                </div>}
+                            </div>
                         </div>
                     </div>
                 </div>

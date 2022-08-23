@@ -19,7 +19,7 @@ import AddingModal from './addModal';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
 
-const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
     dataHocKy = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
 class ThoiGianPhanCongGiangDay extends AdminModal {
@@ -94,7 +94,7 @@ class AdjustModal extends AdminModal {
             tgData.filter(v => giangVien.includes(v.id)).forEach(item => !duplicateGv.includes(item.text) && duplicateGv.push(item.text));
 
             if (duplicateGv.length > 0) {
-                T.confirm('Trùng giảng viên và trợ giảng', 'Giảng viên <b>' + duplicateGv.join(', ') +'</b> này có vừa là giảng viên vừa là trợ giảng. Bạn có muốn tiếp tục cập nhật thông tin?', 'warning', 'true', isConfirm => { 
+                T.confirm('Trùng giảng viên và trợ giảng', 'Giảng viên <b>' + duplicateGv.join(', ') + '</b> này có vừa là giảng viên vừa là trợ giảng. Bạn có muốn tiếp tục cập nhật thông tin?', 'warning', 'true', isConfirm => {
                     if (isConfirm) {
                         data.giangVien = this.giangVien.value();
                         data.troGiang = this.troGiang.value();
@@ -107,7 +107,7 @@ class AdjustModal extends AdminModal {
                     }
                 });
             }
-            
+
         }
     }
 
@@ -276,8 +276,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
 
     handleEdit = (item) => {
         this.setState({ editId: item.id }, () => {
-            // let maNganh = item.tenNganh.split('&&').map(nganh => nganh.split('%')[0]);
-            // let chuyenNganh = item.tenChuyenNganh.split('&&').map(cn => cn.split('%'))
             this.phong.value(item.phong);
             this.thu.value(item.thu);
             this.tietBatDau.value(item.tietBatDau);
@@ -343,7 +341,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tongTiet} />
                         {
                             this.state.editId == item.id ? this.elementEdit() : <>
-                                <TableCell content={item.phong} />
+                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
+                                    <Tooltip title={item.sucChua || ''} arrow ><span>{item.phong}</span></Tooltip>} />
                                 <TableCell type='number' content={item.thu} />
                                 <TableCell type='number' content={item.tietBatDau} />
                                 <TableCell type='number' content={item.soTiet} />

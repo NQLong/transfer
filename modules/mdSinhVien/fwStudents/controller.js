@@ -50,9 +50,9 @@ module.exports = app => {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
                 item.image = user?.image;
             }
+            //TODO: Get baohiemyte
             res.send({ item });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
