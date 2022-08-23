@@ -48,7 +48,7 @@ export function getTccbKhungDanhGiaDonViAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/danh-gia/cau-truc-khung-danh-gia-don-vi/all';
+        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cấu trúc khung đánh giá đơn vi bị lỗi', 'danger');
@@ -65,7 +65,7 @@ T.initPage('pageTccbKhungDanhGiaDonVi');
 export function getTccbKhungDanhGiaDonViPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageTccbKhungDanhGiaDonVi', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/danh-gia/cau-truc-khung-danh-gia-don-vi/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
@@ -80,7 +80,7 @@ export function getTccbKhungDanhGiaDonViPage(pageNumber, pageSize, pageCondition
 
 export function getTccbKhungDanhGiaDonVi(id, done) {
     return () => {
-        const url = `/api/danh-gia/cau-truc-khung-danh-gia-don-vi/item/${id}`;
+        const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
@@ -94,7 +94,7 @@ export function getTccbKhungDanhGiaDonVi(id, done) {
 
 export function createTccbKhungDanhGiaDonVi(item, done) {
     return dispatch => {
-        const url = '/api/danh-gia/cau-truc-khung-danh-gia-don-vi';
+        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify(`Tạo mới bị lỗi: ${data.error.message}`, 'danger');
@@ -111,7 +111,7 @@ export function createTccbKhungDanhGiaDonVi(item, done) {
 
 export function deleteTccbKhungDanhGiaDonVi(id, done) {
     return dispatch => {
-        const url = '/api/danh-gia/cau-truc-khung-danh-gia-don-vi';
+        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
@@ -127,7 +127,7 @@ export function deleteTccbKhungDanhGiaDonVi(id, done) {
 
 export function updateTccbKhungDanhGiaDonVi(id, changes, done) {
     return dispatch => {
-        const url = '/api/danh-gia/cau-truc-khung-danh-gia-don-vi';
+        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');

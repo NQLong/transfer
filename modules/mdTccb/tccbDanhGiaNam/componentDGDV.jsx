@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, getTccbKhungDanhGiaDonVi } from './redux';
+import { createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, getTccbKhungDanhGiaDonVi } from './reduxKhungDanhGiaDonVi';
 import { Link } from 'react-router-dom';
-import ComponentDGDV from './componentDGDV';
+import ComponentDGDV from '../tccbKhungDanhGiaDonVi/componentDGDV';
 import { SelectAdapter_DmDonViAll } from '../../mdDanhMuc/dmDonVi/redux';
 import { AdminPage, FormDatePicker, FormTextBox, FormSelect } from 'view/component/AdminPage';
 import Loading from 'view/component/Loading';

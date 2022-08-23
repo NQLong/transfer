@@ -2,20 +2,22 @@
 
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import tccbKhungDanhGiaDonVi from './redux';
+import tccbDanhGiaNam from './redux';
+import tccbKhungDanhGiaCanBo from './reduxKhungDanhGiaCanBo';
+import tccbKhungDanhGiaDonVi from './reduxKhungDanhGiaDonVi';
 
 export default {
     redux: {
         parent: 'danhGia',
-        reducers: { tccbKhungDanhGiaDonVi }
+        reducers: { tccbDanhGiaNam, tccbKhungDanhGiaCanBo, tccbKhungDanhGiaDonVi }
     },
     routes: [
         {
-            path: '/user/danh-gia/cau-truc-khung-danh-gia-don-vi',
+            path: '/user/tccb/danh-gia',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/danh-gia/cau-truc-khung-danh-gia-don-vi/:id',
+            path: '/user/tccb/danh-gia/:nam',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
         }
     ],
