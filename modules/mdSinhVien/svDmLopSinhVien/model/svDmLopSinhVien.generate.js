@@ -1,6 +1,6 @@
-// Table name: SV_DM_LOP_SINH_VIEN { ma, ten, khoa, maKhungDaoTao, maNganh, nienKhoa }
+// Table name: SV_DM_LOP_SINH_VIEN { ma, ten, khoa, maKhungDaoTao, maNganh, nienKhoa, loaiHinhDaoTao, bacDaoTao }
 const keys = ['KHOA', 'MA', 'MA_NGANH', 'NIEN_KHOA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'khoa': 'KHOA', 'maKhungDaoTao': 'MA_KHUNG_DAO_TAO', 'maNganh': 'MA_NGANH', 'nienKhoa': 'NIEN_KHOA' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'khoa': 'KHOA', 'maKhungDaoTao': 'MA_KHUNG_DAO_TAO', 'maNganh': 'MA_NGANH', 'nienKhoa': 'NIEN_KHOA', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO' };
 
 module.exports = app => {
     app.model.svDmLopSinhVien = {

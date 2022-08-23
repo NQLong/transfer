@@ -1137,6 +1137,7 @@ AS
     khoaSv     STRING(4);
     namHoc     STRING(100);
     hocKy      STRING(1);
+    coSo       STRING(5);
     now        STRING(20);
 --     listIdHocPhan STRING(500);
 begin
@@ -1146,6 +1147,7 @@ begin
     SELECT JSON_VALUE(config, '$.khoaSinhVien') INTO khoaSv FROM DUAL;
     SELECT JSON_VALUE(config, '$.nam') INTO namHoc FROM DUAL;
     SELECT JSON_VALUE(config, '$.hocKy') INTO hocKy FROM DUAL;
+    SELECT JSON_VALUE(config, '$.maCoSo') INTO coSo FROM DUAL;
     SELECT JSON_VALUE(config, '$.now') INTO now FROM DUAL;
 
     --     SELECT LISTAGG(TMP.ID_THOI_KHOA_BIEU, ',') WITHIN GROUP (ORDER BY TMP.ID_THOI_KHOA_BIEU)
@@ -1207,18 +1209,21 @@ begin
 --                          from dual
 --                          connect by regexp_substr(listIdHocPhan, '[^,]+', 1, level) is not null);
     open currentStatusRoom for
-        select
-            TKB.PHONG AS "phong",
-            TKB.THU AS "thu",
-            TKB.TIET_BAT_DAU AS "tietBatDau",
-            TKB.SO_TIET_BUOI AS "soTietBuoi"
-        from  DT_THOI_KHOA_BIEU TKB
-        WHERE TKB.PHONG IS NOT NULL
+        select TKB.PHONG        AS "phong",
+               TKB.THU          AS "thu",
+               TKB.TIET_BAT_DAU AS "tietBatDau",
+               TKB.SO_TIET_BUOI AS "soTietBuoi"
+        from DT_THOI_KHOA_BIEU TKB
+                 LEFT JOIN DM_PHONG DMP ON DMP.MA = TKB.PHONG
+                 LEFT JOIN DM_TOA_NHA DMTN ON DMTN.MA = DMP.TOA_NHA
+        WHERE DMTN.CO_SO = coSo
+          AND TKB.PHONG IS NOT NULL
           AND TKB.THU IS NOT NULL
           AND TKB.TIET_BAT_DAU IS NOT NULL
           AND TKB.IS_MO = 1
           AND TKB.NAM = namHoc
           AND TKB.HOC_KY = hocKy;
+
     open my_cursor for
         select TKB.ID                AS "id",
                TKB.MA_MON_HOC        AS "maMonHoc",
@@ -1236,6 +1241,7 @@ begin
         WHERE TKB.BAC_DAO_TAO = bac
           AND TKB.LOAI_HINH_DAO_TAO = he
           AND TKB.PHONG IS NULL
+          AND TKB.SO_TIET_BUOI IS NOT NULL
           AND TKB.KHOA_SINH_VIEN = khoaSv
           AND TKB.IS_MO = 1
           AND TKB.NAM = namHoc
@@ -4875,6 +4881,61 @@ BEGIN
         ORDER BY 'id' DESC;
     RETURN my_cursor;
 END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_DANG_KY_SO_SEARCH_PAGE(
+    pageNumber IN OUT NUMBER,
+    pageSize IN OUT NUMBER,
+    searchTerm IN STRING,
+    totalItem OUT NUMBER,
+    pageTotal OUT NUMBER
+) RETURN SYS_REFCURSOR AS
+    my_cursor SYS_REFCURSOR;
+    ST        STRING(500) := '%' || lower(searchTerm) || '%';
+
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+    FROM HCTH_DANG_KY_SO dks
+    WHERE (
+              (
+                          ST = ''
+                      OR LOWER(dks.SO_CONG_VAN) LIKE ST
+                  )
+              );
+
+    IF pageNumber < 1 THEN
+        pageNumber := 1;
+    end if;
+
+    IF pageSize < 1 THEN
+        pageSize := 1;
+    end if;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (SELECT dks.ID          AS                       "id",
+                     dks.SO_CONG_VAN AS                       "soCongVan",
+
+                     ROW_NUMBER() over (ORDER BY dks.ID DESC) R
+
+              FROM HCTH_DANG_KY_SO dks
+              WHERE (
+                        (
+                                    ST = ''
+                                OR LOWER(dks.SO_CONG_VAN) LIKE ST
+                            )
+                        )
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY 'id' DESC;
+
+    RETURN my_cursor;
+end;
 
 /
 --EndMethod--
