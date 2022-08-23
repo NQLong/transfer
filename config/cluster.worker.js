@@ -50,6 +50,7 @@ module.exports = (cluster, isDebug) => {
     require('./permission')(app, appConfig);
     require('./authentication.google')(app, appConfig);
     require('./rabbitmq')(app, appConfig);
+    require('./tail')(app);
 
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');
@@ -102,4 +103,8 @@ module.exports = (cluster, isDebug) => {
     // Launch website -------------------------------------------------------------------------------------------------
     require('./debug')(app);
     server.listen(app.port);
+
+    //logger
+    app.setupPm2ViewLogs();
+    app.intervalEmitEvent();
 };

@@ -1,3 +1,5 @@
+const pm2 = require('pm2');
+
 module.exports = (app, appConfig) => {
     app.fs.createFolder(app.bundlePath);
 
@@ -211,5 +213,55 @@ module.exports = (app, appConfig) => {
                 socket.join('cluster');
             }
         }),
+    });
+
+    //pm2 logs API -------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/cluster/logs', app.permission.check('cluster:manage'), (req, res) => {
+        try {
+            const { path } = req.query;
+            if (!path) {
+                res.send({ message: 'Get logs error!' });
+                return;
+            }
+            app.getLogs(path, 30);
+            // app.setupTailWatch(path);
+            // app.intervalEmitEvent(path);
+            res.send({});
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/cluster/list-logs', app.permission.check('cluster:manage'), (req, res) => {
+        pm2.connect(function (error) {
+            if (error) {
+                console.error(error);
+                res.send({ error });
+                process.exit(2);
+            }
+            pm2.list((error, list) => {
+                if (!error) {
+                    if (!list.length) {
+                        //for testing
+                        return { outLog: { name: 'react-scripts-out.log', path: 'react-scripts-out.log' }, errLog: { name: 'react-scripts-out.log', path: 'react-scripts-out.log' } };
+                    }
+                    const rs = list.map((process) => {
+                        return { outLog: { name: `${process.name}-out.log`, path: process.pm2_env.pm_out_log_path }, errLog: { name: `${process.name}-err.log`, path: process.pm2_env.pm_err_log_path } };
+                    });
+                    res.send({ list: rs });
+                } else {
+                    res.send({ error });
+                }
+            });
+        });
+    });
+
+    app.post('/api/cluster/logs', app.permission.check('cluster:manage'), async (req, res) => {
+        try {
+            await app.removeTailWatch();
+            res.send({});
+        } catch (error) {
+            res.send({ error });
+        }
     });
 };
