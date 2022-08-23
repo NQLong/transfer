@@ -60,6 +60,7 @@ class AutoGenModal extends AdminModal {
             nam: getValue(this.nam),
             hocKy: getValue(this.hocKy),
             khoaSinhVien: getValue(this.khoaSinhVien),
+            maCoSo: getValue(this.coSo),
             // listIdNganh: getValue(this.maNganh).toString(),
             khoaDangKy: getValue(this.khoaDangKy),
             ngayBatDau: getValue(this.ngayBatDau).getTime()

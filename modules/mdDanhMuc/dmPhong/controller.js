@@ -78,11 +78,9 @@ module.exports = app => {
                     }
                 };
             }
-            console.log(condition);
             let items = await app.model.dmPhong.getAll(condition);
             res.send({ items });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
 

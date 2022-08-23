@@ -27,24 +27,32 @@ module.exports = app => {
     const bestFit = (hocPhan, listRooms, currentStatus) => {
         let { soLuongDuKien, thu, tietBatDau, soTietBuoi } = hocPhan,
             sizeResult = 10000000, roomResult = null;
-        for (let room of listRooms) {
-            let { ten, sucChua } = room,
-                condition = sucChua + MAX_DEVIANT >= soLuongDuKien && sucChua <= sizeResult && (!currentStatus[ten] || !currentStatus[ten][thu] || !currentStatus[ten][thu].includes(tietBatDau));
-            if (condition) {
-                sizeResult = sucChua;
-                roomResult = { phong: ten, sucChua };
-                if (!currentStatus[ten]) {
-                    currentStatus[ten] = {
-                        [thu]: range(tietBatDau, soTietBuoi + tietBatDau)
-                    };
-                } else if (!currentStatus[ten][thu]) {
-                    currentStatus[ten][thu] = range(tietBatDau, soTietBuoi + tietBatDau);
-                } else {
-                    currentStatus[ten][thu] = [...new Set([...currentStatus[ten][thu], ...range(tietBatDau, soTietBuoi + tietBatDau)])];
+        while (true) {
+            for (let room of listRooms) {
+                let { ten, sucChua } = room,
+                    condition = sucChua + MAX_DEVIANT >= soLuongDuKien && sucChua <= sizeResult && (!currentStatus[ten] || !currentStatus[ten][thu] || !currentStatus[ten][thu].includes(tietBatDau));
+                if (condition) {
+                    sizeResult = sucChua;
+                    roomResult = { phong: ten, sucChua, soLuongDuKien };
+                    if (!currentStatus[ten]) {
+                        currentStatus[ten] = {
+                            [thu]: range(tietBatDau, soTietBuoi + tietBatDau)
+                        };
+                    } else if (!currentStatus[ten][thu]) {
+                        currentStatus[ten][thu] = range(tietBatDau, soTietBuoi + tietBatDau);
+                    } else {
+                        currentStatus[ten][thu] = [...new Set([...currentStatus[ten][thu], ...range(tietBatDau, soTietBuoi + tietBatDau)])];
+                    }
+                    break;
                 }
+            }
+            if (!roomResult) {
+                soLuongDuKien = soLuongDuKien - MAX_DEVIANT;
+            } else {
                 break;
             }
         }
+
         return roomResult;
     };
 
@@ -84,9 +92,8 @@ module.exports = app => {
                 return new Date(item.ngay).setHours(0, 0, 0);
             });
 
-            const dataRoomAndEndDateAuto = await getDataRoomAndEndDate(dataScheduleAuto, listPhongKhongSuDung, currentStatus, config.ngayBatDau, listNgayLe);
+            const dataRoomAndEndDateAuto = await getDataRoomAndEndDate(dataScheduleAuto, listPhongKhongSuDung, currentStatus, config, listNgayLe);
             const data = Object.values(dataRoomAndEndDateAuto);
-            console.log(data);
             for (const hocPhan of data) {
                 let id = hocPhan.id;
                 delete hocPhan.id;
@@ -109,11 +116,11 @@ module.exports = app => {
         dataCurrent.forEach(hocPhan => {
             hocPhanDaXep[hocPhan.id] = hocPhan;
         });
-
         currentStatus.push(...currRoom);
+        let { maCoSo } = config;
 
         // 1.2: Config data thứ, tiết.
-        let dataTiet = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+        let dataTiet = await app.model.dmCaHoc.getAll({ maCoSo, kichHoat: 1 }, 'ten', 'ten');
         dataTiet = dataTiet.map(item => parseInt(item.ten));
         const dataThu = [2, 3, 4, 5, 6, 7];
         const dataTietThu = [], fullDataTietThu = [];
@@ -166,7 +173,7 @@ module.exports = app => {
                     thuTietLoop: for (const thuTiet of thoiGianRanhChung) {
                         if (!thuTiet) {
                             continue hocPhanLoop;
-                        }//TODO: Reset nếu vẫn đang trong scope maMonHocGlobal
+                        }
                         else {
                             let [thu, tietBatDau] = thuTiet.split('_');
                             if (isValidPeriod(tietBatDau, soTietBuoi) == undefined) continue hocPhanLoop;
@@ -209,11 +216,14 @@ module.exports = app => {
         return dataReturn;
     };
 
-    const getDataRoomAndEndDate = async (dataGen, listPhongKhongSuDung, currentStatus, ngayBatDau, listNgayLe) => {
+    const getDataRoomAndEndDate = async (dataGen, listPhongKhongSuDung, currentStatus, config, listNgayLe) => {
+        let { ngayBatDau, maCoSo } = config;
         ngayBatDau = parseInt(ngayBatDau);
+        let listToaNha = await app.model.dmToaNha.getAll({ coSo: maCoSo, kichHoat: 1 }, 'ma');
+        listToaNha = listToaNha.map(item => item.ma);
         let listPhong = await app.model.dmPhong.getAll({
-            statement: 'kichHoat = 1 AND (:listPhongKhongSuDung IS NULL OR ten NOT IN (:listPhongKhongSuDung))',
-            parameter: { listPhongKhongSuDung: listPhongKhongSuDung ? listPhongKhongSuDung.join(',') : null }
+            statement: 'kichHoat = 1 AND (:listPhongKhongSuDung IS NULL OR ten NOT IN (:listPhongKhongSuDung)) AND toaNha IN (:listToaNha)',
+            parameter: { listPhongKhongSuDung: listPhongKhongSuDung ? listPhongKhongSuDung.join(',') : null, listToaNha }
         }, 'ten,sucChua', 'sucChua DESC');
 
         for (let [key, hocPhan] of Object.entries(dataGen)) {
