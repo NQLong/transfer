@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { createDmCaHoc, getDmCaHocAll, updateDmCaHoc, deleteDmCaHoc } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormEditor, FormTextBox, FormCheckbox, FormTabs, FormSelect, } from 'view/component/AdminPage';
+import { SelectAdapter_DmCoSo } from '../dmCoSo/redux';
 
 class EditModal extends AdminModal {
 
@@ -81,11 +82,11 @@ class EditModal extends AdminModal {
             title: this.state.ten ? 'Cập nhật Giờ học' : 'Tạo mới Giờ học',
             size: 'elarge',
             body: <div className='row'>
-                <FormTextBox className='col-md-12' type='text' ref={e => this.ten = e} label='Tên giờ học' placeholder='Tên giờ học' readOnly={readOnly} required />
+                <FormTextBox className='col-md-12' type='number' ref={e => this.ten = e} label='Tiết' readOnly={readOnly} required />
                 <div style={{ position: 'absolute', top: '16px', right: '8px' }}>
                     <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
                         onChange={value => this.changeKichHoat(value ? 1 : 0)} /></div>
-                <FormSelect className='col-md-12' ref={e => this.maCoSo = e} data={[1, 2]} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maCoSo = e} data={SelectAdapter_DmCoSo} readOnly={readOnly} />
                 <div className='form-group col-md-12'>
                     <FormTabs tabs={viEnTabs} />
                 </div>

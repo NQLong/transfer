@@ -43,6 +43,17 @@ module.exports = app => {
         app.model.dmCaHoc.getAll({}, '*', 'maCoSo,thoiGianBatDau', (error, items) => res.send({ error, items }));
     });
 
+    app.get('/api/danh-muc/ca-hoc/all-condition', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), async (req, res) => {
+        try {
+            let maCoSo = req.query.maCoSo || '';
+            let items = await app.model.dmCaHoc.getAll({ maCoSo });
+            res.send({ items });
+        } catch (error) {
+            res.send({ error });
+        }
+
+    });
+
     app.get('/api/danh-muc/ca-hoc/item/:_id', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), (req, res) => {
         app.model.dmCaHoc.get(req.params._id, (error, item) => res.send({ error, item }));
     });
