@@ -14,7 +14,7 @@ import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, 
 import Pagination from 'view/component/Pagination';
 import { getStudentsPage, loginStudentForTest } from './redux';
 
-class LoginToTestModal extends AdminModal {
+export class LoginToTestModal extends AdminModal {
 
     onSubmit = (e) => {
         e && e.preventDefault();
