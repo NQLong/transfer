@@ -59,6 +59,35 @@ module.exports = app => {
         app.model.dmPhong.get({ ten: req.params.ten }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/danh-muc/phong/condition/:maCoSo', app.permission.orCheck('dmPhong:read', 'dtPhong:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
+        try {
+            let listToaNha = await app.model.dmToaNha.getAll({ coSo: req.params.maCoSo, kichHoat: 1 }, 'ma');
+            listToaNha = listToaNha.map(item => item.ma);
+            let condition = {
+                statement: 'toaNha IN (:listToaNha)',
+                parameter: {
+                    listToaNha: listToaNha
+                }
+            };
+            if (req.query.condition) {
+                condition = {
+                    statement: 'lower(ten) LIKE :searchText AND toaNha IN (:listToaNha)',
+                    parameter: {
+                        searchText: `%${req.query.condition.toLowerCase()}%`,
+                        listToaNha: listToaNha
+                    }
+                };
+            }
+            console.log(condition);
+            let items = await app.model.dmPhong.getAll(condition);
+            res.send({ items });
+        } catch (error) {
+            console.log(error);
+            res.send({ error });
+        }
+
+    });
+
     app.post('/api/danh-muc/phong', app.permission.check('dmPhong:write'), (req, res) => {
         app.model.dmPhong.create(req.body.item, (error, item) => res.send({ error, item }));
     });

@@ -171,6 +171,14 @@ export const SelectAdapter_DmPhongAll = {
     ajax: true,
     url: '/api/danh-muc/phong/all',
     data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ten, text: `${item.ten} (SC ${item.sucChua})`, sucChua: item.sucChua })) : [] }),
+    fetchOne: (ten, done) => (getDmPhong(ten, item => done && done({ id: item.ten, text: `${item.ten}` })))(),
+};
+
+export const SelectAdapter_DmPhongFilter = (maCoSo) => ({
+    ajax: true,
+    url: `/api/danh-muc/phong/condition/${maCoSo}`,
+    data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ten, text: `P. ${item.ten} (SC ${item.sucChua})`, sucChua: item.sucChua })) : [] }),
     fetchOne: (ten, done) => (getDmPhong(ten, item => done && done({ id: item.ten, text: `P. ${item.ten}` })))(),
-};
+});

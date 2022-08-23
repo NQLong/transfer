@@ -1,7 +1,10 @@
 import { rgbToHex } from '@mui/material';
+import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmPhongAll } from 'modules/mdDanhMuc/dmPhong/redux';
+import { SelectAdapter_DmPhongFilter } from 'modules/mdDanhMuc/dmPhong/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
+
+import { getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -34,6 +37,17 @@ class AutoGenModal extends AdminModal {
         }
     }
 
+    handleRenderTiet = () => {
+        getDmCaHocAllCondition(this.state.maCoSo, data => {
+            data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
+            data.forEach(tiet => {
+                dataThu.forEach(thu => {
+                    fullDataTietThu.push({ [thu]: tiet });
+                });
+            });
+            this.setState({ fullDataTietThu, dataTiet: data });
+        });
+    }
     onSubmit = () => {
         let thuTietMo = [];
         $('td').each(function () {
@@ -73,26 +87,30 @@ class AutoGenModal extends AdminModal {
                 <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-3' required />
                 <FormSelect ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-3' required />
                 {/* <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoMa} label='Ngành' className='col-md-6' required multiple minimumResultsForSearch={-1} /> */}
-                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị (Khoa, bộ môn, PĐT)' className='col-md-6' required />
-                <FormDatePicker type='date-mask' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' required className='col-md-6' />
-                <FormSelect ref={e => this.listPhongKhongSuDung = e} data={SelectAdapter_DmPhongAll} label={<>Chọn các phòng <b>không sử dụng</b></>} className='col-md-12' multiple={true} />
+                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị (Khoa, bộ môn, PĐT)' className='col-md-4' required />
+                <FormDatePicker type='date-mask' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' required className='col-md-4' />
+                <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Cơ sở' required onChange={value => this.setState({ maCoSo: value.id }, () => {
+                    this.listPhongKhongSuDung.value('');
+                    this.handleRenderTiet();
+                })} className='col-md-4' />
+                <FormSelect ref={e => this.listPhongKhongSuDung = e} data={SelectAdapter_DmPhongFilter(this.state.maCoSo)} label={<>Chọn các phòng <b>không sử dụng</b></>} className='col-md-12' multiple={true} />
                 <div className='form-group col-md-12'>Chọn các tiết <b>không xếp thời khoá biểu</b> </div>
-                <div className='form-group col-md-12' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {this.state.fullDataTietThu && <div className='form-group col-md-12' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     {
                         renderTable({
-                            getDataSource: () => fullDataTietThu,
+                            getDataSource: () => this.state.fullDataTietThu,
                             header: '',
                             renderHead: () => <tr>{
                                 dataThu.map(thu => <th key={thu} style={{ width: '150px', textAlign: 'center' }}>Thứ {thu}</th>)
                             }</tr>,
-                            renderRow: dataTiet.map(tiet => <tr key={tiet}>
+                            renderRow: this.state.dataTiet.map(tiet => <tr key={tiet}>
                                 {dataThu.map(thu => <td key={thu} id={`${thu}_${tiet}`} style={{ textAlign: 'center', backgroundColor: '#0275d8', color: '#fff' }} onClick={e => e.preventDefault() || $(`#${thu}_${tiet}`).css('backgroundColor', (_, cur) => rgbToHex(cur) == '#0275d8' ? '#f0ad4e' : '#0275d8')
                                 }>Tiết {tiet}</td>)}
                             </tr>)
 
                         })
                     }
-                </div>
+                </div>}
             </div>
         });
     }
