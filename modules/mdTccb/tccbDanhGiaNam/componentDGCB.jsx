@@ -43,10 +43,11 @@ class EditModal extends AdminModal {
             T.notify('Mức xếp loại bị trống', 'danger');
             this.mucXepLoai.focus();
         } else {
-            if (!this.state.item)
-                this.props.create({ ...changes, nam: this.props.nam, thuTu: this.props.thuTu + 1 });
-            else this.props.update(this.state.item.id, changes);
-            this.hide();
+            if (!this.state.item) {
+                this.props.create({ ...changes, nam: this.props.nam, thuTu: this.props.thuTu + 1 }, () => this.hide());
+            } else {
+                this.props.update(this.state.item.id, changes, () => this.hide());
+            }
         }
         e.preventDefault();
     };

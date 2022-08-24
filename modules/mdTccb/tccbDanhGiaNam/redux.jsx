@@ -132,7 +132,6 @@ export function updateTccbDanhGiaNam(id, changes, done) {
             if (data.error) {
                 T.notify('Cập nhật đánh giá năm bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
-                done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin đánh giá năm thành công!', 'success');
                 dispatch(getTccbDanhGiaNamPage());

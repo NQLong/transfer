@@ -132,7 +132,6 @@ export function updateTccbKhungDanhGiaDonVi(id, changes, done) {
             if (data.error) {
                 T.notify('Cập nhật cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
-                done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin cấu trúc khung đánh giá đơn vi thành công!', 'success');
                 dispatch(getTccbKhungDanhGiaDonViPage());

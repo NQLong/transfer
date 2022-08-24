@@ -38,11 +38,10 @@ class EditModal extends AdminModal {
                     nam: this.props.nam,
                     parentId: this.state.parentId || null,
                     thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
-                });
+                }, () => this.hide());
             else this.props.update(this.state.item.id, changes);
             this.setState({ item: null });
             this.noiDung.value('');
-            this.hide();
         }
         e.preventDefault();
     };

@@ -132,7 +132,6 @@ export function updateTccbKhungDanhGiaCanBo(id, changes, done) {
             if (data.error) {
                 T.notify('Cập nhật cấu trúc khung đánh giá cán bộ bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
-                done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin cấu trúc khung đánh giá cán bộ thành công!', 'success');
                 dispatch(getTccbKhungDanhGiaCanBoPage());
@@ -153,12 +152,12 @@ export function updateTccbKhungDanhGiaCanBoThuTu(id, thuTu, nam, done) {
             if (data.error) {
                 T.notify('Thay đổi thứ tự bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
-                done && done(data.error);
             } else {
                 T.notify('Thay đổi thứ tự thành công!', 'success');
                 dispatch(getTccbKhungDanhGiaCanBoPage(undefined, undefined, { nam }));
                 done && done();
-            }},
+            }
+        },
             () => T.notify('Thay đổi thứ tự bị lỗi!', 'danger')
         );
     };
