@@ -68,7 +68,9 @@ class BaoHiemModal extends AdminModal {
         });
         T.confirm('Xác nhận', `Xác nhận bạn ${tinhTrang}`, 'warning', true, isConfirm => {
             if (isConfirm) {
-                this.props.createSvBaoHiemYTe({ dienDong }, () => location.reload());
+                this.props.createSvBaoHiemYTe({ dienDong }, () => {
+                    location.reload();
+                });
             }
         });
     }
