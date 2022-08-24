@@ -27,7 +27,6 @@ module.exports = app => {
 
     app.sms.sendByViettel = async (phone, mess, emailSent) => await initViettelSms({ phone, mess }, emailSent);
 
-
     const initViettelSms = async (body, email) => {
         try {
             let { usernameViettel: user, passViettel: pass, brandName, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
