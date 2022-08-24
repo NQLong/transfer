@@ -166,7 +166,7 @@ class UserPage extends AdminPage {
                                     </button>
                                 }
                                 {
-                                    this.state.chuaDongBhyt ? <a href='#'>Chọn diện BHYT</a> : ''
+                                    this.state.chuaDongBhyt ? <a href='#' onClick={e => e.preventDefault() || this.baoHiemModal.show()}>Chọn diện BHYT</a> : ''
                                 }
                                 {
                                     current.congNo ?
