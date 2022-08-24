@@ -75,7 +75,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.item ? 'Cập nhật đánh giá năm' : 'Tạo mới đánh giá năm',
+            title: this.state.item ? (this.state.item.clone ? 'Sao chép đánh giá năm' : 'Cập nhật đánh giá năm') : 'Tạo mới đánh giá năm',
             size: 'large',
             body: <div className='row'>
                 <FormTextBox type='year' ref={e => this.nam = e} label='Năm đánh giá' className='col-12' required readOnly={readOnly || (this.state.item && !this.state.item.clone)} />

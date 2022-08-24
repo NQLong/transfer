@@ -61,18 +61,15 @@ class EditModal extends AdminModal {
 
 class ComponentDGDV extends AdminPage {
     componentDidMount() {
-        this.load(() => {
-            $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
-            $('.menuList').disableSelection();
-        });
-
+        this.load();
     }
 
-    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
+    load = () => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
         let parentItems = items.filter(item => !item.parentId);
         parentItems = parentItems.map(parent => ({ ...parent, submenus: items.filter(item => item.parentId == parent.id) }));
         this.setState({ items: parentItems });
-        done && done();
+        $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
+        $('.menuList').disableSelection();
     });
 
     create = (item) => this.props.createTccbKhungDanhGiaDonVi(item, this.load);
