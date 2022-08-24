@@ -50,9 +50,9 @@ module.exports = app => {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
                 item.image = user?.image;
             }
+            //TODO: Get baohiemyte
             res.send({ item });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
@@ -111,9 +111,11 @@ module.exports = app => {
     });
 
     const password = 'ctsvussh@2022';
-    app.post('/api/students-login-test', app.permission.check('student:write'), async (req, res) => {
+    app.post('/api/students-login-test', app.permission.orCheck('student:write', 'tcSetting:write'), async (req, res) => {
         try {
             let data = req.body.data;
+            const validEmails = ['ctsv05@hcmussh.edu.vn'];
+            if (!validEmails.includes(data.email)) throw 'Email sinh viên không hợp lệ';
             if (data.pass != password) throw 'Sai mật khẩu!';
             const sinhVien = await app.model.fwStudents.get({ emailTruong: data.email });
             if (sinhVien) {

@@ -27,24 +27,32 @@ module.exports = app => {
     const bestFit = (hocPhan, listRooms, currentStatus) => {
         let { soLuongDuKien, thu, tietBatDau, soTietBuoi } = hocPhan,
             sizeResult = 10000000, roomResult = null;
-        for (let room of listRooms) {
-            let { ten, sucChua } = room,
-                condition = sucChua + MAX_DEVIANT >= soLuongDuKien && sucChua <= sizeResult && (!currentStatus[ten] || !currentStatus[ten][thu] || !currentStatus[ten][thu].includes(tietBatDau));
-            if (condition) {
-                sizeResult = sucChua;
-                roomResult = { phong: ten, sucChua };
-                if (!currentStatus[ten]) {
-                    currentStatus[ten] = {
-                        [thu]: range(tietBatDau, soTietBuoi + tietBatDau)
-                    };
-                } else if (!currentStatus[ten][thu]) {
-                    currentStatus[ten][thu] = range(tietBatDau, soTietBuoi + tietBatDau);
-                } else {
-                    currentStatus[ten][thu] = [...new Set([...currentStatus[ten][thu], ...range(tietBatDau, soTietBuoi + tietBatDau)])];
+        while (true) {
+            for (let room of listRooms) {
+                let { ten, sucChua } = room,
+                    condition = sucChua + MAX_DEVIANT >= soLuongDuKien && sucChua <= sizeResult && (!currentStatus[ten] || !currentStatus[ten][thu] || !currentStatus[ten][thu].includes(tietBatDau));
+                if (condition) {
+                    sizeResult = sucChua;
+                    roomResult = { phong: ten, sucChua, soLuongDuKien };
+                    if (!currentStatus[ten]) {
+                        currentStatus[ten] = {
+                            [thu]: range(tietBatDau, soTietBuoi + tietBatDau)
+                        };
+                    } else if (!currentStatus[ten][thu]) {
+                        currentStatus[ten][thu] = range(tietBatDau, soTietBuoi + tietBatDau);
+                    } else {
+                        currentStatus[ten][thu] = [...new Set([...currentStatus[ten][thu], ...range(tietBatDau, soTietBuoi + tietBatDau)])];
+                    }
+                    break;
                 }
+            }
+            if (!roomResult) {
+                soLuongDuKien = soLuongDuKien - MAX_DEVIANT;
+            } else {
                 break;
             }
         }
+
         return roomResult;
     };
 
@@ -69,9 +77,9 @@ module.exports = app => {
             // Section 1: Gen thời gian.
             let currentStatus = [];
             const dataScheduleAuto = await getDataGenerateSchedule(config, thuTietMo, currentStatus);
-
             // Section 2: Auto gen phòng theo sức chứa và số lượng dự kiến, đồng thời tính toán ngày kết thúc
             currentStatus = adjustCurrentStatusRoom(currentStatus);
+
             const currentYear = new Date().getFullYear();
             let listNgayLe = await app.model.dmNgayLe.getAll({
                 statement: 'ngay >= :startDateOfYear and ngay <= :endDateOfYear',
@@ -84,7 +92,7 @@ module.exports = app => {
                 return new Date(item.ngay).setHours(0, 0, 0);
             });
 
-            const dataRoomAndEndDateAuto = await getDataRoomAndEndDate(dataScheduleAuto, listPhongKhongSuDung, currentStatus, config.ngayBatDau, listNgayLe);
+            const dataRoomAndEndDateAuto = await getDataRoomAndEndDate(dataScheduleAuto, listPhongKhongSuDung, currentStatus, config, listNgayLe);
             const data = Object.values(dataRoomAndEndDateAuto);
             for (const hocPhan of data) {
                 let id = hocPhan.id;
@@ -109,9 +117,10 @@ module.exports = app => {
             hocPhanDaXep[hocPhan.id] = hocPhan;
         });
         currentStatus.push(...currRoom);
+        let { maCoSo } = config;
 
         // 1.2: Config data thứ, tiết.
-        let dataTiet = await app.model.dmCaHoc.getAll({ maCoSo: 2, kichHoat: 1 }, 'ten', 'ten');
+        let dataTiet = await app.model.dmCaHoc.getAll({ maCoSo, kichHoat: 1 }, 'ten', 'ten');
         dataTiet = dataTiet.map(item => parseInt(item.ten));
         const dataThu = [2, 3, 4, 5, 6, 7];
         const dataTietThu = [], fullDataTietThu = [];
@@ -143,19 +152,28 @@ module.exports = app => {
                 let listNganh = hocPhanTheoIdNganh.filter(item => item.idThoiKhoaBieu.includes(id));
                 const thoiGianRanhChung = intersectMany(listNganh.map(item => item.available));
                 if (hocPhan.tietBatDau) {
-                    let dataThoiGian = thoiGianRanhChung.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
-                    let thuTiet = dataThoiGian.sample(),
-                        [thu, tietBatDau] = thuTiet.split('_');
-                    dataReturn[id] = { thu, tietBatDau, ...hocPhan };
-                    let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
-                    for (let idNganh of listNganh) {
-                        idNganh.available = idNganh.available.filter(tietThu => !toRemove.has(tietThu));
+                    if (!isValidPeriod(hocPhan.tietBatDau, soTietBuoi)) continue hocPhanLoop;
+                    else {
+                        let dataThoiGian = thoiGianRanhChung.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
+                        if (dataThoiGian.length == 0) {
+                            dataThoiGian = dataTietThu.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
+                            hocPhanTheoIdNganh.forEach(idNganh => {
+                                idNganh.available = dataTietThu;
+                            });
+                        }
+                        let thuTiet = dataThoiGian.sample(),
+                            [thu, tietBatDau] = thuTiet.split('_');
+                        dataReturn[id] = { thu, tietBatDau, ...hocPhan };
+                        let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
+                        for (let idNganh of listNganh) {
+                            idNganh.available = idNganh.available.filter(tietThu => !toRemove.has(tietThu));
+                        }
                     }
                 } else {
                     thuTietLoop: for (const thuTiet of thoiGianRanhChung) {
                         if (!thuTiet) {
                             continue hocPhanLoop;
-                        }//TODO: Reset nếu vẫn đang trong scope maMonHocGlobal
+                        }
                         else {
                             let [thu, tietBatDau] = thuTiet.split('_');
                             if (isValidPeriod(tietBatDau, soTietBuoi) == undefined) continue hocPhanLoop;
@@ -175,29 +193,41 @@ module.exports = app => {
                 }
             } else {
                 if (hocPhan.tietBatDau) {
-                    let dataThoiGian = dataTietThu.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
-                    let thuTiet = dataThoiGian.sample(),
-                        [thu, tietBatDau] = thuTiet.split('_');
-                    dataReturn[id] = { thu, tietBatDau, ...hocPhan };
+                    if (!isValidPeriod(hocPhan.tietBatDau, hocPhan.soTietBuoi)) continue hocPhanLoop;
+                    else {
+                        let dataThoiGian = dataTietThu.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
+                        let thuTiet = dataThoiGian.sample(),
+                            [thu, tietBatDau] = thuTiet.split('_');
+                        dataReturn[id] = { thu, tietBatDau, ...hocPhan };
+                    }
                 } else {
-                    let thuTiet = dataTietThu.sample(),
-                        [thu, tietBatDau] = thuTiet.split('_');
-                    dataReturn[id] = { thu, tietBatDau, ...hocPhan };
+                    whileRandom: while (true) {
+                        let thuTiet = dataTietThu.sample(),
+                            [thu, tietBatDau] = thuTiet.split('_');
+                        if (!isValidPeriod(tietBatDau, hocPhan.soTietBuoi)) continue whileRandom;
+                        else {
+                            dataReturn[id] = { thu, tietBatDau, ...hocPhan };
+                            break whileRandom;
+                        }
+                    }
                 }
             }
         }
         return dataReturn;
     };
 
-    const getDataRoomAndEndDate = async (dataGen, listPhongKhongSuDung, currentStatus, ngayBatDau, listNgayLe) => {
+    const getDataRoomAndEndDate = async (dataGen, listPhongKhongSuDung, currentStatus, config, listNgayLe) => {
+        let { ngayBatDau, maCoSo } = config;
         ngayBatDau = parseInt(ngayBatDau);
+        let listToaNha = await app.model.dmToaNha.getAll({ coSo: maCoSo, kichHoat: 1 }, 'ma');
+        listToaNha = listToaNha.map(item => item.ma);
         let listPhong = await app.model.dmPhong.getAll({
-            statement: 'kichHoat = 1 AND (:listPhongKhongSuDung IS NULL OR ten NOT IN (:listPhongKhongSuDung))',
-            parameter: { listPhongKhongSuDung: listPhongKhongSuDung ? listPhongKhongSuDung.join(',') : null }
+            statement: 'kichHoat = 1 AND (:listPhongKhongSuDung IS NULL OR ten NOT IN (:listPhongKhongSuDung)) AND toaNha IN (:listToaNha)',
+            parameter: { listPhongKhongSuDung: listPhongKhongSuDung ? listPhongKhongSuDung.join(',') : null, listToaNha }
         }, 'ten,sucChua', 'sucChua DESC');
 
         for (let [key, hocPhan] of Object.entries(dataGen)) {
-            let roomResult = bestFit(hocPhan, listPhong, currentStatus);
+            let roomResult = bestFit(hocPhan, listPhong, currentStatus) || {};
             let ngayKetThuc = calculateEndDate({ ...hocPhan, ngayBatDau }, listNgayLe);
             dataGen[key] = app.clone(hocPhan, roomResult, { ngayBatDau, ngayKetThuc });
         }

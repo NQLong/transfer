@@ -60,4 +60,4 @@ export function cancelInvoice(id, lyDo, done, onError) {
             }
         }, () => T.notify('Hủy hóa đơn lỗi', 'danger'));
     };
-} 
+}
