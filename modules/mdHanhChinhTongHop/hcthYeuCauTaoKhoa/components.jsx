@@ -6,8 +6,22 @@ const defaultLineColor = '#000000'; // black
 
 export class DrawSignatureModal extends AdminModal {
 
+	ref = React.createRef();
+
+	contextRef = React.createRef();
+
 	state = {
-		sigUrl: '',
+		sigUrl: ''
+	}
+	
+	onShow = () => {
+		this.setState({
+			isShow: true
+		});
+
+		const canvas = this.ref.current;
+		const ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
 
 	onSubmit = (e) => {
@@ -16,6 +30,12 @@ export class DrawSignatureModal extends AdminModal {
 		this.props.createSignatureImg(shcc, this.state.sigUrl, () => this.hide());
 	}
 
+	onHide = () => {
+		const canvas = this.ref.current;
+		const ctx = canvas.getContext('2d');
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+	
 	render = () => {
 		return this.renderModal({
 			title: 'Vẽ chữ ký',
@@ -24,18 +44,21 @@ export class DrawSignatureModal extends AdminModal {
 				<Canvas lineWith={8}
 					style={{ border: '2px dotted #CCCCCC', borderRadius: 15, cursor: 'crosshair' }}
 					sigUrl={this.state.sigUrl}
+					isShow={this.state.isShow}
 					onChangeSigData={(data) => this.setState({ sigUrl: data })}
 					shcc={this.props.shcc}
+					canvasRef={this.ref}
+					contextRef={this.contextRef}
 				/>
 			</div>
 		});
 	}
 }
 
-const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLineColor, style = {}, onChangeSigData, shcc }) => {
+const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLineColor, style = {}, onChangeSigData, shcc, canvasRef, contextRef }) => {
 
-	const canvasRef = useRef(null);
-	const contextRef = useRef(null);
+	// const canvasRef = useRef(null);
+	// const contextRef = useRef(null);
 	const [isDrawing, setIsDrawing] = useState(false);
 	const [isUpload, setIsUpload] = useState(false);
 	const [imgUrl, setImgUrl] = useState(null);
@@ -52,7 +75,7 @@ const Canvas = ({ width = 570, height = 380, lineWith = 4, lineColor = defaultLi
 		context.lineWidth = lineWith;
 
 		contextRef.current = context;
-
+		
 	}, []);
 
 	const draw = ({ nativeEvent }) => {
