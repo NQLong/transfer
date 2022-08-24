@@ -180,7 +180,7 @@ class UserPage extends AdminPage {
             breadcrumb: ['Học phí'],
             backRoute: '/user',
             content: user && hocPhiAll ? <>
-                <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
+                <img src='/img/headerHocPhi.png' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
                 {Object.keys(hocPhiAll).sort((a, b) => Number(b) - Number(a)).map(namHoc => this.renderSection(namHoc, {
                     dataTrongNam: hocPhiAll[namHoc],
                     dataDetailTrongNam: hocPhiDetailAll[namHoc]
