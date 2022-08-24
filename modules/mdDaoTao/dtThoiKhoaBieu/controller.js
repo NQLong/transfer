@@ -329,12 +329,20 @@ module.exports = app => {
                         await app.model.dtThoiKhoaBieuGiangVien.create({ idThoiKhoaBieu: item.id, giangVien: tgItem, type: 'TG' });
                     }
                 }
-
-                if (changes.maNganh && changes.maNganh.length) {
+                if ((changes.maNganh && changes.maNganh.length) || (changes.chuyenNganh && changes.chuyenNganh.length)) {
                     await app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: condition });
-                    for (let idNganh of changes.maNganh) {
-                        await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: condition, idNganh });
+                    if (changes.maNganh) {
+                        for (let idNganh of changes.maNganh) {
+                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: condition, idNganh });
+                        }
                     }
+                    if (changes.chuyenNganh) {
+                        for (let idChuyenNganh of changes.chuyenNganh) {
+                            let chuyenNganh = await app.model.dtDanhSachChuyenNganh.get({ id: idChuyenNganh });
+                            await app.model.dtThoiKhoaBieuNganh.create({ idThoiKhoaBieu: condition, idNganh: `${chuyenNganh.nganh}%${idChuyenNganh}` });
+                        }
+                    }
+
                 }
                 res.send({ item });
             }
