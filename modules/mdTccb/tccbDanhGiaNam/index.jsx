@@ -3,13 +3,11 @@
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
 import tccbDanhGiaNam from './redux';
-import tccbKhungDanhGiaCanBo from './reduxKhungDanhGiaCanBo';
-import tccbKhungDanhGiaDonVi from './reduxKhungDanhGiaDonVi';
 
 export default {
     redux: {
-        parent: 'danhGia',
-        reducers: { tccbDanhGiaNam, tccbKhungDanhGiaCanBo, tccbKhungDanhGiaDonVi }
+        parent: 'tccb',
+        reducers: { tccbDanhGiaNam }
     },
     routes: [
         {

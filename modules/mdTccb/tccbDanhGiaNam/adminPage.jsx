@@ -13,13 +13,13 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { nam, donViBatDauDangKy, donViKetThucDangKy, giangVienBatDauDangKy, giangVienKetThucDangKy } = item ? item : { nam: 0, donViBatDauDangKy: 0, donViKetThucDangKy: 0, giangVienBatDauDangKy: 0, giangVienKetThucDangKy: 0 };
+        let { nam, donViBatDauDangKy, donViKetThucDangKy, nldBatDauDangKy, nldKetThucDangKy } = item ? item : { nam: 0, donViBatDauDangKy: 0, donViKetThucDangKy: 0, nldBatDauDangKy: 0, nldKetThucDangKy: 0 };
         this.setState({ item });
         this.nam.value(nam ? Number(nam) : '');
         this.donViBatDauDangKy.value(donViBatDauDangKy ? Number(donViBatDauDangKy) : '');
         this.donViKetThucDangKy.value(donViKetThucDangKy ? Number(donViKetThucDangKy) : '');
-        this.giangVienBatDauDangKy.value(giangVienBatDauDangKy ? Number(giangVienBatDauDangKy) : '');
-        this.giangVienKetThucDangKy.value(giangVienKetThucDangKy ? Number(giangVienKetThucDangKy) : '');
+        this.nldBatDauDangKy.value(nldBatDauDangKy ? Number(nldBatDauDangKy) : '');
+        this.nldKetThucDangKy.value(nldKetThucDangKy ? Number(nldKetThucDangKy) : '');
     };
 
     onSubmit = (e) => {
@@ -28,8 +28,8 @@ class EditModal extends AdminModal {
             nam: this.nam.value() ? Number(this.nam.value()) : '',
             donViBatDauDangKy: this.donViBatDauDangKy.value() ? Number(this.donViBatDauDangKy.value()) : '',
             donViKetThucDangKy: this.donViKetThucDangKy.value() ? Number(this.donViKetThucDangKy.value()) : '',
-            giangVienBatDauDangKy: this.giangVienBatDauDangKy.value() ? Number(this.giangVienBatDauDangKy.value()) : '',
-            giangVienKetThucDangKy: this.giangVienKetThucDangKy.value() ? Number(this.giangVienKetThucDangKy.value()) : '',
+            nldBatDauDangKy: this.nldBatDauDangKy.value() ? Number(this.nldBatDauDangKy.value()) : '',
+            nldKetThucDangKy: this.nldKetThucDangKy.value() ? Number(this.nldKetThucDangKy.value()) : '',
         };
         if (changes.nam == '') {
             T.notify('Thiếu năm', 'danger');
@@ -43,23 +43,32 @@ class EditModal extends AdminModal {
         } else if (changes.donViBatDauDangKy >= changes.donViKetThucDangKy) {
             T.notify('Thời hạn đăng ký của đơn vị không phù hợp', 'danger');
             this.donViBatDauDangKy.focus();
-        } else if (changes.giangVienBatDauDangKy == '') {
-            T.notify('Thiếu ngày bắt đầu đăng ký của giảng viên', 'danger');
-            this.giangVienBatDauDangKy.focus();
-        } else if (changes.giangVienKetThucDangKy == '') {
-            T.notify('Thiếu ngày kết thúc đăng ký của giảng viên', 'danger');
-            this.giangVienKetThucDangKy.focus();
-        } else if (changes.giangVienBatDauDangKy >= changes.giangVienKetThucDangKy) {
-            T.notify('Thời hạn đăng ký của giảng viên không phù hợp', 'danger');
-            this.giangVienBatDauDangKy.focus();
+        } else if (changes.nldBatDauDangKy == '') {
+            T.notify('Thiếu ngày bắt đầu đăng ký của người lao động', 'danger');
+            this.nldBatDauDangKy.focus();
+        } else if (changes.nldKetThucDangKy == '') {
+            T.notify('Thiếu ngày kết thúc đăng ký của người lao động', 'danger');
+            this.nldKetThucDangKy.focus();
+        } else if (changes.nldBatDauDangKy >= changes.nldKetThucDangKy) {
+            T.notify('Thời hạn đăng ký của người lao động không phù hợp', 'danger');
+            this.nldBatDauDangKy.focus();
         } else {
             if (!this.state.item || this.state.item.clone) {
-                if (this.state.item.clone) {
-                    this.props.createTccbDanhGiaNamClone(this.state.item.id, changes);
-                } else this.props.createTccbDanhGiaNam(changes);
+                if (!this.state.item) {
+                    this.props.createTccbDanhGiaNam(changes, () => {
+                        this.hide();
+                        this.props?.history.push(`/user/tccb/danh-gia/${changes.nam}`);
+                    });
+                } else {
+                    this.props.createTccbDanhGiaNamClone(this.state.item.id, changes, () => {
+                        this.hide();
+                        this.props?.history.push(`/user/tccb/danh-gia/${changes.nam}`);
+                    });
+                }
             }
-            else this.props.updateTccbDanhGiaNam(this.state.item.id, changes);
-            this.hide();
+            else {
+                this.props.updateTccbDanhGiaNam(this.state.item.id, changes, () => this.hide());
+            }
         }
     };
 
@@ -72,8 +81,8 @@ class EditModal extends AdminModal {
                 <FormTextBox type='year' ref={e => this.nam = e} label='Năm đánh giá' className='col-12' required readOnly={readOnly || (this.state.item && !this.state.item.clone)} />
                 <FormDatePicker type='time-mask' ref={e => this.donViBatDauDangKy = e} className='col-12 col-md-6' label='Đơn vị bắt đầu đăng ký' required readOnly={readOnly} />
                 <FormDatePicker type='time-mask' ref={e => this.donViKetThucDangKy = e} className='col-12 col-md-6' label='Đơn vị kết thúc đăng ký' required readOnly={readOnly} />
-                <FormDatePicker type='time-mask' ref={e => this.giangVienBatDauDangKy = e} className='col-12 col-md-6' label='Giảng viên bắt đầu đăng ký' required readOnly={readOnly} />
-                <FormDatePicker type='time-mask' ref={e => this.giangVienKetThucDangKy = e} className='col-12 col-md-6' label='Giảng viên kết thúc đăng ký' required readOnly={readOnly} />
+                <FormDatePicker type='time-mask' ref={e => this.nldBatDauDangKy = e} className='col-12 col-md-6' label='Người lao động bắt đầu đăng ký' required readOnly={readOnly} />
+                <FormDatePicker type='time-mask' ref={e => this.nldKetThucDangKy = e} className='col-12 col-md-6' label='Người lao động kết thúc đăng ký' required readOnly={readOnly} />
             </div>
         });
     }
@@ -82,17 +91,12 @@ class EditModal extends AdminModal {
 class TccbDanhGiaNamPage extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/danh-gia', () => {
+        T.ready('/user/tccb', () => {
             T.clearSearchBox();
             T.showSearchBox();
             this.props.getTccbDanhGiaNamPage(undefined, undefined, { searchTerm: '' });
         });
     }
-
-    edit = (e, item) => {
-        e.preventDefault();
-        this.modal.current.show(item);
-    };
 
     showModal = (e) => {
         e.preventDefault();
@@ -119,7 +123,7 @@ class TccbDanhGiaNamPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm đánh giá</th>
                     <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của đơn vị</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của giảng viên</th>
+                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của người lao động</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
@@ -128,7 +132,7 @@ class TccbDanhGiaNamPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
                     <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
-                    <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.giangVienBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.giangVienKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete}
                     >
@@ -138,7 +142,7 @@ class TccbDanhGiaNamPage extends AdminPage {
                             </a>
                         </Tooltip>
                         <Tooltip title='Xem thông tin' arrow>
-                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || permission.write ? this.props.history.push(`/user/tccb/danh-gia/${item.nam}`) : T.notify('Vui lòng liên hệ người quản lý!', 'danger')}>
+                            <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || permission.write ? this.props.history.push(`/user/tccb/danh-gia/${item.nam}`) : T.notify('Vui lòng liên hệ người quản lý!', 'danger')}>
                                 <i className='fa fa-lg fa-info' />
                             </a>
                         </Tooltip>
@@ -160,13 +164,15 @@ class TccbDanhGiaNamPage extends AdminPage {
                     createTccbDanhGiaNam={this.props.createTccbDanhGiaNam}
                     updateTccbDanhGiaNam={this.props.updateTccbDanhGiaNam}
                     createTccbDanhGiaNamClone={this.props.createTccbDanhGiaNamClone}
+                    history={this.props.history}
                     readOnly={!permission.write} />
             </>,
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+            backRoute: '/user/tccb',
+            onCreate: permission && permission.write ? () => this.modal.show(null) : null
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, tccbDanhGiaNam: state.danhGia.tccbDanhGiaNam });
+const mapStateToProps = state => ({ system: state.system, tccbDanhGiaNam: state.tccb.tccbDanhGiaNam });
 const mapActionsToProps = { getTccbDanhGiaNamPage, deleteTccbDanhGiaNam, createTccbDanhGiaNam, updateTccbDanhGiaNam, createTccbDanhGiaNamClone };
 export default connect(mapStateToProps, mapActionsToProps)(TccbDanhGiaNamPage);

@@ -142,7 +142,21 @@ export function updateTccbKhungDanhGiaDonVi(id, changes, done) {
     };
 }
 
-
+export function updateTccbKhungDanhGiaDonViThuTu(changes, done) {
+    return dispatch => {
+        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/thu-tu';
+        T.put(url, { changes }, data => {
+            if (data.error) {
+                T.notify('Thay đổi vị trí bị lỗi!', 'danger');
+                console.error(`PUT: ${url}. ${data.error}`);
+            } else {
+                T.notify('Cập nhật menu thành công!', 'success');
+                dispatch(getTccbKhungDanhGiaDonViPage());
+                done && done();
+            }
+        }, () => T.notify('Thay đổi vị trí bị lỗi!', 'danger'));
+    };
+}
 
 export function changeTccbKhungDanhGiaDonVi(item) {
     return { type: TccbKhungDanhGiaDonViUpdate, item };

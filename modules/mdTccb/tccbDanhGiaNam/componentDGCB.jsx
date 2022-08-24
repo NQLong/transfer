@@ -54,7 +54,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật' : 'Tạo mới',
+            title: this.state.item ? 'Cập nhật' : 'Tạo mới',
             body: <div className='row'>
                 <FormTextBox type='number' min='0' className='col-md-12' ref={e => this.tu = e} label='Từ'
                     readOnly={readOnly} required />
@@ -73,7 +73,7 @@ class ComponentDGCB extends AdminPage {
     state = { isLoading: true, length: 0 }
 
     componentDidMount() {
-        this.props.nam && this.props.getTccbKhungDanhGiaCanBoAll({ nam: Number(this.props.nam) }, items => this.setState({ items }));
+        this.load();
     }
 
     componentDidUpdate() {
@@ -93,22 +93,17 @@ class ComponentDGCB extends AdminPage {
                     e.preventDefault();
                     const newIndex = this.state.items[ui.item.index()];
                     const oldIndex = this.state.items[$(this).attr('data-prevIndex')];
-                    this.props.updateTccbKhungDanhGiaCanBoThuTu(oldIndex.id, newIndex.thuTu, this.props.nam, this.reloadItems);
+                    this.props.updateTccbKhungDanhGiaCanBoThuTu(oldIndex.id, newIndex.thuTu, this.props.nam, this.load);
                 }
             })
             .disableSelection();
     }
 
-    reloadItems = () =>  this.props.nam && this.props.getTccbKhungDanhGiaCanBoAll({ nam: Number(this.props.nam) }, items => this.setState({ items }));
+    load = () => this.props.nam && this.props.getTccbKhungDanhGiaCanBoAll({ nam: Number(this.props.nam) }, items => this.setState({ items }));
 
-    edit = (e, item) => {
-        e.preventDefault();
-        this.modal.current.show(item);
-    };
+    create = (item) => this.props.createTccbKhungDanhGiaCanBo(item, this.load);
 
-    create = (item) => this.props.createTccbKhungDanhGiaCanBo(item, this.reloadItems);
-
-    update = (id, changes) => this.props.updateTccbKhungDanhGiaCanBo(id, changes, this.reloadItems);
+    update = (id, changes) => this.props.updateTccbKhungDanhGiaCanBo(id, changes, this.load);
 
     showModal = (e) => {
         e.preventDefault();
@@ -118,7 +113,7 @@ class ComponentDGCB extends AdminPage {
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa mức đánh giá', 'Bạn có chắc bạn muốn xóa mức đánh giá này?', true, isConfirm =>
-            isConfirm && this.props.deleteTccbKhungDanhGiaCanBo(item.id, this.reloadItems));
+            isConfirm && this.props.deleteTccbKhungDanhGiaCanBo(item.id, this.load));
     }
 
     render() {
@@ -153,16 +148,15 @@ class ComponentDGCB extends AdminPage {
                 </tr>
             )
         });
-        return (<div className='tile'>
-            <h3 className='tile-title'>Mức đánh giá cán bộ</h3>
-            <div className='tile-body'>
-                {table}
-            </div>
-            <div style={{ textAlign: 'right' }}>
-                <button className='btn btn-info' type='button' onClick={e => this.showModal(e)}>
-                    <i className='fa fa-fw fa-lg fa-plus' />Thêm mức
-                </button>
-            </div>
+        return (<div>
+            <div>{table}</div>
+            {
+                permission.write && (<div style={{ textAlign: 'right' }}>
+                    <button className='btn btn-info' type='button' onClick={e => this.showModal(e)}>
+                        <i className='fa fa-fw fa-lg fa-plus' />Thêm mức
+                    </button>
+                </div>)
+            }
             <EditModal ref={e => this.modal = e}
                 create={this.create} update={this.update} readOnly={!permission.write}
                 nam={this.props.nam}

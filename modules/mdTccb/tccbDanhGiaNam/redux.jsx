@@ -147,15 +147,14 @@ export function createTccbDanhGiaNamClone(id, changes, done) {
         const url = '/api/tccb/danh-gia/clone';
         T.post(url, { id, newItem: changes }, data => {
             if (data.error) {
-                T.notify('Tạo mới đánh giá năm bị lỗi!', 'danger');
+                T.notify(`Sao chép đánh giá năm bị lỗi: ${data.error?.message}`, 'danger');
                 console.error(`POST ${url}. ${data.error}`);
-                done && done(data.error);
             } else {
-                T.notify('Tạo mới thông tin đánh giá năm thành công!', 'success');
+                T.notify('Sao chép thông tin đánh giá năm thành công!', 'success');
                 dispatch(getTccbDanhGiaNamPage());
                 done && done(data.item);
             }
-        }, () => T.notify('Tạo mới thông tin đánh giá năm bị lỗi!', 'danger'));
+        }, () => T.notify('Sao chép thông tin đánh giá năm bị lỗi!', 'danger'));
     };
 }
 

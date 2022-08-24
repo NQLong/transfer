@@ -1,154 +1,180 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, getTccbKhungDanhGiaDonVi } from './reduxKhungDanhGiaDonVi';
-import { Link } from 'react-router-dom';
-import ComponentDGDV from '../tccbKhungDanhGiaDonVi/componentDGDV';
-import { SelectAdapter_DmDonViAll } from '../../mdDanhMuc/dmDonVi/redux';
-import { AdminPage, FormDatePicker, FormTextBox, FormSelect } from 'view/component/AdminPage';
-import Loading from 'view/component/Loading';
+import { getTccbKhungDanhGiaDonViAll, deleteTccbKhungDanhGiaDonVi, createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonViThuTu } from './reduxKhungDanhGiaDonVi';
+import { AdminModal, FormTextBox, AdminPage } from 'view/component/AdminPage';
+import { Tooltip } from '@mui/material';
 
-class TccbKhungDanhGiaDonViDetails extends AdminPage {
-    state = { isLoading: true }
-
+class EditModal extends AdminModal {
     componentDidMount() {
-        T.ready('/user/danh-gia/cau-truc-khung-danh-gia-don-vi', () => {
-            const route = T.routeMatcher('/user/danh-gia/cau-truc-khung-danh-gia-don-vi/:id');
-            this.id = route.parse(window.location.pathname)?.id;
-            this.setState({ isLoading: false });
-            const query = new URLSearchParams(this.props.location.search);
-            const id = query.get('id');
-            if (this.id !== 'new') {
-                this.getData(this.id);
+        $(document).ready(() => this.onShown(() =>
+            this.noiDung.focus()
+        ));
+    }
+
+    onShow = (item) => {
+        if (item) {
+            if (item.updateItem) {
+                let { noiDung } = item.updateItem;
+                this.noiDung.value(noiDung);
+                this.setState({ item: item.updateItem });
             } else {
-                if (id > 0) {
-                    this.getData(id, true);
-                    return;
-                }
+                const thuTu = item.submenus.length != 0 ? Math.max(...item.submenus.map(item => item.thuTu)) : 0;
+                this.setState({ parentId: item.parentId, thuTu });
             }
-        });
-    }
-
-    getData = (id, isClone = false) => {
-        this.props.getTccbKhungDanhGiaDonVi(id, (dgdv) => {
-            this.setState({ maDonVi: dgdv.maDonVi });
-            let { nam, maDonVi, batDauDangKy, ketThucDangKy } = dgdv;
-            this.nam.value(isClone ? (Number(nam) + 1) : Number(nam));
-            this.maDonVi.value(maDonVi);
-            this.batDauDangKy.value(isClone ? new Date().getTime() : batDauDangKy);
-            this.ketThucDangKy.value(isClone ? new Date().getTime() : ketThucDangKy);
-            const mucCha = T.parse(dgdv.mucCha, {
-                danhGiaDonVi: {}
-            });
-            const mucCon = T.parse(dgdv.mucCon, {
-                danhGiaDonVi: {}
-            });
-            this.danhGiaDonVi.setVal({ parents: mucCha.danhGiaDonVi, childs: mucCon.danhGiaDonVi });
-        });
-    }
-
-    validation = (selector) => {
-        const data = selector.value();
-        const isRequired = selector.props.required;
-        if (data || data === 0) return data;
-        if (isRequired) throw selector;
-        return '';
+        } else this.setState({ item });
     };
 
-    getValue = () => {
-        try {
-            const data = {
-                nam: this.validation(this.nam),
-                maDonVi: this.validation(this.maDonVi),
-                batDauDangKy: this.validation(this.batDauDangKy).setHours(0, 0, 0, 0),
-                ketThucDangKy: this.validation(this.ketThucDangKy).setHours(23, 59, 59, 999)
-            };
-            return data;
-        } catch (selector) {
-            selector.focus();
-            T.notify('<b>' + (selector.props.placeholder || selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
-            return false;
-        }
-    }
-
-    save = () => {
-        const data = this.getValue();
-        if (data) {
-            if (data.batDauDangKy >= data.ketThucDangKy) {
-                T.notify('Thời hạn đăng ký không hợp lệ', 'danger');
-                this.batDauDangKy.focus();
-                return;
-            }
-            const danhGiaDonVi = this.danhGiaDonVi.getValue() || { parents: [], childrens: {} };
-
-            const mucCha = {
-                danhGiaDonVi: {}
-            };
-            const mucCon = {
-                danhGiaDonVi: {}
-            };
-
-            danhGiaDonVi.parents.forEach((dgdv) => {
-                const { id, content } = dgdv;
-                mucCha.danhGiaDonVi[id] = content;
-                mucCon.danhGiaDonVi[id] = danhGiaDonVi.childrens[id];
-            });
-            if (Object.values(mucCha.danhGiaDonVi).some(item => !item) ||
-                Object.values(mucCon.danhGiaDonVi).some(items => items?.some(item => !item.content))
-            ) {
-                T.notify('Vui lòng điền đầy đủ nội dung từng mục', 'danger');
-                return;
-            }
-
-            let updateDatas = { ...{ mucCha: T.stringify(mucCha) }, ...{ mucCon: T.stringify(mucCon) } };
-            if (this.id == 'new') {
-                updateDatas = { ...updateDatas, ...data };
-                this.props.createTccbKhungDanhGiaDonVi(updateDatas, (item) => {
-                    window.location = `/user/danh-gia/cau-truc-khung-danh-gia-don-vi/${item.id}`;
+    onSubmit = (e) => {
+        const changes = {
+            noiDung: this.noiDung.value(),
+        };
+        if (changes.noiDung == '') {
+            T.notify('Nội dung bị trống', 'danger');
+            this.noiDung.focus();
+        } else {
+            if (!this.state.item)
+                this.props.create({
+                    ...changes,
+                    nam: this.props.nam,
+                    parentId: this.state.parentId || null,
+                    thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
                 });
-            } else {
-                this.props.updateTccbKhungDanhGiaDonVi(this.id, { ...updateDatas, ...data });
-            }
+            else this.props.update(this.state.item.id, changes);
+            this.setState({ item: null });
+            this.noiDung.value('');
+            this.hide();
         }
-    }
-    render() {
-        const permission = this.getUserPermission('tccbKhungDanhGiaDonVi');
-        const readOnly = !permission.write;
-        const maDonViCuaUser = String(this.props.system?.user?.maDonVi) || '';
-        const canBoPermissionWrite = maDonViCuaUser && this.getCurrentPermissions().includes('tccbKhungDanhGiaDonVi:canBo:write') && this.state.maDonVi && maDonViCuaUser == this.state.maDonVi;
-        return this.renderPage({
-            icon: 'fa fa-university',
-            title: this.id !== 'new' ? 'Chỉnh sửa cấu trúc khung đánh giá đơn vị' : 'Tạo mới cấu trúc khung đánh giá đơn vị',
-            subTitle: <span style={{ color: 'red' }}>Lưu ý: Các mục đánh dấu * là bắt buộc</span>,
-            breadcrumb: [
-                <Link key={1} to='/user/danh-gia/cau-truc-khung-danh-gia-don-vi'>Cấu trúc khung đánh giá đơn vị</Link>,
-                this.id !== 'new' ? 'Chỉnh sửa' : 'Tạo mới',
-            ],
-            content: <>
-                {this.state.isLoading && <Loading />}
-                <div className='tile'>
-                    <h3 className='tile-title'>Thông tin chung</h3>
-                    <div className='tile-body'>
-                        <div className='row'>
-                            <FormTextBox type='year' ref={e => this.nam = e} label='Năm đánh giá' className='col-md-3' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonViAll} className='col-md-3' required readOnly={readOnly} />
-                            <FormDatePicker type='date-mask' ref={e => this.batDauDangKy = e} className='col-md-3' label='Bắt đầu đăng ký' required readOnly={readOnly} />
-                            <FormDatePicker type='date-mask' ref={e => this.ketThucDangKy = e} className='col-md-3' label='Kết thúc đăng ký' required readOnly={readOnly} />
-                        </div>
-                    </div>
-                </div>
-                <div className='tile'>
-                    <h3 className='tile-title'>Thông tin đánh giá đơn vị</h3>
-                    <div className='tile-body'>
-                        <ComponentDGDV ref={e => this.danhGiaDonVi = e} canBoPermissionWrite={canBoPermissionWrite} />
-                    </div>
-                </div>
-            </>,
-            backRoute: '/user/danh-gia/cau-truc-khung-danh-gia-don-vi',
-            onSave: permission.write || canBoPermissionWrite ? this.save : null,
+        e.preventDefault();
+    };
+
+    render = () => {
+        const readOnly = this.props.readOnly;
+        return this.renderModal({
+            title: this.state.item ? 'Cập nhật' : 'Tạo mới',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung'
+                    readOnly={readOnly} required />
+            </div>
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, tccbKhungDanhGiaDonVi: state.danhGia.tccbKhungDanhGiaDonVi });
-const mapActionsToProps = { createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, getTccbKhungDanhGiaDonVi };
-export default connect(mapStateToProps, mapActionsToProps)(TccbKhungDanhGiaDonViDetails);
+class ComponentDGDV extends AdminPage {
+    componentDidMount() {
+        this.load(() => {
+            $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
+            $('.menuList').disableSelection();
+        });
+
+    }
+
+    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
+        let parentItems = items.filter(item => !item.parentId);
+        parentItems = parentItems.map(parent => ({ ...parent, submenus: items.filter(item => item.parentId == parent.id) }));
+        this.setState({ items: parentItems });
+        done && done();
+    });
+
+    create = (item) => this.props.createTccbKhungDanhGiaDonVi(item, this.load);
+
+    update = (id, changes) => this.props.updateTccbKhungDanhGiaDonVi(id, changes, this.load);
+
+    updateMenuPriorities = () => {
+        const changes = [];
+        for (let i = 0, thuTu = 0, list1 = $('#menuMain').children(); i < list1.length; i++) {
+            let menu = list1.eq(i);
+            changes.push({ id: menu.attr('data-id'), thuTu });
+            thuTu++;
+
+            let list2 = menu.children();
+            if (list2.length > 1) {
+                list2 = list2.eq(1).children();
+                for (let j = 0; j < list2.length; j++) {
+                    changes.push({ id: list2.eq(j).attr('data-id'), thuTu });
+                    thuTu++;
+                }
+            }
+        }
+        this.props.updateTccbKhungDanhGiaDonViThuTu(changes, this.load);
+    }
+
+    showModal = (e) => {
+        e.preventDefault();
+        this.modal.show();
+    }
+
+    delete = (e, item) => {
+        e.preventDefault();
+        T.confirm('Xóa mục', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
+            isConfirm && this.props.deleteTccbKhungDanhGiaDonVi(item.id, this.load));
+    }
+
+    renderMenu = (index, menu, level, hasCreate, hasUpdate, hasDelete) => (
+        <li key={menu.id} data-id={menu.id}>
+            <div style={{ display: 'inline-flex' }}>
+                {level == 0 ? <b>{`${index + 1}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
+                &nbsp;
+                <div className='buttons btn-group btn-group-sm'>
+                    {hasCreate && level == 0 &&
+                        <Tooltip title='Tạo mục con' arrow>
+                            <a className='btn btn-warning' href='#' onClick={() => this.modal.show({ parentId: menu.id, submenus: menu.submenus || [] })}>
+                                <i className='fa fa-lg fa-plus' />
+                            </a>
+                        </Tooltip>
+                    }
+                    {hasUpdate && <Tooltip title='Chỉnh sửa' arrow>
+                        <a className='btn btn-info' href='#' onClick={() => this.modal.show({ updateItem: menu })}>
+                            <i className='fa fa-lg fa-edit' />
+                        </a>
+                    </Tooltip>}
+                    {hasDelete && <Tooltip title='Xoá' arrow>
+                        <a className='btn btn-danger' href='#' onClick={e => this.delete(e, menu)}>
+                            <i className='fa fa-lg fa-trash' />
+                        </a>
+                    </Tooltip>}
+                </div>
+            </div>
+
+            {menu.submenus ? (
+                <ul className='menuList'>
+                    {menu.submenus.map((subMenu, index) => this.renderMenu(index, subMenu, level + 1, hasCreate, hasUpdate, hasDelete))}
+                </ul>
+            ) : null}
+        </li>);
+
+    render() {
+        const permission = this.getUserPermission('tccbKhungDanhGiaDonVi'),
+            hasCreate = permission.write,
+            hasUpdate = permission.write,
+            hasDelete = permission.delete;
+
+        const items = this.state?.items || [];
+        const thuTu = items.length != 0 ? Math.max(...items.map(item => item.thuTu)) : 0;
+        return (
+            <div>
+                {
+                    items.length == 0 ? (<b>Không có dữ liệu đánh giá đơn vị</b>) :
+                        <div>
+                            <ul id='menuMain' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0 }}>
+                                {items.map((item, index) => this.renderMenu(index, item, 0, hasCreate, hasUpdate, hasDelete))}
+                            </ul>
+                        </div>
+                }
+                {hasCreate && (<div style={{ textAlign: 'right' }}>
+                    <button className='btn btn-info' type='button' onClick={() => this.modal.show(null)}>
+                        <i className='fa fa-fw fa-lg fa-plus' />Thêm mục cha
+                    </button>
+                </div>)}
+                <EditModal ref={e => this.modal = e}
+                    create={this.create} update={this.update} readOnly={!permission.write}
+                    nam={this.props.nam}
+                    thuTu={thuTu}
+                />
+            </div>
+        );
+    }
+}
+
+const mapStateToProps = state => ({ system: state.system });
+const mapActionsToProps = { getTccbKhungDanhGiaDonViAll, deleteTccbKhungDanhGiaDonVi, createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonViThuTu };
+export default connect(mapStateToProps, mapActionsToProps)(ComponentDGDV);

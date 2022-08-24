@@ -10,11 +10,12 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = req.query.condition ? req.query.condition : {};
-        app.model.tccbKhungDanhGiaDonVi.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        app.model.tccbKhungDanhGiaDonVi.getPage(pageNumber, pageSize, condition, '*', 'THU_TU ASC', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/all', app.permission.check('user:login'), (req, res) => {
-        app.model.tccbKhungDanhGiaDonVi.getAll({}, '*', 'id', (error, items) => res.send({ error, items }));
+        const condition = req.query.condition || {};
+        app.model.tccbKhungDanhGiaDonVi.getAll(condition, '*', 'THU_TU ASC', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/item/:id', app.permission.check('user:login'), (req, res) => {
@@ -33,6 +34,33 @@ module.exports = app => {
     });
 
     app.delete('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi', app.permission.check('tccbKhungDanhGiaDonVi:delete'), (req, res) => {
-        app.model.tccbKhungDanhGiaDonVi.delete({ id: req.body.id }, error => res.send({ error }));
+        const id = req.body.id;
+        app.model.tccbKhungDanhGiaDonVi.delete({ parentId: id }, error => {
+            if (error) {
+                res.send({ error });
+            } else {
+                app.model.tccbKhungDanhGiaDonVi.delete({ id }, error => res.send({ error }));
+            }
+        });
     });
+
+    app.put('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/thu-tu', app.permission.check('tccbKhungDanhGiaDonVi:write'), (req, res) => {
+        let error = null;
+        const changes = req.body.changes,
+            updateOneChange = (index) => {
+                if (index < changes.length) {
+                    const item = changes[index];
+                    if (item) {
+                        app.model.tccbKhungDanhGiaDonVi.update({ id: item.id }, { thuTu: item.thuTu }, err => {
+                            if (err) error = err;
+                            updateOneChange(index + 1);
+                        });
+                    }
+                } else {
+                    res.send({ error });
+                }
+            };
+        updateOneChange(0);
+    });
+
 };

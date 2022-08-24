@@ -1,6 +1,6 @@
 module.exports = app => {
     app.permission.add(
-        {name: 'tccbKhungDanhGiaCanBo:read'},
+        { name: 'tccbKhungDanhGiaCanBo:read' },
         { name: 'tccbKhungDanhGiaCanBo:write' },
         { name: 'tccbKhungDanhGiaCanBo:delete' }
     );
@@ -13,7 +13,7 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo/all', app.permission.check('user:login'), (req, res) => {
-        const condition = req.query.condition || {}; 
+        const condition = req.query.condition || {};
         app.model.tccbKhungDanhGiaCanBo.getAll(condition, '*', 'THU_TU ASC', (error, items) => res.send({ error, items }));
     });
 
