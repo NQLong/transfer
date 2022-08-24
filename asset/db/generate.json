@@ -622,6 +622,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88739\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "HE_DAO_TAO": {
+                    "value": "heDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
                 }
             },
             "primaryKeys": [
@@ -11983,6 +11990,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "USER_MODIFIED": {
+                    "value": "userModified",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 70
+                },
+                "LAST_MODIFIED": {
+                    "value": "lastModified",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -16518,7 +16539,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 255
+                    "size": 1000
                 },
                 "THU_TU": {
                     "value": "thuTu",
@@ -16670,15 +16691,15 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "GIANG_VIEN_BAT_DAU_DANG_KY": {
-                    "value": "giangVienBatDauDangKy",
+                "NLD_BAT_DAU_DANG_KY": {
+                    "value": "nldBatDauDangKy",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
                 },
-                "GIANG_VIEN_KET_THUC_DANG_KY": {
-                    "value": "giangVienKetThucDangKy",
+                "NLD_KET_THUC_DANG_KY": {
+                    "value": "nldKetThucDangKy",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -16744,6 +16765,53 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_BAO_HIEM_Y_TE": {
+            "active": true,
+            "moduleName": "svBaoHiemYTe",
+            "modelName": "svBaoHiemYTe",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_163099\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 12
+                },
+                "DIEN_DONG": {
+                    "value": "dienDong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 3
+                },
+                "THOI_GIAN": {
+                    "value": "thoiGian",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "USER_MODIFIED": {
+                    "value": "userModified",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
                 }
             },
             "primaryKeys": [

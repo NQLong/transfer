@@ -1,6 +1,6 @@
-// Table name: TCCB_DANH_GIA_NAM { id, nam, donViBatDauDangKy, donViKetThucDangKy, giangVienBatDauDangKy, giangVienKetThucDangKy }
+// Table name: TCCB_DANH_GIA_NAM { id, nam, donViBatDauDangKy, donViKetThucDangKy, nldBatDauDangKy, nldKetThucDangKy }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'donViBatDauDangKy': 'DON_VI_BAT_DAU_DANG_KY', 'donViKetThucDangKy': 'DON_VI_KET_THUC_DANG_KY', 'giangVienBatDauDangKy': 'GIANG_VIEN_BAT_DAU_DANG_KY', 'giangVienKetThucDangKy': 'GIANG_VIEN_KET_THUC_DANG_KY' };
+const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'donViBatDauDangKy': 'DON_VI_BAT_DAU_DANG_KY', 'donViKetThucDangKy': 'DON_VI_KET_THUC_DANG_KY', 'nldBatDauDangKy': 'NLD_BAT_DAU_DANG_KY', 'nldKetThucDangKy': 'NLD_KET_THUC_DANG_KY' };
 
 module.exports = app => {
     app.model.tccbDanhGiaNam = {
