@@ -101,7 +101,7 @@ module.exports = (app, appConfig) => {
         truyenThong: {
             index: 6000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
-            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
+            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp', 'SMS']
         },
         websiteDv: {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
