@@ -32,6 +32,10 @@ module.exports = app => {
         try {
             let { usernameViettel: user, passViettel: pass, brandName, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
             let { phone, mess } = body;
+            // console.log('usernameViettel', user);
+            // console.log('passViettel', pass);
+            // console.log('brandName', brandName);
+            // console.log('totalSMSViettel', currentTotal);
 
             let dataEncode = parseInt(app.sms.checkNonLatinChar(mess));
 
@@ -54,7 +58,7 @@ module.exports = app => {
                             console.error(e);
                             resolve({ error: e });
                         }
-                        console.log(resData);
+                        // console.log(resData);
                         if (resData.code == 1) {
                             try {
                                 const item = await app.model.fwSms.create({
