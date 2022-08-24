@@ -96,20 +96,22 @@ class UserPage extends AdminPage {
                 window.history.pushState('', '', '/user/hoc-phi');
             }
         }
-
         T.ready('/user/hoc-phi', () => {
-            this.props.getHocPhi();
-            this.props.getAllHocPhiStudent('', () => {
-                this.props.getSvBaoHiemYTe(item => {
-                    if (!item) {
-                        this.baoHiemModal.show();
-                        this.setState({ chuaDongBhyt: true });
-                    } else {
-                        this.setState({ chuaDongBhyt: false });
-                    }
+            let user = this.props.system.user;
+            if (user.isStudent && !user.ngayNhapHoc && user.data.namTuyenSinh == '2022') {
+                this.props.getHocPhi();
+                this.props.getAllHocPhiStudent('', () => {
+                    this.props.getSvBaoHiemYTe(item => {
+                        if (!item) {
+                            this.baoHiemModal.show();
+                            this.setState({ chuaDongBhyt: true });
+                        } else {
+                            this.setState({ chuaDongBhyt: false });
+                        }
+                    });
                 });
-            });
-            this.props.getTcHocPhiHuongDan();
+                this.props.getTcHocPhiHuongDan();
+            }
 
         });
     }
