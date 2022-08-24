@@ -54,7 +54,7 @@ module.exports = app => {
                             console.error(e);
                             resolve({ error: e });
                         }
-
+                        console.log(resData);
                         if (resData.code == 1) {
                             try {
                                 const item = await app.model.fwSms.create({
@@ -68,7 +68,7 @@ module.exports = app => {
                                     resolve({ success: true });
                                 } else resolve({ error: 'Create model SMS fail' });
                             } catch (error) {
-                                console.error('Request is successfull but callback has error: ', error);
+                                console.error('Request is successful but callback has error: ', error);
                                 resolve({ error: 'Create model SMS fail' });
                             }
                         } else resolve({ error: 'Unsuccessful request' });
