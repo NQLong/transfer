@@ -4,7 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
 import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent } from './redux';
-
+import { getSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
+import BaoHiemYTeModal from './BaoHiemYTeModal';
 class ButtonBank extends React.Component {
     render = () => {
         const { title, onClick, imgSrc } = this.props;
@@ -39,7 +40,7 @@ class ThanhToanModal extends AdminModal {
                         window.open('/sample/BIDV-2022.pdf', '_blank');
                     }} />
                     <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
-                    {/* <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} /> */}
+                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                 </section>
                 <section className='row' style={{ display: this.state.vcb ? '' : 'none', justifyContent: 'center' }}>
                     <ButtonBank title='Bằng tài khoản VCB' imgSrc='/img/logo/vcb.png' onClick={() => this.props.vnPayGoToTransaction('vnpay-vcb', link => {
@@ -95,11 +96,23 @@ class UserPage extends AdminPage {
                 window.history.pushState('', '', '/user/hoc-phi');
             }
         }
-
         T.ready('/user/hoc-phi', () => {
-            this.props.getHocPhi();
-            this.props.getAllHocPhiStudent();
-            this.props.getTcHocPhiHuongDan();
+            let user = this.props.system.user;
+            if (user.isStudent && !user.ngayNhapHoc && user.data.namTuyenSinh == '2022') {
+                this.props.getHocPhi();
+                this.props.getAllHocPhiStudent('', () => {
+                    this.props.getSvBaoHiemYTe(item => {
+                        if (!item) {
+                            this.baoHiemModal.show();
+                            this.setState({ chuaDongBhyt: true });
+                        } else {
+                            this.setState({ chuaDongBhyt: false });
+                        }
+                    });
+                });
+                this.props.getTcHocPhiHuongDan();
+            }
+
         });
     }
     renderTableHocPhi = (data) => {
@@ -131,7 +144,7 @@ class UserPage extends AdminPage {
         e.target.setAttribute('disabled', true);
         setTimeout(() => e.target.removeAttribute('disabled', false), 4000);
         T.notify('Hệ thống đang chuẩn bị để tải xuống hóa đơn');
-        T.download(`/api/finance/invoice/view/${id}`);
+        T.download(`/api/finance/invoice/paper/download/${id}`);
     }
 
     renderSection = (namHoc, hocPhiTrongNam) => {
@@ -152,11 +165,13 @@ class UserPage extends AdminPage {
                                         <i className='fa fa-lg fa-download' /> Chuyển thành hóa đơn giấy
                                     </button>
                                 }
-
+                                {
+                                    this.state.chuaDongBhyt ? <a href='#'>Chọn diện BHYT</a> : ''
+                                }
                                 {
                                     current.congNo ?
                                         (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
-                                            <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                            <button disabled={this.state.chuaDongBhyt} className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                                 Thanh toán
                                             </button>
                                         </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
@@ -203,6 +218,7 @@ class UserPage extends AdminPage {
                     dataTrongNam: hocPhiAll[namHoc],
                     dataDetailTrongNam: hocPhiDetailAll[namHoc]
                 }))}
+                <BaoHiemYTeModal ref={e => this.baoHiemModal = e} />
             </> : loadSpinner()
         });
     }
@@ -210,6 +226,6 @@ class UserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent, getSvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);

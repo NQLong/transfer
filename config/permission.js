@@ -321,6 +321,7 @@ module.exports = app => {
                             user.isStudent = 1;
                             user.active = 1;
                             user.data = student;
+                            user.ngayNhapHoc = student.ngayNhapHoc;
                             user.studentId = student.mssv;
                             user.lastName = student.ho;
                             user.firstName = student.ten;
