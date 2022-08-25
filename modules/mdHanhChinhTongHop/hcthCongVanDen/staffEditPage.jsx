@@ -174,7 +174,8 @@ class StaffEditPage extends AdminPage {
                 routeMatcherUrl: '/user/van-ban-den/:id',
                 readyUrl: '/user',
                 breadcrumb: [
-                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    // <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    <Link key={0} to='/user/van-phong-dien-tu'>...</Link>,
                     <Link key={1} to='/user/van-ban-den'>Danh sách văn bản đến</Link>,
                     this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],

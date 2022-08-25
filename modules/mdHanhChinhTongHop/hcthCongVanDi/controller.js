@@ -10,12 +10,12 @@ module.exports = app => {
         },
     };
 
-    const menu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1053: { title: 'Văn bản đi', link: '/user/van-ban-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1053: { title: 'Văn bản đi', link: '/user/van-ban-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
+    //     },
+    // };
     app.permission.add(
         { name: 'hcthCongVanDi:read' },
         { name: 'hcthCongVanDi:write' },
@@ -23,7 +23,7 @@ module.exports = app => {
         { name: 'hcthCongVanDi:manage' },
         { name: 'donViCongVanDi:manage' },
         { name: 'hcth:login', menu: staffMenu },
-        { name: 'staff:login', menu },
+        // { name: 'staff:login', menu },
         { name: 'hcth:manage' }
     );
 
@@ -399,7 +399,7 @@ module.exports = app => {
                     originalFilename = files.hcthCongVanDiUpdateFile[0].originalFilename,
                     filePath = `/${id}/${generatedFileName}`,
                     destPath = app.assetPath + '/congVanDi' + filePath,
-                    validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                    validUploadFileType = ['.doc', '.docx', '.pdf', '.png', '.jpg'],
                     baseNamePath = app.path.extname(srcPath);
 
                 const originFileId = userDataArr[2];

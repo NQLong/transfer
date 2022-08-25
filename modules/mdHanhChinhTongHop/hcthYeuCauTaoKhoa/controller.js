@@ -9,16 +9,16 @@ module.exports = app => {
         },
     };
 
-    const menu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1057: { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1057: { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
+    //     },
+    // };
 
     app.permission.add({ name: 'hcthYeuCauTaoKhoa:read', menu: staffMenu }, 'hcthYeuCauTaoKhoa:write', 'hcthYeuCauTaoKhoa:delete');
-    app.permission.add({ name: 'manager:write', menu: menu });
-    app.permission.add({ name: 'rectors:login', menu: menu });
+    // app.permission.add({ name: 'manager:write', menu: menu });
+    // app.permission.add({ name: 'rectors:login', menu: menu });
     app.get('/user/hcth/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
     app.get('/user/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
 
