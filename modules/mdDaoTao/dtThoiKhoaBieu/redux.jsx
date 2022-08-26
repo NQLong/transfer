@@ -4,9 +4,27 @@ import T from 'view/js/common';
 const DtThoiKhoaBieuGetAll = 'DtThoiKhoaBieu:GetAll';
 const DtThoiKhoaBieuGetPage = 'DtThoiKhoaBieu:GetPage';
 const DtThoiKhoaBieuUpdate = 'DtThoiKhoaBieu:Update';
+const DtThoiKhoaBieuConfig = 'DtThoiKhoaBieu:Config';
+const DtThoiKhoaBieuConfigUpdate = 'DtThoiKhoaBieu:ConfigUpdate';
 
 export default function dtThoiKhoaBieuReducer(state = null, data) {
     switch (data.type) {
+        case DtThoiKhoaBieuConfigUpdate:
+            if (state && state.items && state.items.dataCanGen) {
+                let currentState = state;
+                console.log(data.data.currentData);
+                currentState.items.dataCanGen.forEach(item => {
+                    if (item.id == data.data.currentId) {
+                        item = { ...item, ...data.data.currentData };
+                    }
+                });
+                console.log(currentState);
+                return currentState;
+            } else {
+                return null;
+            }
+        case DtThoiKhoaBieuConfig:
+            return Object.assign({}, state, { items: data.items });
         case DtThoiKhoaBieuGetAll:
             return Object.assign({}, state, { items: data.items });
         case DtThoiKhoaBieuGetPage:
@@ -188,7 +206,7 @@ export function changeDtThoiKhoaBieu(item) {
 
 export function getDtLichDayHoc(phong, done) {
     return () => {
-        T.get('/api/dao-tao/get-schedule/', { phong }, data => {
+        T.get('/api/dao-tao/get-schedule', { phong }, data => {
             if (data.error) {
                 T.notify(`Lỗi: ${data.error.message}`, 'danger');
                 console.error(data.error.message);
@@ -196,5 +214,27 @@ export function getDtLichDayHoc(phong, done) {
                 done && done(data);
             }
         });
+    };
+}
+
+export function getDtThoiKhoaBieuByConfig(config, done) {
+    return dispatch => {
+        T.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', { config }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+                console.error(result.error.message);
+                done && done(result);
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfig, items: result });
+                done && done(result);
+            }
+        });
+    };
+}
+
+export function updateDtThoiKhoaBieuConfig(data, done) {
+    return dispatch => {
+        dispatch({ type: DtThoiKhoaBieuConfigUpdate, data });
+        done && done();
     };
 }

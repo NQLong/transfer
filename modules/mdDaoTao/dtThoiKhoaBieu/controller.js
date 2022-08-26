@@ -24,6 +24,7 @@ module.exports = app => {
     }));
 
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
+    app.get('/user/dao-tao/thoi-khoa-bieu/auto-generate', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
@@ -381,6 +382,22 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            console.log(req.body.config);
+
+            const { config } = req.body,
+                dataFree = await app.model.dtThoiKhoaBieu.getFree(JSON.stringify(config));
+            let { rows: dataCanGen, hocphandaxep: dataCurrent } = dataFree;
+
+            res.send({ dataCanGen, dataCurrent });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+
+    });
     // Export xlsx
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {
