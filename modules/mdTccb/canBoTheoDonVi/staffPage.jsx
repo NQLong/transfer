@@ -118,8 +118,8 @@ class CanBoTheoDonVi extends AdminPage {
         let nhomRoles = ['ttDoanhNghiep'];
         ctsvNhapHocPermissions.write && nhomRoles.push('ctsvNhapHoc');
         congVanPermission.manage && nhomRoles.push('quanLyCongVanDen', 'hcthQuanLyCongVanDi');
-        managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong', 'soanThaoCongVanDi', 'tccbDonViDangKyNhiemVu');
-        managerPermission.login && nhomRoles.push('quanLyDonVi');
+        managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong', 'soanThaoCongVanDi');
+        managerPermission.login && nhomRoles.push('quanLyDonVi', 'tccbDonViDangKyNhiemVu');
         quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
         daoTaoPermission && nhomRoles.push('daoTao');
 
