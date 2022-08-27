@@ -43,7 +43,7 @@ class HcthHoSo extends AdminPage {
     state = { filter: {} };
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
+        T.ready('/user', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -84,7 +84,7 @@ class HcthHoSo extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue', fontWeight: 'bold' }} content={`${item.hoNguoiTao} ${item.tenNguoiTao}`.trim().normalizedName()} />
-                        <TableCell type='link' contentClassName='multiple-lines' contentStyle={{ width: '100%', minWidth: '300px' }} content={item.tieuDe || 'Chưa có tiêu đề'} url={`/user/hcth/ho-so/${item.id}`} />
+                        <TableCell type='link' contentClassName='multiple-lines' contentStyle={{ width: '100%', minWidth: '300px' }} content={item.tieuDe || 'Chưa có tiêu đề'} url={`/user/ho-so/${item.id}`} />
                         <TableCell type='buttons' content='' />
                     </tr>
                 );
@@ -94,6 +94,7 @@ class HcthHoSo extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-file-text',
             title: 'Hồ sơ',
+            stickyHead: true,
             content: <>
                 <div className="tile">
                     {table}
@@ -102,7 +103,7 @@ class HcthHoSo extends AdminPage {
                     getPage={this.getPage} />,
                 <CreateModal ref={e => this.createModal = e} create={this.props.createHoSo} getPage={this.getPage} {...{ pageNumber, pageSize }} />
             </>,
-            backRoute: '/user/hcth',
+            backRoute: '/user',
             onCreate: (e) => {
                 e.preventDefault();
                 this.createModal.show(null);
