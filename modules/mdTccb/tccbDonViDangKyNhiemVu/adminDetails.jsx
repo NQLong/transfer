@@ -121,7 +121,6 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
         const permission = this.getUserPermission('tccbDonViDangKyNhiemVu');
         const list = this.state?.items || [];
         const danhGiaNam = this.state?.danhGiaNam || null;
-        console.log(list);
         let table = renderTable({
             emptyTable: 'Không có dữ liệu đăng ký',
             getDataSource: () => list,
