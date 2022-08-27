@@ -6,7 +6,7 @@ module.exports = app => {
         }
     };
     app.permission.add(
-        { name: 'tccbDanhGiaNam:mage', menu },
+        { name: 'tccbDanhGiaNam:manage', menu },
         { name: 'tccbDanhGiaNam:write' },
         { name: 'tccbDanhGiaNam:delete' },
     );
