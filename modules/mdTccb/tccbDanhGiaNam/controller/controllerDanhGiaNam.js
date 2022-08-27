@@ -6,35 +6,35 @@ module.exports = app => {
         }
     };
     app.permission.add(
-        { name: 'tccbDanhGiaNam:read', menu },
+        { name: 'tccbDanhGiaNam:mage', menu },
         { name: 'tccbDanhGiaNam:write' },
         { name: 'tccbDanhGiaNam:delete' },
     );
 
     app.permissionHooks.add('staff', 'addRoleDanhGiaNam', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '30') {
-            app.permissionHooks.pushUserPermission(user, 'tccbDanhGiaNam:read', 'tccbDanhGiaNam:write', 'tccbDanhGiaNam:delete');
+            app.permissionHooks.pushUserPermission(user, 'tccbDanhGiaNam:manage', 'tccbDanhGiaNam:write', 'tccbDanhGiaNam:delete');
             resolve();
         } else resolve();
     }));
 
-    app.get('/user/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:read'), app.templates.admin);
-    app.get('/user/tccb/danh-gia/:nam', app.permission.check('tccbDanhGiaNam:read'), app.templates.admin);
+    app.get('/user/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:manage'), app.templates.admin);
+    app.get('/user/tccb/danh-gia/:nam', app.permission.check('tccbDanhGiaNam:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/danh-gia/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/danh-gia/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = req.query.condition || {};
         app.model.tccbDanhGiaNam.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/tccb/danh-gia/all', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/danh-gia/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.tccbDanhGiaNam.getAll(condition, '*', 'id', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/danh-gia/item/:id', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/danh-gia/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         app.model.tccbDanhGiaNam.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 

@@ -1,18 +1,18 @@
 module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    // app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    // app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
     //     const pageNumber = parseInt(req.params.pageNumber),
     //         pageSize = parseInt(req.params.pageSize),
     //         condition = req.query.condition ? req.query.condition : {};
     //     app.model.tccbKhungDanhGiaDonVi.getPage(pageNumber, pageSize, condition, '*', 'THU_TU ASC', (error, page) => res.send({ error, page }));
     // });
 
-    app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/all', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.tccbKhungDanhGiaDonVi.getAll(condition, '*', 'THU_TU ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/item/:id', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         app.model.tccbKhungDanhGiaDonVi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 

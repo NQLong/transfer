@@ -1,18 +1,18 @@
 module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    // app.get('/api/tccb/diem-tru/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    // app.get('/api/tccb/diem-tru/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
     //     const pageNumber = parseInt(req.params.pageNumber),
     //         pageSize = parseInt(req.params.pageSize),
     //         condition = req.query.condition || {};
     //     app.model.tccbDiemTru.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     // });
 
-    app.get('/api/tccb/diem-tru/all', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/diem-tru/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.tccbDiemTru.getAll(condition, '*', 'id', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/diem-tru/item/:id', app.permission.check('tccbDanhGiaNam:read'), (req, res) => {
+    app.get('/api/tccb/diem-tru/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         app.model.tccbDiemTru.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 

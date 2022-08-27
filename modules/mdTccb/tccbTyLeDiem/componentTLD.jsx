@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getTccbTyLeDiemAll, createTccbTyLeDiem, updateTccbTyLeDiem, deleteTccbTyLeDiem } from './redux';
 import { getDmChucVuAll, SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
-import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, FormSelect } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, FormSelect, getValue } from 'view/component/AdminPage';
 import T from 'view/js/common';
 
 class EditModal extends AdminModal {
@@ -25,33 +25,16 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         let maChucVu = this.maChucVu.value().join(',');
         const changes = {
-            nhom: this.nhom.value(),
+            nhom: getValue(this.nhom),
             maChucVu,
-            kcm: this.kcm.value(),
-            kld: this.kld.value(),
-            donViDanhGia: this.donViDanhGia.value(),
+            kcm: getValue(this.kcm),
+            kld: getValue(this.kld),
+            donViDanhGia: getValue(this.donViDanhGia),
         };
-        if (changes.nhom == '') {
-            T.notify('Vui lòng điền nhóm', 'danger');
-            this.nhom.focus();
-        } else if (changes.maChucVu === undefined) {
-            T.notify('Vui lòng chọn mã chức vụ', 'danger');
-            this.maChucVu.focus();
-        } else if (changes.kcm == '') {
-            T.notify('Vui lòng điền Kcm', 'danger');
-            this.kcm.focus();
-        } else if (changes.kld == '') {
-            T.notify('Vui lòng điền kld', 'danger');
-            this.kld.focus();
-        } else if (changes.donViDanhGia == '') {
-            T.notify('Vui lòng điền đơn vị đánh giá', 'danger');
-            this.kld.focus();
+        if (!this.state.item) {
+            this.props.create({ ...changes, nam: this.props.nam }, () => this.hide());
         } else {
-            if (!this.state.item) {
-                this.props.create({ ...changes, nam: this.props.nam }, () => this.hide());
-            } else {
-                this.props.update(this.state.item.id, changes, () => this.hide());
-            }
+            this.props.update(this.state.item.id, changes, () => this.hide());
         }
         e.preventDefault();
     };
@@ -64,9 +47,9 @@ class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-md-12' ref={e => this.nhom = e} label='Nhóm'
                     readOnly={readOnly} required />
                 <FormSelect ref={e => this.maChucVu = e} label='Cán bộ lãnh đạo' multiple={true} className='col-md-12' data={SelectAdapter_DmChucVuV2} readOnly={readOnly} />
-                <FormTextBox type='number' min='0' step='0.01' className='col-md-12' ref={e => this.kcm = e} label='Kcm'
+                <FormTextBox type='number' min={0} step={true} className='col-md-12' ref={e => this.kcm = e} label='Kcm'
                     readOnly={readOnly} required />
-                <FormTextBox type='number' min='0' step='0.01' className='col-md-12' ref={e => this.kld = e} label='Klđ'
+                <FormTextBox type='number' min={0} step={true} className='col-md-12' ref={e => this.kld = e} label='Klđ'
                     readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.donViDanhGia = e} label='Đơn vị đánh giá'
                     readOnly={readOnly} required />

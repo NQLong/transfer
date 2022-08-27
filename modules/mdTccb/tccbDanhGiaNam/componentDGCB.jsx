@@ -57,9 +57,9 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.item ? 'Cập nhật' : 'Tạo mới',
             body: <div className='row'>
-                <FormTextBox type='number' min='0' className='col-md-12' ref={e => this.tu = e} label='Từ'
+                <FormTextBox type='number' min={0} className='col-md-12' ref={e => this.tu = e} label='Từ'
                     readOnly={readOnly} required />
-                <FormTextBox type='number' min='0' className='col-md-12' ref={e => this.den = e} label='Đến'
+                <FormTextBox type='number' min={0} className='col-md-12' ref={e => this.den = e} label='Đến'
                     readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.mucDanhGia = e} label='Mức đánh giá'
                     readOnly={readOnly} required />

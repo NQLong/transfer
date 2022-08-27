@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTccbDiemTruAll, createTccbDiemTru, updateTccbDiemTru, deleteTccbDiemTru } from './redux';
-import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, getValue } from 'view/component/AdminPage';
 import T from 'view/js/common';
 
 class EditModal extends AdminModal {
@@ -20,21 +20,13 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         const changes = {
-            noiDung: this.noiDung.value(),
-            diemQuyDinh: this.diemQuyDinh.value(),
+            noiDung: getValue(this.noiDung),
+            diemQuyDinh: getValue(this.diemQuyDinh),
         };
-        if (changes.noiDung == '') {
-            T.notify('Vui lòng điền nội dung', 'danger');
-            this.noiDung.focus();
-        } else if (changes.diemQuyDinh === undefined) {
-            T.notify('Vui lòng điền điểm quy định', 'danger');
-            this.diemQuyDinh.focus();
+        if (!this.state.item) {
+            this.props.create({ ...changes, nam: this.props.nam }, () => this.hide());
         } else {
-            if (!this.state.item) {
-                this.props.create({ ...changes, nam: this.props.nam }, () => this.hide());
-            } else {
-                this.props.update(this.state.item.id, changes, () => this.hide());
-            }
+            this.props.update(this.state.item.id, changes, () => this.hide());
         }
         e.preventDefault();
     };
@@ -46,7 +38,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung'
                     readOnly={readOnly} required />
-                <FormTextBox type='number' min='0' className='col-md-12' ref={e => this.diemQuyDinh = e} label='Điểm quy định'
+                <FormTextBox type='number' min={0} className='col-md-12' ref={e => this.diemQuyDinh = e} label='Điểm quy định'
                     readOnly={readOnly} required />
             </div>
         });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTccbKhungDanhGiaDonViAll, deleteTccbKhungDanhGiaDonVi, createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonViThuTu } from './reduxKhungDanhGiaDonVi';
-import { AdminModal, FormTextBox, AdminPage } from 'view/component/AdminPage';
+import { AdminModal, FormTextBox, AdminPage, getValue } from 'view/component/AdminPage';
 import { Tooltip } from '@mui/material';
 
 class EditModal extends AdminModal {
@@ -26,23 +26,18 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         const changes = {
-            noiDung: this.noiDung.value(),
+            noiDung: getValue(this.noiDung),
         };
-        if (changes.noiDung == '') {
-            T.notify('Nội dung bị trống', 'danger');
-            this.noiDung.focus();
-        } else {
-            if (!this.state.item)
-                this.props.create({
-                    ...changes,
-                    nam: this.props.nam,
-                    parentId: this.state.parentId || null,
-                    thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
-                }, () => this.hide());
-            else this.props.update(this.state.item.id, changes, () => this.hide());
-            this.setState({ item: null });
-            this.noiDung.value('');
-        }
+        if (!this.state.item)
+            this.props.create({
+                ...changes,
+                nam: this.props.nam,
+                parentId: this.state.parentId || null,
+                thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
+            }, () => this.hide());
+        else this.props.update(this.state.item.id, changes, () => this.hide());
+        this.setState({ item: null });
+        this.noiDung.value('');
         e.preventDefault();
     };
 
