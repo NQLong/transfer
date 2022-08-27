@@ -2,15 +2,12 @@ import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TccbKhungDanhGiaDonViGetAll = 'TccbKhungDanhGiaDonVi:GetAll';
-const TccbKhungDanhGiaDonViGetPage = 'TccbKhungDanhGiaDonVi:GetPage';
 const TccbKhungDanhGiaDonViUpdate = 'TccbKhungDanhGiaDonVi:Update';
 
 export default function TccbKhungDanhGiaDonViReducer(state = null, data) {
     switch (data.type) {
         case TccbKhungDanhGiaDonViGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TccbKhungDanhGiaDonViGetPage:
-            return Object.assign({}, state, { page: data.page });
         case TccbKhungDanhGiaDonViUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -61,23 +58,6 @@ export function getTccbKhungDanhGiaDonViAll(condition, done) {
     };
 }
 
-T.initPage('pageTccbKhungDanhGiaDonVi');
-export function getTccbKhungDanhGiaDonViPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTccbKhungDanhGiaDonVi', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
-                console.error(`GET ${url}. ${data.error}`);
-            } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
-                dispatch({ type: TccbKhungDanhGiaDonViGetPage, page: data.page });
-            }
-        });
-    };
-}
-
 export function getTccbKhungDanhGiaDonVi(id, done) {
     return () => {
         const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/item/${id}`;
@@ -102,7 +82,7 @@ export function createTccbKhungDanhGiaDonVi(item, done) {
             } else {
                 T.notify('Tạo cấu trúc khung đánh giá đơn vi thành công!', 'success');
                 data.warning && T.notify(data.warning.message, 'warning');
-                dispatch(getTccbKhungDanhGiaDonViPage());
+                dispatch(getTccbKhungDanhGiaDonViAll());
                 if (done) done(data.item);
             }
         });
@@ -118,7 +98,7 @@ export function deleteTccbKhungDanhGiaDonVi(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Cấu trúc khung đánh giá đơn vi đã xóa thành công!', 'success', false, 800);
-                dispatch(getTccbKhungDanhGiaDonViPage());
+                dispatch(getTccbKhungDanhGiaDonViAll());
                 done && done();
             }
         }, () => T.notify('Xóa cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger'));
@@ -134,7 +114,7 @@ export function updateTccbKhungDanhGiaDonVi(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật thông tin cấu trúc khung đánh giá đơn vi thành công!', 'success');
-                dispatch(getTccbKhungDanhGiaDonViPage());
+                dispatch(getTccbKhungDanhGiaDonViAll());
                 done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger'));
@@ -150,7 +130,7 @@ export function updateTccbKhungDanhGiaDonViThuTu(changes, done) {
                 console.error(`PUT: ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật menu thành công!', 'success');
-                dispatch(getTccbKhungDanhGiaDonViPage());
+                dispatch(getTccbKhungDanhGiaDonViAll());
                 done && done();
             }
         }, () => T.notify('Thay đổi vị trí bị lỗi!', 'danger'));

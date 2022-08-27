@@ -2,15 +2,12 @@ import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TccbTyLeDiemGetAll = 'TccbTyLeDiem:GetAll';
-const TccbTyLeDiemGetPage = 'TccbTyLeDiem:GetPage';
 const TccbTyLeDiemUpdate = 'TccbTyLeDiem:Update';
 
 export default function TccbTyLeDiemReducer(state = null, data) {
     switch (data.type) {
         case TccbTyLeDiemGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TccbTyLeDiemGetPage:
-            return Object.assign({}, state, { page: data.page });
         case TccbTyLeDiemUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -61,23 +58,6 @@ export function getTccbTyLeDiemAll(condition, done) {
     };
 }
 
-T.initPage('pageTccbTyLeDiem');
-export function getTccbTyLeDiemPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTccbTyLeDiem', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/tccb/ty-le-diem/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách tỷ lệ điểm bị lỗi!', 'danger');
-                console.error(`GET ${url}. ${data.error}`);
-            } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
-                dispatch({ type: TccbTyLeDiemGetPage, page: data.page });
-            }
-        });
-    };
-}
-
 export function getTccbTyLeDiem(id, done) {
     return () => {
         const url = `/api/tccb/ty-le-diem/item/${id}`;
@@ -102,7 +82,7 @@ export function createTccbTyLeDiem(item, done) {
             } else {
                 T.notify('Tạo mới tỷ lệ điểm thành công!', 'success');
                 data.warning && T.notify(data.warning.message, 'warning');
-                dispatch(getTccbTyLeDiemPage());
+                dispatch(getTccbTyLeDiemAll());
                 if (done) done(data.item);
             }
         });
@@ -118,7 +98,7 @@ export function deleteTccbTyLeDiem(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xoá tỷ lệ điểm thành công!', 'success', false, 800);
-                dispatch(getTccbTyLeDiemPage());
+                dispatch(getTccbTyLeDiemAll());
                 done && done();
             }
         }, () => T.notify('Xóa tỷ lệ điểm bị lỗi!', 'danger'));
@@ -134,7 +114,7 @@ export function updateTccbTyLeDiem(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật tỷ lệ điểm thành công!', 'success');
-                dispatch(getTccbTyLeDiemPage());
+                dispatch(getTccbTyLeDiemAll());
                 done && done(data.item);
             }
         }, () => T.notify('Cập nhật tỷ lệ điểm bị lỗi!', 'danger'));

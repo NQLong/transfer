@@ -2,15 +2,12 @@ import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TccbDiemThuongGetAll = 'TccbDiemThuong:GetAll';
-const TccbDiemThuongGetPage = 'TccbDiemThuong:GetPage';
 const TccbDiemThuongUpdate = 'TccbDiemThuong:Update';
 
 export default function TccbDiemThuongReducer(state = null, data) {
     switch (data.type) {
         case TccbDiemThuongGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TccbDiemThuongGetPage:
-            return Object.assign({}, state, { page: data.page });
         case TccbDiemThuongUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -61,23 +58,6 @@ export function getTccbDiemThuongAll(condition, done) {
     };
 }
 
-T.initPage('pageTccbDiemThuong');
-export function getTccbDiemThuongPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTccbDiemThuong', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/tccb/diem-thuong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách điểm thưởng bị lỗi!', 'danger');
-                console.error(`GET ${url}. ${data.error}`);
-            } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
-                dispatch({ type: TccbDiemThuongGetPage, page: data.page });
-            }
-        });
-    };
-}
-
 export function getTccbDiemThuong(id, done) {
     return () => {
         const url = `/api/tccb/diem-thuong/item/${id}`;
@@ -102,7 +82,7 @@ export function createTccbDiemThuong(item, done) {
             } else {
                 T.notify('Tạo mới điểm thưởng thành công!', 'success');
                 data.warning && T.notify(data.warning.message, 'warning');
-                dispatch(getTccbDiemThuongPage());
+                dispatch(getTccbDiemThuongAll());
                 if (done) done(data.item);
             }
         });
@@ -118,7 +98,7 @@ export function deleteTccbDiemThuong(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xoá điểm thưởng thành công!', 'success', false, 800);
-                dispatch(getTccbDiemThuongPage());
+                dispatch(getTccbDiemThuongAll());
                 done && done();
             }
         }, () => T.notify('Xóa điểm thưởng bị lỗi!', 'danger'));
@@ -134,7 +114,7 @@ export function updateTccbDiemThuong(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật điểm thưởng thành công!', 'success');
-                dispatch(getTccbDiemThuongPage());
+                dispatch(getTccbDiemThuongAll());
                 done && done(data.item);
             }
         }, () => T.notify('Cập nhật điểm thưởng bị lỗi!', 'danger'));
