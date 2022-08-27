@@ -59,138 +59,81 @@ module.exports = app => {
                 app.model.tccbTyLeDiem.delete({ nam }),
                 app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
             ]);
+            res.send({});
         } catch (error) {
             res.send({ error });
         }
     });
 
     app.post('/api/tccb/danh-gia/clone', app.permission.check('tccbDanhGiaNam:write'), async (req, res) => {
-        const id = req.body.id,
-            newItem = req.body.newItem;
-
-        const cloneTyLeDiem = (index, list, oldNam) => {
-            if (index == list.length) {
-                app.model.tccbDanhGiaNam.create(newItem, (error, item) => {
-                    res.send({ error, item });
-                });
-            } else {
-                app.model.tccbTyLeDiem.create({ ...list[index] }, () => {
-                    cloneTyLeDiem(index + 1, list, oldNam);
-                });
-            }
-        };
-
-        const cloneDiemTru = (index, list, oldNam) => {
-            if (index == list.length) {
-                app.model.tccbTyLeDiem.getAll({ nam: oldNam }, (error, itemsTyLeDiem) => {
-                    itemsTyLeDiem = itemsTyLeDiem.map(item => {
-                        delete item.id;
-                        delete item.nam;
-                        return {
-                            nam: Number(newItem.nam),
-                            ...item,
-                        };
-                    });
-                    cloneTyLeDiem(0, itemsTyLeDiem, oldNam);
-                });
-            } else {
-                app.model.tccbDiemTru.create({ ...list[index] }, () => {
-                    cloneDiemTru(index + 1, list, oldNam);
-                });
-            }
-        };
-
-        const cloneDiemThuong = (index, list, oldNam) => {
-            if (index == list.length) {
-                app.model.tccbDiemTru.getAll({ nam: oldNam }, (error, itemsDiemTru) => {
-                    itemsDiemTru = itemsDiemTru.map(item => {
-                        delete item.id;
-                        delete item.nam;
-                        return {
-                            nam: Number(newItem.nam),
-                            ...item,
-                        };
-                    });
-                    cloneDiemTru(0, itemsDiemTru, oldNam);
-                });
-            } else {
-                app.model.tccbDiemThuong.create({ ...list[index] }, () => {
-                    cloneDiemThuong(index + 1, list, oldNam);
-                });
-            }
-        };
-
-        const cloneKhungDanhGiaDonViCon = (indexCha, index, submenus, list, oldNam) => {
-            if (index == submenus.length) {
-                cloneKhungDanhGiaDonViCha(indexCha + 1, list, oldNam);
-            } else {
-                app.model.tccbKhungDanhGiaDonVi.create({ ...submenus[index] }, () => {
-                    cloneKhungDanhGiaDonViCon(indexCha, index + 1, submenus, list, oldNam);
-                });
-            }
-        };
-
-        const cloneKhungDanhGiaDonViCha = (index, list, oldNam) => {
-            if (index == list.length) {
-                app.model.tccbDiemThuong.getAll({ nam: oldNam }, (error, itemsDiemThuong) => {
-                    itemsDiemThuong = itemsDiemThuong.map(item => {
-                        delete item.id;
-                        delete item.nam;
-                        return {
-                            nam: Number(newItem.nam),
-                            ...item,
-                        };
-                    });
-                    cloneDiemThuong(0, itemsDiemThuong, oldNam);
-                });
-            } else {
-                delete list[index].id;
-                let submenus = list[index].submenus;
-                delete list[index].submenus;
-                app.model.tccbKhungDanhGiaDonVi.create({ ...list[index] }, (error, newItem) => {
-                    submenus = submenus.map(item => {
-                        delete item.id;
-                        delete item.parentId;
-                        return { ...item, parentId: newItem.id };
-                    });
-                    cloneKhungDanhGiaDonViCon(index, 0, submenus, list, oldNam);
-                });
-            }
-        };
-
-        const cloneKhungDanhGiaCanBo = (index, list, oldNam) => {
-            if (index == list.length) {
-                app.model.tccbKhungDanhGiaDonVi.getAll({ nam: oldNam }, (error, itemsDonVi) => {
-                    const cloneDonVi = itemsDonVi.map(donVi => {
-                        delete donVi.nam;
-                        return { ...donVi, nam: Number(newItem.nam) };
-                    });
-                    let parentItems = cloneDonVi.filter(item => !item.parentId);
-                    parentItems = parentItems.map(parent => ({ ...parent, submenus: cloneDonVi.filter(item => item.parentId == parent.id) }));
-                    cloneKhungDanhGiaDonViCha(0, parentItems, oldNam);
-                });
-            } else {
-                app.model.tccbKhungDanhGiaCanBo.create({ ...list[index] }, () => {
-                    cloneKhungDanhGiaCanBo(index + 1, list, oldNam);
-                });
-            }
-        };
-
-        app.model.tccbDanhGiaNam.get({ nam: Number(newItem.nam) }, (error, item) => {
+        try {
+            const id = req.body.id, newItem = req.body.newItem;
+            let item = await app.model.tccbDanhGiaNam.get({ nam: Number(newItem.nam) });
             if (item) {
-                res.send({ error: 'Năm đánh giá đã tồn tại' });
-            } else {
-                app.model.tccbDanhGiaNam.get({ id }, (error, item) => {
-                    app.model.tccbKhungDanhGiaCanBo.getAll({ nam: item.nam }, (error, itemsCanBo) => {
-                        const cloneCanBo = itemsCanBo.map(canBo => {
-                            delete canBo.id;
-                            delete canBo.nam;
-                            return { ...canBo, nam: Number(newItem.nam) };
-                        });
-                        cloneKhungDanhGiaCanBo(0, cloneCanBo, item.nam);
-                    });
-                });
+                throw 'Năm đánh giá đã tồn tại';
             }
-        });
+            item = await app.model.tccbDanhGiaNam.get({ id });
+            const nam = item.nam;
+            let [itemsCanBo, itemsDonVi, itemsDiemThuong, itemsDiemTru, itemsTyLeDiem] = await Promise.all([
+                app.model.tccbKhungDanhGiaCanBo.getAll({ nam }),
+                app.model.tccbKhungDanhGiaDonVi.getAll({ nam }),
+                app.model.tccbDiemThuong.getAll({ nam }),
+                app.model.tccbDiemTru.getAll({ nam }),
+                app.model.tccbTyLeDiem.getAll({ nam }),
+            ]);
+            itemsCanBo = itemsCanBo.map(canBo => {
+                delete canBo.id;
+                delete canBo.nam;
+                return { ...canBo, nam: Number(newItem.nam) };
+            });
+            itemsDiemThuong = itemsDiemThuong.map(item => {
+                delete item.id;
+                delete item.nam;
+                return { nam: Number(newItem.nam), ...item };
+            });
+            itemsDiemTru = itemsDiemTru.map(item => {
+                delete item.id;
+                delete item.nam;
+                return { nam: Number(newItem.nam), ...item };
+            });
+            itemsTyLeDiem = itemsTyLeDiem.map(item => {
+                delete item.id;
+                delete item.nam;
+                return { nam: Number(newItem.nam), ...item };
+            });
+
+            itemsDonVi = itemsDonVi.map(donVi => {
+                delete donVi.nam;
+                return { ...donVi, nam: Number(newItem.nam) };
+            });
+            const parentItems = itemsDonVi.filter(item => !item.parentId);
+            const sortChildItems = parentItems.map(parent => ({ ...parent, submenus: itemsDonVi.filter(item => item.parentId == parent.id) }));
+            const listNewParent = await Promise.all(parentItems.map(parentItem => {
+                delete parentItem.id;
+                delete parentItem.submenus;
+                return app.model.tccbKhungDanhGiaDonVi.create(parentItem);
+            }));
+            let listNewChild = sortChildItems.map((parentItem, index) =>
+                parentItem.submenus.map(submenu => {
+                    delete submenu.id;
+                    delete submenu.parentId;
+                    return { ...submenu, parentId: listNewParent[index].id };
+                })
+            );
+            listNewChild = listNewChild.reduce((prev, cur) => prev.concat(cur));
+
+            let listPromise = [
+                itemsCanBo.map(item => app.model.tccbKhungDanhGiaCanBo.create(item)),
+                itemsDiemThuong.map(item => app.model.tccbDiemThuong.create(item)),
+                itemsDiemTru.map(item => app.model.tccbDiemTru.create(item)),
+                itemsTyLeDiem.map(item => app.model.tccbTyLeDiem.create(item)),
+                listNewChild.map(item => app.model.tccbKhungDanhGiaDonVi.create(item)),
+            ];
+            await Promise.all(listPromise.reduce((prev, cur) => prev.concat(cur)));
+            item = await app.model.tccbDanhGiaNam.create(newItem);
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 };
