@@ -10,8 +10,8 @@ class HcthHoSoEdit extends AdminPage {
     state = { id: null, isLoading: true };
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
-            const params = T.routeMatcher('/user/hcth/ho-so/:id').parse(window.location.pathname);
+        T.ready('/user', () => {
+            const params = T.routeMatcher('/user/ho-so/:id').parse(window.location.pathname);
             this.setState({
                 id: params.id === 'new' ? null : params.id,
             }, () => this.getData());
@@ -54,7 +54,7 @@ class HcthHoSoEdit extends AdminPage {
         renderRow: (item, index) => {
             return <tr key={item.id}>
                 <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                <TableCell type='link' contentClassName='multiple-lines' content={`Văn bản đi: ${item.keyB}`} url={`/user/hcth/van-ban-di/${item.keyB}`} />
+                <TableCell type='link' contentClassName='multiple-lines' content={`Văn bản đi: ${item.keyB}`} url={`/user/van-ban-di/${item.keyB}`} />
                 <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayTaoDi, 'dd/mm/yyyy')} />
                 <TableCell contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.trichYeuDi} />
                 <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ delete: true }} onDelete={e => this.deleteVanBan(e, item)} />
@@ -98,7 +98,7 @@ class HcthHoSoEdit extends AdminPage {
             icon: 'fa fa-file-text',
             title: `Hồ sơ ${this.state.id}`,
             content: this.state.isLoading ? loadSpinner() : this.renderContent(),
-            backRoute: '/user/hcth/ho-so'
+            backRoute: '/user/ho-so'
         });
     }
 }

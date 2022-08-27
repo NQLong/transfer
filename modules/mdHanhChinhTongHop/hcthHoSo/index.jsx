@@ -10,11 +10,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/hcth/ho-so',
+            path: '/user/ho-so',
             component: Loadable({ loading: Loading, loader: () => import('./userPage') })
         },
         {
-            path: '/user/hcth/ho-so/:id',
+            path: '/user/ho-so/:id',
             component: Loadable({ loading: Loading, loader: () => import('./userEditPage') })
         }
     ]
