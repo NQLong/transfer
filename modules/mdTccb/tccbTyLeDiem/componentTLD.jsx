@@ -27,8 +27,8 @@ class EditModal extends AdminModal {
         const changes = {
             nhom: getValue(this.nhom),
             maChucVu,
-            kcm: getValue(this.kcm),
-            kld: getValue(this.kld),
+            kcm: Number(getValue(this.kcm)).toFixed(2),
+            kld: Number(getValue(this.kld)).toFixed(2),
             donViDanhGia: getValue(this.donViDanhGia),
         };
         if (!this.state.item) {
