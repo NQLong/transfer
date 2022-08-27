@@ -1,9 +1,4 @@
 module.exports = app => {
-    app.permission.add(
-        { name: 'tccbKhungDanhGiaCanBo:read' },
-        { name: 'tccbKhungDanhGiaCanBo:write' },
-        { name: 'tccbKhungDanhGiaCanBo:delete' }
-    );
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo/page/:pageNumber/:pageSize', app.permission.check('user:login'), async (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -21,22 +16,22 @@ module.exports = app => {
         app.model.tccbKhungDanhGiaCanBo.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo', app.permission.check('tccbKhungDanhGiaCanBo:write'), (req, res) => {
+    app.post('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo', app.permission.check('tccbDanhGiaNam:write'), (req, res) => {
         const newItem = req.body.item;
         app.model.tccbKhungDanhGiaCanBo.create(newItem, (error, item) => {
             res.send({ error, item });
         });
     });
 
-    app.put('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo', app.permission.check('tccbKhungDanhGiaCanBo:write'), (req, res) => {
+    app.put('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo', app.permission.check('tccbDanhGiaNam:write'), (req, res) => {
         app.model.tccbKhungDanhGiaCanBo.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo', app.permission.check('tccbKhungDanhGiaCanBo:delete'), (req, res) => {
+    app.delete('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo', app.permission.check('tccbDanhGiaNam:delete'), (req, res) => {
         app.model.tccbKhungDanhGiaCanBo.delete({ id: req.body.id }, error => res.send({ error }));
     });
 
-    app.put('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo/thu-tu', app.permission.check('tccbKhungDanhGiaCanBo:write'), (req, res) => {
+    app.put('/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo/thu-tu', app.permission.check('tccbDanhGiaNam:write'), (req, res) => {
         let id = Number(req.body.id),
             thuTu = Number(req.body.thuTu),
             nam = Number(req.body.nam);

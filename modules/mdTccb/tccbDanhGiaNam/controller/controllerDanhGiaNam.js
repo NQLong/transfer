@@ -32,7 +32,6 @@ module.exports = app => {
 
     app.post('/api/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:write'), (req, res) => {
         const newItem = req.body.item;
-        console.log(newItem);
         app.model.tccbDanhGiaNam.get({ nam: Number(newItem.nam) }, (error, item) => {
             if (!error && item) {
                 res.send({ error: 'Năm đánh giá đã tồn tại' });
@@ -48,42 +47,101 @@ module.exports = app => {
         app.model.tccbDanhGiaNam.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:delete'), (req, res) => {
-        app.model.tccbDanhGiaNam.get({ id: req.body.id }, (error, item) => {
-            app.model.tccbKhungDanhGiaCanBo.delete({ nam: Number(item.nam) }, (error) => {
-                if (!error) {
-                    app.model.tccbKhungDanhGiaDonVi.delete({ nam: Number(item.nam) }, error => {
-                        if (!error) {
-                            app.model.tccbDanhGiaNam.delete({ id: req.body.id }, error => res.send({ error }));
-                        } else {
-                            res.send({ error });
-                        }
-                    });
-                } else {
-                    res.send({ error });
-                }
-            });
-        });
+    app.delete('/api/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:delete'), async (req, res) => {
+        try {
+            const item = await app.model.tccbDanhGiaNam.get({ id: req.body.id });
+            const nam = Number(item.nam);
+            await Promise.all([
+                app.model.tccbKhungDanhGiaCanBo.delete({ nam }),
+                app.model.tccbKhungDanhGiaDonVi.delete({ nam }),
+                app.model.tccbDiemThuong.delete({ nam }),
+                app.model.tccbDiemTru.delete({ nam }),
+                app.model.tccbTyLeDiem.delete({ nam }),
+                app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
+            ]);
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
-    app.post('/api/tccb/danh-gia/clone', app.permission.check('tccbDanhGiaNam:write'), (req, res) => {
+    app.post('/api/tccb/danh-gia/clone', app.permission.check('tccbDanhGiaNam:write'), async (req, res) => {
         const id = req.body.id,
             newItem = req.body.newItem;
 
-        const cloneKhungDanhGiaDonViCon = (indexCha, index, submenus, list) => {
-            if (index == submenus.length) {
-                cloneKhungDanhGiaDonViCha(indexCha + 1, list);
+        const cloneTyLeDiem = (index, list, oldNam) => {
+            if (index == list.length) {
+                app.model.tccbDanhGiaNam.create(newItem, (error, item) => {
+                    res.send({ error, item });
+                });
             } else {
-                app.model.tccbKhungDanhGiaDonVi.create({ ...submenus[index] }, () => {
-                    cloneKhungDanhGiaDonViCon(indexCha, index + 1, submenus, list);
+                app.model.tccbTyLeDiem.create({ ...list[index] }, () => {
+                    cloneTyLeDiem(index + 1, list, oldNam);
                 });
             }
         };
 
-        const cloneKhungDanhGiaDonViCha = (index, list) => {
+        const cloneDiemTru = (index, list, oldNam) => {
             if (index == list.length) {
-                app.model.tccbDanhGiaNam.create(newItem, (error, item) => {
-                    res.send({ error, item });
+                app.model.tccbTyLeDiem.getAll({ nam: oldNam }, (error, itemsTyLeDiem) => {
+                    itemsTyLeDiem = itemsTyLeDiem.map(item => {
+                        delete item.id;
+                        delete item.nam;
+                        return {
+                            nam: Number(newItem.nam),
+                            ...item,
+                        };
+                    });
+                    cloneTyLeDiem(0, itemsTyLeDiem, oldNam);
+                });
+            } else {
+                app.model.tccbDiemTru.create({ ...list[index] }, () => {
+                    cloneDiemTru(index + 1, list, oldNam);
+                });
+            }
+        };
+
+        const cloneDiemThuong = (index, list, oldNam) => {
+            if (index == list.length) {
+                app.model.tccbDiemTru.getAll({ nam: oldNam }, (error, itemsDiemTru) => {
+                    itemsDiemTru = itemsDiemTru.map(item => {
+                        delete item.id;
+                        delete item.nam;
+                        return {
+                            nam: Number(newItem.nam),
+                            ...item,
+                        };
+                    });
+                    cloneDiemTru(0, itemsDiemTru, oldNam);
+                });
+            } else {
+                app.model.tccbDiemThuong.create({ ...list[index] }, () => {
+                    cloneDiemThuong(index + 1, list, oldNam);
+                });
+            }
+        };
+
+        const cloneKhungDanhGiaDonViCon = (indexCha, index, submenus, list, oldNam) => {
+            if (index == submenus.length) {
+                cloneKhungDanhGiaDonViCha(indexCha + 1, list, oldNam);
+            } else {
+                app.model.tccbKhungDanhGiaDonVi.create({ ...submenus[index] }, () => {
+                    cloneKhungDanhGiaDonViCon(indexCha, index + 1, submenus, list, oldNam);
+                });
+            }
+        };
+
+        const cloneKhungDanhGiaDonViCha = (index, list, oldNam) => {
+            if (index == list.length) {
+                app.model.tccbDiemThuong.getAll({ nam: oldNam }, (error, itemsDiemThuong) => {
+                    itemsDiemThuong = itemsDiemThuong.map(item => {
+                        delete item.id;
+                        delete item.nam;
+                        return {
+                            nam: Number(newItem.nam),
+                            ...item,
+                        };
+                    });
+                    cloneDiemThuong(0, itemsDiemThuong, oldNam);
                 });
             } else {
                 delete list[index].id;
@@ -95,7 +153,7 @@ module.exports = app => {
                         delete item.parentId;
                         return { ...item, parentId: newItem.id };
                     });
-                    cloneKhungDanhGiaDonViCon(index, 0, submenus, list);
+                    cloneKhungDanhGiaDonViCon(index, 0, submenus, list, oldNam);
                 });
             }
         };
@@ -109,7 +167,7 @@ module.exports = app => {
                     });
                     let parentItems = cloneDonVi.filter(item => !item.parentId);
                     parentItems = parentItems.map(parent => ({ ...parent, submenus: cloneDonVi.filter(item => item.parentId == parent.id) }));
-                    cloneKhungDanhGiaDonViCha(0, parentItems);
+                    cloneKhungDanhGiaDonViCha(0, parentItems, oldNam);
                 });
             } else {
                 app.model.tccbKhungDanhGiaCanBo.create({ ...list[index] }, () => {

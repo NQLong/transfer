@@ -39,7 +39,7 @@ class EditModal extends AdminModal {
                     parentId: this.state.parentId || null,
                     thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
                 }, () => this.hide());
-            else this.props.update(this.state.item.id, changes);
+            else this.props.update(this.state.item.id, changes, () => this.hide());
             this.setState({ item: null });
             this.noiDung.value('');
         }
@@ -63,17 +63,18 @@ class ComponentDGDV extends AdminPage {
         this.load();
     }
 
-    load = () => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
+    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
         let parentItems = items.filter(item => !item.parentId);
         parentItems = parentItems.map(parent => ({ ...parent, submenus: items.filter(item => item.parentId == parent.id) }));
         this.setState({ items: parentItems });
         $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
         $('.menuList').disableSelection();
+        done && done();
     });
 
-    create = (item) => this.props.createTccbKhungDanhGiaDonVi(item, this.load);
+    create = (item, done) => this.props.createTccbKhungDanhGiaDonVi(item, () => this.load(done));
 
-    update = (id, changes) => this.props.updateTccbKhungDanhGiaDonVi(id, changes, this.load);
+    update = (id, changes, done) => this.props.updateTccbKhungDanhGiaDonVi(id, changes, () => this.load(done));
 
     updateMenuPriorities = () => {
         const changes = [];
@@ -139,7 +140,7 @@ class ComponentDGDV extends AdminPage {
         </li>);
 
     render() {
-        const permission = this.getUserPermission('tccbKhungDanhGiaDonVi'),
+        const permission = this.getUserPermission('tccbDanhGiaNam'),
             hasCreate = permission.write,
             hasUpdate = permission.write,
             hasDelete = permission.delete;

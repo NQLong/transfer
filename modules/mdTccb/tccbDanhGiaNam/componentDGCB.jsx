@@ -100,11 +100,14 @@ class ComponentDGCB extends AdminPage {
             .disableSelection();
     }
 
-    load = () => this.props.nam && this.props.getTccbKhungDanhGiaCanBoAll({ nam: Number(this.props.nam) }, items => this.setState({ items }));
+    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaCanBoAll({ nam: Number(this.props.nam) }, items => {
+        this.setState({ items });
+        done && done();
+    });
 
-    create = (item) => this.props.createTccbKhungDanhGiaCanBo(item, this.load);
+    create = (item, done) => this.props.createTccbKhungDanhGiaCanBo(item, () => this.load(done));
 
-    update = (id, changes) => this.props.updateTccbKhungDanhGiaCanBo(id, changes, this.load);
+    update = (id, changes, done) => this.props.updateTccbKhungDanhGiaCanBo(id, changes, () => this.load(done));
 
     showModal = (e) => {
         e.preventDefault();
@@ -118,7 +121,7 @@ class ComponentDGCB extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('tccbKhungDanhGiaCanBo');
+        const permission = this.getUserPermission('tccbDanhGiaNam');
         const list = this.state.items || [];
         const thuTu = list.length != 0 ? Math.max(...list.map(item => item.thuTu)) : 0;
         let table = renderTable({
