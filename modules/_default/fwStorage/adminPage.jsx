@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import T from 'view/js/common.js';
-import { getFwStorageAll, getFwStoragePage, createFwStorage, updateStorage, deleteStorage } from './redux';
+import { getFwStoragePage, createFwStorage, updateStorage, deleteStorage } from './redux';
 import { getAll } from 'modules/_default/_init/reduxCategory';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
@@ -150,5 +150,5 @@ class StoragePage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, fwStorage: state.fwStorage });
-const mapActionsToProps = { getFwStorageAll, getFwStoragePage, createFwStorage, updateStorage, deleteStorage, getAll };
+const mapActionsToProps = { getFwStoragePage, createFwStorage, updateStorage, deleteStorage, getAll };
 export default connect(mapStateToProps, mapActionsToProps)(StoragePage);

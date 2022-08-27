@@ -22,7 +22,7 @@ export function createSvBaoHiemYTe(data, done) {
                 T.notify('Có lỗi hệ thống! Vui lòng báo để được hỗ trợ', 'danger');
             } else {
                 done(result.item);
-                T.notify('Đăng ký thành công!', 'danger');
+                T.notify('Đăng ký thành công!', 'success');
             }
         });
     };
