@@ -119,7 +119,7 @@ class CanBoTheoDonVi extends AdminPage {
         ctsvNhapHocPermissions.write && nhomRoles.push('ctsvNhapHoc');
         congVanPermission.manage && nhomRoles.push('quanLyCongVanDen', 'hcthQuanLyCongVanDi');
         managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong', 'soanThaoCongVanDi');
-        managerPermission.login && nhomRoles.push('quanLyDonVi');
+        managerPermission.login && nhomRoles.push('quanLyDonVi', 'tccbDonViDangKyNhiemVu');
         quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
         daoTaoPermission && nhomRoles.push('daoTao');
 

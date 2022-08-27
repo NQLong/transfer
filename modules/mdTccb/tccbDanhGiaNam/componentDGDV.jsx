@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTccbKhungDanhGiaDonViAll, deleteTccbKhungDanhGiaDonVi, createTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonVi, updateTccbKhungDanhGiaDonViThuTu } from './reduxKhungDanhGiaDonVi';
-import { AdminModal, FormTextBox, AdminPage } from 'view/component/AdminPage';
+import { AdminModal, FormTextBox, AdminPage, getValue } from 'view/component/AdminPage';
 import { Tooltip } from '@mui/material';
 
 class EditModal extends AdminModal {
@@ -26,23 +26,18 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         const changes = {
-            noiDung: this.noiDung.value(),
+            noiDung: getValue(this.noiDung),
         };
-        if (changes.noiDung == '') {
-            T.notify('Nội dung bị trống', 'danger');
-            this.noiDung.focus();
-        } else {
-            if (!this.state.item)
-                this.props.create({
-                    ...changes,
-                    nam: this.props.nam,
-                    parentId: this.state.parentId || null,
-                    thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
-                }, () => this.hide());
-            else this.props.update(this.state.item.id, changes);
-            this.setState({ item: null });
-            this.noiDung.value('');
-        }
+        if (!this.state.item)
+            this.props.create({
+                ...changes,
+                nam: this.props.nam,
+                parentId: this.state.parentId || null,
+                thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
+            }, () => this.hide());
+        else this.props.update(this.state.item.id, changes, () => this.hide());
+        this.setState({ item: null });
+        this.noiDung.value('');
         e.preventDefault();
     };
 
@@ -63,17 +58,18 @@ class ComponentDGDV extends AdminPage {
         this.load();
     }
 
-    load = () => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
+    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
         let parentItems = items.filter(item => !item.parentId);
         parentItems = parentItems.map(parent => ({ ...parent, submenus: items.filter(item => item.parentId == parent.id) }));
         this.setState({ items: parentItems });
         $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
         $('.menuList').disableSelection();
+        done && done();
     });
 
-    create = (item) => this.props.createTccbKhungDanhGiaDonVi(item, this.load);
+    create = (item, done) => this.props.createTccbKhungDanhGiaDonVi(item, () => this.load(done));
 
-    update = (id, changes) => this.props.updateTccbKhungDanhGiaDonVi(id, changes, this.load);
+    update = (id, changes, done) => this.props.updateTccbKhungDanhGiaDonVi(id, changes, () => this.load(done));
 
     updateMenuPriorities = () => {
         const changes = [];
@@ -139,7 +135,7 @@ class ComponentDGDV extends AdminPage {
         </li>);
 
     render() {
-        const permission = this.getUserPermission('tccbKhungDanhGiaDonVi'),
+        const permission = this.getUserPermission('tccbDanhGiaNam'),
             hasCreate = permission.write,
             hasUpdate = permission.write,
             hasDelete = permission.delete;
