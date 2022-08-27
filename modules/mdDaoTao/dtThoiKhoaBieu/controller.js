@@ -307,6 +307,10 @@ module.exports = app => {
                     delete changes.troGiang;
                 }
 
+                ['thu', 'tietBatDau', 'soTietBuoi', 'soLuongDuKien'].forEach(key => {
+                    if (!changes[key]) changes[key] = '';
+                });
+
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
 
                 let allGvItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'GV' });
@@ -385,7 +389,6 @@ module.exports = app => {
 
     app.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         try {
-            console.log(req.body.config);
 
             const { config } = req.body,
                 dataFree = await app.model.dtThoiKhoaBieu.getFree(JSON.stringify(config));

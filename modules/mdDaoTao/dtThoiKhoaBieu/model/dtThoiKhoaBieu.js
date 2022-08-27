@@ -76,7 +76,7 @@ module.exports = app => {
 
             // Section 1: Gen thời gian.
             let currentStatus = [];
-            const dataScheduleAuto = await getDataGenerateSchedule(config, thuTietMo, currentStatus);
+            const dataScheduleAuto = await app.model.dtThoiKhoaBieu.getDataGenerateSchedule(config, thuTietMo, currentStatus);
             // Section 2: Auto gen phòng theo sức chứa và số lượng dự kiến, đồng thời tính toán ngày kết thúc
             currentStatus = adjustCurrentStatusRoom(currentStatus);
 
@@ -108,7 +108,8 @@ module.exports = app => {
 
     const intersectMany = (arrays) => arrays.reduce((prev, cur) => prev.filter(Set.prototype.has, new Set(cur)), arrays[0]);
 
-    const getDataGenerateSchedule = async (config, thuTietMo, currentStatus) => {
+    app.model.dtThoiKhoaBieu.getDataGenerateSchedule = async (config, thuTietMo, currentStatus) => {
+
         // 1.1: Config data theo loại hình, bậc.
         let dataFree = await app.model.dtThoiKhoaBieu.getFree(JSON.stringify(config));
         let { rows: dataCanGen, hocphandaxep: dataCurrent, hocphantheoidnganh: hocPhanTheoIdNganh, currentstatusroom: currRoom } = dataFree;

@@ -10,21 +10,21 @@ const DtThoiKhoaBieuConfigUpdate = 'DtThoiKhoaBieu:ConfigUpdate';
 export default function dtThoiKhoaBieuReducer(state = null, data) {
     switch (data.type) {
         case DtThoiKhoaBieuConfigUpdate:
-            if (state && state.items && state.items.dataCanGen) {
-                let currentState = state;
-                console.log(data.data.currentData);
-                currentState.items.dataCanGen.forEach(item => {
-                    if (item.id == data.data.currentId) {
-                        item = { ...item, ...data.data.currentData };
+            if (state) {
+                let currentState = Object.assign({}, state),
+                    dataCanGen = currentState.dataCanGen;
+                for (let i = 0, n = dataCanGen.length; i < n; i++) {
+                    if (dataCanGen[i].id == data.data.currentId) {
+                        dataCanGen.splice(i, 1, { ...dataCanGen[i], ...data.data.currentData });
+                        break;
                     }
-                });
-                console.log(currentState);
-                return currentState;
+                }
+                return Object.assign({}, state, currentState);
             } else {
                 return null;
             }
         case DtThoiKhoaBieuConfig:
-            return Object.assign({}, state, { items: data.items });
+            return Object.assign({}, data.items);
         case DtThoiKhoaBieuGetAll:
             return Object.assign({}, state, { items: data.items });
         case DtThoiKhoaBieuGetPage:
@@ -232,9 +232,25 @@ export function getDtThoiKhoaBieuByConfig(config, done) {
     };
 }
 
+export function resetDtThoiKhoaBieuConfig(done) {
+    return dispatch => {
+        dispatch({ type: DtThoiKhoaBieuConfig, items: {} });
+        done && done();
+    };
+}
+
 export function updateDtThoiKhoaBieuConfig(data, done) {
     return dispatch => {
-        dispatch({ type: DtThoiKhoaBieuConfigUpdate, data });
-        done && done();
+        const url = '/api/dao-tao/thoi-khoa-bieu-condition';
+        T.put(url, { condition: data.currentId, changes: data.currentData }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+                console.error(result.error);
+            } else {
+                T.notify('Cập nhật thành công', 'success');
+                dispatch(getDtThoiKhoaBieuByConfig(data.config));
+                done && done();
+            }
+        });
     };
 }

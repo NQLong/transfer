@@ -1,5 +1,5 @@
 
-import { Tooltip } from '@mui/material';
+import { rgbToHex, Tooltip } from '@mui/material';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
@@ -8,13 +8,20 @@ import { connect } from 'react-redux';
 import { AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
-import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig } from './redux';
-import { getDmCaHocAll } from 'modules/mdDanhMuc/dmCaHoc/redux';
+import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig } from './redux';
+import { getDmCaHocAll, getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc/redux';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
+import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
+// import { SelectAdapter_DmPhongFilter } from 'modules/mdDanhMuc/dmPhong/redux';
 const dataKhoaSinhVien = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
 
+const dataThu = [2, 3, 4, 5, 6, 7];
+const fullDataTietThu = [];
 class GenSchedPage extends AdminPage {
-    state = {}
+    state = {
+        step: 3
+    }
+
     componentDidMount() {
         this.props.getDmCaHocAll(items => {
             items = [...new Set(items.map(item => parseInt(item.ten)))];
@@ -44,15 +51,12 @@ class GenSchedPage extends AdminPage {
             };
             this.props.getDtThoiKhoaBieuByConfig(config, result => {
                 this.setState({ onSaveConfig: false });
-                if (result.error) {
-                    this.setState({ readOnlyConfig: false });
-                }
-                else if (result.dataCanGen) {
+                if (result.dataCanGen) {
+                    this.setState({ config, step: 2 });
                     getDtNganhDaoTaoAll(items => {
-                        let dataNganh = items.filter(item => config.loaiHinhDaoTao == 'CLC' ? item.maNganh.includes('_CLC') : !item.maNganh.includes('_CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
+                        let dataNganh = items.filter(item => config.loaiHinhDaoTao == 'CLC' ? item.maNganh.includes('_CLC') : !item.maNganh.includes('_CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}`, name: item.tenNganh }));
                         this.setState({ dataNganh });
                     });
-                    this.setState({ readOnlyConfig: true });
                 }
             });
             this.setState({ config });
@@ -66,14 +70,14 @@ class GenSchedPage extends AdminPage {
         let currentId = this.state.editId;
         if (currentId) {
             let currentData = {
-                thu: this.thu.value(),
-                tietBatDau: this.tietBatDau.value(),
-                soTietBuoi: this.soTietBuoi.value(),
-                soLuongDuKien: this.soLuongDuKien.value(),
+                thu: this.thu.value() || '',
+                tietBatDau: this.tietBatDau.value() || '',
+                soTietBuoi: this.soTietBuoi.value() || '',
+                soLuongDuKien: this.soLuongDuKien.value() || '',
                 maNganh: this.maNganh.value(),
                 chuyenNganh: this.chuyenNganh.value()
             };
-            this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData });
+            this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData, config: this.state.config });
         }
         this.setState({ editId: item.id }, () => {
             this.thu.value(item.thu);
@@ -84,6 +88,71 @@ class GenSchedPage extends AdminPage {
             this.chuyenNganh.value(item.maChuyenNganh ? item.maChuyenNganh.split(',') : '');
         });
 
+    }
+
+    handleUpdate = (e) => {
+        e.preventDefault();
+        let currentId = this.state.editId;
+        let currentData = {
+            thu: this.thu.value(),
+            tietBatDau: this.tietBatDau.value(),
+            soTietBuoi: this.soTietBuoi.value(),
+            soLuongDuKien: this.soLuongDuKien.value(),
+            maNganh: this.maNganh.value(),
+            chuyenNganh: this.chuyenNganh.value()
+        };
+        this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData, config: this.state.config }, () => {
+            this.setState({ editId: null });
+        });
+    }
+
+    handleResetConfig = (e) => {
+        e.preventDefault();
+        this.setState({ step: 1 }, () => {
+            this.props.resetDtThoiKhoaBieuConfig();
+        });
+    }
+
+    handleSubmitAdjustedData = (e) => {
+        e.preventDefault();
+        this.setState({ step: 3 }, () => {
+            this.coSo.focus();
+            this.props.resetDtThoiKhoaBieuConfig();
+        });
+    }
+
+    handleChooseBuilding = (value) => {
+        this.setState({ maCoSo: value.id, amount: 1 }, () => {
+            this.handleRenderTiet();
+            // this.phongKhongSuDung.value('');
+        });
+    }
+
+    handleRenderTiet = () => {
+        getDmCaHocAllCondition(this.state.maCoSo, data => {
+            data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
+            data.forEach(tiet => {
+                dataThu.forEach(thu => {
+                    fullDataTietThu.push({ [thu]: tiet });
+                });
+            });
+            this.setState({ fullDataTietThu, dataTiet: data });
+        });
+    }
+
+    handleSaveTimeConfig = () => {
+        let thuTietMo = [], thuTietKhongMo = [];
+        $('td').each(function () {
+            if (rgbToHex($(this).css('backgroundColor')) == '#0275d8') {
+                thuTietMo.push($(this).attr('id'));
+            } else {
+                thuTietKhongMo.push($(this).attr('id'));
+            }
+        });
+        const listDonVi = this.listDonVi.value(),
+            listTenDonVi = this.listDonVi.data().map(item => item.text);
+        console.log(thuTietMo, listDonVi, listTenDonVi);
+        this.setState({ timeConfig: [...(this.state.timeConfig || []), { listTenDonVi, listDonVi, thuTietKhongMo, thuTietMo }] });
     }
 
     editElement = () => {
@@ -141,10 +210,7 @@ class GenSchedPage extends AdminPage {
                 </>}
                 <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} >
                     {this.state.editId == item.id ? <Tooltip title='Lưu' arrow>
-                        <button className='btn btn-success' onClick={e => {
-                            e.preventDefault();
-                            this.handleUpdate(item);
-                        }}>
+                        <button className='btn btn-success' onClick={this.handleUpdate}>
                             <i className='fa fa-lg fa-check' />
                         </button>
                     </Tooltip> : <>
@@ -166,24 +232,31 @@ class GenSchedPage extends AdminPage {
 
     render() {
         let dtThoiKhoaBieuConfig = this.props.dtThoiKhoaBieu;
-        let { onSaveConfig, readOnlyConfig } = this.state;
+        let { onSaveConfig, step, timeConfig } = this.state;
         return this.renderPage({
             title: 'Quản lý sinh thời khoá biểu tự động',
-            icon: 'fa fa-cons',
+            icon: 'fa fa-cogs',
             content: <div className='row'>
-                <div className='col-md-12' style={{ display: !readOnlyConfig ? '' : 'none' }}>
+                <section className='col-md-12' style={{ display: step == 1 ? '' : 'none' }} id='config'>
+                    <span style={{ fontSize: '0.8rem' }}>
+                        <b className='text-danger'>Cấu hình</b>&nbsp;
+                        <i className='fa fa-sm fa-angle-double-right' />&nbsp;
+                        <span>Điều chỉnh</span>&nbsp;
+                        <i className='fa fa-sm fa-angle-double-right' />&nbsp;
+                        <span>Sinh thời gian</span>
+                    </span>
                     <div className='tile'>
                         <div className='tile-title'>
-                            <h5>Cấu hình</h5>
+                            <h4>Cấu hình</h4>
                         </div>
                         <div className='tile-body'>
                             <div className='row'>
                                 <FormSelect ref={e => this.bacDaoTao = e} className='col-md-2' label='Bậc' data={SelectAdapter_DmSvBacDaoTao} style={{ marginBottom: '0' }} required readOnly />
-                                <FormSelect readOnly={readOnlyConfig} ref={e => this.loaiHinhDaoTao = e} className='col-md-3' label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} required />
-                                <FormSelect readOnly={readOnlyConfig} data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-3' label='Năm học' onChange={this.handleNam} required />
-                                <FormSelect readOnly={readOnlyConfig} ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-2' required />
-                                <FormSelect readOnly={readOnlyConfig} ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-2' required />
-                                <FormSelect readOnly={readOnlyConfig} ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị mở môn' className='col-md-12' required />
+                                <FormSelect ref={e => this.loaiHinhDaoTao = e} className='col-md-3' label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} required />
+                                <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-3' label='Năm học' onChange={this.handleNam} required />
+                                <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-2' required />
+                                <FormSelect ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-2' required />
+                                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị mở môn' className='col-md-12' required />
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <button className='btn btn-outline-primary' type='button' onClick={this.handleSubmitConfig} disabled={onSaveConfig}>
@@ -191,30 +264,93 @@ class GenSchedPage extends AdminPage {
                                 </button>
                             </div>
                         </div>
-
                     </div>
-                </div>
-                <div className='col-md-12' style={{ display: readOnlyConfig && dtThoiKhoaBieuConfig && dtThoiKhoaBieuConfig.items ? '' : 'none' }}>
+                </section>
+
+                <section className='col-md-12' style={{ display: step == 2 ? '' : 'none' }} id='adjustData'>
+                    <span style={{ fontSize: '0.8rem' }}>
+                        <span>Cấu hình</span>&nbsp;
+                        <i className='fa fa-sm fa-angle-double-right' />&nbsp;
+                        <b className='text-danger'>Điều chỉnh</b>&nbsp;
+                        <i className='fa fa-sm fa-angle-double-right' />&nbsp;
+                        <span>Sinh thời gian</span>
+                    </span>
                     <div className='tile'>
                         <div className='tile-title'>
-                            <h5>Danh sách môn cần xếp lịch</h5>
-                            <button className='btn btn-outline-secondary' type='button' onClick={e => e.preventDefault() || this.setState({ readOnlyConfig: false }, () => {
-                                dtThoiKhoaBieuConfig = null;
-                            })} style={{ position: 'absolute', top: '20px', right: '20px' }}>
+                            <h4>Điều chỉnh</h4>
+                            <button className='btn btn-outline-secondary' type='button' onClick={this.handleResetConfig} style={{ position: 'absolute', top: '20px', right: '170px' }}>
                                 Cấu hình lại <i className='fa fa-lg fa-repeat' />
-                            </button></div>
+                            </button>
+
+                            <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleSubmitAdjustedData}>
+                                Sinh thời gian <i className='fa fa-lg fa-arrow-right' />
+                            </button>
+                        </div>
                         <div className='tile-body'>
-                            {this.genData(dtThoiKhoaBieuConfig?.items?.dataCanGen)}
+                            {this.genData(dtThoiKhoaBieuConfig?.dataCanGen)}
                         </div>
                     </div>
-                </div>
-            </div>
+                </section>
+
+                <section className='col-md-12' style={{ display: step == 3 ? '' : 'none' }} id='configTime'>
+                    <span style={{ fontSize: '0.8rem' }}>
+                        <span>Cấu hình</span>&nbsp;
+                        <i className='fa fa-sm fa-angle-double-right' />&nbsp;
+                        <span>Điều chỉnh</span>&nbsp;
+                        <i className='fa fa-sm fa-angle-double-right' />&nbsp;
+                        <b className='text-danger'>Sinh thời gian</b>
+                    </span>
+                    <div className='tile'>
+                        <h4 className='tile-title'>Thời gian</h4>
+                        <div className='tile-body'>
+                            <div className='row'>
+                                <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Chọn cơ sở học' className='col-md-6' onChange={this.handleChooseBuilding} />
+                                <div className='col-md-6' />
+                                {/* <FormSelect ref={e => this.phongKhongSuDung = e} data={SelectAdapter_DmPhongFilter(this.state.maCoSo)} className='col-md-8' label='Chọn các phòng không sử dụng' /> */}
+                                {this.state.fullDataTietThu &&
+                                    <div className='form-group col-md-6'>
+                                        <label>Chọn các tiết <b>không xếp thời khoá biểu</b> </label>
+                                        {renderTable({
+                                            getDataSource: () => this.state.fullDataTietThu,
+                                            header: '',
+                                            renderHead: () => <tr>{
+                                                dataThu.map(thu => <th key={thu} style={{ width: '100px', textAlign: 'center' }}>Thứ {thu}</th>)
+                                            }</tr>,
+                                            renderRow: this.state.dataTiet.map(tiet => <tr key={tiet}>
+                                                {dataThu.map(thu => <td key={thu} id={`${thu}_${tiet}`} style={{ textAlign: 'center', backgroundColor: '#0275d8', color: '#fff' }} onClick={e => e.preventDefault() || $(`#${thu}_${tiet}`).css('backgroundColor', (_, cur) => rgbToHex(cur) == '#0275d8' ? '#f0ad4e' : '#0275d8')
+                                                }>Tiết {tiet}</td>)}
+                                            </tr>)
+                                        })}
+                                    </div>}
+                                {this.state.fullDataTietThu && <div className='form-group col-md-6'>
+                                    {(timeConfig || []).map((item, index) => {
+                                        let dataKhongMo = item.thuTietKhongMo.map(item => ({ thu: item.split('_')[0], tiet: item.split('_')[1] })).groupBy('thu');
+                                        return (<div key={index} style={{ marginBottom: '20px' }}>
+                                            <span>K/BM: {item.listTenDonVi.length ? item.listTenDonVi.join(', ') : 'Tất cả'}:<br /></span>
+                                            <span>{item.thuTietKhongMo.length ? Object.keys(dataKhongMo).map(key => <b key={key}>
+                                                - Trừ Thứ {key}, Tiết {dataKhongMo[key].map(item => item.tiet).join(', ')}.
+                                            </b>) : <b>Sinh tự động trên toàn bộ thứ, tiết</b>}</span>
+                                            <button className='btn btn-danger'><i className='fa fa-lg fa-trash' /></button>
+                                        </div>);
+                                    })}
+                                    <FormSelect ref={e => this.listDonVi = e} label='Chọn các khoa/bộ môn' placeholder='Chọn các khoa/bộ môn (Nếu không chọn thì mặc định là tất cả)' data={SelectAdapter_DmDonViFaculty_V2} multiple />
+                                    <div style={{ textAlign: 'right' }}>
+                                        <button className='btn btn-outline-success' type='button' onClick={this.handleSaveTimeConfig}>
+                                            <i className='fa fa-lg fa-save' /> Lưu
+                                        </button>
+                                    </div>
+                                </div>}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
 const mapActionsToProps = {
-    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig
+    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig
 };
 export default connect(mapStateToProps, mapActionsToProps)(GenSchedPage);
