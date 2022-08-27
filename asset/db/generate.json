@@ -16446,8 +16446,8 @@
         },
         "TCCB_KHUNG_DANH_GIA_CAN_BO": {
             "active": true,
-            "moduleName": "tccbKhungDanhGiaCanBo",
-            "modelName": "tccbDanhGiaNam",
+            "moduleName": "tccbDanhGiaNam",
+            "modelName": "tccbKhungDanhGiaCanBo",
             "methods": {
                 "TCCB_KHUNG_DANH_GIA_CAN_BO_GAN_THU_TU": "updateThuTu"
             },
