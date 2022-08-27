@@ -59,7 +59,7 @@ module.exports = app => {
                 app.model.tccbTyLeDiem.delete({ nam }),
                 app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
             ]);
-            res.send({});
+            res.end();
         } catch (error) {
             res.send({ error });
         }
