@@ -2,15 +2,12 @@ import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const TccbKhungDanhGiaCanBoGetAll = 'TccbKhungDanhGiaCanBo:GetAll';
-const TccbKhungDanhGiaCanBoGetPage = 'TccbKhungDanhGiaCanBo:GetPage';
 const TccbKhungDanhGiaCanBoUpdate = 'TccbKhungDanhGiaCanBo:Update';
 
 export default function TccbKhungDanhGiaCanBoReducer(state = null, data) {
     switch (data.type) {
         case TccbKhungDanhGiaCanBoGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TccbKhungDanhGiaCanBoGetPage:
-            return Object.assign({}, state, { page: data.page });
         case TccbKhungDanhGiaCanBoUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -61,23 +58,6 @@ export function getTccbKhungDanhGiaCanBoAll(condition, done) {
     };
 }
 
-T.initPage('pageTccbKhungDanhGiaCanBo');
-export function getTccbKhungDanhGiaCanBoPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTccbKhungDanhGiaCanBo', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách cấu trúc khung đánh giá cán bộ bị lỗi!', 'danger');
-                console.error(`GET ${url}. ${data.error}`);
-            } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
-                dispatch({ type: TccbKhungDanhGiaCanBoGetPage, page: data.page });
-            }
-        });
-    };
-}
-
 export function getTccbKhungDanhGiaCanBo(id, done) {
     return () => {
         const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-can-bo/item/${id}`;
@@ -102,7 +82,7 @@ export function createTccbKhungDanhGiaCanBo(item, done) {
             } else {
                 T.notify('Tạo cấu trúc khung đánh giá cán bộ thành công!', 'success');
                 data.warning && T.notify(data.warning.message, 'warning');
-                dispatch(getTccbKhungDanhGiaCanBoPage());
+                dispatch(getTccbKhungDanhGiaCanBoAll());
                 if (done) done(data.item);
             }
         });
@@ -118,7 +98,7 @@ export function deleteTccbKhungDanhGiaCanBo(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Cấu trúc khung đánh giá cán bộ đã xóa thành công!', 'success', false, 800);
-                dispatch(getTccbKhungDanhGiaCanBoPage());
+                dispatch(getTccbKhungDanhGiaCanBoAll());
                 done && done();
             }
         }, () => T.notify('Xóa cấu trúc khung đánh giá cán bộ bị lỗi!', 'danger'));
@@ -134,7 +114,7 @@ export function updateTccbKhungDanhGiaCanBo(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật thông tin cấu trúc khung đánh giá cán bộ thành công!', 'success');
-                dispatch(getTccbKhungDanhGiaCanBoPage());
+                dispatch(getTccbKhungDanhGiaCanBoAll());
                 done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin cấu trúc khung đánh giá cán bộ bị lỗi!', 'danger'));
@@ -154,7 +134,7 @@ export function updateTccbKhungDanhGiaCanBoThuTu(id, thuTu, nam, done) {
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 T.notify('Thay đổi thứ tự thành công!', 'success');
-                dispatch(getTccbKhungDanhGiaCanBoPage(undefined, undefined, { nam }));
+                dispatch(getTccbKhungDanhGiaCanBoAll(undefined, undefined, { nam }));
                 done && done();
             }
         },

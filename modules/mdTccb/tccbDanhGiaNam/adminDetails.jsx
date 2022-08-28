@@ -3,8 +3,11 @@ import { connect } from 'react-redux';
 import { getTccbDanhGiaNam } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage } from 'view/component/AdminPage';
+import ComponentDiemThuong from '../tccbDiemThuong/componentDiemThuong';
+import ComponentDiemTru from '../tccbDiemTru/componentDiemTru';
 import ComponentDGCB from './componentDGCB';
 import ComponentDGDV from './componentDGDV';
+import ComponentTLD from '../tccbTyLeDiem/componentTLD';
 import T from 'view/js/common';
 
 class TccbKhungDanhGiaCanBoDetails extends AdminPage {
@@ -19,6 +22,28 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
 
     render() {
         const nam = this.state?.nam || '';
+        const listComponent = nam ? [
+            {
+                title: 'Mức đánh giá cán bộ',
+                component: <ComponentDGCB nam={nam} />,
+            },
+            {
+                title: 'Điểm thưởng',
+                component: <ComponentDiemThuong nam={nam} />,
+            },
+            {
+                title: 'Điểm trừ',
+                component: <ComponentDiemTru nam={nam} />,
+            },
+            {
+                title: 'Tỷ lệ điểm',
+                component: <ComponentTLD nam={nam} />
+            },
+            {
+                title: 'Khung đánh giá đơn vị',
+                component: <ComponentDGDV nam={nam} />,
+            },
+        ] : [];
         return this.renderPage({
             icon: 'fa fa-university',
             title: `Đánh giá năm: ${nam}`,
@@ -28,38 +53,26 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
             ],
             content: <>
                 {nam && <div>
-                    <div id="accordion-1" className='mt-2'>
-                        <div className="card">
-                            <div className="card-header" id="headingOne">
-                                <h5 className="mb-0">
-                                    <button className="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne-1" aria-expanded="true" aria-controls="collapseOne-1">
-                                        Mức đánh giá cán bộ
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseOne-1" className="collapse" aria-labelledby="headingOne" data-parent="#accordion-1">
-                                <div className="card-body">
-                                    <ComponentDGCB nam={nam} />
+                    {
+                        listComponent.map((item, index) => (<>
+                            <div id={`accordion-${index}`} className='mt-2'>
+                                <div className="card">
+                                    <div className="card-header" id={`heading-${index}`}>
+                                        <h5 className="mb-0">
+                                            <button className="btn btn-link collapsed" data-toggle="collapse" data-target={`#collapseOne-${index}`} aria-expanded="true" aria-controls={`collapseOne-${index}`}>
+                                                {item.title}
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id={`collapseOne-${index}`} className="collapse" aria-labelledby={`heading-${index}`} data-parent={`#accordion-${index}`}>
+                                        <div className="card-body">
+                                            {item.component}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="accordion-2" className='mt-2'>
-                        <div className="card">
-                            <div className="card-header" id="headingOne">
-                                <h5 className="mb-0">
-                                    <button className="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne-2" aria-expanded="true" aria-controls="collapseOne-2">
-                                        Đánh giá đơn vị
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseOne-2" className="collapse" aria-labelledby="headingOne" data-parent="#accordion-2">
-                                <div className="card-body">
-                                    <ComponentDGDV nam={nam} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            </div></>
+                        ))
+                    }
                 </div>
                 }
             </>,

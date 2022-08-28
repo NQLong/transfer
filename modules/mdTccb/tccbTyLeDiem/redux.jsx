@@ -1,14 +1,14 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const TccbKhungDanhGiaDonViGetAll = 'TccbKhungDanhGiaDonVi:GetAll';
-const TccbKhungDanhGiaDonViUpdate = 'TccbKhungDanhGiaDonVi:Update';
+const TccbTyLeDiemGetAll = 'TccbTyLeDiem:GetAll';
+const TccbTyLeDiemUpdate = 'TccbTyLeDiem:Update';
 
-export default function TccbKhungDanhGiaDonViReducer(state = null, data) {
+export default function TccbTyLeDiemReducer(state = null, data) {
     switch (data.type) {
-        case TccbKhungDanhGiaDonViGetAll:
+        case TccbTyLeDiemGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TccbKhungDanhGiaDonViUpdate:
+        case TccbTyLeDiemUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
                     updatedPage = Object.assign({}, state.page),
@@ -39,31 +39,31 @@ export default function TccbKhungDanhGiaDonViReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-export function getTccbKhungDanhGiaDonViAll(condition, done) {
+export function getTccbTyLeDiemAll(condition, done) {
     if (typeof condition === 'function') {
         done = condition;
         condition = {};
     }
     return dispatch => {
-        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/all';
+        const url = '/api/tccb/ty-le-diem/all';
         T.get(url, { condition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách cấu trúc khung đánh giá đơn vi bị lỗi', 'danger');
+                T.notify('Lấy danh sách tỷ lệ điểm bị lỗi', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
-                dispatch({ type: TccbKhungDanhGiaDonViGetAll, items: data.items ? data.items : [] });
+                dispatch({ type: TccbTyLeDiemGetAll, items: data.items ? data.items : [] });
             }
         });
     };
 }
 
-export function getTccbKhungDanhGiaDonVi(id, done) {
+export function getTccbTyLeDiem(id, done) {
     return () => {
-        const url = `/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/item/${id}`;
+        const url = `/api/tccb/ty-le-diem/item/${id}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
+                T.notify('Lấy mục tỷ lệ điểm bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.item);
@@ -72,71 +72,55 @@ export function getTccbKhungDanhGiaDonVi(id, done) {
     };
 }
 
-export function createTccbKhungDanhGiaDonVi(item, done) {
+export function createTccbTyLeDiem(item, done) {
     return dispatch => {
-        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi';
+        const url = '/api/tccb/ty-le-diem';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify(`Tạo mới bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`POST ${url}. ${data.error.message}`);
             } else {
-                T.notify('Tạo cấu trúc khung đánh giá đơn vi thành công!', 'success');
+                T.notify('Tạo mới tỷ lệ điểm thành công!', 'success');
                 data.warning && T.notify(data.warning.message, 'warning');
-                dispatch(getTccbKhungDanhGiaDonViAll());
+                dispatch(getTccbTyLeDiemAll());
                 if (done) done(data.item);
             }
         });
     };
 }
 
-export function deleteTccbKhungDanhGiaDonVi(id, done) {
+export function deleteTccbTyLeDiem(id, done) {
     return dispatch => {
-        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi';
+        const url = '/api/tccb/ty-le-diem';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
+                T.notify('Xóa tỷ lệ điểm bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Cấu trúc khung đánh giá đơn vi đã xóa thành công!', 'success', false, 800);
-                dispatch(getTccbKhungDanhGiaDonViAll());
+                T.alert('Xoá tỷ lệ điểm thành công!', 'success', false, 800);
+                dispatch(getTccbTyLeDiemAll());
                 done && done();
             }
-        }, () => T.notify('Xóa cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tỷ lệ điểm bị lỗi!', 'danger'));
     };
 }
 
-export function updateTccbKhungDanhGiaDonVi(id, changes, done) {
+export function updateTccbTyLeDiem(id, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi';
+        const url = '/api/tccb/ty-le-diem';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger');
+                T.notify('Cập nhật tỷ lệ điểm bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
-                T.notify('Cập nhật thông tin cấu trúc khung đánh giá đơn vi thành công!', 'success');
-                dispatch(getTccbKhungDanhGiaDonViAll());
+                T.notify('Cập nhật tỷ lệ điểm thành công!', 'success');
+                dispatch(getTccbTyLeDiemAll());
                 done && done(data.item);
             }
-        }, () => T.notify('Cập nhật thông tin cấu trúc khung đánh giá đơn vi bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật tỷ lệ điểm bị lỗi!', 'danger'));
     };
 }
 
-export function updateTccbKhungDanhGiaDonViThuTu(changes, done) {
-    return dispatch => {
-        const url = '/api/tccb/danh-gia/cau-truc-khung-danh-gia-don-vi/thu-tu';
-        T.put(url, { changes }, data => {
-            if (data.error) {
-                T.notify('Thay đổi vị trí bị lỗi!', 'danger');
-                console.error(`PUT: ${url}. ${data.error}`);
-            } else {
-                T.notify('Cập nhật menu thành công!', 'success');
-                dispatch(getTccbKhungDanhGiaDonViAll());
-                done && done();
-            }
-        }, () => T.notify('Thay đổi vị trí bị lỗi!', 'danger'));
-    };
-}
-
-export function changeTccbKhungDanhGiaDonVi(item) {
-    return { type: TccbKhungDanhGiaDonViUpdate, item };
+export function changeTccbTyLeDiem(item) {
+    return { type: TccbTyLeDiemUpdate, item };
 }
