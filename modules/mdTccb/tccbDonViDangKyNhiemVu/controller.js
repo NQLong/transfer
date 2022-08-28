@@ -21,6 +21,40 @@ module.exports = app => {
     //     condition.maDonVi = maDonVi;
     //     app.model.tccbDonViDangKyNhiemVu.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     // });
+    app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/danh-gia-nam/all', app.permission.check('tccbDonViDangKyNhiemVu:write'), (req, res) => {
+        app.model.tccbDanhGiaNam.getAll({}, '*', 'id', (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/allByYear', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+        try {
+            const nam = Number(req.query.nam), maDonVi = req.session.user.staff.maDonVi;
+            let danhGiaNam = await app.model.tccbDanhGiaNam.getAll({ nam });
+            danhGiaNam = danhGiaNam[0];
+            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam });
+            let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi });
+            let items = danhGiaDonVis.filter(item => !item.parentId);
+            items = items.map(item => danhGiaDonVis.filter(danhGia => danhGia.parentId == item.id));
+            items = items.reduce((prev, cur) => prev.concat(cur));
+            items = items.map(danhGiaDonVi => {
+                const index = dangKys.findIndex(dangKy => dangKy.maKhungDanhGiaDonVi == danhGiaDonVi.id);
+                if (index == -1) {
+                    return {
+                        noiDung: danhGiaDonVi.noiDung,
+                        maKhungDanhGiaDonVi: danhGiaDonVi.id,
+                        maDonVi,
+                        nam,
+                    };
+                }
+                return {
+                    noiDung: danhGiaDonVi.noiDung,
+                    ...dangKys[index]
+                };
+            });
+            res.send({ items, danhGiaNam });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 
     app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/all', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
@@ -32,7 +66,6 @@ module.exports = app => {
         } catch (error) {
             res.send({ error });
         }
-
     });
 
     app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/item/:id', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {

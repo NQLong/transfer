@@ -79,9 +79,9 @@ class TccbNhomDanhGiaNhiemVuPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Ghi chú</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm</th>
+                    <th style={{ width: '40%', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên</th>
+                    <th style={{ width: '40%', textAlign: 'center', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                    <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
@@ -89,8 +89,8 @@ class TccbNhomDanhGiaNhiemVuPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.ten} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.ghiChu} />
+                    <TableCell style={{ textAlign: 'left' }} content={item.ten} />
+                    <TableCell style={{ textAlign: 'left' }} content={item.ghiChu} />
                     <TableCell style={{ textAlign: 'center' }} content={item.nam} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={value => this.props.updateTccbNhomDanhGiaNhiemVu(item.id, { kichHoat: Number(value) })} />

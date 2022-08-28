@@ -61,6 +61,34 @@ export function getTccbDonViDangKyNhiemVuAll(condition, done) {
     };
 }
 
+export function getTccbDonViDangKyNhiemVuDanhGiaNamAll(done) {
+    return () => {
+        const url = '/api/tccb/don-vi-dang-ky-nhiem-vu/danh-gia-nam/all';
+        T.get(url, {}, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách đăng ký bị lỗi', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                if (done) done(data.items);
+            }
+        });
+    };
+}
+
+export function getTccbDonViDangKyNhiemVuByYear(nam, done) {
+    return () => {
+        const url = '/api/tccb/don-vi-dang-ky-nhiem-vu/allByYear';
+        T.get(url, { nam }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách đăng ký bị lỗi', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                if (done) done(data);
+            }
+        });
+    };
+}
+
 // T.initPage('pageTccbDonViDangKyNhiemVu');
 // export function getTccbDonViDangKyNhiemVuPage(pageNumber, pageSize, pageCondition, done) {
 //     const page = T.updatePage('pageTccbDonViDangKyNhiemVu', pageNumber, pageSize, pageCondition);

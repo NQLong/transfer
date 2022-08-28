@@ -8,6 +8,7 @@ import ComponentDiemTru from '../tccbDiemTru/componentDiemTru';
 import ComponentDGCB from './componentDGCB';
 import ComponentDGDV from './componentDGDV';
 import ComponentTLD from '../tccbTyLeDiem/componentTLD';
+import ComponentDMCV from '../tccbDinhMucCongViecGvVaNcv/componentDMCV';
 import T from 'view/js/common';
 
 class TccbKhungDanhGiaCanBoDetails extends AdminPage {
@@ -38,6 +39,10 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
             {
                 title: 'Tỷ lệ điểm',
                 component: <ComponentTLD nam={nam} />
+            },
+            {
+                title: 'Định mức công việc cho giảng viên và nghiên cứu viên',
+                component: <ComponentDMCV nam={nam} />
             },
             {
                 title: 'Khung đánh giá đơn vị',

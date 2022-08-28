@@ -28,12 +28,12 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = req.query.condition || {};
-        app.model.tccbDanhGiaNam.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        app.model.tccbDanhGiaNam.getPage(pageNumber, pageSize, condition, '*', 'nam DESC', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/tccb/danh-gia/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         const condition = req.query.condition || {};
-        app.model.tccbDanhGiaNam.getAll(condition, '*', 'id', (error, items) => res.send({ error, items }));
+        app.model.tccbDanhGiaNam.getAll(condition, '*', 'nam DESC', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/tccb/danh-gia/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
@@ -68,6 +68,7 @@ module.exports = app => {
                 app.model.tccbDiemTru.delete({ nam }),
                 app.model.tccbTyLeDiem.delete({ nam }),
                 app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
+                app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear(nam),
             ]);
             res.end();
         } catch (error) {
@@ -140,6 +141,7 @@ module.exports = app => {
                 listNewChild.map(item => app.model.tccbKhungDanhGiaDonVi.create(item)),
             ];
             await Promise.all(listPromise.reduce((prev, cur) => prev.concat(cur)));
+            await app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear(nam, newItem.nam);
             item = await app.model.tccbDanhGiaNam.create(newItem);
             res.send({ item });
         } catch (error) {

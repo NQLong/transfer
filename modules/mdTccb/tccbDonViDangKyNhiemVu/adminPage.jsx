@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbDanhGiaNamAll } from '../tccbDanhGiaNam/redux';
+import { getTccbDonViDangKyNhiemVuDanhGiaNamAll } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import { Tooltip } from '@mui/material';
@@ -9,7 +9,7 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            this.props.getTccbDanhGiaNamAll(items => this.setState({ items }));
+            this.props.getTccbDonViDangKyNhiemVuDanhGiaNamAll(items => this.setState({ items }));
         });
     }
 
@@ -65,5 +65,5 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { getTccbDanhGiaNamAll };
+const mapActionsToProps = { getTccbDonViDangKyNhiemVuDanhGiaNamAll };
 export default connect(mapStateToProps, mapActionsToProps)(TccbDonViDangKyNhiemVuPage);
