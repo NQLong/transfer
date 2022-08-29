@@ -135,6 +135,7 @@ class AdminEditPage extends AdminPage {
     constructor(props) {
         super(props);
         this.updateFileRef = React.createRef();
+        this.uploadCommentFile = React.createRef();
     }
 
     listFileRefs = {};
@@ -204,7 +205,10 @@ class AdminEditPage extends AdminPage {
             renderAvatar: (item) => <img src={item.image || '/img/avatar.png'} style={{ width: '48px', height: '48px', paddingTop: '5px', borderRadius: '50%' }} />,
             renderName: (item) => <><span style={{ color: 'blue' }}>{item.ho?.normalizedName()} {item.ten?.normalizedName()}</span></>,
             renderTime: (item) => T.dateToText(item.ngayTao, 'dd/mm/yyyy HH:MM'),
-            renderContent: (item) => item.noiDung
+            renderContent: (item) => <div>
+                <b>{item.noiDung}</b>
+                <a href={`/api/hcth/van-ban-di/download-comment/${this.state.id}/${item.tenFile}`} download>{item.tenFile}</a>
+            </div>
         });
     }
 
@@ -250,7 +254,7 @@ class AdminEditPage extends AdminPage {
     }
 
     setData = (data = null) => {
-        let { trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi, laySoTuDong = true, soCongVan = '', ngoaiNgu, banLuu } = data ? data :
+        let { trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], phanHoi = [], trangThai, loaiCongVan, loaiVanBan, history = [], soDi, laySoTuDong = true, soCongVan = '', ngoaiNgu, banLuu } = data ? data :
             { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai: '', trangThai: '', loaiVanBan: '', loaiCongVan: 'TRUONG', soDi: '', ngoaiNgu: '10', banLuu: '29' };
 
         this.trichYeu.value(trichYeu);
@@ -273,7 +277,7 @@ class AdminEditPage extends AdminPage {
             laySoTuDong,
             soCongVan,
             checkDonViGui: this.state.listDonViQuanLy.includes(donViGui),
-            listFile, phanHoi: danhSachPhanHoi
+            listFile, phanHoi: phanHoi
         }, () => {
             this.loaiCongVan.value(loaiCongVan);
             this.trangThai?.value(trangThai || '');
@@ -315,6 +319,14 @@ class AdminEditPage extends AdminPage {
             }
             this.state.id && this.props.updateHcthCongVanDi(this.state.id, { linkCongVan }, () => response.item.capNhatFileId && this.props.getYeuCauKy(this.state.id));
             this.setState({ listFile });
+        }
+    }
+
+    onSuccessUploadComment = (response) => {
+        if (response.error) T.notify('Thêm phản hồi bị lỗi', 'danger');
+        else if (response) {
+            T.notify('Thêm phản hồi thành công!', 'success');
+            this.props.getPhanHoi(this.state.id);
         }
     }
 
@@ -542,6 +554,10 @@ class AdminEditPage extends AdminPage {
         });
     }
 
+    onUploadFile = (e) => {
+        e.preventDefault();
+        this.uploadCommentFile.current.uploadInput.click();
+    }
 
     tableListFile = (data, id, permission, canAddFile, listYeuCauKi = []) => renderTable({
         getDataSource: () => data,
@@ -862,11 +878,14 @@ class AdminEditPage extends AdminPage {
                                 </div>
                                 <FormRichTextBox type='text' className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
                                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                    <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
-                                        Thêm
+                                    <button type='submit' className='btn btn-primary mr-2' onClick={this.onUploadFile}>
+                                        <i className="fa fa-upload"></i>Thêm file
+                                    </button>
+                                    <button type='submit' className='btn btn-success mr-2' onClick={this.onCreatePhanHoi}>
+                                        <i className="fa fa-paper-plane"></i>Thêm
                                     </button>
                                     {this.canReturn() && <button type='submit' className='btn btn-danger' onClick={this.onReturnCvDi}>
-                                        Trả lại
+                                        <i className="fa fa-reply"></i>Trả lại
                                     </button>}
                                 </div>
                             </div>
@@ -906,6 +925,13 @@ class AdminEditPage extends AdminPage {
                     userData={`hcthCongVanDiUpdateFile:${this.state.id}:${this.state.originFileId}:${this.state.updateFileId}`} style={{ display: 'none' }}
                     success={this.onSuccess} ajax={true} />
                 <FileHistoryModal ref={e => this.historyFileMoal = e} data={groupListFile} fileId={this.state.updateFileId} isShowSubmit={false} />
+
+                <FileBox ref={this.uploadCommentFile} postUrl='/user/upload'
+                    uploadType='hcthVanBanDiCommentFile'
+                    userData={`hcthVanBanDiCommentFile:${this.state.id}`}
+                    style={{ display: 'none' }}
+                    success={this.onSuccessUploadComment} ajax={true}
+                />
             </>),
             backRoute,
             onSave: ([trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_HCTH.id, trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.DA_XEM_XET.id, ''].includes(this.state.trangThai)) && (((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) || (unitEditPermission && unitEditPermission.edit)) && !this.checkNotDonVi()) ? this.save : null,
