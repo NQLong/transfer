@@ -12,12 +12,14 @@ import { YeuCauKy, YeuCauKyModal } from '../hcthCongVanTrinhKy/component';
 import { createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy } from '../hcthCongVanTrinhKy/redux';
 import { createHoSo, updateHoSo } from '../hcthHoSo/redux';
 import { TaoHoSoModal, ThemVaoHoSoModal } from '../hcthHoSo/component';
+import { ThemVaoNhiemVuModal } from '../hcthNhiemVu/component';
+import { themVaoNhiemVu } from '../hcthNhiemVu/redux';
 import { FileHistoryModal } from './component';
 import { createHcthCongVanDi, createPhanHoi, deleteFile, deleteHcthCongVanDi, getCongVanDi, getHcthCongVanDiAll, getHcthCongVanDiPage, getHcthCongVanDiSearchPage, getHistory, getPhanHoi, getYeuCauKy, publishingCongVanDi, readCongVanDi, updateHcthCongVanDi, updateStatus } from './redux';
 
 import { SelectAdapter_DmNgoaiNguV2 } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
 
-const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan } = require('../constant.js');
+const { action, trangThaiCongVanDi, CONG_VAN_DI_TYPE, loaiCongVan, loaiLienKet } = require('../constant.js');
 
 const listTrangThai = {
     '1': {
@@ -840,11 +842,15 @@ class AdminEditPage extends AdminPage {
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={this.canReadOnly()} required readOnlyEmptyText=': Chưa có trích yếu' />
 
                         {this.state.id && <div className="col-md-12" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <button type='submit' className='btn btn-primary mr-2' onClick={e => { e.preventDefault(); this.taoHoSoModal.show(); }}>
-                                Tạo hồ sơ
+                            <button type='submit' className='btn btn-success mr-2' onClick={e => { e.preventDefault(); this.taoHoSoModal.show(); }}>
+                                <i className="fa fa-plus"></i>Tạo hồ sơ
                             </button>
-                            <button type='submit' className='btn btn-success mr-2' onClick={e => { e.preventDefault(); this.themVaoHoSoModal.show(); }}>
-                                Thêm vào hồ sơ
+                            <button type='submit' className='btn btn-primary mr-2' onClick={e => { e.preventDefault(); this.themVaoHoSoModal.show(); }}>
+                                <i className="fa fa-arrow-up"></i>Thêm vào hồ sơ
+                            </button>
+
+                            <button type='submit' className='btn btn-primary mr-2' onClick={e => { e.preventDefault(); this.themVaoNhiemVuModal.show(); }} >
+                                <i className="fa fa-arrow-up"></i>Thêm vào nhiệm vụ
                             </button>
                         </div>}
                     </div>
@@ -862,11 +868,11 @@ class AdminEditPage extends AdminPage {
                                 </div>
                                 <FormRichTextBox type='text' className='col-md-12 mt-3' ref={e => this.phanHoi = e} label='Thêm phản hồi' />
                                 <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                    <button type='submit' className='btn btn-primary mr-2' onClick={this.onCreatePhanHoi}>
-                                        Thêm
+                                    <button type='submit' className='btn btn-success mr-2' onClick={this.onCreatePhanHoi}>
+                                        <i className="fa fa-paper-plane"></i>Thêm
                                     </button>
                                     {this.canReturn() && <button type='submit' className='btn btn-danger' onClick={this.onReturnCvDi}>
-                                        Trả lại
+                                        <i className="fa fa-reply"></i>Trả lại
                                     </button>}
                                 </div>
                             </div>
@@ -890,7 +896,11 @@ class AdminEditPage extends AdminPage {
                 {!isNew &&
                     <div className="tile">
                         <h3 className='tile-title'><i className={`btn fa fa-sort-amount-${this.state.historySortType == 'DESC' ? 'desc' : 'asc'}`} onClick={this.onChangeHistorySort} /> Lịch sử</h3>
-                        {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
+                        <div className="tile-body row">
+                            <div className="col-md-12" style={{ maxHeight: '60vh', overflowY: 'auto' }} >
+                                {this.renderHistory(this.props.hcthCongVanDi?.item?.history)}
+                            </div>
+                        </div>
                     </div>
                 }
 
@@ -901,6 +911,7 @@ class AdminEditPage extends AdminPage {
                 <TaoHoSoModal ref={e => this.taoHoSoModal = e} create={this.props.createHoSo} />
 
                 <ThemVaoHoSoModal ref={e => this.themVaoHoSoModal = e} add={this.props.updateHoSo} vanBanId={this.state.id} />
+                <ThemVaoNhiemVuModal ref={e => this.themVaoNhiemVuModal = e} vanBanId={this.state.id} add={this.props.themVaoNhiemVu} loaiVanBan={loaiLienKet.VAN_BAN_DI.id} />
                 <FileBox ref={this.updateFileRef} postUrl='/user/upload'
                     uploadType='hcthCongVanDiUpdateFile'
                     userData={`hcthCongVanDiUpdateFile:${this.state.id}:${this.state.originFileId}:${this.state.updateFileId}`} style={{ display: 'none' }}
@@ -915,5 +926,5 @@ class AdminEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi, phanHoi: state.hcth.hcthPhanHoi });
-const mapActionsToProps = { getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, createDmDonViGuiCv, readCongVanDi, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, publishingCongVanDi, getYeuCauKy, createHoSo, updateHoSo };
+const mapActionsToProps = { getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, updateStatus, getPhanHoi, createDmDonViGuiCv, readCongVanDi, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, publishingCongVanDi, getYeuCauKy, createHoSo, updateHoSo, themVaoNhiemVu };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
