@@ -1,6 +1,6 @@
-// Table name: TCCB_NHOM_DANH_GIA_NHIEM_VU { id, ten, ghiChu, nam, kichHoat }
+// Table name: TCCB_NHOM_DANH_GIA_NHIEM_VU { id, ten, ghiChu, nam, kichHoat, thuTu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'ghiChu': 'GHI_CHU', 'nam': 'NAM', 'kichHoat': 'KICH_HOAT' };
+const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'ghiChu': 'GHI_CHU', 'nam': 'NAM', 'kichHoat': 'KICH_HOAT', 'thuTu': 'THU_TU' };
 
 module.exports = app => {
     app.model.tccbNhomDanhGiaNhiemVu = {
@@ -214,6 +214,19 @@ module.exports = app => {
                     resolve(result);
                 }
             });
+        }),
+
+        updateThuTu: (pId, pThuTu, pIsUp, pNam, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN tccb_nhom_danh_gia_nhiem_vu_gan_thu_tu(:pId, :pThuTu, :pIsUp, :pNam); END;',
+                { pId, pThuTu, pIsUp, pNam }, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                });
         }),
     };
 };
