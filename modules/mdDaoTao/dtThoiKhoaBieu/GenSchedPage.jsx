@@ -14,8 +14,6 @@ import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
 import { GetAllDmPhongInCoSo } from 'modules/mdDanhMuc/dmPhong/redux';
 // import { SelectAdapter_DmPhongFilter } from 'modules/mdDanhMuc/dmPhong/redux';
-const dataKhoaSinhVien = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
-
 const dataThu = [2, 3, 4, 5, 6, 7];
 const fullDataTietThu = [];
 class GenSchedPage extends AdminPage {
@@ -24,18 +22,20 @@ class GenSchedPage extends AdminPage {
     }
 
     componentDidMount() {
-        this.props.getDmCaHocAll(items => {
-            items = [...new Set(items.map(item => parseInt(item.ten)))];
-            this.setState({ dataTiet: items });
-        });
         T.ready('/user/dao-tao', () => {
-            // For testing
-            this.bacDaoTao.value('DH');
-            this.loaiHinhDaoTao.value('CQ');
-            this.nam.value(61);
-            this.hocKy.value(1);
-            this.khoaSinhVien.value(2021);
-            this.khoaDangKy.value(33);
+            this.setState({ dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) });
+            const cookie = T.updatePage('pageDtThoiKhoaBieu');
+            const { filter } = cookie;
+
+            if (filter) {
+                let { namFilter, bacDaoTaoFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
+                this.bacDaoTao.value(bacDaoTaoFilter);
+                this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
+                this.nam.value(namFilter);
+                this.hocKy.value(hocKyFilter);
+                this.khoaSinhVien.value(khoaSinhVienFilter);
+            }
+
         });
     }
 
@@ -115,37 +115,44 @@ class GenSchedPage extends AdminPage {
 
     handleResetConfig = (e) => {
         e.preventDefault();
-        this.setState({ step: 1 }, () => {
+        this.setState({ step: 1, editId: null }, () => {
             this.props.resetDtThoiKhoaBieuConfig();
         });
     }
 
     handleSubmitAdjustedData = (e) => {
         e.preventDefault();
-        this.setState({ step: 3 }, () => {
-            this.coSo.focus();
+        this.setState({ step: 3, editId: null }, () => {
+            // this.coSo.focus();
+            this.handleRenderTiet();
         });
     }
     // End step 2.
 
     // Step 3: Config time
     handleChooseBuilding = (value) => {
-        this.setState({ maCoSo: value.id, amount: 1 }, () => {
-            this.handleRenderTiet();
-            // this.phongKhongSuDung.value('');
+        getDmCaHocAllCondition(value.id, data => {
+            data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
+            this.setState({ dataTiet: data });
         });
     }
 
     handleRenderTiet = () => {
-        getDmCaHocAllCondition(this.state.maCoSo, data => {
-            data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
-            data.forEach(tiet => {
-                dataThu.forEach(thu => {
-                    fullDataTietThu.push({ [thu]: tiet });
-                });
+        this.state.dataTiet.forEach(tiet => {
+            dataThu.forEach(thu => {
+                fullDataTietThu.push({ [thu]: tiet });
             });
-            this.setState({ fullDataTietThu, dataTiet: data });
         });
+        this.setState({ fullDataTietThu });
+        // getDmCaHocAllCondition(this.coSo.value(), data => {
+        //     data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
+        //     data.forEach(tiet => {
+        //         dataThu.forEach(thu => {
+        //             fullDataTietThu.push({ [thu]: tiet });
+        //         });
+        //     });
+        //     this.setState({ fullDataTietThu, dataTiet: data });
+        // });
     }
 
     handleSaveTimeConfig = () => {
@@ -416,7 +423,7 @@ class GenSchedPage extends AdminPage {
 
     render() {
         let dtThoiKhoaBieuConfig = this.props.dtThoiKhoaBieu;
-        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess } = this.state;
+        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess, dataKhoaSinhVien } = this.state;
         return this.renderPage({
             title: 'Quản lý sinh thời khoá biểu tự động',
             icon: 'fa fa-cogs',
@@ -433,8 +440,9 @@ class GenSchedPage extends AdminPage {
                                 <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-3' label='Năm học' onChange={this.handleNam} required />
                                 <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-2' required />
                                 <FormSelect ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-2' required />
-                                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị mở môn' className='col-md-8' required />
-                                <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' required />
+                                <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} label='Đơn vị mở môn' className='col-md-12' required />
+                                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' required />
+                                <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Chọn cơ sở học' className='col-md-6' onChange={this.handleChooseBuilding} />
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <button className='btn btn-outline-primary' type='button' onClick={this.handleSubmitConfig} disabled={onSaveConfig}>
@@ -482,8 +490,8 @@ class GenSchedPage extends AdminPage {
                                 {timeConfig && timeConfig.length ? <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleGenTime}>
                                     Tiếp theo <i className='fa fa-lg fa-arrow-right' />
                                 </button> : ''}
-                                <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Chọn cơ sở học' className='col-md-6' onChange={this.handleChooseBuilding} />
-                                <div className='col-md-6' />
+                                {/* <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Chọn cơ sở học' className='col-md-6' onChange={this.handleChooseBuilding} />
+                                <div className='col-md-6' /> */}
                                 {/* <FormSelect ref={e => this.phongKhongSuDung = e} data={SelectAdapter_DmPhongFilter(this.state.maCoSo)} className='col-md-8' label='Chọn các phòng không sử dụng' /> */}
                                 {this.state.fullDataTietThu &&
                                     <div className='form-group col-md-6'>
@@ -572,10 +580,10 @@ class GenSchedPage extends AdminPage {
                         <div className='tile-title'>
                             <h4>Bước 6: Kết quả tự động xếp phòng học, lịch học</h4>
                             {genSuccess ?
-                                <button className='btn btn-success' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.updateGenData}>
+                                <button className='btn btn-success' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={e => e.preventDefault() || this.props.history.push('/user/dao-tao/thoi-khoa-bieu')}>
                                     Hoàn tất <i className='fa fa-lg fa-check' />
-                                </button> : <button className='btn btn-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.updateGenData}>
-                                    {isWaitingUpdate ? 'Loading' : 'Lưu thay đổi'}<i className={isWaitingUpdate ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-save'} />
+                                </button> : <button className='btn btn-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.updateGenData} disabled={isWaitingUpdate}>
+                                    {isWaitingUpdate ? 'Loading' : 'Lưu thay đổi'} <i className={isWaitingUpdate ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-save'} />
                                 </button>}
                         </div>
                         <div className='tile-body'>
