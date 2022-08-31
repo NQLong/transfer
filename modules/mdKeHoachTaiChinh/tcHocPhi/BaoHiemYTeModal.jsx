@@ -76,7 +76,7 @@ class BaoHiemModal extends AdminModal {
     }
 
     renderChoices = (item) => {
-        return <div className={`btn ${this.state[item.key] ? 'btn-primary' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', }} onClick={item.onClick}>
+        return <div className={`btn ${this.state[item.key] ? 'btn-primary' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', padding: '20px' }} onClick={item.onClick}>
 
             <h5 style={{ whiteSpace: 'normal' }}>{item.title}</h5>
             <ul style={{ whiteSpace: 'normal', width: '100%', textAlign: 'left', fontWeight: 'normal', paddingLeft: 10 }}>
@@ -88,11 +88,11 @@ class BaoHiemModal extends AdminModal {
     render = () => {
         let { check12ThangBhyt, check15ThangBhyt, checkMienBhyt } = this.state;
         return this.renderModal({
-            title: 'Diện Bảo hiểm y tế',
+            title: 'Mức đóng BHYT',
             size: 'large',
             isShowSubmit: check12ThangBhyt || check15ThangBhyt || checkMienBhyt,
             body: <div className='row'>
-                <div className='text-danger form-group col-md-12'>* Sinh viên vui lòng chọn <b>1 trong 3 diện</b> để tiến hành đóng học phí</div>
+                <div className='text-danger form-group col-md-12'>* Sinh viên vui lòng chọn <b>1 trong 3 mức đóng BHYT</b> để tiến hành đóng học phí</div>
                 {/* <FormCheckbox className='col-md-12' ref={e => this.checkMienBhyt = e} label='Đối tượng được miễn đóng BHYT' onChange={this.handleMienDongBhyt} />
                 <FormCheckbox className='col-md-12' ref={e => this.check12ThangBhyt = e} label='Tham gia BHYT 12 tháng (563.220 đồng, từ ngày 01/01/2023 đến 31/12/2023)' onChange={this.handleDong12Thang} />
                 <FormCheckbox className='col-md-12' ref={e => this.check15ThangBhyt = e} label='Tham gia BHYT 15 tháng (704.025 đồng, từ ngày 01/10/2022 đến 31/12/2023)' onChange={this.handleDong15Thang} /> */}
@@ -105,7 +105,7 @@ class BaoHiemModal extends AdminModal {
 
                     </div>
                     <div className='col-md-4'>
-                        {this.renderChoices({ key: 'check15ThangBhyt', title: 'Tham gia BHYT 15 tháng', conditions: ['Sinh viên chưa có thẻ BHYT.', 'Thời hạn sử dụng thẻ BHYT cũ đến hết ngày 30/9/2022.', <>Sinh viên tra cứu thời hạn sử dụng thẻ BHYT <a style={{ color: this.state.check15ThangBhyt ? 'red' : 'blue' }} className='btn-link' target='_blank' rel='noopener noreferrer' href='https://baohiemxahoi.gov.vn/tracuu/Pages/tra-cuu-thoi-han-su-dung-the-bhyt.aspx'>tại đây</a>.</>], onClick:() => this.handleDong15Thang(!this.state.check15ThangBhyt) })}
+                        {this.renderChoices({ key: 'check15ThangBhyt', title: 'Tham gia BHYT 15 tháng', conditions: ['Sinh viên chưa có thẻ BHYT.', 'Thời hạn sử dụng thẻ BHYT cũ đến hết ngày 30/9/2022.', <>Sinh viên tra cứu thời hạn sử dụng thẻ BHYT <a style={{ color: this.state.check15ThangBhyt ? 'red' : 'blue' }} className='btn-link' target='_blank' rel='noopener noreferrer' href='https://baohiemxahoi.gov.vn/tracuu/Pages/tra-cuu-thoi-han-su-dung-the-bhyt.aspx'>tại đây</a>.</>], onClick: () => this.handleDong15Thang(!this.state.check15ThangBhyt) })}
 
                     </div>
                 </div>
