@@ -384,7 +384,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                     <i className='fa fa-lg fa-cog' />
                                 </button>
                             </Tooltip>}
-                            {(permission.write || permission.manage) && <Tooltip title='Xóa' arrow>
+                            {(permission.write || permission.manage) && !(item.phong && item.thu && item.tietBatDau) && <Tooltip title='Xóa' arrow>
                                 <button className='btn btn-danger' onClick={e => e.preventDefault() || this.delete(item)}>
                                     <i className='fa fa-lg fa-trash' />
                                 </button>
