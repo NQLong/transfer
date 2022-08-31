@@ -872,8 +872,8 @@ export class ThemVaoNhiemVuModal extends AdminModal {
         return this.renderModal({
             title: 'Thêm văn bản vào nhiệm vụ',
             size: 'elarge',
-            body: <div className="row">
-                <FormSelect className="col-md-12" label='Chọn nhiệm vụ' ref={e => this.nhiemVu = e} data={SelectAdapter_NhiemVu} required />
+            body: <div className='row'>
+                <FormSelect className='col-md-12' label='Chọn nhiệm vụ' ref={e => this.nhiemVu = e} data={SelectAdapter_NhiemVu} required />
             </div>
         });
     }

@@ -763,7 +763,7 @@ class StaffEditPage extends AdminPage {
                         }
                         {this.state.id && <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <button type='submit' className='btn btn-primary mr-2' onClick={e => { e.preventDefault(); this.themVaoNhiemVuModal.show(); }} >
-                                <i className="fa fa-arrow-up"></i>Thêm vào nhiệm vụ
+                                <i className='fa fa-arrow-up'></i>Thêm vào nhiệm vụ
                             </button>
                         </div>}
 
