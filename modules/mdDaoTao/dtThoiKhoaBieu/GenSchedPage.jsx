@@ -26,10 +26,9 @@ class GenSchedPage extends AdminPage {
             this.setState({ dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) });
             const cookie = T.updatePage('pageDtThoiKhoaBieu');
             const { filter } = cookie;
-
+            this.bacDaoTao.value('DH');
             if (filter) {
-                let { namFilter, bacDaoTaoFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
-                this.bacDaoTao.value(bacDaoTaoFilter);
+                let { namFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
                 this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
                 this.nam.value(namFilter);
                 this.hocKy.value(hocKyFilter);
