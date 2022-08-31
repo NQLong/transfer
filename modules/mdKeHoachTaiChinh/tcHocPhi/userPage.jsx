@@ -36,11 +36,11 @@ class ThanhToanModal extends AdminModal {
             </button>,
             body: <div>
                 <section className='row justify-content-center' style={{ display: this.state.vcb || this.state.agri ? 'none' : '' }}>
+                    <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
+                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                     <ButtonBank title='BIDV' imgSrc='/img/logo/logo_bidv.png' onClick={() => {
                         window.open('/sample/BIDV-2022.pdf', '_blank');
                     }} />
-                    <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
-                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                 </section>
                 <section className='row' style={{ display: this.state.vcb ? '' : 'none', justifyContent: 'center' }}>
                     <ButtonBank title='Bằng tài khoản VCB' imgSrc='/img/logo/vcb.png' onClick={() => this.props.vnPayGoToTransaction('vnpay-vcb', link => {
@@ -152,7 +152,7 @@ class UserPage extends AdminPage {
         const dataHocKy = dataTrongNam.groupBy('hocKy');
         return (
             <div className='tile' key={namHoc}>
-                <div className='tile-title'>Năm {namHoc} - {Number(namHoc) + 1}</div>
+                <div className='tile-title'>Năm học {namHoc} - {Number(namHoc) + 1}</div>
                 {Object.keys(dataHocKy).sort((a, b) => Number(b) - Number(a)).map(hocKy => {
                     let current = dataHocKy[hocKy][0];
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
