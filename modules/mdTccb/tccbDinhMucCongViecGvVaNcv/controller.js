@@ -62,8 +62,8 @@ module.exports = app => {
         try {
             const ma = req.query.ma;
             let items = await Promise.all([
-                app.model.dmChucDanhKhoaHoc.get({ ma }),
-                app.model.dmNgachCdnn.get({ ma }),
+                app.model.dmChucDanhKhoaHoc.get({ ma, kichHoat: 1 }),
+                app.model.dmNgachCdnn.get({ ma, kichHoat: 1 }),
             ]);
             let result = items[0] ? items[0] : items[1];
             res.send({ result });

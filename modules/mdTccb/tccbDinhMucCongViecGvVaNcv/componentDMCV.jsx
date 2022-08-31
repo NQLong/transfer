@@ -52,11 +52,11 @@ class EditModal extends AdminModal {
         this.setState({ item });
         this.idNhom.value(idNhom);
         this.maChucDanh.value(maChucDanh.split(','));
-        this.soGioGiangDay.value(Number(soGioGiangDay).toFixed(2));
+        this.soGioGiangDay.value(Number(soGioGiangDay));
         this.soDiemGiangDay.value(Number(soDiemGiangDay).toFixed(2));
-        this.soGioNghienCuuKhoaHoc.value(Number(soGioNghienCuuKhoaHoc).toFixed(2));
+        this.soGioNghienCuuKhoaHoc.value(Number(soGioNghienCuuKhoaHoc));
         this.soDiemNghienCuuKhoaHoc.value(Number(soDiemNghienCuuKhoaHoc).toFixed(2));
-        this.soGioKhac.value(Number(soGioKhac).toFixed(2));
+        this.soGioKhac.value(Number(soGioKhac));
         this.soDiemKhac.value(Number(soDiemKhac).toFixed(2));
     };
 
@@ -65,11 +65,11 @@ class EditModal extends AdminModal {
         const changes = {
             idNhom: getValue(this.idNhom),
             maChucDanh,
-            soGioGiangDay: Number(getValue(this.soGioGiangDay)).toFixed(2),
+            soGioGiangDay: Number(getValue(this.soGioGiangDay)),
             soDiemGiangDay: Number(getValue(this.soDiemGiangDay)).toFixed(2),
-            soGioNghienCuuKhoaHoc: Number(getValue(this.soGioNghienCuuKhoaHoc)).toFixed(2),
+            soGioNghienCuuKhoaHoc: Number(getValue(this.soGioNghienCuuKhoaHoc)),
             soDiemNghienCuuKhoaHoc: Number(getValue(this.soDiemNghienCuuKhoaHoc)).toFixed(2),
-            soGioKhac: Number(getValue(this.soGioKhac)).toFixed(2),
+            soGioKhac: Number(getValue(this.soGioKhac)),
             soDiemKhac: Number(getValue(this.soDiemKhac)).toFixed(2),
         };
         if (!this.state.item) {
@@ -91,11 +91,11 @@ class EditModal extends AdminModal {
                     label='Nhóm chức danh'
                     placeholder='Nhóm chức danh' readOnly={readOnly} required />
                 <FormSelect ref={e => this.maChucDanh = e} multiple={true} className='col-md-6' data={SelectAdapter_NgachCdnnVaChucDanhKhoaHoc} label='Mã chức danh' placeholder='Mã chức danh' readOnly={readOnly} required />
-                <FormTextBox type='number' min={0} step={true} className='col-md-4' ref={e => this.soGioGiangDay = e} label='Số giờ giảng dạy'
+                <FormTextBox type='number' min={0} className='col-md-4' ref={e => this.soGioGiangDay = e} label='Số giờ giảng dạy'
                     readOnly={readOnly} required />
-                <FormTextBox type='number' min={0} step={true} className='col-md-4' ref={e => this.soGioNghienCuuKhoaHoc = e} label='Số giờ nghiên cứu khoa học'
+                <FormTextBox type='number' min={0} className='col-md-4' ref={e => this.soGioNghienCuuKhoaHoc = e} label='Số giờ nghiên cứu khoa học'
                     readOnly={readOnly} required />
-                <FormTextBox type='number' min={0} step={true} className='col-md-4' ref={e => this.soGioKhac = e} label='Số giờ khác'
+                <FormTextBox type='number' min={0} className='col-md-4' ref={e => this.soGioKhac = e} label='Số giờ khác'
                     readOnly={readOnly} required />
                 <FormTextBox type='number' min={0} step={true} className='col-md-4' ref={e => this.soDiemGiangDay = e} label='Số điểm giảng dạy'
                     readOnly={readOnly} required />
@@ -203,9 +203,9 @@ class ComponentDMCV extends AdminPage {
                                     <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
                                     <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
                                     <TableCell style={{ textAlign: 'left' }} content={'Số giờ làm việc'} />
-                                    <TableCell style={{ textAlign: 'center' }} content={Number(menu.soGioGiangDay).toFixed(2)} />
-                                    <TableCell style={{ textAlign: 'center' }} content={Number(menu.soGioNghienCuuKhoaHoc).toFixed(2)} />
-                                    <TableCell style={{ textAlign: 'center' }} content={Number(menu.soGioKhac).toFixed(2)} />
+                                    <TableCell style={{ textAlign: 'center' }} content={menu.soGioGiangDay} />
+                                    <TableCell style={{ textAlign: 'center' }} content={menu.soGioNghienCuuKhoaHoc} />
+                                    <TableCell style={{ textAlign: 'center' }} content={menu.soGioKhac} />
                                     <TableCell style={{ textAlign: 'center' }} rowSpan={2} type='buttons' content={menu} permission={permission}
                                         onEdit={() => this.modal.show(menu)}
                                         onDelete={this.delete}

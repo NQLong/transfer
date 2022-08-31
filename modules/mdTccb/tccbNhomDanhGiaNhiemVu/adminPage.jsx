@@ -12,19 +12,19 @@ export class EditModal extends AdminModal {
         ));
     }
 
-    reset = () => {
+    onHide = () => {
         this.ten.value('');
         this.ghiChu.value('');
-        this.kichHoat(0);
     }
 
     onShow = (item) => {
-        this.setState({ item });
-        let { ten, ghiChu, nam, kichHoat } = item ? item : { ten: '', nam: 0, ghiChu: '', kichHoat: 0 };
-        this.ten.value(ten);
-        this.ghiChu.value(ghiChu);
+        this.onHide();
+        let { ten, ghiChu, nam, kichHoat } = item ? item : { ten: '', nam: 0, ghiChu: '', kichHoat: 1 };
+        this.ten.value(ten || '');
+        this.ghiChu.value(ghiChu || '');
         this.nam.value(nam ? Number(nam) : '');
         this.kichHoat.value(kichHoat ? Number(kichHoat) : 1);
+        this.setState({ item });
     };
 
     onSubmit = (e) => {
@@ -36,9 +36,9 @@ export class EditModal extends AdminModal {
             kichHoat: getValue(this.kichHoat)
         };
         if (!this.state.item || this.state.item.add) {
-            this.props.createTccbNhomDanhGiaNhiemVu(changes, () => { this.hide(); this.reset(); this.setState({ item: null }); });
+            this.props.createTccbNhomDanhGiaNhiemVu(changes, this.hide);
         } else {
-            this.props.updateTccbNhomDanhGiaNhiemVu(this.state.item.id, changes, () => { this.hide(); this.reset(); this.setState({ item: null }); });
+            this.props.updateTccbNhomDanhGiaNhiemVu(this.state.item.id, changes, this.hide);
         }
     };
 
