@@ -61,25 +61,33 @@ module.exports = app => {
 
     app.get('/api/danh-muc/phong/condition/:maCoSo', app.permission.orCheck('dmPhong:read', 'dtPhong:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
         try {
-            let listToaNha = await app.model.dmToaNha.getAll({ coSo: req.params.maCoSo, kichHoat: 1 }, 'ma');
-            listToaNha = listToaNha.map(item => item.ma);
-            let condition = {
-                statement: 'toaNha IN (:listToaNha)',
-                parameter: {
-                    listToaNha: listToaNha
-                }
-            };
-            if (req.query.condition) {
-                condition = {
-                    statement: 'lower(ten) LIKE :searchText AND toaNha IN (:listToaNha)',
-                    parameter: {
-                        searchText: `%${req.query.condition.toLowerCase()}%`,
-                        listToaNha: listToaNha
+            let coSo = await app.model.dmCoSo.get({ ma: parseInt(req.params.maCoSo) });
+            if (!coSo) res.send({ error: 'Không tìm thấy cơ sở' });
+            else {
+                let listToaNha = await app.model.dmToaNha.getAll({ coSo: parseInt(req.params.maCoSo), kichHoat: 1 }, 'ma');
+                if (!listToaNha || !listToaNha.length) res.send({ items: [] });
+                else {
+                    listToaNha = listToaNha.map(item => item.ma);
+                    let condition = {
+                        statement: 'toaNha IN (:listToaNha)',
+                        parameter: {
+                            listToaNha: listToaNha
+                        }
+                    };
+                    if (req.query.condition) {
+                        condition = {
+                            statement: 'lower(ten) LIKE :searchText AND toaNha IN (:listToaNha)',
+                            parameter: {
+                                searchText: `%${req.query.condition.toLowerCase()}%`,
+                                listToaNha: listToaNha
+                            }
+                        };
                     }
-                };
+                    let items = await app.model.dmPhong.getAll(condition);
+                    res.send({ items: items.map(item => ({ ...item, tenCoSo: app.utils.parse(coSo.ten, { vi: '' }).vi })) });
+                }
             }
-            let items = await app.model.dmPhong.getAll(condition);
-            res.send({ items });
+
         } catch (error) {
             res.send({ error });
         }

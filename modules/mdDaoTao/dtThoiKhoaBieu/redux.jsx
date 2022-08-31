@@ -254,3 +254,31 @@ export function updateDtThoiKhoaBieuConfig(data, done) {
         });
     };
 }
+
+export function dtThoiKhoaBieuGenTime(data, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/generate-time';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lỗi ${result.error.message || 'hệ thống'}`, 'danger');
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfig, items: { dataCanGen: result.dataReturn } });
+                done && done(result.dataReturn);
+            }
+        });
+    };
+}
+
+export function dtThoiKhoaBieuGenRoom(data, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/generate-room-end-date';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lồi: ${result.error.message || 'Sinh tự động thất bại'}`, 'danger');
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfig, items: { dataCanGen: result.dataReturn } });
+                done && done(result.dataReturn);
+            }
+        });
+    };
+}

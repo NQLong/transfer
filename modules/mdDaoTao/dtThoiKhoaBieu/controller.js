@@ -401,6 +401,11 @@ module.exports = app => {
         }
 
     });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/generate-time', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataGenerateSchedule);
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/generate-room-end-date', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataRoomAndEndDate);
+
     // Export xlsx
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {
