@@ -121,37 +121,46 @@ module.exports = app => {
                 hocPhanDaXep[hocPhan.id] = hocPhan;
             });
             // 1.2: Config data thứ, tiết.
-            for (const ele of timeConfig) {
-                if (!ele.listDonVi) {
-                    hocPhanTheoIdNganh.forEach(idNganh => {
-                        idNganh.available = ele.thuTietMo;
-                    });
-                } else {
-                    ele.listDonVi = ele.listDonVi.map(item => parseInt(item));
-                    hocPhanTheoIdNganh.forEach(idNganh => {
-                        if ((idNganh.khoa && ele.listDonVi.includes(idNganh.khoa)) || (idNganh.khoaCn && ele.listDonVi.includes(idNganh.khoaCn))) {
+            const setAvailable = () => {
+                for (const ele of timeConfig) {
+                    if (!ele.listDonVi) {
+                        hocPhanTheoIdNganh.forEach(idNganh => {
                             idNganh.available = ele.thuTietMo;
-                        }
-                    });
+                        });
+                    } else {
+                        ele.listDonVi = ele.listDonVi.map(item => parseInt(item));
+                        hocPhanTheoIdNganh.forEach(idNganh => {
+                            if ((idNganh.khoa && ele.listDonVi.includes(idNganh.khoa)) || (idNganh.khoaCn && ele.listDonVi.includes(idNganh.khoaCn))) {
+                                idNganh.available = ele.thuTietMo;
+                            }
+                        });
+                    }
                 }
-            }
+            };
+
+            setAvailable();
+
             let dataReturn = [];
             hocPhanLoop: for (let hocPhan of dataCanGen) {
                 let { id, loaiMonHoc, soTietBuoi } = hocPhan;
                 if (!loaiMonHoc) {
                     // Môn bắt buộc
                     let listNganh = hocPhanTheoIdNganh.filter(item => item.idThoiKhoaBieu.includes(id));
-                    const thoiGianRanhChung = intersectMany(listNganh.map(item => item.available));
+                    let thoiGianRanhChung = intersectMany(listNganh.map(item => item.available));
                     if (hocPhan.tietBatDau) {
                         if (!isValidPeriod(hocPhan.tietBatDau, soTietBuoi)) continue hocPhanLoop;
                         else {
                             let dataThoiGian = thoiGianRanhChung.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
                             if (dataThoiGian.length == 0) {
+                                setAvailable();
+                                listNganh = hocPhanTheoIdNganh.filter(item => item.idThoiKhoaBieu.includes(id));
+                                thoiGianRanhChung = intersectMany(listNganh.map(item => item.available));
                                 dataThoiGian = thoiGianRanhChung.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
                                 hocPhanTheoIdNganh.forEach(idNganh => {
                                     idNganh.available = dataThoiGian;
                                 });
                             }
+                            // console.log(dataThoiGian);
                             let thuTiet = dataThoiGian.sample(),
                                 [thu, tietBatDau] = thuTiet.split('_');
                             dataReturn.push({ ...hocPhan, thu, tietBatDau });
@@ -207,6 +216,7 @@ module.exports = app => {
             }
             res.send({ dataReturn });
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     };
