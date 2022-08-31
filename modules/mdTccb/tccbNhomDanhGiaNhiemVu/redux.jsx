@@ -152,3 +152,20 @@ export const SelectAdapter_NhomDanhGiaNhiemVu = (nam) => ({
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.id, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getTccbNhomDanhGiaNhiemVu(ma, item => done && done({ id: item.id, text: item.ten })))(),
 });
+
+export function updateTccbNhomDanhGiaNhiemVuThuTu(id, thuTu, nam, done) {
+    return () => {
+        const url = '/api/tccb/nhom-danh-gia-nhiem-vu/thu-tu';
+        T.put(url, { id, thuTu, nam }, (data) => {
+            if (data.error) {
+                T.notify('Thay đổi thứ tự bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+            } else {
+                T.notify('Thay đổi thứ tự thành công!', 'success');
+                done && done();
+            }
+        },
+            () => T.notify('Thay đổi thứ tự bị lỗi!', 'danger')
+        );
+    };
+}

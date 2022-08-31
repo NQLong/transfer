@@ -109,8 +109,8 @@ class ComponentDGCB extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={item.nhom} />
                     <TableCell style={{ textAlign: 'left' }} content={this.tenChucVu(item, this.chucVuOption)} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.kcm} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.kld} />
+                    <TableCell style={{ textAlign: 'center' }} content={Number(item.kcm).toFixed(2)} />
+                    <TableCell style={{ textAlign: 'center' }} content={Number(item.kld).toFixed(2)} />
                     <TableCell style={{ textAlign: 'left' }} content={item.donViDanhGia} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}

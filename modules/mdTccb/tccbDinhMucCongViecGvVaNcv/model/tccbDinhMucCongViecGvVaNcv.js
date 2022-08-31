@@ -12,27 +12,31 @@ module.exports = app => {
 
     app.model.tccbDinhMucCongViecGvVaNcv.getAllByYear = async (nam) => {
         const [listNhom, listNgach, listChucDanhKhoaHoc] = await Promise.all([
-            app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam }),
+            app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam }, '*', 'thuTu ASC'),
             app.model.dmNgachCdnn.getAll(),
             app.model.dmChucDanhKhoaHoc.getAll(),
         ]);
         const listChucDanh = listNgach.concat(listChucDanhKhoaHoc);
         const listId = listNhom.map(nhom => nhom.id);
-        const items = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listId)', parameter: { listId } }, '*', 'idNhom');
-        const result = items.map(item => {
+        if (listId.length == 0) return [];
+
+        let items = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listId)', parameter: { listId } }, '*', 'idNhom');
+        items = items.map(item => {
             const itemChucDanhIds = item.maChucDanh.split(',');
             const chucDanhs = itemChucDanhIds.map(ma => {
                 const index = listChucDanh.findIndex(chucDanh => chucDanh.ma == ma);
                 return index == -1 ? '' : listChucDanh[index].ten;
             });
-            const index = listNhom.findIndex(nhom => nhom.id == item.idNhom);
             return {
                 ...item,
                 chucDanhs: chucDanhs.join('; '),
-                tenNhom: index != -1 ? listNhom[index].ten : '',
             };
         });
-        return result;
+        const result = listNhom.map(nhom => ({
+            ...nhom,
+            submenus: items.filter(item => item.idNhom == nhom.id),
+        }));
+        return result.filter(item => item.submenus.length > 0);
     };
 
     app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear = async (oldNam, newNam) => {

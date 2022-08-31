@@ -5,10 +5,19 @@ import { AdminModal, FormTextBox, AdminPage, getValue } from 'view/component/Adm
 import { Tooltip } from '@mui/material';
 
 class EditModal extends AdminModal {
+
+    parentId = null;
+    thuTu = null;
+
     componentDidMount() {
         $(document).ready(() => this.onShown(() =>
             this.noiDung.focus()
         ));
+    }
+
+    reset = () => {
+        this.parentId = null;
+        this.thuTu = null;
     }
 
     onShow = (item) => {
@@ -18,13 +27,14 @@ class EditModal extends AdminModal {
                 this.noiDung.value(noiDung);
                 this.setState({ item: item.updateItem });
             } else {
-                const thuTu = item.submenus.length != 0 ? Math.max(...item.submenus.map(item => item.thuTu)) : 0;
-                this.setState({ parentId: item.parentId, thuTu });
+                this.parentId = item.parentId;
+                this.thuTu = item.submenus.length != 0 ? Math.max(...item.submenus.map(item => item.thuTu)) : 0;
             }
         } else this.setState({ item });
     };
 
     onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
             noiDung: getValue(this.noiDung),
         };
@@ -32,13 +42,12 @@ class EditModal extends AdminModal {
             this.props.create({
                 ...changes,
                 nam: this.props.nam,
-                parentId: this.state.parentId || null,
-                thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
-            }, () => this.hide());
-        else this.props.update(this.state.item.id, changes, () => this.hide());
-        this.setState({ item: null });
+                parentId: this.parentId || null,
+                thuTu: this.thuTu ? this.thuTu + 1 : this.props.thuTu + 1
+            }, this.hide);
+        else this.props.update(this.state.item.id, changes, this.hide);
+        this.reset();
         this.noiDung.value('');
-        e.preventDefault();
     };
 
     render = () => {

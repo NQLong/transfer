@@ -84,7 +84,7 @@ class ComponentDGCB extends AdminPage {
             });
             return ui;
         }
-        $('table tbody')
+        $('table.dgcb tbody')
             .sortable({
                 helper: fixWidthHelper,
                 start: (e, ui) => {
@@ -125,6 +125,7 @@ class ComponentDGCB extends AdminPage {
         const list = this.state.items || [];
         const thuTu = list.length != 0 ? Math.max(...list.map(item => item.thuTu)) : 0;
         let table = renderTable({
+            className: 'dgcb',
             emptyTable: 'Không có dữ liệu khung đánh giá cán bộ',
             getDataSource: () => list,
             renderHead: () => (

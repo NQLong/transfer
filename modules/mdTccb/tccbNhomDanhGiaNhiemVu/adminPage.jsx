@@ -1,20 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbNhomDanhGiaNhiemVuPage, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, deleteTccbNhomDanhGiaNhiemVu } from './redux';
+import { getTccbNhomDanhGiaNhiemVuPage, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, deleteTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVuThuTu } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell, AdminModal, FormTextBox, FormCheckbox, getValue } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
-class EditModal extends AdminModal {
+export class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() =>
             this.ten.focus()
         ));
     }
 
+    reset = () => {
+        this.ten.value('');
+        this.ghiChu.value('');
+        this.kichHoat(0);
+    }
+
     onShow = (item) => {
-        let { ten, ghiChu, nam, kichHoat } = item ? item : { ten: '', nam: 0, ghiChu: '', kichHoat: 0 };
         this.setState({ item });
+        let { ten, ghiChu, nam, kichHoat } = item ? item : { ten: '', nam: 0, ghiChu: '', kichHoat: 0 };
         this.ten.value(ten);
         this.ghiChu.value(ghiChu);
         this.nam.value(nam ? Number(nam) : '');
@@ -29,10 +35,10 @@ class EditModal extends AdminModal {
             nam: Number(getValue(this.nam)),
             kichHoat: getValue(this.kichHoat)
         };
-        if (!this.state.item) {
-            this.props.createTccbNhomDanhGiaNhiemVu(changes, this.hide);
+        if (!this.state.item || this.state.item.add) {
+            this.props.createTccbNhomDanhGiaNhiemVu(changes, () => { this.hide(); this.reset(); this.setState({ item: null }); });
         } else {
-            this.props.updateTccbNhomDanhGiaNhiemVu(this.state.item.id, changes, this.hide);
+            this.props.updateTccbNhomDanhGiaNhiemVu(this.state.item.id, changes, () => { this.hide(); this.reset(); this.setState({ item: null }); });
         }
     };
 
@@ -40,12 +46,14 @@ class EditModal extends AdminModal {
 
     render = () => {
         const readOnly = this.props.readOnly;
+        const add = this.state?.item?.add || false;
+        const update = this.state?.item?.update || false;
         return this.renderModal({
-            title: this.state.item ? 'Cập nhật nhóm đánh giá' : 'Tạo mới nhóm đánh giá',
+            title: !this.state.item || this.state.item.add ? 'Tạo mới nhóm đánh giá' : 'Cập nhật nhóm đánh giá',
             body: <div className='row'>
                 <FormTextBox className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
                 <FormTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi Chú' readOnly={readOnly} placeholder='Ghi chú' />
-                <FormTextBox type='year' ref={e => this.nam = e} label='Năm' className='col-12' required readOnly={readOnly} />
+                <FormTextBox type='year' ref={e => this.nam = e} label='Năm' className='col-12' required readOnly={readOnly || add || update} />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
                     onChange={value => this.changeKichHoat(value)} required />
             </div>
@@ -123,5 +131,5 @@ class TccbNhomDanhGiaNhiemVuPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tccbNhomDanhGiaNhiemVu: state.tccb.tccbNhomDanhGiaNhiemVu });
-const mapActionsToProps = { getTccbNhomDanhGiaNhiemVuPage, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, deleteTccbNhomDanhGiaNhiemVu };
+const mapActionsToProps = { getTccbNhomDanhGiaNhiemVuPage, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, deleteTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVuThuTu };
 export default connect(mapStateToProps, mapActionsToProps)(TccbNhomDanhGiaNhiemVuPage);
