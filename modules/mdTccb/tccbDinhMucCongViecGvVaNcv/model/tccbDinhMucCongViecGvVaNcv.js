@@ -4,10 +4,11 @@ module.exports = app => {
     app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear = async (nam) => {
         const listNhom = await app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam });
         const listId = listNhom.map(nhom => nhom.id);
-        await Promise.all([
-            app.model.tccbNhomDanhGiaNhiemVu.delete({ nam }),
-            app.model.tccbDinhMucCongViecGvVaNcv.delete({ statement: 'idNhom IN (:listId)', parameter: { listId } }),
-        ]);
+        if (listId.length > 0)
+            await Promise.all([
+                app.model.tccbNhomDanhGiaNhiemVu.delete({ nam }),
+                app.model.tccbDinhMucCongViecGvVaNcv.delete({ statement: 'idNhom IN (:listId)', parameter: { listId } }),
+            ]);
     };
 
     app.model.tccbDinhMucCongViecGvVaNcv.getAllByYear = async (nam) => {
@@ -41,7 +42,9 @@ module.exports = app => {
 
     app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear = async (oldNam, newNam) => {
         const listNhom = await app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam: oldNam });
-        const listDinhMuc = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listId)', parameter: { listId: listNhom.map(nhom => nhom.id) } }, '*', 'idNhom');
+        const listId = listNhom.map(nhom => nhom.id);
+        if (listId.length == 0) return;
+        const listDinhMuc = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listId)', parameter: { listId } }, '*', 'idNhom');
         const sortDinhMuc = listNhom.map(nhom => ({ ...nhom, submenus: listDinhMuc.filter(item => item.idNhom == nhom.id) }));
         const listNewNhom = await Promise.all(listNhom.map(nhom => {
             delete nhom.id;
