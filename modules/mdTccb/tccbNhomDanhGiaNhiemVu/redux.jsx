@@ -146,8 +146,8 @@ export function changeTccbNhomDanhGiaNhiemVu(item) {
 }
 
 export const SelectAdapter_NhomDanhGiaNhiemVu = (nam) => ({
-    ajax: false,
-    data: () => ({ condition: { nam, kichHoat: 1 } }),
+    ajax: true,
+    data: (params) => ({ condition: { searchText: params.term, nam } }),
     url: '/api/tccb/nhom-danh-gia-nhiem-vu/all',
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.id, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getTccbNhomDanhGiaNhiemVu(ma, item => done && done({ id: item.id, text: item.ten })))(),

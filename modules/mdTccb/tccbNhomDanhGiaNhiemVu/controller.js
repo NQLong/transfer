@@ -8,7 +8,14 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/nhom-danh-gia-nhiem-vu/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
-        const condition = req.query.condition || {};
+        let _condition = req.query.condition || {};
+        const condition = {
+            statement: 'lower(ten) LIKE :searchText AND nam = :nam AND kichHoat = 1',
+            parameter: {
+                searchText: `%${_condition.searchText || ''}%`,
+                nam: _condition.nam
+            }
+        };
         app.model.tccbNhomDanhGiaNhiemVu.getAll(condition, '*', 'nam DESC, thuTu ASC', (error, items) => res.send({ error, items }));
     });
 
