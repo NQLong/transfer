@@ -24,6 +24,7 @@ module.exports = app => {
     }));
 
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
+    app.get('/user/dao-tao/thoi-khoa-bieu/auto-generate', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
@@ -306,6 +307,10 @@ module.exports = app => {
                     delete changes.troGiang;
                 }
 
+                ['thu', 'tietBatDau', 'soTietBuoi', 'soLuongDuKien'].forEach(key => {
+                    if (!changes[key]) changes[key] = '';
+                });
+
                 let item = await app.model.dtThoiKhoaBieu.update({ id: condition }, changes);
 
                 let allGvItem = await app.model.dtThoiKhoaBieuGiangVien.getAll({ idThoiKhoaBieu: item.id, type: 'GV' });
@@ -359,11 +364,14 @@ module.exports = app => {
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
-        app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: req.body.id }, () => {
-            app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => {
-                res.send({ errors });
-            });
-        });
+        try {
+            app.model.dtThoiKhoaBieuGiangVien.delete({ idThoiKhoaBieu: req.body.id });
+            app.model.dtThoiKhoaBieu.delete({ id: req.body.id });
+            app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: req.body.id });
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
@@ -381,6 +389,42 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+
+            const { config } = req.body,
+                dataFree = await app.model.dtThoiKhoaBieu.getFree(JSON.stringify(config));
+            let { rows: dataCanGen, hocphandaxep: dataCurrent } = dataFree;
+
+            res.send({ dataCanGen, dataCurrent });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+
+    });
+
+    app.put('/api/dao-tao/thoi-khoa-bieu/save-gen-data', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let data = req.body.data;
+            for (const item of data) {
+                let id = parseInt(item.id);
+                delete item.id;
+                item.userModified = req.session.user.email;
+                item.lastModified = Date.now();
+                await app.model.dtThoiKhoaBieu.update({ id }, item);
+            }
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/generate-time', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataGenerateSchedule);
+
+    app.post('/api/dao-tao/thoi-khoa-bieu/generate-room-end-date', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataRoomAndEndDate);
+
     // Export xlsx
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {

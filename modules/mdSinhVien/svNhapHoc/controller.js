@@ -50,8 +50,12 @@ module.exports = app => {
             const secretCode = req.body.secretCode, mssv = req.body.mssv;
             if (secretCode == mySecretCode) {
                 const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+                let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
                 let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
                 dataNhapHoc = dataNhapHoc.rows ? dataNhapHoc.rows[0] : {};
+                dataNhapHoc.khoaSinhVien = cauHinhNhapHoc ? cauHinhNhapHoc.khoaSinhVien : '';
+                dataNhapHoc.heDaoTao = cauHinhNhapHoc ? cauHinhNhapHoc.heDaoTao : '';
+
                 if (dataNhapHoc.ngayNhapHoc === null) {
                     return res.send({ error: 'Hồ sơ không hợp lệ' });
                 } else if (dataNhapHoc.ngayNhapHoc == -1) {

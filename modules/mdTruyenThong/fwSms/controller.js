@@ -27,11 +27,14 @@ module.exports = app => {
 
     app.sms.sendByViettel = async (phone, mess, emailSent) => await initViettelSms({ phone, mess }, emailSent);
 
-
     const initViettelSms = async (body, email) => {
         try {
             let { usernameViettel: user, passViettel: pass, brandName, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
             let { phone, mess } = body;
+            // console.log('usernameViettel', user);
+            // console.log('passViettel', pass);
+            // console.log('brandName', brandName);
+            // console.log('totalSMSViettel', currentTotal);
 
             let dataEncode = parseInt(app.sms.checkNonLatinChar(mess));
 
@@ -54,7 +57,7 @@ module.exports = app => {
                             console.error(e);
                             resolve({ error: e });
                         }
-
+                        // console.log(resData);
                         if (resData.code == 1) {
                             try {
                                 const item = await app.model.fwSms.create({
@@ -68,7 +71,7 @@ module.exports = app => {
                                     resolve({ success: true });
                                 } else resolve({ error: 'Create model SMS fail' });
                             } catch (error) {
-                                console.error('Request is successfull but callback has error: ', error);
+                                console.error('Request is successful but callback has error: ', error);
                                 resolve({ error: 'Create model SMS fail' });
                             }
                         } else resolve({ error: 'Unsuccessful request' });

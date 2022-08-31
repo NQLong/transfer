@@ -175,6 +175,21 @@ export const SelectAdapter_DmPhongAll = {
     fetchOne: (ten, done) => (getDmPhong(ten, item => done && done({ id: item.ten, text: `${item.ten}` })))(),
 };
 
+export function GetAllDmPhongInCoSo(maCoSo, done) {
+    return () => {
+        const url = `/api/danh-muc/phong/condition/${maCoSo}`;
+        T.get(url, result => {
+            if (result.error) {
+                T.notify('Lấy danh sách phòng lỗi', 'danger');
+                console.error(result.error);
+            } else {
+                if (!result.items.length) T.notify('Cơ sở này chưa có phòng học', 'warning');
+                done && done(result.items);
+            }
+        });
+    };
+}
+
 export const SelectAdapter_DmPhongFilter = (maCoSo) => ({
     ajax: true,
     url: `/api/danh-muc/phong/condition/${maCoSo}`,

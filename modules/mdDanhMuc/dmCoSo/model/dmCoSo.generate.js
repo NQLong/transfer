@@ -1,6 +1,6 @@
-// Table name: DM_CO_SO { ten, diaChi, tenVietTat, moTa, kichHoat, ma }
+// Table name: DM_CO_SO { ten, diaChi, tenVietTat, moTa, kichHoat, ma, heDaoTao }
 const keys = ['MA'];
-const obj2Db = { 'ten': 'TEN', 'diaChi': 'DIA_CHI', 'tenVietTat': 'TEN_VIET_TAT', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'ma': 'MA' };
+const obj2Db = { 'ten': 'TEN', 'diaChi': 'DIA_CHI', 'tenVietTat': 'TEN_VIET_TAT', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'ma': 'MA', 'heDaoTao': 'HE_DAO_TAO' };
 
 module.exports = app => {
     app.model.dmCoSo = {
