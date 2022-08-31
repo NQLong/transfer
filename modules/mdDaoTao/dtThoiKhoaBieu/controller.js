@@ -402,6 +402,22 @@ module.exports = app => {
 
     });
 
+    app.put('/api/dao-tao/thoi-khoa-bieu/save-gen-data', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let data = req.body.data;
+            for (const item of data) {
+                let id = parseInt(item.id);
+                delete item.id;
+                item.userModified = req.session.user.email;
+                item.lastModified = Date.now();
+                await app.model.dtThoiKhoaBieu.update({ id }, item);
+            }
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     app.post('/api/dao-tao/thoi-khoa-bieu/generate-time', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataGenerateSchedule);
 
     app.post('/api/dao-tao/thoi-khoa-bieu/generate-room-end-date', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataRoomAndEndDate);

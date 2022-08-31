@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
-import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom } from './redux';
+import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData } from './redux';
 import { getDmCaHocAll, getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc/redux';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
@@ -360,6 +360,22 @@ class GenSchedPage extends AdminPage {
         });
     }
 
+    updateGenData = () => {
+        this.setState({ isWaitingUpdate: true });
+        let data = this.props.dtThoiKhoaBieu.dataCanGen.map(item => ({
+            thu: parseInt(item.thu),
+            tietBatDau: parseInt(item.tietBatDau),
+            phong: item.phong,
+            sucChua: parseInt(item.sucChua),
+            id: parseInt(item.id),
+            ngayBatDau: parseInt(item.ngayBatDau),
+            ngayKetThuc: parseInt(item.ngayKetThuc),
+        }));
+        this.props.updateDtThoiKhoaBieuGenData(data, () => {
+            this.setState({ isWaitingUpdate: true, genSuccess: true });
+        });
+    }
+
     genResultRoom = (data) => renderTable({
         getDataSource: () => data,
         stickyHead: true,
@@ -400,7 +416,7 @@ class GenSchedPage extends AdminPage {
 
     render() {
         let dtThoiKhoaBieuConfig = this.props.dtThoiKhoaBieu;
-        let { onSaveConfig, step, timeConfig, isWaitingGenRoom } = this.state;
+        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess } = this.state;
         return this.renderPage({
             title: 'Quản lý sinh thời khoá biểu tự động',
             icon: 'fa fa-cogs',
@@ -555,9 +571,12 @@ class GenSchedPage extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'>
                             <h4>Bước 6: Kết quả tự động xếp phòng học, lịch học</h4>
-                            <button className='btn btn-success' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }}>
-                                Hoàn tất <i className='fa fa-lg fa-check' />
-                            </button>
+                            {genSuccess ?
+                                <button className='btn btn-success' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.updateGenData}>
+                                    Hoàn tất <i className='fa fa-lg fa-check' />
+                                </button> : <button className='btn btn-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.updateGenData}>
+                                    {isWaitingUpdate ? 'Loading' : 'Lưu thay đổi'}<i className={isWaitingUpdate ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-save'} />
+                                </button>}
                         </div>
                         <div className='tile-body'>
                             {this.state.step == 6 && this.genResultRoom(dtThoiKhoaBieuConfig?.dataCanGen)}
@@ -565,12 +584,13 @@ class GenSchedPage extends AdminPage {
                     </div>
                 </section>
             </div >,
+            backRoute: '/user/dao-tao/thoi-khoa-bieu'
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
 const mapActionsToProps = {
-    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom
+    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData
 };
 export default connect(mapStateToProps, mapActionsToProps)(GenSchedPage);

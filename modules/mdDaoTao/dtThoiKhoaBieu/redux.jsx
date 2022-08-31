@@ -282,3 +282,17 @@ export function dtThoiKhoaBieuGenRoom(data, done) {
         });
     };
 }
+
+export function updateDtThoiKhoaBieuGenData(data, done) {
+    return () => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/save-gen-data';
+        T.put(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lồi: ${result.error.message || 'cập nhật thất bại'}`, 'danger');
+            } else {
+                T.notify('Lưu dữ liệu thành công', 'success');
+            }
+            done && done(result);
+        });
+    };
+}
