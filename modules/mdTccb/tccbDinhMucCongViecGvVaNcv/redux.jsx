@@ -60,7 +60,7 @@ export function getTccbDinhMucCongViecGvVaNcvAll(condition, done) {
 
 export function getTccbDinhMucCongViecGvVaNcvAllByYear(nam, done) {
     return () => {
-        const url = '/api/tccb/dinh-muc-cong-viec-gv-va-ncv/allByYear';
+        const url = '/api/tccb/dinh-muc-cong-viec-gv-va-ncv/all-by-year';
         T.get(url, { nam }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách định mức theo năm bị lỗi', 'danger');
@@ -95,7 +95,6 @@ export function createTccbDinhMucCongViecGvVaNcv(item, done) {
                 console.error(`POST ${url}. ${data.error.message}`);
             } else {
                 T.notify('Tạo mới định mức thành công!', 'success');
-                data.warning && T.notify(data.warning.message, 'warning');
                 dispatch(getTccbDinhMucCongViecGvVaNcvAll());
                 if (done) done(data.item);
             }
@@ -140,8 +139,8 @@ export function changeTccbDinhMucCongViecGvVaNcv(item) {
 }
 
 export const SelectAdapter_NgachCdnnVaChucDanhKhoaHoc = {
-    ajax: false,
-    data: () => ({ condition: { kichHoat: 1 } }),
+    ajax: true,
+    data: params => ({ condition: params.term }),
     url: '/api/tccb/ngach-cdnn-va-chuc-danh-khoa-hoc/all',
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getNgachCdnnHoacChucDanhKhoaHoc(ma, item => done && done({ id: item.ma, text: item.ten })))(),
@@ -149,17 +148,12 @@ export const SelectAdapter_NgachCdnnVaChucDanhKhoaHoc = {
 
 export function getNgachCdnnHoacChucDanhKhoaHoc(ma, done) {
     return () => {
-        const url = '/api/tccb/ngach-cdnn-va-chuc-danh-khoa-hoc/all';
+        const url = `/api/tccb/ngach-cdnn-va-chuc-danh-khoa-hoc/item/${ma}`;
         T.get(url, {}, data => {
             if (data.error) {
                 done && done(null);
             } else {
-                const index = data.items.findIndex(item => item.ma == ma);
-                let item = null;
-                if (index != -1) {
-                    item = data.items[index];
-                }
-                done && done(item);
+                done && done(data.result);
             }
         }, () => T.notify('Lấy ngạch hoặc chức danh khoa học bị lỗi!', 'danger'));
     };

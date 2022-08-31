@@ -12,7 +12,7 @@ module.exports = app => {
         app.model.tccbDinhMucCongViecGvVaNcv.getAll(condition, '*', 'id', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/dinh-muc-cong-viec-gv-va-ncv/allByYear', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
+    app.get('/api/tccb/dinh-muc-cong-viec-gv-va-ncv/all-by-year', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
         try {
             const nam = req.query.nam || '';
             const items = await app.model.tccbDinhMucCongViecGvVaNcv.getAllByYear(nam);
@@ -43,12 +43,30 @@ module.exports = app => {
 
     app.get('/api/tccb/ngach-cdnn-va-chuc-danh-khoa-hoc/all', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
         try {
+            const condition = req.query.condition;
             let items = await Promise.all([
-                app.model.dmChucDanhKhoaHoc.getAll(),
-                app.model.dmNgachCdnn.getAll(),
+                app.model.dmChucDanhKhoaHoc.getAll({ kichHoat: 1 }),
+                app.model.dmNgachCdnn.getAll({ kichHoat: 1 }),
             ]);
             items = items.reduce((prev, curr) => prev.concat(curr));
+            if (condition) {
+                items = items.filter(item => item.ten.toLowerCase().includes(condition.toLowerCase()));
+            }
             res.send({ items });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/tccb/ngach-cdnn-va-chuc-danh-khoa-hoc/item/:ma', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
+        try {
+            const ma = req.query.ma;
+            let items = await Promise.all([
+                app.model.dmChucDanhKhoaHoc.get({ ma }),
+                app.model.dmNgachCdnn.get({ ma }),
+            ]);
+            let result = items[0] ? items[0] : items[1];
+            res.send({ result });
         } catch (error) {
             res.send({ error });
         }
