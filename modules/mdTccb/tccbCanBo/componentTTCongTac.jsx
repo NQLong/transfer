@@ -90,6 +90,7 @@ class ComponentTTCongTac extends AdminPage {
                 ngach: this.getValue(this.ngach),
                 bacLuong: this.getValue(this.bacLuong),
                 heSoLuong: this.getValue(this.heSo),
+                tyLePhuCapThamNien: this.getValue(this.tyLePhuCapThamNien),
                 ngayHuongLuong: this.getValue(this.ngayHuong) ? this.getValue(this.ngayHuong).getTime() : '',
                 tyLeVuotKhung: this.getValue(this.tyLeVuotKhung),
                 tyLePhuCapUuDai: this.getValue(this.tyLePhuCapUuDai),
@@ -139,8 +140,9 @@ class ComponentTTCongTac extends AdminPage {
                     <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' readOnly={readOnly} />
                     <FormTextBox ref={e => this.heSo = e} className='col-md-3' label='Hệ số' readOnly={readOnly} />
                     <FormDatePicker type='date-mask' ref={e => this.ngayHuong = e} className='col-md-6' label='Ngày hưởng' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.tyLeVuotKhung = e} className='col-md-6' label='Phụ cấp thâm niên' readOnly={readOnly} />
-                    <FormTextBox ref={e => this.tyLePhuCapUuDai = e} className='col-md-6' label='Phụ cấp ưu đãi' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.tyLePhuCapThamNien = e} className='col-md-4' label='Phụ cấp thâm niên vượt khung' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.tyLeVuotKhung = e} className='col-md-4' label='Phụ cấp thâm niên nghề' readOnly={readOnly} />
+                    <FormTextBox ref={e => this.tyLePhuCapUuDai = e} className='col-md-4' label='Phụ cấp ưu đãi' readOnly={readOnly} />
 
                     <FormTextBox ref={e => this.soBhxh = e} className='col-md-6' label='Mã số Bảo hiểm xã hội' readOnly={readOnly} />
                     <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-3' label='Tháng bắt đầu' type='month-mask' readOnly={readOnly} />
