@@ -16761,7 +16761,7 @@
         },
         "TCCB_DON_VI_DANG_KY_NHIEM_VU": {
             "active": true,
-            "moduleName": "tccbDonViDangKyNhiemVu",
+            "moduleName": "tccbDanhGiaDonViDangKyNhiemVu",
             "modelName": "tccbDonViDangKyNhiemVu",
             "columns": {
                 "ID": {
@@ -16902,7 +16902,7 @@
         },
         "TCCB_DIEM_THUONG": {
             "active": true,
-            "moduleName": "tccbDiemThuong",
+            "moduleName": "tccbDanhGiaDiemThuong",
             "modelName": "tccbDiemThuong",
             "columns": {
                 "ID": {
@@ -16942,7 +16942,7 @@
         },
         "TCCB_DIEM_TRU": {
             "active": true,
-            "moduleName": "tccbDiemTru",
+            "moduleName": "tccbDanhGiaDiemTru",
             "modelName": "tccbDiemTru",
             "columns": {
                 "ID": {
@@ -16982,7 +16982,7 @@
         },
         "TCCB_TY_LE_DIEM": {
             "active": true,
-            "moduleName": "tccbTyLeDiem",
+            "moduleName": "tccbDanhGiaTyLeDiem",
             "modelName": "tccbTyLeDiem",
             "columns": {
                 "ID": {
@@ -17118,7 +17118,7 @@
         },
         "TCCB_DINH_MUC_CONG_VIEC_GV_VA_NCV": {
             "active": true,
-            "moduleName": "tccbDinhMucCongViecGvVaNcv",
+            "moduleName": "tccbDanhGiaDinhMucCongViecGvVaNcv",
             "modelName": "tccbDinhMucCongViecGvVaNcv",
             "columns": {
                 "ID": {
@@ -17193,7 +17193,7 @@
         },
         "TCCB_NHOM_DANH_GIA_NHIEM_VU": {
             "active": true,
-            "moduleName": "tccbNhomDanhGiaNhiemVu",
+            "moduleName": "tccbDanhGiaNhomDanhGiaNhiemVu",
             "modelName": "tccbNhomDanhGiaNhiemVu",
             "methods": {
                 "tccb_nhom_danh_gia_nhiem_vu_gan_thu_tu": "updateThuTu"

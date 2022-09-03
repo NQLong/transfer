@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTccbDinhMucCongViecGvVaNcvAllByYear, createTccbDinhMucCongViecGvVaNcv, updateTccbDinhMucCongViecGvVaNcv, deleteTccbDinhMucCongViecGvVaNcv, SelectAdapter_NgachCdnnVaChucDanhKhoaHoc } from './redux';
-import { SelectAdapter_NhomDanhGiaNhiemVu, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVuThuTu, deleteTccbNhomDanhGiaNhiemVu } from '../tccbNhomDanhGiaNhiemVu/redux';
+import { SelectAdapter_NhomDanhGiaNhiemVu, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVuThuTu, deleteTccbNhomDanhGiaNhiemVu } from '../tccbDanhGiaNhomDanhGiaNhiemVu/redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, getValue, FormSelect, FormCheckbox } from 'view/component/AdminPage';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
