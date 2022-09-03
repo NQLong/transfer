@@ -1,6 +1,6 @@
 // Table name: TCCB_DINH_MUC_CONG_VIEC_GV_VA_NCV { id, idNhom, maChucDanh, soGioGiangDay, soDiemGiangDay, soGioNghienCuuKhoaHoc, soDiemNghienCuuKhoaHoc, soGioKhac, soDiemKhac }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'idNhom': 'ID_NHOM', 'maChucDanh': 'MA_CHUC_DANH', 'soGioGiangDay': 'SO_GIO_GIANG_DAY', 'soDiemGiangDay': 'SO_DIEM_GIANG_DAY', 'soGioNghienCuuKhoaHoc': 'SO_GIO_NGHIEN_CUU_KHOA_HOC', 'soDiemNghienCuuKhoaHoc': 'SO_DIEM_NGHIEN_CUU_KHOA_HOC', 'soGioKhac': 'SO_GIO_KHAC', 'soDiemKhac': 'SO_DIEM_KHAC', 'thuTu': 'THU_TU' };
+const obj2Db = { 'id': 'ID', 'idNhom': 'ID_NHOM', 'maChucDanh': 'MA_CHUC_DANH', 'soGioGiangDay': 'SO_GIO_GIANG_DAY', 'soDiemGiangDay': 'SO_DIEM_GIANG_DAY', 'soGioNghienCuuKhoaHoc': 'SO_GIO_NGHIEN_CUU_KHOA_HOC', 'soDiemNghienCuuKhoaHoc': 'SO_DIEM_NGHIEN_CUU_KHOA_HOC', 'soGioKhac': 'SO_GIO_KHAC', 'soDiemKhac': 'SO_DIEM_KHAC' };
 
 module.exports = app => {
     app.model.tccbDinhMucCongViecGvVaNcv = {
