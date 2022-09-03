@@ -7,39 +7,6 @@ import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, getValue, F
 import { EditModal as EditModalNhom } from '../tccbNhomDanhGiaNhiemVu/adminPage';
 import T from 'view/js/common';
 
-const intToRoman = (num) => {
-    const map = {
-        M: 1000,
-        CM: 900,
-        D: 500,
-        CD: 400,
-        C: 100,
-        XC: 90,
-        L: 50,
-        XL: 40,
-        X: 10,
-        IX: 9,
-        V: 5,
-        IV: 4,
-        I: 1,
-    };
-    let result = '';
-
-    for (let key in map) {
-        const repeatCounter = Math.floor(num / map[key]);
-
-        if (repeatCounter !== 0) {
-            result += key.repeat(repeatCounter);
-        }
-
-        num %= map[key];
-
-        if (num === 0) return result;
-    }
-
-    return result;
-};
-
 class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() =>
@@ -51,7 +18,7 @@ class EditModal extends AdminModal {
         let { idNhom, maChucDanh, soGioGiangDay, soDiemGiangDay, soGioNghienCuuKhoaHoc, soDiemNghienCuuKhoaHoc, soGioKhac, soDiemKhac } = item ? item : { idNhom: '', maChucDanh: '', soGioGiangDay: 0, soDiemGiangDay: 0, soGioNghienCuuKhoaHoc: 0, soDiemNghienCuuKhoaHoc: 0, soGioKhac: 0, soDiemKhac: 0 };
         this.setState({ item });
         this.idNhom.value(idNhom);
-        this.maChucDanh.value(maChucDanh.split(','));
+        this.maChucDanh.value(maChucDanh ? maChucDanh.split(',') : '');
         this.soGioGiangDay.value(Number(soGioGiangDay));
         this.soDiemGiangDay.value(Number(soDiemGiangDay).toFixed(2));
         this.soGioNghienCuuKhoaHoc.value(Number(soGioNghienCuuKhoaHoc));
@@ -186,9 +153,9 @@ class ComponentDMCV extends AdminPage {
             ),
             multipleTbody: true,
             renderRow: (item, index) => (
-                <tbody>
-                    <tr>
-                        <TableCell style={{ textAlign: 'center' }} content={<b>{intToRoman(index + 1)}</b>} />
+                <tbody key={index} style={{ backgroundColor: 'white' }}>
+                    <tr key={`${index}-1`}>
+                        <TableCell style={{ textAlign: 'center' }} content={<b>{Number.intToRoman(index + 1)}</b>} />
                         <TableCell style={{ textAlign: 'left' }} colSpan={5} content={<b>{item.ten}</b>} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                             onEdit={() => this.nhomModal.show({ ...item, update: true })}
@@ -199,7 +166,7 @@ class ComponentDMCV extends AdminPage {
                         item.submenus.length > 0 &&
                         item.submenus.map((menu, stt) => (
                             <>
-                                <tr>
+                                <tr key={`${index}-${stt}-1`}>
                                     <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
                                     <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
                                     <TableCell style={{ textAlign: 'left' }} content={'Số giờ làm việc'} />
@@ -211,7 +178,7 @@ class ComponentDMCV extends AdminPage {
                                         onDelete={this.delete}
                                     />
                                 </tr>
-                                <tr>
+                                <tr key={`${index}-${stt}-2`}>
                                     <TableCell style={{ textAlign: 'left' }} content={'Số điểm'} />
                                     <TableCell style={{ textAlign: 'center' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
                                     <TableCell style={{ textAlign: 'center' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
@@ -223,7 +190,7 @@ class ComponentDMCV extends AdminPage {
                 </tbody>
             )
         });
-        return (<div>
+        return (<>
             <div>{table}</div>
             {
                 permission.write && (<div style={{ textAlign: 'right' }}>
@@ -243,7 +210,7 @@ class ComponentDMCV extends AdminPage {
                 createTccbNhomDanhGiaNhiemVu={this.createNhom}
                 updateTccbNhomDanhGiaNhiemVu={this.updateNhom}
             />
-        </div>);
+        </>);
     }
 }
 

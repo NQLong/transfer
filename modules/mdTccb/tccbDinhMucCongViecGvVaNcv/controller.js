@@ -60,7 +60,7 @@ module.exports = app => {
 
     app.get('/api/tccb/ngach-cdnn-va-chuc-danh-khoa-hoc/item/:ma', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
         try {
-            const ma = req.query.ma;
+            const ma = req.params.ma;
             let items = await Promise.all([
                 app.model.dmChucDanhKhoaHoc.get({ ma, kichHoat: 1 }),
                 app.model.dmNgachCdnn.get({ ma, kichHoat: 1 }),
