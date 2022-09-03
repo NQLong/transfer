@@ -198,3 +198,17 @@ export function getDtLichDayHoc(phong, done) {
         });
     };
 }
+
+export function createMultipleThoiKhoaBieu(data, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/multiple';
+        T.post(url, { data }, (data) => {
+            if (!data.error) {
+                dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
+                done && done();
+            } else {
+                T.notify('Lưu danh sách học phí có lỗi', 'danger');
+            }
+        });
+    };
+}

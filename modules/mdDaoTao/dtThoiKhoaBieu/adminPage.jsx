@@ -429,6 +429,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 </div>
             </div>,
             onCreate: permission.write ? (e) => e.preventDefault() || this.addingModal.show() : null,
+            onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/dao-tao/import-thoi-khoa-bieu') : null,
             onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/dao-tao/thoi-khoa-bieu/download-excel?filter=${T.stringify(this.state.filter)}`, 'THOI_KHOA_BIEU.xlsx') : null,
         });
     }

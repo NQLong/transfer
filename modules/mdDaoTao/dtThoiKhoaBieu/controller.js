@@ -24,6 +24,7 @@ module.exports = app => {
     }));
 
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
+    app.get('/user/dao-tao/import-thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
@@ -381,6 +382,14 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
+    //Hook upload -------------------------------------------------------------------------------
+    app.uploadHooks.add('DtThoiKhoaBieuData', (req, fields, files, params, done) =>
+        app.permission.has(req, () => dtThoiKhoaBieuImportData(fields, files, done), done, 'tcHocPhi:write')
+    );
+    const dtThoiKhoaBieuImportData= async (fields, files, done) => {
+        console.log(fields,files,done);
+    };
+    
     // Export xlsx
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {

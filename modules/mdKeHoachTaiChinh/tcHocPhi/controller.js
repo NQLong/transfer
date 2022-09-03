@@ -268,6 +268,7 @@ module.exports = app => {
                                             tmpRow = { ...tmpRow, curFee };
                                             duplicateDatas.push(mssv);
                                         }
+                                        console.log(tmpRow);
                                         items.push(tmpRow);
                                     }
                                 }
