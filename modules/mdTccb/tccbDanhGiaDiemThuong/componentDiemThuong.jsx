@@ -76,7 +76,7 @@ class ComponentDiemThuong extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                    <th style={{ width: '70%', textAlign: 'center', whiteSpace: 'nowrap' }}>Nội dung</th>
+                    <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Nội dung</th>
                     <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Điểm quy định</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
