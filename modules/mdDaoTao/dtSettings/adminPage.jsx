@@ -7,8 +7,10 @@ import ScheduleConfigSection from './section/ScheduleConfigSection';
 
 class DtSetting extends AdminPage {
     componentDidMount() {
-        this.props.getAllDtSettings(items => {
-            this.configSchedule.setValue(items);
+        T.ready('/user/dao-tao', () => {
+            this.props.getAllDtSettings(items => {
+                this.configSchedule.setValue(items);
+            });
         });
     }
 
