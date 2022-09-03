@@ -17205,32 +17205,6 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "DT_CAU_HINH_TKB": {
-            "active": true,
-            "moduleName": "dtCauHinhTkb",
-            "modelName": "dtCauHinhTkb",
-            "columns": {
-                "KEY": {
-                    "value": "key",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 50
-                },
-                "VALUE": {
-                    "value": "value",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
-                }
-            },
-            "primaryKeys": [
-                "KEY"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "DT_DM_BUOI_HOC": {
             "active": true,
             "moduleName": "dtDmBuoiHoc",
@@ -17448,6 +17422,32 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_SETTINGS": {
+            "active": true,
+            "moduleName": "dtSettings",
+            "modelName": "dtSettings",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
             ],
             "foreignKeys": [],
             "type": "table"
