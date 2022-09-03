@@ -1,8 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.dtThoiKhoaBieu.foo = () => { };
-    const MAX_DEVIANT = 20,
-        DATE_UNIX = 24 * 60 * 60 * 1000;
+    const MAX_DEVIANT = 10, DATE_UNIX = 24 * 60 * 60 * 1000;
 
     /**
      * Period: Tiết
