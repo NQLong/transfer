@@ -7,29 +7,21 @@ import { Link } from 'react-router-dom';
 import T from 'view/js/common';
 
 class TccbThongTinDangKyDonViDetails extends AdminPage {
+    state = { nam: '', donVi: '' }
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/danh-gia/:nam/don-vi/:ma');
-            this.nam = parseInt(route.parse(window.location.pathname)?.nam);
-            this.maDonVi = route.parse(window.location.pathname)?.ma;
-            this.props.getDmDonVi(this.maDonVi, item => {
-                this.donVi = item?.ten;
-                this.setState({ nam: this.nam, donVi: this.donVi });
-                this.load(this.nam, this.maDonVi);
+            const nam = parseInt(route.parse(window.location.pathname)?.nam);
+            const maDonVi = route.parse(window.location.pathname)?.ma;
+            this.props.getTccbThongTinDangKyDonVi(nam, maDonVi, (items, donVi) => {
+                this.setState({ items, nam, donVi });
             });
         });
     }
-
-    load = (nam, maDonVi, done) => {
-        this.props.getTccbThongTinDangKyDonVi(nam, maDonVi, (items) => {
-            this.setState({ items });
-            done && done();
-        });
-    }
-
     render() {
         const list = this.state?.items || [];
-        const nam = this.state?.nam, donVi = this.state?.donVi;
+        const nam = this.state.nam, donVi = this.state.donVi;
         let table = renderTable({
             emptyTable: 'Không có dữ liệu đăng ký',
             getDataSource: () => list,
@@ -63,7 +55,7 @@ class TccbThongTinDangKyDonViDetails extends AdminPage {
             content: <>
                 <div className='tile'>{table}</div>
             </>,
-            backRoute: `/user/tccb/danh-gia/${this.nam}/don-vi`,
+            backRoute: `/user/tccb/danh-gia/${nam}/don-vi`,
         });
     }
 }

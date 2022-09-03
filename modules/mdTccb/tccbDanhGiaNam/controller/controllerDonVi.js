@@ -13,9 +13,10 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/tccb/danh-gia/:nam/don-vi/:ma', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
+    app.get('/api/tccb/danh-gia/don-vi', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
         try {
-            const nam = Number(req.params.nam), maDonVi = req.params.ma;
+            const nam = Number(req.query.nam), maDonVi = req.query.ma;
+            const donVi = await app.model.dmDonVi.get({ ma: maDonVi });
             let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam });
             let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi });
             let items = danhGiaDonVis.filter(item => !item.parentId);
@@ -36,7 +37,7 @@ module.exports = app => {
                     ...dangKys[index]
                 };
             });
-            res.send({ items });
+            res.send({ items, donVi: donVi.ten });
         } catch (error) {
             res.send({ error });
         }

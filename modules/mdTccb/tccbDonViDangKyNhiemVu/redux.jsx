@@ -77,7 +77,7 @@ export function getTccbDonViDangKyNhiemVuDanhGiaNamAll(done) {
 
 export function getTccbDonViDangKyNhiemVuByYear(nam, done) {
     return () => {
-        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all/by-year';
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all-by-year';
         T.get(url, { nam }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách đăng ký bị lỗi', 'danger');

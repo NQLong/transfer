@@ -31,13 +31,13 @@ export function getTccbThongTinDonViPage(pageNumber, pageSize, pageCondition, do
 
 export function getTccbThongTinDangKyDonVi(nam, maDonVi, done) {
     return () => {
-        const url = `/api/tccb/danh-gia/${nam}/don-vi/${maDonVi}`;
-        T.get(url, {}, data => {
+        const url = '/api/tccb/danh-gia/don-vi/';
+        T.get(url, { nam, ma: maDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy thông tin bị lỗi', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.items);
+                if (done) done(data.items, data.donVi);
             }
         });
     };

@@ -25,9 +25,9 @@ module.exports = app => {
         app.model.tccbDanhGiaNam.getAll({}, '*', 'nam DESC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all/by-year', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+    app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all-by-year', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
-            const nam = Number(req.query.nam), maDonVi = req.session.user.staff.maDonVi;
+            const nam = parseInt(req.query.nam), maDonVi = req.session.user.staff.maDonVi;
             let danhGiaNam = await app.model.tccbDanhGiaNam.getAll({ nam });
             danhGiaNam = danhGiaNam[0];
             let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam });
@@ -83,12 +83,13 @@ module.exports = app => {
             const newItem = req.body.item;
             const nam = newItem.nam;
             const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
-            if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
-                throw 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp';
+            if (donViBatDauDangKy > Date.now() || Date.now() > donViKetThucDangKy) {
+                res.send({ error: 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp' });
+            } else {
+                newItem.maDonVi = req.session.user.staff.maDonVi;
+                const item = await app.model.tccbDonViDangKyNhiemVu.create(newItem);
+                res.send({ item });
             }
-            newItem.maDonVi = req.session.user.staff.maDonVi;
-            const item = await app.model.tccbDonViDangKyNhiemVu.create(newItem);
-            res.send({ item });
         } catch (error) {
             res.send({ error });
         }
@@ -101,10 +102,11 @@ module.exports = app => {
             const { nam } = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id });
             const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
             if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
-                throw 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp';
+                res.send({ error: 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp' });
+            } else {
+                const item = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id }, changes);
+                res.send({ item });
             }
-            const item = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id }, changes);
-            res.send({ item });
         } catch (error) {
             res.send({ error });
         }

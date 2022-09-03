@@ -73,9 +73,9 @@ module.exports = app => {
     });
 
     app.put('/api/tccb/danh-gia/dinh-muc-cong-viec-gv-va-ncv/thu-tu', app.permission.check('tccbDanhGiaNam:write'), (req, res) => {
-        let id = Number(req.body.id),
-            thuTu = Number(req.body.thuTu),
-            idNhom = Number(req.body.idNhom);
+        let id = parseInt(req.body.id),
+            thuTu = parseInt(req.body.thuTu),
+            idNhom = parseInt(req.body.idNhom);
         if (id && thuTu) {
             app.model.tccbDinhMucCongViecGvVaNcv.get({ id }, (error, item) => {
                 if (item) {

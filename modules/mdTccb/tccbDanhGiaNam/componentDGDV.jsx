@@ -43,7 +43,7 @@ class EditModal extends AdminModal {
                 ...changes,
                 nam: this.props.nam,
                 parentId: this.parentId || null,
-                thuTu: this.thuTu ? this.thuTu + 1 : this.props.thuTu + 1
+                thuTu: this.thuTu ? parseInt(this.thuTu) + 1 : parseInt(this.props.thuTu) + 1
             }, this.hide);
         else this.props.update(this.state.item.id, changes, this.hide);
         this.reset();
@@ -68,7 +68,7 @@ class ComponentDGDV extends AdminPage {
         this.load();
     }
 
-    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
+    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: parseInt(this.props.nam) }, items => {
         let parentItems = items.filter(item => !item.parentId);
         parentItems = parentItems.map(parent => ({ ...parent, submenus: items.filter(item => item.parentId == parent.id) }));
         this.setState({ items: parentItems });
