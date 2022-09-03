@@ -1,21 +1,69 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTccbDinhMucCongViecGvVaNcvAllByYear, createTccbDinhMucCongViecGvVaNcv, updateTccbDinhMucCongViecGvVaNcv, deleteTccbDinhMucCongViecGvVaNcv, SelectAdapter_NgachCdnnVaChucDanhKhoaHoc } from './redux';
-import { createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu } from '../tccbNhomDanhGiaNhiemVu/redux';
-import { SelectAdapter_NhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVuThuTu, deleteTccbNhomDanhGiaNhiemVu } from '../tccbNhomDanhGiaNhiemVu/redux';
-import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, getValue, FormSelect } from 'view/component/AdminPage';
-import { EditModal as EditModalNhom } from '../tccbNhomDanhGiaNhiemVu/adminPage';
+import { SelectAdapter_NhomDanhGiaNhiemVu, createTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVu, updateTccbNhomDanhGiaNhiemVuThuTu, deleteTccbNhomDanhGiaNhiemVu } from '../tccbNhomDanhGiaNhiemVu/redux';
+import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell, getValue, FormSelect, FormCheckbox } from 'view/component/AdminPage';
+import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
 
-class EditModal extends AdminModal {
+class EditModalNhom extends AdminModal {
     componentDidMount() {
-        $(document).ready(() => this.onShown(() =>
-            this.idNhom.focus()
-        ));
+        $(document).ready(() => this.onShown());
+    }
+
+    onHide = () => {
+        this.ten.value('');
+        this.ghiChu.value('');
     }
 
     onShow = (item) => {
-        let { idNhom, maChucDanh, soGioGiangDay, soDiemGiangDay, soGioNghienCuuKhoaHoc, soDiemNghienCuuKhoaHoc, soGioKhac, soDiemKhac } = item ? item : { idNhom: '', maChucDanh: '', soGioGiangDay: 0, soDiemGiangDay: 0, soGioNghienCuuKhoaHoc: 0, soDiemNghienCuuKhoaHoc: 0, soGioKhac: 0, soDiemKhac: 0 };
+        this.onHide();
+        let { ten, ghiChu, kichHoat } = item ? item : { ten: '', ghiChu: '', kichHoat: 1 };
+        this.ten.value(ten || '');
+        this.ghiChu.value(ghiChu || '');
+        this.kichHoat.value(kichHoat ? Number(kichHoat) : 1);
+        this.setState({ item });
+    };
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const changes = {
+            ten: getValue(this.ten),
+            ghiChu: getValue(this.ghiChu),
+            nam: Number(this.props.nam),
+            kichHoat: getValue(this.kichHoat)
+        };
+        if (!this.state.item) {
+            this.props.createTccbNhomDanhGiaNhiemVu(changes, this.hide);
+        } else {
+            this.props.updateTccbNhomDanhGiaNhiemVu(this.state.item.id, changes, this.hide);
+        }
+    };
+
+    changeKichHoat = value => this.kichHoat.value(Number(value));
+
+    render = () => {
+        const readOnly = this.props.readOnly;
+        return this.renderModal({
+            title: !this.state.item ? 'Tạo mới nhóm đánh giá' : 'Cập nhật nhóm đánh giá',
+            body: <div className='row'>
+                <FormTextBox className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
+                <FormTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi Chú' readOnly={readOnly} placeholder='Ghi chú' />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
+                    onChange={value => this.changeKichHoat(value)} required />
+            </div>
+        });
+    }
+}
+
+class EditModal extends AdminModal {
+    componentDidMount() {
+        $(document).ready(() => this.onShown());
+    }
+
+    onShow = (item) => {
+        let idNhom = item.add ? item.idNhom : item.item.idNhom;
+        let { maChucDanh, soGioGiangDay, soDiemGiangDay, soGioNghienCuuKhoaHoc, soDiemNghienCuuKhoaHoc, soGioKhac, soDiemKhac } = item.add ? { maChucDanh: '', soGioGiangDay: 0, soDiemGiangDay: 0, soGioNghienCuuKhoaHoc: 0, soDiemNghienCuuKhoaHoc: 0, soGioKhac: 0, soDiemKhac: 0 } : item.item;
         this.setState({ item });
         this.idNhom.value(idNhom);
         this.maChucDanh.value(maChucDanh ? maChucDanh.split(',') : '');
@@ -28,6 +76,7 @@ class EditModal extends AdminModal {
     };
 
     onSubmit = (e) => {
+        e.preventDefault();
         const maChucDanh = getValue(this.maChucDanh).join(',');
         const changes = {
             idNhom: getValue(this.idNhom),
@@ -39,25 +88,26 @@ class EditModal extends AdminModal {
             soGioKhac: Number(getValue(this.soGioKhac)),
             soDiemKhac: Number(getValue(this.soDiemKhac)).toFixed(2),
         };
-        if (!this.state.item) {
+        if (this.state.item.add) {
             this.props.create(changes, this.hide);
         } else {
-            this.props.update(this.state.item.id, changes, this.hide);
+            this.props.update(this.state.item.item.id, changes, this.hide);
         }
-        e.preventDefault();
     };
 
     render = () => {
         const readOnly = this.props.readOnly;
         const nam = this.props.nam || 0;
+        const add = this.state?.item?.add;
         return this.renderModal({
-            title: this.state.item ? 'Cập nhật' : 'Tạo mới',
+            title: add ? 'Tạo mới' : 'Cập nhật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect ref={e => this.idNhom = e} className='col-md-6' data={SelectAdapter_NhomDanhGiaNhiemVu(nam)}
+                <FormSelect ref={e => this.idNhom = e} className='col-md-12' data={SelectAdapter_NhomDanhGiaNhiemVu(nam)}
                     label='Nhóm chức danh'
-                    placeholder='Nhóm chức danh' readOnly={readOnly} required />
-                <FormSelect ref={e => this.maChucDanh = e} multiple={true} className='col-md-6' data={SelectAdapter_NgachCdnnVaChucDanhKhoaHoc} label='Mã chức danh' placeholder='Mã chức danh' readOnly={readOnly} required />
+                    placeholder='Nhóm chức danh' readOnly={true} required />
+                <FormSelect ref={e => this.maChucDanh = e} multiple={true} className='col-md-12' data={SelectAdapter_NgachCdnnVaChucDanhKhoaHoc}
+                    label='Mã chức danh' placeholder='Mã chức danh' readOnly={readOnly} required />
                 <FormTextBox type='number' min={0} className='col-md-4' ref={e => this.soGioGiangDay = e} label='Số giờ giảng dạy'
                     readOnly={readOnly} required />
                 <FormTextBox type='number' min={0} className='col-md-4' ref={e => this.soGioNghienCuuKhoaHoc = e} label='Số giờ nghiên cứu khoa học'
@@ -120,7 +170,7 @@ class ComponentDMCV extends AdminPage {
     deleteNhom = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa nhóm chức danh', 'Bạn có chắc bạn muốn xóa nhóm chức danh này?', true, isConfirm =>
-            isConfirm && this.props.deleteTccbDinhMucCongViecGvVaNcvByNhom(item.id, this.load));
+            isConfirm && this.props.deleteTccbNhomDanhGiaNhiemVu(item.id, this.load));
     }
 
     create = (item, done) => this.props.createTccbDinhMucCongViecGvVaNcv(item, () => this.load(done));
@@ -130,7 +180,7 @@ class ComponentDMCV extends AdminPage {
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa định mức', 'Bạn có chắc bạn muốn xóa định mức này?', true, isConfirm =>
-            isConfirm && this.props.deleteTccbNhomDanhGiaNhiemVu(item.id, this.load));
+            isConfirm && this.props.deleteTccbDinhMucCongViecGvVaNcv(item.id, this.load));
     }
 
     render() {
@@ -158,9 +208,15 @@ class ComponentDMCV extends AdminPage {
                         <TableCell style={{ textAlign: 'center' }} content={<b>{Number.intToRoman(index + 1)}</b>} />
                         <TableCell style={{ textAlign: 'left' }} colSpan={5} content={<b>{item.ten}</b>} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                            onEdit={() => this.nhomModal.show({ ...item, update: true })}
+                            onEdit={() => this.nhomModal.show(item)}
                             onDelete={this.deleteNhom}
-                        />
+                        >
+                            <Tooltip title='Thêm' arrow>
+                                <button className='btn btn-success' onClick={() => this.modal.show({ idNhom: item.id, add: true })}>
+                                    <i className='fa fa-lg fa-plus' />
+                                </button>
+                            </Tooltip>
+                        </TableCell>
                     </tr>
                     {
                         item.submenus.length > 0 &&
@@ -170,19 +226,19 @@ class ComponentDMCV extends AdminPage {
                                     <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
                                     <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
                                     <TableCell style={{ textAlign: 'left' }} content={'Số giờ làm việc'} />
-                                    <TableCell style={{ textAlign: 'center' }} content={menu.soGioGiangDay} />
-                                    <TableCell style={{ textAlign: 'center' }} content={menu.soGioNghienCuuKhoaHoc} />
-                                    <TableCell style={{ textAlign: 'center' }} content={menu.soGioKhac} />
-                                    <TableCell style={{ textAlign: 'center' }} rowSpan={2} type='buttons' content={menu} permission={permission}
-                                        onEdit={() => this.modal.show(menu)}
+                                    <TableCell style={{ textAlign: 'right' }} content={menu.soGioGiangDay} />
+                                    <TableCell style={{ textAlign: 'right' }} content={menu.soGioNghienCuuKhoaHoc} />
+                                    <TableCell style={{ textAlign: 'right' }} content={menu.soGioKhac} />
+                                    <TableCell style={{ textAlign: 'right' }} rowSpan={2} type='buttons' content={menu} permission={permission}
+                                        onEdit={() => this.modal.show({ item: menu, add: false })}
                                         onDelete={this.delete}
                                     />
                                 </tr>
                                 <tr key={`${index}-${stt}-2`}>
                                     <TableCell style={{ textAlign: 'left' }} content={'Số điểm'} />
-                                    <TableCell style={{ textAlign: 'center' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
-                                    <TableCell style={{ textAlign: 'center' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
-                                    <TableCell style={{ textAlign: 'center' }} content={Number(menu.soDiemKhac).toFixed(2)} />
+                                    <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
+                                    <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
+                                    <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemKhac).toFixed(2)} />
                                 </tr>
                             </>
                         ))
@@ -194,11 +250,8 @@ class ComponentDMCV extends AdminPage {
             <div>{table}</div>
             {
                 permission.write && (<div style={{ textAlign: 'right' }}>
-                    <button className='btn btn-warning mr-1' type='button' onClick={() => this.nhomModal.show({ add: true, nam: this.props.nam })}>
+                    <button className='btn btn-info' type='button' onClick={() => this.nhomModal.show(null)}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm nhóm chức danh
-                    </button>
-                    <button className='btn btn-info mr-1' type='button' onClick={() => this.modal.show(null)}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm định mức
                     </button>
                 </div>)
             }
@@ -209,6 +262,7 @@ class ComponentDMCV extends AdminPage {
             <EditModalNhom ref={e => this.nhomModal = e}
                 createTccbNhomDanhGiaNhiemVu={this.createNhom}
                 updateTccbNhomDanhGiaNhiemVu={this.updateNhom}
+                nam={this.props.nam}
             />
         </>);
     }

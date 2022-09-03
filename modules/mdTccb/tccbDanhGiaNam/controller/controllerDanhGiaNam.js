@@ -3,7 +3,6 @@ module.exports = app => {
         parentMenu: app.parentMenu.tccb,
         menus: {
             3034: { title: 'Đánh giá', link: '/user/tccb/danh-gia', icon: 'fa-pencil-square-o', backgroundColor: '#2a99b8', groupIndex: 6 },
-            3038: { title: 'Nhóm đánh giá nhiệm vụ', link: '/user/tccb/nhom-danh-gia-nhiem-vu', groupIndex: 6 }
         }
     };
     app.permission.add(
@@ -21,7 +20,6 @@ module.exports = app => {
 
     app.get('/user/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:manage'), app.templates.admin);
     app.get('/user/tccb/danh-gia/:nam', app.permission.check('tccbDanhGiaNam:manage'), app.templates.admin);
-    app.get('/user/tccb/nhom-danh-gia-nhiem-vu', app.permission.check('tccbDanhGiaNam:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/danh-gia/page/:pageNumber/:pageSize', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {

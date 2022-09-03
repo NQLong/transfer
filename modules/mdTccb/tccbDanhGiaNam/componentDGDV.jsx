@@ -54,6 +54,7 @@ class EditModal extends AdminModal {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.item ? 'Cập nhật' : 'Tạo mới',
+            size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung'
                     readOnly={readOnly} required />
@@ -118,20 +119,20 @@ class ComponentDGDV extends AdminPage {
                 <div className='buttons btn-group btn-group-sm'>
                     {hasCreate && level == 0 &&
                         <Tooltip title='Tạo mục con' arrow>
-                            <a className='btn btn-warning' href='#' onClick={() => this.modal.show({ parentId: menu.id, submenus: menu.submenus || [] })}>
+                            <button className='btn btn-warning' onClick={() => this.modal.show({ parentId: menu.id, submenus: menu.submenus || [] })}>
                                 <i className='fa fa-lg fa-plus' />
-                            </a>
+                            </button>
                         </Tooltip>
                     }
                     {hasUpdate && <Tooltip title='Chỉnh sửa' arrow>
-                        <a className='btn btn-info' href='#' onClick={() => this.modal.show({ updateItem: menu })}>
+                        <button className='btn btn-info' onClick={() => this.modal.show({ updateItem: menu })}>
                             <i className='fa fa-lg fa-edit' />
-                        </a>
+                        </button>
                     </Tooltip>}
                     {hasDelete && <Tooltip title='Xoá' arrow>
-                        <a className='btn btn-danger' href='#' onClick={e => this.delete(e, menu)}>
+                        <button className='btn btn-danger' onClick={e => this.delete(e, menu)}>
                             <i className='fa fa-lg fa-trash' />
-                        </a>
+                        </button>
                     </Tooltip>}
                 </div>
             </div>

@@ -48,7 +48,7 @@ export function getTccbNhomDanhGiaNhiemVuAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/tccb/nhom-danh-gia-nhiem-vu/all';
+        const url = '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nhóm đánh giá bị lỗi', 'danger');
@@ -65,7 +65,7 @@ T.initPage('pageTccbNhomDanhGiaNhiemVu');
 export function getTccbNhomDanhGiaNhiemVuPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageTccbNhomDanhGiaNhiemVu', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/tccb/nhom-danh-gia-nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nhóm đánh giá bị lỗi!', 'danger');
@@ -80,7 +80,7 @@ export function getTccbNhomDanhGiaNhiemVuPage(pageNumber, pageSize, pageConditio
 
 export function getTccbNhomDanhGiaNhiemVu(id, done) {
     return () => {
-        const url = `/api/tccb/nhom-danh-gia-nhiem-vu/item/${id}`;
+        const url = `/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy nhóm đánh giá bị lỗi!', 'danger');
@@ -94,7 +94,7 @@ export function getTccbNhomDanhGiaNhiemVu(id, done) {
 
 export function createTccbNhomDanhGiaNhiemVu(item, done) {
     return dispatch => {
-        const url = '/api/tccb/nhom-danh-gia-nhiem-vu';
+        const url = '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify(`Tạo mới bị lỗi: ${data.error.message}`, 'danger');
@@ -111,7 +111,7 @@ export function createTccbNhomDanhGiaNhiemVu(item, done) {
 
 export function deleteTccbNhomDanhGiaNhiemVu(id, done) {
     return dispatch => {
-        const url = '/api/tccb/nhom-danh-gia-nhiem-vu';
+        const url = '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa nhóm đánh giá bị lỗi!', 'danger');
@@ -127,7 +127,7 @@ export function deleteTccbNhomDanhGiaNhiemVu(id, done) {
 
 export function updateTccbNhomDanhGiaNhiemVu(id, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/nhom-danh-gia-nhiem-vu';
+        const url = '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật nhóm đánh giá bị lỗi!', 'danger');
@@ -148,14 +148,14 @@ export function changeTccbNhomDanhGiaNhiemVu(item) {
 export const SelectAdapter_NhomDanhGiaNhiemVu = (nam) => ({
     ajax: true,
     data: (params) => ({ condition: { searchText: params.term, nam } }),
-    url: '/api/tccb/nhom-danh-gia-nhiem-vu/all',
+    url: '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/all',
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.id, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getTccbNhomDanhGiaNhiemVu(ma, item => done && done({ id: item.id, text: item.ten })))(),
 });
 
 export function updateTccbNhomDanhGiaNhiemVuThuTu(id, thuTu, nam, done) {
     return () => {
-        const url = '/api/tccb/nhom-danh-gia-nhiem-vu/thu-tu';
+        const url = '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/thu-tu';
         T.put(url, { id, thuTu, nam }, (data) => {
             if (data.error) {
                 T.notify('Thay đổi thứ tự bị lỗi!', 'danger');

@@ -45,7 +45,7 @@ export function getTccbTyLeDiemAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/tccb/ty-le-diem/all';
+        const url = '/api/tccb/danh-gia/ty-le-diem/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tỷ lệ điểm bị lỗi', 'danger');
@@ -60,7 +60,7 @@ export function getTccbTyLeDiemAll(condition, done) {
 
 export function getTccbTyLeDiem(id, done) {
     return () => {
-        const url = `/api/tccb/ty-le-diem/item/${id}`;
+        const url = `/api/tccb/danh-gia/ty-le-diem/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy mục tỷ lệ điểm bị lỗi!', 'danger');
@@ -74,7 +74,7 @@ export function getTccbTyLeDiem(id, done) {
 
 export function createTccbTyLeDiem(item, done) {
     return dispatch => {
-        const url = '/api/tccb/ty-le-diem';
+        const url = '/api/tccb/danh-gia/ty-le-diem';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify(`Tạo mới bị lỗi: ${data.error.message}`, 'danger');
@@ -91,7 +91,7 @@ export function createTccbTyLeDiem(item, done) {
 
 export function deleteTccbTyLeDiem(id, done) {
     return dispatch => {
-        const url = '/api/tccb/ty-le-diem';
+        const url = '/api/tccb/danh-gia/ty-le-diem';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa tỷ lệ điểm bị lỗi!', 'danger');
@@ -107,7 +107,7 @@ export function deleteTccbTyLeDiem(id, done) {
 
 export function updateTccbTyLeDiem(id, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/ty-le-diem';
+        const url = '/api/tccb/danh-gia/ty-le-diem';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật tỷ lệ điểm bị lỗi!', 'danger');

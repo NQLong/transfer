@@ -37,7 +37,7 @@ module.exports = app => {
             ...nhom,
             submenus: items.filter(item => item.idNhom == nhom.id),
         }));
-        return result.filter(item => item.submenus.length > 0);
+        return result;
     };
 
     app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear = async (oldNam, newNam) => {

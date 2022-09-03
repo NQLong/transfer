@@ -13,7 +13,7 @@ module.exports = app => {
     app.get('/user/tccb/don-vi-dang-ky-nhiem-vu/:nam', app.permission.check('tccbDonViDangKyNhiemVu:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    // app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/page/:pageNumber/:pageSize', app.permission.check('tccbDonViDangKyNhiemVu:write'), (req, res) => {
+    // app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/page/:pageNumber/:pageSize', app.permission.check('tccbDonViDangKyNhiemVu:write'), (req, res) => {
     //     const pageNumber = parseInt(req.params.pageNumber),
     //         pageSize = parseInt(req.params.pageSize),
     //         condition = req.query.condition || {};
@@ -21,11 +21,11 @@ module.exports = app => {
     //     condition.maDonVi = maDonVi;
     //     app.model.tccbDonViDangKyNhiemVu.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     // });
-    app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/danh-gia-nam/all', app.permission.check('tccbDonViDangKyNhiemVu:write'), (req, res) => {
-        app.model.tccbDanhGiaNam.getAll({}, '*', 'id', (error, items) => res.send({ error, items }));
+    app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/danh-gia-nam/all', app.permission.check('tccbDonViDangKyNhiemVu:write'), (req, res) => {
+        app.model.tccbDanhGiaNam.getAll({}, '*', 'nam DESC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/allByYear', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+    app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all/by-year', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
             const nam = Number(req.query.nam), maDonVi = req.session.user.staff.maDonVi;
             let danhGiaNam = await app.model.tccbDanhGiaNam.getAll({ nam });
@@ -56,7 +56,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/all', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+    app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
             const condition = req.query.condition || {};
             const maDonVi = req.session.user.staff.maDonVi;
@@ -68,7 +68,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/tccb/don-vi-dang-ky-nhiem-vu/item/:id', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+    app.get('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/item/:id', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
             const maDonVi = req.session.user.staff.maDonVi;
             const item = await app.model.tccbDonViDangKyNhiemVu.get({ id: req.params.id, maDonVi });
@@ -78,9 +78,14 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/tccb/don-vi-dang-ky-nhiem-vu', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+    app.post('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
             const newItem = req.body.item;
+            const nam = newItem.nam;
+            const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
+            if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
+                throw 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp';
+            }
             newItem.maDonVi = req.session.user.staff.maDonVi;
             const item = await app.model.tccbDonViDangKyNhiemVu.create(newItem);
             res.send({ item });
@@ -89,10 +94,15 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/tccb/don-vi-dang-ky-nhiem-vu', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
+    app.put('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu', app.permission.check('tccbDonViDangKyNhiemVu:write'), async (req, res) => {
         try {
             const changes = req.body.changes;
             changes.maDonVi = req.session.user.staff.maDonVi;
+            const { nam } = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id });
+            const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
+            if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
+                throw 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp';
+            }
             const item = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id }, changes);
             res.send({ item });
         } catch (error) {
@@ -100,8 +110,17 @@ module.exports = app => {
         }
     });
 
-    app.delete('/api/tccb/don-vi-dang-ky-nhiem-vu', app.permission.check('tccbDonViDangKyNhiemVu:delete'), (req, res) => {
-        app.model.tccbDonViDangKyNhiemVu.delete({ id: req.body.id }, error => res.send({ error }));
+    app.delete('/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu', app.permission.check('tccbDonViDangKyNhiemVu:delete'), async (req, res) => {
+        try {
+            const { nam } = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id });
+            const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
+            if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
+                throw 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp';
+            }
+            await app.model.tccbDonViDangKyNhiemVu.delete({ id: req.body.id });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.assignRoleHooks.addRoles('tccbDonViDangKyNhiemVu', { id: 'tccbDonViDangKyNhiemVu:write', text: 'Đơn vị đăng ký nhiệm vụ' });
