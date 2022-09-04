@@ -30,7 +30,7 @@ module.exports = app => {
             const nam = parseInt(req.query.nam), maDonVi = req.session.user.staff.maDonVi;
             let danhGiaNam = await app.model.tccbDanhGiaNam.getAll({ nam });
             danhGiaNam = danhGiaNam[0];
-            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam });
+            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 });
             let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi });
             let items = danhGiaDonVis.filter(item => !item.parentId);
             items = items.map(item => danhGiaDonVis.filter(danhGia => danhGia.parentId == item.id));
@@ -87,6 +87,8 @@ module.exports = app => {
                 res.send({ error: 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp' });
             } else {
                 newItem.maDonVi = req.session.user.staff.maDonVi;
+                newItem.userModified = req.session.user.email;
+                newItem.lastModified = Date.now();
                 const item = await app.model.tccbDonViDangKyNhiemVu.create(newItem);
                 res.send({ item });
             }
@@ -99,12 +101,14 @@ module.exports = app => {
         try {
             const changes = req.body.changes;
             changes.maDonVi = req.session.user.staff.maDonVi;
-            const { nam } = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id });
+            const { nam } = await app.model.tccbDonViDangKyNhiemVu.get({ id: req.body.id });
             const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
-            if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
+            if (donViBatDauDangKy > Date.now() || Date.now() > donViKetThucDangKy) {
                 res.send({ error: 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp' });
             } else {
-                const item = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id }, changes);
+                changes.userModified = req.session.user.email;
+                changes.lastModified = Date.now();
+                const item = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id, maDonVi: changes.maDonVi }, changes);
                 res.send({ item });
             }
         } catch (error) {
@@ -116,10 +120,12 @@ module.exports = app => {
         try {
             const { nam } = await app.model.tccbDonViDangKyNhiemVu.update({ id: req.body.id });
             const { donViBatDauDangKy, donViKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
-            if (donViBatDauDangKy > new Date.now() || new Date.now() > donViKetThucDangKy) {
-                throw 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp';
+            if (donViBatDauDangKy > Date.now() || Date.now() > donViKetThucDangKy) {
+                res.send({ error: 'Bạn không được quyền đăng ký do thời gian đăng ký không phù hợp' });
+            } else {
+                await app.model.tccbDonViDangKyNhiemVu.delete({ id: req.body.id, maDonVi: req.session.user.staff.maDonVi });
+                res.end();
             }
-            await app.model.tccbDonViDangKyNhiemVu.delete({ id: req.body.id });
         } catch (error) {
             res.send({ error });
         }

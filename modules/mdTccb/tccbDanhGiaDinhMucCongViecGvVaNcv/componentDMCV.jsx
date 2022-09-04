@@ -8,7 +8,7 @@ import T from 'view/js/common';
 
 class EditModalNhom extends AdminModal {
     componentDidMount() {
-        $(document).ready(() => this.onShown());
+        $(document).ready(() => this.onShown(() => this.ten.focus()));
     }
 
     onHide = () => {
@@ -145,7 +145,7 @@ class ComponentDMCV extends AdminPage {
         return ui;
     }
 
-    load = (done) => this.props.nam && this.props.getTccbDinhMucCongViecGvVaNcvAllByYear(Number(this.props.nam), items => {
+    load = (done) => this.props.nam && this.props.getTccbDinhMucCongViecGvVaNcvAllByYear(parseInt(this.props.nam), items => {
         this.setState({ items });
         $('table.dmcv').sortable({
             items: '> tbody',
@@ -193,7 +193,7 @@ class ComponentDMCV extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>STT</th>
-                    <th style={{ width: '40%', textAlign: 'center', whiteSpace: '' }}>Chức danh</th>
+                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: '' }}>Chức danh</th>
                     <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Số giờ làm việc/Số điểm</th>
                     <th style={{ width: '10%', textAlign: 'center', whiteSpace: 'nowrap' }}>Nhiệm vụ giảng dạy</th>
                     <th style={{ width: '10%', textAlign: 'center', whiteSpace: 'nowrap' }}>Nhiệm vụ nghiên cứu khoa học</th>

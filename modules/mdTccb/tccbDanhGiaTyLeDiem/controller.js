@@ -7,9 +7,23 @@ module.exports = app => {
     //     app.model.tccbTyLeDiem.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     // });
 
-    app.get('/api/tccb/danh-gia/ty-le-diem/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
-        const condition = req.query.condition || {};
-        app.model.tccbTyLeDiem.getAll(condition, '*', 'id', (error, items) => res.send({ error, items }));
+    app.get('/api/tccb/danh-gia/ty-le-diem/all', app.permission.check('tccbDanhGiaNam:manage'), async (req, res) => {
+        try {
+            const condition = req.query.condition || {};
+            let items = await app.model.tccbTyLeDiem.getAll(condition, '*', 'id');
+            const dmChucVu = await app.model.dmChucVu.getAll();
+            items = items.map(item => {
+                const maChucVus = item.maChucVu.split(',');
+                const tenChucVu = dmChucVu.filter(chucVu => maChucVus.includes(chucVu.ma)).map(chucVu => chucVu.ten).join('; ');
+                return {
+                    ...item,
+                    tenChucVu
+                };
+            });
+            res.send({ items });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/tccb/danh-gia/ty-le-diem/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {

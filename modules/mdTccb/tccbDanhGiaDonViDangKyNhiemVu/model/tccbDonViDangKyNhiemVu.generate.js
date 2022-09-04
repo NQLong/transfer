@@ -1,6 +1,6 @@
 // Table name: TCCB_DON_VI_DANG_KY_NHIEM_VU { id, dangKyKpi, dienGiai, maKhungDanhGiaDonVi, maDonVi, nam }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'dangKyKpi': 'DANG_KY_KPI', 'dienGiai': 'DIEN_GIAI', 'maKhungDanhGiaDonVi': 'MA_KHUNG_DANH_GIA_DON_VI', 'maDonVi': 'MA_DON_VI', 'nam': 'NAM' };
+const obj2Db = { 'id': 'ID', 'dangKyKpi': 'DANG_KY_KPI', 'dienGiai': 'DIEN_GIAI', 'maKhungDanhGiaDonVi': 'MA_KHUNG_DANH_GIA_DON_VI', 'maDonVi': 'MA_DON_VI', 'nam': 'NAM', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED' };
 
 module.exports = app => {
     app.model.tccbDonViDangKyNhiemVu = {

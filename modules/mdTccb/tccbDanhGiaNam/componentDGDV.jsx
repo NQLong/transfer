@@ -114,7 +114,7 @@ class ComponentDGDV extends AdminPage {
     renderMenu = (index, menu, level, hasCreate, hasUpdate, hasDelete) => (
         <li key={menu.id} data-id={menu.id}>
             <div style={{ display: 'inline-flex' }}>
-                {level == 0 ? <b>{`${index + 1}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
+                {level == 0 ? <b>{`${Number.intToRoman(index + 1)}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
                 &nbsp;
                 <div className='buttons btn-group btn-group-sm'>
                     {hasCreate && level == 0 &&
@@ -138,7 +138,7 @@ class ComponentDGDV extends AdminPage {
             </div>
 
             {menu.submenus ? (
-                <ul className='menuList'>
+                <ul className='menuList' style={{ listStyle: 'none' }}>
                     {menu.submenus.map((subMenu, index) => this.renderMenu(index, subMenu, level + 1, hasCreate, hasUpdate, hasDelete))}
                 </ul>
             ) : null}
@@ -157,14 +157,14 @@ class ComponentDGDV extends AdminPage {
                 {
                     items.length == 0 ? (<b>Không có dữ liệu đánh giá đơn vị</b>) :
                         <div>
-                            <ul id='menuMain' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0 }}>
+                            <ul id='menuMain' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0, listStyle: 'none' }}>
                                 {items.map((item, index) => this.renderMenu(index, item, 0, hasCreate, hasUpdate, hasDelete))}
                             </ul>
                         </div>
                 }
                 {hasCreate && (<div style={{ textAlign: 'right' }}>
                     <button className='btn btn-info' type='button' onClick={() => this.modal.show(null)}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm mục cha
+                        <i className='fa fa-fw fa-lg fa-plus' />Thêm nhóm
                     </button>
                 </div>)}
                 <EditModal ref={e => this.modal = e}

@@ -139,7 +139,7 @@ class ComponentDGCB extends AdminPage {
                 </tr>
             ),
             renderRow: (item, index) => (
-                <tr key={index}>
+                <tr key={index} style={{ backgroundColor: 'white' }}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'center' }} content={item.tu} />
                     <TableCell style={{ textAlign: 'center' }} content={item.den} />
