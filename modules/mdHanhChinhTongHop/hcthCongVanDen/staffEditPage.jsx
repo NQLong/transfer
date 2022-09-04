@@ -8,10 +8,11 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormCheckbox, FormDatePicker, FormFileBox, FormRichTextBox, FormSelect, FormTextBox, renderComment, renderTable, renderTimeline, TableCell } from 'view/component/AdminPage';
 import { duyetCongVan, createChiDao, createHcthCongVanDen, createPhanHoi, deleteFile, getChiDao, getCongVanDen, getHistory, getPhanHoi, updateHcthCongVanDen, updateStatus, updateQuyenChiDao } from './redux';
-
+import { ThemVaoNhiemVuModal } from '../hcthNhiemVu/component';
+import { themVaoNhiemVu } from '../hcthNhiemVu/redux';
 import { SelectAdapter_DmNgoaiNguV2 } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
 
-const { action, MA_BAN_GIAM_HIEU, MA_CHUC_VU_HIEU_TRUONG, trangThaiSwitcher } = require('../constant.js');
+const { action, MA_BAN_GIAM_HIEU, MA_CHUC_VU_HIEU_TRUONG, trangThaiSwitcher, loaiLienKet } = require('../constant.js');
 
 
 export const getTrangThaiText = (value) => {
@@ -760,6 +761,11 @@ class StaffEditPage extends AdminPage {
                             {quyenChiDao}
                         </>)
                         }
+                        {this.state.id && <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <button type='submit' className='btn btn-primary mr-2' onClick={e => { e.preventDefault(); this.themVaoNhiemVuModal.show(); }} >
+                                <i className='fa fa-arrow-up'></i>Thêm vào nhiệm vụ
+                            </button>
+                        </div>}
 
                     </div>
                 </div>
@@ -784,6 +790,7 @@ class StaffEditPage extends AdminPage {
                     permissions={dmDonViGuiCvPermission}
                     create={this.onCreateDonviGui}
                 />
+                <ThemVaoNhiemVuModal ref={e => this.themVaoNhiemVuModal = e} vanBanId={this.state.id} add={this.props.themVaoNhiemVu} loaiVanBan={loaiLienKet.VAN_BAN_DEN.id} />
             </>),
             backRoute,
             onSave: !readOnly && (!this.state.id || hcthStaffPermission.login) ? this.save : null,
@@ -793,5 +800,5 @@ class StaffEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDen: state.hcth.hcthCongVanDen });
-const mapActionsToProps = { duyetCongVan, createHcthCongVanDen, updateHcthCongVanDen, getCongVanDen, deleteFile, createDmDonViGuiCv, getStaffPage, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao, updateQuyenChiDao };
+const mapActionsToProps = { duyetCongVan, createHcthCongVanDen, updateHcthCongVanDen, getCongVanDen, deleteFile, createDmDonViGuiCv, getStaffPage, createChiDao, createPhanHoi, updateStatus, getPhanHoi, getHistory, getChiDao, updateQuyenChiDao, themVaoNhiemVu };
 export default connect(mapStateToProps, mapActionsToProps)(StaffEditPage);

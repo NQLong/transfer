@@ -214,7 +214,7 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "1,0"
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -16547,6 +16547,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "5,0"
+                },
+                "IS_DELETE": {
+                    "value": "isDelete",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -16805,53 +16812,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "HCTH_SIGNED_FILE": {
-            "active": true,
-            "moduleName": "hcthSignedFile",
-            "modelName": "hcthSignedFile",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_163743\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
                 },
-                "FILE_ID": {
-                    "value": "fileId",
-                    "dataType": "NUMBER",
+                "USER_MODIFIED": {
+                    "value": "userModified",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
+                    "nullable": true,
+                    "size": 255
                 },
-                "PREV": {
-                    "value": "prev",
+                "LAST_MODIFIED": {
+                    "value": "lastModified",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
-                },
-                "FILE_SIZE": {
-                    "value": "fileSize",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "SIGNATURE_COUNT": {
-                    "value": "signatureCount",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "5,0"
                 }
             },
             "primaryKeys": [
@@ -17045,6 +17019,11 @@
             "active": true,
             "moduleName": "hcthSoDangKy",
             "modelName": "hcthSoDangKy",
+            "methods": {
+                "HCTH_SO_DANG_KY_CREATE_SO_VAN_BAN": "createSoVanBan",
+                "HCTH_SO_DANG_KY_VALIDATE_SO_CONG_VAN": "validateSoCongVan",
+                "HCTH_SO_DANG_KY_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -17108,6 +17087,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -17179,6 +17165,13 @@
                 },
                 "SO_DIEM_KHAC": {
                     "value": "soDiemKhac",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "THU_TU": {
+                    "value": "thuTu",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -17313,6 +17306,180 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DM_BUOI_HOC": {
+            "active": true,
+            "moduleName": "dtDmBuoiHoc",
+            "modelName": "dtDmBuoiHoc",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_166495\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 30
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "LOAI_HINH": {
+                    "value": "loaiHinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DM_THU": {
+            "active": true,
+            "moduleName": "dtDmThu",
+            "modelName": "dtDmThu",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_SETTINGS": {
+            "active": true,
+            "moduleName": "dtSettings",
+            "modelName": "dtSettings",
+            "columns": {
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "VALUE": {
+                    "value": "value",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                }
+            },
+            "primaryKeys": [
+                "KEY"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_SIGNING_CONFIG": {
+            "active": true,
+            "moduleName": "hcthSigningConfig",
+            "modelName": "hcthSigningConfig",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_163743\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "VBDF_ID": {
+                    "value": "vbdfId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "SIGN_TYPE": {
+                    "value": "signType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "STATUS": {
+                    "value": "status",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "SIGN_AT": {
+                    "value": "signAt",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "PAGE_NUMBER": {
+                    "value": "pageNumber",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                },
+                "X_COORDINATE": {
+                    "value": "xCoordinate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "Y_COORDINATE": {
+                    "value": "yCoordinate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
                 }
             },
             "primaryKeys": [
