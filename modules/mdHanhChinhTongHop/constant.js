@@ -51,6 +51,7 @@ module.exports = {
 
     CONG_VAN_TYPE: 'DEN',
     CONG_VAN_DI_TYPE: 'DI',
+    NHIEM_VU_TYPE: 'NHIEM_VU',
     MA_CHUC_VU_HIEU_TRUONG: '001',
     MA_BAN_GIAM_HIEU: '68',
     MA_HCTH: '29',
@@ -90,13 +91,13 @@ module.exports = {
     },
 
     loaiLienKet: {
-        'CONG_VAN_DEN': {
-            id: 'CONG_VAN_DEN',
+        'VAN_BAN_DEN': {
+            id: 'VAN_BAN_DEN',
             text: 'Văn bản đến',
         },
 
-        'CONG_VAN_DI': {
-            id: 'CONG_VAN_DI',
+        'VAN_BAN_DI': {
+            id: 'VAN_BAN_DI',
             text: 'Văn bản đi',
         }
     },
