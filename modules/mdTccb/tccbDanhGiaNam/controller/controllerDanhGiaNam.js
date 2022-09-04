@@ -61,7 +61,7 @@ module.exports = app => {
             const nam = Number(item.nam);
             await Promise.all([
                 app.model.tccbKhungDanhGiaCanBo.delete({ nam }),
-                app.model.tccbKhungDanhGiaDonVi.delete({ nam }),
+                app.model.tccbKhungDanhGiaDonVi.update({ nam }, { isDelete: 1 }),
                 app.model.tccbDiemThuong.delete({ nam }),
                 app.model.tccbDiemTru.delete({ nam }),
                 app.model.tccbTyLeDiem.delete({ nam }),
@@ -85,7 +85,7 @@ module.exports = app => {
             const nam = item.nam;
             let [itemsCanBo, itemsDonVi, itemsDiemThuong, itemsDiemTru, itemsTyLeDiem] = await Promise.all([
                 app.model.tccbKhungDanhGiaCanBo.getAll({ nam }),
-                app.model.tccbKhungDanhGiaDonVi.getAll({ nam }),
+                app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 }),
                 app.model.tccbDiemThuong.getAll({ nam }),
                 app.model.tccbDiemTru.getAll({ nam }),
                 app.model.tccbTyLeDiem.getAll({ nam }),

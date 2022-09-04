@@ -17,7 +17,7 @@ module.exports = app => {
         try {
             const nam = Number(req.query.nam), maDonVi = req.query.ma;
             const donVi = await app.model.dmDonVi.get({ ma: maDonVi });
-            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam });
+            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 });
             let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi });
             let items = danhGiaDonVis.filter(item => !item.parentId);
             items = items.map(item => danhGiaDonVis.filter(danhGia => danhGia.parentId == item.id));

@@ -36,8 +36,8 @@ module.exports = app => {
         try {
             const id = req.body.id;
             await Promise.all([
-                app.model.tccbKhungDanhGiaDonVi.update({ parentId: id }, { isDelete: 1 }),
-                app.model.tccbKhungDanhGiaDonVi.update({ id }, { isDelete: 1 })
+                app.model.tccbKhungDanhGiaDonVi.update({ parentId: id, isDelete: 0 }, { isDelete: 1 }),
+                app.model.tccbKhungDanhGiaDonVi.update({ id, isDelete: 0 }, { isDelete: 1 })
             ]);
             res.end();
         } catch (error) {
@@ -52,7 +52,7 @@ module.exports = app => {
                 if (index < changes.length) {
                     const item = changes[index];
                     if (item) {
-                        app.model.tccbKhungDanhGiaDonVi.update({ id: item.id }, { thuTu: item.thuTu }, err => {
+                        app.model.tccbKhungDanhGiaDonVi.update({ id: item.id, isDelete: 0 }, { thuTu: item.thuTu }, err => {
                             if (err) error = err;
                             updateOneChange(index + 1);
                         });
