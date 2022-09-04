@@ -21,7 +21,7 @@ module.exports = app => {
         const listId = listNhom.map(nhom => nhom.id);
         if (listId.length == 0) return [];
 
-        let items = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listId)', parameter: { listId } }, '*', 'idNhom');
+        let items = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listId)', parameter: { listId } }, '*', 'id');
         items = items.map(item => {
             const itemChucDanhIds = item.maChucDanh.split(',');
             const chucDanhs = itemChucDanhIds.map(ma => {
