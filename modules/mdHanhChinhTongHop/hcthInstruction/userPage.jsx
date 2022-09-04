@@ -46,7 +46,7 @@ class userPage extends AdminPage {
             icon: 'fa fa-list',
             title: 'Hướng dẫn sử dụng',
             content: <>
-                <div className="tile">
+                <div className='tile'>
                     {table}
                 </div>
             </>,

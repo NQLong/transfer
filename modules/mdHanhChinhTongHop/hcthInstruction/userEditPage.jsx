@@ -55,18 +55,18 @@ class userEditPage extends AdminPage {
             readOnly = !permission.login;
 
         return <>
-            <div className="tile">
-                <div className="tile-title">
+            <div className='tile'>
+                <div className='tile-title'>
                     <FormTextBox ref={e => this.tieuDeInstruction = e} label='Tiêu đề' readOnly={readOnly} />
                 </div>
 
-                <div className="tile-body">
+                <div className='tile-body'>
                     {readOnly && <div dangerouslySetInnerHTML={{ __html: this.state.noiDung }} style={{ minHeight: '400px' }} ></div>}
                     {!readOnly && <FormEditor ref={e => this.noiDungInstruction = e} height={400} label='Nội dung:' dangerouslySetInnerHTML={{ _html: this.state.noiDung }} readOnly={readOnly} />}
                 </div>
                 {!readOnly && <div style={{ textAlign: 'right' }}>
-                    <button className="btn btn-success" type='button' onClick={() => this.saveContent()}>
-                        <i className="fa fa-lg fa-save"></i>
+                    <button className='btn btn-success' type='button' onClick={() => this.saveContent()}>
+                        <i className='fa fa-lg fa-save'></i>
                         Lưu
                     </button>
                 </div>}
