@@ -492,3 +492,24 @@ export function refreshCanBoNhanStatus(data, done) {
     };
 }
 
+export const SelectAdapter_NhiemVu = {
+    ajax: true,
+    url: '/api/hcth/nhiem-vu/search/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: `Tiêu đề: ${item.tieuDe}` })) : [] })
+};
+
+export function themVaoNhiemVu(id, changes, done) {
+    return () => {
+        const url = '/api/hcth/nhiem-vu/add';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật nhiệm vụ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+            } else {
+                T.notify('Cập nhật nhiệm vụ thành công', 'success');
+                done && done();
+            }
+        }, () => T.notify('Cập nhật nhiệm vụ bị lỗi!', 'danger'));
+    };
+}
