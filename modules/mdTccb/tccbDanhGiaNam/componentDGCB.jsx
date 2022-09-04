@@ -133,8 +133,8 @@ class ComponentDGCB extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Từ</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Đến</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức đánh giá</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức xếp loại</th>
+                    <th style={{ width: '70%', textAlign: 'left', whiteSpace: 'nowrap' }}>Mức đánh giá</th>
+                    <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức xếp loại</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
@@ -143,7 +143,7 @@ class ComponentDGCB extends AdminPage {
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'center' }} content={item.tu} />
                     <TableCell style={{ textAlign: 'center' }} content={item.den} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.mucDanhGia} />
+                    <TableCell style={{ textAlign: 'left' }} content={item.mucDanhGia} />
                     <TableCell style={{ textAlign: 'center' }} content={item.mucXepLoai} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}
