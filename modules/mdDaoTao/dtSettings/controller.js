@@ -44,6 +44,19 @@ module.exports = app => {
         }
     });
 
+    app.get('/api/dao-tao/settings/schedule-settings', app.permission.check('dtSettings:manage'), async (req, res) => {
+        try {
+            const listKey = ['tkbSoLopMin', 'tkbSoLopMax', 'tkbSoTietBuoiMin', 'tkbSoTietBuoiMax', 'tkbSoBuoiTuanMin', 'tkbSoBuoiTuanMax', 'tkbSoLuongDuKienMin', 'tkbSoLuongDuKienMax'];
+            let result = await app.model.dtSettings.getValue(...listKey);
+            Object.keys(result).forEach(key => {
+                result[key] = result[key] ? parseInt(result[key]) : 0;
+            });
+            res.send({ items: result });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     app.put('/api/dao-tao/settings', app.permission.check('dtSettings:write'), async (req, res) => {
         try {
             const { changes } = req.body;
