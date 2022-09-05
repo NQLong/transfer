@@ -36,13 +36,13 @@ class TccbThongTinDangKyDonViDetails extends AdminPage {
             renderRow: (item, index) => (
                 <>
                     <tr>
-                        <TableCell style={{ textAlign: 'center' }} colSpan='1' content={<b>{(index + 1).intToRoman()}</b>} />
-                        <TableCell style={{ textAlign: 'left' }} colSpan='3' content={<b>{item.noiDung}</b>} />
+                        <TableCell style={{ textAlign: 'center' }} className='text-primary' colSpan='1' content={<b>{(index + 1).intToRoman()}</b>} />
+                        <TableCell style={{ textAlign: 'left' }} className='text-primary' colSpan='3' content={<b>{item.noiDung}</b>} />
                     </tr>
                     {
                         item.submenus.length > 0 &&
                         item.submenus.map((menu, stt) => (
-                            <tr key={index}>
+                            <tr key={`${index}-${stt}`}>
                                 <TableCell style={{ textAlign: 'center' }} content={stt + 1} />
                                 <TableCell style={{ textAlign: 'left' }} content={menu.noiDung} />
                                 <TableCell style={{ textAlign: 'left' }} content={<p dangerouslySetInnerHTML={{ __html: menu.dangKyKpi }} />} />

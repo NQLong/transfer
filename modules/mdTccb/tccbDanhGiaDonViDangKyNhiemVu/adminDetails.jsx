@@ -111,8 +111,8 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
             renderRow: (item, index) => (
                 <>
                     <tr>
-                        <TableCell style={{ textAlign: 'center' }} colSpan='1' content={<b>{(index + 1).intToRoman()}</b>} />
-                        <TableCell style={{ textAlign: 'left' }} colSpan='4' content={<b>{item.noiDung}</b>} />
+                        <TableCell style={{ textAlign: 'center' }} colSpan='1' className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
+                        <TableCell style={{ textAlign: 'left' }} colSpan='4' className='text-primary' content={<b>{item.noiDung}</b>} />
                     </tr>
                     {
                         item.submenus.length > 0 &&
