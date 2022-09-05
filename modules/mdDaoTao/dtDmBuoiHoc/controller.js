@@ -26,23 +26,35 @@ module.exports = app => {
 
 
     //     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/user/dao-tao/buoi-hoc', app.permission.orCheck('dtDmBuoiHoc:read', 'dtChuongTrinhDaoTao:manage'), app.templates.admin);
+    app.get('/user/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:read'), app.templates.admin);
 
-    app.get('/api/dao-tao/buoi-hoc/all', app.permission.orCheck('dtDmBuoiHoc:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        app.model.dtDmBuoiHoc.getAll({}, '*', 'id asc', (error, items) => {
-            res.send({ error, items });
-        });
+    app.get('/api/dao-tao/buoi-hoc/all', app.permission.check('dtDmBuoiHoc:read'), async (req, res) => {
+        try {
+            let items = await app.model.dtDmBuoiHoc.getAll();
+            console.log(items);
+            let listLoaiHinh = await app.model.dmSvLoaiHinhDaoTao.getAll({}, 'ma,ten');
+            console.log(listLoaiHinh);
+            items.forEach(item => {
+                let loaiHinh = item.loaiHinh.split(',');
+                console.log(loaiHinh);
+            });
+
+            res.send({items});
+
+        } catch (error) {
+            res.send({error});
+        }
     });
 
-    app.post('/api/dao-tao/buoi-hoc', app.permission.orCheck('dtDmBuoiHoc:write', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.post('/api/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:write'), (req, res) => {
         app.model.dtDmBuoiHoc.create(req.body.data, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/dao-tao/buoi-hoc', app.permission.orCheck('dtDmBuoiHoc:delete', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.delete('/api/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:delete'), (req, res) => {
         app.model.dtDmBuoiHoc.delete({ id: req.body.id }, error => res.send({ error }));
     });
 
-    app.put('/api/dao-tao/buoi-hoc', app.permission.orCheck('dtDmBuoiHoc:write', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+    app.put('/api/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:write'), (req, res) => {
         let changes = req.body.changes;
         app.model.dtDmBuoiHoc.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
     });

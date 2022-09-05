@@ -74,10 +74,10 @@ class DtDmBuoiHocPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: '80%' }} nowrap='true'>Tên</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Tên</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Loại Hình</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: '90%' }} nowrap='true'>Loại Hình</th>
+                    {/* <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th> */}
 
                 </tr>),
             renderRow: (item, index) => (
@@ -87,8 +87,8 @@ class DtDmBuoiHocPage extends AdminPage {
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={() => this.props.updateDtDmBuoiHoc(item.id, { kichHoat: item.kichHoat == 1 ? 0 : 1 })} />
                     <TableCell content={item.loaiHinh} />
-                    <TableCell type='buttons' content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    {/* <TableCell type='buttons' content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete} /> */}
                 </tr>
             )
         });
@@ -105,7 +105,7 @@ class DtDmBuoiHocPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write} create={this.props.createDtDmBuoiHoc} update={this.props.updateDtDmBuoiHoc} />
             </>,
             backRoute: '/user/dao-tao',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+            // onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 

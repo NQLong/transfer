@@ -77,3 +77,11 @@ export function updateDtDmBuoiHoc(id, changes, done) {
     };
 }
 
+export const SelectAdapter_DtDmBuoiHoc = {
+    ajax: true,
+    url: '/api/dao-tao/buoi-hoc/all',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDtDmBuoiHocAll(id, item => item && done && done({ id: item.id, text: item.ten })))(),
+};
+

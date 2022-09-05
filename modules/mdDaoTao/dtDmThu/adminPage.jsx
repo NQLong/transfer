@@ -24,7 +24,7 @@ class EditModal extends AdminModal {
             // ma: this.ma.value(),
             // ten: this.ten.value(),
             // kichHoat: this.kichHoat.value() ? 1 : 0,
-            ma: getValue(this.ma),
+            // ma: getValue(this.ma),
             ten: getValue(this.ten),
             kichHoat: Number(getValue(this.kichHoat))
         };
@@ -43,7 +43,7 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật Thứ' : 'Tạo mới Thứ',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Ma' readOnly={readOnly} required />
+                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={true} required />
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} required />
             </div>
@@ -80,7 +80,7 @@ class DtDmThuPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: '80%' }} nowrap='true'>Tên</th>
+                    <th style={{ width: '90%' }} nowrap='true'>Tên</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
 
@@ -92,7 +92,7 @@ class DtDmThuPage extends AdminPage {
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={() => this.props.updateDtDmThu(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 })} />
                     <TableCell type='buttons' content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                        onEdit={() => this.modal.show(item)} />
                 </tr>
             )
         });
@@ -109,7 +109,7 @@ class DtDmThuPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write} create={this.props.createDtDmThu} update={this.props.updateDtDmThu} />
             </>,
             backRoute: '/user/dao-tao',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+            // onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 

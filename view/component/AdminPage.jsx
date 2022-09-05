@@ -1009,7 +1009,7 @@ export class AdminPage extends React.Component {
         T.title(title);
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
-            createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới' />;
+            createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới2' />;
             right += 60;
         }
         if (onSave) {

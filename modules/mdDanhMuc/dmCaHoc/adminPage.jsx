@@ -4,6 +4,7 @@ import { createDmCaHoc, getDmCaHocAll, updateDmCaHoc, deleteDmCaHoc } from './re
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormEditor, FormTextBox, FormCheckbox, FormTabs, FormSelect, } from 'view/component/AdminPage';
 import { SelectAdapter_DmCoSo } from '../dmCoSo/redux';
+import { SelectAdapter_DtDmBuoiHoc } from '../../mdDaoTao/dtDmBuoiHoc/redux';
 
 class EditModal extends AdminModal {
 
@@ -14,12 +15,13 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { ma, ten, moTa, kichHoat, thoiGianBatDau, thoiGianKetThuc, maCoSo } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true, maCoSo: 2 };
+        let { ma, ten, moTa, kichHoat, thoiGianBatDau, thoiGianKetThuc, maCoSo, buoi } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true, maCoSo: 2, buoi: 1 };
 
         this.setState({ ma, ten, item });
         let mo_ta = !moTa ? {} : JSON.parse(moTa);
         this.ten.value(ten);
         this.maCoSo.value(maCoSo);
+        this.buoi.value(buoi);
         this.moTaVi.value(mo_ta.vi ? mo_ta.vi : '');
         this.moTaEn.value(mo_ta.en ? mo_ta.en : '');
         this.kichHoat.value(kichHoat ? 1 : 0);
@@ -35,6 +37,7 @@ class EditModal extends AdminModal {
         const changes = {
             ten: this.ten.value(),
             maCoSo: this.maCoSo.value(),
+            buoi: this.buoi.value(),
             moTa: JSON.stringify({ vi: this.moTaVi.value(), en: this.moTaEn.value() }),
             thoiGianBatDau: `${this.gioBatDau.value()}:${this.phutBatDau.value()}`,
             thoiGianKetThuc: `${this.gioKetThuc.value()}:${this.phutKetThuc.value()}`,
@@ -86,7 +89,8 @@ class EditModal extends AdminModal {
                 <div style={{ position: 'absolute', top: '16px', right: '8px' }}>
                     <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
                         onChange={value => this.changeKichHoat(value ? 1 : 0)} /></div>
-                <FormSelect className='col-md-12' ref={e => this.maCoSo = e} data={SelectAdapter_DmCoSo} readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.maCoSo = e} data={SelectAdapter_DmCoSo} readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.buoi = e} data={SelectAdapter_DtDmBuoiHoc} readOnly={readOnly} />
                 <div className='form-group col-md-12'>
                     <FormTabs tabs={viEnTabs} />
                 </div>
