@@ -30,26 +30,27 @@ module.exports = app => {
             const nam = parseInt(req.query.nam), maDonVi = req.session.user.staff.maDonVi;
             let danhGiaNam = await app.model.tccbDanhGiaNam.getAll({ nam });
             danhGiaNam = danhGiaNam[0];
-            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 });
+            let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 }, '*', 'THU_TU ASC');
             let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi });
             let items = danhGiaDonVis.filter(item => !item.parentId);
-            items = items.map(item => danhGiaDonVis.filter(danhGia => danhGia.parentId == item.id));
-            items = items.reduce((prev, cur) => prev.concat(cur));
-            items = items.map(danhGiaDonVi => {
-                const index = dangKys.findIndex(dangKy => dangKy.maKhungDanhGiaDonVi == danhGiaDonVi.id);
+            danhGiaDonVis = danhGiaDonVis.filter(item => item.parentId).map(item => {
+                const index = dangKys.findIndex(dangKy => dangKy.maKhungDanhGiaDonVi == item.id);
                 if (index == -1) {
                     return {
-                        noiDung: danhGiaDonVi.noiDung,
-                        maKhungDanhGiaDonVi: danhGiaDonVi.id,
+                        noiDung: item.noiDung,
+                        maKhungDanhGiaDonVi: item.id,
+                        parentId: item.parentId,
                         maDonVi,
                         nam,
                     };
                 }
                 return {
-                    noiDung: danhGiaDonVi.noiDung,
+                    parentId: item.parentId,
+                    noiDung: item.noiDung,
                     ...dangKys[index]
                 };
             });
+            items = items.map(item => ({ ...item, submenus: danhGiaDonVis.filter(danhGia => danhGia.parentId == item.id) }));
             res.send({ items, danhGiaNam });
         } catch (error) {
             res.send({ error });

@@ -109,24 +109,36 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
                 </tr>
             ),
             renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell style={{ textAlign: 'center' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'left' }} content={item.noiDung} />
-                    <TableCell style={{ textAlign: 'left' }} content={<p dangerouslySetInnerHTML={{ __html: item.dangKyKpi }} />} />
-                    <TableCell style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }} content={item.dienGiai} />
-                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                        onDelete={(e) => danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy) ? this.delete(e, item) : T.notify('Hết thời hạn đăng ký', 'danger')}
-                    >
-                        {
-                            permission.write && danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy)
-                            && <Tooltip title='Đăng ký' arrow>
-                                <a className='btn btn-info' href='#' onClick={() => this.modal.show(item)}>
-                                    <i className='fa fa-lg fa-edit' />
-                                </a>
-                            </Tooltip>
-                        }
-                    </TableCell>
-                </tr>
+                <>
+                    <tr>
+                        <TableCell style={{ textAlign: 'center' }} colSpan='1' content={<b>{(index + 1).intToRoman()}</b>} />
+                        <TableCell style={{ textAlign: 'left' }} colSpan='4' content={<b>{item.noiDung}</b>} />
+                    </tr>
+                    {
+                        item.submenus.length > 0 &&
+                        item.submenus.map((menu, stt) => (
+                            <tr key={index}>
+                                <TableCell style={{ textAlign: 'center' }} content={stt + 1} />
+                                <TableCell style={{ textAlign: 'left' }} content={menu.noiDung} />
+                                <TableCell style={{ textAlign: 'left' }} content={<p dangerouslySetInnerHTML={{ __html: menu.dangKyKpi }} />} />
+                                <TableCell style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }} content={menu.dienGiai} />
+                                <TableCell style={{ textAlign: 'center' }} type='buttons' content={menu} permission={permission}
+                                    onDelete={(e) => danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy) ? this.delete(e, menu) : T.notify('Hết thời hạn đăng ký', 'danger')}
+                                >
+                                    {
+                                        permission.write && danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy)
+                                        && <Tooltip title='Đăng ký' arrow>
+                                            <a className='btn btn-info' href='#' onClick={() => this.modal.show(menu)}>
+                                                <i className='fa fa-lg fa-edit' />
+                                            </a>
+                                        </Tooltip>
+                                    }
+                                </TableCell>
+                            </tr>
+                        ))
+                    }
+                </>
+
             )
         });
 
