@@ -6,20 +6,19 @@ import { getDmDonViAll, SelectAdapter_DmDonVi, SelectAdapter_DmDonViFaculty_V2 }
 import { createDtThoiGianPhanCong } from '../dtThoiGianPhanCong/redux';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
-import { AdminModal, AdminPage, CirclePageButton, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
 import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
-import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import AutoGenSchedModal from './autoGenSchedModal';
 import AddingModal from './addModal';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
-
-const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+import { getDmCaHocAll } from 'modules/mdDanhMuc/dmCaHoc/redux';
+const dataThu = [2, 3, 4, 5, 6, 7],
     dataHocKy = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
 class ThoiGianPhanCongGiangDay extends AdminModal {
@@ -94,7 +93,7 @@ class AdjustModal extends AdminModal {
             tgData.filter(v => giangVien.includes(v.id)).forEach(item => !duplicateGv.includes(item.text) && duplicateGv.push(item.text));
 
             if (duplicateGv.length > 0) {
-                T.confirm('Trùng giảng viên và trợ giảng', 'Giảng viên <b>' + duplicateGv.join(', ') +'</b> này có vừa là giảng viên vừa là trợ giảng. Bạn có muốn tiếp tục cập nhật thông tin?', 'warning', 'true', isConfirm => { 
+                T.confirm('Trùng giảng viên và trợ giảng', 'Giảng viên <b>' + duplicateGv.join(', ') + '</b> này có vừa là giảng viên vừa là trợ giảng. Bạn có muốn tiếp tục cập nhật thông tin?', 'warning', 'true', isConfirm => {
                     if (isConfirm) {
                         data.giangVien = this.giangVien.value();
                         data.troGiang = this.troGiang.value();
@@ -107,7 +106,7 @@ class AdjustModal extends AdminModal {
                     }
                 });
             }
-            
+
         }
     }
 
@@ -122,7 +121,7 @@ class AdjustModal extends AdminModal {
                 <FormTextBox ref={e => this.khoa = e} className='form-group col-md-8' readOnly label='Khoa, bộ môn' />
                 <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={quanLyKhoa} />
                 <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={quanLyKhoa} />
-                <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={dataTiet} readOnly={quanLyKhoa} />
+                <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={this.props.dataTiet} readOnly={quanLyKhoa} />
                 <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' multiple={true} readOnly={!quanLyKhoa} />
                 <FormSelect ref={e => this.troGiang = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn trợ giảng' multiple={true} readOnly={!quanLyKhoa} />
             </div>
@@ -133,6 +132,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
     check = {}
     state = { page: null, isEdit: {}, sucChua: {}, filter: {}, idNamDaoTao: '', hocKy: '' }
     componentDidMount() {
+        this.props.getDmCaHocAll(items => {
+            items = [...new Set(items.map(item => parseInt(item.ten)))];
+            this.setState({ dataTiet: items });
+        });
         getDtNganhDaoTaoAll(items => {
             let dataNganh = items.map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
             this.setState({ dataNganh });
@@ -140,29 +143,37 @@ class DtThoiKhoaBieuPage extends AdminPage {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(true);
-            this.setState({ idNamDaoTao: '', hocKy: '' });
+            this.setState({ idNamDaoTao: '', hocKy: '', dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) }, () => { this.khoaSinhVienFilter.value(''); this.changeAdvancedSearch(true); });
         });
-        this.changeAdvancedSearch(true);
     }
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.dtThoiKhoaBieu && this.props.dtThoiKhoaBieu.page ? this.props.dtThoiKhoaBieu.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
-        const idNamDaoTao = this.namFilter.value(),
-            hocKy = this.hocKyFilter.value(),
-            donVi = this.khoaFilter.value(),
-            bacDaoTaoFilter = this.bacDaoTaoFilter.value(),
-            thuFilter = this.thuFilter.value(),
-            phongFilter = this.phongFilter.value(),
-            giangVienFilter = this.giangVienFilter.value(),
-            monHocFilter = this.monHocFilter.value(),
-            loaiHinhDaoTaoFilter = this.loaiHinhDaoTaoFilter.value();
-        const pageFilter = (isInitial) ? {} : { idNamDaoTao, hocKy, donVi, bacDaoTaoFilter, loaiHinhDaoTaoFilter, thuFilter, phongFilter, giangVienFilter, monHocFilter };
-        this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, pageCondition, () => {
-                if (isInitial) {
-                    ['namFilter', 'hocKyFilter', 'khoaFilter', 'bacDaoTaoFilter', 'loaiHinhDaoTaoFilter', 'phongFilter', 'thuFilter', 'giangVienFilter', 'monHocFilter'].forEach(e => this[e].value(''));
-                    this.hideAdvanceSearch();
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        let { filter } = cookie;
+        if (!filter || (typeof filter == 'string' && filter.includes('%'))) filter = {};
+        if (isInitial) {
+            this.showAdvanceSearch();
+            ['namFilter', 'hocKyFilter', 'khoaFilter', 'loaiHinhDaoTaoFilter', 'phongFilter', 'thuFilter', 'monHocFilter', 'khoaSinhVienFilter'].forEach(e => {
+                if (filter[e]) {
+                    this[e].value(filter[e]);
                 }
+            });
+            this.setState({ filter }, () => this.getPage(pageNumber, pageSize, pageCondition));
+        } else {
+            // ['namFilter', 'hocKyFilter', 'khoaFilter', 'loaiHinhDaoTaoFilter', 'phongFilter', 'thuFilter', 'monHocFilter', 'khoaSinhVienFilter'].forEach(e => filter[e] = this[e].value());
+            this.getPage(pageNumber, pageSize, pageCondition, page => {
+                T.notify(`Tìm thấy ${page.totalItem} kết quả`, 'info');
+                this.hideAdvanceSearch();
+            });
+        }
+    }
+
+    resetAdvancedSearch = () => {
+        ['namFilter', 'hocKyFilter', 'khoaFilter', 'loaiHinhDaoTaoFilter', 'phongFilter', 'thuFilter', 'monHocFilter', 'khoaSinhVienFilter'].forEach(e => this[e].value(''));
+        this.setState({ filter: {} }, () => {
+            this.getPage(1, 50, '', () => {
+                this.hideAdvanceSearch();
             });
         });
     }
@@ -225,7 +236,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <FormSelect ref={e => this.thu = e} style={{ marginBottom: '0' }} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
-                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0' }} data={dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
+                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0' }} data={this.state.dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
             } />
             <TableCell style={{ textAlign: 'center' }} content={
                 <FormTextBox type='number' ref={e => this.soTiet = e} style={{ width: '70px', marginBottom: '0', textAlign: 'right' }} min={1} max={5} />
@@ -251,24 +262,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
             tietBatDau: this.tietBatDau.value(),
             soTietBuoi: this.soTiet.value(),
             soLuongDuKien: this.soLuongDuKien.value(),
-            maNganh: this.maNganh.value()
+            maNganh: this.maNganh.value(),
+            chuyenNganh: this.chuyenNganh.value()
         };
-        let { tietBatDau, soTietBuoi } = curData;
-        if (tietBatDau && soTietBuoi) {
-            tietBatDau = parseInt(tietBatDau);
-            soTietBuoi = parseInt(soTietBuoi);
-            if (soTietBuoi == 5 && tietBatDau >= 2) {
-                T.notify(`Lỗi: Học từ tiết 5 tới tiết ${tietBatDau + soTietBuoi - 1}`, 'warning');
-                return this.tietBatDau.focus();
-            }
-            else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) {
-                T.notify('Thời gian học không hợp lệ!', 'danger');
-                return this.tietBatDau.focus();
-            } else if (soTietBuoi + tietBatDau - 1 >= 10) {
-                T.notify('Thời gian học không hợp lệ!', 'danger');
-                return this.tietBatDau.focus();
-            }
-        }
         this.props.updateDtThoiKhoaBieuCondition(item.id, curData, () => {
             this.setState({ editId: null });
         });
@@ -276,8 +272,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
 
     handleEdit = (item) => {
         this.setState({ editId: item.id }, () => {
-            // let maNganh = item.tenNganh.split('&&').map(nganh => nganh.split('%')[0]);
-            // let chuyenNganh = item.tenChuyenNganh.split('&&').map(cn => cn.split('%'))
             this.phong.value(item.phong);
             this.thu.value(item.thu);
             this.tietBatDau.value(item.tietBatDau);
@@ -288,6 +282,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
         });
     }
 
+    handleAutoGen = (e) => {
+        e?.preventDefault();
+        T.confirm('Lưu ý', 'Hãy chắc chắn rằng bạn đã chọn mở các môn theo đúng đợt', 'warning', true, isConfirm => isConfirm && this.props.history.push('/user/dao-tao/thoi-khoa-bieu/auto-generate'));
+    }
     render() {
         const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete', 'manage', 'export']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtThoiKhoaBieu?.page || { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '', list: [] };
@@ -309,7 +307,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }}>Tiết bắt đầu</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Số tiết</th>
                     <th style={{ width: 'auto' }}>SLDK</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Ngành</th>
+                    <th style={{ width: 'auto' }}>Ngành<br />Chuyên ngành</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Ngày bắt đầu</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Ngày kết thúc</th>
                     <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Khoa <br />Bộ môn</th>
@@ -343,13 +341,15 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tongTiet} />
                         {
                             this.state.editId == item.id ? this.elementEdit() : <>
-                                <TableCell content={item.phong} />
+                                <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={
+                                    <Tooltip title={item.sucChua || ''} arrow ><span>{item.phong}</span></Tooltip>} />
                                 <TableCell type='number' content={item.thu} />
                                 <TableCell type='number' content={item.tietBatDau} />
                                 <TableCell type='number' content={item.soTiet} />
                                 <TableCell type='number' content={item.soLuongDuKien} />
                                 <TableCell style={{ width: 'auto', whiteSpace: 'nowrap' }} content={<>{
                                     item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[0]} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                                    {item.tenChuyenNganh && <br />}
                                     {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={`${nganh.split('%')[0]}_${nganh.split('%')[1].getFirstLetters()}`} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
                                 </>} />
                             </>
@@ -365,7 +365,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.namDaoTao} />
                         <TableCell type='number' content={item.hocKy} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                            {(permission.write || permission.manage) && !item.phong && <>
+                            {/* {(permission.write || permission.manage) && !item.phong && <>
                                 {this.state.editId != item.id && <Tooltip title='Điều chỉnh' arrow>
                                     <button className='btn btn-primary' onClick={e => e.preventDefault() || this.handleEdit(item)}>
                                         <i className='fa fa-lg fa-edit' />
@@ -378,13 +378,13 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                     }}>
                                         <i className='fa fa-lg fa-check' />
                                     </button>
-                                </Tooltip>}</>}
+                                </Tooltip>}</>} */}
                             {(permission.write || permission.manage) && (item.phong && item.thu && item.tietBatDau) && <Tooltip title='Điều chỉnh' arrow>
                                 <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
                                     <i className='fa fa-lg fa-cog' />
                                 </button>
                             </Tooltip>}
-                            {(permission.write || permission.manage) && item.phong && <Tooltip title='Xóa' arrow>
+                            {(permission.write || permission.manage) && !(item.phong && item.thu && item.tietBatDau) && <Tooltip title='Xóa' arrow>
                                 <button className='btn btn-danger' onClick={e => e.preventDefault() || this.delete(item)}>
                                     <i className='fa fa-lg fa-trash' />
                                 </button>
@@ -407,31 +407,28 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtThoiKhoaBieuPage} />
                 <AdjustModal ref={e => this.modal = e} quanLyKhoa={permission.manage}
-                    update={this.props.updateDtThoiKhoaBieuCondition}
+                    update={this.props.updateDtThoiKhoaBieuCondition} dataTiet={this.state.dataTiet}
                 />
                 <AutoGenSchedModal ref={e => this.autoGen = e} permission={permission} filter={this.state.filter} />
                 <ThoiGianPhanCongGiangDay ref={e => this.thoiGianModal = e} create={this.props.createDtThoiGianPhanCong} />
                 <AddingModal ref={e => this.addingModal = e} create={this.props.createDtThoiKhoaBieu} disabledClickOutside filter={this.state.filter} />
-                {permission.write && <CirclePageButton type='custom' customClassName='btn-danger' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
-                    || this.autoGen.show()} style={{ marginRight: '180px' }} />}
-                {permission.write && <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-thumb-tack' tooltip='Tạo thời gian phân công giảng dạy' onClick={e => e.preventDefault()
-                    || this.thoiGianModal.show()} style={{ marginRight: '120px' }} />}
             </>,
             backRoute: '/user/dao-tao',
             advanceSearch: <div className='row'>
                 <FormSelect ref={e => this.namFilter = e} className='col-md-2' placeholder='Năm đào tạo' data={SelectAdapter_DtCauTrucKhungDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, idNamDaoTao: value?.id } })} allowClear />
+                <FormSelect ref={e => this.khoaSinhVienFilter = e} className='col-md-2' placeholder='Khoá' data={this.state.dataKhoaSinhVien || []} onChange={value => this.setState({ filter: { ...this.state.filter, khoaSinhVienFilter: value?.id } })} allowClear />
                 <FormSelect ref={e => this.hocKyFilter = e} className='col-md-2' placeholder='Học kỳ' data={dataHocKy} onChange={value => this.setState({ filter: { ...this.state.filter, hocKy: value?.id } })} allowClear />
-                <FormSelect ref={e => this.bacDaoTaoFilter = e} className='col-md-2' placeholder='Bậc' data={SelectAdapter_DmSvBacDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, bacDaoTaoFilter: value?.id } })} allowClear />
+                {/* <FormSelect ref={e => this.bacDaoTaoFilter = e} className='col-md-2' placeholder='Bậc' data={SelectAdapter_DmSvBacDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, bacDaoTaoFilter: value?.id } })} allowClear /> */}
                 <FormSelect ref={e => this.loaiHinhDaoTaoFilter = e} className='col-md-2' placeholder='Hệ' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} onChange={value => this.setState({ filter: { ...this.state.filter, loaiHinhDaoTaoFilter: value?.id } })} allowClear />
 
                 <FormSelect ref={e => this.phongFilter = e} className='col-md-2' placeholder='Phòng' data={SelectAdapter_DmPhong} onChange={value => this.setState({ filter: { ...this.state.filter, phongFilter: value?.id } })} allowClear />
                 <FormSelect ref={e => this.thuFilter = e} className='col-md-2' placeholder='Thứ' data={dataThu} onChange={value => this.setState({ filter: { ...this.state.filter, thuFilter: value?.id } })} allowClear />
                 <FormSelect ref={e => this.khoaFilter = e} className='col-md-4' placeholder='Khoa/Bộ môn' data={SelectAdapter_DmDonVi} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id } })} allowClear />
-                <FormSelect ref={e => this.giangVienFilter = e} className='col-md-4' data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' onChange={value => this.setState({ filter: { ...this.state.filter, giangVienFilter: value?.id } })} allowClear />
+
                 <FormSelect ref={e => this.monHocFilter = e} data={SelectAdapter_DmMonHocAll()} className='col-md-4' placeholder='Môn học' onChange={value => this.setState({ filter: { ...this.state.filter, monHocFilter: value?.id } })} allowClear />
                 <div style={{ display: 'flex', justifyContent: 'end' }} className='form-group col-md-12'>
                     <button className='btn btn-secondary' onClick={
-                        e => e.preventDefault() || this.changeAdvancedSearch(true)} style={{ marginRight: '15px' }}>
+                        e => e.preventDefault() || this.resetAdvancedSearch()} style={{ marginRight: '15px' }}>
                         <i className='fa fa-lg fa-times' /> Reset
                     </button>
                     <button className='btn btn-success' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
@@ -441,10 +438,13 @@ class DtThoiKhoaBieuPage extends AdminPage {
             </div>,
             onCreate: permission.write ? (e) => e.preventDefault() || this.addingModal.show() : null,
             onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/dao-tao/thoi-khoa-bieu/download-excel?filter=${T.stringify(this.state.filter)}`, 'THOI_KHOA_BIEU.xlsx') : null,
+            buttons: permission.write && [
+                { className: 'btn-warning', icon: 'fa-calendar', tooltip: 'Xếp thời khoá biểu', onClick: this.handleAutoGen }
+            ]
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
-const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule, createDtThoiGianPhanCong };
+const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule, createDtThoiGianPhanCong, getDmCaHocAll };
 export default connect(mapStateToProps, mapActionsToProps)(DtThoiKhoaBieuPage);

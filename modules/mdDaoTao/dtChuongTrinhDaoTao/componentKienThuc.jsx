@@ -27,22 +27,24 @@ class ComponentKienThuc extends AdminPage {
             // hocKyDuKien: null,
             khoa: null
         };
-        this.setEditState(idx, childId, childText, editFlag, id, isDeleted, () => {
-            this.rows[idx].ten = item ? item?.tenMonHoc : '';
-            this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
-            this.rows[idx].tinhChatMon.value(item ? item.tinhChatMon : 0);
-            this.rows[idx].soTietLyThuyet.value(item ? (item.soTietLyThuyet || 0).toString() : '0');
-            this.rows[idx].soTietThucHanh.value(item ? (item.soTietThucHanh || 0).toString() : '0');
-            // this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
-            this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
-            // id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
-            this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
-            item && item.maMonHoc && this.props.pushMonHocChosen(item.maMonHoc);
-            this.rows[idx].ma.value((item && item.maMonHoc) ? item.maMonHoc : '');
-            this.rows[idx].khoa.value(item ? item.khoa : '');
-            this.rows[idx].soTiet.value(item ? (item.tongSoTiet || 0).toString() : '0');
-            done();
-        });
+        setTimeout(() => {
+            this.setEditState(idx, childId, childText, editFlag, id, isDeleted, () => {
+                this.rows[idx].ten = item ? item?.tenMonHoc : '';
+                this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
+                this.rows[idx].tinhChatMon.value(item ? item.tinhChatMon : 0);
+                this.rows[idx].soTietLyThuyet.value(item ? (item.soTietLyThuyet || 0).toString() : '0');
+                this.rows[idx].soTietThucHanh.value(item ? (item.soTietThucHanh || 0).toString() : '0');
+                // this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
+                this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
+                // id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
+                this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
+                item && item.maMonHoc && this.props.pushMonHocChosen(item.maMonHoc);
+                this.rows[idx].ma.value((item && item.maMonHoc) ? item.maMonHoc : '');
+                this.rows[idx].khoa.value(item ? item.khoa : '');
+                this.rows[idx].soTiet.value(item ? (item.tongSoTiet || 0).toString() : '0');
+                done();
+            });
+        }, 0);
     }
 
     setEditState = (idx, childId, childText, editFlag, id, isDeleted, done) => {

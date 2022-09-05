@@ -7,6 +7,7 @@ import { SelectAdapter_FwCanBo, SelectAdapter_FwCanBoByDonVi } from 'modules/mdT
 const { vaiTro, loaiLienKet, trangThaiNhiemVu } = require('../constant');
 const vaiTroSelector = Object.keys(vaiTro).map(key => ({ id: key, text: vaiTro[key].text }));
 
+import { SelectAdapter_NhiemVu } from './redux';
 export class RefreshStatusModal extends AdminModal {
 
     componentDidMount() {
@@ -320,7 +321,7 @@ class CongVanDenSelector extends React.Component {
             searchTerm = this.search.value(),
             year = this.year.value(),
             [fromTime, toTime] = year && Number.isInteger(Number(year)) ? getYearRange(Number(year)) : [],
-            currentLienKet = this.props.hcthNhiemVu?.item?.lienKet?.filter(item => item.loaiB == loaiLienKet.CONG_VAN_DEN.id) || [],
+            currentLienKet = this.props.hcthNhiemVu?.item?.lienKet?.filter(item => item.loaiB == loaiLienKet.VAN_BAN_DEN.id) || [],
             filter = { fromTime, toTime, hasIds: 0, excludeIds: currentLienKet.map(item => item.keyB).toString() };
 
         if (this.tabs.selectedTabIndex() == 1) {
@@ -421,7 +422,7 @@ class CongVanDiSelector extends React.Component {
             searchTerm = this.search.value(),
             year = this.year.value(),
             [fromTime, toTime] = year && Number.isInteger(Number(year)) ? getYearRange(Number(year)) : [],
-            currentLienKet = this.props.hcthNhiemVu?.item?.lienKet?.filter(item => item.loaiB == loaiLienKet.CONG_VAN_DI.id) || [],
+            currentLienKet = this.props.hcthNhiemVu?.item?.lienKet?.filter(item => item.loaiB == loaiLienKet.VAN_BAN_DI.id) || [],
             filter = { fromTime, toTime, hasIds: 0, excludeIds: currentLienKet.map(item => item.keyB).toString() };
         if (this.tabs.selectedTabIndex() == 1) {
             filter.ids = this.state.ids.toString();
@@ -541,11 +542,11 @@ export class LienKetModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiLienKet = e} label='Loại liên kết' data={Object.keys(loaiLienKet).map(key => ({ id: loaiLienKet[key]?.id, text: loaiLienKet[key]?.text }))} onChange={(value) => this.setState({ loaiLienKet: value })} required />
                 {
-                    this.state.loaiLienKet?.id == loaiLienKet.CONG_VAN_DEN.id &&
+                    this.state.loaiLienKet?.id == loaiLienKet.VAN_BAN_DEN.id &&
                     <CongVanDenSelector {...this.props} ref={e => this.lienKet = e} />
                 }
                 {
-                    this.state.loaiLienKet?.id == loaiLienKet.CONG_VAN_DI.id &&
+                    this.state.loaiLienKet?.id == loaiLienKet.VAN_BAN_DI.id &&
                     <CongVanDiSelector {...this.props} ref={e => this.lienKet = e} />
                 }
             </div>
@@ -631,9 +632,9 @@ export class LienKet extends React.Component {
                 </tr>
             ),
             renderRow: (item, index) => {
-                if (item.loaiB == loaiLienKet.CONG_VAN_DEN.id)
+                if (item.loaiB == loaiLienKet.VAN_BAN_DEN.id)
                     return this.renderCongVanDenRow(item, index, sitePermission.delete);
-                else if (item.loaiB == loaiLienKet.CONG_VAN_DI.id)
+                else if (item.loaiB == loaiLienKet.VAN_BAN_DI.id)
                     return this.renderCongVanDiRow(item, index, sitePermission.delete);
             }
         });
@@ -844,5 +845,36 @@ export class ListFiles extends React.Component {
                 </div>
             </div>
         );
+    }
+}
+
+export class ThemVaoNhiemVuModal extends AdminModal {
+    onShow = () => {
+        this.nhiemVu.value('');
+    }
+
+    onSubmit = () => {
+        const data = {
+            nhiemVu: this.nhiemVu.value(),
+            vanBan: this.props.vanBanId,
+            loaiVanBan: this.props.loaiVanBan,
+        };
+
+        if (!data.nhiemVu) {
+            T.notify('Chưa có nhiệm vụ nào được chọn', 'danger');
+            this.nhiemVu.focus();
+        } else {
+            this.props.add(data.nhiemVu, { vanBan: data.vanBan, loaiVanBan: data.loaiVanBan }, () => this.hide());
+        }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thêm văn bản vào nhiệm vụ',
+            size: 'elarge',
+            body: <div className='row'>
+                <FormSelect className='col-md-12' label='Chọn nhiệm vụ' ref={e => this.nhiemVu = e} data={SelectAdapter_NhiemVu} required />
+            </div>
+        });
     }
 }

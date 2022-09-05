@@ -60,7 +60,7 @@ module.exports = app => {
                         // Order already confirmed
                         if (transaction) res.send({ Message: 'Order already confirmed', RspCode: '02' });
                         else if (vnp_TransactionStatus == '00') {
-                            await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, vnp_BankCode, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
+                            await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `VNPAY_${vnp_BankCode}`, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
 
                             // await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate });
 

@@ -15,7 +15,11 @@ class ProfileCanBo extends AdminPage {
                 if (user.isStaff != 1 && user.isStudent != 1 || user.isUnit == 1) {
                     this.setState({ isLoad: false });
                     this.profileCommon.value(user);
-                } else this.setState({ isHCMUSSH: true });
+                } else this.setState({ isHCMUSSH: true }, () => {
+                    if (user.isStudent == 1 && !user.ngayNhapHoc) {
+                        this.props.history.push('/user/sinh-vien/info');
+                    }
+                });
             }
         });
     }

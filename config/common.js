@@ -64,7 +64,7 @@ module.exports = (app, appConfig) => {
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-pie-chart',
-            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Hợp đồng', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
+            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Hợp đồng', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn', 'Đánh giá']
         },
         finance: {
             index: 5000, title: 'Kế hoạch - Tài chính', link: '/user/finance', icon: 'fa-credit-card',
@@ -101,7 +101,7 @@ module.exports = (app, appConfig) => {
         truyenThong: {
             index: 6000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
-            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
+            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp', 'SMS']
         },
         websiteDv: {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',

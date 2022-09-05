@@ -4,7 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, loadSpinner, renderTable, TableCell } from 'view/component/AdminPage';
 import { getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent } from './redux';
-
+import { getSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
+import BaoHiemYTeModal from './BaoHiemYTeModal';
 class ButtonBank extends React.Component {
     render = () => {
         const { title, onClick, imgSrc } = this.props;
@@ -35,11 +36,11 @@ class ThanhToanModal extends AdminModal {
             </button>,
             body: <div>
                 <section className='row justify-content-center' style={{ display: this.state.vcb || this.state.agri ? 'none' : '' }}>
+                    <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
+                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                     <ButtonBank title='BIDV' imgSrc='/img/logo/logo_bidv.png' onClick={() => {
                         window.open('/sample/BIDV-2022.pdf', '_blank');
                     }} />
-                    <ButtonBank title='VCB-VNPAY' imgSrc='/img/logo/vcb.png' onClick={() => this.setState({ vcb: true })} />
-                    <ButtonBank title='AGRIBANK-VNPAY' imgSrc='/img/logo/agribank.png' onClick={() => this.setState({ agri: true })} />
                 </section>
                 <section className='row' style={{ display: this.state.vcb ? '' : 'none', justifyContent: 'center' }}>
                     <ButtonBank title='Bằng tài khoản VCB' imgSrc='/img/logo/vcb.png' onClick={() => this.props.vnPayGoToTransaction('vnpay-vcb', link => {
@@ -95,11 +96,23 @@ class UserPage extends AdminPage {
                 window.history.pushState('', '', '/user/hoc-phi');
             }
         }
-
         T.ready('/user/hoc-phi', () => {
-            this.props.getHocPhi();
-            this.props.getAllHocPhiStudent();
-            this.props.getTcHocPhiHuongDan();
+            let user = this.props.system.user;
+            if (user.isStudent && !user.ngayNhapHoc && user.data.namTuyenSinh == '2022') {
+                this.props.getHocPhi();
+                this.props.getAllHocPhiStudent('', () => {
+                    this.props.getSvBaoHiemYTe(item => {
+                        if (!item) {
+                            this.baoHiemModal.show();
+                            this.setState({ chuaDongBhyt: true });
+                        } else {
+                            this.setState({ chuaDongBhyt: false });
+                        }
+                    });
+                });
+                this.props.getTcHocPhiHuongDan();
+            }
+
         });
     }
     renderTableHocPhi = (data) => {
@@ -139,7 +152,7 @@ class UserPage extends AdminPage {
         const dataHocKy = dataTrongNam.groupBy('hocKy');
         return (
             <div className='tile' key={namHoc}>
-                <div className='tile-title'>Năm {namHoc} - {Number(namHoc) + 1}</div>
+                <div className='tile-title'>Năm học {namHoc} - {Number(namHoc) + 1}</div>
                 {Object.keys(dataHocKy).sort((a, b) => Number(b) - Number(a)).map(hocKy => {
                     let current = dataHocKy[hocKy][0];
                     return (<div key={`${namHoc}_${hocKy}`} style={{ marginBottom: '40px' }}>
@@ -152,11 +165,13 @@ class UserPage extends AdminPage {
                                         <i className='fa fa-lg fa-download' /> Chuyển thành hóa đơn giấy
                                     </button>
                                 }
-
+                                {
+                                    this.state.chuaDongBhyt ? <a href='#' onClick={e => e.preventDefault() || this.baoHiemModal.show()}>Chọn diện BHYT</a> : ''
+                                }
                                 {
                                     current.congNo ?
                                         (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
-                                            <button className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
+                                            <button disabled={this.state.chuaDongBhyt} className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                                 Thanh toán
                                             </button>
                                         </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
@@ -198,11 +213,12 @@ class UserPage extends AdminPage {
             breadcrumb: ['Học phí'],
             backRoute: '/user',
             content: user && hocPhiAll ? <>
-                <img src='/img/header.jpg' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
+                <img src='/img/headerHocPhi.png' style={{ maxWidth: '100%', marginRight: 20 }} ></img>
                 {Object.keys(hocPhiAll).sort((a, b) => Number(b) - Number(a)).map(namHoc => this.renderSection(namHoc, {
                     dataTrongNam: hocPhiAll[namHoc],
                     dataDetailTrongNam: hocPhiDetailAll[namHoc]
                 }))}
+                <BaoHiemYTeModal ref={e => this.baoHiemModal = e} />
             </> : loadSpinner()
         });
     }
@@ -210,6 +226,6 @@ class UserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent
+    getTcHocPhiPage, getTcHocPhiHuongDan, vnPayGoToTransaction, getHocPhi, getAllHocPhiStudent, getSvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);
