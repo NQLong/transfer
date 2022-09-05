@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import { getTccbDanhGiaNam } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage } from 'view/component/AdminPage';
-import ComponentDiemThuong from '../tccbDiemThuong/componentDiemThuong';
-import ComponentDiemTru from '../tccbDiemTru/componentDiemTru';
+import ComponentDiemThuong from '../tccbDanhGiaDiemThuong/componentDiemThuong';
+import ComponentDiemTru from '../tccbDanhGiaDiemTru/componentDiemTru';
 import ComponentDGCB from './componentDGCB';
 import ComponentDGDV from './componentDGDV';
-import ComponentTLD from '../tccbTyLeDiem/componentTLD';
+import ComponentTLD from '../tccbDanhGiaTyLeDiem/componentTLD';
+import ComponentDMCV from '../tccbDanhGiaDinhMucCongViecGvVaNcv/componentDMCV';
 import T from 'view/js/common';
 
 class TccbKhungDanhGiaCanBoDetails extends AdminPage {
@@ -38,6 +39,10 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
             {
                 title: 'Tỷ lệ điểm',
                 component: <ComponentTLD nam={nam} />
+            },
+            {
+                title: 'Định mức công việc cho giảng viên và nghiên cứu viên',
+                component: <ComponentDMCV nam={nam} />
             },
             {
                 title: 'Khung đánh giá đơn vị',
