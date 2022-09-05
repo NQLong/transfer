@@ -15,7 +15,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { ma, ten, moTa, kichHoat, thoiGianBatDau, thoiGianKetThuc, maCoSo, buoi } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true, maCoSo: 2, buoi: 1 };
+        let { ma, ten, moTa, kichHoat, thoiGianBatDau, thoiGianKetThuc, maCoSo, buoi } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true, maCoSo: '', buoi: '' };
 
         this.setState({ ma, ten, item });
         let mo_ta = !moTa ? {} : JSON.parse(moTa);
@@ -89,8 +89,8 @@ class EditModal extends AdminModal {
                 <div style={{ position: 'absolute', top: '16px', right: '8px' }}>
                     <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
                         onChange={value => this.changeKichHoat(value ? 1 : 0)} /></div>
-                <FormSelect className='col-md-6' ref={e => this.maCoSo = e} data={SelectAdapter_DmCoSo} readOnly={readOnly} />
-                <FormSelect className='col-md-6' ref={e => this.buoi = e} data={SelectAdapter_DtDmBuoiHoc} readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.maCoSo = e} data={SelectAdapter_DmCoSo} readOnly={readOnly} label='Cơ sở' />
+                <FormSelect className='col-md-6' ref={e => this.buoi = e} data={SelectAdapter_DtDmBuoiHoc} readOnly={readOnly} label='Buồi' />
                 <div className='form-group col-md-12'>
                     <FormTabs tabs={viEnTabs} />
                 </div>

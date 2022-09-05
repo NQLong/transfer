@@ -19,7 +19,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesDtDmBuoiHoc', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtDmBuoiHoc:read', 'dtDmBuoiHoc:write', 'dtDmBuoiHoc:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtDmBuoiHoc:read', 'dtDmBuoiHoc:write');
             resolve();
         } else resolve();
     }));
@@ -31,18 +31,21 @@ module.exports = app => {
     app.get('/api/dao-tao/buoi-hoc/all', app.permission.check('dtDmBuoiHoc:read'), async (req, res) => {
         try {
             let items = await app.model.dtDmBuoiHoc.getAll();
-            console.log(items);
             let listLoaiHinh = await app.model.dmSvLoaiHinhDaoTao.getAll({}, 'ma,ten');
-            console.log(listLoaiHinh);
-            items.forEach(item => {
-                let loaiHinh = item.loaiHinh.split(',');
-                console.log(loaiHinh);
+            let loaiHinhMapper = {};
+            listLoaiHinh.forEach(loaiHinh => {
+                loaiHinhMapper[loaiHinh.ma] = loaiHinh.ten;
             });
-
-            res.send({items});
+            items.forEach(item => {
+                if (item.loaiHinh) {
+                    let loaiHinh = item.loaiHinh.split(','); // ['CQ','VB2'] --> ['Chính quy','Văn bằng 2']
+                    item.tenLoaiHinh = loaiHinh.map(item => loaiHinhMapper[item]);
+                }
+            });
+            res.send({ items });
 
         } catch (error) {
-            res.send({error});
+            res.send({ error });
         }
     });
 
@@ -57,5 +60,14 @@ module.exports = app => {
     app.put('/api/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:write'), (req, res) => {
         let changes = req.body.changes;
         app.model.dtDmBuoiHoc.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+    });
+
+    app.get('/api/dao-tao/buoi-hoc/item/:id', app.permission.check('dtDmBuoiHoc:write'), async (req, res) => {
+        try {
+            let item = await app.model.dtDmBuoiHoc.get({ id: req.params.id });
+            res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 };
