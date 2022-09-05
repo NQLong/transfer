@@ -14,7 +14,7 @@ class EditModal extends AdminModal {
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: 1 };
         this.setState({ ma});
-        this.ma.value(ma);
+        // this.ma.value(ma);
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
     };
@@ -43,7 +43,7 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật Thứ' : 'Tạo mới Thứ',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={true} required />
+                {/* <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={true} required /> */}
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} required />
             </div>
@@ -88,7 +88,7 @@ class DtDmThuPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    <TableCell content={item.ten} />
+                    <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={() => this.props.updateDtDmThu(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 })} />
                     <TableCell type='buttons' content={item} permission={permission}

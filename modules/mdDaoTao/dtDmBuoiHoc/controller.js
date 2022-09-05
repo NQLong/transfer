@@ -30,7 +30,9 @@ module.exports = app => {
 
     app.get('/api/dao-tao/buoi-hoc/all', app.permission.check('dtDmBuoiHoc:read'), async (req, res) => {
         try {
-            let items = await app.model.dtDmBuoiHoc.getAll();
+            let kichHoat = req.query.kichHoat;
+            let condition = kichHoat? {kichHoat:1}:{};
+            let items = await app.model.dtDmBuoiHoc.getAll(condition);
             let listLoaiHinh = await app.model.dmSvLoaiHinhDaoTao.getAll({}, 'ma,ten');
             let loaiHinhMapper = {};
             listLoaiHinh.forEach(loaiHinh => {

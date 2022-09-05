@@ -90,7 +90,7 @@ class EditModal extends AdminModal {
                     <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
                         onChange={value => this.changeKichHoat(value ? 1 : 0)} /></div>
                 <FormSelect className='col-md-6' ref={e => this.maCoSo = e} data={SelectAdapter_DmCoSo} readOnly={readOnly} label='Cơ sở' />
-                <FormSelect className='col-md-6' ref={e => this.buoi = e} data={SelectAdapter_DtDmBuoiHoc} readOnly={readOnly} label='Buồi' />
+                <FormSelect className='col-md-6' ref={e => this.buoi = e} data={SelectAdapter_DtDmBuoiHoc} readOnly={readOnly} label='Buổi' />
                 <div className='form-group col-md-12'>
                     <FormTabs tabs={viEnTabs} />
                 </div>
@@ -183,7 +183,7 @@ class dmCaHocAdminPage extends AdminPage {
                     create={this.props.createDmCaHoc} update={this.props.updateDmCaHoc} />
             </>,
             backRoute: `/user/${this.menu}`,
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+            Buổi: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 }

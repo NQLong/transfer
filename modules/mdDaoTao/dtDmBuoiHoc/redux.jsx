@@ -93,7 +93,7 @@ export function getItemDtDmBuoiHoc(id, done) {
 export const SelectAdapter_DtDmBuoiHoc = {
     ajax: true,
     url: '/api/dao-tao/buoi-hoc/all',
-    data: params => ({ condition: params.term }),
+    data: params => ({ condition: params.term, kichHoat: 1 }),
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.id, text: item.ten })) : [] }),
     fetchOne: (id, done) => (getItemDtDmBuoiHoc(id, item => item && done && done({ id: item.id, text: item.ten })))(),
 };

@@ -81,7 +81,7 @@ class DtDmBuoiHocPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={index + 1} />
-                    <TableCell content={item.ten} />
+                    <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
                     <TableCell content={item.tenLoaiHinh.join(', ')} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={() => this.props.updateDtDmBuoiHoc(item.id, { kichHoat: item.kichHoat == 1 ? 0 : 1 })} />
