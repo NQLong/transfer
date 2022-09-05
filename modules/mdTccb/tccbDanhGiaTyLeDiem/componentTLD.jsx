@@ -17,8 +17,8 @@ class EditModal extends AdminModal {
         this.setState({ item });
         this.nhom.value(nhom);
         this.maChucVu.value(maChucVu ? maChucVu.split(',') : '');
-        this.kcm.value(Number(kcm));
-        this.kld.value(Number(kld));
+        this.kcm.value(Number(kcm).toFixed(2));
+        this.kld.value(Number(kld).toFixed(2));
         this.donViDanhGia.value(donViDanhGia);
     };
 
@@ -63,15 +63,7 @@ class ComponentDGCB extends AdminPage {
     chucVuOption = [];
 
     componentDidMount() {
-        this.props.getDmChucVuAll(items => {
-            this.chucVuOption = items;
-            this.load();
-        });
-    }
-
-    tenChucVu = (item, chucVuOption) => {
-        const maChucVus = item.maChucVu.split(',');
-        return chucVuOption.filter(chucVu => maChucVus.includes(chucVu.ma)).map(chucVu => chucVu.ten).join('; ');
+        this.load();
     }
 
     load = (done) => this.props.nam && this.props.getTccbTyLeDiemAll({ nam: Number(this.props.nam) }, items => {
@@ -108,9 +100,9 @@ class ComponentDGCB extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={item.nhom} />
-                    <TableCell style={{ textAlign: 'left' }} content={this.tenChucVu(item, this.chucVuOption)} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.kcm} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.kld} />
+                    <TableCell style={{ textAlign: 'left' }} content={item.tenChucVu} />
+                    <TableCell style={{ textAlign: 'center' }} content={Number(item.kcm).toFixed(2)} />
+                    <TableCell style={{ textAlign: 'center' }} content={Number(item.kld).toFixed(2)} />
                     <TableCell style={{ textAlign: 'left' }} content={item.donViDanhGia} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}

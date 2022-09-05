@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbDanhGiaNamAll } from '../tccbDanhGiaNam/redux';
+import { getTccbDonViDangKyNhiemVuDanhGiaNamAll } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import { Tooltip } from '@mui/material';
@@ -9,7 +9,7 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            this.props.getTccbDanhGiaNamAll(items => this.setState({ items }));
+            this.props.getTccbDonViDangKyNhiemVuDanhGiaNamAll(items => this.setState({ items }));
         });
     }
 
@@ -30,20 +30,20 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
-                    <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
-                    <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell type='link' url={`/user/tccb/don-vi-dang-ky-nhiem-vu/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
+                    <TableCell style={{ textAlign: 'center', color: `${new Date().getTime() >= item.donViBatDauDangKy && new Date().getTime() <= item.donViKetThucDangKy && 'green'}` }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}>
                         {
                             (new Date().getTime() >= item.donViBatDauDangKy && new Date().getTime() <= item.donViKetThucDangKy) ?
                                 <Tooltip title='Đăng ký nhiệm vụ' arrow>
-                                    <a className='btn btn-info' href='#' onClick={() => this.props.history.push(`/user/tccb/don-vi-dang-ky-nhiem-vu/${item.nam}`)}>
+                                    <button className='btn btn-info' onClick={() => this.props.history.push(`/user/tccb/don-vi-dang-ky-nhiem-vu/${item.nam}`)}>
                                         <i className='fa fa-lg fa-edit' />
-                                    </a>
+                                    </button>
                                 </Tooltip> :
                                 <Tooltip title='Xem thông tin đăng ký' arrow>
-                                    <a className='btn btn-warning' href='#' onClick={() => this.props.history.push(`/user/tccb/don-vi-dang-ky-nhiem-vu/${item.nam}`)}>
+                                    <button className='btn btn-warning' onClick={() => this.props.history.push(`/user/tccb/don-vi-dang-ky-nhiem-vu/${item.nam}`)}>
                                         <i className='fa fa-lg fa-info' />
-                                    </a>
+                                    </button>
                                 </Tooltip>
                         }
                     </TableCell>
@@ -65,5 +65,5 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { getTccbDanhGiaNamAll };
+const mapActionsToProps = { getTccbDonViDangKyNhiemVuDanhGiaNamAll };
 export default connect(mapStateToProps, mapActionsToProps)(TccbDonViDangKyNhiemVuPage);

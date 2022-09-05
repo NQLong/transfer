@@ -48,7 +48,7 @@ export function getTccbDonViDangKyNhiemVuAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/tccb/don-vi-dang-ky-nhiem-vu/all';
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách đăng ký bị lỗi', 'danger');
@@ -61,11 +61,39 @@ export function getTccbDonViDangKyNhiemVuAll(condition, done) {
     };
 }
 
+export function getTccbDonViDangKyNhiemVuDanhGiaNamAll(done) {
+    return () => {
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/danh-gia-nam/all';
+        T.get(url, {}, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách đăng ký bị lỗi', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                if (done) done(data.items);
+            }
+        });
+    };
+}
+
+export function getTccbDonViDangKyNhiemVuByYear(nam, done) {
+    return () => {
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/all-by-year';
+        T.get(url, { nam }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách đăng ký bị lỗi', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                if (done) done(data);
+            }
+        });
+    };
+}
+
 // T.initPage('pageTccbDonViDangKyNhiemVu');
 // export function getTccbDonViDangKyNhiemVuPage(pageNumber, pageSize, pageCondition, done) {
 //     const page = T.updatePage('pageTccbDonViDangKyNhiemVu', pageNumber, pageSize, pageCondition);
 //     return dispatch => {
-//         const url = `/api/tccb/don-vi-dang-ky-nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
+//         const url = `/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
 //         T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
 //             if (data.error) {
 //                 T.notify('Lấy danh sách đăng ký bị lỗi!', 'danger');
@@ -80,7 +108,7 @@ export function getTccbDonViDangKyNhiemVuAll(condition, done) {
 
 export function getTccbDonViDangKyNhiemVu(id, done) {
     return () => {
-        const url = `/api/tccb/don-vi-dang-ky-nhiem-vu/item/${id}`;
+        const url = `/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy đăng ký bị lỗi!', 'danger');
@@ -94,7 +122,7 @@ export function getTccbDonViDangKyNhiemVu(id, done) {
 
 export function createTccbDonViDangKyNhiemVu(item, done) {
     return dispatch => {
-        const url = '/api/tccb/don-vi-dang-ky-nhiem-vu';
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify(`Tạo mới bị lỗi: ${data.error.message}`, 'danger');
@@ -111,7 +139,7 @@ export function createTccbDonViDangKyNhiemVu(item, done) {
 
 export function deleteTccbDonViDangKyNhiemVu(id, done) {
     return dispatch => {
-        const url = '/api/tccb/don-vi-dang-ky-nhiem-vu';
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa đăng ký bị lỗi!', 'danger');
@@ -127,7 +155,7 @@ export function deleteTccbDonViDangKyNhiemVu(id, done) {
 
 export function updateTccbDonViDangKyNhiemVu(id, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/don-vi-dang-ky-nhiem-vu';
+        const url = '/api/tccb/danh-gia/don-vi-dang-ky-nhiem-vu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật đăng ký bị lỗi!', 'danger');

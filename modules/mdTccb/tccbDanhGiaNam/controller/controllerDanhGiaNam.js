@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3034: { title: 'Đánh giá', link: '/user/tccb/danh-gia', icon: 'fa-user-times', backgroundColor: '#2a99b8', groupIndex: 6 }
+            3034: { title: 'Đánh giá', link: '/user/tccb/danh-gia', icon: 'fa-pencil-square-o', backgroundColor: '#2a99b8', groupIndex: 6 },
         }
     };
     app.permission.add(
@@ -26,12 +26,12 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = req.query.condition || {};
-        app.model.tccbDanhGiaNam.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        app.model.tccbDanhGiaNam.getPage(pageNumber, pageSize, condition, '*', 'nam DESC', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/tccb/danh-gia/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         const condition = req.query.condition || {};
-        app.model.tccbDanhGiaNam.getAll(condition, '*', 'id', (error, items) => res.send({ error, items }));
+        app.model.tccbDanhGiaNam.getAll(condition, '*', 'nam DESC', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/tccb/danh-gia/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
@@ -61,11 +61,12 @@ module.exports = app => {
             const nam = Number(item.nam);
             await Promise.all([
                 app.model.tccbKhungDanhGiaCanBo.delete({ nam }),
-                app.model.tccbKhungDanhGiaDonVi.delete({ nam }),
+                app.model.tccbKhungDanhGiaDonVi.update({ nam }, { isDelete: 1 }),
                 app.model.tccbDiemThuong.delete({ nam }),
                 app.model.tccbDiemTru.delete({ nam }),
                 app.model.tccbTyLeDiem.delete({ nam }),
                 app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
+                app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear(nam),
             ]);
             res.end();
         } catch (error) {
@@ -84,7 +85,7 @@ module.exports = app => {
             const nam = item.nam;
             let [itemsCanBo, itemsDonVi, itemsDiemThuong, itemsDiemTru, itemsTyLeDiem] = await Promise.all([
                 app.model.tccbKhungDanhGiaCanBo.getAll({ nam }),
-                app.model.tccbKhungDanhGiaDonVi.getAll({ nam }),
+                app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 }),
                 app.model.tccbDiemThuong.getAll({ nam }),
                 app.model.tccbDiemTru.getAll({ nam }),
                 app.model.tccbTyLeDiem.getAll({ nam }),
@@ -138,6 +139,7 @@ module.exports = app => {
                 listNewChild.map(item => app.model.tccbKhungDanhGiaDonVi.create(item)),
             ];
             await Promise.all(listPromise.reduce((prev, cur) => prev.concat(cur)));
+            await app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear(nam, newItem.nam);
             item = await app.model.tccbDanhGiaNam.create(newItem);
             res.send({ item });
         } catch (error) {

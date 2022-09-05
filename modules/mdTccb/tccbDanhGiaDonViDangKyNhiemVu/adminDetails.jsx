@@ -1,9 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbKhungDanhGiaDonViAll } from '../tccbDanhGiaNam/reduxKhungDanhGiaDonVi';
 import { getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { getTccbDanhGiaNamAll } from '../tccbDanhGiaNam/redux';
-import { getTccbDonViDangKyNhiemVuAll, createTccbDonViDangKyNhiemVu, updateTccbDonViDangKyNhiemVu, deleteTccbDonViDangKyNhiemVu } from './redux';
+import { getTccbDonViDangKyNhiemVuByYear, createTccbDonViDangKyNhiemVu, updateTccbDonViDangKyNhiemVu, deleteTccbDonViDangKyNhiemVu, getTccbDonViDangKyNhiemVuDanhGiaNamAll } from './redux';
 import { AdminPage, renderTable, TableCell, AdminModal, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
 import T from 'view/js/common';
@@ -33,14 +31,14 @@ class EditModal extends AdminModal {
             this.dangKyKpi.focus();
         } else {
             if (this.state.item.id) {
-                this.props.update(this.state.item.id, changes, () => this.hide());
+                this.props.update(this.state.item.id, changes, this.hide);
             } else {
                 this.props.create({
                     ...changes,
                     maKhungDanhGiaDonVi: this.state.item.maKhungDanhGiaDonVi,
                     maDonVi: this.state.item.maDonVi,
                     nam: Number(this.state.item.nam),
-                }, () => this.hide());
+                }, this.hide);
             }
         }
     };
@@ -68,50 +66,27 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
             this.maDonVi = this.props.system.user.maDonVi;
             this.props.getDmDonVi(this.maDonVi, item => {
                 this.donVi = item?.ten;
-                this.load(this.nam, this.maDonVi);
+                this.load(this.nam);
             });
         });
     }
 
-    load = (nam, maDonVi, done) => {
-        this.props.getTccbDanhGiaNamAll({ nam: Number(nam) }, danhGiaNam => {
-            danhGiaNam = danhGiaNam[0];
-            this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(nam) }, danhGiaDonVis => {
-                this.props.getTccbDonViDangKyNhiemVuAll({ nam: Number(this.nam), maDonVi }, dangKys => {
-                    let items = danhGiaDonVis.filter(item => !item.parentId);
-                    items = items.map(item => danhGiaDonVis.filter(danhGia => danhGia.parentId == item.id));
-                    items = items.reduce((prev, cur) => prev.concat(cur));
-                    items = items.map(danhGiaDonVi => {
-                        const index = dangKys.findIndex(dangKy => dangKy.maKhungDanhGiaDonVi == danhGiaDonVi.id);
-                        if (index == -1) {
-                            return {
-                                noiDung: danhGiaDonVi.noiDung,
-                                maKhungDanhGiaDonVi: danhGiaDonVi.id,
-                                maDonVi,
-                                nam: Number(this.nam),
-                            };
-                        }
-                        return {
-                            noiDung: danhGiaDonVi.noiDung,
-                            ...dangKys[index]
-                        };
-                    });
-                    this.setState({ items, danhGiaNam });
-                    done && done();
-                });
-            });
+    load = (nam, done) => {
+        this.props.getTccbDonViDangKyNhiemVuByYear(nam, (data) => {
+            this.setState({ items: data.items, danhGiaNam: data.danhGiaNam });
+            done && done();
         });
     }
 
-    create = (item, done) => this.props.createTccbDonViDangKyNhiemVu(item, () => this.load(this.nam, this.maDonVi, done));
+    create = (item, done) => this.props.createTccbDonViDangKyNhiemVu(item, () => this.load(this.nam, done));
 
-    update = (id, changes, done) => this.props.updateTccbDonViDangKyNhiemVu(id, changes, () => this.load(this.nam, this.maDonVi, done));
+    update = (id, changes, done) => this.props.updateTccbDonViDangKyNhiemVu(id, changes, () => this.load(this.nam, done));
 
     delete = (e, item) => {
         e.preventDefault();
         if (item.id) {
             T.confirm('Xóa đăng ký', 'Bạn có chắc bạn muốn xóa đăng ký này?', true, isConfirm =>
-                isConfirm && this.props.deleteTccbDonViDangKyNhiemVu(item.id, () => this.load(this.nam, this.maDonVi)));
+                isConfirm && this.props.deleteTccbDonViDangKyNhiemVu(item.id, () => this.load(this.nam)));
         } else {
             T.notify('Bạn chưa đăng ký KPI ở mục này', 'danger');
         }
@@ -134,24 +109,36 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
                 </tr>
             ),
             renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell style={{ textAlign: 'center' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'left' }} content={item.noiDung} />
-                    <TableCell style={{ textAlign: 'left' }} content={<p dangerouslySetInnerHTML={{ __html: item.dangKyKpi }} />} />
-                    <TableCell style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }} content={item.dienGiai} />
-                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                        onDelete={(e) => danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy) ? this.delete(e, item) : T.notify('Hết thời hạn đăng ký', 'danger')}
-                    >
-                        {
-                            permission.write && danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy)
-                            && <Tooltip title='Đăng ký' arrow>
-                                <a className='btn btn-info' href='#' onClick={() => this.modal.show(item)}>
-                                    <i className='fa fa-lg fa-edit' />
-                                </a>
-                            </Tooltip>
-                        }
-                    </TableCell>
-                </tr>
+                <>
+                    <tr>
+                        <TableCell style={{ textAlign: 'center' }} colSpan='1' className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
+                        <TableCell style={{ textAlign: 'left' }} colSpan='4' className='text-primary' content={<b>{item.noiDung}</b>} />
+                    </tr>
+                    {
+                        item.submenus.length > 0 &&
+                        item.submenus.map((menu, stt) => (
+                            <tr key={index}>
+                                <TableCell style={{ textAlign: 'center' }} content={stt + 1} />
+                                <TableCell style={{ textAlign: 'left' }} content={menu.noiDung} />
+                                <TableCell style={{ textAlign: 'left' }} content={<p dangerouslySetInnerHTML={{ __html: menu.dangKyKpi }} />} />
+                                <TableCell style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }} content={menu.dienGiai} />
+                                <TableCell style={{ textAlign: 'center' }} type='buttons' content={menu} permission={permission}
+                                    onDelete={(e) => danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy) ? this.delete(e, menu) : T.notify('Hết thời hạn đăng ký', 'danger')}
+                                >
+                                    {
+                                        permission.write && danhGiaNam && (danhGiaNam.donViBatDauDangKy <= new Date().getTime() && new Date().getTime() <= danhGiaNam.donViKetThucDangKy)
+                                        && <Tooltip title='Đăng ký' arrow>
+                                            <a className='btn btn-info' href='#' onClick={() => this.modal.show(menu)}>
+                                                <i className='fa fa-lg fa-edit' />
+                                            </a>
+                                        </Tooltip>
+                                    }
+                                </TableCell>
+                            </tr>
+                        ))
+                    }
+                </>
+
             )
         });
 
@@ -176,5 +163,5 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { getTccbKhungDanhGiaDonViAll, getTccbDonViDangKyNhiemVuAll, createTccbDonViDangKyNhiemVu, updateTccbDonViDangKyNhiemVu, deleteTccbDonViDangKyNhiemVu, getDmDonVi, getTccbDanhGiaNamAll };
+const mapActionsToProps = { getTccbDonViDangKyNhiemVuByYear, createTccbDonViDangKyNhiemVu, updateTccbDonViDangKyNhiemVu, deleteTccbDonViDangKyNhiemVu, getDmDonVi, getTccbDonViDangKyNhiemVuDanhGiaNamAll };
 export default connect(mapStateToProps, mapActionsToProps)(TccbDonViDangKyNhiemVuDetails);
