@@ -114,7 +114,7 @@ class ComponentDGDV extends AdminPage {
     renderMenu = (index, menu, level, hasCreate, hasUpdate, hasDelete) => (
         <li key={menu.id} data-id={menu.id}>
             <div style={{ display: 'inline-flex' }}>
-                {level == 0 ? <b>{`${Number.intToRoman(index + 1)}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
+                {level == 0 ? <b>{`${(index + 1).intToRoman()}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
                 &nbsp;
                 <div className='buttons btn-group btn-group-sm'>
                     {hasCreate && level == 0 &&

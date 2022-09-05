@@ -855,7 +855,8 @@ Date.getDateInputDefaultMax = function () {
     return Date.nextYear().roundDate().getTime();
 };
 
-Number.intToRoman = function (num) {
+Number.prototype.intToRoman = function () {
+    let num = parseInt(this);
     const map = {
         M: 1000,
         CM: 900,

@@ -1,6 +1,6 @@
 // Table name: TCCB_KHUNG_DANH_GIA_DON_VI { id, nam, parentId, noiDung, thuTu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'parentId': 'PARENT_ID', 'noiDung': 'NOI_DUNG', 'thuTu': 'THU_TU', 'isDelete': 'IS_DELETE' };
+const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'parentId': 'PARENT_ID', 'noiDung': 'NOI_DUNG', 'thuTu': 'THU_TU' };
 
 module.exports = app => {
     app.model.tccbKhungDanhGiaDonVi = {
