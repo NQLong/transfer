@@ -26,20 +26,15 @@ class EditModal extends AdminModal {
             dangKyKpi: this.dangKyKpi.value(),
             dienGiai: this.dienGiai.value(),
         };
-        if (changes.dangKyKpi == '') {
-            T.notify('Nội dung đăng ký bị trống', 'danger');
-            this.dangKyKpi.focus();
+        if (this.state.item.id) {
+            this.props.update(this.state.item.id, changes, this.hide);
         } else {
-            if (this.state.item.id) {
-                this.props.update(this.state.item.id, changes, this.hide);
-            } else {
-                this.props.create({
-                    ...changes,
-                    maKhungDanhGiaDonVi: this.state.item.maKhungDanhGiaDonVi,
-                    maDonVi: this.state.item.maDonVi,
-                    nam: Number(this.state.item.nam),
-                }, this.hide);
-            }
+            this.props.create({
+                ...changes,
+                maKhungDanhGiaDonVi: this.state.item.maKhungDanhGiaDonVi,
+                maDonVi: this.state.item.maDonVi,
+                nam: Number(this.state.item.nam),
+            }, this.hide);
         }
     };
 
