@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            8017: {
+            7022: {
                 title: 'Buổi Học', groupIndex: 2,
                 link: '/user/dao-tao/buoi-hoc'
             },
@@ -10,25 +10,24 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'dtDmBuoiHoc:read', menu },
         { name: 'dtDmBuoiHoc:manage', menu },
-        { name: 'dtChuongTrinhDaoTao:manage', menu },
         { name: 'dtDmBuoiHoc:write' },
         { name: 'dtDmBuoiHoc:delete' },
     );
 
     app.permissionHooks.add('staff', 'addRolesDtDmBuoiHoc', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtDmBuoiHoc:read', 'dtDmBuoiHoc:write');
+            app.permissionHooks.pushUserPermission(user, 'dtDmBuoiHoc:manage', 'dtDmBuoiHoc:write');
             resolve();
         } else resolve();
     }));
 
 
-    //     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/user/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:read'), app.templates.admin);
+    app.get('/user/dao-tao/buoi-hoc', app.permission.check('dtDmBuoiHoc:manage'), app.templates.admin);
 
-    app.get('/api/dao-tao/buoi-hoc/all', app.permission.check('dtDmBuoiHoc:read'), async (req, res) => {
+    //     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+
+    app.get('/api/dao-tao/buoi-hoc/all', app.permission.check('dtDmBuoiHoc:manage'), async (req, res) => {
         try {
             let kichHoat = req.query.kichHoat;
             let condition = kichHoat? {kichHoat:1}:{};
@@ -40,7 +39,7 @@ module.exports = app => {
             });
             items.forEach(item => {
                 if (item.loaiHinh) {
-                    let loaiHinh = item.loaiHinh.split(','); // ['CQ','VB2'] --> ['Chính quy','Văn bằng 2']
+                    let loaiHinh = item.loaiHinh.split(',');
                     item.tenLoaiHinh = loaiHinh.map(item => loaiHinhMapper[item]);
                 }
             });

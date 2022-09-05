@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            8016: {
+            7023: {
                 title: 'Thứ', groupIndex: 2,
                 link: '/user/dao-tao/thu'
             },
@@ -10,26 +10,24 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'dtDmThu:read', menu },
         { name: 'dtDmThu:manage', menu },
-        { name: 'dtChuongTrinhDaoTao:manage', menu },
         { name: 'dtDmThu:write' },
         { name: 'dtDmThu:delete' },
     );
 
     app.permissionHooks.add('staff', 'addRolesDtDmThu', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtDmThu:read', 'dtDmThu:write', 'dtDmThu:delete');
+            app.permissionHooks.pushUserPermission(user, 'dtDmThu:manage', 'dtDmThu:write', 'dtDmThu:delete');
             resolve();
         } else resolve();
     }));
 
+    app.get('/user/dao-tao/thu', app.permission.check('dtDmThu:manage'), app.templates.admin);
 
     //     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/user/dao-tao/thu', app.permission.check('dtDmThu:read'), app.templates.admin);
 
-    app.get('/api/dao-tao/thu/all', app.permission.check('dtDmThu:read'), (req, res) => {
-        app.model.dtDmThu.getAll({}, '*', 'ma asc', (error, items) => {
+    app.get('/api/dao-tao/thu/all', app.permission.check('dtDmThu:manage'), (req, res) => {
+        app.model.dtDmThu.getAll({}, '*', '', (error, items) => {
             res.send({ error, items });
         });
     });

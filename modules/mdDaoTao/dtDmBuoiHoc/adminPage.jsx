@@ -5,14 +5,13 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, getValue, FormSelect } from 'view/component/AdminPage';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 class EditModal extends AdminModal {
-    // Always begin with componentDidMount
     componentDidMount() {
         this.onShown(() => {
             this.ten.focus();
         });
     }
     onShow = (item) => {
-        let { id, ten, kichHoat, loaiHinh } = item ? item : { id: null, ten: '', kichHoat: true, loaiHinh: '' };
+        let { id, ten, kichHoat, loaiHinh } = item ? item : { id: null, ten: '', kichHoat: 1, loaiHinh: '' };
         this.setState({ id, ten, item });
         this.ten.value(ten);
         this.loaiHinh.value(loaiHinh.split(','));
@@ -72,8 +71,8 @@ class DtDmBuoiHocPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '90%' }} nowrap='true'>Hệ</th>
+                    <th style={{ width: '20%' }} nowrap='true'>Tên</th>
+                    <th style={{ width: '80%' }} nowrap='true'>Hệ</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
 

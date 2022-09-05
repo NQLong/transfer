@@ -4,7 +4,6 @@ import { getDtDmThuAll, deleteDtDmThu, createDtDmThu, updateDtDmThu } from './re
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, getValue} from 'view/component/AdminPage';
 class EditModal extends AdminModal {
-    //Always begin with componentDidMount
     componentDidMount() {
         this.onShown(() => {
             this.ten.focus();
@@ -14,27 +13,18 @@ class EditModal extends AdminModal {
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: 1 };
         this.setState({ ma});
-        // this.ma.value(ma);
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
     };
 
     onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
-            // ma: this.ma.value(),
-            // ten: this.ten.value(),
-            // kichHoat: this.kichHoat.value() ? 1 : 0,
-            // ma: getValue(this.ma),
             ten: getValue(this.ten),
             kichHoat: Number(getValue(this.kichHoat))
         };
-        if (changes.ten == '') {
-            T.notify('Tên thứ bị trống!', 'danger');
-            this.ten.focus();
-        } else {
-            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-        }
-        e.preventDefault();
+        this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
+        
     };
 
     render = () => {
@@ -43,7 +33,6 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật Thứ' : 'Tạo mới Thứ',
             size: 'large',
             body: <div className='row'>
-                {/* <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={true} required /> */}
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} required />
             </div>
@@ -81,9 +70,8 @@ class DtDmThuPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto' }} nowrap='true'>#</th>
                     <th style={{ width: '90%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: '10%' }} nowrap='true'>Kích hoạt</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
-
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
@@ -108,8 +96,7 @@ class DtDmThuPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <EditModal ref={e => this.modal = e} readOnly={!permission.write} create={this.props.createDtDmThu} update={this.props.updateDtDmThu} />
             </>,
-            backRoute: '/user/dao-tao',
-            // onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+            backRoute: '/user/dao-tao'
         });
     }
 
