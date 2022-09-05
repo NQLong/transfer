@@ -9,9 +9,11 @@ import T from 'view/js/common';
 import { createDtThoiKhoaBieuMultiple } from './redux';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
-import { SelectAdapter_DtDanhSachChuyenNganh, getDtDanhSachChuyenNganhFilter } from '../dtDanhSachChuyenNganh/redux';
-import { SelectAdapter_DtNganhDaoTaoFilter, getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
-
+import { getDtDanhSachChuyenNganhFilter, SelectAdapter_DtDanhSachChuyenNganhFilter } from '../dtDanhSachChuyenNganh/redux';
+import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
+import { getScheduleSettings } from '../dtSettings/redux';
+import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
+import { getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc/redux';
 const MA_PDT = '33', MA_CTSV = '32';
 
 const dataKhoaSinhVien = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
@@ -20,12 +22,7 @@ class RenderListMon extends React.Component {
     dataNganh = []
     state = { listSelected: [], listNganh: [] }
     componentDidMount() {
-        let data = this.props.data,
-            { soLop, loaiHinhDaoTao } = data;
-        getDtNganhDaoTaoAll(items => {
-            let dataNganh = items.filter(item => loaiHinhDaoTao == 'CLC' ? item.tenNganh.toUpperCase().includes('CLC') : !item.tenNganh.toUpperCase().includes('CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
-            this.setState({ dataNganh, soLop }, () => this.init());
-        });
+        this.init();
     }
 
     componentDidUpdate(prev) {
@@ -34,29 +31,47 @@ class RenderListMon extends React.Component {
 
     init = () => {
         let data = this.props.data,
-            { khoaDangKy, maNganh, nam, soLop } = data;
-        if (khoaDangKy == MA_PDT) {
-            Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
-                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
-            });
-            // let dataNganh = this.state.dataNganh.map(item => item.id);
-            // let spliceLength = parseInt(this.state.dataNganh.length / soLop);
-            // for (let nhom = 1; nhom <= soLop && dataNganh.length; nhom++) {
-            //     let value = dataNganh.splice(0, spliceLength);
-            //     this.ref.maNganh[nhom]?.value([...this.ref.maNganh[nhom]?.value(), ...value]);
-            //     this.ref.chuyenNganh[nhom]?.value('');
-            //     if (nhom == soLop && dataNganh.length > 0) { nhom = 0; spliceLength = 1; }
-            // }
-        } else {
-            getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
-                Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
-                    ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
-                    this.ref.chuyenNganh[nhom].value(items.map(item => item.id));
-                    this.ref.maNganh[nhom].value([maNganh]);
+            { soLop, loaiHinhDaoTao } = data;
+        getDtNganhDaoTaoAll(items => {
+            let dataNganh = items.filter(item => loaiHinhDaoTao == 'CLC' ? item.tenNganh.toUpperCase().includes('CLC') : !item.tenNganh.toUpperCase().includes('CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}` }));
+            this.setState({ dataNganh, soLop }, () => {
+                getDmCaHocAllCondition(this.props.data.coSo, items => {
+                    let dataTiet = items.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
+                    this.setState({ dataTiet, fullDataTiet: items.map(item => ({ ...item, ten: parseInt(item.ten) })) }, () => console.log(this.state.fullDataTiet));
+                    let data = this.props.data,
+                        { khoaDangKy, maNganh, nam, soLop } = data;
+                    if (khoaDangKy == MA_PDT) {
+                        Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
+                            ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
+                            this.ref.tietBatDau[nhom].value('');
+                        });
+                    } else {
+                        getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
+                            if (!items.length) {
+                                this.setState({ hideChuyenNganh: true }, () => {
+                                    Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
+                                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'maNganh'].forEach(key => this.ref[key][nhom].value(data[key]));
+                                        this.ref.tietBatDau[nhom].value('');
+                                        this.ref.maNganh[nhom].value([maNganh]);
+                                    });
+                                });
+                            }
+                            else {
+                                this.setState({ hideChuyenNganh: false }, () => {
+                                    Array.from({ length: data.soLop }, (_, i) => i + 1).forEach(nhom => {
+                                        ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
+                                        this.ref.chuyenNganh[nhom].value(items.map(item => item.id));
+                                        this.ref.tietBatDau[nhom].value('');
+                                        this.ref.maNganh[nhom].value([maNganh]);
+                                    });
+                                });
+                            }
+                        });
+                    }
                 });
             });
+        });
 
-        }
     }
 
     getData = () => {
@@ -68,20 +83,24 @@ class RenderListMon extends React.Component {
                     eachData[key] = this.ref[key][nhom] ? getValue(this.ref[key][nhom]) : '';
                 });
                 let { soTietBuoi, tietBatDau } = eachData;
+                tietBatDau = parseInt(tietBatDau);
+                soTietBuoi = parseInt(soTietBuoi);
                 if (tietBatDau) {
-                    if (soTietBuoi == 5 && tietBatDau >= 2) {
-                        T.notify(`Lỗi: Học từ tiết 5 tới tiết ${tietBatDau + soTietBuoi - 1}`, 'warning');
-                        throw '';
-                    }
-                    else if (soTietBuoi >= 4 && tietBatDau != 6 && tietBatDau >= 3) {
-                        T.notify('Thời gian học phần không hợp lệ!', 'danger');
-                        throw '';
+                    let buoiHocBatDau = this.state.fullDataTiet.find(item => item.ten == tietBatDau).buoi;
+                    let dataKetThuc = this.state.fullDataTiet.find(item => item.ten == (tietBatDau + soTietBuoi - 1));
+                    if (!dataKetThuc) {
+                        T.notify('Không có tiết kết thúc phù hợp', 'danger');
+                        throw ('');
+                    } else if (buoiHocBatDau != dataKetThuc.buoi) {
+                        T.notify('Bắt đầu và kết thúc ở 2 buổi khác nhau!', 'danger');
+                        throw ('');
                     }
                 }
                 data.push(eachData);
             });
             return data;
         } catch (input) {
+            console.log(input);
             if (input) {
                 T.notify('Vui lòng điền đầy đủ dữ liệu', 'danger');
                 input.focus();
@@ -102,8 +121,10 @@ class RenderListMon extends React.Component {
     }
 
     render() {
-        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, soTietBuoi } = this.props.data;
+        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, tenNganh } = this.props.data;
+        const { tkbSoBuoiTuanMax, tkbSoBuoiTuanMin, tkbSoLuongDuKienMax, tkbSoLuongDuKienMin, tkbSoTietBuoiMax, tkbSoTietBuoiMin } = this.props.scheduleConfig;
         tenMonHoc = tenMonHoc.split(':')[1];
+        let { hideChuyenNganh, dataTiet } = this.state;
         return Array.from({ length: soLop }, (_, i) => i + 1).map(nhom => {
             this.ref = {
                 soTietBuoi: {},
@@ -115,13 +136,14 @@ class RenderListMon extends React.Component {
                 // giangVien: {}
             };
             return (<React.Fragment key={nhom}>
-                <div className='form-group col-md-12' style={{ marginBottom: '0.5rem' }}><b>Lớp {maMonHoc}_{nhom}</b>: {tenMonHoc}</div>
-                <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-1' placeholder='Số tiết /buổi' required defaulValue={soTietBuoi} min={1} max={5} />
-                <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-1' placeholder='Số buổi /tuần' required min={1} max={3} />
-                <FormTextBox type='number' ref={e => this.ref.tietBatDau[nhom] = e} className='col-md-1' placeholder='Tiết bắt đầu' min={1} max={9} />
-                <FormTextBox type='number' ref={e => this.ref.soLuongDuKien[nhom] = e} className='col-md-1' placeholder='SLDK' required multiple />
-                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-8' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
-                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-8' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
+                <div className='form-group col-md-12' style={{ marginBottom: '0.rem', color: 'blue' }}><b>Lớp {maMonHoc}_{nhom}</b>: {tenMonHoc}</div>
+                <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-2' label='Số tiết /buổi' required min={tkbSoTietBuoiMin} max={tkbSoTietBuoiMax} smallText={`Nhập từ ${tkbSoTietBuoiMin} đến ${tkbSoTietBuoiMax}`} />
+                <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-2' label='Số buổi /tuần' required min={tkbSoBuoiTuanMin} max={tkbSoBuoiTuanMax} smallText={`Nhập từ ${tkbSoBuoiTuanMin} đến ${tkbSoBuoiTuanMax}`} />
+                <FormSelect ref={e => this.ref.tietBatDau[nhom] = e} className='col-md-2' label='Tiết bắt đầu' data={dataTiet} />
+                <FormTextBox type='number' ref={e => this.ref.soLuongDuKien[nhom] = e} className='col-md-2' label='SLDK' required min={tkbSoLuongDuKienMin} max={tkbSoLuongDuKienMax} smallText={`Nhập từ ${tkbSoLuongDuKienMin} đến ${tkbSoLuongDuKienMax}`} />
+                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={maNganh ? [{ id: maNganh, text: `${maNganh}: ${tenNganh}` }] : this.state.dataNganh} label='Ngành' multiple className={'col-md-4'} onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} required={maNganh ? false : true} />
+                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganhFilter(maNganh, nam)} label='Chuyên ngành' multiple className='col-md-12' style={{ display: hideChuyenNganh ? 'none' : '' }} />
+
                 {/* <FormSelect ref={e => this.ref.giangVien[nhom] = e} data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' className='col-md-3' /> */}
                 {nhom != soLop && <hr className='col-md-12' />}
             </React.Fragment>);
@@ -130,12 +152,16 @@ class RenderListMon extends React.Component {
 }
 connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(RenderListMon);
 class AddingModal extends AdminModal {
-    state = { khoaDangKy: MA_PDT, savedThongTinChung: false }
+    state = { khoaDangKy: MA_PDT, savedThongTinChung: false, dataNganh: [] }
 
     componentDidMount() {
         $('#1').show();
         $('#2').hide();
         this.disabledClickOutside();
+        this.props.getScheduleSettings(items => {
+            this.setState({ scheduleConfig: items });
+        });
+
     }
     onShow = () => {
         this.bacDaoTao.value('DH');
@@ -162,7 +188,9 @@ class AddingModal extends AdminModal {
                 khoaDangKy: getValue(this.khoaDangKy),
                 soTietLyThuyet: this.state.soTietLyThuyet,
                 soTietThucHanh: this.state.soTietThucHanh,
+                coSo: getValue(this.coSo),
                 maNganh: this.maNganh.value(),
+                tenNganh: this.maNganh.data().text.split(': ')[1],
                 khoaSinhVien: getValue(this.khoaSinhVien),
                 soLop: getValue(this.soLop),
                 soTietBuoi: getValue(this.soTiet),
@@ -207,7 +235,11 @@ class AddingModal extends AdminModal {
     }
 
     handleMonHoc = value => {
-        let { tietLt: soTietLyThuyet, tietTh: soTietThucHanh } = value?.item || {};
+        let { tietLt: soTietLyThuyet, tietTh: soTietThucHanh, khoa } = value?.item || {};
+        if (khoa) {
+            this.khoaDangKy.value(khoa);
+            this.setState({ khoaDangKy: khoa }, () => this.maNganh.value(''));
+        }
         this.setState({ soTietLyThuyet, soTietThucHanh });
     }
 
@@ -225,14 +257,20 @@ class AddingModal extends AdminModal {
         $('#2').show();
         $('#1').hide();
     }
-
+    handleLoaiHinh = value => {
+        getDtNganhDaoTaoAll(items => {
+            let dataNganh = items.filter(item => value.id == 'CLC' ? item.tenNganh.toUpperCase().includes('CLC') : !item.tenNganh.toUpperCase().includes('CLC')).map(item => ({ id: item.maNganh, text: `${item.maNganh}: ${item.tenNganh}`, khoa: item.khoa }));
+            this.setState({ dataNganh }, () => this.maNganh.value(''));
+        });
+    }
 
     render = () => {
         let hideNganhSelect = this.state.khoaDangKy && [MA_CTSV, MA_PDT].includes(this.state.khoaDangKy.toString()),
             savedThongTinChung = this.state.savedThongTinChung;
+        const { tkbSoBuoiTuanMax, tkbSoBuoiTuanMin, tkbSoLopMax, tkbSoLopMin, tkbSoLuongDuKienMax, tkbSoLuongDuKienMin, tkbSoTietBuoiMax, tkbSoTietBuoiMin } = this.state.scheduleConfig || {};
         return this.renderModal({
             title: <>
-                <div>Mở thời khoá biểu</div>
+                <div>Tạo học phần</div>
                 <ul className='app-breadcrumb breadcrumb'>
                     <a href='' onClick={this.showThongTinChung}>Thông tin chung</a>
                     &nbsp;/&nbsp;
@@ -258,34 +296,36 @@ class AddingModal extends AdminModal {
             body:
                 <div>
                     <div className='row' id='1'>
-                        <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-3' label='Bậc đào tạo' readOnly required />
-                        <FormSelect ref={e => this.loaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-3' label='Hệ đào tạo' required />
+                        <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} className='col-md-12' label='Bậc đào tạo' readOnly required style={{ marginBottom: '0' }} />
+                        <FormSelect ref={e => this.loaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} className='col-md-4' label='Hệ đào tạo' required onChange={this.handleLoaiHinh} />
                         <FormSelect data={SelectAdapter_DtCauTrucKhungDaoTao} ref={e => this.nam = e} className='col-md-2' label='Năm học' onChange={this.handleNam} required />
                         <FormSelect ref={e => this.hocKy = e} data={[1, 2, 3]} label='Học kỳ' className='col-md-2' required />
                         <FormSelect ref={e => this.khoaSinhVien = e} data={dataKhoaSinhVien} label='Khoá sinh viên' className='col-md-2' required />
-                        <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className={hideNganhSelect ? 'col-md-12' : 'col-md-6'} label='Đơn vị phụ trách môn' onChange={this.handleDonVi} required />
-                        <FormSelect ref={e => this.maNganh = e} data={SelectAdapter_DtNganhDaoTaoFilter(this.state.khoaDangKy || null)} style={{ display: hideNganhSelect ? 'none' : 'block' }} className='col-md-6' label='Ngành' required={!hideNganhSelect} />
+                        <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Cơ sở học' className='col-md-2' required />
                         <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' required onChange={this.handleMonHoc} />
                         <FormCheckbox ref={e => this.loaiMonHoc = e} label='Tự chọn' style={{ marginBottom: '0' }} className='col-md-2' />
-                        <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' required min={1} max={15} />
-                        <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' required min={1} max={5} />
-                        <FormTextBox type='number' ref={e => this.soBuoi = e} className='col-md-3' label='Số buổi /tuần' required min={1} max={3} />
-                        <FormTextBox type='number' ref={e => this.soLuongDuKien = e} className='col-md-3' label='SLDK' required />
+                        <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className={hideNganhSelect ? 'col-md-12' : 'col-md-6'} label='Đơn vị phụ trách môn' onChange={this.handleDonVi} required />
+                        <FormSelect ref={e => this.maNganh = e} data={this.state.khoaDangKy ? this.state.dataNganh.filter(item => item.khoa == this.state.khoaDangKy) : this.state.dataNganh} style={{ display: hideNganhSelect ? 'none' : 'block' }} className='col-md-6' label='Ngành' required={!hideNganhSelect} />
+
+                        <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' required min={tkbSoLopMin} max={tkbSoLopMax} smallText={`Nhập từ ${tkbSoLopMin} đến ${tkbSoLopMax}`} />
+                        <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' required min={tkbSoTietBuoiMin} max={tkbSoTietBuoiMax} smallText={`Nhập từ ${tkbSoTietBuoiMin} đến ${tkbSoTietBuoiMax}`} />
+                        <FormTextBox type='number' ref={e => this.soBuoi = e} className='col-md-3' label='Số buổi /tuần' required min={tkbSoBuoiTuanMin} max={tkbSoBuoiTuanMax} smallText={`Nhập từ ${tkbSoBuoiTuanMin} đến ${tkbSoBuoiTuanMax}`} />
+                        <FormTextBox type='number' ref={e => this.soLuongDuKien = e} className='col-md-3' label='SLDK' required min={tkbSoLuongDuKienMin} max={tkbSoLuongDuKienMax} smallText={`Nhập từ ${tkbSoLuongDuKienMin} đến ${tkbSoLuongDuKienMax}`} />
                     </div>
                     <div id='2' style={{ height: '70vh', overflow: 'scroll', margin: '0 20 0 20' }}>
                         {
                             this.state.data?.soLop &&
                             <React.Fragment>
-                                <div className='row' style={{ position: 'sticky', top: 0, zIndex: '1051', backgroundColor: '#0275d8', paddingBottom: '10px', paddingTop: '10px', textAlign: 'center', marginBottom: '15px' }}>
+                                {/* <div className='row' style={{ position: 'sticky', top: 0, zIndex: '1051', backgroundColor: '#0275d8', paddingBottom: '10px', paddingTop: '10px', textAlign: 'center', marginBottom: '15px' }}>
                                     <b className='col-md-1 text-white' >S.Tiết</b>
                                     <b className='col-md-1 text-white' >S.Buổi</b>
                                     <b className='col-md-1 text-white' >T.bắt đầu</b>
                                     <b className='col-md-1 text-white' >SLDK</b>
                                     <b className='col-md-5 text-white' >{this.state.data.maNganh ? 'Chuyên ngành' : 'Ngành đào tạo'}</b>
                                     <b className='col-md-3 text-white' >Giảng viên</b>
-                                </div>
+                                </div> */}
                                 <div className='row'>
-                                    <RenderListMon data={this.state.data} ref={e => this.cpnMon = e} />
+                                    <RenderListMon data={this.state.data} ref={e => this.cpnMon = e} scheduleConfig={this.state.scheduleConfig} />
                                 </div>
                             </React.Fragment>
                         }
@@ -297,6 +337,6 @@ class AddingModal extends AdminModal {
 
 const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = {
-    createDtThoiKhoaBieuMultiple
+    createDtThoiKhoaBieuMultiple, getScheduleSettings
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(AddingModal);

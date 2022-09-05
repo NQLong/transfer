@@ -46,7 +46,7 @@ module.exports = app => {
     app.get('/api/danh-muc/ca-hoc/all-condition', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), async (req, res) => {
         try {
             let maCoSo = req.query.maCoSo || '';
-            let items = await app.model.dmCaHoc.getAll({ maCoSo });
+            let items = await app.model.dmCaHoc.getAll({ maCoSo, kichHoat: 1 });
             res.send({ items });
         } catch (error) {
             res.send({ error });
