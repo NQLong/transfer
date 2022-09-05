@@ -1308,7 +1308,7 @@ AS
     my_cursor            SYS_REFCURSOR;
     sT                   STRING(502) := '%' || lower(searchTerm) || '%';
     donVi                STRING(10);
-    namFilter          STRING(10);
+    namFilter            STRING(10);
     hocKy                STRING(1);
     bacDaoTaoFilter      STRING(10);
     khoaSinhVienFilter   STRING(4);
@@ -1353,21 +1353,27 @@ BEGIN
                         WHERE TYPE = 'TG'
                         GROUP BY GV.ID_THOI_KHOA_BIEU
                         ORDER BY GV.ID_THOI_KHOA_BIEU) LISTTG on LISTTG.ID = TKB.ID
-
-             LEFT JOIN DT_THOI_KHOA_BIEU_NGANH TKBN ON TKBN.ID_THOI_KHOA_BIEU = TKB.ID
-
-             LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN TKBN.ID_NGANH
-             LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CNDT ON (CNDT.NGANH || '##' || CNDT.ID) IN TKBN.ID_NGANH
+             LEFT JOIN (SELECT LISTAGG(sTKBN.ID_NGANH, ',') WITHIN GROUP (ORDER BY NULL) AS ID_NGANH,
+                               sTKBN.ID_THOI_KHOA_BIEU,
+                               LISTAGG(NDT.KHOA, ',') WITHIN GROUP (ORDER BY NULL)       AS KHOA_NGANH,
+                               LISTAGG(DSCN.KHOA, ',') WITHIN GROUP (ORDER BY NULL)      AS KHOA_CN
+                        FROM DT_THOI_KHOA_BIEU_NGANH sTKBN
+                                 LEFT JOIN DT_THOI_KHOA_BIEU sTKB ON sTKBN.ID_THOI_KHOA_BIEU = sTKB.ID
+                                 LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN sTKBN.ID_NGANH
+                                 LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH DSCN
+                                           ON (DSCN.NGANH || '##' || DSCN.ID) IN sTKBN.ID_NGANH
+                        GROUP BY sTKBN.ID_THOI_KHOA_BIEU) TKBN ON TKBN.ID_THOI_KHOA_BIEU = TKB.ID
 
     WHERE (khoaSinhVienFilter IS NULL OR khoaSinhVienFilter = '' OR TKB.KHOA_SINH_VIEN = khoaSinhVienFilter)
       AND (namFilter IS NULL OR namFilter = '' OR namFilter = TKB.NAM)
       AND (hocKy IS NULL OR hocKy = '' OR hocKy = TKB.HOC_KY)
-      AND (donVi IS NULL OR donVi = '' OR donVI IN (SELECT regexp_substr(NDT.KHOA, '[^,]+', 1, level)
+      AND (donVi IS NULL OR donVi = '' OR donVi IN (SELECT regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level)
                                                     from dual
-                                                    connect by regexp_substr(NDT.KHOA, '[^,]+', 1, level) is not null)
-        OR donVI IN (SELECT regexp_substr(CNDT.KHOA, '[^,]+', 1, level)
+                                                    connect by regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level) is not null)
+        OR donVi IN (SELECT regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level)
                      from dual
-                     connect by regexp_substr(CNDT.KHOA, '[^,]+', 1, level) is not null))
+                     connect by regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level) is not null)
+        )
       AND (bacDaoTaoFilter IS NULL OR bacDaoTaoFilter = '' OR bacDaoTaoFilter = TKB.BAC_DAO_TAO)
       AND (loaiHinhDaoTaoFilter IS NULL OR loaiHinhDaoTaoFilter = '' OR
            loaiHinhDaoTaoFilter = TKB.LOAI_HINH_DAO_TAO)
@@ -1473,7 +1479,7 @@ BEGIN
                                INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
                                LEFT OUTER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
                                INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
-                                          ON (sCN.NGANH || '%' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
+                                          ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
                       WHERE sTKB.ID = TKB.ID) AS          "tenChuyenNganh",
 
                      (SELECT LISTAGG(sCN.ID, ',') WITHIN GROUP (
@@ -1483,7 +1489,7 @@ BEGIN
                                INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
                                LEFT OUTER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
                                INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
-                                          ON (sCN.NGANH || '%' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
+                                          ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
                       WHERE sTKB.ID = TKB.ID) AS          "maChuyenNganh",
 
                      TKB.KHOA_SINH_VIEN       AS          "khoaSinhVien",
@@ -1511,21 +1517,31 @@ BEGIN
                                   WHERE TYPE = 'TG'
                                   GROUP BY GV.ID_THOI_KHOA_BIEU
                                   ORDER BY GV.ID_THOI_KHOA_BIEU) LISTTG on LISTTG.ID = TKB.ID
+                       LEFT JOIN (SELECT LISTAGG(sTKBN.ID_NGANH, ',') WITHIN GROUP (ORDER BY NULL) AS ID_NGANH,
+                                         sTKBN.ID_THOI_KHOA_BIEU,
+                                         LISTAGG(NDT.KHOA, ',') WITHIN GROUP (ORDER BY NULL)       AS KHOA_NGANH,
+                                         LISTAGG(DSCN.KHOA, ',') WITHIN GROUP (ORDER BY NULL)      AS KHOA_CN
+                                  FROM DT_THOI_KHOA_BIEU_NGANH sTKBN
+                                           LEFT JOIN DT_THOI_KHOA_BIEU sTKB ON sTKBN.ID_THOI_KHOA_BIEU = sTKB.ID
+                                           LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN sTKBN.ID_NGANH
+                                           LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH DSCN
+                                                     ON (DSCN.NGANH || '##' || DSCN.ID) IN sTKBN.ID_NGANH
+                                  GROUP BY sTKBN.ID_THOI_KHOA_BIEU) TKBN
+                                 ON TKBN.ID_THOI_KHOA_BIEU = TKB.ID
 
-                       LEFT JOIN DT_THOI_KHOA_BIEU_NGANH TKBN ON TKBN.ID_THOI_KHOA_BIEU = TKB.ID
-
-                       LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN TKBN.ID_NGANH
-                       LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH CNDT ON (CNDT.NGANH || '##' || CNDT.ID) IN TKBN.ID_NGANH
+--                        LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN TKBN.ID_NGANH
+--                        LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH DSCN ON (DSCN.NGANH || '##' || DSCN.ID) IN TKBN.ID_NGANH
 
               WHERE (khoaSinhVienFilter IS NULL OR khoaSinhVienFilter = '' OR TKB.KHOA_SINH_VIEN = khoaSinhVienFilter)
                 AND (namFilter IS NULL OR namFilter = '' OR namFilter = TKB.NAM)
                 AND (hocKy IS NULL OR hocKy = '' OR hocKy = TKB.HOC_KY)
-                AND (donVi IS NULL OR donVi = '' OR donVI IN (SELECT regexp_substr(NDT.KHOA, '[^,]+', 1, level)
+                AND (donVi IS NULL OR donVi = '' OR donVi IN (SELECT regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level)
                                                               from dual
-                                                              connect by regexp_substr(NDT.KHOA, '[^,]+', 1, level) is not null)
-                  OR donVI IN (SELECT regexp_substr(CNDT.KHOA, '[^,]+', 1, level)
+                                                              connect by regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level) is not null)
+                  OR donVi IN (SELECT regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level)
                                from dual
-                               connect by regexp_substr(CNDT.KHOA, '[^,]+', 1, level) is not null))
+                               connect by regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level) is not null)
+                  )
                 AND (bacDaoTaoFilter IS NULL OR bacDaoTaoFilter = '' OR bacDaoTaoFilter = TKB.BAC_DAO_TAO)
                 AND (loaiHinhDaoTaoFilter IS NULL OR loaiHinhDaoTaoFilter = '' OR
                      loaiHinhDaoTaoFilter = TKB.LOAI_HINH_DAO_TAO)

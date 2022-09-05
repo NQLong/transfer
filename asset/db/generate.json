@@ -17488,168 +17488,15 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "DT_DM_BUOI_HOC": {
+        "TCCB_DANH_GIA_CA_NHAN_DANG_KY": {
             "active": true,
-            "moduleName": "dtDmBuoiHoc",
-            "modelName": "dtDmBuoiHoc",
+            "moduleName": "tccbDanhGiaCaNhanDangKy",
+            "modelName": "tccbDanhGiaCaNhanDangKy",
             "columns": {
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_166495\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 30
-                },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "LOAI_HINH": {
-                    "value": "loaiHinh",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 50
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "DT_DM_THU": {
-            "active": true,
-            "moduleName": "dtDmThu",
-            "modelName": "dtDmThu",
-            "columns": {
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 10
-                },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "1",
-                    "nullable": true,
-                    "size": "1,0"
-                }
-            },
-            "primaryKeys": [
-                "MA"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "HCTH_BAN_LUU": {
-            "active": true,
-            "moduleName": "hcthBanLuu",
-            "modelName": "hcthBanLuu",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_166171\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "DON_VI": {
-                    "value": "donVi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "10,0"
-                },
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "10,0"
-                },
-                "LOAI": {
-                    "value": "loai",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 20
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "HCTH_INSTRUCTION": {
-            "active": true,
-            "moduleName": "hcthInstruction",
-            "modelName": "hcthInstruction",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_165483\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "NOI_DUNG": {
-                    "value": "noiDung",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 2000
-                },
-                "TIEU_DE": {
-                    "value": "tieuDe",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 1000
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "HCTH_SIGNING_CONFIG": {
-            "active": true,
-            "moduleName": "hcthSigningConfig",
-            "modelName": "hcthSigningConfig",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_163743\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "VBDF_ID": {
-                    "value": "vbdfId",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_168773\".nextval",
                     "nullable": false,
                     "size": "22,0"
                 },
@@ -17657,80 +17504,26 @@
                     "value": "shcc",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
-                    "size": 20
-                },
-                "SIGN_TYPE": {
-                    "value": "signType",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 20
-                },
-                "STATUS": {
-                    "value": "status",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
                     "nullable": true,
-                    "size": 10
+                    "size": 255
                 },
-                "SIGN_AT": {
-                    "value": "signAt",
+                "ID_NHOM_DANG_KY": {
+                    "value": "idNhomDangKy",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "20,0"
+                    "size": "22,0"
                 },
-                "PAGE_NUMBER": {
-                    "value": "pageNumber",
+                "DANG_KY": {
+                    "value": "dangKy",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "0",
                     "nullable": true,
-                    "size": "3,0"
-                },
-                "X_COORDINATE": {
-                    "value": "xCoordinate",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "4,0"
-                },
-                "Y_COORDINATE": {
-                    "value": "yCoordinate",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "4,0"
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
                 "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "DT_SETTINGS": {
-            "active": true,
-            "moduleName": "dtSettings",
-            "modelName": "dtSettings",
-            "columns": {
-                "KEY": {
-                    "value": "key",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 50
-                },
-                "VALUE": {
-                    "value": "value",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
-                }
-            },
-            "primaryKeys": [
-                "KEY"
             ],
             "foreignKeys": [],
             "type": "table"
