@@ -117,7 +117,7 @@ export class TableHeader extends React.Component {
 
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
-    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {},
+    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {}, multipleTbody = false
 }) {
     const list = getDataSource();
     if (list == null) {
@@ -134,7 +134,9 @@ export function renderTable({
         const table = (
             <table className={'table table-hover table-bordered table-responsive ' + className} style={{ margin: 0, ...style }}>
                 <thead className={header}>{renderHead()}</thead>
-                <tbody>{typeof renderRow == 'function' ? list.map(renderRow) : renderRow}</tbody>
+                {
+                    multipleTbody ? <>{typeof renderRow == 'function' ? list.map(renderRow) : renderRow}</> : <tbody>{typeof renderRow == 'function' ? list.map(renderRow) : renderRow}</tbody>
+                }
             </table>
         );
 
@@ -1009,7 +1011,7 @@ export class AdminPage extends React.Component {
         T.title(title);
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
-            createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới2' />;
+            createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới' />;
             right += 60;
         }
         if (onSave) {
