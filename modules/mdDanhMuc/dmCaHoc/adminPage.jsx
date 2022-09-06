@@ -183,7 +183,7 @@ class dmCaHocAdminPage extends AdminPage {
                     create={this.props.createDmCaHoc} update={this.props.updateDmCaHoc} />
             </>,
             backRoute: `/user/${this.menu}`,
-            Buổi: permission && permission.write ? (e) => this.showModal(e) : null
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 }
