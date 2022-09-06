@@ -84,7 +84,7 @@ class ComponentDGCB extends AdminPage {
             });
             return ui;
         }
-        $('table tbody')
+        $('table.dgcb tbody')
             .sortable({
                 helper: fixWidthHelper,
                 start: (e, ui) => {
@@ -125,6 +125,7 @@ class ComponentDGCB extends AdminPage {
         const list = this.state.items || [];
         const thuTu = list.length != 0 ? Math.max(...list.map(item => item.thuTu)) : 0;
         let table = renderTable({
+            className: 'dgcb',
             emptyTable: 'Không có dữ liệu khung đánh giá cán bộ',
             getDataSource: () => list,
             renderHead: () => (
@@ -132,17 +133,17 @@ class ComponentDGCB extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Từ</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Đến</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức đánh giá</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức xếp loại</th>
+                    <th style={{ width: '70%', textAlign: 'left', whiteSpace: 'nowrap' }}>Mức đánh giá</th>
+                    <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức xếp loại</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
-                <tr key={index}>
+                <tr key={index} style={{ backgroundColor: 'white' }}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'center' }} content={item.tu} />
                     <TableCell style={{ textAlign: 'center' }} content={item.den} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.mucDanhGia} />
+                    <TableCell style={{ textAlign: 'left' }} content={item.mucDanhGia} />
                     <TableCell style={{ textAlign: 'center' }} content={item.mucXepLoai} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}

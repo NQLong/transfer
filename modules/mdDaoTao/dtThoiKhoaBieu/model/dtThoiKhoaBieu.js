@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.dtThoiKhoaBieu.foo = () => { };
-    const MAX_DEVIANT = 20,
+    const MAX_DEVIANT = 10,
         DATE_UNIX = 24 * 60 * 60 * 1000;
 
     /**
@@ -160,7 +160,7 @@ module.exports = app => {
                                     idNganh.available = dataThoiGian;
                                 });
                             }
-                            // console.log(dataThoiGian);
+
                             let thuTiet = dataThoiGian.sample(),
                                 [thu, tietBatDau] = thuTiet.split('_');
                             dataReturn.push({ ...hocPhan, thu, tietBatDau });
@@ -238,14 +238,15 @@ module.exports = app => {
                 return new Date(item.ngay).setHours(0, 0, 0);
             });
             let currentStatus = adjustCurrentStatusRoom(currRoom);
-            let dataReturn = [];
+            let dataReturn = [], dataNull = [];
 
             for (let hocPhan of listData) {
-                let roomResult = bestFit(hocPhan, listRoom, currentStatus) || {};
+                let roomResult = bestFit(hocPhan, listRoom, currentStatus);
+                // if (!roomResult) dataNull.push
                 let ngayKetThuc = calculateEndDate({ ...hocPhan, ngayBatDau: parseInt(config.ngayBatDau) }, listNgayLe);
                 dataReturn.push({ ...hocPhan, ...roomResult, ngayKetThuc, ngayBatDau: parseInt(config.ngayBatDau) });
             }
-            res.send({ dataReturn });
+            res.send({ dataReturn, dataNull });
         } catch (error) {
             console.log(error);
             res.send({ error });

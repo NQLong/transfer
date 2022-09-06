@@ -3,11 +3,12 @@
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
 import tccbDanhGiaNam from './redux';
+import tccbThongTinDonVi from './reduxThongTinDonVi';
 
 export default {
     redux: {
         parent: 'tccb',
-        reducers: { tccbDanhGiaNam }
+        reducers: { tccbDanhGiaNam, tccbThongTinDonVi }
     },
     routes: [
         {
@@ -17,6 +18,14 @@ export default {
         {
             path: '/user/tccb/danh-gia/:nam',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
+        },
+        {
+            path: '/user/tccb/danh-gia/:nam/don-vi',
+            component: Loadable({ loading: Loading, loader: () => import('./adminListDonVi') })
+        },
+        {
+            path: '/user/tccb/danh-gia/:nam/don-vi/:ma',
+            component: Loadable({ loading: Loading, loader: () => import('./adminDonViDangKyDetail') })
         }
     ],
 };
