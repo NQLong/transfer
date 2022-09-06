@@ -4,9 +4,27 @@ import T from 'view/js/common';
 const DtThoiKhoaBieuGetAll = 'DtThoiKhoaBieu:GetAll';
 const DtThoiKhoaBieuGetPage = 'DtThoiKhoaBieu:GetPage';
 const DtThoiKhoaBieuUpdate = 'DtThoiKhoaBieu:Update';
+const DtThoiKhoaBieuConfig = 'DtThoiKhoaBieu:Config';
+const DtThoiKhoaBieuConfigUpdate = 'DtThoiKhoaBieu:ConfigUpdate';
 
 export default function dtThoiKhoaBieuReducer(state = null, data) {
     switch (data.type) {
+        case DtThoiKhoaBieuConfigUpdate:
+            if (state) {
+                let currentState = Object.assign({}, state),
+                    dataCanGen = currentState.dataCanGen;
+                for (let i = 0, n = dataCanGen.length; i < n; i++) {
+                    if (dataCanGen[i].id == data.data.currentId) {
+                        dataCanGen.splice(i, 1, { ...dataCanGen[i], ...data.data.currentData });
+                        break;
+                    }
+                }
+                return Object.assign({}, state, currentState);
+            } else {
+                return null;
+            }
+        case DtThoiKhoaBieuConfig:
+            return Object.assign({}, data.items);
         case DtThoiKhoaBieuGetAll:
             return Object.assign({}, state, { items: data.items });
         case DtThoiKhoaBieuGetPage:
@@ -188,13 +206,94 @@ export function changeDtThoiKhoaBieu(item) {
 
 export function getDtLichDayHoc(phong, done) {
     return () => {
-        T.get('/api/dao-tao/get-schedule/', { phong }, data => {
+        T.get('/api/dao-tao/get-schedule', { phong }, data => {
             if (data.error) {
                 T.notify(`Lỗi: ${data.error.message}`, 'danger');
                 console.error(data.error.message);
             } else {
                 done && done(data);
             }
+        });
+    };
+}
+
+export function getDtThoiKhoaBieuByConfig(config, done) {
+    return dispatch => {
+        T.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', { config }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+                console.error(result.error.message);
+                done && done(result);
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfig, items: result });
+                done && done(result);
+            }
+        });
+    };
+}
+
+export function resetDtThoiKhoaBieuConfig(done) {
+    return dispatch => {
+        dispatch({ type: DtThoiKhoaBieuConfig, items: {} });
+        done && done();
+    };
+}
+
+export function updateDtThoiKhoaBieuConfig(data, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/thoi-khoa-bieu-condition';
+        T.put(url, { condition: data.currentId, changes: data.currentData }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+                console.error(result.error);
+            } else {
+                T.notify('Cập nhật thành công', 'success');
+                dispatch(getDtThoiKhoaBieuByConfig(data.config));
+                done && done();
+            }
+        });
+    };
+}
+
+export function dtThoiKhoaBieuGenTime(data, doneError, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/generate-time';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lỗi ${result.error.message || 'hệ thống'}`, 'danger');
+                doneError && doneError();
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfig, items: { dataCanGen: result.dataReturn } });
+                done && done(result.dataReturn);
+            }
+        });
+    };
+}
+
+export function dtThoiKhoaBieuGenRoom(data, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/generate-room-end-date';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lồi: ${result.error.message || 'Sinh tự động thất bại'}`, 'danger');
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfig, items: { dataCanGen: result.dataReturn } });
+                done && done(result.dataReturn);
+            }
+        });
+    };
+}
+
+export function updateDtThoiKhoaBieuGenData(data, done) {
+    return () => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/save-gen-data';
+        T.put(url, { data }, result => {
+            if (result.error) {
+                T.notify(`Lồi: ${result.error.message || 'cập nhật thất bại'}`, 'danger');
+            } else {
+                T.notify('Lưu dữ liệu thành công', 'success');
+            }
+            done && done(result);
         });
     };
 }

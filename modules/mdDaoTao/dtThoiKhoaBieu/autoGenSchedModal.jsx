@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import { AdminModal, FormDatePicker, FormSelect, getValue, renderTable } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { initSchedule, autoGenSched } from './redux';
-
+import { getScheduleSettings } from '../dtSettings/redux';
 
 const dataKhoaSinhVien = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i),
     dataThu = [2, 3, 4, 5, 6, 7],
@@ -25,6 +25,9 @@ dataTiet.forEach(tiet => {
 });
 class AutoGenModal extends AdminModal {
     state = { clicked: false }
+    componentDidMount() {
+        this.props.getScheduleSettings();
+    }
     onShow = () => {
         this.bacDaoTao.value('DH');
         let filter = this.props.filter;
@@ -77,6 +80,7 @@ class AutoGenModal extends AdminModal {
         });
     }
     render = () => {
+        console.log(this.props.dtTkbConfig);
         return this.renderModal({
             title: 'Cấu hình sinh thời khoá biểu',
             isLoading: this.state.isLoading,
@@ -117,8 +121,8 @@ class AutoGenModal extends AdminModal {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system });
+const mapStateToProps = state => ({ system: state.system, dtTkbConfig: state.daoTao.dtTkbConfig });
 const mapActionsToProps = {
-    initSchedule, autoGenSched
+    initSchedule, autoGenSched, getScheduleSettings
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(AutoGenModal);
