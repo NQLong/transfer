@@ -182,7 +182,7 @@ class StaffPage extends AdminPage {
                 let pageC = pageCondition;
                 pageC = typeof pageC === 'string' ? pageC : '';
                 if (pageC.length == 0) pageC = null;
-                T.download(T.url(`/api/staff/download-excel/${filter}/${pageC}`), 'DANH_SACH_CAN_BO.xlsx');
+                T.download(`/api/staff/download-excel/${filter}/${pageC}`, 'DANH_SACH_CAN_BO.xlsx');
                 setTimeout(() => {
                     this.setState({ exported: false });
                 }, 1000);
@@ -242,7 +242,7 @@ class StaffPage extends AdminPage {
                     <TableCell content={item.tenChucDanhNgheNghiep + ((item.ngach == '01.003' && item.isCvdt) ? ' (CVPVĐT & NCKH)' : '')} contentClassName='multiple-lines-2' />
                     <TableCell content={<>
                         {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh}<br /></span>}
-                        {item.tenDonVi ? (item.loaiDonVi == 1 ? ['16','18'].includes(item.maDonVi) ? 'Bộ môn ' : 'Khoa ' : '') + item.tenDonVi.normalizedName() : ''}
+                        {item.tenDonVi ? (item.loaiDonVi == 1 ? ['16', '18'].includes(item.maDonVi) ? 'Bộ môn ' : 'Khoa ' : '') + item.tenDonVi.normalizedName() : ''}
                     </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.email} />
                     <TableCell type='date' style={{ color: 'blue' }} dateFormat='dd/mm/yyyy' content={item.ngayBatDauCongTac} />
