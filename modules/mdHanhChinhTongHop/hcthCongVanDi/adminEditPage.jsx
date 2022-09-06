@@ -137,7 +137,6 @@ class AdminEditPage extends AdminPage {
     constructor(props) {
         super(props);
         this.updateFileRef = React.createRef();
-        this.uploadCommentFile = React.createRef();
     }
 
     listFileRefs = {};
@@ -558,7 +557,7 @@ class AdminEditPage extends AdminPage {
 
     onUploadFile = (e) => {
         e.preventDefault();
-        this.uploadCommentFile.current.uploadInput.click();
+        this.uploadCommentFile.uploadInput.click();
     }
 
     tableListFile = (data, id, permission, canAddFile, listYeuCauKi = []) => renderTable({
@@ -937,7 +936,7 @@ class AdminEditPage extends AdminPage {
                     success={this.onSuccess} ajax={true} />
                 <FileHistoryModal ref={e => this.historyFileMoal = e} data={groupListFile} fileId={this.state.updateFileId} isShowSubmit={false} />
 
-                <FileBox ref={this.uploadCommentFile} postUrl='/user/upload'
+                <FileBox ref={e => this.uploadCommentFile = e} postUrl='/user/upload'
                     uploadType='hcthVanBanDiCommentFile'
                     userData={`hcthVanBanDiCommentFile:${this.state.id}`}
                     style={{ display: 'none' }}
