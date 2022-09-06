@@ -54,7 +54,7 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
         filter = {};
     }
     return dispatch => {
-        const url = `/api/hcth/cong-van-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
+        const url = `/api/hcth/van-ban-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
         T.get(url).then(data => {
             if (data.error) {
                 T.alert('Công văn đến', 'Lấy danh sách công văn đến bị lỗi');
@@ -75,7 +75,7 @@ export function getMoreCongVanDenPage(pageNumber, pageSize, pageCondition, filte
         filter = {};
     }
     return dispatch => {
-        const url = `/api/hcth/cong-van-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
+        const url = `/api/hcth/van-ban-den/search/page/${pageNumber}/${pageSize}?${T.objectToQueryString({ condition: pageCondition, filter })}`;
         T.get(url).then(data => {
             if (data.error) {
                 T.alert('Công văn đến', 'Lấy danh sách công văn đến bị lỗi');
@@ -97,7 +97,7 @@ export function getCongVanDen(id, context, done) {
         context = {};
     }
     return dispatch => {
-        const url = `/api/hcth/cong-van-den/${id}`;
+        const url = `/api/hcth/van-ban-den/${id}`;
         T.get(url, { params: context }).then(data => {
             if (data.error) {
                 if (data.error.status == 401) {
@@ -116,7 +116,7 @@ export function getCongVanDen(id, context, done) {
 
 export function createPhanHoi(data, done) {
     return () => {
-        const url = '/api/hcth/cong-van-den/phan-hoi';
+        const url = '/api/hcth/van-ban-den/phan-hoi';
         T.post(url, { data }).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Thêm phản hồi bị lỗi');
@@ -130,7 +130,7 @@ export function createPhanHoi(data, done) {
 
 export function getPhanHoi(id, done) {
     return dispatch => {
-        const url = `/api/hcth/cong-van-den/phan-hoi/${id}`;
+        const url = `/api/hcth/van-ban-den/phan-hoi/${id}`;
         T.get(url).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Lấy danh sách phản hồi lỗi');
@@ -145,7 +145,7 @@ export function getPhanHoi(id, done) {
 
 export function createChiDao(data, done) {
     return () => {
-        const url = '/api/hcth/cong-van-den/chi-dao';
+        const url = '/api/hcth/van-ban-den/chi-dao';
         T.post(url, { data }).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Thêm chỉ đạo bị lỗi');
@@ -159,7 +159,7 @@ export function createChiDao(data, done) {
 
 export function traLaiCongVan(data, done) {
     return () => {
-        const url = '/api/hcth/cong-van-den/tra-lai';
+        const url = '/api/hcth/van-ban-den/tra-lai';
         T.put(url, data).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Trả lại công văn lỗi.\n' + res.error.errorMessage || '');
@@ -173,7 +173,7 @@ export function traLaiCongVan(data, done) {
 
 export function duyetCongVan(data, done) {
     return () => {
-        const url = '/api/hcth/cong-van-den/duyet';
+        const url = '/api/hcth/van-ban-den/duyet';
         T.put(url, data).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Duyệt công văn lỗi.\n' + res.error.errorMessage || '');
@@ -187,7 +187,7 @@ export function duyetCongVan(data, done) {
 
 export function getChiDao(id, done) {
     return dispatch => {
-        const url = `/api/hcth/cong-van-den/chi-dao/${id}`;
+        const url = `/api/hcth/van-ban-den/chi-dao/${id}`;
         T.get(url).then(res => {
             if (res.error) {
                 T.alert('Công văn đến', 'Lấy công văn chỉ đạo lỗi');
@@ -247,7 +247,7 @@ export function getStaffPage(pageNumber, pageSize, pageCondition, filter, done) 
 
 export function updateQuyenChiDao(id, shcc, trangThaiCv, status, done) {
     return (dispatch) => {
-        const url = '/api/hcth/cong-van-den/quyen-chi-dao';
+        const url = '/api/hcth/van-ban-den/quyen-chi-dao';
         T.post(url, { id, shcc, trangThaiCv, status }).then(res => {
             if (status) {
                 dispatch({ type: HcthCongVanDenAddCanBoChiDao, quyenChiDao: shcc});

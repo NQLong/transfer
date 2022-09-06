@@ -11,6 +11,7 @@ import { useTheme, Badge } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { addNotification } from './notification/redux';
 import commonStyles from '../../Asset/Styles/styles';
+import Key from './Key/Key';
 
 const Tab = createBottomTabNavigator();
 
@@ -86,6 +87,17 @@ export default DefaultScreenTabs = ({ navigation }) => {
             />
             <Tab.Screen
                 name="notification"
+                component={Key}
+                options={{
+                    headerTitle: 'Tạo khoá',
+                    tabBarLabel: 'Tạo khoá',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="key-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="key"
                 component={Notification}
                 options={{
                     headerTitle: 'Thông báo',

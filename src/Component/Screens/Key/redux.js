@@ -78,29 +78,9 @@ export function getCongVanTrinhKy(id, context, done) {
                 T.alert('Công văn trình ký', 'Lấy công văn trình ký bị lỗi!');
                 console.error('GET: ' + url + '.', data.error);
             } else {
-                console.log(data.item);
                 dispatch({ type: HcthCongVanTrinhKyGet, item: data.item });
                 done && done(data.item);
             }
         }).catch(() => T.alert('Công văn trình ký', 'Lấy công văn trình ký bị lỗi!'));
     }
 }
-
-export function getChuKyDienTuVanBanDi(data, done) {
-    return () => {
-        console.log('redux :', data);
-        const url = '/api/hcth/ky-dien-tu/van-ban-di';
-        T.get(url, { params: data }).then(res => {
-            if (res.error) {
-                T.alert('Lỗi', 'Lấy chữ kí điện tử lỗi');
-                console.error('GET: ' + url + '.', res.error);
-            } else {
-                done && done({ data: res });
-            }
-        }).catch((error) => {
-            console.log(error);
-            T.alert('Lỗi', 'Lấy chữ kí điện tử thành công')
-        });
-    }
-}
-

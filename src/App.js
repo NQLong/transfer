@@ -7,7 +7,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import type { Node } from 'react';
+import { Node } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';

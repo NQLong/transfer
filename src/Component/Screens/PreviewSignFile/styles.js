@@ -31,12 +31,11 @@ export default StyleSheet.create({
         alignItems: 'center'
     },  
     buttonContainer: {
-        flex: 1,
         // justifyContent: 'flex-end',
         position: 'absolute',
         // bottom: 100,
         right: 10, 
-        bottom: 70
+        bottom: 30
     },
     buttonSign: {
         justifyContent: 'center',
@@ -52,10 +51,10 @@ export default StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         shadowRadius: 10,
-        shadowColor: '#F02A4B',
+        shadowColor: '#000080',
         shadowOpacity: 0.3,
         shadowOffset: { height: 10 },
-        backgroundColor: '#F02A4B',
+        backgroundColor: '#000080',
         margin: 20
     },
     textSign: {
@@ -63,4 +62,30 @@ export default StyleSheet.create({
         textAlign: 'center',
         margin: 10,
     },
+
+    pdfBar: {
+        display: 'flex', 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+
+    prevTouch: {
+        padding: 10,
+        flex: 0.33,
+        alignItems: 'flex-start'
+    },
+
+    nextTouch: {
+        flex: 0.33,
+        padding: 10,
+        alignItems: 'flex-end'
+    },
+
+    paging: {
+        flex: 0.33,
+        padding: 10
+    }
+
+
 })

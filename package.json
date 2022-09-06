@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint .",
     "android:bundle:debug": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
-    "android:bundle:release": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/"
+    "android:bundle:release": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/",
+    "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/hcmussh/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.6",
@@ -23,8 +24,10 @@
     "@reduxjs/toolkit": "^1.8.2",
     "@types/react-native": "^0.67.8",
     "axios": "^0.27.2",
+    "blob-to-buffer": "^1.2.9",
     "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
+    "data-uri-to-buffer": "^4.0.0",
     "dateformat": "^5.0.3",
     "fbjs": "^3.0.4",
     "node-forge": "^1.3.1",
@@ -33,7 +36,7 @@
     "react": "17.0.2",
     "react-native": "^0.68.2",
     "react-native-animatable": "^1.3.3",
-    "react-native-blob-util": "^0.16.1",
+    "react-native-blob-util": "^0.16.2",
     "react-native-camera": "^4.2.1",
     "react-native-color-matrix-image-filters": "^5.2.14",
     "react-native-device-info": "^9.0.2",
