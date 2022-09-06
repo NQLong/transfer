@@ -4,11 +4,16 @@ module.exports = app => {
     app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear = async (nam) => {
         const listNhom = await app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam });
         const listId = listNhom.map(nhom => nhom.id);
-        if (listId.length > 0)
+        if (listId.length > 0) {
+            const listCount = await Promise.all(listId.map(idNhomDangKy => app.model.tccbDanhGiaCaNhanDangKy.count({ idNhomDangKy })));
+            if (listCount.some(count => count.rows[0]['COUNT(*)'] > 0)) {
+                throw 'Nhóm định mức đã có thông tin đăng ký, không thể xoá';
+            }
             await Promise.all([
                 app.model.tccbNhomDanhGiaNhiemVu.delete({ nam }),
                 app.model.tccbDinhMucCongViecGvVaNcv.delete({ statement: 'idNhom IN (:listId)', parameter: { listId } }),
             ]);
+        }
     };
 
     app.model.tccbDinhMucCongViecGvVaNcv.getAllByYear = async (nam) => {

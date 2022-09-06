@@ -205,8 +205,10 @@ class ComponentDMCV extends AdminPage {
             renderRow: (item, index) => (
                 <tbody key={index} style={{ backgroundColor: 'white' }}>
                     <tr key={`${index}-1`}>
-                        <TableCell style={{ textAlign: 'center' }} content={<b>{(index + 1).intToRoman()}</b>} />
-                        <TableCell style={{ textAlign: 'left' }} colSpan={5} content={<b>{item.ten}</b>} />
+                        <TableCell style={{ textAlign: 'center' }} className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
+                        <TableCell style={{ textAlign: 'left' }} className='text-primary' colSpan={4} content={<b>{item.ten}</b>} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateTccbNhomDanhGiaNhiemVu(item.id, { kichHoat: value ? 1 : 0, }, this.load)} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                             onEdit={() => this.nhomModal.show(item)}
                             onDelete={this.deleteNhom}
