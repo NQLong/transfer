@@ -887,7 +887,7 @@ class AdminEditPage extends AdminPage {
                                         <i className='fa fa-upload'></i>Thêm file
                                     </button>
                                     <button type='submit' className='btn btn-success mr-2' onClick={this.onCreatePhanHoi}>
-                                        <i className='fa fa-paper-plane'></i><i className='fa fa-paper-plane'></i>Thêm
+                                        <i className='fa fa-paper-plane'></i>Thêm
                                     </button>
                                     {this.canReturn() && <button type='submit' className='btn btn-danger' onClick={this.onReturnCvDi}>
                                         <i className='fa fa-reply'></i>Trả lại
