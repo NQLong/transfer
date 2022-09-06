@@ -12,7 +12,7 @@ import { renderScrollView } from '@/Utils/component';
 
 import T from '@/Utils/common';
 
-import styles from './styles';
+import styles from '../../Key/styles';
 import commonStyles from '../../../../Asset/Styles/styles';
 import style from '../../notification/style';
 import DocumentPicker, { types } from 'react-native-document-picker';
@@ -101,9 +101,10 @@ const FileList = ({ navigation }) => {
         } else {
             const items = fileKy.map((item, key) => {
                 const
-                    originalName = item.ten,
-                    linkFile = `${T.config.API_URL}api/hcth/cong-van-cac-phong/download/${id}/${originalName}`,
+                    originalName = item.tenFile,
+                    linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${originalName}`,
                     style = {};
+                console.log(linkFile);
                 if (key == 0) {
                     style.borderTopWidth = 0;
                 }
@@ -156,22 +157,25 @@ const CongVanTrinhKy = (props) => {
         dispatch(getCongVanTrinhKy(congVanId, context, done));
     }
 
-    const onPickKey = async () => {
-        const keyFile = await DocumentPicker.pick({
-            presentationStyle: 'fullScreen',
-            allowMultiSelection: false,
-        });
+    // const onPickKey = async () => {
+    //     const keyFile = await DocumentPicker.pick({
+    //         presentationStyle: 'fullScreen',
+    //         allowMultiSelection: false,
+    //     });
 
-        return fs.readFile(keyFile[0].uri, 'base64');
-    }
+    //     return fs.readFile(keyFile[0].uri, 'base64');
+    // }
 
     const confirmSign = async () => {
         try {
             const congVanId = route?.params?.congVanTrinhKyId;
-            const key = await onPickKey();
+            const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`; 
+            const key = RNFS.readFile(keyDir, 'base64');
             const file = fileKy[0],
-                linkFile = `${T.config.API_URL}api/hcth/cong-van-cac-phong/download/${id}/${file.ten}`;
-            navigation.push('ReadFile', { id: congVanId, key, file, source: { uri: linkFile, cache: true } });
+                linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${file.tenFile}`;
+
+            navigation.setOptions({ title: 'Updated!' });
+            navigation.push('SelectSignPos', { id: congVanId, key, file, source: { uri: linkFile, cache: true } });
             
         } catch (error) {
             console.error(error);

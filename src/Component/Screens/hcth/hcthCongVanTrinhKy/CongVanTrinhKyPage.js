@@ -8,7 +8,7 @@ import { getHcthCongVanTrinhKySearchPage, getMoreHcthCongVanTrinhKyPage } from '
 // import { renderScrollView, AdminModal } from '@/Utils/component';
 
 import commonStyles from '../../../../Asset/Styles/styles';
-import styles from './styles';
+import styles from '../../Key/styles';
 
 const initPageNumber = 1;
 const initPageSize = 10;
