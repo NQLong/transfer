@@ -45,6 +45,10 @@ module.exports = app => {
     app.get('/api/tccb/danh-gia/ca-nhan-dang-ky/all-by-year', app.permission.check('staff:login'), async (req, res) => {
         try {
             const nam = parseInt(req.query.nam), shcc = req.session.user.shcc;
+            const item = await app.model.tccbDanhGiaNam.get({ nam });
+            if (!item) {
+                return res.send({ items: [] });
+            }
             const canBo = await app.model.canBo.get({ shcc });
             if (!canBo.ngach && !canBo.chucDanh) {
                 return res.send({ items: [] });
@@ -123,10 +127,14 @@ module.exports = app => {
     app.post('/api/tccb/danh-gia/ca-nhan-dang-ky', app.permission.check('staff:login'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc, newItem = req.body.item, idNhom = parseInt(req.body.idNhom);
-            if (!(await checkDangKyHopLe(shcc, idNhom))) {
+            const [checkHopLe, item] = await Promise.all([
+                checkDangKyHopLe(shcc, idNhom),
+                app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 }, 'nam')
+            ]);
+            if (!checkHopLe) {
                 return res.send({ error: 'Bạn không có quyền đăng ký nhóm này' });
             }
-            const { nam } = await app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 });
+            const nam = item.nam;
             if (!nam) {
                 return res.send({ error: 'Đăng ký không thành công' });
             }
@@ -134,7 +142,7 @@ module.exports = app => {
             if (nldBatDauDangKy > Date.now() || Date.now() > nldKetThucDangKy) {
                 res.send({ error: 'Thời gian đăng ký không phù hợp' });
             } else {
-                newItem.shcc = req.session.user.shcc;
+                newItem.shcc = shcc;
                 newItem.idNhomDangKy = idNhom;
                 const item = await app.model.tccbDanhGiaCaNhanDangKy.create(newItem);
                 res.send({ item, nam });
@@ -147,10 +155,14 @@ module.exports = app => {
     app.put('/api/tccb/danh-gia/ca-nhan-dang-ky', app.permission.check('staff:login'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc, id = parseInt(req.body.id), changes = req.body.changes, idNhom = parseInt(req.body.idNhom);
-            if (!(await checkDangKyHopLe(shcc, idNhom))) {
+            const [checkHopLe, item] = await Promise.all([
+                checkDangKyHopLe(shcc, idNhom),
+                app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 }, 'nam')
+            ]);
+            if (!checkHopLe) {
                 return res.send({ error: 'Bạn không có quyền đăng ký nhóm này' });
             }
-            const { nam } = await app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 });
+            const nam = item.nam;
             if (!nam) {
                 return res.send({ error: 'Đăng ký không thành công' });
             }

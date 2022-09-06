@@ -5,11 +5,18 @@ module.exports = app => {
         const listNhom = await app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam });
         const listId = listNhom.map(nhom => nhom.id);
         if (listId.length > 0) {
-            const listCount = await Promise.all(listId.map(idNhomDangKy => app.model.tccbDanhGiaCaNhanDangKy.count({ idNhomDangKy })));
+            const listCount = await Promise.all(listId.map(idNhomDangKy => app.model.tccbDanhGiaCaNhanDangKy.count({ idNhomDangKy, dangKy: 1 })));
             if (listCount.some(count => count.rows[0]['COUNT(*)'] > 0)) {
                 throw 'Nhóm định mức đã có thông tin đăng ký, không thể xoá';
             }
+            const condition = {
+                statement: 'idNhomDangKy IN (:listId) AND dangKy = 0',
+                parameter: {
+                    listId
+                }
+            };
             await Promise.all([
+                app.model.tccbDanhGiaCaNhanDangKy.delete(condition),
                 app.model.tccbNhomDanhGiaNhiemVu.delete({ nam }),
                 app.model.tccbDinhMucCongViecGvVaNcv.delete({ statement: 'idNhom IN (:listId)', parameter: { listId } }),
             ]);
