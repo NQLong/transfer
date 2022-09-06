@@ -19,7 +19,9 @@ import { Title } from 'react-native-paper';
 const RNFS = require('react-native-fs');
 
 const SelectSignPosition = ({ navigation, route }) => {
-    const { source, page, key, file, id, x, y, scale} = route.params;
+    const { source, page, key, fileIndex, id, x, y, scale, listSignFile } = route.params;
+
+    const file = listSignFile[fileIndex];
 
     console.log(x, y);
 
@@ -31,12 +33,13 @@ const SelectSignPosition = ({ navigation, route }) => {
         navigation.push('CongVanTrinhKySign', { 
             key, 
             linkFile: source.uri, 
-            file,
+            fileIndex,
             id,
             x,
             y,
             scale,
-            page
+            page,
+            listSignFile
         });
     };
 

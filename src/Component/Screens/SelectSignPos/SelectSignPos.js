@@ -19,13 +19,17 @@ import { Title } from 'react-native-paper';
 const RNFS = require('react-native-fs');
 
 const SelectSignPosition = ({ navigation, route }) => {
-    const { source, key, file, id } = route.params;
+    const { source, key, fileIndex, id, listSignFile } = route.params;
+
+    const file = listSignFile[fileIndex];
+
+    const { config } = file;
 
     const [sourcePdf, setSourcePdf] = useState(source);
 
     const [page, setPage] = useState(1);
 
-    const [coordinates, setCoordinates] = useState({ x: 0, y: 0});
+    const [coordinates, setCoordinates] = useState({ x: config.xCoordinate ?? 0 , y: config.yCoordinate ?? 0});
 
     const [pageSize, setPageSize] = useState({ width: 0, height: 0});
 
@@ -46,10 +50,10 @@ const SelectSignPosition = ({ navigation, route }) => {
                 source: sourcePdf, 
                 id,
                 page,
-                x: coordinates.x * 1.6 -35,
-                y: coordinates.y* 1.6 - 215 - 40,
+                x: coordinates.x * 1.6 - 35,
+                y: coordinates.y * 1.6 - 215 - 40,
                 scale: 0.5,
-                file
+                fileIndex
             })},
                 //navigation.push('CongVanTrinhKySign', { key, linkFile: source.uri, id});
             {text: 'KHÔNG', style: 'cancel'}
@@ -109,7 +113,7 @@ const SelectSignPosition = ({ navigation, route }) => {
                     console.log(width, height);
 
                     let signPosX = coordinates.x * 1.6 - 35;
-                    let signPosY = height - coordinates.y * 1.6 - 25 + 215;
+                    let signPosY = height - coordinates.y * 1.6 - 190;
 
                     console.log(signPosX, signPosY);
 

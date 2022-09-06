@@ -13,6 +13,8 @@ import { addNotification } from './notification/redux';
 import commonStyles from '../../Asset/Styles/styles';
 import Key from './Key/Key';
 
+import VanBanDiPage from './hcth/hcthVanBanDi/VanBanDiPage';
+
 const Tab = createBottomTabNavigator();
 
 export default DefaultScreenTabs = ({ navigation }) => {
@@ -23,7 +25,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
 
     const dispatch = useDispatch();
 
-    useEffect(() => { 
+    useEffect(() => {
         if (!settings) navigation.navigate('');
 
         T.socket.on('receive-notification', (email, notifyItem) => {
@@ -31,7 +33,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
             if (user.email && user.email == email) {
                 dispatch(addNotification(notifyItem));
             }
-        });   
+        });
     }, [settings]);
 
     const { colors } = useTheme();
@@ -56,6 +58,23 @@ export default DefaultScreenTabs = ({ navigation }) => {
                     ),
                     headerRight: () => (
                         <TouchableOpacity onPress={() => { navigation.navigate('FilterCongVanDen') }} style={{ width: 30, marginRight: 15 }}>
+                            <Ionicons name='search-outline' color='white' style={{ fontSize: 25 }} />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+
+            <Tab.Screen
+                name="vanBanDiPage"
+                component={VanBanDiPage}
+                options={{
+                    headerTitle: 'Văn bản đi',
+                    tabBarLabel: 'Văn bản đi',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="reader-outline" color={color} size={size} />
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => { navigation.navigate('VanBanDiFilter') }} style={{ width: 30, marginRight: 15 }}>
                             <Ionicons name='search-outline' color='white' style={{ fontSize: 25 }} />
                         </TouchableOpacity>
                     ),

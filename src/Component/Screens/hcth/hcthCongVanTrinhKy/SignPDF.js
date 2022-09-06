@@ -159,7 +159,7 @@ import {
             pdf.slice(byteRange[1]),
         ]);
         
-        return pdf;
+        return { pdf, signAt: Date.now() };
     }
   
     /**

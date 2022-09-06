@@ -22,7 +22,9 @@ import SignPDF from './SignPDF';
 
 const CongVanTrinhKySign = ({ navigation, route }) => {
     const dispatch = useDispatch();
-    const { key, linkFile, file, x, y, scale, page, id } = route.params;
+    const { key, linkFile, fileIndex, x, y, scale, page, id, listSignFile } = route.params;
+
+    const file = listSignFile[fileIndex];
     const user = useSelector(state => state?.settings?.user);
     const [passphrase, setPassphrase] = useState('');
 
@@ -66,7 +68,7 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                     Buffer.from(key, 'base64')
                 );
                 
-                const pdfBuffer = await signPdf.signPDF('12345678');
+                const { pdf: pdfBuffer, signAt } = await signPdf.signPDF('12345678');
 
                 var path = fs.DocumentDirectoryPath + '/test.pdf';
                 console.log(path);
@@ -103,8 +105,7 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                             'Accept': 'application/pdf',
                         },
                         fields: {
-                            'userData': `hcthKyDienTu:${file.ma}`,
-                            'fileId': id
+                            'userData': `hcthKyDienTu:${file.vanBanDi}:${file.id}:${signAt}`,
                         },
                         begin: upload,
                         progress: uploadProgress,
@@ -129,7 +130,16 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                         console.log(err);
                     });
                 })
-                navigation.navigate('congVanTrinhKyPage');
+
+                if (fileIndex < listSignFile.length) {
+                    const congVanId = route?.params?.vanBanDiId;
+                    const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`; 
+                    const key = RNFS.readFile(keyDir, 'base64');
+                    const signFile = listSignFile[fileIndex + 1],
+                        linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${signFile.file.tenFile}`;
+        
+                    navigation.navigate('SelectSignPos', { id: congVanId, key, fileIndex: fileIndex + 1, listSignFile, source: { uri: linkFile, cache: true } });
+                } else navigation.navigate('congVanTrinhKyPage');
 
             }));
             // const file = await getFile(linkFile);

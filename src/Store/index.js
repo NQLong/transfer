@@ -9,10 +9,13 @@ import Reactotron from 'reactotron-react-native';
 import settings from './settings';
 import hcthCongVanDen from '@/Component/Screens/hcth/hcthCongVanDen/redux';
 // import hcthCongVanCacPhong from '@/Component/Screens/hcth/hcthCongVanCacPhong/redux';
+
+import hcthVanBanDi from '@/Component/Screens/hcth/hcthVanBanDi/redux';
 import hcthCongVanTrinhKy from '@/Component/Screens/hcth/hcthCongVanTrinhKy/redux';
 import notification from '@/Component/Screens/notification/redux';
 
-const reducers = combineReducers({ settings, hcthCongVanDen, hcthCongVanTrinhKy, notification });
+
+const reducers = combineReducers({ settings, hcthCongVanDen, hcthCongVanTrinhKy, notification, hcthVanBanDi });
 
 const persistConfig = {
     key: 'root',

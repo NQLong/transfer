@@ -17,6 +17,9 @@ import ReadFile from './ReadFile/ReadFile';
 import CongVanDenFilter from './hcth/hcthCongVanDen/CongVanDenFilter';
 import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
 import CongVanTrinhKySign from './hcth/hcthCongVanTrinhKy/CongVanTrinhKySign';
+import VanBanDi from './hcth/hcthVanBanDi/VanBanDi';
+
+import VanBanDiFilter from './hcth/hcthVanBanDi/VanBanDiFilter';
 import ScanQRCode from './ScanQRCode/ScanQRCode';
 import SelectSignPosition from './SelectSignPos/SelectSignPos';
 import PreviewSignFile from './PreviewSignFile/PreviewSignFile';
@@ -42,6 +45,8 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKy' component={CongVanTrinhKy} />
             <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKySign' component={CongVanTrinhKySign} />
             <Stack.Screen options={{ headerTitle: 'Lấy key'}} name="ScanQRCode" component={ScanQRCode}/>
+            <Stack.Screen options={{ headerTitle: 'Văn bản đi' }} name='VanBanDi' component={VanBanDi} />
+            <Stack.Screen options={{ headerTitle: 'Văn bản đi' }} name='VanBanDiFilter' component={VanBanDiFilter} />
 
         </Stack.Navigator>
     )
