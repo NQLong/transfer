@@ -1,311 +1,215 @@
-CREATE OR REPLACE FUNCTION DT_THOI_KHOA_BIEU_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, filter IN STRING,
-                                              searchTerm IN STRING,
-                                              totalItem OUT NUMBER, pageTotal OUT NUMBER,
-                                              thoiGianPhanCong OUT SYS_REFCURSOR) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION TCCB_CAN_BO_DOWNLOAD_EXCEL(filter IN STRING, searchTerm IN STRING) RETURN SYS_REFCURSOR
 AS
-    my_cursor            SYS_REFCURSOR;
-    sT                   STRING(502) := '%' || lower(searchTerm) || '%';
-    donVi                STRING(10);
-    namFilter            STRING(10);
-    hocKy                STRING(1);
-    bacDaoTaoFilter      STRING(10);
-    khoaSinhVienFilter   STRING(4);
-    loaiHinhDaoTaoFilter STRING(10);
-    phongFilter          STRING(10);
-    thuFilter            STRING(2);
-    monHocFilter         STRING(20);
+    canbosys        SYS_REFCURSOR;
+    ST              STRING(500) := '%' || lower(searchTerm) || '%';
+    listShcc        STRING(100);
+    listDonVi       STRING(100);
+    listNgach       STRING(100);
+    listHocVi       STRING(100);
+    listChucDanh    STRING(100);
+    gender          STRING(3);
+    isBienChe       NUMBER;
+    fromYear        NUMBER;
+    toYear          NUMBER;
+    listDanToc      STRING(100);
+    listTonGiao     STRING(100);
+    loaiHopDong     NUMBER;
+    loaiChuyenVien  NUMBER;
+    listQuocGia     STRING(100);
+    fromAge         NUMBER;
+    toAge           NUMBER;
+    listChuyenNganh STRING(100);
 BEGIN
-    SELECT JSON_VALUE(filter, '$.namFilter') INTO namFilter FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.bacDaoTaoFilter') INTO bacDaoTaoFilter FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.loaiHinhDaoTaoFilter') INTO loaiHinhDaoTaoFilter FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.khoaSinhVienFilter') INTO khoaSinhVienFilter FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listShcc') INTO listShcc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listDonVi') INTO listDonVi FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.gender') INTO gender FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listNgach') INTO listNgach FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listHocVi') INTO listHocVi FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listChucDanh') INTO listChucDanh FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.isBienChe') INTO isBienChe FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.fromYear') INTO fromYear FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.toYear') INTO toYear FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listDanToc') INTO listDanToc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listTonGiao') INTO listTonGiao FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.loaiHopDong') INTO loaiHopDong FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.loaiChuyenVien') INTO loaiChuyenVien FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listQuocGia') INTO listQuocGia FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.fromAge') INTO fromAge FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.toAge') INTO toAge FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listChuyenNganh') INTO listChuyenNganh FROM DUAL;
 
-    SELECT JSON_VALUE(filter, '$.donVi') INTO donVi FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.phongFilter') INTO phongFilter FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.thuFilter') INTO thuFilter FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.monHocFilter') INTO monHocFilter FROM DUAL;
-
-    SELECT COUNT(*)
-    INTO totalItem
-    FROM DT_THOI_KHOA_BIEU TKB
-             LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
-             LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
-             LEFT JOIN DM_MON_HOC DMMH ON DMMH.MA = TKB.MA_MON_HOC
-             LEFT JOIN DM_DON_VI DV ON DV.MA = DMMH.KHOA
-             LEFT JOIN (SELECT GV.ID_THOI_KHOA_BIEU                          ID,
-                               LISTAGG(GV.GIANG_VIEN || '_' || TD.VIET_TAT || CB.HO || ' ' || CB.TEN, ',')
-                                       WITHIN GROUP (ORDER BY GV.GIANG_VIEN) LISTGV
-                        FROM DT_THOI_KHOA_BIEU_GIANG_VIEN GV
-                                 LEFT JOIN TCHC_CAN_BO CB on GV.GIANG_VIEN = CB.SHCC
-                                 LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
-                        WHERE TYPE = 'GV'
-                        GROUP BY GV.ID_THOI_KHOA_BIEU
-                        ORDER BY GV.ID_THOI_KHOA_BIEU) LISTGV on LISTGV.ID = TKB.ID
-             LEFT JOIN (SELECT GV.ID_THOI_KHOA_BIEU                          ID,
-                               LISTAGG(GV.GIANG_VIEN || '_' || TD.VIET_TAT || CB.HO || ' ' || CB.TEN, ',')
-                                       WITHIN GROUP (ORDER BY GV.GIANG_VIEN) LISTTG
-                        FROM DT_THOI_KHOA_BIEU_GIANG_VIEN GV
-                                 LEFT JOIN TCHC_CAN_BO CB on GV.GIANG_VIEN = CB.SHCC
-                                 LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
-                        WHERE TYPE = 'TG'
-                        GROUP BY GV.ID_THOI_KHOA_BIEU
-                        ORDER BY GV.ID_THOI_KHOA_BIEU) LISTTG on LISTTG.ID = TKB.ID
-             LEFT JOIN (SELECT LISTAGG(sTKBN.ID_NGANH, ',') WITHIN GROUP (ORDER BY NULL) AS ID_NGANH,
-                               sTKBN.ID_THOI_KHOA_BIEU,
-                               LISTAGG(NDT.KHOA, ',') WITHIN GROUP (ORDER BY NULL)       AS KHOA_NGANH,
-                               LISTAGG(DSCN.KHOA, ',') WITHIN GROUP (ORDER BY NULL)      AS KHOA_CN
-                        FROM DT_THOI_KHOA_BIEU_NGANH sTKBN
-                                 LEFT JOIN DT_THOI_KHOA_BIEU sTKB ON sTKBN.ID_THOI_KHOA_BIEU = sTKB.ID
-                                 LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN sTKBN.ID_NGANH
-                                 LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH DSCN
-                                           ON (DSCN.NGANH || '##' || DSCN.ID) IN sTKBN.ID_NGANH
-                        GROUP BY sTKBN.ID_THOI_KHOA_BIEU) TKBN ON TKBN.ID_THOI_KHOA_BIEU = TKB.ID
-
-    WHERE (khoaSinhVienFilter IS NULL OR khoaSinhVienFilter = '' OR TKB.KHOA_SINH_VIEN = khoaSinhVienFilter)
-      AND (namFilter IS NULL OR namFilter = '' OR namFilter = TKB.NAM)
-      AND (hocKy IS NULL OR hocKy = '' OR hocKy = TKB.HOC_KY)
-      AND (donVi IS NULL OR donVi = '' OR donVi IN (SELECT regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level)
-                                                    from dual
-                                                    connect by regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level) is not null)
-        OR donVi IN (SELECT regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level)
-                     from dual
-                     connect by regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level) is not null)
-        )
-      AND (bacDaoTaoFilter IS NULL OR bacDaoTaoFilter = '' OR bacDaoTaoFilter = TKB.BAC_DAO_TAO)
-      AND (loaiHinhDaoTaoFilter IS NULL OR loaiHinhDaoTaoFilter = '' OR
-           loaiHinhDaoTaoFilter = TKB.LOAI_HINH_DAO_TAO)
-      AND (phongFilter IS NULL OR phongFilter = '' OR phongFilter = TKB.PHONG)
-      AND (thuFilter IS NULL OR thuFilter = '' OR thuFilter = TKB.THU)
-      AND (monHocFilter IS NULL OR monHocFilter = '' OR monHocFilter = TKB.MA_MON_HOC)
-
-      AND (searchTerm = ''
-        OR LOWER(TRIM(DMMH.TEN)) LIKE sT
-        OR LOWER(TRIM(DV.TEN)) LIKE sT
-        OR LOWER(TRIM(TKB.MA_MON_HOC)) LIKE sT
-        OR LOWER(TRIM(TKB.HOC_KY)) LIKE sT
-        OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
-        OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm));
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN thoiGianPhanCong FOR
+    OPEN canbosys FOR
         SELECT *
-        FROM (SELECT TGPC.BAT_DAU                         AS "batDau",
-                     TGPC.KET_THUC                        AS "ketThuc",
-                     TGPC.DON_VI                          AS "donVi",
-                     DV.TEN                               AS "tenDonVi",
-                     CTKDT.NAM_DAO_TAO                    AS "namDaoTao",
-                     TGPC.HOC_KY                          AS "hocKy",
+        FROM (SELECT CB.SHCC                                                    AS "shcc",
+                     CB.HO                                                      AS "ho",
+                     CB.TEN                                                     AS "ten",
+                     CB.PHAI                                                    AS "phai",
+                     CB.MA_DON_VI                                               AS "maDonVi",
+                     DV.TEN                                                     AS "tenDonVi",
+                     NG.MA                                                      AS "ngach",
+                     NG.TEN                                                     AS "tenChucDanhNgheNghiep",
+                     TRINH_DO.TEN                                               AS "hocVi",
+                     CB.NAM_HOC_VI                                              AS "namHocVi",
+                     CD.TEN                                                     AS "hocHam",
+                     CB.NAM_CHUC_DANH                                           AS "namChucDanh",
+                     CB.CHUYEN_NGANH_CHUC_DANH                                  AS "chuyenNganhChucDanh",
+                     CB.NGAY_BAT_DAU_CONG_TAC                                   AS "ngayBatDauCongTac",
+                     CB.NGAY_BIEN_CHE                                           AS "ngayBienChe",
+                     CB.THAC_SI                                                 AS "thacSi",
+                     CB.TIEN_SI                                                 AS "tienSi",
+                     CB.CHUYEN_NGANH                                            AS "chuyenNganh",
+                     CB.QUE_QUAN                                                AS "queQuan",
+                     CB.IS_CVDT                                                 AS "isCvdt",
+                     CB.IS_HDTN                                                 AS "isHdtn",
+                     CB.HOC_VI_NOI_TOT_NGHIEP                                   AS "hocViNoiTotNghiep",
+                     CB.TRINH_DO_PHO_THONG                                      AS "trinhDoPhoThong",
+                     CB.HE_SO_LUONG                                             AS "heSoLuong",
+                     CB.BAC_LUONG                                               AS "bacLuong",
+                     CB.MOC_NANG_LUONG                                          AS "mocNangLuong",
+                     CB.TY_LE_VUOT_KHUNG                                        AS "tyLeVuotKhung",
+                     CB.TY_LE_PHU_CAP_THAM_NIEN                                 AS "phuCapThamNien",
+                     CB.TY_LE_PHU_CAP_UU_DAI                                    AS "phuCapUuDai",
+                     CB.CMND                                                    AS "cmnd",
+                     CB.CMND_NGAY_CAP                                           AS "cmndNgayCap",
+                     CB.CMND_NOI_CAP                                            AS "cmndNoiCap",
+                     CB.DANH_HIEU                                               AS "danhHieu",
+                     CB.DANG_VIEN                                               AS "dangVien",
+                     CB.GHI_CHU                                                 AS "ghiChu",
+                     (SELECT DMCV.TEN
+                      FROM QT_CHUC_VU QTCV
+                               LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = QTCV.MA_CHUC_VU
+                      WHERE QTCV.SHCC = CB.SHCC
+                        AND CHUC_VU_CHINH = 1)                                  AS "chucVuChinh",
 
-                     (SELECT COUNT(*)
-                      FROM DT_THOI_KHOA_BIEU TKB
-                               LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
-                               LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
-                               LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
-                      WHERE (TGMM.KICH_HOAT = 1)
-                        AND TKB.KHOA_DANG_KY = DV.MA)     AS "tongSoLop",
+                     (SELECT QTCV.MA_CHUC_VU
+                      FROM QT_CHUC_VU QTCV
+                      WHERE QTCV.SHCC = CB.SHCC
+                        AND CHUC_VU_CHINH = 1)                                  AS "maChucVuChinh",
 
-                     (SELECT COUNT(*)
-                      FROM DT_THOI_KHOA_BIEU TKB
-                               LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
-                               LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
-                               LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
-                      WHERE (TGMM.KICH_HOAT = 1)
-                        AND TKB.KHOA_DANG_KY = DV.MA
-                        AND (TKB.GIANG_VIEN IS NOT NULL)) AS "daPhanCong"
+                     (SELECT QTCV.NGAY_RA_QD
+                      FROM QT_CHUC_VU QTCV
+                      WHERE QTCV.SHCC = CB.SHCC
+                        AND CHUC_VU_CHINH = 1)                                  AS "boNhiemNgay",
 
-              FROM DT_THOI_GIAN_PHAN_CONG TGPC
-                       LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TGPC.NAM
-                       LEFT JOIN DT_THOI_GIAN_MO_MON TGMM ON TGMM.NAM = CTKDT.ID
-                       LEFT JOIN DM_DON_VI DV ON DV.MA = TGPC.DON_VI
-              WHERE (donVi IS NULL OR donVi = '' OR donVi = TGPC.DON_VI));
+                     (SELECT DMCV.PHU_CAP
+                      FROM QT_CHUC_VU QTCV
+                               LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = QTCV.MA_CHUC_VU
+                      WHERE QTCV.SHCC = CB.SHCC
+                        AND CHUC_VU_CHINH = 1)                                  AS "phuCapChucVu",
+                     (CASE
+                          WHEN CB.NGAY_BIEN_CHE IS NULL THEN 'Hợp đồng'
+                          ELSE 'Biên chế'
+                         END)                                                   AS "loaiCanBo",
+                     (select LISTAGG(dmqg.TEN_QUOC_GIA, '-') WITHIN GROUP ( ORDER BY NULL)
+                      FROM DM_QUOC_GIA dmqg
+                      WHERE INSTR(CB.HOC_VI_NOI_TOT_NGHIEP, dmqg.MA_CODE) != 0) AS "danhSahcQuocGiaHocViNoiTotNghiep",
+--                         (CASE
+--                              WHEN CB.TIEN_SI = 1 THEN
+--                                  (SELECT qtdt.KET_THUC
+--                                   FROM QT_DAO_TAO qtdt
+--                                   WHERE qtdt.SHCC = CB.SHCC
+--                                     AND qtdt.TRINH_DO = '4' AND ROWNUM <= 1)
+--                             END)                  AS "ngayCapNhatTienSi",
+--                         (CASE WHEN CB.THAC_SI = 1 THEN
+--                                  (SELECT qtdt.KET_THUC
+--                                    FROM QT_DAO_TAO qtdt
+--                                    WHERE qtdt.SHCC = CB.SHCC AND qtdt.TRINH_DO = '3' AND ROWNUM <= 1)
+--                             END)                  AS "ngayCapNhatThacSi",
 
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (SELECT TKB.ID                   AS          "id",
-                     TKB.PHONG                AS          "phong",
-                     TKB.THU                  AS          "thu",
-                     TKB.TIET_BAT_DAU         AS          "tietBatDau",
-                     TKB.SO_TIET_BUOI         AS          "soTiet",
-                     TKB.HOC_KY               AS          "hocKy",
-                     TKB.NAM                  AS          "nam",
-                     TKB.MA_MON_HOC           AS          "maMonHoc",
-                     TKB.NGAY_BAT_DAU         AS          "ngayBatDau",
-                     TKB.NGAY_KET_THUC        AS          "ngayKetThuc",
-                     TKB.LOAI_MON_HOC         AS          "loaiMonHoc",
-                     TKB.NHOM                 AS          "nhom",
-                     TKB.SO_LUONG_DU_KIEN     AS          "soLuongDuKien",
-                     DV.TEN                   AS          "tenKhoaBoMon",
-                     DV.MA                    AS          "maKhoaBoMon",
-                     DMMH.TEN                 AS          "tenMonHoc",
-                     DMMH.TONG_TIET           AS          "tongTiet",
-                     TKB.KHOA_DANG_KY         AS          "khoaDangKy",
-                     DV1.TEN                  AS          "tenKhoaDangKy",
-                     TKB.GIANG_VIEN           as          "giangVien",
-                     TKB.SUC_CHUA             AS          "sucChua",
-                     TKB.BUOI                 AS          "buoi",
-                     TKB.IS_MO                AS          "isMo",
-                     CTKDT.NAM_DAO_TAO        AS          "namDaoTao",
-                     TKB.BAC_DAO_TAO          AS          "bacDaoTao",
-                     TKB.LOAI_HINH_DAO_TAO    AS          "loaiHinhDaoTao",
-                     LISTGV.LISTGV            AS          "listGiangVien",
-                     LISTTG.LISTTG            AS          "listTroGiang",
-                     (SELECT LISTAGG(sNDT.MA_NGANH, ',') WITHIN GROUP (
-                         order by sTKB.ID
-                         )
-                      FROM DT_THOI_KHOA_BIEU sTKB
-                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
-                               INNER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
-                      WHERE sTKB.ID = TKB.ID) AS          "maNganh",
+                     CB.NGAY_SINH                                               AS "ngaySinh",
+                     CB.EMAIL                                                   AS "email",
 
-                     (SELECT LISTAGG((TO_CHAR(sNDT.MA_NGANH) || '%' || sNDT.TEN_NGANH), '&&') WITHIN GROUP (
-                         order by sTKB.ID
-                         )
-                      FROM DT_THOI_KHOA_BIEU sTKB
-                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
-                               INNER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
-                      WHERE sTKB.ID = TKB.ID) AS          "tenNganh",
+                     dmDanToc.MA                                                AS "maDanToc",
+                     dmDanToc.TEN                                               AS "tenDanToc",
 
-                     (SELECT LISTAGG(TO_CHAR(sCN.NGANH) || '%' || sCN.TEN, '&&') WITHIN GROUP (
-                         order by sTKB.ID
-                         )
-                      FROM DT_THOI_KHOA_BIEU sTKB
-                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
-                               LEFT OUTER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
-                               INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
-                                          ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
-                      WHERE sTKB.ID = TKB.ID) AS          "tenChuyenNganh",
+                     dmTonGiao.MA                                               AS "maTonGiao",
+                     dmTonGiao.TEN                                              AS "tenTonGiao",
 
-                     (SELECT LISTAGG(sCN.ID, ',') WITHIN GROUP (
-                         order by sTKB.ID
-                         )
-                      FROM DT_THOI_KHOA_BIEU sTKB
-                               INNER JOIN DT_THOI_KHOA_BIEU_NGANH sTKBN ON sTKB.ID = sTKBN.ID_THOI_KHOA_BIEU
-                               LEFT OUTER JOIN DT_NGANH_DAO_TAO sNDT ON sNDT.MA_NGANH = sTKBN.ID_NGANH
-                               INNER JOIN DT_DANH_SACH_CHUYEN_NGANH sCN
-                                          ON (sCN.NGANH || '##' || TO_CHAR(sCN.ID)) = sTKBN.ID_NGANH
-                      WHERE sTKB.ID = TKB.ID) AS          "maChuyenNganh",
+                     ROW_NUMBER() OVER (ORDER BY CB.TEN)                           R
+              FROM TCHC_CAN_BO CB
+                       LEFT JOIN DM_DON_VI DV on CB.MA_DON_VI = DV.MA
+                       LEFT JOIN DM_TRINH_DO TRINH_DO ON TRINH_DO.MA = CB.HOC_VI
+                       LEFT JOIN DM_NGACH_CDNN NG on CB.NGACH = NG.MA
+                       LEFT JOIN DM_CHUC_DANH_KHOA_HOC CD ON CB.CHUC_DANH = CD.MA
+                       LEFT JOIN DM_DAN_TOC dmDanToc ON CB.DAN_TOC = dmDanToc.MA
+                       LEFT JOIN DM_TON_GIAO dmTonGiao ON CB.TON_GIAO = dmTonGiao.MA
 
-                     TKB.KHOA_SINH_VIEN       AS          "khoaSinhVien",
-                     ROW_NUMBER() OVER (ORDER BY TKB.THU) R
-              FROM DT_THOI_KHOA_BIEU TKB
-                       LEFT JOIN DT_CAU_TRUC_KHUNG_DAO_TAO CTKDT ON CTKDT.ID = TKB.NAM
-                       LEFT JOIN DM_DON_VI DV1 ON DV1.MA = TKB.KHOA_DANG_KY
-                       LEFT JOIN DM_MON_HOC DMMH ON DMMH.MA = TKB.MA_MON_HOC
-                       LEFT JOIN DM_DON_VI DV ON DV.MA = DMMH.KHOA
-                       LEFT JOIN (SELECT GV.ID_THOI_KHOA_BIEU                          ID,
-                                         LISTAGG(GV.GIANG_VIEN || '_' || TD.VIET_TAT || CB.HO || ' ' || CB.TEN, ',')
-                                                 WITHIN GROUP (ORDER BY GV.GIANG_VIEN) LISTGV
-                                  FROM DT_THOI_KHOA_BIEU_GIANG_VIEN GV
-                                           LEFT JOIN TCHC_CAN_BO CB on GV.GIANG_VIEN = CB.SHCC
-                                           LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
-                                  WHERE TYPE = 'GV'
-                                  GROUP BY GV.ID_THOI_KHOA_BIEU
-                                  ORDER BY GV.ID_THOI_KHOA_BIEU) LISTGV on LISTGV.ID = TKB.ID
-                       LEFT JOIN (SELECT GV.ID_THOI_KHOA_BIEU                          ID,
-                                         LISTAGG(GV.GIANG_VIEN || '_' || TD.VIET_TAT || CB.HO || ' ' || CB.TEN, ',')
-                                                 WITHIN GROUP (ORDER BY GV.GIANG_VIEN) LISTTG
-                                  FROM DT_THOI_KHOA_BIEU_GIANG_VIEN GV
-                                           LEFT JOIN TCHC_CAN_BO CB on GV.GIANG_VIEN = CB.SHCC
-                                           LEFT JOIN DM_TRINH_DO TD ON TD.MA = CB.HOC_VI
-                                  WHERE TYPE = 'TG'
-                                  GROUP BY GV.ID_THOI_KHOA_BIEU
-                                  ORDER BY GV.ID_THOI_KHOA_BIEU) LISTTG on LISTTG.ID = TKB.ID
-                       LEFT JOIN (SELECT LISTAGG(sTKBN.ID_NGANH, ',') WITHIN GROUP (ORDER BY NULL) AS ID_NGANH,
-                                         sTKBN.ID_THOI_KHOA_BIEU,
-                                         LISTAGG(NDT.KHOA, ',') WITHIN GROUP (ORDER BY NULL)       AS KHOA_NGANH,
-                                         LISTAGG(DSCN.KHOA, ',') WITHIN GROUP (ORDER BY NULL)      AS KHOA_CN
-                                  FROM DT_THOI_KHOA_BIEU_NGANH sTKBN
-                                           LEFT JOIN DT_THOI_KHOA_BIEU sTKB ON sTKBN.ID_THOI_KHOA_BIEU = sTKB.ID
-                                           LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN sTKBN.ID_NGANH
-                                           LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH DSCN
-                                                     ON (DSCN.NGANH || '##' || DSCN.ID) IN sTKBN.ID_NGANH
-                                  GROUP BY sTKBN.ID_THOI_KHOA_BIEU) TKBN
-                                 ON TKBN.ID_THOI_KHOA_BIEU = TKB.ID
-
---                        LEFT JOIN DT_NGANH_DAO_TAO NDT ON NDT.MA_NGANH IN TKBN.ID_NGANH
---                        LEFT JOIN DT_DANH_SACH_CHUYEN_NGANH DSCN ON (DSCN.NGANH || '##' || DSCN.ID) IN TKBN.ID_NGANH
-
-              WHERE (khoaSinhVienFilter IS NULL OR khoaSinhVienFilter = '' OR TKB.KHOA_SINH_VIEN = khoaSinhVienFilter)
-                AND (namFilter IS NULL OR namFilter = '' OR namFilter = TKB.NAM)
-                AND (hocKy IS NULL OR hocKy = '' OR hocKy = TKB.HOC_KY)
-                AND (donVi IS NULL OR donVi = '' OR donVi IN (SELECT regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level)
-                                                              from dual
-                                                              connect by regexp_substr(TKBN.KHOA_NGANH, '[^,]+', 1, level) is not null)
-                  OR donVi IN (SELECT regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level)
-                               from dual
-                               connect by regexp_substr(TKBN.KHOA_CN, '[^,]+', 1, level) is not null)
+              WHERE (
+                      ((listShcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
+                                                             from dual
+                                                             connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
+                          OR
+                       (listDonVi IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
+                                                                   from dual
+                                                                   connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
+                          OR (listShcc IS NULL AND listDonVi IS NULL))
+                      AND (gender IS NULL OR gender IS NOT NULL AND CB.PHAI = gender)
+                      AND (listNgach IS NULL OR
+                           listNgach IS NOT NULL AND CB.NGACH IN (SELECT regexp_substr(listNgach, '[^,]+', 1, level)
+                                                                  from dual
+                                                                  connect by regexp_substr(listNgach, '[^,]+', 1, level) is not null))
+                      AND (listHocVi IS NULL OR
+                           listHocVi IS NOT NULL AND CB.HOC_VI IN (SELECT regexp_substr(listHocVi, '[^,]+', 1, level)
+                                                                   from dual
+                                                                   connect by regexp_substr(listHocVi, '[^,]+', 1, level) is not null))
+                      AND (listChucDanh IS NULL OR
+                           listChucDanh IS NOT NULL AND
+                           CB.CHUC_DANH IN (SELECT regexp_substr(listChucDanh, '[^,]+', 1, level)
+                                            from dual
+                                            connect by regexp_substr(listChucDanh, '[^,]+', 1, level) is not null))
+                      AND (isBienChe IS NULL OR
+                           (isBienChe = 0 AND NGAY_BIEN_CHE IS NOT NULL) OR
+                           (isBienChe = 1 AND NGAY_BIEN_CHE IS NULL)
+                          )
+                      AND (fromYear IS NULL OR
+                           (CB.NGAY_BAT_DAU_CONG_TAC IS NOT NULL AND CB.NGAY_BAT_DAU_CONG_TAC >= fromYear))
+                      AND
+                      (toYear IS NULL OR (CB.NGAY_BAT_DAU_CONG_TAC IS NOT NULL AND CB.NGAY_BAT_DAU_CONG_TAC <= toYear))
+                      AND (listDanToc IS NULL OR (CB.DAN_TOC IN (SELECT regexp_substr(listDanToc, '[^,]+', 1, level)
+                                                                 from dual
+                                                                 connect by regexp_substr(listDanToc, '[^,]+', 1, level) is not null)))
+                      AND (listTonGiao IS NULL OR (CB.TON_GIAO IN (SELECT regexp_substr(listTonGiao, '[^,]+', 1, level)
+                                                                   from dual
+                                                                   connect by regexp_substr(listTonGiao, '[^,]+', 1, level) is not null)))
+                      AND (listQuocGia IS NULL OR (CB.HOC_VI_NOI_TOT_NGHIEP IS NOT NULL AND
+                                                   EXISTS(
+                                                           SELECT regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level)
+                                                           from dual
+                                                           connect by regexp_substr(TO_CHAR(CB.HOC_VI_NOI_TOT_NGHIEP), '[^,]+', 1, level) is not null
+                                                           INTERSECT
+                                                           SELECT regexp_substr(listQuocGia, '[^,]+', 1, level)
+                                                           from dual
+                                                           connect by regexp_substr(listQuocGia, '[^,]+', 1, level) is not null
+                                                       )
+                      ))
+                      AND (loaiHopDong IS NULL OR CB.IS_HDTN = loaiHopDong)
+                      AND (loaiChuyenVien IS NULL OR CB.IS_CVDT = loaiChuyenVien)
+                      AND (fromAge IS NULL OR (cb.NGAY_SINH IS NOT NULL AND (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
+                                                                                                         (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
+                                                                                                          from dual)) /
+                                                                                          12)
+                                                                             from dual) >= fromAge))
+                      AND (toAge IS NULL OR (cb.NGAY_SINH IS NOT NULL AND (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
+                                                                                                       (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
+                                                                                                        from dual)) /
+                                                                                        12)
+                                                                           from dual) <= toAge))
+                      AND (listChuyenNganh IS NULL OR
+                           (CB.CHUYEN_NGANH IN (SELECT regexp_substr(listChuyenNganh, '[^,]+', 1, level)
+                                                from dual
+                                                connect by regexp_substr(listChuyenNganh, '[^,]+', 1, level) is not null)))
                   )
-                AND (bacDaoTaoFilter IS NULL OR bacDaoTaoFilter = '' OR bacDaoTaoFilter = TKB.BAC_DAO_TAO)
-                AND (loaiHinhDaoTaoFilter IS NULL OR loaiHinhDaoTaoFilter = '' OR
-                     loaiHinhDaoTaoFilter = TKB.LOAI_HINH_DAO_TAO)
-                AND (phongFilter IS NULL OR phongFilter = '' OR phongFilter = TKB.PHONG)
-                AND (thuFilter IS NULL OR thuFilter = '' OR thuFilter = TKB.THU)
-                AND (monHocFilter IS NULL OR monHocFilter = '' OR monHocFilter = TKB.MA_MON_HOC)
-
+                AND (NGAY_NGHI IS NULL)
                 AND (searchTerm = ''
-                  OR LOWER(TRIM(DMMH.TEN)) LIKE sT
-                  OR LOWER(TRIM(DV.TEN)) LIKE sT
-                  OR LOWER(TRIM(TKB.MA_MON_HOC)) LIKE sT
-                  OR LOWER(TRIM(TKB.HOC_KY)) LIKE sT
-                  OR LOWER('thứ' || ' ' || TRIM(TKB.THU)) LIKE lower(searchTerm)
-                  OR LOWER(TRIM(TKB.PHONG)) LIKE lower(searchTerm))
-              ORDER BY TKB.THU NULLS FIRST, TKB.KHOA_DANG_KY)
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-END ;
-
-/
---EndMethod--
-
-CREATE OR REPLACE PROCEDURE tccb_dinh_muc_cong_viec_gv_va_ncv_gan_thu_tu(p_id in NUMBER, p_thu_tu in number, p_is_up in number,
-                                                             p_nhom in NUMBER)
-    IS
-BEGIN
-    IF p_is_up = 1 THEN
-        UPDATE TCCB_DINH_MUC_CONG_VIEC_GV_VA_NCV SET thu_tu=thu_tu + 1 WHERE thu_tu >= p_thu_tu AND p_nhom = ID_NHOM;
-    ELSE
-        UPDATE TCCB_DINH_MUC_CONG_VIEC_GV_VA_NCV SET thu_tu=thu_tu - 1 WHERE thu_tu <= p_thu_tu AND p_nhom = ID_NHOM;
-    END IF;
-    UPDATE TCCB_DINH_MUC_CONG_VIEC_GV_VA_NCV SET thu_tu=p_thu_tu WHERE id = p_id;
-    commit;
-END;
-
-/
---EndMethod--
-
-CREATE OR REPLACE PROCEDURE tccb_khung_danh_gia_can_bo_gan_thu_tu(p_id in NUMBER, p_thu_tu in number, p_is_up in number,
-                                                             p_nam in NUMBER)
-    IS
-BEGIN
-    IF p_is_up = 1 THEN
-        UPDATE TCCB_KHUNG_DANH_GIA_CAN_BO SET thu_tu=thu_tu + 1 WHERE thu_tu >= p_thu_tu AND p_nam = NAM;
-    ELSE
-        UPDATE TCCB_KHUNG_DANH_GIA_CAN_BO SET thu_tu=thu_tu - 1 WHERE thu_tu <= p_thu_tu AND p_nam = NAM;
-    END IF;
-    UPDATE TCCB_KHUNG_DANH_GIA_CAN_BO SET thu_tu=p_thu_tu WHERE id = p_id;
-    commit;
-END;
-
-/
---EndMethod--
-
-CREATE OR REPLACE PROCEDURE tccb_nhom_danh_gia_nhiem_vu_gan_thu_tu(p_id in NUMBER, p_thu_tu in number, p_is_up in number,
-                                                             p_nam in NUMBER)
-    IS
-BEGIN
-    IF p_is_up = 1 THEN
-        UPDATE TCCB_NHOM_DANH_GIA_NHIEM_VU SET thu_tu=thu_tu + 1 WHERE thu_tu >= p_thu_tu AND p_nam = NAM;
-    ELSE
-        UPDATE TCCB_NHOM_DANH_GIA_NHIEM_VU SET thu_tu=thu_tu - 1 WHERE thu_tu <= p_thu_tu AND p_nam = NAM;
-    END IF;
-    UPDATE TCCB_NHOM_DANH_GIA_NHIEM_VU SET thu_tu=p_thu_tu WHERE id = p_id;
-    commit;
-END;
+                  OR LOWER(CB.SHCC) LIKE ST
+                  OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE ST
+                  OR LOWER(CB.EMAIL) LIKE ST
+                  OR LOWER(CB.CHUYEN_NGANH) LIKE ST
+                  OR LOWER(CB.DANH_HIEU) LIKE ST
+                  OR LOWER(CB.GHI_CHU) LIKE ST)
+              ORDER BY CB.TEN);
+    RETURN canbosys;
+end;
 
 /
 --EndMethod--

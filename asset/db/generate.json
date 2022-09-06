@@ -17436,7 +17436,7 @@
                     "value": "shcc",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 20
                 },
                 "SIGN_TYPE": {
@@ -17480,6 +17480,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "FONT_NAME": {
+                    "value": "fontName",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "FONT_SIZE": {
+                    "value": "fontSize",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
                 }
             },
             "primaryKeys": [

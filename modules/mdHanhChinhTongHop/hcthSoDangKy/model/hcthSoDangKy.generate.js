@@ -1,6 +1,6 @@
-// Table name: HCTH_SO_DANG_KY { id, soCongVan, soDi, loaiCongVan, loaiVanBan, donViGui, ngayTao, tuDong }
+// Table name: HCTH_SO_DANG_KY { id, soCongVan, soDi, loaiCongVan, loaiVanBan, donViGui, ngayTao, tuDong, suDung, ma }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'donViGui': 'DON_VI_GUI', 'ngayTao': 'NGAY_TAO', 'tuDong': 'TU_DONG' };
+const obj2Db = { 'id': 'ID', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'donViGui': 'DON_VI_GUI', 'ngayTao': 'NGAY_TAO', 'tuDong': 'TU_DONG', 'suDung': 'SU_DUNG', 'ma': 'MA' };
 
 module.exports = app => {
     app.model.hcthSoDangKy = {
