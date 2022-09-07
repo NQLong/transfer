@@ -6905,7 +6905,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "NULL",
                     "nullable": true,
-                    "size": 10
+                    "size": 20
                 },
                 "SO_CONG_VAN": {
                     "value": "soCongVan",
@@ -14867,19 +14867,19 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "REPLY": {
-                    "value": "reply",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                },
-                "REPLY_TIME": {
-                    "value": "replyTime",
+                "ARPPOVED_TIME": {
+                    "value": "arppovedTime",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "PURPOSE": {
+                    "value": "purpose",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -17436,7 +17436,7 @@
                     "value": "shcc",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": false,
+                    "nullable": true,
                     "size": 20
                 },
                 "SIGN_TYPE": {
@@ -17480,6 +17480,175 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "FONT_NAME": {
+                    "value": "fontName",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "FONT_SIZE": {
+                    "value": "fontSize",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_CA_NHAN_DANG_KY": {
+            "active": true,
+            "moduleName": "tccbDanhGiaCaNhanDangKy",
+            "modelName": "tccbDanhGiaCaNhanDangKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_168773\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "ID_NHOM_DANG_KY": {
+                    "value": "idNhomDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "DANG_KY": {
+                    "value": "dangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_SMS_DM_PURPOSE": {
+            "active": true,
+            "moduleName": "fwSmsDmPurpose",
+            "modelName": "fwSmsDmPurpose",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_169098\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "USER_MODIFIED": {
+                    "value": "userModified",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "LAST_MODIFIED": {
+                    "value": "lastModified",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "CAN_BO_THUC_HIEN": {
+                    "value": "canBoThucHien",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_SMS_PARAMETER": {
+            "active": true,
+            "moduleName": "fwSmsParameter",
+            "modelName": "fwSmsParameter",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_169101\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MODEL_NAME": {
+                    "value": "modelName",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "COLUMN_NAME": {
+                    "value": "columnName",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "CHU_THICH": {
+                    "value": "chuThich",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
                 }
             },
             "primaryKeys": [
