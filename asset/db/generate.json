@@ -17656,6 +17656,46 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "TCCB_DANH_GIA_CA_NHAN_DANG_KY": {
+            "active": true,
+            "moduleName": "tccbDanhGiaCaNhanDangKy",
+            "modelName": "tccbDanhGiaCaNhanDangKy",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_168773\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "ID_NHOM_DANG_KY": {
+                    "value": "idNhomDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "DANG_KY": {
+                    "value": "dangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }

@@ -10,7 +10,7 @@ module.exports = app => {
     app.get('/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
         let _condition = req.query.condition || {};
         const condition = {
-            statement: 'lower(ten) LIKE :searchText AND nam = :nam AND kichHoat = 1',
+            statement: 'lower(ten) LIKE :searchText AND nam = :nam',
             parameter: {
                 searchText: `%${_condition.searchText || ''}%`,
                 nam: _condition.nam
@@ -43,11 +43,18 @@ module.exports = app => {
     app.delete('/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu', app.permission.check('tccbDanhGiaNam:delete'), async (req, res) => {
         try {
             const id = req.body.id;
-            await Promise.all([
-                app.model.tccbDinhMucCongViecGvVaNcv.delete({ idNhom: id }),
-                app.model.tccbNhomDanhGiaNhiemVu.delete({ id }),
-            ]);
-            res.end();
+            let count = await app.model.tccbDanhGiaCaNhanDangKy.count({ idNhomDangKy: id, dangKy: 1 });
+            count = count.rows[0]['COUNT(*)'];
+            if (count > 0) {
+                res.send({ error: 'Nhóm đã có thông tin đăng ký, không thể xoá' });
+            } else {
+                await Promise.all([
+                    app.model.tccbDanhGiaCaNhanDangKy.delete({ idNhomDangKy: id, dangKy: 0 }),
+                    app.model.tccbDinhMucCongViecGvVaNcv.delete({ idNhom: id }),
+                    app.model.tccbNhomDanhGiaNhiemVu.delete({ id }),
+                ]);
+                res.end();
+            }
         } catch (error) {
             res.send({ error });
         }
