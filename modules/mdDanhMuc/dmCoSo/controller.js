@@ -36,7 +36,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/co-so/all', app.permission.check('dmCoSo:read'), (req, res) => {
+    app.get('/api/danh-muc/co-so/all', app.permission.check('staff:login'), (req, res) => {
         app.model.dmCoSo.getAll((error, items) => res.send({ error, items }));
     });
 
