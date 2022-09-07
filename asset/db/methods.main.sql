@@ -5735,9 +5735,9 @@ BEGIN
                           OR (tabValue = 1 AND dks.TU_DONG = 1)
                           OR (tabValue = 2 AND dks.TU_DONG = 0)
                       )
-                  AND (
-                      dks.SU_DUNG IS NULL OR dks.SU_DUNG = 0
-                      )
+--                   AND (
+--                       dks.SU_DUNG IS NULL OR dks.SU_DUNG = 0
+--                       )
               );
 
     IF pageNumber < 1 THEN
@@ -5771,9 +5771,9 @@ BEGIN
                                     OR (tabValue = 1 AND dks.TU_DONG = 1)
                                     OR (tabValue = 2 AND dks.TU_DONG = 0)
                                 )
-                            AND (
-                                dks.SU_DUNG IS NULL OR dks.SU_DUNG = 0
-                                )
+--                             AND (
+--                                 dks.SU_DUNG IS NULL OR dks.SU_DUNG = 0
+--                                 )
                         )
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
