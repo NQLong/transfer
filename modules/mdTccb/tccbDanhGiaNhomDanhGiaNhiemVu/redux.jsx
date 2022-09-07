@@ -114,7 +114,7 @@ export function deleteTccbNhomDanhGiaNhiemVu(id, done) {
         const url = '/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa nhóm đánh giá bị lỗi!', 'danger');
+                T.notify(`Xóa nhóm đánh giá bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Nhóm đánh giá đã xóa thành công!', 'success', false, 800);
