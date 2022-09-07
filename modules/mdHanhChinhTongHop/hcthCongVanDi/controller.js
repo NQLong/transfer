@@ -336,11 +336,16 @@ module.exports = app => {
     // Upload API  -----------------------------------------------------------------------------------------------
     app.fs.createFolder(app.path.join(app.assetPath, '/congVanDi'));
 
+    app.fs.createFolder(app.path.join(app.assetPath, '/phanHoiDi'));
+
     app.uploadHooks.add('hcthCongVanDiFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
 
     app.uploadHooks.add('hcthCongVanDiUpdateFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => hcthCongVanDiUpdateFile(req, fields, files, params, done), done, 'staff:login'));
+
+    app.uploadHooks.add('hcthVanBanDiCommentFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthVanBanDiCommentFile(req, fields, files, params, done), done, 'staff:login'));
 
     const hcthCongVanDiFile = async (req, fields, files, params, done) => {
         try {
@@ -429,7 +434,45 @@ module.exports = app => {
         }
     };
 
+    const hcthVanBanDiCommentFile = async (req, fields, files, params, done) => {
+        try {
+            if (
+                fields.userData &&
+                fields.userData[0] &&
+                fields.userData[0].startsWith('hcthVanBanDiCommentFile') &&
+                files.hcthVanBanDiCommentFile &&
+                files.hcthVanBanDiCommentFile.length > 0
+            ) {
+                const
+                    srcPath = files.hcthVanBanDiCommentFile[0].path,
+                    id = fields.userData[0].substring(24),
+                    originalFilename = files.hcthVanBanDiCommentFile[0].originalFilename,
+                    filePath = `/${id}/` + originalFilename,
+                    destPath = app.assetPath + '/phanHoiDi' + filePath,
+                    validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                    baseNamePath = app.path.extname(srcPath);
+                if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                    done && done({ error: 'Định dạng tập tin không hợp lệ!' });
+                    app.fs.deleteFile(srcPath);
+                } else {
+                    await app.fs.createFolder(
+                        app.path.join(app.assetPath, '/phanHoiDi/' + '/' + id)
+                    );
 
+                    await app.fs.rename(srcPath, destPath);
+
+
+                    const newPhanHoi = await app.model.hcthPhanHoi.create({ canBoGui: req.session.user.shcc, key: id, ngayTao: new Date().getTime(), loai: 'DI' });
+
+                    const newFile = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: newPhanHoi.ngayTao, loai: 'PHAN_HOI', ma: newPhanHoi.id, nguoiTao: req.session.user.shcc });
+
+                    done && done({ error: null, item: { ...newPhanHoi, ...newFile } });
+                }
+            }
+        } catch (error) {
+            done && done({ error });
+        }
+    };
 
     //Delete file
     app.put('/api/hcth/van-ban-di/delete-file', app.permission.check('hcthCongVanDi:delete'), async (req, res) => {
@@ -504,6 +547,33 @@ module.exports = app => {
             }
             throw { status: 404, message: 'Không tìm thấy tập tin!' };
         } catch (error) {
+            console.error(error);
+            res.status(error.status || 400).send(error.message || 'Không tìm thấy tập tin');
+        }
+    });
+
+    app.get('/api/hcth/van-ban-di/download-comment/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
+            const { id, fileName } = req.params;
+            const congVan = await app.model.hcthCongVanDi.get({ id });
+            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
+            if (!await isRelated(congVan, donViNhan, req)) {
+                throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
+            } else {
+                const dir = app.path.join(app.assetPath, `/phanHoiDi/${id}`);
+                if (app.fs.existsSync(dir)) {
+                    const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+                    for (const serverFileName of serverFileNames) {
+                        const clientFileIndex = serverFileName.indexOf(fileName);
+                        if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                            return res.sendFile(app.path.join(dir, serverFileName));
+                        }
+                    }
+                }
+            }
+            throw { status: 404, message: 'Không tìm thấy tập tin!' };
+        } catch (error) {
+            console.error(error);
             res.status(error.status || 400).send(error.message || 'Không tìm thấy tập tin');
         }
     });
@@ -600,7 +670,7 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login', 'developer:login'), (req, res) => {
+    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         const { canBoGui, noiDung, key, ngayTao, loai } = req.body.data;
 
         const newPhanHoi = {
