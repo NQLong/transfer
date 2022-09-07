@@ -22,11 +22,19 @@ module.exports = app => {
             let _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
                 user = req.session.user;
-            let donVi = '';
+            let donVi = null;
             if (!user.permissions.includes('fwSmsTemplate:manage')) {
                 donVi = user.staff.maDonVi;
             }
-            let page = await app.model.fwSmsTemplate.getPage(_pageNumber, _pageSize, { donVi });
+            let condition = !donVi ? null : { donVi };
+            let [listPurpose, page] = await Promise.all([
+                app.model.fwSmsDmPurpose.getAll(),
+                app.model.fwSmsTemplate.getPage(_pageNumber, _pageSize, condition)
+            ]);
+
+            let purposeMapper = {};
+            listPurpose.forEach(item => purposeMapper[item.id] = item.ten);
+            page.list.forEach(item => item.mucDich = purposeMapper[item.purpose]);
             res.send({ page });
         } catch (error) {
             res.send({ error });

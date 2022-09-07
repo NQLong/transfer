@@ -38,7 +38,7 @@ class FwSmsTemplateDraftPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'pre-wrap' }} content={item.content} />
                     <TableCell content={item.mucDich} />
                     <TableCell content={<>{item.email} <br /> {T.dateToText(new Date(item.lastModified), 'HH:mm:ss dd/mm/yyyy')}</>} />
-                    {permissionTemplate.write ? <TableCell type='checkbox' permission={permissionTemplate} onChanged={value => value == true && this.props.fwSmsTemplateDraftUpdate(item.id, { approved: value })} content={item.approved} /> : <TableCell style={{ whiteSpace: 'nowrap' }} content={item.approved ? `Duyệt lúc ${T.dateToText(new Date(item.approvedTime), 'HH:mm:ss dd/mm/yyyy')}` : 'Chưa duyệt'} />}
+                    {permissionTemplate.write && !item.approved ? <TableCell type='checkbox' permission={permissionTemplate} onChanged={value => value == true && this.props.fwSmsTemplateDraftUpdate(item.id, { approved: value })} content={item.approved} /> : <TableCell style={{ whiteSpace: 'nowrap' }} content={item.approved ? `Duyệt lúc ${T.dateToText(new Date(item.approvedTime), 'HH:mm:ss dd/mm/yyyy')}` : 'Chưa duyệt'} />}
                     <TableCell type='buttons' permission={permissionDraft} onEdit={() => this.modalDraft.show(item)} />
                 </tr>
             )

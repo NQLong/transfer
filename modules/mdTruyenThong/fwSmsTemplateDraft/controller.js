@@ -63,11 +63,13 @@ module.exports = app => {
                 let data = {};
                 if (req.body.changes.approved) {
                     data = app.clone(req.body.changes, { approvedTime: new Date().getTime() });
+                    let item = await app.model.fwSmsTemplateDraft.get({ id: req.body.id });
+                    delete item.id;
+                    await app.model.fwSmsTemplate.create(app.clone(item, data, { approver: email }));
                 } else {
                     data = app.clone(req.body.changes, { email, lastModified: new Date().getTime() });
                 }
-                console.log(data);
-                const item = await app.model.fwSmsTemplateDraft.update(req.body.id, data);
+                const item = await app.model.fwSmsTemplateDraft.update({ id: req.body.id }, data);
                 res.send({ item });
             }
         } catch (error) {

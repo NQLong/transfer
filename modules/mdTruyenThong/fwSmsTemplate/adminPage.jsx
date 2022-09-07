@@ -26,21 +26,18 @@ class FwSmsTemplateDraftPage extends AdminPage {
             stickyHead: true,
             renderHead: () => <tr>
                 <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                <th style={{ width: '60%' }}>Nội dung mẫu</th>
-                <th style={{ width: '20%' }}>Mục đích</th>
-                {/* <th style={{ width: '20%' }}>Đơn vị</th> */}
-                <th style={{ width: 'auto' }}>Người soạn</th>
-                <th style={{ width: '20%' }}>Duyệt</th>
-                <th style={{ width: 'auto' }}>Thao tác</th>
+                <th style={{ width: '60%' }} nowrap='true'>Nội dung</th>
+                <th style={{ width: '20%' }} nowrap='true'>Mục đích</th>
+                <th style={{ width: '20%' }} nowrap='true'>Người duyệt</th>
+                <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
             </tr>,
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell style={{ whiteSpace: 'pre-wrap' }} content={item.content} />
-                    <TableCell content={item.purpose || ''} />
-                    {/* <TableCell content={item.tenDonVi || ''} /> */}
-                    <TableCell content={item.email || ''} />
-                    <TableCell type='checkbox' permission={permission} onChanged={value => value == true && this.props.fwSmsTemplateUpdate(item.id, { approved: value })} />
+                    <TableCell content={item.mucDich || ''} />
+                    <TableCell content={item.approver} />
+                    <TableCell type='buttons' permission={permission} onEdit={() => this.modalDraft.show(item)} />
                 </tr>
             )
         });
