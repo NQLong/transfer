@@ -222,8 +222,8 @@ class ComponentDMCV extends AdminPage {
                     </tr>
                     {
                         item.submenus.length > 0 &&
-                        item.submenus.map((menu, stt) => (
-                            <>
+                        item.submenus.map((menu, stt) =>
+                            [
                                 <tr key={`${index}-${stt}-1`}>
                                     <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
                                     <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
@@ -235,15 +235,15 @@ class ComponentDMCV extends AdminPage {
                                         onEdit={() => this.modal.show({ item: menu, add: false })}
                                         onDelete={this.delete}
                                     />
-                                </tr>
+                                </tr>,
                                 <tr key={`${index}-${stt}-2`}>
                                     <TableCell style={{ textAlign: 'left' }} content={'Số điểm'} />
                                     <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
                                     <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
                                     <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemKhac).toFixed(2)} />
                                 </tr>
-                            </>
-                        ))
+                            ]
+                        )
                     }
                 </tbody>
             )

@@ -45,31 +45,29 @@ class TccbCaNhanDangKyDetails extends AdminPage {
             multipleTbody: true,
             renderRow: (item, index) => (
                 <tbody key={index} style={{ backgroundColor: 'white' }}>
-                    <tr key={`${index}-1`}>
+                    <tr>
                         <TableCell style={{ textAlign: 'center' }} className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
                         <TableCell style={{ textAlign: 'left' }} className='text-primary' colSpan={5} content={<b>{item.nhom.ten}</b>} />
                         <TableCell type='checkbox' rowSpan={1 + item.submenus.length * 2} content={item.dangKy || 0} permission={permission} onChanged={value => this.dangKy(item, value)} />
                     </tr>
                     {
                         item.submenus.length > 0 &&
-                        item.submenus.map((menu, stt) => (
-                            <>
-                                <tr key={`${index}-${stt}-1`}>
-                                    <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
-                                    <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
-                                    <TableCell style={{ textAlign: 'left' }} content={'Số giờ làm việc'} />
-                                    <TableCell style={{ textAlign: 'right' }} content={menu.soGioGiangDay} />
-                                    <TableCell style={{ textAlign: 'right' }} content={menu.soGioNghienCuuKhoaHoc} />
-                                    <TableCell style={{ textAlign: 'right' }} content={menu.soGioKhac} />
-                                </tr>
-                                <tr key={`${index}-${stt}-2`}>
-                                    <TableCell style={{ textAlign: 'left' }} content={'Số điểm'} />
-                                    <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
-                                    <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
-                                    <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemKhac).toFixed(2)} />
-                                </tr>
-                            </>
-                        ))
+                        item.submenus.map((menu, stt) => [
+                            <tr key={`${index}-${stt}-1`}>
+                                <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
+                                <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
+                                <TableCell style={{ textAlign: 'left' }} content={'Số giờ làm việc'} />
+                                <TableCell style={{ textAlign: 'right' }} content={menu.soGioGiangDay} />
+                                <TableCell style={{ textAlign: 'right' }} content={menu.soGioNghienCuuKhoaHoc} />
+                                <TableCell style={{ textAlign: 'right' }} content={menu.soGioKhac} />
+                            </tr>,
+                            <tr key={`${index}-${stt}-2`}>
+                                <TableCell style={{ textAlign: 'left' }} content={'Số điểm'} />
+                                <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
+                                <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
+                                <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemKhac).toFixed(2)} />
+                            </tr>
+                        ])
                     }
                 </tbody>
             )

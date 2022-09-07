@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3038: { title: 'Cá nhân đăng ký', link: '/user/tccb/ca-nhan-dang-ky', icon: 'fa-pencil', backgroundColor: '#2a99b8', groupIndex: 6 }
+            3038: { title: 'Cá nhân đăng ký', link: '/user/tccb/ca-nhan-dang-ky', icon: 'fa-pencil', backgroundColor: '#fecc2c', groupIndex: 6 }
         }
     };
     app.permission.add(
@@ -40,6 +40,25 @@ module.exports = app => {
         condition.parameter.idNhom = idNhom;
         let item = await app.model.tccbDinhMucCongViecGvVaNcv.get(condition);
         return item ? true : false;
+    };
+
+    const cancelOtherDangKy = async (shcc, nam) => {
+        let listNhomId = await app.model.tccbNhomDanhGiaNhiemVu.getAll({ nam }, 'id');
+        if (listNhomId.length == 0) {
+            return;
+        }
+        listNhomId = listNhomId.map(item => item.id);
+        const conditionUpdate = {
+            statement: 'shcc = :shcc AND idNhomDangKy IN (:listNhomId) AND dangKy = 1',
+            parameter: {
+                shcc, listNhomId
+            }
+        };
+        let listNhomDangKy = await app.model.tccbDanhGiaCaNhanDangKy.getAll(conditionUpdate, 'id');
+        if (listNhomDangKy.length > 0) {
+            await app.model.tccbDanhGiaCaNhanDangKy.update(conditionUpdate, { dangKy: 0 });
+        }
+        return;
     };
 
     app.get('/api/tccb/danh-gia/ca-nhan-dang-ky/all-by-year', app.permission.check('staff:login'), async (req, res) => {
@@ -127,14 +146,14 @@ module.exports = app => {
     app.post('/api/tccb/danh-gia/ca-nhan-dang-ky', app.permission.check('staff:login'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc, newItem = req.body.item, idNhom = parseInt(req.body.idNhom);
-            const [checkHopLe, item] = await Promise.all([
+            const [checkHopLe, nhom] = await Promise.all([
                 checkDangKyHopLe(shcc, idNhom),
                 app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 }, 'nam')
             ]);
             if (!checkHopLe) {
                 return res.send({ error: 'Bạn không có quyền đăng ký nhóm này' });
             }
-            const nam = item.nam;
+            const nam = nhom.nam;
             if (!nam) {
                 return res.send({ error: 'Đăng ký không thành công' });
             }
@@ -144,6 +163,7 @@ module.exports = app => {
             } else {
                 newItem.shcc = shcc;
                 newItem.idNhomDangKy = idNhom;
+                await cancelOtherDangKy(shcc, nam);
                 const item = await app.model.tccbDanhGiaCaNhanDangKy.create(newItem);
                 res.send({ item, nam });
             }
@@ -155,14 +175,14 @@ module.exports = app => {
     app.put('/api/tccb/danh-gia/ca-nhan-dang-ky', app.permission.check('staff:login'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc, id = parseInt(req.body.id), changes = req.body.changes, idNhom = parseInt(req.body.idNhom);
-            const [checkHopLe, item] = await Promise.all([
+            const [checkHopLe, nhom] = await Promise.all([
                 checkDangKyHopLe(shcc, idNhom),
                 app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 }, 'nam')
             ]);
             if (!checkHopLe) {
                 return res.send({ error: 'Bạn không có quyền đăng ký nhóm này' });
             }
-            const nam = item.nam;
+            const nam = nhom.nam;
             if (!nam) {
                 return res.send({ error: 'Đăng ký không thành công' });
             }
@@ -170,7 +190,8 @@ module.exports = app => {
             if (nldBatDauDangKy > Date.now() || Date.now() > nldKetThucDangKy) {
                 res.send({ error: 'Thời gian đăng ký không phù hợp' });
             } else {
-                const item = await app.model.tccbDanhGiaCaNhanDangKy.update({ id, shcc: req.session.user.shcc }, changes);
+                await cancelOtherDangKy(shcc, nam);
+                const item = await app.model.tccbDanhGiaCaNhanDangKy.update({ id, shcc }, changes);
                 res.send({ item, nam });
             }
         } catch (error) {
