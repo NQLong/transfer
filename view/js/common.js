@@ -772,6 +772,13 @@ String.prototype.getFirstLetters = function () {
         .join('');
     return firstLetters;
 }
+
+String.prototype.numberDisplay = function (replaceValue = '.') {
+    const decimalSplitter = replaceValue == '.' ? ',' : '.';
+    let [integer, decimal] = this.split('.');
+    if (!decimal) [integer, decimal] = this.split(',');
+    return `${integer.toString().replace(/\B(?=(\d{3})+(?!\d))/g, replaceValue)}${decimal ? decimalSplitter : ''}${decimal || ''}`;
+};
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);
