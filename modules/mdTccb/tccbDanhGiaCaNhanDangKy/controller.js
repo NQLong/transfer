@@ -146,6 +146,9 @@ module.exports = app => {
     app.post('/api/tccb/danh-gia/ca-nhan-dang-ky', app.permission.check('staff:login'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc, newItem = req.body.item, idNhom = parseInt(req.body.idNhom);
+            if (newItem.dangKy == 0) {
+                throw 'Bạn phải đăng ký ít nhất một nhóm';
+            }
             const [checkHopLe, nhom] = await Promise.all([
                 checkDangKyHopLe(shcc, idNhom),
                 app.model.tccbNhomDanhGiaNhiemVu.get({ id: idNhom, kichHoat: 1 }, 'nam')
