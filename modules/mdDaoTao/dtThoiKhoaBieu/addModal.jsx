@@ -82,10 +82,11 @@ class RenderListMon extends React.Component {
                 ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'tietBatDau', 'chuyenNganh', 'maNganh'].forEach(key => {
                     eachData[key] = this.ref[key][nhom] ? getValue(this.ref[key][nhom]) : '';
                 });
-                let { soTietBuoi, tietBatDau } = eachData;
-                tietBatDau = parseInt(tietBatDau);
-                soTietBuoi = parseInt(soTietBuoi);
-                if (tietBatDau) {
+
+                if (eachData.tietBatDau) {
+                    let { soTietBuoi, tietBatDau } = eachData;
+                    tietBatDau = parseInt(tietBatDau);
+                    soTietBuoi = parseInt(soTietBuoi);
                     let buoiHocBatDau = this.state.fullDataTiet.find(item => item.ten == tietBatDau).buoi;
                     let dataKetThuc = this.state.fullDataTiet.find(item => item.ten == (tietBatDau + soTietBuoi - 1));
                     if (!dataKetThuc) {
@@ -197,10 +198,6 @@ class AddingModal extends AdminModal {
                 soBuoiTuan: getValue(this.soBuoi),
                 soLuongDuKien: getValue(this.soLuongDuKien)
             };
-            if (data.soLuongDuKien >= 300) {
-                T.notify('Không có phòng đủ sức chứa!', 'danger');
-                throw '';
-            }
             this.setState({ data, savedThongTinChung: true }, () => {
                 this.showChiTiet();
             });

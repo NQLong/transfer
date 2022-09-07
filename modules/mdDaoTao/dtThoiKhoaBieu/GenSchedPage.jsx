@@ -13,9 +13,8 @@ import { getDmCaHocAll, getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
 import { GetAllDmPhongInCoSo } from 'modules/mdDanhMuc/dmPhong/redux';
-import T from 'view/js/common';
-// import { SelectAdapter_DmPhongFilter } from 'modules/mdDanhMuc/dmPhong/redux';
-const dataThu = [2, 3, 4, 5, 6, 7];
+import { getScheduleSettings } from '../dtSettings/redux';
+
 const fullDataTietThu = [];
 class GenSchedPage extends AdminPage {
     state = {
@@ -24,18 +23,19 @@ class GenSchedPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
-            this.setState({ dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) });
-            const cookie = T.updatePage('pageDtThoiKhoaBieu');
-            const { filter } = cookie;
-            this.bacDaoTao.value('DH');
-            if (filter) {
-                let { namFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
-                this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
-                this.nam.value(namFilter);
-                this.hocKy.value(hocKyFilter);
-                this.khoaSinhVien.value(khoaSinhVienFilter);
-            }
-
+            this.props.getScheduleSettings(items => {
+                this.setState({ scheduleConfig: items, dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) });
+                const cookie = T.updatePage('pageDtThoiKhoaBieu');
+                const { filter } = cookie;
+                this.bacDaoTao.value('DH');
+                if (filter) {
+                    let { namFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
+                    this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
+                    this.nam.value(namFilter);
+                    this.hocKy.value(hocKyFilter);
+                    this.khoaSinhVien.value(khoaSinhVienFilter);
+                }
+            });
         });
     }
 
@@ -109,9 +109,31 @@ class GenSchedPage extends AdminPage {
             maNganh: this.maNganh.value(),
             chuyenNganh: this.chuyenNganh.value()
         };
-        this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData, config: this.state.config }, () => {
-            this.setState({ editId: null });
-        });
+        if (!currentData.soTietBuoi) {
+            T.notify('Số tiết bị trống!', 'danger');
+            this.soTietBuoi.focus();
+        } else if (!currentData.soLuongDuKien) {
+            T.notify('Số lượng dự kiến bị trống!', 'danger');
+            this.soLuongDuKien.focus();
+        } else if (!currentData.maNganh && !currentData.chuyenNganh) {
+            T.notify('Học phần không có ngành/chuyên ngành', 'danger');
+        } else {
+            if (currentData.tietBatDau) {
+                let { soTietBuoi, tietBatDau } = currentData;
+                tietBatDau = parseInt(tietBatDau);
+                soTietBuoi = parseInt(soTietBuoi);
+                let buoiHocBatDau = this.state.fullDataTiet.find(item => item.ten == tietBatDau).buoi;
+                let dataKetThuc = this.state.fullDataTiet.find(item => item.ten == (tietBatDau + soTietBuoi - 1));
+                if (!dataKetThuc) {
+                    return T.notify('Không có tiết kết thúc phù hợp', 'danger');
+                } else if (buoiHocBatDau != dataKetThuc.buoi) {
+                    return T.notify('Bắt đầu và kết thúc ở 2 buổi khác nhau!', 'danger');
+                }
+            }
+            this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData, config: this.state.config }, () => {
+                this.setState({ editId: null });
+            });
+        }
     }
 
     handleResetConfig = (e) => {
@@ -139,21 +161,13 @@ class GenSchedPage extends AdminPage {
     }
 
     handleRenderTiet = () => {
+        let dataThu = this.state.scheduleConfig.dataThu.map(item => parseInt(item.ma));
         this.state.dataTiet.forEach(tiet => {
             dataThu.forEach(thu => {
                 fullDataTietThu.push({ [thu]: tiet });
             });
         });
         this.setState({ fullDataTietThu });
-        // getDmCaHocAllCondition(this.coSo.value(), data => {
-        //     data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
-        //     data.forEach(tiet => {
-        //         dataThu.forEach(thu => {
-        //             fullDataTietThu.push({ [thu]: tiet });
-        //         });
-        //     });
-        //     this.setState({ fullDataTietThu, dataTiet: data });
-        // });
     }
 
     handleSaveTimeConfig = () => {
@@ -230,18 +244,19 @@ class GenSchedPage extends AdminPage {
     }
 
     editElement = () => {
+        const { tkbSoLuongDuKienMax, tkbSoLuongDuKienMin, tkbSoTietBuoiMax, tkbSoTietBuoiMin, dataThu } = this.state.scheduleConfig || {};
         return (<>
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.thu = e} style={{ marginBottom: '0', width: '50px' }} min={2} max={7} />
+                <FormSelect ref={e => this.thu = e} style={{ marginBottom: '0', width: '50px' }} data={dataThu.map(item => ({ id: parseInt(item.ma), text: item.ten }))} />
             } />
             <TableCell content={
-                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0', width: '50px' }} data={this.state.dataTiet} />
+                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0', width: '70px' }} data={this.state.dataTiet} />
             } />
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.soTietBuoi = e} style={{ width: '50px', marginBottom: '0' }} min={1} max={5} />
+                <FormTextBox type='number' ref={e => this.soTietBuoi = e} style={{ width: '50px', marginBottom: '0' }} min={tkbSoTietBuoiMin} max={tkbSoTietBuoiMax} />
             } />
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ width: '70px', marginBottom: '0' }} />
+                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ width: '70px', marginBottom: '0' }} min={tkbSoLuongDuKienMin} max={tkbSoLuongDuKienMax} />
             } />
             <TableCell content={
                 <>
@@ -366,12 +381,12 @@ class GenSchedPage extends AdminPage {
             listRoom
         }, () => {
             this.setState({ step: 6, isWaitingGenRoom: false }, () => {
-                let data = this.props.dtThoiKhoaBieu.dataCanGen.filter(item => !item.phong);
-                if (data.length) {
-                    T.confirm('Đề xuất', `Có ${data.length} học phần không tìm kiếm được phòng có sức chứa dự kiến phù hợp. Bạn có muốn hệ thống tự động giảm dần số lượng dự kiến của học phần để tìm phòng phù hợp hơn không?`, true, isConfirm => {
-                        isConfirm && console.log(isConfirm);
-                    });
-                }
+                // let data = this.props.dtThoiKhoaBieu.dataCanGen.filter(item => !item.phong);
+                // if (data.length) {
+                //     T.confirm('Đề xuất', `Có ${data.length} học phần không tìm kiếm được phòng có sức chứa dự kiến phù hợp. Bạn có muốn hệ thống tự động giảm dần số lượng dự kiến của học phần để tìm phòng phù hợp hơn không?`, true, isConfirm => {
+                //         isConfirm && console.log(isConfirm);
+                //     });
+                // }
             });
         });
     }
@@ -434,7 +449,8 @@ class GenSchedPage extends AdminPage {
 
     render() {
         let dtThoiKhoaBieuConfig = this.props.dtThoiKhoaBieu;
-        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess, dataKhoaSinhVien, isWait } = this.state;
+        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess, dataKhoaSinhVien, isWait, scheduleConfig } = this.state;
+        let { dataThu } = scheduleConfig || [];
         return this.renderPage({
             title: 'Quản lý sinh thời khoá biểu tự động',
             icon: 'fa fa-cogs',
@@ -511,10 +527,10 @@ class GenSchedPage extends AdminPage {
                                             getDataSource: () => this.state.fullDataTietThu,
                                             header: '',
                                             renderHead: () => <tr>{
-                                                dataThu.map(thu => <th key={thu} style={{ width: '100px', textAlign: 'center' }}>Thứ {thu}</th>)
+                                                dataThu.map(item => parseInt(item.ma)).map(thu => <th key={thu} style={{ width: '100px', textAlign: 'center' }}>Thứ {thu}</th>)
                                             }</tr>,
                                             renderRow: this.state.dataTiet.map(tiet => <tr key={tiet}>
-                                                {dataThu.map(thu => <td key={thu} id={`${thu}_${tiet}`} style={{ textAlign: 'center', backgroundColor: '#0275d8', color: '#fff' }} onClick={e => e.preventDefault() || $(`#${thu}_${tiet}`).css('backgroundColor', (_, cur) => rgbToHex(cur) == '#0275d8' ? '#f0ad4e' : '#0275d8')
+                                                {dataThu.map(item => parseInt(item.ma)).map(thu => <td key={thu} id={`${thu}_${tiet}`} style={{ textAlign: 'center', backgroundColor: '#0275d8', color: '#fff' }} onClick={e => e.preventDefault() || $(`#${thu}_${tiet}`).css('backgroundColor', (_, cur) => rgbToHex(cur) == '#0275d8' ? '#f0ad4e' : '#0275d8')
                                                 }>Tiết {tiet}</td>)}
                                             </tr>)
                                         })}
@@ -538,7 +554,7 @@ class GenSchedPage extends AdminPage {
                                             </Tooltip>
                                         </div>);
                                     })}
-                                    <FormSelect ref={e => this.listDonVi = e} onChange={this.handleChooseFaculty} label='Chọn khoa/bộ môn' placeholder='Chọn khoa/bộ môn' data={SelectAdapter_DmDonViFaculty_V2} multiple />
+                                    <FormSelect ref={e => this.listDonVi = e} onChange={this.handleChooseFaculty} label='Chọn khoa/bộ môn' placeholder='Chọn khoa/bộ môn áp dụng' data={SelectAdapter_DmDonViFaculty_V2} multiple />
                                     <div style={{ textAlign: 'right' }}>
                                         <button className='btn btn-outline-success' type='button' onClick={this.handleSaveTimeConfig}>
                                             <i className='fa fa-lg fa-save' /> Lưu
@@ -614,6 +630,6 @@ class GenSchedPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
 const mapActionsToProps = {
-    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData
+    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, getScheduleSettings
 };
 export default connect(mapStateToProps, mapActionsToProps)(GenSchedPage);

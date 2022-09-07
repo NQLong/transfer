@@ -51,6 +51,8 @@ module.exports = app => {
             Object.keys(result).forEach(key => {
                 result[key] = result[key] ? parseInt(result[key]) : 0;
             });
+            let dataThu = await app.model.dtDmThu.getAll({ kichHoat: 1 }, 'ma,ten', 'ma ASC');
+            result.dataThu = dataThu;
             res.send({ items: result });
         } catch (error) {
             res.send({ error });
