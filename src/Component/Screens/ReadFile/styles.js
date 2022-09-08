@@ -63,4 +63,10 @@ export default StyleSheet.create({
         textAlign: 'center',
         margin: 10,
     },
+
+    pdf: {
+        flex:1,
+        width:Dimensions.get('window').width,
+        height:Dimensions.get('window').height,
+    }
 })

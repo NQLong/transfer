@@ -104,7 +104,6 @@ const FileList = ({ navigation }) => {
                     originalName = item.tenFile,
                     linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${originalName}`,
                     style = {};
-                console.log(linkFile);
                 if (key == 0) {
                     style.borderTopWidth = 0;
                 }
