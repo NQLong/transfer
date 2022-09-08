@@ -82,18 +82,6 @@ export default DefaultScreenTabs = ({ navigation }) => {
             />
 
             <Tab.Screen
-                name="congVanTrinhKyPage"
-                component={CongVanTrinhKyPage}
-                options={{
-                    headerTitle: 'Công văn trình ký',
-                    tabBarLabel: 'Công văn trình ký',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="reader-outline" color={color} size={size} />
-                    )
-                }}
-            />
-
-            <Tab.Screen
                 name="user"
                 component={User}
                 options={{

@@ -88,18 +88,16 @@ export function getCongVanTrinhKy(id, context, done) {
 
 export function getChuKyDienTuVanBanDi(data, done) {
     return () => {
-        console.log('redux :', data);
         const url = '/api/hcth/ky-dien-tu/van-ban-di';
         T.get(url, { params: data }).then(res => {
             if (res.error) {
                 T.alert('Lỗi', 'Lấy chữ kí điện tử lỗi');
                 console.error('GET: ' + url + '.', res.error);
             } else {
-                done && done({ data: res });
+                done(res);
             }
         }).catch((error) => {
-            console.log(error);
-            T.alert('Lỗi', 'Lấy chữ kí điện tử thành công')
+            T.alert('Lỗi', 'Lấy chữ kí điện tử lỗi')
         });
     }
 }

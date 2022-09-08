@@ -20,7 +20,6 @@ import {
      * @return Promise<Buffer>
      */
     async signPDF(passphrase) {
-      console.log(passphrase);
     //   let newPDF = await this._addPlaceholder();
     //   newPDF = signer.sign(newPDF, this.certificate);
 
@@ -28,10 +27,6 @@ import {
         asn1StrictParsing: false,
         passphrase,
       }
-
-      console.log(this.pdfDoc instanceof Buffer);
-      console.log(this.certificate instanceof Buffer);
-
         if (!(this.pdfDoc instanceof Buffer)) {
             throw new SignPdfError(
                 'PDF expected as Buffer.',
@@ -143,6 +138,8 @@ import {
         }
 
         let signature = Buffer.from(raw, 'binary').toString('hex');
+
+
         // Store the HEXified signature. At least useful in tests.
         //this.lastSignature = signature;
 
@@ -151,13 +148,13 @@ import {
             .from(String.fromCharCode(0).repeat((placeholderLength / 2) - raw.length))
             .toString('hex');
 
-        console.log(signature.length);
         // Place it in the document.
         pdf = Buffer.concat([
             pdf.slice(0, byteRange[1]),
             Buffer.from(`<${signature}>`),
             pdf.slice(byteRange[1]),
         ]);
+
         
         return { pdf, signAt: Date.now() };
     }

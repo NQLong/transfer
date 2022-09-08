@@ -4,28 +4,15 @@ global.Buffer = global.Buffer || require('buffer').Buffer
 import { View, Dimensions, Alert, TouchableOpacity, Text, Button, ScrollView } from 'react-native';
 import Pdf from 'react-native-pdf';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import fs from 'react-native-fs';
-
-import { Buffer } from 'buffer';
 
 import T from '@/Utils/common';
 
-import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-
-import toBuffer from 'blob-to-buffer';
 import styles from './styles';
-import { Title } from 'react-native-paper';
-
-const RNFS = require('react-native-fs');
 
 const SelectSignPosition = ({ navigation, route }) => {
     const { source, page, key, fileIndex, id, x, y, scale, listSignFile } = route.params;
 
     const file = listSignFile[fileIndex];
-
-    console.log(x, y);
-
-    console.log('file id:', id);
 
     const [sourcePdf, setSourcePdf] = useState(source);
 
@@ -45,8 +32,7 @@ const SelectSignPosition = ({ navigation, route }) => {
 
     useEffect(() => {
         console.log('load');
-        const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${file.id}/${file.tenFile}`;
-        console.log(linkFile);
+        const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${file.vanBanDi}/${file.file.tenFile}`;
         navigation.setOptions({
             headerRight: () => <TouchableOpacity
             onPress={() => navigation.replace('SelectSignPos', { ...route.params, source: { uri: linkFile, cache: true } })}

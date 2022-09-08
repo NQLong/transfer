@@ -33,6 +33,8 @@ const SelectSignPosition = ({ navigation, route }) => {
 
     const [pageSize, setPageSize] = useState({ width: 0, height: 0});
 
+    const [scale, setScale] = useState(1);
+
     const [numOfPages, setNumOfPages] = useState(0);
 
     const [isPreviewSign, setIsPreviewSign] = useState(false);
@@ -40,8 +42,6 @@ const SelectSignPosition = ({ navigation, route }) => {
     const scrollRef = useRef();
 
     const pressHandler = () => {
-        console.log(coordinates);
-        console.log('final page height: ', pageSize, pageSize.height - coordinates.y);
         Alert.alert('KÝ', 'Bạn có chắc chắn muốn ký ở vị trí này không ?', [
             {text: 'XÁC NHẬN',
             // onPress: () => {
@@ -50,8 +50,8 @@ const SelectSignPosition = ({ navigation, route }) => {
                 source: sourcePdf, 
                 id,
                 page,
-                x: coordinates.x * 1.6 - 35,
-                y: coordinates.y * 1.6 - 215 - 40,
+                x: scale < 0 ? coordinates.x / Math.abs(scale) - 70: coordinates.x * Math.abs(scale) - 70,
+                y:  scale < 0 ? coordinates.y / Math.abs(scale) - 37.5 : coordinates.y * Math.abs(scale) - 37.5,
                 scale: 0.5,
                 fileIndex
             })},
@@ -69,11 +69,8 @@ const SelectSignPosition = ({ navigation, route }) => {
     const onGoToNextPage = () => setPage(page + 1);
 
     useEffect(() => {
-        console.log('load');
 
         const loadPdf = async () => {
-
-            console.log(source.uri);
 
             const res = await fetchFile(source.uri);
 
@@ -103,20 +100,15 @@ const SelectSignPosition = ({ navigation, route }) => {
                     const firstPage = pages[page - 1];
 
                     const { width, height } = firstPage.getSize();
-
+                
                     setPageSize({ width, height });
 
                     const jpgDims = jpgImage.scale(0.25);
 
-                    console.log('jpgDims :', jpgDims);
-
-                    console.log(width, height);
-
-                    let signPosX = coordinates.x * 1.6 - 35;
-                    let signPosY = height - coordinates.y * 1.6 - 190;
-
-                    console.log(signPosX, signPosY);
-
+                    let signPosX = scale < 0 ? coordinates.x / Math.abs(scale) - 75 : coordinates.x * Math.abs(scale) - 37.5;
+                    let signPosY = scale < 0 ? pageSize.height - coordinates.y / Math.abs(scale) - 37.5 : 
+                    pageSize.height - coordinates.y * Math.abs(scale) - 37.5;
+                    
                     if (coordinates.x === 0 && coordinates.y === 0) {
                         signPosX = width/ 2;
                         signPosY = height/ 2;
@@ -137,8 +129,6 @@ const SelectSignPosition = ({ navigation, route }) => {
                     const pdfBase64 = newArrBuffer.toString('base64');
 
                     setSourcePdf({ uri: 'data:application/pdf;base64,' + pdfBase64 });
-
-                    scrollRef.current.scrollTo({ x: width, y: height, animated: true });
                     
             }
             // })
@@ -167,13 +157,15 @@ const SelectSignPosition = ({ navigation, route }) => {
                             </TouchableOpacity> }
                         </View>
                 </View>
-
-                <ScrollView ref={scrollRef}>
+            
                     <Pdf
                         source={sourcePdf}
                         scale={1}
-                        onLoadComplete={(numberOfPages, filePath) => {
+                        onLoadComplete={(numberOfPages, filePath, size) => {
                             console.log(`Number of pages: ${numberOfPages}`);
+                            if (size.width >= pageSize.width) {
+                                setScale(-size.width / pageSize.width);
+                            } else setScale(pageSize.width / size.width);
                             setNumOfPages(numberOfPages);
                         }}
                         onPageChanged={(page, numberOfPages) => {
@@ -212,8 +204,8 @@ const SelectSignPosition = ({ navigation, route }) => {
                     </TouchableOpacity>
                     </View>
                     }
+             
 
-                </ScrollView>
     </View>
 }
 

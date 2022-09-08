@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, TouchableOpacity, View } from 'react-native';
-import { Card, List, Text, useTheme } from 'react-native-paper';
+import { Card, List, Text, Menu, useTheme } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -12,24 +12,39 @@ import T from '@/Utils/common';
 
 import { Comment, FormTextBox } from '@/Utils/component';
 import { createPhanHoi, getPhanHoi, getVanBanDi } from './redux';
+const RNFS = require('react-native-fs');
 
 import commonStyles from '../../../../Asset/Styles/styles';
 import styles from './styles';
 
+// const trangThaiVanBanDi = {
+//     NHAP: { id: 1, text: 'Nháp', color: '#17a2b8' },
+//     XEM_XET: { id: 6, text: 'Xem xét', color: '#007bff' },
+//     CHO_KIEM_TRA: { id: 2, text: 'Chờ kiểm tra', color: '#007bff' },
+//     CHO_DUYET: { id: 3, text: 'Chờ duyệt', color: '#007bff' },
+//     TRA_LAI: { id: 4, text: 'Trả lại', color: '#dc3545' },
+//     DA_XEM_XET: { id: 5, text: 'Đã xem xét', color: '#28a745' },
+//     DA_DUYET: { id: 7, text: 'Đã duyệt', color: '#28a745' },
+//     CHO_PHAN_PHOI: { id: 8, text: 'Chờ phân phối', color: '#007bff' },
+//     CHO_KY: { id: 9, text: 'Chờ ký', color: '#007bff' },
+//     DA_PHAN_PHOI: { id: 10, text: 'Đã phân phối', color: '#28a745' },
+//     TRA_LAI_PHONG: { id: 11, text: 'Trả lại (Đơn vị)', color: '#dc3545' },
+//     TRA_LAI_HCTH: { id: 12, text: 'Trả lại (HCTH)', color: '#dc3545' },
+// }
+
 const trangThaiVanBanDi = {
-    NHAP: { id: 1, text: 'Nháp', color: '#17a2b8' },
-    XEM_XET: { id: 6, text: 'Xem xét', color: '#007bff' },
-    CHO_KIEM_TRA: { id: 2, text: 'Chờ kiểm tra', color: '#007bff' },
-    CHO_DUYET: { id: 3, text: 'Chờ duyệt', color: '#007bff' },
-    TRA_LAI: { id: 4, text: 'Trả lại', color: '#dc3545' },
-    DA_XEM_XET: { id: 5, text: 'Đã xem xét', color: '#28a745' },
-    DA_DUYET: { id: 7, text: 'Đã duyệt', color: '#28a745' },
-    CHO_PHAN_PHOI: { id: 8, text: 'Chờ phân phối', color: '#007bff' },
-    CHO_KY: { id: 9, text: 'Chờ ký', color: '#007bff' },
-    DA_PHAN_PHOI: { id: 10, text: 'Đã phân phối', color: '#28a745' },
-    TRA_LAI_PHONG: { id: 11, text: 'Trả lại (Đơn vị)', color: '#dc3545' },
-    TRA_LAI_HCTH: { id: 12, text: 'Trả lại (HCTH)', color: '#dc3545' },
-}
+    NHAP: { text: 'Nháp', id: 'NHAP', color: 'red' },
+    KIEM_TRA_NOI_DUNG: { text: 'Kiểm tra nội dung', id: 'KIEM_TRA_NOI_DUNG', color: 'blue' },
+    TRA_LAI_NOI_DUNG: { text: 'Trả lại nội dung', id: 'TRA_LAI_NOI_DUNG', color: 'red' },
+    KIEM_TRA_THE_THUC: { text: 'Kiểm tra thê thức', id: 'KIEM_TRA_THE_THUC', color: 'blue' },
+    TRA_LAI_THE_THUC: { text: 'Trả lại thể thức', id: 'TRA_LAI_THE_THUC', color: 'red' },
+    TRA_LAI: { text: 'Trả lại', id: 'TRA_LAI', color: 'red' },
+    KY_THE_THUC: { text: 'Ký thể thức', id: 'KY_THE_THUC', color: 'blue' },
+    KY_NOI_DUNG: { text: 'Kiểm tra thê thức', id: 'KIEM_TRA_THE_THUC', color: 'blue' },
+    KY_PHAT_HANH: { text: 'Ký phát hành', id: 'KY_PHAT_HANH', color: 'blue' },
+    DONG_DAU: { text: 'Đóng dấu mộc đỏ', id: 'DONG_DAU', color: 'blue' },
+    DA_PHAT_HANH: { text: 'Đã phát hành', id: 'DA_PHAT_HANH', color: 'green' },
+};
 
 const action = {
     CREATE: 'CREATE',
@@ -108,7 +123,7 @@ const actionColor = (value) => {
 };
 
 const CanBoNhan = () => {
-    const list = useSelector(state => state?.hcthVanBanDi?.item?.danhSachCanBoNhan);
+    const list = useSelector(state => state?.hcthVanBanDi?.item?.canBoNhan);
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
@@ -141,13 +156,13 @@ const CanBoNhan = () => {
 }
 
 const DonViNhan = () => {
-    const list = useSelector(state => state?.hcthVanBanDi?.item?.danhSachDonViNhan);
+    const list = useSelector(state => state?.hcthVanBanDi?.item?.donViNhan);
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
         if (!list) {
             return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
-        } else if (!list.length) {
+        } else if (list.length > 0) {
             return <List.Item title='Chưa có danh sách đơn vị nhận' />
         } else {
             const items = list.map((item, key) => {
@@ -174,13 +189,13 @@ const DonViNhan = () => {
 }
 
 const DonViNhanNgoai = () => {
-    const list = useSelector(state => state?.hcthVanBanDi?.item?.danhSachDonViNhanNgoai);
+    const list = useSelector(state => state?.hcthVanBanDi?.item?.donViNhanNgoai);
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(true);
     const renderContent = () => {
         if (!list) {
             return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
-        } else if (!list.length) {
+        } else if (list.length > 0) {
             return <List.Item title='Chưa có danh sách đơn vị nhận ngoài' />
         } else {
             const items = list.map((item, key) => {
@@ -267,6 +282,46 @@ const PhanHoi = () => {
 
 }
 
+const FileList = ({ navigation }) => {
+    const listFile = useSelector(state => state.hcthVanBanDi?.item?.files);
+    const id = useSelector(state => state.hcthCongVanDi?.item?.id);
+    const { colors } = useTheme();
+    const [isExpand, setIsExpand] = useState(true);
+    const renderContent = () => {
+
+        if (!listFile)
+            return <ActivityIndicator size='large' color={colors.primary} style={commonStyles.mb20} />
+        else if (listFile.length === 0)
+            return <List.Item title={'Chưa có tập tin công văn'} />
+        else {
+            const items = listFile.map((item, key) => {
+                const
+                    originalName = item.file.tenFile,
+                    linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${item.vanBanDi}/${originalName}`,
+                    style = {};
+                if (key == 0)
+                    style.borderTopWidth = 0;
+                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.file.ten}</Text></TouchableOpacity>} />
+            });
+            return items;
+        };
+    }
+
+
+    return <Card style={commonStyles.m5} elevation={4}>
+
+        <List.Accordion id='files'
+            title='Danh sách tập tin công văn'
+            left={props => {
+                return <Ionicons {...props} size={20} style={commonStyles.m5} name='document-text-outline' />
+            }}
+            expanded={isExpand}
+            onPress={() => setIsExpand(!isExpand)}>
+            {renderContent()}
+        </List.Accordion>
+    </Card>
+}
+
 const History = () => {
     const history = useSelector(state => state.hcthVanBanDi?.item?.history);
     const user = useSelector(state => state.settings?.user);
@@ -318,11 +373,10 @@ const VanBanDi = (props) => {
     const { navigation, route } = props;
     const dispatch = useDispatch();
     const item = useSelector(state => {
-        console.log(state?.hcthVanBanDi?.item);
         return state?.hcthVanBanDi?.item;
     });
 
-    const files = item?.files || {};
+    const files = item?.files || [];
 
     const userInfo = useSelector(state => state?.settings.user);
     const [context, setContext] = useState({});
@@ -341,27 +395,28 @@ const VanBanDi = (props) => {
     }
 
     const getData = (done) => {
-        // console.log(userInfo);
         const vanBanDiId = route?.params.vanBanDiId;
         dispatch(getVanBanDi(vanBanDiId, context, done));
     }
 
-    const onSignVanVanDi = () => {
+    const onSignVanVanDi = async () => {
         try {
             const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => cfg.shcc === userInfo.shcc && !cfg.signAt));
 
             const congVanId = route?.params?.vanBanDiId;
             const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`; 
-            const key = RNFS.readFile(keyDir, 'base64');
-            const signFile = listSignFile[0],
-                linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${signFile.file.tenFile}`;
+            
+            const key = await RNFS.readFile(keyDir, 'base64');
+
+            const signFile = listSignFile[0];
+
+            const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${signFile.vanBanDi}/${signFile.file.tenFile}`;
 
             navigation.push('SelectSignPos', { id: congVanId, key, fileIndex: 0, listSignFile, source: { uri: linkFile, cache: true } });
             
         } catch (error) {
             console.error(error);
         }
-        navigation('SelectSignPos', { })
     }
 
     const enabledSignBtn = () => {
@@ -380,7 +435,7 @@ const VanBanDi = (props) => {
                 <List.Item title='Ngày ký' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayKy ? T.dateToText(item.ngayKy) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày tạo' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayTao ? T.dateToText(item.ngayTao) : 'Chưa có'}</Text>} />
 
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: Object.values(trangThaiVanBanDi)[item?.trangThai || '1'].color, fontWeight: 'bold' }}>{Object.values(trangThaiVanBanDi)[item?.trangThai || '1'].text}</Text>} />
+                {/* <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item?.trangThai].color, fontWeight: 'bold' }}>{trangThaiVanBanDi[item?.trangThai].text}</Text>} /> */}
 
                 {/* <List.Item title='Ngôn ngữ' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngoaiNgu}</Text>} /> */}
 
@@ -404,7 +459,7 @@ const VanBanDi = (props) => {
         visible={isMenuVisible}
         onDismiss={closeMenu}
         anchor={<TouchableOpacity onPress={openMenu}><Ionicons name={'ellipsis-vertical'} color='black' size={20} style={commonStyles.m10} /></TouchableOpacity>}>
-        { enabledSignBtn && menuItems}
+        {menuItems}
     </Menu> : null;
 
     return renderScrollView({
@@ -412,6 +467,7 @@ const VanBanDi = (props) => {
         content: <>
             {/* <Text>Hello</Text> */}
             {generalInfo()}
+            <FileList navigation={navigation} />
             <CanBoNhan />
             <DonViNhan />
             <DonViNhanNgoai />

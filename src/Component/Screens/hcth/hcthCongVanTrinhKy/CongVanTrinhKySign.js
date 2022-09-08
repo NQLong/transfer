@@ -20,6 +20,8 @@ import { PDFDocument } from 'pdf-lib';
 import { useDispatch, useSelector } from 'react-redux';
 import SignPDF from './SignPDF';
 
+const RNFS = require('react-native-fs');
+
 const CongVanTrinhKySign = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const { key, linkFile, fileIndex, x, y, scale, page, id, listSignFile } = route.params;
@@ -62,26 +64,25 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
             };
 
             dispatch(getChuKyDienTuVanBanDi(data, async (res) => {
-                console.log('passphrase :', passphrase);
                 const signPdf = new SignPDF(
                     Buffer.from(res.data, 'base64'),
                     Buffer.from(key, 'base64')
                 );
                 
-                const { pdf: pdfBuffer, signAt } = await signPdf.signPDF('12345678');
+                const { pdf: pdfBuffer, signAt} = await signPdf.signPDF(passphrase);
 
                 var path = fs.DocumentDirectoryPath + '/test.pdf';
-                console.log(path);
                 const uploadUrl = T.config.API_URL + 'user/upload';
                 
                 fs.writeFile(path, pdfBuffer.toString('base64'), 'base64').then((success) => {
                     console.log('FILE WRITTEN!');
                     const fileName = linkFile.substring(linkFile.lastIndexOf('/') + 1, linkFile.length);
-                    console.log(fileName);
+                    const originFileName = file.file.ten.substring(0, file.file.ten.lastIndexOf('.'));
+                    const extFile = file.file.ten.substring(file.file.ten.lastIndexOf('.') + 1, file.file.ten.length);
                     var files = [
                         {
                             name: 'file',
-                            filename: `${user.shcc}-signed.pdf`,
+                            filename: `${originFileName}_${user.shcc}.${extFile}`,
                             filepath: path,
                             filetype: 'application/pdf'
                         },
@@ -113,7 +114,6 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                         // navigation.pus
                         if (response.statusCode == 200) {
                             const resBody = JSON.parse(response.body);
-                            console.log(resBody);
                             if (!resBody.error) {
                                 T.alert('Thông báo', 'Chữ kí hợp lệ. Tải lên thành công !!');
                             } else {
@@ -129,87 +129,19 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                         }
                         console.log(err);
                     });
-                })
+                });
 
-                if (fileIndex < listSignFile.length) {
+                if (fileIndex < listSignFile.length - 1) {
                     const congVanId = route?.params?.vanBanDiId;
-                    const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`; 
+                    const keyDir = RNFS.DocumentDirectoryPath + `/${user.shcc}.p12`; 
                     const key = RNFS.readFile(keyDir, 'base64');
-                    const signFile = listSignFile[fileIndex + 1],
-                        linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${signFile.file.tenFile}`;
+                    const signFile = listSignFile[fileIndex + 1];
+                    const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${id}/${signFile.file.tenFile}`;
         
                     navigation.navigate('SelectSignPos', { id: congVanId, key, fileIndex: fileIndex + 1, listSignFile, source: { uri: linkFile, cache: true } });
-                } else navigation.navigate('congVanTrinhKyPage');
+                } else navigation.navigate('vanBanDiPage');
 
             }));
-            // const file = await getFile(linkFile);
-            // const signPdf = new SignPDF(Buffer.from(file, 'base64'), Buffer.from(key, 'base64'));
-            // const pdfBuffer = await signPdf.signPDF(passphrase);
-            // var path = fs.DocumentDirectoryPath + '/test.pdf';
-            // const uploadUrl = T.config.API_URL + 'user/upload';
-
-            // const begin = new Date();
-            // const timeOut = 500;
-            // fs.writeFile(path, pdfBuffer.toString('base64'), 'base64').then((success) => {
-
-            //     console.log('FILE WRITTEN!');
-            //     const fileName = linkFile.substring(linkFile.lastIndexOf('/') + 1, linkFile.length);
-            //     var files = [
-            //         {
-            //             name: 'file',
-            //             filename: fileName,
-            //             filepath: path,
-            //             filetype: 'application/pdf'
-            //         },
-            //     ];
-            //     var upload = (response) => {
-            //         var jobId = response.jobId;
-            //         console.log('UPLOAD HAS BEGUN! JobId: ' + jobId);
-            //     };
-
-            //     var uploadProgress = (response) => {
-            //         // if (new Date().getTime() - begin.getTime() > timeOut) throw new Error('Lỗi')
-            //         var percentage = Math.floor((response.totalBytesSent / response.totalBytesExpectedToSend) * 100);
-            //         console.log('UPLOAD IS ' + percentage + '% DONE!');
-            //     };
-
-            //     fs.uploadFiles({
-            //         toUrl: uploadUrl,
-            //         files: files,
-            //         method: 'POST',
-            //         headers: {
-            //             'Accept': 'application/json',
-            //         },
-            //         fields: {
-            //             'userData': `hcthCongVanDiSignatureFile:${id}`,
-            //         },
-            //         begin: upload,
-            //         progress: uploadProgress,
-            //     }).promise.then((response) => {
-            //         // navigation.pus
-            //         if (response.statusCode == 200) {
-            //             const resBody = JSON.parse(response.body);
-            //             if (!resBody.error) {
-            //                 T.alert('Thông báo', 'Chữ kí hợp lệ. Tải lên thành công !!');
-            //             } else {
-            //                 T.alert('Lỗi', resBody.error);
-            //             }
-            //             console.log('FILES UPLOADED!'); // response.statusCode, response.headers, response.body
-            //         } else {
-            //             console.log('SERVER ERROR');
-            //         }
-            //         console.log('good boy');
-            //     }).catch((err) => {
-            //         if (err.description === 'cancelled') {
-
-            //         }
-            //         console.log(err);
-            //     });
-            // })
-            // navigation.navigate('congVanTrinhKyPage');
-
-            
-            
         }
         catch (error) {
             // console.log(response);
