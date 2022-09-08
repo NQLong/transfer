@@ -1,6 +1,6 @@
-// Table name: FW_SMS_TEMPLATE { id, donVi, content, timeApproved, approver, purpose, active }
+// Table name: FW_SMS_TEMPLATE { id, donVi, content, purpose, active, thamSo, approver }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'donVi': 'DON_VI', 'content': 'CONTENT', 'timeApproved': 'TIME_APPROVED', 'approver': 'APPROVER', 'purpose': 'PURPOSE', 'active': 'ACTIVE' };
+const obj2Db = { 'id': 'ID', 'donVi': 'DON_VI', 'content': 'CONTENT', 'purpose': 'PURPOSE', 'active': 'ACTIVE', 'thamSo': 'THAM_SO', 'approver': 'APPROVER' };
 
 module.exports = app => {
     app.model.fwSmsTemplate = {

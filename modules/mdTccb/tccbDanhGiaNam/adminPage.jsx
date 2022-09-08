@@ -131,7 +131,7 @@ class TccbDanhGiaNamPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
-                    <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}/don-vi`} style={{ textAlign: 'center' }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
                     <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete}
