@@ -18,6 +18,10 @@ class ClusterPage extends AdminPage {
   state = { selectedServiceName: 'main', contentLog: '', listLogs: [], isLoading: false };
   logs = {};
   content = {};
+  logLength = 0;
+  isWaitingViewLog = true;
+  isGetLogFromSocket = true;
+  preData = '';
   componentDidMount() {
     T.ready();
     this.props.getClusterAll();
@@ -33,7 +37,10 @@ class ClusterPage extends AdminPage {
       const serviceName = this.state.selectedServiceName;
       const key = getValue(this.logs[serviceName]);
       const { datas } = rs;
-      if (datas[key]) {
+      if (datas[key] && !this.isWaitingViewLog) {
+        if (datas[key] === this.preData) return;
+        this.preData = datas[key];
+        this.logLength += datas[key].split('\n').length;
         const tmpContentLog = this.state.contentLog.concat(`\n${datas[key]}`);
         this.setState({ contentLog: tmpContentLog, isLoading: false }, () => {
           this.content[serviceName].scrollTo({ top: this.content[serviceName].scrollHeight });
@@ -48,13 +55,21 @@ class ClusterPage extends AdminPage {
   }
 
   viewLog = (path) => {
+    this.logLength = 0;
+    this.isWaitingViewLog = true;
     this.setState({ contentLog: '', isLoading: true }, () => {
-      this.props.watchLogs(path);
+      this.props.watchLogs(path, 0, () => {
+        this.isWaitingViewLog = false;
+      });
     });
   }
 
+  // scrollLog = (path) => {
+
+  // }
+
   onServiceTabChanged = (data, serviceNames) => data && data.tabIndex != null && serviceNames[data.tabIndex] &&
-    this.setState({ selectedServiceName: serviceNames[data.tabIndex] });
+    this.setState({ selectedServiceName: serviceNames[data.tabIndex], contentLog: ''});
 
   resetCluster = (e, serviceName, item) => e.preventDefault() || T.confirm('Reset cluster', `Are you sure you want to reset cluster ${serviceName}:${item.pid}?`, true, isConfirm =>
     isConfirm && this.props.resetCluster(serviceName, item.pid));
@@ -141,6 +156,7 @@ class ClusterPage extends AdminPage {
       </tr>),
   });
 
+
   render() {
     const permission = this.getUserPermission('cluster');
     const services = (this.props.cluster || {});
@@ -187,7 +203,7 @@ class ClusterPage extends AdminPage {
             <div className='tile-body'>
               <div style={{ overflow: 'auto', height: '300px', backgroundColor: '#000000', color: '#ffffff' }} ref={e => this.content[serviceName] = e}>
                 <p style={{ padding: '0px 16px', whiteSpace: 'break-spaces' }}>{this.state.contentLog}</p>
-                {this.state.isLoading && <p style={{ padding: '0px 16px'}}>Loading...</p>}
+                {this.state.isLoading && <p style={{ padding: '0px 16px' }}>Loading...</p>}
               </div>
             </div>
           </div>);

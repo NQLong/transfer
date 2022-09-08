@@ -218,15 +218,14 @@ module.exports = (app, appConfig) => {
     //pm2 logs API -------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/cluster/logs', app.permission.check('cluster:manage'), (req, res) => {
         try {
-            const { path } = req.query;
+            const { path, from } = req.query;
             if (!path) {
                 res.send({ message: 'Get logs error!' });
                 return;
             }
-            app.getLogs(path, 30);
-            // app.setupTailWatch(path);
-            // app.intervalEmitEvent(path);
-            res.send({});
+            app.getLogs(path, 30, from, () => {
+                res.send({});
+            });
         } catch (error) {
             res.send({ error });
         }

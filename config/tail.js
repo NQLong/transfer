@@ -46,22 +46,23 @@ module.exports = (app) => {
             app.watchFiles.push(path);
             tail.on('line', (data) => {
                 if (!app.datas[path]) app.datas[path] = '';
-                app.datas[path] = app.datas[path].concat(`${data}\n`);
+                app.datas[path] = app.datas[path].concat(`${app.datas[path] ? '\n' : ''}${data}`);
             });
         } catch (ex) {
             console.log(ex);
         }
     };
 
-    app.getLogs = (path, nLines, from = 0) => {
+    app.getLogs = (path, nLines, from = 0, cb = () => { }) => {
         app.fs.readFile(path, 'utf-8', (err, data) => {
             if (err) throw err;
             const lines = data.trim().split('\n');
             nLines = nLines > lines.length ? lines.length : nLines;
+            app.datas[path] = '';
             for (let index = from; index < nLines; index++) {
-                if (!app.datas[path]) app.datas[path] = '';
-                app.datas[path] = app.datas[path].concat(`${lines[lines.length - nLines + index]}\n`);
+                app.datas[path] = app.datas[path].concat(`${app.datas[path] ? '\n' : ''}${lines[lines.length - nLines + parseInt(index)]}`);
             }
+            cb();
         });
     };
 

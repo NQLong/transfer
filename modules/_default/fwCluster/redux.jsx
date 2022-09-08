@@ -127,13 +127,15 @@ export function getAllLogs(done) {
     };
 }
 
-export function watchLogs(path) {
+export function watchLogs(path, from, done) {
     return () => {
         const url = '/api/cluster/logs';
-        T.get(url, { path }, data => {
+        T.get(url, { path, from }, data => {
             if (data.error) {
                 T.notify('Watch logs bị lỗi!', 'danger');
                 console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done();
             }
         }, error => console.error(error) || T.notify('Watch logs bị lỗi!', 'danger'));
     };
