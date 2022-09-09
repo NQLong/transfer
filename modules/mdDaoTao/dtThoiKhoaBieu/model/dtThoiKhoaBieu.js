@@ -35,7 +35,7 @@ module.exports = app => {
             for (let room of listRooms) {
                 let { ten, sucChua } = room;
                 sucChua = parseInt(sucChua);
-                let condition = (sucChua + MAX_DEVIANT >= soLuongDuKien) && (sucChua <= sizeResult) && (!currentStatus[ten] || !currentStatus[ten][thu] || !currentStatus[ten][thu].includes(tietBatDau));
+                let condition = (sucChua >= soLuongDuKien - MAX_DEVIANT) && (sucChua <= sizeResult) && (!currentStatus[ten] || !currentStatus[ten][thu] || !currentStatus[ten][thu].includes(tietBatDau));
                 if (condition) {
                     sizeResult = sucChua;
                     roomResult = { phong: ten, sucChua };
@@ -54,22 +54,29 @@ module.exports = app => {
                 }
                 return roomResult;
             } else {
-                MAX_DEVIANT += 10;
+                MAX_DEVIANT += 5;
             }
         }
 
     };
 
-    const calculateEndDate = (hocPhan, listNgayLe = []) => {
+    const calculateStartToEndDate = (hocPhan, listNgayLe = []) => {
         let { soTietLyThuyet, soTietThucHanh, soBuoiTuan, soTietBuoi, ngayBatDau, thu } = hocPhan,
             tongTiet = parseInt(soTietLyThuyet) + parseInt(soTietThucHanh),
             soTuan = Math.ceil(tongTiet / (soTietBuoi * soBuoiTuan));
+        thu = parseInt(thu);
+        // Tính lại ngày bắt đầu ứng với thứ của học phần
+        let thuBatDau = new Date(ngayBatDau).getDay();
+
+        let deviant = thuBatDau - thu + 1;
+        ngayBatDau = ngayBatDau + deviant * DATE_UNIX;
+        // Tính ngày kết thúc
         let ngayKetThuc = ngayBatDau + soTuan * 7 * DATE_UNIX;
         for (let ngayLe of listNgayLe) {
             if (ngayLe > ngayBatDau && ngayLe <= ngayKetThuc && new Date(ngayLe).getDay() == thu - 1) ngayKetThuc += 7 * DATE_UNIX;
         }
         if (isNaN(ngayKetThuc)) ngayKetThuc = '';
-        return ngayKetThuc;
+        return { ngayBatDau, ngayKetThuc };
     };
 
     // Start: new auto generate schedule functions
@@ -131,8 +138,7 @@ module.exports = app => {
                 configRangePeriod[key] = configRangePeriod[key] ? parseInt(configRangePeriod[key]) : 0;
             });
 
-            let fullDataTiet = await app.model.dmCaHoc.getAll({ maCoSo: config.coSo }, 'ten,buoi');
-
+            let fullDataTiet = await app.model.dmCaHoc.getAll({ maCoSo: config.coSo, kichHoat: 1 }, 'ten,buoi');
             // 1.2: Config data thứ, tiết.
             const setAvailable = () => {
                 for (const ele of timeConfig) {
@@ -166,6 +172,7 @@ module.exports = app => {
                             let dataThoiGian = thoiGianRanhChung.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
                             if (dataThoiGian.length == 0) {
                                 setAvailable();
+                                hocPhan.isDuplicated = true;
                                 listNganh = hocPhanTheoIdNganh.filter(item => item.idThoiKhoaBieu.includes(id));
                                 thoiGianRanhChung = intersectMany(listNganh.map(item => item.available));
                                 dataThoiGian = thoiGianRanhChung.filter(item => item.split('_')[1] == hocPhan.tietBatDau);
@@ -176,6 +183,12 @@ module.exports = app => {
 
                             let thuTiet = dataThoiGian.sample(),
                                 [thu, tietBatDau] = thuTiet.split('_');
+                            if (hocPhan.isDuplicated) {
+                                dataCanGen.forEach(item => listNganh.filter(nganh => {
+                                    if (item.maNganh.includes(nganh.idNganh) && item.maMonHoc != hocPhan.maMonHoc && item.thu == hocPhan.thu && item.tietBatDau == hocPhan.tietBatDau) console.log(`${hocPhan.maMonHoc}_${hocPhan.nhom}`, `${item.maMonHoc}_${item.nhom}`);
+                                }));
+                                // let findDuplicate = dataCanGen.find(item => item.maMonHoc != hocPhan.maMonHoc && item.thu == thu && item.tietBatDau == tietBatDau && listNganh.filter(nganh => item.maNganh.split(',').includes(nganh.idNganh)));
+                            }
                             dataReturn.push({ ...hocPhan, thu, tietBatDau });
                             let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));
                             for (let idNganh of listNganh) {
@@ -256,8 +269,8 @@ module.exports = app => {
             for (let hocPhan of listData) {
                 let roomResult = bestFit(hocPhan, listRoom, currentStatus);
                 // if (!roomResult) dataNull.push
-                let ngayKetThuc = calculateEndDate({ ...hocPhan, ngayBatDau: parseInt(config.ngayBatDau) }, listNgayLe);
-                dataReturn.push({ ...hocPhan, ...roomResult, ngayKetThuc, ngayBatDau: parseInt(config.ngayBatDau) });
+                let { newBatDau, ngayKetThuc } = calculateStartToEndDate({ ...hocPhan, ngayBatDau: parseInt(config.ngayBatDau) }, listNgayLe);
+                dataReturn.push({ ...hocPhan, ...roomResult, ngayKetThuc, ngayBatDau: parseInt(newBatDau) });
             }
             res.send({ dataReturn, dataNull });
         } catch (error) {
@@ -278,7 +291,7 @@ module.exports = app => {
 
         for (let [key, hocPhan] of Object.entries(dataGen)) {
             let roomResult = bestFit(hocPhan, listPhong, currentStatus) || {};
-            let ngayKetThuc = calculateEndDate({ ...hocPhan, ngayBatDau }, listNgayLe);
+            let ngayKetThuc = calculateStartToEndDate({ ...hocPhan, ngayBatDau }, listNgayLe);
             dataGen[key] = app.clone(hocPhan, roomResult, { ngayBatDau, ngayKetThuc });
         }
 

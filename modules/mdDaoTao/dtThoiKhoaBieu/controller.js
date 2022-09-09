@@ -147,10 +147,27 @@ module.exports = app => {
         }
     });
 
+    app.post('/api/dao-tao/thoi-khoa-bieu/check-if-exist', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        try {
+            let data = req.body.data;
+            const { maMonHoc, bacDaoTao, loaiHinhDaoTao, nam, hocKy, khoaSinhVien } = data;
+            let checkItems = await app.model.dtThoiKhoaBieu.getAll({ maMonHoc, bacDaoTao, loaiHinhDaoTao, nam, hocKy, khoaSinhVien }, 'maMonHoc,nhom');
+            if (checkItems.length) {
+                checkItems = checkItems.map(item => parseInt(item.nhom));
+                let maxNhomCurrent = Math.max(...checkItems);
+                res.send({ warning: `Môn học đã có ${maxNhomCurrent} lớp cho hệ ${loaiHinhDaoTao}, khoá ${khoaSinhVien}`, maxNhomCurrent });
+            }
+            else res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     app.post('/api/dao-tao/thoi-khoa-bieu/create-multiple', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         try {
             let { data, settings } = req.body;
-            for (let index = 0; index < data.length; index++) {
+
+            for (let index = parseInt(settings.startIndex); index < data.length; index++) {
                 let item = data[index],
                     maNganh = item.maNganh,
                     chuyenNganh = item.chuyenNganh || [],
@@ -392,11 +409,9 @@ module.exports = app => {
 
     app.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         try {
-
             const { config } = req.body,
                 dataFree = await app.model.dtThoiKhoaBieu.getFree(JSON.stringify(config));
             let { rows: dataCanGen, hocphandaxep: dataCurrent } = dataFree;
-
             res.send({ dataCanGen, dataCurrent });
         } catch (error) {
             console.error(error);
@@ -458,13 +473,6 @@ module.exports = app => {
                 { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 },
                 { header: 'TRỢ GIẢNG', key: 'giangVien', width: 30 },
             ];
-            // ws.getRow(1).font = {
-            //     name: 'Times New Roman',
-            //     family: 4,
-            //     size: 12,
-            //     bold: true,
-            //     color: { argb: 'FF000000' }
-            // };
 
             const list = data.rows;
             list.forEach((item, index) => {

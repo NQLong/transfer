@@ -105,20 +105,44 @@ export function createDtThoiKhoaBieu(item, settings, done) {
     };
 }
 
+export function checkIfExistDtThoiKhoaBieu(data, done) {
+    return () => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/check-if-exist';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify('Kiểm tra các ràng buộc lỗi', 'danger');
+            } else if (result.warning) {
+                T.confirm('Cảnh báo', `${result.warning}. Bạn vẫn muốn tạo thêm?`, true, isConfirm => {
+                    isConfirm && done(result.maxNhomCurrent);
+                });
+            } else {
+                done && done(0);
+            }
+        });
+    };
+}
+
 export function createDtThoiKhoaBieuMultiple(data, settings, done) {
     return dispatch => {
         const cookie = T.updatePage('pageDtThoiKhoaBieu');
         const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu/create-multiple';
-        T.post(url, { data, settings }, data => {
-            if (data.error) {
+        T.post(url, { data, settings }, result => {
+            if (result.error) {
                 T.notify('Tạo lớp bị lỗi!', 'danger');
-                console.error(`POST ${url}. ${data.error.message}`);
+                console.error(`POST ${url}. ${result.error.message}`);
                 done && done();
-            } else {
+            } else if (result.warning) {
+                T.confirm('Cảnh báo', `${result.warning}. Bạn vẫn muốn tạo thêm?`, true, isConfirm => {
+                    if (isConfirm) {
+                        createDtThoiKhoaBieuMultiple({ ...data, confirmCreate: true }, settings, done);
+                    }
+                });
+            }
+            else {
                 T.notify('Tạo lớp thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
-                if (done) done();
+                if (done) done(result);
             }
         });
     };

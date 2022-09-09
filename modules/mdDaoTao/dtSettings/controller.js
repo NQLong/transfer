@@ -3,7 +3,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7022: { title: 'Cấu hình', pin: true, link: '/user/dao-tao/settings', icon: 'fa-sliders', backgroundColor: '#274d5a' },
+            7024: { title: 'Cấu hình', pin: true, link: '/user/dao-tao/settings', icon: 'fa-sliders', backgroundColor: '#274d5a' },
         },
     };
 

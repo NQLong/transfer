@@ -3,7 +3,7 @@ module.exports = app => {
         parentMenu: app.parentMenu.daoTao,
         menus: {
             7022: {
-                title: 'Buổi Học', groupIndex: 2,
+                title: 'Buổi học', groupIndex: 2,
                 link: '/user/dao-tao/buoi-hoc'
             },
         },
@@ -30,7 +30,7 @@ module.exports = app => {
     app.get('/api/dao-tao/buoi-hoc/all', app.permission.check('dtDmBuoiHoc:manage'), async (req, res) => {
         try {
             let kichHoat = req.query.kichHoat;
-            let condition = kichHoat? {kichHoat:1}:{};
+            let condition = kichHoat ? { kichHoat: 1 } : {};
             let items = await app.model.dtDmBuoiHoc.getAll(condition);
             let listLoaiHinh = await app.model.dmSvLoaiHinhDaoTao.getAll({}, 'ma,ten');
             let loaiHinhMapper = {};
