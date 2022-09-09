@@ -187,7 +187,7 @@ module.exports = app => {
 
             const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L'});
 
-            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? 'hieuquang2212@gmail.com' : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', 
+            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', 
             [{
                 filename: `${shcc}-${khoa.id}-1.png`,
                 content:  qrCode_1.replace('data:image/png;base64,', ''),
