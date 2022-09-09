@@ -58,7 +58,7 @@ const ScanScreen = ({ navigation }) => {
         flashMode={RNCamera.Constants.FlashMode.torch}
         topContent={
           <Text style={styles.centerText}>
-            { step === 1 ? 'Quét hình ảnh thứ nhất 123' : 'Quét hình ảnh thứ hai'}
+            { step === 1 ? 'Quét hình ảnh thứ nhất' : 'Quét hình ảnh thứ hai'}
           </Text>
         }
         bottomContent={
