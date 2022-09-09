@@ -1,7 +1,9 @@
 module.exports = app => {
-    const FILE_TYPE = 'DI';
+    // const FILE_TYPE = 'DI';
 
-    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, loaiCongVan } = require('../constant');
+    const LOAI_VAN_BAN = 'DI';
+
+    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, loaiCongVan, vanBanDi, MA_HCTH } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -10,505 +12,467 @@ module.exports = app => {
         },
     };
 
-    // const menu = {
-    //     parentMenu: app.parentMenu.user,
-    //     menus: {
-    //         1053: { title: 'Văn bản đi', link: '/user/van-ban-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA', groupIndex: 5 },
-    //     },
-    // };
+    const staffPermission = 'donViCongVanDi:edit',
+        managerPermission = 'donViCongVanDi:manage';
+
+    /**
+     *  permission list*/
     app.permission.add(
         { name: 'hcthCongVanDi:read' },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
         { name: 'hcthCongVanDi:manage' },
-        { name: 'donViCongVanDi:manage' },
+        { name: managerPermission },
         { name: 'hcth:login', menu: staffMenu },
         // { name: 'staff:login', menu },
         { name: 'hcth:manage' }
     );
+
+    app.permissionHooks.add('staff', 'addRolesHcthVanBanDi', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi && staff.maDonVi == MA_HCTH) {
+            app.permissionHooks.pushUserPermission(user, 'dmm', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write');
+            resolve();
+        } else resolve();
+    }));
+
 
     app.get('/user/van-ban-di', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/van-ban-di/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/hcth/van-ban-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
     app.get('/user/hcth/van-ban-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
-    // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.query.filter && req.query.filter != '%%%%%%' ? req.query.filter :
-            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null },
-            donViXem = '',
-            canBoXem = '';
-
-        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-        const hcthPermission = getUserPermission(req, 'hcth', ['manage', 'login']),
-            hcthManagePermission = getUserPermission(req, 'hcthCongVanDi', ['manage']);
-        const user = req.session.user;
-        const permissions = user.permissions;
-        const roles = req.session.user.roles,
-            admin = roles && roles.find(o => o.name == 'admin');
-
-        donViXem = req.session?.user?.staff?.donViQuanLy || [];
-        donViXem = donViXem.map(item => item.maDonVi).toString() ||
-            // chuyên viên quản lý và chuyên viên soạn thảo
-            ((permissions.includes('donViCongVanDi:manage') || permissions.includes('donViCongVanDi:edit')) && req.session?.user?.staff?.maDonVi)
-            || '';
-        canBoXem = req.session?.user?.shcc || '';
-
-        let loaiCanBo = admin ? 4 :
-            rectorsPermission.login ? 1 :
-                (hcthManagePermission.manage || (permissions.includes('donViCongVanDi:manage') && hcthPermission.login)) ? 2 : // chuyên viên quản lý thuộc phòng hcth
-                    (permissions.includes('donViCongVanDi:edit') && hcthPermission.login) ? 6 : //chuyên viên soạn thảo thuộc phòng hcth
-
-                        permissions.includes('donViCongVanDi:edit') ? 5 :  // chuyên viên soạn thảo
-                            (hcthPermission.login && !hcthManagePermission.manage) ? 3 : 0; // nhân viên phòng hcth
-
-        if (!admin && (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent))) {
-            donViXem = '';
-            canBoXem = '';
-        }
-
-        if (congVanYear && Number(congVanYear) > 1900) {
-            timeType = 1;
-            fromTime = new Date(`${congVanYear}-01-01`).getTime();
-            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
-        }
-
-        // const dataFilter = { canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status: status ? status.toString() : status };
-        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-            }
-        });
-    });
-
+    const getDonViQuanLy = (req) => req.session?.user?.staff?.donViQuanLy?.map(item => item.maDonVi) || [];
+    const getDonVi = (req) => req.session?.user?.staff?.maDonVi;
+    const getShcc = (req) => req.session.user?.shcc;
     const getCurrentPermissions = (req) => (req.session && req.session.user && req.session.user.permissions) || [];
-
     const getUserPermission = (req, prefix, listPermissions = ['read', 'write', 'delete']) => {
         const permission = {}, currentPermissions = getCurrentPermissions(req);
         listPermissions.forEach(item => permission[item] = currentPermissions.includes(`${prefix}:${item}`));
         return permission;
     };
+    const getInstance = async (id) => {
+        const instance = await app.model.hcthCongVanDi.get({ id });
+        if (!instance) throw 'Văn bản đi không tồn tại';
+        return instance;
+    }
 
-    app.get('/api/hcth/van-ban-di/all', app.permission.orCheck('hcthCongVanDi:read', 'developer:login'), (req, res) => {
-        app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
-    });
+    // APIs ----------------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
+            const
+                // pageNumber = parseInt(req.params.pageNumber),
+                // pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+                permissions = req.session.user.permissions;
+            let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.query.filter || {};
 
-    const createListDonViNhan = (listDonViNhan, congVanId, done) => {
-        if (listDonViNhan && listDonViNhan.length > 0) {
-            const promises = listDonViNhan.map((donViNhan) => new Promise((resolve, reject) => app.model.hcthDonViNhan.create(
-                {
-                    donViNhan: donViNhan.id,
-                    ma: congVanId,
-                    donViNhanNgoai: donViNhan.donViNhanNgoai,
-                    loai: donViNhan.loai,
-                },
-                (error, item) => {
-                    if (error) reject(error);
-                    else resolve(item);
-                }
-            )));
-            Promise.all(promises).then((result) => done && done(result)).catch((error) => done && done(error));
-        } else {
-            done && done({ error: null });
-        }
-    };
+            //status scheme
+            let scope = { SELF: [], DEPARTMENT: [], GLOBAL: [], }
 
-    app.post('/api/hcth/van-ban-di', (req, res) => {
-        const { fileList, donViNhan, donViNhanNgoai, banLuu, ...data } = req.body.data;
-        app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user?.staff?.shcc }, (error, item) => {
-            if (error) {
-                res.send({ error, item });
-            } else {
-                let { id } = item;
-                app.fs.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
-                try {
-                    updateListFile(fileList, id, ({ error }) => {
-                        if (error) {
-                            throw error;
-                        } else {
-                            let listDonViNhan = [];
-                            let listDonViNhanNgoai = [];
-                            let listBanLuu = [];
-                            if (donViNhanNgoai && donViNhanNgoai.length > 0) {
-                                listDonViNhanNgoai = donViNhanNgoai.map((id) => ({ id: id, donViNhanNgoai: 1, loai: 'DI' }));
-                            }
-                            if (donViNhan && donViNhan.length > 0) {
-                                listDonViNhan = donViNhan.map((id) => ({ id: id, donViNhanNgoai: 0, loai: 'DI' }));
-                            }
+            scope.SELF = [vanBanDi.trangThai.DA_PHAT_HANH.id];
 
-                            if (banLuu && banLuu.length > 0) {
-                                listBanLuu = banLuu.map((id) => ({ id: id, donViNhanNgoai: 0, loai: 'BAN_LUU' }));
-                            }
+            if (permissions.includes(managerPermission)) scope.DEPARTMENT =
+                scope.DEPARTMENT = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('rectors:login') || permissions.includes('hcthCongVanDi:read'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('developer:login'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).map(item => item.id);
+            Object.keys(scope).forEach(key => scope[key] = scope[key].toString());
 
-                            createListDonViNhan([...listDonViNhan, ...listDonViNhanNgoai, ...listBanLuu], id, ({ error }) => {
-                                if (error) {
-                                    throw error;
-                                } else {
-                                    app.model.hcthHistory.create({ loai: 'DI', key: id, shcc: req.session?.user?.shcc, hanhDong: 'CREATE', thoiGian: new Date().getTime() }, (error) => {
-                                        if (error) {
-                                            throw error;
-                                        } else {
-                                            res.send({ error, item });
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                } catch (error) {
-                    deleteCongVan(id, () => res.send({ error }));
-                }
+            const userDepartments = new Set(getDonViQuanLy(req));
+            if (getDonVi(req))
+                userDepartments.add(getDonVi(req));
+
+            const userShcc = getShcc(req);
+
+            const filterData = { userShcc, userDepartments: [...userDepartments].toString(), donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime };
+
+            if (congVanYear && Number(congVanYear) > 1900) {
+                filterData.timeType = 1;
+                filterData.fromTime = new Date(`${congVanYear}-01-01`).getTime();
+                filterData.toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
             }
-        });
+
+            const page = await app.model.hcthCongVanDi.searchPageAlternate(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), '', app.utils.stringify(scope), app.utils.stringify(filterData));
+
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            const pageCondition = searchTerm;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
     });
 
-    const updateListFile = (listFile, congVanId, done) => {
-        if (listFile && listFile.length > 0) {
-            const [{ id, ...changes }] = listFile.splice(0, 1),
-                sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.tenFile}`),
-                destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.tenFile}`);
-            if (!changes.ma)
-                app.fs.rename(sourcePath, destPath, error => {
-                    if (error) done && done({ error });
-                    else {
-                        app.model.hcthFile.update({ id }, { ...changes, ma: congVanId }, (error) => {
-                            if (error)
-                                done && done({ error });
-                            else {
-                                updateListFile(listFile, congVanId, done);
-                            }
-                        });
-                    }
-                });
-            else {
-                app.model.hcthFile.update({ id }, { ...changes }, (error) => {
-                    if (error)
-                        done && done({ error });
-                    else {
-                        updateListFile(listFile, congVanId, done);
-                    }
-                });
+
+    app.post('/api/hcth/van-ban-di', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const { files = [], canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], ...data } = req.body.data;
+            const instance = await app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user.shcc, ngayTao: new Date().getTime(), trangThai: vanBanDi.trangThai.NHAP.id });
+            const id = instance.id;
+            try {
+
+                //create vanBanDi instance
+
+                //create don vi nhan from list
+                await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN);
+
+                //create don vi nhan ngoai from list
+                await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN, { donViNhanNgoai: 1, });
+
+                // create ban luu
+                await app.model.hcthBanLuu.createFromList(banLuu, instance.id, LOAI_VAN_BAN,);
+
+                //create can bo nhan from list
+                await app.model.hcthCanBoNhan.listCreate(canBoNhan.map(shcc => ({ canBoNhan: shcc, ma: instance.id, loai: LOAI_VAN_BAN })));
+
+                //handle list file
+                app.fs.createFolder(app.path.join(app.assetPath, 'congVanDi', `${instance.id}`));
+                await Promise.all(files.map(item => createFileVanBanDi(item, instance.id, req.session.user.shcc)));
+
+                //create history
+                await app.model.hcthHistory.create({ loai: 'DI', key: instance.id, shcc: req.session?.user?.shcc, hanhDong: 'CREATE', thoiGian: instance.ngayTao });
+                res.send({});
+            } catch (error) {
+                console.error(error);
+                deleteCongVan(id, () => res.send({ error }));
+                // res.send({ error });
             }
-        } else {
-            done && done({});
-        }
-    };
-
-    const deleteCongVan = (id, done) => {
-        app.model.hcthFile.delete({ ma: id }, (error) => {
-            if (error) done && done({ error });
-            else
-                app.model.hcthCongVanDi.delete({ id }, (error) => {
-                    app.fs.deleteFolder(app.assetPath + '/congVanDi/' + id);
-                    done && done({ error });
-                });
-        });
-    };
-
-    // Cần sửa lại
-    app.put('/api/hcth/van-ban-di', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
-        const { fileList, donViNhan, donViNhanNgoai, ...changes } = req.body.changes;
-        const { isSend = false } = changes;
-
-        if (isSend) {
-            const currentYear = new Date().getFullYear();
-            const firstDayOfYear = new Date(currentYear, 0, 1);
-            const nam = Date.parse(firstDayOfYear);
-            let { id: ma, donViGui, trangThai } = changes;
-            ma = parseInt(ma);
-            donViGui = parseInt(donViGui);
-            app.model.hcthCongVanDi.updateSoCongVanDi(ma, donViGui, nam, (errors, result) => {
-                if (errors) {
-                    res.send({ errors, result });
-                } else {
-                    app.model.hcthCongVanDi.update({ id: req.body.id }, { trangThai }, (errors, item) => {
-                        if (errors)
-                            res.send({ errors, item });
-                        else {
-                            let listDonViNhan = [];
-                            let listDonViNhanNgoai = [];
-                            if (donViNhanNgoai && donViNhanNgoai.length > 0) {
-                                listDonViNhanNgoai = donViNhanNgoai.map((id) => ({ id: id, donViNhanNgoai: 1 }));
-                            }
-                            if (donViNhan && donViNhan.length > 0) {
-                                listDonViNhan = donViNhan.map((id) => ({ id: id, donViNhanNgoai: 0 }));
-                            }
-
-                            app.model.hcthDonViNhan.delete({ ma: req.body.id, loai: CONG_VAN_DI_TYPE }, () =>
-                                createListDonViNhan([...listDonViNhan, ...listDonViNhanNgoai], req.body.id,
-                                    () => {
-                                        updateListFile(fileList, req.body.id, () =>
-                                            app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: action.APPROVE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
-                                                res.send({ error, item });
-                                            })
-                                        );
-                                    })
-                            );
-                        }
-                    });
-                }
-            });
-        } else {
-            app.model.hcthCongVanDi.get({ id: req.body.id }, (error, congVan) => {
-                if (error)
-                    res.send({ error, congVan });
-                else {
-                    app.model.hcthCongVanDi.update({ id: req.body.id }, changes, (errors, item) => {
-                        if (errors)
-                            res.send({ errors, item });
-                        else {
-                            let listDonViNhan = [];
-                            let listDonViNhanNgoai = [];
-                            if (donViNhanNgoai && donViNhanNgoai.length > 0) {
-                                listDonViNhanNgoai = donViNhanNgoai.map((id) => ({ id: id, donViNhanNgoai: 1, }));
-                            }
-                            if (donViNhan && donViNhan.length > 0) {
-                                listDonViNhan = donViNhan.map((id) => ({ id: id, donViNhanNgoai: 0 }));
-                            }
-
-                            app.model.hcthDonViNhan.delete(
-                                { ma: req.body.id, loai: 'DI' },
-                                () =>
-                                    createListDonViNhan([...listDonViNhan, ...listDonViNhanNgoai], req.body.id, () => {
-                                        updateListFile(fileList, req.body.id, () => {
-                                            const trangThaiBefore = congVan.trangThai;
-                                            const trangThaiAfter = item.trangThai;
-                                            let hanhDong;
-                                            // chỉnh lại
-                                            if (trangThaiBefore == trangThaiCongVanDi.NHAP.id) {
-                                                hanhDong = action.SEND;
-                                            }
-
-                                            if (trangThaiBefore == trangThaiAfter) {
-                                                hanhDong = action.UPDATE;
-                                            }
-                                            if (trangThaiBefore == trangThaiCongVanDi.TRA_LAI_HCTH.id && trangThaiAfter == trangThaiCongVanDi.CHO_PHAN_PHOI.id) {
-                                                hanhDong = action.SEND;
-                                            }
-
-                                            app.model.hcthHistory.create({
-                                                key: req.body.id, loai: CONG_VAN_DI_TYPE, hanhDong: hanhDong, thoiGian: new Date().getTime(),
-                                                shcc: req.session?.user?.shcc,
-                                            },
-                                                (error) => {
-                                                    onStatusChange(item, trangThaiBefore, trangThaiAfter);
-                                                    res.send({ error, item });
-                                                }
-                                            );
-                                        });
-                                    })
-                            );
-                        }
-                    });
-                }
-            });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
         }
     });
+
+
+    app.put('/api/hcth/van-ban-di/ready/:id', app.permission.orCheck(staffPermission), async (req, res) => {
+        try {
+            const instance = await getInstance(req.params.id);
+
+            //TODO: check permission in api level
+            const currentStatus = instance.trangThai;
+            let nextStatus;
+            switch (currentStatus) {
+                case vanBanDi.trangThai.NHAP.id:
+                case vanBanDi.trangThai.TRA_LAI_NOI_DUNG.id:
+                    nextStatus = vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id;
+                    break;
+                case vanBanDi.trangThai.TRA_LAI_THE_THUC.id:
+                    nextStatus = vanBanDi.trangThai.KIEM_TRA_THE_THUC.id;
+                    break;
+                case vanBanDi.trangThai.TRA_LAI.id:
+                    nextStatus = vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id;
+
+
+                    break;
+                default:
+                    throw 'Trạng thái văn bản không hợp lệ';
+            };
+
+            //TODO: check status change condition
+            const files = await getFiles(instance.id);
+            files.forEach(vanBanDiFile => {
+                if (!vanBanDiFile.phuLuc) {
+                    const configs = vanBanDiFile.config;
+                    configs.forEach(config => {
+                        if ([vanBanDi.signType.NOI_DUNG.id, vanBanDi.signType.THE_THUC.id, vanBanDi.signType.KY_PHAT_HANH.id,].includes(config.signType)) {
+                            if (!config.shcc) throw `${vanBanDi.signType[config.signType].text} ở tệp tin ${vanBanDiFile.file.ten} chưa được cấu hình cán bộ ký.`;
+                        }
+                    })
+                }
+            })
+
+            await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextStatus });
+            await app.model.hcthHistory.create({ loai: 'DI', key: instance.id, shcc: req.session?.user?.shcc, hanhDong: action.UPDATE_STATUS, thoiGian: new Date().getTime() });
+            //TODO: reuse send notification
+            res.send({});
+
+        } catch (error) {
+            console.error(error);
+            console.log(error.message);
+            res.send({ error });
+        }
+    });
+
+
+    /**
+     * 
+     * Handle files when creating van ban di
+     * @param file: object {fileName, originalFileName, phuLuc}
+     * @param vanBanDi: id van ban di moi tao
+     * @param creator: shcc cua can bo tai len file
+     * 
+     */
+    const createFileVanBanDi = async (file, vanBanDi, creator) => {
+        let instance = await app.model.hcthVanBanDiFile.create({ vanBanDi, phuLuc: file.phuLuc }),
+            currentPath = app.path.join(app.assetPath, `congVanDi/new/${file.fileName}`),
+            fileStat = await app.fs.statSync(currentPath);
+
+        app.fs.renameSync(currentPath, app.path.join(app.assetPath, `congVanDi/${vanBanDi}/${file.fileName}`));
+
+        const newFile = await app.model.hcthFile.create({ ten: file.originalFilename, nguoiTao: creator, tenFile: file.fileName, kichThuoc: Math.round(fileStat.size / 1024 * 100) / 100, loai: 'FILE_VBD', ma: instance.id, ngayTao: new Date().getTime(), });
+
+        instance = await app.model.hcthVanBanDiFile.update({ id: instance.id }, { fileId: newFile.id });
+
+        return instance;
+    };
+
+
+    const deleteCongVan = async (id, done) => {
+        try {
+            await app.model.hcthVanBanDiFile.delete({ ma: id });
+            await app.model.hcthCongVanDi.delete({ id });
+            app.fs.deleteFolder(app.assetPath + '/congVanDi/' + id);
+            done && done();
+        } catch {
+            done && done(error);
+        }
+    };
+
+    app.get('/api/hcth/van-ban-di/file/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
+            const { id } = req.params;
+            const instance = await app.model.hcthVanBanDiFile.get({ id });
+            const file = await app.model.hcthFile.get({ id: instance.fileId });
+
+            if (!instance || !file) return res.status(404).send({ error: 'Tệp tin không tồn tại' });
+
+            const buffer = app.fs.readFileSync(app.path.join(app.assetPath, `congVanDi/${instance.vanBanDi}`, file.tenFile), 'base64');
+            // res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
+            res.send({ data: buffer });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send(error);
+        }
+    });
+
+    app.put('/api/hcth/van-ban-di/:id', app.permission.orCheck(staffPermission, 'hcthCongVanDi:read', 'developer:login'), async (req, res) => {
+        try {
+            //NOTE this api will not accept modification of status
+            const { files = [], canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], trangThai, ...data } = req.body;
+            const id = req.params.id;
+            let instance = await getInstance(id);
+
+            //TODO: check suitable status to update if not throw error
+
+            instance = await app.model.hcthCongVanDi.update({ id }, data);
+
+            //update don vi nhan
+            // NOTE: this is just a quick solution
+            //TODO: delete only deleted items and create only new item
+            await app.model.hcthDonViNhan.delete({ ma: id, loai: LOAI_VAN_BAN });
+            await app.model.hcthCanBoNhan.delete({ ma: id, loai: LOAI_VAN_BAN });
+            await app.model.hcthBanLuu.delete({ ma: id, loai: LOAI_VAN_BAN });
+
+            //create don vi nhan ngoai from list
+            await app.model.hcthDonViNhan.createFromList(donViNhanNgoai, instance.id, LOAI_VAN_BAN, { donViNhanNgoai: 1, });
+            await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN, { donViNhanNgoai: 0, });
+
+            // create ban luu
+            await app.model.hcthBanLuu.createFromList(banLuu, instance.id, LOAI_VAN_BAN,);
+
+            //create can bo nhan from list
+            await app.model.hcthCanBoNhan.listCreate(canBoNhan.map(shcc => ({ canBoNhan: shcc, ma: instance.id, loai: LOAI_VAN_BAN })));
+            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc })
+            res.send({});
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
 
     app.delete('/api/hcth/van-ban-di', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    app.get('/api/hcth/van-ban-di/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let condition = { statement: null };
-        const statement = ['trichYeu', 'donViGui', 'soCongVan']
-            .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
-        if (req.query.condition) {
-            condition = {
-                statement,
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            };
+
+    app.put('/api/hcth/van-ban-di/content/approve/:id', app.permission.check(managerPermission), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const instance = await getInstance(id);
+
+            if (instance.trangThai != vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id)
+                throw 'Trạng thái văn bản không hợp lệ';
+
+            //TODO: check don vi quan ly
+            if (instance.loaiCongVan == vanBanDi.loaiCongVan.TRUONG)
+                await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.KIEM_TRA_THE_THUC.id });
+            else
+                await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.KY_PHAT_HANH.id });
+            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.UPDATE_STATUS, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+
+            res.send({});
+
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
         }
-        app.model.hcthCongVanDi.getPage(pageNumber, pageSize, condition, (error, page) => {
-            res.send({ error, page });
-        });
     });
 
+    app.put('/api/hcth/van-ban-di/formality/approve/:id', app.permission.check('hcthCongVanDi:manage'), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const instance = await getInstance(id);
+
+            if (instance.trangThai != vanBanDi.trangThai.KIEM_TRA_THE_THUC.id)
+                throw 'Trạng thái văn bản không hợp lệ';
+
+            await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.KY_THE_THUC.id });
+            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.UPDATE_STATUS, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+
+            res.send({});
+
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
+    app.put('/api/hcth/van-ban-di/return/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = req.params.id, lyDo = req.body;
+            const instance = await getInstance(id);
+            const current = instance.trangThai;
+            let nextStatus;
+            //TODO: check permission when return
+            switch (current) {
+                case vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id:
+                    nextStatus = vanBanDi.trangThai.TRA_LAI_NOI_DUNG.id;
+                    break;
+                case vanBanDi.trangThai.KIEM_TRA_THE_THUC.id:
+                    nextStatus = vanBanDi.trangThai.TRA_LAI_THE_THUC.id; break;
+                case vanBanDi.trangThai.KY_PHAT_HANH.id:
+                    nextStatus = vanBanDi.trangThai.TRA_LAI.id; break;
+                default:
+                    throw 'Trạng thái văn bản không hợp lệ';
+            }
+            await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextStatus });
+            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.RETURN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+            res.send({})
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
     // Upload API  -----------------------------------------------------------------------------------------------
     app.fs.createFolder(app.path.join(app.assetPath, '/congVanDi'));
 
-    app.uploadHooks.add('hcthCongVanDiFile', (req, fields, files, params, done) =>
-        app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
+    app.uploadHooks.add('hcthVanBanDiFileV2', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthVanBanDiFile(req, fields, files, params, done), done, 'staff:login'));
 
-    app.uploadHooks.add('hcthCongVanDiUpdateFile', (req, fields, files, params, done) =>
-        app.permission.has(req, () => hcthCongVanDiUpdateFile(req, fields, files, params, done), done, 'staff:login'));
+    const hcthVanBanDiFile = async (req, fields, files, params, done) => {
+        try {
+            const type = fields.userData?.length && fields.userData[0],
+                data = fields.data && fields.data[0] && app.utils.parse(fields.data[0]);
+            console.log({ data });
+            if (type == 'hcthVanBanDiFileV2') {
+                const
+                    file = files.hcthVanBanDiFileV2[0],
+                    { path, originalFilename } = file,
+                    validFileType = ['.pdf'], //TODO: allow doc and docx
+                    fileName = path.replace(/^.*[\\\/]/, ''),
+                    extName = app.path.extname(fileName);
+                if (!validFileType.includes(extName))
+                    return done && done({ error: 'Định dạng file không hợp lệ' });
+                if (!data.id) {
+                    app.fs.renameSync(path, app.path.join(app.assetPath, 'congVanDi/new', fileName));
+                    done && done({
+                        fileName,
+                        originalFilename,
+                        phuLuc: data.phuLuc,
+                        file: { ten: originalFilename, tenFile: fileName },
+                    });
+                }
+                else {
+                    //check if van ban di to add file existed
+                    const vbd = await getInstance(data.id);
+                    //get file stat
+                    const fileStat = await app.fs.statSync(path);
+                    //move file to van ban asset folder
+                    app.fs.renameSync(path, app.path.join(app.assetPath, `congVanDi/${data.id}`, fileName));
+                    // create van ban di file instance
+                    let instance = await app.model.hcthVanBanDiFile.create({ vanBanDi: vbd.id, phuLuc: data.phuLuc });
+                    // create physic file information
+                    const newFile = await app.model.hcthFile.create({ ten: file.originalFilename, nguoiTao: req.session.user.shcc, tenFile: fileName, kichThuoc: Math.round((fileStat.size / 1024) * 100) / 100, loai: 'FILE_VBD', ma: instance.id, thoiGian: new Date().getTime(), });
+                    // update the latest physic file of van ban di file
+                    instance = await app.model.hcthVanBanDiFile.update({ id: instance.id }, { fileId: newFile.id });
+                    done && done({
+                        ...instance,
+                        file: newFile
+                    })
+                };
+            }
 
-    const hcthCongVanDiFile = async (req, fields, files, params, done) => {
+        } catch (error) {
+            console.error(error);
+            done && done({ error });
+        }
+    };
+
+    app.uploadHooks.add('hcthKyDienTu', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthKyDienTu(req, fields, files, params, done), done, 'staff:login'));
+
+    const hcthKyDienTu = async (req, fields, files, params, done) => {
         try {
             if (
                 fields.userData &&
                 fields.userData[0] &&
-                fields.userData[0].startsWith('hcthCongVanDiFile') &&
-                files.hcthCongVanDiFile &&
-                files.hcthCongVanDiFile.length > 0) {
+                fields.userData[0].startsWith('hcthKyDienTu') &&
+                files.file &&
+                files.file.length > 0) {
                 const
-                    srcPath = files.hcthCongVanDiFile[0].path,
-                    generatedFileName = srcPath.substring(srcPath.lastIndexOf('/') + 1, srcPath.length),
-                    isNew = fields.userData[0].substring(18) == 'new',
-                    id = fields.userData[0].substring(18),
-                    originalFilename = files.hcthCongVanDiFile[0].originalFilename,
-                    filePath = (isNew ? '/new/' : `/${id}/`) + generatedFileName,
-                    destPath = app.assetPath + '/congVanDi' + filePath,
-                    validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
-                    baseNamePath = app.path.extname(srcPath);
+                    srcPath = files.file[0].path,
+                    validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
+                    baseNamePath = app.path.extname(srcPath),
+                    originalFilename = files.file[0].originalFilename,
+                    randomFilename = srcPath.substring(srcPath.lastIndexOf('/') + 1);
+
+                const [rest, congVanId, fileId, signAt] = fields.userData[0].split(':');
+
+                console.log(congVanId, fileId, signAt);
 
                 if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-                    done && done({ error: 'Định dạng tập tin không hợp lệ!' });
+                    done({ error: 'Định dạng tập tin không hợp lệ!' });
                     app.fs.deleteFile(srcPath);
                 } else {
+                    const destPath = app.path.join(app.assetPath, 'congVanDi', congVanId);
                     await app.fs.createFolder(
-                        app.path.join(app.assetPath, '/congVanDi/' + (isNew ? '/new' : '/' + id))
+                        destPath
                     );
-                    await app.fs.rename(srcPath, destPath);
 
-                    const newFile = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id, tenFile: generatedFileName, nguoiTao: req.session.user.shcc });
+                    app.fs.renameSync(srcPath, destPath + `/${randomFilename}`);
 
-                    const canBo = await app.model.canBo.get({ shcc: req.session.user.shcc });
+                    const item = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: 'FILE_VBD', ma: fileId, tenFile: randomFilename });
 
-                    done && done({ error: null, item: { ...newFile, hoNguoiTao: canBo.ho, tenNguoiTao: canBo.ten } });
+                    await app.model.hcthSigningConfig.update({ vbdfId: fileId, shcc: req.session.user.shcc }, { signAt, status: 'DA_KY' });
+                    // await ap
+                    // await app.model.hcthCanBoKy.update({ nguoiKy: req.session.user.shcc, congVanTrinhKy: fileId }, { trangThai: 'DA_KY' });
+
+                    done && done({ error: null, item });
                 }
             }
         } catch (error) {
-            done && done({ error });
-        }
-    };
-
-    const hcthCongVanDiUpdateFile = async (req, fields, files, params, done) => {
-        try {
-            if (
-                fields.userData &&
-                fields.userData[0] &&
-                fields.userData[0].startsWith('hcthCongVanDiUpdateFile') &&
-                files.hcthCongVanDiUpdateFile &&
-                files.hcthCongVanDiUpdateFile.length > 0) {
-
-                const userDataArr = fields.userData[0].split(':');
-                const
-                    srcPath = files.hcthCongVanDiUpdateFile[0].path,
-                    generatedFileName = srcPath.substring(srcPath.lastIndexOf('/') + 1, srcPath.length),
-                    id = userDataArr[1],
-                    originalFilename = files.hcthCongVanDiUpdateFile[0].originalFilename,
-                    filePath = `/${id}/${generatedFileName}`,
-                    destPath = app.assetPath + '/congVanDi' + filePath,
-                    validUploadFileType = ['.doc', '.docx', '.pdf', '.png', '.jpg'],
-                    baseNamePath = app.path.extname(srcPath);
-
-                const originFileId = userDataArr[2];
-
-                const updateFileId = userDataArr[3];
-
-                if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-                    done && done({ error: 'Định dạng tập tin không hợp lệ!' });
-                    app.fs.deleteFile(srcPath);
-                } else {
-                    await app.fs.rename(srcPath, destPath);
-                    const newFile = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, ma: id === 'new' ? null : id, tenFile: generatedFileName, capNhatFileId: originFileId, nguoiTao: req.session.user.shcc });
-                    const canBo = await app.model.canBo.get({ shcc: req.session.user.shcc });
-                    // update cong van trinh ki
-
-                    const congVanTrinhKy = await await app.model.hcthCongVanTrinhKy.get({ fileCongVan: updateFileId, congVan: id });
-
-                    if (congVanTrinhKy) {
-                        await app.model.hcthCongVanTrinhKy.update({ fileCongVan: updateFileId, congVan: id }, { fileCongVan: newFile.id });
-                    }
-                    //await app.model.hcthCongVanTrinhKy.update({ fileCongVan: updateFileId }, { fileCongVan: newFile.id });
-                    done && done({ error: null, item: { ...newFile, hoNguoiTao: canBo.ho, tenNguoiTao: canBo.ten } });
-                }
-            }
-        } catch (error) {
+            console.log(error);
             done && done({ error });
         }
     };
 
 
 
-    //Delete file
-    app.put('/api/hcth/van-ban-di/delete-file', app.permission.check('hcthCongVanDi:delete'), async (req, res) => {
+    app.get('/api/hcth/van-ban-di/file-list/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
-            const
-                id = req.body.id,
-                fileId = req.body.fileId,
-                updateFileId = req.body.updateFileId,
-                file = req.body.file,
-                congVan = id || null,
-                path = app.assetPath + '/congVanDi/' + (id ? id + '/' : 'new/'),
-                filePath = path + file;
-
-            // xoa file goc
-
-            await app.model.hcthFile.delete({ id: fileId, ma: congVan });
-
-            const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan: fileId, congVan });
-
-            if (congVanTrinhKy) {
-                await app.model.hcthCongVanTrinhKy.delete({ fileCongVan: fileId, congVan });
-                await app.model.hcthCanBoKy.delete({ congVanTrinhKy: congVanTrinhKy.id });
-            }
-
-            if (app.fs.existsSync(filePath))
-                await app.fs.deleteFile(filePath);
-
-            // xoa cac file cap nhat
-            const checkUpdateFile = await app.model.hcthFile.get({ ma: congVan, capNhatFileId: fileId });
-
-            if (checkUpdateFile) {
-                const listUpdateFile = await app.model.hcthFile.getAll({ ma: congVan, capNhatFileId: fileId });
-                await app.model.hcthFile.delete({ ma: congVan, capNhatFileId: fileId });
-                listUpdateFile.forEach(file => {
-                    if (app.fs.existsSync(path + file)) app.fs.deleteFile(path + file);
-                });
-
-                const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ fileCongVan: updateFileId, congVan });
-                if (congVanTrinhKy) {
-                    await app.model.hcthCongVanTrinhKy.delete({ fileCongVan: updateFileId, congVan });
-                    await app.model.hcthCanBoKy.delete({ congVanTrinhKy: congVanTrinhKy.id });
-                }
-            }
-
-            res.send({ error: null });
-
+            const instance = await getInstance(req.params.id);
+            //TODO: check get permission
+            res.send({ files: await getFiles(instance.id) });
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
-
     });
 
-    app.get('/api/hcth/van-ban-di/download/:id/:fileName', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
-        try {
-            const { id, fileName } = req.params;
-            const congVan = await app.model.hcthCongVanDi.get({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'donViNhan', 'id');
-            if (!await isRelated(congVan, donViNhan, req)) {
-                throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
-            } else {
-                const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
-                if (app.fs.existsSync(dir)) {
-                    const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
-                    for (const serverFileName of serverFileNames) {
-                        const clientFileIndex = serverFileName.indexOf(fileName);
-                        if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
-                            const fileCongVan = await app.model.hcthFile.get({ ma: id, tenFile: serverFileName });
-                            return res.download(app.path.join(dir, serverFileName), app.path.join(dir, fileCongVan.ten));
-                        }
-                    }
-                }
-            }
-            throw { status: 404, message: 'Không tìm thấy tập tin!' };
-        } catch (error) {
-            res.status(error.status || 400).send(error.message || 'Không tìm thấy tập tin');
-        }
-    });
+    //TODO: delelte file
 
-    // Cần sửa lại
     const isRelated = async (congVan, donViNhan, req) => {
         try {
             const permissions = req.session.user.permissions;
@@ -533,16 +497,17 @@ module.exports = app => {
             let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
             if (canBoNhan && canBoNhan.split(',').includes(req.session.user.shcc))
                 return true;
-            else if (donViGui == maDonVi && (permissions.includes('donViCongVanDi:manage') || maDonViQuanLy.find(item => donViGui.includes(item.maDonVi)) || permissions.includes('donViCongVanDi:edit'))) {
+            else if (donViGui == maDonVi && (permissions.includes(managerPermission) || maDonViQuanLy.find(item => donViGui.includes(item.maDonVi)) || permissions.includes(staffPermission))) {
                 return true;
             } else {
                 let maDonViNhan = donViNhan.map((item) => item.donViNhan);
-                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDi:manage') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
+                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes(managerPermission) && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
             }
         } catch {
             return false;
         }
     };
+
     const viewCongVan = async (congVanId, shcc, nguoiTao) => {
         if (!shcc || shcc == nguoiTao) return;
         const history = await app.model.hcthHistory.get({ loai: 'DI', key: congVanId, shcc: shcc, hanhDong: action.VIEW });
@@ -559,86 +524,108 @@ module.exports = app => {
             if (isNaN(id)) {
                 throw { status: 400, message: 'Invalid id' };
             }
-            const congVan = await app.model.hcthCongVanDi.get({ id });
-            const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
 
-            const banLuu = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'BAN_LUU' }, 'id, donViNhan', 'id');
+            const congVan = await getInstance(id);
+
+            // const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
+            let donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: LOAI_VAN_BAN, donViNhanNgoai: 0 }, 'donViNhan', 'id');
+            let donViNhanNgoai = await app.model.hcthDonViNhan.getAll({ ma: id, loai: LOAI_VAN_BAN, donViNhanNgoai: 1 }, 'donViNhan', 'id');
+            let canBoNhan = await app.model.hcthCanBoNhan.getAll({ ma: id, loai: LOAI_VAN_BAN });
+            const banLuu = await app.model.hcthBanLuu.getAll({ ma: id, loai: LOAI_VAN_BAN }, 'donVi', 'id');
             if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            else if (congVan?.trangThai == trangThaiCongVanDi.DA_PHAN_PHOI.id && req.session.user?.shcc) {
+            //TODO: use new state system
+            else if (congVan.trangThai == vanBanDi.trangThai.DA_PHAT_HANH.id && req.session.user?.shcc) {
                 await viewCongVan(id, req.session.user.shcc, congVan.nguoiTao);
             }
-            let files = await app.model.hcthFile.getAllFrom(id, 'DI');
+            // let files = await app.model.hcthFile.getAllFrom(id, 'DI');
 
-            files = files.rows;
+            const files = await getFiles(id);
 
             const phanHoi = await app.model.hcthPhanHoi.getAllFrom(id, 'DI');
             const history = await app.model.hcthHistory.getAllFrom(id, 'DI', req.query.historySortType);
-            const vanBanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(id);
 
-            const vanBanTrinhKyWithListCanBo = await Promise.all(vanBanTrinhKy.rows.map(async vanBan => {
-                const listCanBoKy = await app.model.hcthCanBoKy.getAll({ congVanTrinhKy: vanBan.id });
-                return { ...vanBan, listCanBoKy };
-            }));
+            let danhSachCanBoNhan = [],
+                danhSachDonViNhan = [],
+                danhSachDonViNhanNgoai = [];
+            donViNhan = donViNhan.map((item) => item.donViNhan);
+            donViNhanNgoai = donViNhanNgoai.map((item) => item.donViNhan);
+            canBoNhan = canBoNhan.map((item) => item.canBoNhan)
+            if (canBoNhan.length) {
+                danhSachCanBoNhan = await app.model.canBo.getAll({
+                    statement: 'SHCC IN (:danhSach)',
+                    parameter: { danhSach: canBoNhan }
+                }, 'shcc,ten,ho,email', 'ten');
+            }
+            console.log(donViNhan, donViNhanNgoai, canBoNhan)
+
+            if (donViNhan?.length) {
+                danhSachDonViNhan = await app.model.dmDonVi.getAll({
+                    statement: `MA IN (${donViNhan.toString()})`,
+                    parameter: {},
+                }, 'ma, ten', 'ma');
+            }
+
+            if (donViNhanNgoai?.length) {
+                danhSachDonViNhanNgoai = await app.model.dmDonViGuiCv.getAll({
+                    statement: `ID IN (${donViNhanNgoai.toString()})`,
+                    parameter: {},
+                }, 'id, ten', 'id');
+            }
 
             res.send({
                 item: {
                     ...congVan,
+                    donViNhan, donViNhanNgoai, canBoNhan, files,
+                    danhSachCanBoNhan, danhSachDonViNhan, danhSachDonViNhanNgoai,
+                    banLuu: banLuu.map(item => item.donVi),
                     phanHoi: phanHoi?.rows || [],
-                    donViNhan: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 0).map((item) => item.donViNhan) : []).toString(),
-                    donViNhanNgoai: (donViNhan ? donViNhan.filter((item) => item.donViNhanNgoai == 1).map((item) => item.donViNhan) : []
-                    ).toString(),
-                    banLuu: banLuu ? banLuu.map(item => item.donViNhan) : [],
-                    yeuCauKy: vanBanTrinhKyWithListCanBo,
-                    listFile: files || [],
                     history: history?.rows || [],
                 },
             });
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
 
-    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.check('staff:login', 'developer:login'), (req, res) => {
-        const { canBoGui, noiDung, key, ngayTao, loai } = req.body.data;
 
-        const newPhanHoi = {
-            canBoGui,
-            noiDung,
-            key: Number(key),
-            ngayTao: Number(ngayTao),
-            loai
-        };
+    const getFiles = async (id) => {
+        /**
+         * TODO:
+         *  there aren't many files in each van ban di, but we should use function in db just in case;
+         */
+        const
+            files = await app.model.hcthVanBanDiFile.getAll({ vanBanDi: id }),
+            result = files.map(async (item) => {
+                const config = await app.model.hcthSigningConfig.getList(item.id),
+                    file = await app.model.hcthFile.get({ id: item.fileId });
+                return {
+                    ...item,
+                    file, //physic file info 
+                    config: config.rows || [] //all signing config of van ban di file(signType, singer, ...)
+                };
+            });
+        return await Promise.all(result);
+    }
 
-        app.model.hcthPhanHoi.create(newPhanHoi, (error, item) => res.send({ error, item }));
+    app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
+            //TODO: check permission
+            const { noiDung, key } = req.body.data;
+
+            const newPhanHoi = {
+                canBoGui: req.session.user.shcc,
+                noiDung,
+                key: Number(key),
+                ngayTao: new Date().getTime(),
+                loai: LOAI_VAN_BAN
+            };
+
+            await app.model.hcthPhanHoi.create(newPhanHoi);
+        } catch (error) { console.error(error); res.send({ error }) }
     });
-
-    // sửa lại
-    const getMessage = (status) => {
-        switch (status) {
-            case '4':
-                return 'Bạn có văn bản đi bị trả lại';
-            case '5':
-                return 'Bạn đã nhận văn bản đi mới';
-            default:
-                return '';
-        }
-    };
-
-    const getIconColor = (status) => {
-        switch (status) {
-            case '4':
-                return 'danger';
-            case '2':
-            case '3':
-                return 'info';
-            default:
-                return '';
-        }
-    };
-
-
 
     app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
@@ -653,75 +640,11 @@ module.exports = app => {
         }));
     };
 
-    const createStaffNotification = async (item, status) => {
-        const staff = await app.model.hcthCongVanDi.getAllStaff(item.id);
-
-        const emails = staff.rows.map(item => item.email);
-
-        await createNotification(emails, { title: 'Văn bản đi', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
-    };
-
-    // Đang gửi cho phòng Hcth
-    const createHcthStaffNotification = async (item, status) => {
-        const hcthStaff = await app.model.hcthCongVanDi.getHcthStaff();
-        const emails = hcthStaff.rows.map(item => item.email);
-        await createNotification(emails, { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản đi cần kiểm tra', iconColor: getIconColor(status), link: `/user/hcth/van-ban-di/${item.id}` });
-
-    };
-
-    // Đang gửi cho phòng chuyên viên quản lý hoặc trưởng phòng
-    const createCanBoQuanLyNotification = async (item, status) => {
-        let listEmail = [];
-
-        const manageStaff = await app.model.canBo.get({ maDonVi: item.donViGui, chucVu: '003' }, 'shcc, email');
-        if (manageStaff && manageStaff.shcc !== item.nguoiTao) listEmail.push(manageStaff.email);
-
-        const manageCongVanDiStaff = await app.model.fwAssignRole.getAll({ nguoiGan: manageStaff.shcc, tenRole: 'donViCongVanDi:manage' }, 'nguoiDuocGan');
-
-        if (manageCongVanDiStaff.length > 0) {
-            const listShcc = manageCongVanDiStaff.map(staff => staff.nguoiDuocGan).filter(shcc => shcc !== item.nguoiTao);
-
-            const canBos = await app.model.canBo.getAll({
-                statement: 'shcc IN (:dsCanBo)',
-                parameter: {
-                    dsCanBo: [...listShcc, ''],
-                }
-            }, 'email, shcc', 'email');
-
-            const listStaffEmail = canBos.map(canBo => canBo.email);
-            listEmail = [...listEmail, ...listStaffEmail];
-        }
-
-        await createNotification(listEmail, { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản cần xem xét', iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
-
-    };
-
-    // Đang gửi cho hiệu trưởng
-    const createSchoolAdministratorNotification = async (item, status) => {
-        const principal = await app.model.canBo.get({ shcc: '001.0068' }, 'shcc, email');
-        await createNotification([principal.email], { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản cần duyệt', iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
-    };
-
-    // Gửi cho người tạo
-    const createAuthorNotification = async (id, shcc, status) => {
-        const staff = await app.model.canBo.get({ shcc: shcc }, 'email');
-
-        await createNotification([staff.email], { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản bị trả lại', iconColor: getIconColor(status), link: `/user/van-ban-di/${id}` });
-    };
-
-    // Gửi cho cán bộ ký
-    const createSignNotification = async (item, status) => {
-        const signStaff = await app.model.hcthCongVanDi.getSignStaff(item.id);
-
-        const emails = signStaff.rows.map(item => item.email);
-
-        await createNotification(emails, { title: 'Văn bản đi', icon: 'fa-book', subTitle: 'Bạn có một văn bản chờ ký', iconColor: getIconColor(status), link: `/user/van-ban-di/${item.id}` });
-    };
 
     // Phân quyền Quản lý Văn bản đi trong đơn vị
     const quanLyCongVanDiRole = 'quanLyCongVanDiPhong';
 
-    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: 'donViCongVanDi:manage', text: 'Quản lý văn bản đi trong đơn vị' });
+    app.assignRoleHooks.addRoles(quanLyCongVanDiRole, { id: managerPermission, text: 'Quản lý văn bản đi trong đơn vị' });
 
     app.assignRoleHooks.addHook(quanLyCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -733,7 +656,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'checkRoleQuanLyDonVi', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length > 0) {
-            app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
+            app.permissionHooks.pushUserPermission(user, staffPermission, managerPermission, 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write');
         }
         resolve();
     }));
@@ -741,8 +664,8 @@ module.exports = app => {
     app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVanDiTrongDonVi', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole === quanLyCongVanDiRole);
         inScopeRoles.forEach(role => {
-            if (role.tenRole == 'donViCongVanDi:manage') {
-                app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:manage', 'dmDonVi:read', 'dmDonViGuiCv:read', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
+            if (role.tenRole == managerPermission) {
+                app.permissionHooks.pushUserPermission(user, managerPermission, 'dmDonVi:read', 'dmDonViGuiCv:read');
             }
         });
         resolve();
@@ -761,13 +684,6 @@ module.exports = app => {
         }
     });
 
-    // app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
-    //     if (staff.donViQuanLy && staff.donViQuanLy.length > 0 && staff.maDonVi == MA_HCTH) {
-    //         app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:manage', 'hcth:manage');
-    //     }
-    //     resolve();
-    // }));
-
     app.permissionHooks.add('assignRole', 'checkRoleHcthQuanLyCongVanDi', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == hcthQuanLyCongVanDiRole);
         inScopeRoles.forEach(role => {
@@ -781,7 +697,7 @@ module.exports = app => {
     // Phân quyền soạn thảo văn bản đi trong đơn vị
     const soanThaoCongVanDiRole = 'soanThaoCongVanDi';
 
-    app.assignRoleHooks.addRoles(soanThaoCongVanDiRole, { id: 'donViCongVanDi:edit', text: 'Soạn thảo văn bản đi trong đơn vị' });
+    app.assignRoleHooks.addRoles(soanThaoCongVanDiRole, { id: staffPermission, text: 'Soạn thảo văn bản đi trong đơn vị' });
 
     app.assignRoleHooks.addHook(soanThaoCongVanDiRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
@@ -794,8 +710,8 @@ module.exports = app => {
     app.permissionHooks.add('assignRole', 'checkRoleSoanThaoCongVanDi', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == soanThaoCongVanDiRole);
         inScopeRoles.forEach(role => {
-            if (role.tenRole === 'donViCongVanDi:edit') {
-                app.permissionHooks.pushUserPermission(user, 'donViCongVanDi:edit', 'dmDonVi:read', 'dmDonViGuiCv:read', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
+            if (role.tenRole === staffPermission) {
+                app.permissionHooks.pushUserPermission(user, staffPermission, 'dmDonVi:read', 'dmDonViGuiCv:read');
             }
         });
         resolve();
@@ -817,7 +733,7 @@ module.exports = app => {
         const data = {
             ids, excludeIds, hasIds, fromTime, toTime,
             shccCanBo: req.session.user?.shcc,
-            donViCanBo: donViCanBo.toString() || (userPermissions.includes('donViCongVanDi:manage') ? req.session.user?.staff?.maDonVi : '') || '',
+            donViCanBo: donViCanBo.toString() || (userPermissions.includes(managerPermission) ? req.session.user?.staff?.maDonVi : '') || '',
             staffType
         };
         let filterParam;
@@ -838,123 +754,6 @@ module.exports = app => {
         }
     });
 
-    const updateCongVanDi = (id, changes) => new Promise((resolve, reject) => {
-        app.model.hcthCongVanDi.update({ id }, changes, (error, item) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(item);
-            }
-        });
-    });
-
-    const statusToAction = (before, after) => {
-        switch (before) {
-            case trangThaiCongVanDi.NHAP.id:
-            case trangThaiCongVanDi.TRA_LAI.id:
-                if (before == after) {
-                    return action.UPDATE;
-                }
-                return action.SEND;
-            // Cần làm trả lại ở đây
-            case trangThaiCongVanDi.XEM_XET.id:
-                if (after == trangThaiCongVanDi.TRA_LAI_PHONG.id) {
-                    return action.RETURN;
-                }
-                return action.SEND;
-            case trangThaiCongVanDi.CHO_KIEM_TRA.id:
-                if (after == trangThaiCongVanDi.TRA_LAI.id) return action.RETURN;
-                else return action.ACCEPT;
-            case trangThaiCongVanDi.CHO_DUYET.id:
-                if (after == trangThaiCongVanDi.TRA_LAI.id) return action.RETURN;
-                else return action.APPROVE;
-            case trangThaiCongVanDi.DA_XEM_XET.id:
-            case trangThaiCongVanDi.DA_DUYET.id:
-                return action.WAIT_SIGN;
-            //Từ chờ phân phối -> chờ ký hoặc đã phân phối
-            case trangThaiCongVanDi.CHO_PHAN_PHOI.id:
-                if (after == trangThaiCongVanDi.CHO_KY.id) return action.WAIT_SIGN;
-                else if (after == trangThaiCongVanDi.TRA_LAI_HCTH.id) return action.RETURN;
-                else return action.DISTRIBUTE;
-            case trangThaiCongVanDi.TRA_LAI_HCTH.id:
-                if (before == after) return action.UPDATE;
-                else return action.SEND;
-            default:
-                return '';
-        }
-    };
-
-    const createSoCongVan = (ma, donViGui) => new Promise((resolve, reject) => {
-        const currentYear = new Date().getFullYear();
-        const firstDayOfYear = new Date(currentYear, 0, 1);
-        const nam = Date.parse(firstDayOfYear);
-        app.model.hcthCongVanDi.updateSoCongVanDi(ma, donViGui, nam, (error) => {
-            if (error) {
-                return reject(error);
-            } else {
-                resolve();
-            }
-        });
-    });
-
-    app.put('/api/hcth/van-ban-di/status', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
-        try {
-            let { id, trangThai, donViGui } = req.body.data;
-            const congVan = await app.model.hcthCongVanDi.get({ id });
-            if (congVan.trangThai == trangThai || !trangThai) {
-                res.send({ error: null, item: congVan });
-            } else {
-                if (trangThai == trangThaiCongVanDi.DA_XEM_XET.id) {
-                    await createSoCongVan(id, donViGui);
-                }
-                if (trangThai == trangThaiCongVanDi.CHO_KY.id) {
-                    const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.get({ congVan: id });
-                    if (!congVanTrinhKy) {
-                        trangThai = trangThaiCongVanDi.DA_PHAN_PHOI.id;
-                    }
-                }
-
-                await app.model.hcthHistory.create({
-                    key: id,
-                    loai: CONG_VAN_DI_TYPE,
-                    thoiGian: new Date().getTime(),
-                    shcc: req.session?.user?.shcc,
-                    hanhDong: statusToAction(congVan.trangThai, trangThai),
-                });
-
-                const canBoTao = congVan.nguoiTao;
-                const newCongVan = await updateCongVanDi(id, { trangThai });
-                if (canBoTao) {
-                    await onStatusChange(congVan, congVan.trangThai, trangThai, canBoTao);
-                }
-                res.send({ newCongVan });
-            }
-        } catch (error) {
-            res.send({ error });
-        }
-    });
-
-    app.put('/api/hcth/van-ban-di/read/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
-        const { id, shcc } = req.body.data;
-        // check permission
-        const check = await app.model.hcthHistory.get({ key: id, hanhDong: action.READ, loai: 'DI', shcc: shcc });
-
-        try {
-            if (check) {
-                throw 400;
-            }
-            await app.model.hcthHistory.create({
-                key: id,
-                loai: CONG_VAN_DI_TYPE,
-                thoiGian: new Date().getTime(),
-                shcc: req.session?.user?.shcc,
-                hanhDong: action.READ,
-            });
-            res.send({ error: null });
-        } catch (error) {
-            res.send({ error });
-        }
-    });
 
     app.get('/api/hcth/van-ban-di/phan-hoi/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
@@ -966,23 +765,6 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/van-ban-di/yeu-cau-ky/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
-        try {
-            const id = parseInt(req.params.id);
-
-            const vanBanTrinhKy = await app.model.hcthCongVanTrinhKy.getAllFrom(id);
-
-            const vanBanTrinhKyWithListCanBo = await Promise.all(vanBanTrinhKy.rows.map(async vanBan => {
-                const listCanBoKy = await app.model.hcthCanBoKy.getAll({ congVanTrinhKy: vanBan.id });
-                return { ...vanBan, listCanBoKy };
-            }));
-
-            res.send({ error: null, item: vanBanTrinhKyWithListCanBo });
-
-        } catch (error) {
-            res.send({ error });
-        }
-    });
 
     app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
@@ -1008,7 +790,7 @@ module.exports = app => {
         const permissions = user.permissions;
 
         donViXem = req.session?.user?.staff?.donViQuanLy || [];
-        donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes('donViCongVanDi:manage') && req.session?.user?.staff?.maDonVi || '';
+        donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes(managerPermission) && req.session?.user?.staff?.maDonVi || '';
         canBoXem = req.session?.user?.shcc || '';
 
         let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.manage ? 2 : 0;
@@ -1150,62 +932,73 @@ module.exports = app => {
         });
     });
 
-    const onStatusChange = async (item, before, after, shcc) => {
-        if (trangThaiCongVanDi.XEM_XET.id == after) {
-            await createCanBoQuanLyNotification(item, after);
-        }
-        else if ([trangThaiCongVanDi.CHO_KIEM_TRA.id, trangThaiCongVanDi.CHO_PHAN_PHOI.id].includes(after)) {
-            await createHcthStaffNotification(item, after);
-        } else if (after == trangThaiCongVanDi.CHO_DUYET.id) {
-            await createSchoolAdministratorNotification(item, after);
-        } else if (after == trangThaiCongVanDi.DA_PHAN_PHOI.id) {
-            await createStaffNotification(item, after);
-        } else if ([trangThaiCongVanDi.TRA_LAI_PHONG.id, trangThaiCongVanDi.TRA_LAI_HCTH.id, trangThaiCongVanDi.TRA_LAI.id].includes(after)) {
-            await createAuthorNotification(item.id, shcc, after);
-        } else if (after == trangThaiCongVanDi.CHO_KY.id) {
-            await createSignNotification(item, after);
-        }
-    };
-
-
-    //api chuyển từ giai đoạn soạn thảo sang phát hành
-    app.put('/api/hcth/van-ban-di/publishing/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
-        // TODO: viết cho trường hợp có cán bộ ký
+    app.post('/api/hcth/van-ban-di/file/config', app.permission.check('staff:login'), async (req, res) => {
         try {
-            const id = Number(req.params.id);
-            const congVan = await app.model.hcthCongVanDi.get({ id });
-            if (!congVan) throw 'văn bản không tồn tại';
-            if (congVan.loaiCongVan == loaiCongVan.DON_VI.id) {
-                // TODO: check quyền throw '...'
-                if (congVan.trangThai != trangThaiCongVanDi.DA_XEM_XET.id) throw 'Trạng thái văn bản không hợp lệ';
-                const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAll({ congVan: id });
-                const trangThaiMoi = congVanTrinhKy.length ? trangThaiCongVanDi.CHO_KY.id : trangThaiCongVanDi.DA_PHAN_PHOI.id;
-                if (!congVan.laySoTuDong) {
-                    const currentYear = new Date().getFullYear();
-                    const firstDayOfYear = new Date(currentYear, 0, 1);
-                    const nam = Date.parse(firstDayOfYear);
-                    try {
-                        await app.model.hcthCongVanDi.validateSoCongVan(Number(id), congVan.donViGui, nam, trangThaiMoi);
-                    } catch {
-                        throw { message: 'Số văn bản không hợp lệ' };
-                    }
-                } else await app.model.hcthCongVanDi.update({ id }, { trangThai: trangThaiMoi });
-                // TODO: gửi thông báo nếu có văn bản trình ký
-                return res.send({});
-            }
-            else {
-                //
-                if (congVan.trangThai != trangThaiCongVanDi.DA_DUYET.id) {
-                    throw 'Trạng thái văn bản không hợp lệ';
-                }
-                // const congVanTrinhKy = await app.model.hcthCongVanTrinhKy.getAll({ congVan: id });
-                const trangThaiMoi = trangThaiCongVanDi.CHO_PHAN_PHOI.id;
-                await app.model.hcthCongVanDi.update({ id }, { trangThai: trangThaiMoi });
-                return res.send({});
-            }
+            const { id, config } = req.body;
+            console.log({ config });
+            const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
+            const promises = config.map(async item => {
+                const { id: itemId, ...data } = item
+                if (!itemId)
+                    return await app.model.hcthSigningConfig.create({ vbdfId: vanBanDiFile.id, ...data });
+                else
+                    return await app.model.hcthSigningConfig.update({ id: itemId }, data);
+            });
+            await Promise.all(promises);
+            await app.model.hcthHistory.create({ key: vanBanDiFile.vanBanDi, loai: LOAI_VAN_BAN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc, hanhDong: action.UPDATE_SIGNING_CONFIG, });
+            res.send({});
         } catch (error) {
             console.error(error);
-            return res.send({ error });
+            res.send({ error });
         }
     });
+
+
+    app.put('/api/hcth/van-ban-di/return/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const instance = await getInstance(id);
+            const lyDo = req.body.lyDo;
+            if (!lyDo) throw 'Vui lòng nhập lý do trả lại';
+            switch (instance.trangThai) {
+                case vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id:
+                    await onContentReturn(req, instance);
+                    break;
+                case vanBanDi.trangThai.KIEM_TRA_THE_THUC.id:
+                    await onFormailtyReturn(req, instance);
+                    break;
+                case vanBanDi.trangThai.KY_PHAT_HANH.id:
+                    await onPublishReturn(req, instance);
+                    break;
+                default:
+                    throw 'Trạng thái văn bản không hợp lệ';
+            }
+            await app.model.hcthPhanHoi.create({ canBoGui: req.session.user.shcc, noiDung: lyDo, key: id, ngayTao: new Date().getTime(), loai: LOAI_VAN_BAN });
+            //TODO: send creator notification
+            await app.model.hcthHistory.create({ key: instance.id, loai: LOAI_VAN_BAN, hanhDong: action.RETURN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+            res.send({});
+        } catch (error) {
+            console.error(error)
+            res.send(error)
+        }
+    })
+
+    const onContentReturn = async (req, instance) => {
+        const permissions = getCurrentPermissions(req);
+        const donViQuanLy = getDonViQuanLy(req);
+        const donVi = getDonVi(req);
+        if (donVi && permissions.includes(managerPermission)) donViQuanLy.push(donVi);
+        if (!donViQuanLy.includes(instance.donViGui)) throw 'Bạn không đủ quyền để trả lại văn bản này.';
+        await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI_NOI_DUNG.id });
+    }
+    const onFormailtyReturn = async (req, instance) => {
+        const permissions = getCurrentPermissions(req);
+        if (!permissions.includes('hcthCongVanDi:manage')) throw 'Bạn không đủ quyền để trả lại văn bản này.';
+        await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI_THE_THUC.id });
+    }
+    const onPublishReturn = async (req, instance) => {
+        const permissions = getCurrentPermissions(req);
+        if (!permissions.includes('rectors:login')) throw 'Bạn không đủ quyền để trả lại văn bản này.';
+        await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI.id });
+    }
 };

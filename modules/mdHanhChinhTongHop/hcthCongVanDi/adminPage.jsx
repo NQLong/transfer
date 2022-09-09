@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-    getHcthCongVanDiPage,
-    getHcthCongVanDiAll,
     createHcthCongVanDi,
     updateHcthCongVanDi,
     deleteHcthCongVanDi,
@@ -25,58 +23,15 @@ import {
 import {
     SelectAdapter_DmLoaiCongVan
 } from 'modules/mdDanhMuc/dmLoaiCongVan/redux';
-const { loaiCongVan } = require('../constant');
+const { loaiCongVan, vanBanDi } = require('../constant');
 
-const listTrangThai = {
-    '1': {
-        status: 'Nháp',
-        color: 'red'
-    },
-    '6': {
-        status: 'Xem xét',
-        color: 'green'
-    },
-    '2': {
-        status: 'Chờ kiểm tra',
-        color: 'blue'
-    },
-    '3': {
-        status: 'Chờ duyệt',
-        color: 'blue'
-    },
-    '4': {
-        status: 'Trả lại',
-        color: 'red'
-    },
-    '5': {
-        status: 'Đã xem xét',
-        color: 'green'
-    },
-    '7': {
-        status: 'Đã duyệt',
-        color: 'green'
-    },
-    '8': {
-        status: 'Chờ phân phối',
-        color: 'green'
-    },
-    '9': {
-        status: 'Chờ ký',
-        color: 'green'
-    },
-    '10': {
-        status: 'Đã phân phối',
-        color: 'green'
-    },
-    '11': {
-        status: 'Trả lại (Đơn vị)',
-        color: 'red'
-    },
-    '12': {
-        status: 'Trả lại (HCTH)',
-        color: 'red'
-    }
-};
+const getTrangThaiColor = (trangThai) => {
+    return vanBanDi.trangThai[trangThai]?.color || 'blue';
+}
+
+const getTrangThaiText = (trangThai) => {
+    return vanBanDi.trangThai[trangThai]?.text;
+}
 
 const timeList = [
     { id: 1, text: 'Theo ngày gửi' },
@@ -206,11 +161,6 @@ class HcthCongVanDi extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
 
-        const selectStatus = Object.keys(listTrangThai).map(item =>
-        ({
-            id: item,
-            text: listTrangThai[item].status
-        }));
         // Chỉ trưởng phòng mới có quyền thêm văn bản
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu văn bản đi',
@@ -282,7 +232,7 @@ class HcthCongVanDi extends AdminPage {
                                 }</span>
                             </>
                         } />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai ? listTrangThai[item.trangThai].color : '' }} content={item.trangThai ? listTrangThai[item.trangThai].status : ''}></TableCell>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai ? getTrangThaiColor(item.trangThai) : 'blue' }} content={item.trangThai ? getTrangThaiText(item.trangThai) : ''}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ ...permission, delete: permission.delete && item.trangThai == '1' }}
                             onEdit={`${baseUrl}/${item.id}`}
                             onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
@@ -316,7 +266,7 @@ class HcthCongVanDi extends AdminPage {
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanNgoai = e} label='Đơn vị nhận bên ngoài' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.loaiVanBan = e} label='Loại văn bản' data={SelectAdapter_DmLoaiCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.status = e} label='Trạng thái' data={selectStatus} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.status = e} label='Trạng thái' data={Object.values(vanBanDi.trangThai)} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
                     {this.timeType?.value() && (<>
                         <FormDatePicker type='date' className='col-md-4' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
@@ -338,8 +288,6 @@ class HcthCongVanDi extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi });
 const mapActionsToProps = {
-    getHcthCongVanDiAll,
-    getHcthCongVanDiPage,
     createHcthCongVanDi,
     updateHcthCongVanDi,
     deleteHcthCongVanDi,

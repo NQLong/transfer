@@ -31,4 +31,13 @@ module.exports = () => {
     Array.prototype.sample = function () {
         return this[Math.floor(Math.random() * this.length)];
     };
+
+    Array.prototype.intersect = function (other, compare = (a, b) => a == b) {
+        return this.filter(itemA => other.some(itemB => compare(itemA, itemB)));
+    }
+
+    Array.prototype.difference = function (other, compare = (a, b) => a != b) {
+        return this.filter(itemA => other.some(itemB => compare(itemA, itemB)));
+    }
+
 };
