@@ -11,18 +11,17 @@ import { HcthVanBanDiSearch } from './redux';
 
 
 const trangThaiCongVanDi = {
-    NHAP: { id: 1, text: 'Nháp', color: '#17a2b8' },
-    XEM_XET: { id: 6, text: 'Xem xét', color: '#007bff' },
-    CHO_KIEM_TRA: { id: 2, text: 'Chờ kiểm tra', color: '#007bff' },
-    CHO_DUYET: { id: 3, text: 'Chờ duyệt', color: '#007bff' },
-    TRA_LAI: { id: 4, text: 'Trả lại', color: '#dc3545' },
-    DA_XEM_XET: { id: 5, text: 'Đã xem xét', color: '#28a745' },
-    DA_DUYET: { id: 7, text: 'Đã duyệt', color: '#28a745' },
-    CHO_PHAN_PHOI: { id: 8, text: 'Chờ phân phối', color: '#007bff' },
-    CHO_KY: { id: 9, text: 'Chờ ký', color: '#007bff' },
-    DA_PHAN_PHOI: { id: 10, text: 'Đã phân phối', color: '#28a745' },
-    TRA_LAI_PHONG: { id: 11, text: 'Trả lại (Đơn vị)', color: '#dc3545' },
-    TRA_LAI_HCTH: { id: 12, text: 'Trả lại (HCTH)', color: '#dc3545' },
+    NHAP: { text: 'Nháp', id: 'NHAP', color: 'red' },
+    KIEM_TRA_NOI_DUNG: { text: 'Kiểm tra nội dung', id: 'KIEM_TRA_NOI_DUNG', color: 'blue' },
+    TRA_LAI_NOI_DUNG: { text: 'Trả lại nội dung', id: 'TRA_LAI_NOI_DUNG', color: 'red' },
+    KIEM_TRA_THE_THUC: { text: 'Kiểm tra thê thức', id: 'KIEM_TRA_THE_THUC', color: 'blue' },
+    TRA_LAI_THE_THUC: { text: 'Trả lại thể thức', id: 'TRA_LAI_THE_THUC', color: 'red' },
+    TRA_LAI: { text: 'Trả lại', id: 'TRA_LAI', color: 'red' },
+    KY_THE_THUC: { text: 'Ký thể thức', id: 'KY_THE_THUC', color: 'blue' },
+    KY_NOI_DUNG: { text: 'Kiểm tra thê thức', id: 'KIEM_TRA_THE_THUC', color: 'blue' },
+    KY_PHAT_HANH: { text: 'Ký phát hành', id: 'KY_PHAT_HANH', color: 'blue' },
+    DONG_DAU: { text: 'Đóng dấu mộc đỏ', id: 'DONG_DAU', color: 'blue' },
+    DA_PHAT_HANH: { text: 'Đã phát hành', id: 'DA_PHAT_HANH', color: 'green' },
 };
 
 const VanBanDiFilter = ({ navigation }) => {

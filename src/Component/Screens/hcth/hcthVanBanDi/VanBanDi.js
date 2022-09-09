@@ -435,7 +435,7 @@ const VanBanDi = (props) => {
                 <List.Item title='Ngày ký' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayKy ? T.dateToText(item.ngayKy) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày tạo' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayTao ? T.dateToText(item.ngayTao) : 'Chưa có'}</Text>} />
 
-                {/* <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item?.trangThai].color, fontWeight: 'bold' }}>{trangThaiVanBanDi[item?.trangThai].text}</Text>} /> */}
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item.trangThai]?.color  || 'black', fontWeight: 'bold' }}>{trangThaiVanBanDi[item.trangThai]?.text || 'Nháp'}</Text>} />
 
                 {/* <List.Item title='Ngôn ngữ' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngoaiNgu}</Text>} /> */}
 
@@ -452,7 +452,7 @@ const VanBanDi = (props) => {
     const closeMenu = () => setIsMenuVisible(false);
     const menuItems = [];
     
-    menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
+    enabledSignBtn && menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
 
     // const headerRightButton = () => <Text>askdaks</Text>;
     const headerRightButton = () => menuItems.length ? <Menu

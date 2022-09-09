@@ -71,7 +71,6 @@ export function getMoreHcthVanBanDiPage(pageNumber, pageSize, pageCondition, fil
 }
 
 export function getVanBanDi(id, context, done) {
-    console.log(id);
     if (typeof context === 'function') {
         done = context;
         context = {};
@@ -81,6 +80,7 @@ export function getVanBanDi(id, context, done) {
         const url = `/api/hcth/van-ban-di/${id}`;
 
         T.get(url, { params: context }).then(data => {
+            console.log('res: ', data);
             if (data.error) {
                 if (data.error.status === 401) {
                     console.error('GET: ' + url + '.', data.error.message);
