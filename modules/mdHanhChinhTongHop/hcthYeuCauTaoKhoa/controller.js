@@ -1,6 +1,8 @@
 module.exports = app => {
     const forge = require('node-forge');
+    const qrCode = require('qrcode');
     const { trangThaiRequest } = require('../constant');
+    const jimp = require('jimp');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -182,14 +184,23 @@ module.exports = app => {
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
 
-            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', [{
-                filename: `${shcc}-${khoa.id}.p12`,
-                content: p12b64,
-                encoding: 'base64'
-            }]);
+            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, 2000), { version: 33, errorCorrectionLevel: 'L', });
 
+            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L' });
+
+            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới',
+                [{
+                    filename: `${shcc}-${khoa.id}-1.png`,
+                    content: qrCode_1.replace('data:image/png;base64,', ''),
+                    encoding: 'base64'
+                }, {
+                    filename: `${shcc}-${khoa.id}-2.png`,
+                    content: qrCode_2.replace('data:image/png;base64,', ''),
+                    encoding: 'base64'
+                }]);
             await app.model.hcthUserPublicKey.update({ id: khoa.id }, { publicKey });
             res.send({});
+
         } catch (error) {
             res.send({ error });
         }
@@ -321,8 +332,37 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), (req, res) => {
-        const shcc = req.session.user.shcc;
-        return res.sendFile(app.path.join(app.assetPath, `/key/${shcc}.png`));
+    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+        try {
+            const shcc = req.session.user.shcc;
+            const path = app.path.join(app.assetPath, `/key/${shcc}.png`)
+            const { format, height, width, background } = req.query;
+            let buffer = app.fs.readFileSync(path, 'base64');;
+            const sendResponse = (buffer) => {
+                if (!format) {
+                    res.writeHead(200, [['Content-Type', 'image/png'], ['Content-Disposition', 'attachment;filename=' + `${shcc}.png`]]);
+                    return res.end(Buffer.from(buffer, 'base64'));
+                }
+                else if (format == 'base64') {
+                    return res.send({ data: buffer });
+                }
+                else
+                    return res.status(400).send({ error: 'format không được hỗ trợ' });
+            }
+            if (height != null && width != null) {
+                let image = await jimp.read(Buffer.from(buffer, 'base64'));
+                if (background)
+                    image = image.background(background);
+                image = image.resize(parseInt(width), parseInt(height));
+                buffer = image.getBuffer(jimp.MIME_PNG, (error, buffer) => { 
+                    if (error) throw error;
+                    console.log(buffer);
+                    sendResponse(buffer.toString('base64'));
+                })
+            }
+            else sendResponse(buffer);
+        } catch (error) {
+            res.status(400).send({ error });
+        }
     });
 };

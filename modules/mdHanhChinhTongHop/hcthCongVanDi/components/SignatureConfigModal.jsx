@@ -71,7 +71,7 @@ export default class SignatureConfigModal extends AdminModal {
         try {
 
             Object.values(vanBanDi.signType).filter(item => !item.phuLuc).forEach(item => {
-                if ([vanBanDi.signType.KY_PHAT_HANH.id, vanBanDi.signType.NOI_DUNG.id, vanBanDi.signType.THE_THUC.id].includes(item.id)) {
+                if ([vanBanDi.signType.KY_PHAT_HANH.id, vanBanDi.signType.KY_NOI_DUNG.id, vanBanDi.signType.KY_THE_THUC.id].includes(item.id)) {
                     const current = this.state.config.find(config => config.signType == item.id);
                     const newObject = {
                         ...current,
@@ -88,8 +88,8 @@ export default class SignatureConfigModal extends AdminModal {
                     };
                     config.push(newObject);
                 }
-                else if (item.id == vanBanDi.signType.MOC_DO.id) {
-                    const current = this.state.config.find(config => config.signType == 'MOC_DO');
+                else if (item.id == vanBanDi.signType.DONG_DAU.id) {
+                    const current = this.state.config.find(config => config.signType == item.id);
                     config.push(current);
                 }
             });
@@ -114,7 +114,7 @@ export default class SignatureConfigModal extends AdminModal {
         const signType = vanBanDi.signType;
         return <ol style={{ width: '100%' }}>
             {Object.values(vanBanDi.signType).filter(item => !item.phuLuc).map((item, index) => {
-                if ([signType.KY_PHAT_HANH.id, signType.NOI_DUNG.id, signType.THE_THUC.id].includes(item.id)) {
+                if ([signType.KY_PHAT_HANH.id, signType.KY_NOI_DUNG.id, signType.KY_THE_THUC.id].includes(item.id)) {
                     const { height = 50, width = 50, text } = item;
                     const { xCoordinate, yCoordinate, pageNumber } = this.state.config?.find(config => config.signType == item.id) || {};
                     return <React.Fragment key={index}>
@@ -148,7 +148,7 @@ export default class SignatureConfigModal extends AdminModal {
                         </div>
                     </React.Fragment>;
                 }
-                else if (item.id == signType.MOC_DO.id) {
+                else if (item.id == signType.DONG_DAU.id) {
                     const { height = 50, width = 50, text } = item;
                     const { xCoordinate, yCoordinate, pageNumber } = this.state.config?.find(config => config.signType == item.id) || {};
 
@@ -157,7 +157,7 @@ export default class SignatureConfigModal extends AdminModal {
                         <li className='col-md-12 font-weight-bold'><div className='d-flex align-items-center justify-content-between'>
                             <span>{text}</span>
                             <Tooltip title='Vị trí chữ ký' arrow>
-                                <button className='btn btn-secondary' onClick={(e) => e.preventDefault() || this.props.pdfModal.show({ id: this.state.id, xCoordinate, yCoordinate, height, width, pageNumber, submit: (data) => this.onChangePosition(data, vanBanDi.signType.MOC_DO.id) })}>
+                                <button className='btn btn-secondary' onClick={(e) => e.preventDefault() || this.props.pdfModal.show({ id: this.state.id, xCoordinate, yCoordinate, height, width, pageNumber, submit: (data) => this.onChangePosition(data, vanBanDi.signType.DONG_DAU.id) })}>
                                     <i className='fa fa-lg fa-crosshairs' />
                                 </button>
                             </Tooltip>

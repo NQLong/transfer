@@ -205,8 +205,10 @@ class ComponentDMCV extends AdminPage {
             renderRow: (item, index) => (
                 <tbody key={index} style={{ backgroundColor: 'white' }}>
                     <tr key={`${index}-1`}>
-                        <TableCell style={{ textAlign: 'center' }} content={<b>{(index + 1).intToRoman()}</b>} />
-                        <TableCell style={{ textAlign: 'left' }} colSpan={5} content={<b>{item.ten}</b>} />
+                        <TableCell style={{ textAlign: 'center' }} className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
+                        <TableCell style={{ textAlign: 'left' }} className='text-primary' colSpan={4} content={<b>{item.ten}</b>} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateTccbNhomDanhGiaNhiemVu(item.id, { kichHoat: value ? 1 : 0, }, this.load)} />
                         <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                             onEdit={() => this.nhomModal.show(item)}
                             onDelete={this.deleteNhom}
@@ -220,8 +222,8 @@ class ComponentDMCV extends AdminPage {
                     </tr>
                     {
                         item.submenus.length > 0 &&
-                        item.submenus.map((menu, stt) => (
-                            <>
+                        item.submenus.map((menu, stt) =>
+                            [
                                 <tr key={`${index}-${stt}-1`}>
                                     <TableCell style={{ textAlign: 'center' }} rowSpan={2} content={stt + 1} />
                                     <TableCell style={{ textAlign: 'left' }} rowSpan={2} content={menu.chucDanhs} />
@@ -233,15 +235,15 @@ class ComponentDMCV extends AdminPage {
                                         onEdit={() => this.modal.show({ item: menu, add: false })}
                                         onDelete={this.delete}
                                     />
-                                </tr>
+                                </tr>,
                                 <tr key={`${index}-${stt}-2`}>
                                     <TableCell style={{ textAlign: 'left' }} content={'Số điểm'} />
                                     <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemGiangDay).toFixed(2)} />
                                     <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemNghienCuuKhoaHoc).toFixed(2)} />
                                     <TableCell style={{ textAlign: 'right' }} content={Number(menu.soDiemKhac).toFixed(2)} />
                                 </tr>
-                            </>
-                        ))
+                            ]
+                        )
                     }
                 </tbody>
             )

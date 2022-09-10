@@ -114,7 +114,7 @@ export function deleteTccbDanhGiaNam(id, done) {
         const url = '/api/tccb/danh-gia';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa đánh giá năm bị lỗi!', 'danger');
+                T.notify(`Xóa đánh giá năm bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Đánh giá năm đã xóa thành công!', 'success', false, 800);

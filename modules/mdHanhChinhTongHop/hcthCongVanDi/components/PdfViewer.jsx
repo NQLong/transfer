@@ -15,8 +15,9 @@ export default class PdfViewer extends AdminModal {
     onShow = (props) => {
         // console.log({props});
         this.setState({ ...props }, () => {
-            const url = props.url || `/api/hcth/van-ban-di/file/${props.id}`;
+            const url = props.url || `/api/hcth/van-ban-di/file/${props.id}?format=base64`;
             T.get(url, {}, async (res) => {
+                console.log(res);
                 const buffer = Buffer.from(res.data, 'base64');
                 this.setState({ file: buffer, outFile: buffer }, this.setBuffer);
             });

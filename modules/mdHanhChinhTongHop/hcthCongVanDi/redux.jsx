@@ -273,7 +273,7 @@ export function contentAprrove(id, done) {
 
 export function formailtyAprrove(id, done) {
     return () => {
-        const url = `/api/hcth/van-ban-di/formailty/approve/${id}`;
+        const url = `/api/hcth/van-ban-di/formality/approve/${id}`;
         T.put(url, (res) => {
             if (res.error) {
                 T.notify('Cập nhật trạng thái thất bại. ' + (res.error.message || ''), 'danger');

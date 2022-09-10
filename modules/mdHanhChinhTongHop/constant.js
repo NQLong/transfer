@@ -159,14 +159,13 @@ module.exports = {
         },
 
         signType: {
-            NOI_DUNG: { id: 'NOI_DUNG', text: 'Ký nháy nội dung', level: 3, color: 'blue', height: 50, width: 50 },
-            THE_THUC: { id: 'THE_THUC', text: 'Ký nháy thể thức', level: 3, color: 'blue', height: 50, width: 50 },
+            KY_NOI_DUNG: { id: 'KY_NOI_DUNG', text: 'Ký nháy nội dung', level: 3, color: 'blue', height: 50, width: 50 },
+            KY_THE_THUC: { id: 'KY_THE_THUC', text: 'Ký nháy thể thức', level: 3, color: 'blue', height: 50, width: 50 },
             /**NOTE: for van ban noi bo, ky phat hanh has level 1 but if its require red stamp then level would still be 2 */
             KY_PHAT_HANH: { id: 'KY_PHAT_HANH', text: 'Ký phát hành', level: 2, color: 'green', height: 75, width: 75 },
             SO_VAN_BAN: { id: 'SO_VAN_BAN', text: 'Số văn bản', color: 'blue' },
-            MOC_DO: { id: 'MOC_DO', text: 'Đóng mộc đỏ', level: 1, color: 'red', height: 100, width: 100 },
+            DONG_DAU: { id: 'DONG_DAU', text: 'Đóng dấu mộc đỏ', level: 1, color: 'red', height: 100, width: 100 },
             KY_PHU_LUC: { id: 'KY_PHU_LUC', text: 'Ký phụ lục', level: 1, color: 'blue', phuLuc: 1 },
-
         }
     }
 };

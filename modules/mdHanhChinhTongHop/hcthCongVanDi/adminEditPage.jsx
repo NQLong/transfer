@@ -14,7 +14,7 @@ import { ThemVaoNhiemVuModal } from '../hcthNhiemVu/component';
 import { themVaoNhiemVu } from '../hcthNhiemVu/redux';
 // import { FileHistoryModal } from './component';
 import { LichSu, PhanHoi, VanBanDiFileV2 } from './components/index';
-import { contentAprrove, createHcthCongVanDi, createPhanHoi, deleteFile, deleteHcthCongVanDi, getCongVanDi, getFile, getHcthCongVanDiSearchPage, getHistory, getPhanHoi, ready, updateHcthCongVanDi } from './redux';
+import { formailtyAprrove, contentAprrove, createHcthCongVanDi, createPhanHoi, deleteFile, deleteHcthCongVanDi, getCongVanDi, getFile, getHcthCongVanDiSearchPage, getHistory, getPhanHoi, ready, updateHcthCongVanDi } from './redux';
 
 import { SelectAdapter_DmNgoaiNguV2 } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
 
@@ -98,7 +98,7 @@ class AdminEditPage extends AdminPage {
 
     onFormalityAprrove = () => {
         T.confirm('Kiểm tra thể thức văn bản', 'Các tệp tin văn bản sẽ được ký!', 'warning', true, isConfirm =>
-            isConfirm && this.props.contentAprrove(this.state.id, () => window.location.reload())
+            isConfirm && this.props.formailtyAprrove(this.state.id, () => window.location.reload())
         );
     }
 
@@ -114,6 +114,10 @@ class AdminEditPage extends AdminPage {
         if (trangThaiCongVanDi.KIEM_TRA_NOI_DUNG.id == this.state.trangThai) {
             if (this.isManager())
                 buttons.push({ className: 'btn-success', icon: 'fa-check-square-o', tooltip: 'Phê duyệt nội dung', onClick: e => e.preventDefault() || this.onContentAprrove() });
+        }
+        if (trangThaiCongVanDi.KIEM_TRA_THE_THUC.id == this.state.trangThai) {
+            if (this.getCurrentPermissions().includes('hcthCongVanDi:manage'))
+                buttons.push({ className: 'btn-success', icon: 'fa-certificate', tooltip: 'Phê duyệt thể thức', onClick: e => e.preventDefault() || this.onFormalityAprrove() });
         }
         return buttons;
     }
@@ -399,5 +403,5 @@ class AdminEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi, phanHoi: state.hcth.hcthPhanHoi });
-const mapActionsToProps = { contentAprrove, getFile, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, getPhanHoi, createDmDonViGuiCv, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, createHoSo, updateHoSo, themVaoNhiemVu, ready };
+const mapActionsToProps = { formailtyAprrove, contentAprrove, getFile, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, getPhanHoi, createDmDonViGuiCv, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, createHoSo, updateHoSo, themVaoNhiemVu, ready };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

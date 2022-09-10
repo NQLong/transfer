@@ -15,6 +15,7 @@ module.exports = app => {
                 }
                 else console.warn(key, 'is not a valid keyword for app.pdf.signVisualPlaceholder');
             });
+            console.log(javaArguments);
             const java = new JavaCaller({
                 jar: app.pdf.pdfSignJar,
                 rootPath: '/.'

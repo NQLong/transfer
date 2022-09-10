@@ -112,12 +112,10 @@ module.exports = app => {
     app.post('/api/hcth/van-ban-di', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { files = [], canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], ...data } = req.body.data;
+            //create vanBanDi instance
             const instance = await app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user.shcc, ngayTao: new Date().getTime(), trangThai: vanBanDi.trangThai.NHAP.id });
             const id = instance.id;
             try {
-
-                //create vanBanDi instance
-
                 //create don vi nhan from list
                 await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN);
 
@@ -179,7 +177,7 @@ module.exports = app => {
                 if (!vanBanDiFile.phuLuc) {
                     const configs = vanBanDiFile.config;
                     configs.forEach(config => {
-                        if ([vanBanDi.signType.NOI_DUNG.id, vanBanDi.signType.THE_THUC.id, vanBanDi.signType.KY_PHAT_HANH.id,].includes(config.signType)) {
+                        if ([vanBanDi.signType.KY_NOI_DUNG.id, vanBanDi.signType.KY_THE_THUC.id, vanBanDi.signType.KY_PHAT_HANH.id,].includes(config.signType)) {
                             if (!config.shcc) throw `${vanBanDi.signType[config.signType].text} ở tệp tin ${vanBanDiFile.file.ten} chưa được cấu hình cán bộ ký.`;
                         }
                     });
@@ -193,7 +191,6 @@ module.exports = app => {
 
         } catch (error) {
             console.error(error);
-            console.log(error.message);
             res.send({ error });
         }
     });
@@ -236,14 +233,26 @@ module.exports = app => {
     app.get('/api/hcth/van-ban-di/file/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id } = req.params;
+            const { format, version } = req.query;
             const instance = await app.model.hcthVanBanDiFile.get({ id });
+            let condition = {
+                id: instance.fileId,
+                ma: instance.id,
+                loai: 'FILE_VBD'
+            }
+            if (version)
+                condition.id = version
             const file = await app.model.hcthFile.get({ id: instance.fileId });
-
             if (!instance || !file) return res.status(404).send({ error: 'Tệp tin không tồn tại' });
 
             const buffer = app.fs.readFileSync(app.path.join(app.assetPath, `congVanDi/${instance.vanBanDi}`, file.tenFile), 'base64');
-            // res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
-            res.send({ data: buffer });
+            if (!format) {
+                res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
+                return res.end(Buffer.from(buffer, 'base64'));
+            }
+            else if (format == 'base64')
+                return res.send({ data: buffer });
+            throw 'Lỗi format file';
         } catch (error) {
             console.error(error);
             res.status(500).send(error);
@@ -300,7 +309,7 @@ module.exports = app => {
                 throw 'Trạng thái văn bản không hợp lệ';
 
             //TODO: check don vi quan ly
-            if (instance.loaiCongVan == vanBanDi.loaiCongVan.TRUONG)
+            if (instance.loaiCongVan == vanBanDi.loaiCongVan.TRUONG.id)
                 await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.KIEM_TRA_THE_THUC.id });
             else
                 await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.KY_PHAT_HANH.id });
@@ -369,7 +378,6 @@ module.exports = app => {
         try {
             const type = fields.userData?.length && fields.userData[0],
                 data = fields.data && fields.data[0] && app.utils.parse(fields.data[0]);
-            console.log({ data });
             if (type == 'hcthVanBanDiFileV2') {
                 const
                     file = files.hcthVanBanDiFileV2[0],
@@ -427,7 +435,7 @@ module.exports = app => {
                 files.file.length > 0) {
                 const
                     srcPath = files.file[0].path,
-                    validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
+                    validUploadFileType = ['.pdf'],
                     baseNamePath = app.path.extname(srcPath),
                     originalFilename = files.file[0].originalFilename,
                     randomFilename = srcPath.substring(srcPath.lastIndexOf('/') + 1);
@@ -435,7 +443,6 @@ module.exports = app => {
                 // eslint-disable-next-line no-unused-vars
                 const [rest, congVanId, fileId, signAt] = fields.userData[0].split(':');
 
-                console.log(congVanId, fileId, signAt);
 
                 if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                     done({ error: 'Định dạng tập tin không hợp lệ!' });
@@ -445,20 +452,19 @@ module.exports = app => {
                     await app.fs.createFolder(
                         destPath
                     );
+                    //TODO: check number of signature and compare to previous version
 
                     app.fs.renameSync(srcPath, destPath + `/${randomFilename}`);
 
                     const item = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: 'FILE_VBD', ma: fileId, tenFile: randomFilename });
-
-                    await app.model.hcthSigningConfig.update({ vbdfId: fileId, shcc: req.session.user.shcc }, { signAt, status: 'DA_KY' });
-                    // await ap
-                    // await app.model.hcthCanBoKy.update({ nguoiKy: req.session.user.shcc, congVanTrinhKy: fileId }, { trangThai: 'DA_KY' });
+                    await app.model.hcthSigningConfig.update({ vbdfId: fileId, shcc: req.session.user.shcc }, { signAt: new Date().getTime(), status: 'DA_KY' });
+                    await app.model.hcthVanBanDiFile.update({ id: fileId }, { fileId: item.id });
 
                     done && done({ error: null, item });
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             done && done({ error });
         }
     };
@@ -563,7 +569,6 @@ module.exports = app => {
                     parameter: { danhSach: canBoNhan }
                 }, 'shcc,ten,ho,email', 'ten');
             }
-            console.log(donViNhan, donViNhanNgoai, canBoNhan);
 
             if (donViNhan?.length) {
                 danhSachDonViNhan = await app.model.dmDonVi.getAll({
@@ -939,7 +944,6 @@ module.exports = app => {
     app.post('/api/hcth/van-ban-di/file/config', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { id, config } = req.body;
-            console.log({ config });
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
             const promises = config.map(async item => {
                 const { id: itemId, ...data } = item;
