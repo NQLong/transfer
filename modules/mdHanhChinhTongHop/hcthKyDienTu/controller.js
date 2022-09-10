@@ -1,5 +1,5 @@
 module.exports = app => {
-
+    app;
     // app.fs.createFolder(app.path.join(app.assetPath, 'pdf'));
     // const cacheDir = app.path.join(app.assetPath, 'pdf/cache');
     // app.fs.createFolder(cacheDir);
@@ -73,4 +73,4 @@ module.exports = app => {
     //         }
     //     }
     // };
-}
+};

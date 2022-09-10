@@ -222,7 +222,7 @@ export function getFile(id, done) {
                 done && done(res.files);
             }
         }, () => T.notify('Lấy danh sách tệp tin thất bại.', 'danger'));
-    }
+    };
 }
 
 export function updateConfig(id, config, done) {
@@ -237,7 +237,7 @@ export function updateConfig(id, config, done) {
                 done && done();
             }
         }, () => T.notify('Câp nhật cấu hình chữ ký thất bại. ', 'danger'));
-    }
+    };
 }
 
 
@@ -253,7 +253,7 @@ export function ready(id, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật trạng thái thất bại.', 'danger'));
-    }
+    };
 }
 
 export function contentAprrove(id, done) {
@@ -268,7 +268,7 @@ export function contentAprrove(id, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật trạng thái thất bại.', 'danger'));
-    }
+    };
 }
 
 export function formailtyAprrove(id, done) {
@@ -283,7 +283,7 @@ export function formailtyAprrove(id, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật trạng thái thất bại.', 'danger'));
-    }
+    };
 }
 
 export function returnVanBan(id, lyDo, done) {
@@ -298,5 +298,5 @@ export function returnVanBan(id, lyDo, done) {
                 done && done();
             }
         }, () => T.notify('Trả lại văn bản thất bại.', 'danger'));
-    }
+    };
 }

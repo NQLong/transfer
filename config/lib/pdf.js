@@ -22,6 +22,6 @@ module.exports = app => {
             const { status, stdout, stderr } = await java.run(javaArguments);
             return { status, stdout, stderr };
         }
-    }
+    };
     
-}
+};

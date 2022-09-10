@@ -1,7 +1,6 @@
 import { Tooltip } from '@mui/material';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { AdminModal, FormSelect } from 'view/component/AdminPage';
 const { vanBanDi, font } = require('../../constant');
 import { updateConfig } from '../redux';
@@ -14,14 +13,14 @@ const fontSizeArray = () => {
         array.push(start + i * 0.5);
     }
     return array;
-}
+};
 
 
 export default class SignatureConfigModal extends AdminModal {
 
     allRef = {}
 
-    onShow = (item, capVanBan) => {
+    onShow = (item) => {
         this.clearForm();
         console.log(item);
         this.setState({ ...item }, () => {
@@ -38,7 +37,7 @@ export default class SignatureConfigModal extends AdminModal {
             } catch {
                 return;
             }
-        })
+        });
     }
 
     setConfig = () => {
@@ -48,7 +47,7 @@ export default class SignatureConfigModal extends AdminModal {
                 this.allRef.fontName?.value(item.fontName || '');
                 this.allRef.fontSize?.value(item.fontSize || '');
             }
-        })
+        });
     }
 
 
@@ -93,7 +92,7 @@ export default class SignatureConfigModal extends AdminModal {
                     const current = this.state.config.find(config => config.signType == 'MOC_DO');
                     config.push(current);
                 }
-            })
+            });
             updateConfig(this.state.id, config, done)();
         } catch (error) {
             console.error(error);
@@ -107,7 +106,7 @@ export default class SignatureConfigModal extends AdminModal {
         const index = config.indexOf(current);
         current = { ...current, ...data };
         config.splice(index, 1, current);
-        console.log({ config })
+        console.log({ config });
         this.setState({ config });
     }
 
@@ -147,7 +146,7 @@ export default class SignatureConfigModal extends AdminModal {
                                 </button>
                             </Tooltip>
                         </div>
-                    </React.Fragment>
+                    </React.Fragment>;
                 }
                 else if (item.id == signType.MOC_DO.id) {
                     const { height = 50, width = 50, text } = item;
@@ -164,13 +163,13 @@ export default class SignatureConfigModal extends AdminModal {
                             </Tooltip>
                         </div></li>
 
-                    </React.Fragment>
+                    </React.Fragment>;
                 }
                 else {
                     throw new Error('missing sign type');
                 }
             })}
-        </ol >
+        </ol >;
     }
 
     renderPhuLucForm = () => {
@@ -191,7 +190,7 @@ export default class SignatureConfigModal extends AdminModal {
                     <button className='btn btn-success' onClick={(e) => { e.preventDefault(); this.setState({ config: [...this.state.config, {}] }) }}><i className='fa fa-lg fa-plus' />Thêm thông tin chữ ký</button>
                 </div> */}
             </div>
-        })
+        });
     }
 }
 

@@ -34,7 +34,7 @@ export default class VanBanDiFileV2 extends React.Component {
                             <button className='btn btn-outline-info' onClick={(e) => e.preventDefault() || e.stopPropagation() || this.configModal.show(item)}><i className='fa fa-lg fa-sliders' /></button>
                         </Tooltip>
                     </TableCell>
-                </tr>
+                </tr>;
             }
         });
     }
@@ -47,7 +47,7 @@ export default class VanBanDiFileV2 extends React.Component {
         if (!this.props.id) {
             this.setState({ files: [...this.state.files, file] }, () => done && done());
         }
-        else this.props.getFile(this.props.id, (files) => { this.setFiles(files) || (done && done(files))});
+        else this.props.getFile(this.props.id, (files) => { this.setFiles(files) || (done && done(files));});
     }
 
     render() {

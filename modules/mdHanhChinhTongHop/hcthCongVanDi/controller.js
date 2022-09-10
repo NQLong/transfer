@@ -3,7 +3,7 @@ module.exports = app => {
 
     const LOAI_VAN_BAN = 'DI';
 
-    const { trangThaiCongVanDi, CONG_VAN_DI_TYPE, action, loaiCongVan, vanBanDi, MA_HCTH } = require('../constant');
+    const { CONG_VAN_DI_TYPE, action, vanBanDi, MA_HCTH } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -54,7 +54,7 @@ module.exports = app => {
         const instance = await app.model.hcthCongVanDi.get({ id });
         if (!instance) throw 'Văn bản đi không tồn tại';
         return instance;
-    }
+    };
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/hcth/van-ban-di/search/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
@@ -67,19 +67,21 @@ module.exports = app => {
             let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.query.filter || {};
 
             //status scheme
-            let scope = { SELF: [], DEPARTMENT: [], GLOBAL: [], }
+            let scope = { SELF: [], DEPARTMENT: [], GLOBAL: [], };
 
             scope.SELF = [vanBanDi.trangThai.DA_PHAT_HANH.id];
 
-            if (permissions.includes(managerPermission)) scope.DEPARTMENT =
+            if (permissions.includes(managerPermission))
                 scope.DEPARTMENT = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
             if (permissions.includes('rectors:login') || permissions.includes('hcthCongVanDi:read'))
                 scope.GLOBAL = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
             if (permissions.includes('developer:login'))
                 scope.GLOBAL = Object.values(vanBanDi.trangThai).map(item => item.id);
+            console.log(scope);
             Object.keys(scope).forEach(key => scope[key] = scope[key].toString());
 
             const userDepartments = new Set(getDonViQuanLy(req));
+            console.log(userDepartments);
             if (getDonVi(req))
                 userDepartments.add(getDonVi(req));
 
@@ -92,7 +94,8 @@ module.exports = app => {
                 filterData.fromTime = new Date(`${congVanYear}-01-01`).getTime();
                 filterData.toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
             }
-
+            // console.log(scope);
+            console.log(filterData);
             const page = await app.model.hcthCongVanDi.searchPageAlternate(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), '', app.utils.stringify(scope), app.utils.stringify(filterData));
 
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
@@ -119,7 +122,7 @@ module.exports = app => {
                 await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN);
 
                 //create don vi nhan ngoai from list
-                await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN, { donViNhanNgoai: 1, });
+                await app.model.hcthDonViNhan.createFromList(donViNhanNgoai, instance.id, LOAI_VAN_BAN, { donViNhanNgoai: 1, });
 
                 // create ban luu
                 await app.model.hcthBanLuu.createFromList(banLuu, instance.id, LOAI_VAN_BAN,);
@@ -168,7 +171,7 @@ module.exports = app => {
                     break;
                 default:
                     throw 'Trạng thái văn bản không hợp lệ';
-            };
+            }
 
             //TODO: check status change condition
             const files = await getFiles(instance.id);
@@ -179,9 +182,9 @@ module.exports = app => {
                         if ([vanBanDi.signType.NOI_DUNG.id, vanBanDi.signType.THE_THUC.id, vanBanDi.signType.KY_PHAT_HANH.id,].includes(config.signType)) {
                             if (!config.shcc) throw `${vanBanDi.signType[config.signType].text} ở tệp tin ${vanBanDiFile.file.ten} chưa được cấu hình cán bộ ký.`;
                         }
-                    })
+                    });
                 }
-            })
+            });
 
             await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextStatus });
             await app.model.hcthHistory.create({ loai: 'DI', key: instance.id, shcc: req.session?.user?.shcc, hanhDong: action.UPDATE_STATUS, thoiGian: new Date().getTime() });
@@ -225,7 +228,7 @@ module.exports = app => {
             await app.model.hcthCongVanDi.delete({ id });
             app.fs.deleteFolder(app.assetPath + '/congVanDi/' + id);
             done && done();
-        } catch {
+        } catch (error) {
             done && done(error);
         }
     };
@@ -250,7 +253,8 @@ module.exports = app => {
     app.put('/api/hcth/van-ban-di/:id', app.permission.orCheck(staffPermission, 'hcthCongVanDi:read', 'developer:login'), async (req, res) => {
         try {
             //NOTE this api will not accept modification of status
-            const { files = [], canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], trangThai, ...data } = req.body;
+            // eslint-disable-next-line no-unused-vars            
+            const { canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], trangThai, ...data } = req.body;
             const id = req.params.id;
             let instance = await getInstance(id);
 
@@ -274,7 +278,7 @@ module.exports = app => {
 
             //create can bo nhan from list
             await app.model.hcthCanBoNhan.listCreate(canBoNhan.map(shcc => ({ canBoNhan: shcc, ma: instance.id, loai: LOAI_VAN_BAN })));
-            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc })
+            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
             res.send({});
         } catch (error) {
             res.send({ error });
@@ -331,7 +335,7 @@ module.exports = app => {
 
     app.put('/api/hcth/van-ban-di/return/:id', app.permission.check('staff:login'), async (req, res) => {
         try {
-            const id = req.params.id, lyDo = req.body;
+            const id = req.params.id;
             const instance = await getInstance(id);
             const current = instance.trangThai;
             let nextStatus;
@@ -349,7 +353,7 @@ module.exports = app => {
             }
             await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextStatus });
             await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.RETURN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
-            res.send({})
+            res.send({});
         } catch (error) {
             console.error(error);
             res.send({ error });
@@ -400,8 +404,8 @@ module.exports = app => {
                     done && done({
                         ...instance,
                         file: newFile
-                    })
-                };
+                    });
+                }
             }
 
         } catch (error) {
@@ -428,6 +432,7 @@ module.exports = app => {
                     originalFilename = files.file[0].originalFilename,
                     randomFilename = srcPath.substring(srcPath.lastIndexOf('/') + 1);
 
+                // eslint-disable-next-line no-unused-vars
                 const [rest, congVanId, fileId, signAt] = fields.userData[0].split(':');
 
                 console.log(congVanId, fileId, signAt);
@@ -551,14 +556,14 @@ module.exports = app => {
                 danhSachDonViNhanNgoai = [];
             donViNhan = donViNhan.map((item) => item.donViNhan);
             donViNhanNgoai = donViNhanNgoai.map((item) => item.donViNhan);
-            canBoNhan = canBoNhan.map((item) => item.canBoNhan)
+            canBoNhan = canBoNhan.map((item) => item.canBoNhan);
             if (canBoNhan.length) {
                 danhSachCanBoNhan = await app.model.canBo.getAll({
                     statement: 'SHCC IN (:danhSach)',
                     parameter: { danhSach: canBoNhan }
                 }, 'shcc,ten,ho,email', 'ten');
             }
-            console.log(donViNhan, donViNhanNgoai, canBoNhan)
+            console.log(donViNhan, donViNhanNgoai, canBoNhan);
 
             if (donViNhan?.length) {
                 danhSachDonViNhan = await app.model.dmDonVi.getAll({
@@ -608,7 +613,7 @@ module.exports = app => {
                 };
             });
         return await Promise.all(result);
-    }
+    };
 
     app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
@@ -624,21 +629,13 @@ module.exports = app => {
             };
 
             await app.model.hcthPhanHoi.create(newPhanHoi);
-        } catch (error) { console.error(error); res.send({ error }) }
+        } catch (error) { console.error(error); res.send({ error }); }
     });
 
     app.get('/api/hcth/van-ban-di/lich-su/:id', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', req.query.historySortType, (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
-    const createNotification = async (emails, notification) => {
-        return await Promise.all(emails.map(async email => {
-            await app.notification.send({
-                toEmail: email,
-                ...notification
-            });
-        }));
-    };
 
 
     // Phân quyền Quản lý Văn bản đi trong đơn vị
@@ -718,39 +715,46 @@ module.exports = app => {
     }));
 
 
-    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber);
-        const pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
-
-        const donViCanBo = (req.session?.user?.staff?.donViQuanly || []).map(item => item.maDonVi);
-        const userPermissions = req.session.user?.permissions || [];
-        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-        const hcthPermission = getUserPermission(req, 'hcth', ['login']);
-        const staffType = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
-
-        const data = {
-            ids, excludeIds, hasIds, fromTime, toTime,
-            shccCanBo: req.session.user?.shcc,
-            donViCanBo: donViCanBo.toString() || (userPermissions.includes(managerPermission) ? req.session.user?.staff?.maDonVi : '') || '',
-            staffType
-        };
-        let filterParam;
+    app.get('/api/hcth/van-ban-di/selector/page/:pageNumber/:pageSize', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
-            filterParam = JSON.stringify(data);
-        } catch {
-            res.send('Lọc dữ liệu lỗi');
-            return;
-        } finally {
-            app.model.hcthCongVanDi.searchSelector(pageNumber, pageSize, filterParam, searchTerm, (error, page) => {
-                if (error || !page) res.send({ error });
-                else {
-                    const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                    const pageCondition = searchTerm;
-                    res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-                }
-            });
+            const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+                permissions = req.session.user.permissions;
+            const { ids = '', excludeIds = '', hasIds = 0, fromTime = null, toTime = null } = req.query.filter;
+
+            const userDepartments = new Set(getDonViQuanLy(req));
+            if (getDonVi(req))
+                userDepartments.add(getDonVi(req));
+
+            const userShcc = getShcc(req);
+
+            //status scheme
+            let scope = { SELF: [], DEPARTMENT: [], GLOBAL: [], };
+
+            scope.SELF = [vanBanDi.trangThai.DA_PHAT_HANH.id];
+
+            if (permissions.includes(managerPermission))
+                scope.DEPARTMENT = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('rectors:login') || permissions.includes('hcthCongVanDi:read'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('developer:login'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).map(item => item.id);
+
+            Object.keys(scope).forEach(key => scope[key] = scope[key].toString());
+
+            const filterParam = {
+                ids, excludeIds, hasIds, fromTime, toTime,
+                userShcc, userDepartments: [...userDepartments].toString()
+            };
+
+            const page = await app.model.hcthCongVanDi.searchSelector(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), app.utils.stringify(filterParam), app.utils.stringify(scope), searchTerm);
+
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            const pageCondition = searchTerm;
+
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
         }
     });
 
@@ -938,7 +942,7 @@ module.exports = app => {
             console.log({ config });
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
             const promises = config.map(async item => {
-                const { id: itemId, ...data } = item
+                const { id: itemId, ...data } = item;
                 if (!itemId)
                     return await app.model.hcthSigningConfig.create({ vbdfId: vanBanDiFile.id, ...data });
                 else
@@ -978,10 +982,10 @@ module.exports = app => {
             await app.model.hcthHistory.create({ key: instance.id, loai: LOAI_VAN_BAN, hanhDong: action.RETURN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
             res.send({});
         } catch (error) {
-            console.error(error)
-            res.send(error)
+            console.error(error);
+            res.send(error);
         }
-    })
+    });
 
     const onContentReturn = async (req, instance) => {
         const permissions = getCurrentPermissions(req);
@@ -990,15 +994,15 @@ module.exports = app => {
         if (donVi && permissions.includes(managerPermission)) donViQuanLy.push(donVi);
         if (!donViQuanLy.includes(instance.donViGui)) throw 'Bạn không đủ quyền để trả lại văn bản này.';
         await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI_NOI_DUNG.id });
-    }
+    };
     const onFormailtyReturn = async (req, instance) => {
         const permissions = getCurrentPermissions(req);
         if (!permissions.includes('hcthCongVanDi:manage')) throw 'Bạn không đủ quyền để trả lại văn bản này.';
         await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI_THE_THUC.id });
-    }
+    };
     const onPublishReturn = async (req, instance) => {
         const permissions = getCurrentPermissions(req);
         if (!permissions.includes('rectors:login')) throw 'Bạn không đủ quyền để trả lại văn bản này.';
         await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI.id });
-    }
+    };
 };

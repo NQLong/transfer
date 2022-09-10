@@ -1,7 +1,6 @@
 import React from 'react';
-import { AdminPage, renderComment, FormRichTextBox, renderTimeline } from 'view/component/AdminPage';
+import { AdminPage, renderTimeline } from 'view/component/AdminPage';
 import { connect } from 'react-redux';
-import { createPhanHoi } from '../redux';
 import { action } from 'modules/mdHanhChinhTongHop/constant';
 
 
@@ -80,7 +79,7 @@ class LichSu extends AdminPage {
                     </div>
                 </div>
             </div>
-        </React.Fragment>
+        </React.Fragment>;
     }
 }
 

@@ -27,11 +27,11 @@ const { loaiCongVan, vanBanDi } = require('../constant');
 
 const getTrangThaiColor = (trangThai) => {
     return vanBanDi.trangThai[trangThai]?.color || 'blue';
-}
+};
 
 const getTrangThaiText = (trangThai) => {
     return vanBanDi.trangThai[trangThai]?.text;
-}
+};
 
 const timeList = [
     { id: 1, text: 'Theo ngày gửi' },

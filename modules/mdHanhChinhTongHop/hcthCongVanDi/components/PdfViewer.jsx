@@ -1,14 +1,11 @@
 import { Tooltip } from '@mui/material';
 import { Buffer } from 'buffer';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { PDFDocument, rgb } from 'pdf-lib';
 import React from 'react';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
-import { Link } from 'react-router-dom';
-import { AdminModal, FormCheckbox, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
-import FileBox from 'view/component/FileBox';
+import { AdminModal } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-const { vanBanDi } = require('../../constant');
+// const { vanBanDi } = require('../../constant');
 
 
 export default class PdfViewer extends AdminModal {
@@ -46,7 +43,7 @@ export default class PdfViewer extends AdminModal {
         this.setState({ content: null });
     }
 
-    handleClick = (event, page) => {
+    handleClick = (event) => {
         // console.log(event);
         // console.log(event.target.getBoundingClientRect())
         let bounds = event.target.getBoundingClientRect();
@@ -101,12 +98,12 @@ export default class PdfViewer extends AdminModal {
                     <div className='d-flex' style={{ height: 'fit-content', width: 'fit-content', display: 'inline-block' }} >
                         {/* <div disabled style={{ pointerEvents: 'none', cursor: 'default' }}> */}
                         <Document onLoadSuccess={(data) => !this.state.pages && this.setState({ pages: data.numPages })} file={{ data: this.state.outFile }}>
-                            <Page onClick={!this.state.readOnly ? (e, p) => this.handleClick(e, p) : null} scale={this.state.scale} pageNumber={this.state.page} />
+                            <Page onClick={!this.state.readOnly ? (e) => this.handleClick(e) : null} scale={this.state.scale} pageNumber={this.state.page} />
                         </Document>
                         {/* </div> */}
                     </div>
                 </div>
             </div>
-        })
+        });
     }
 }

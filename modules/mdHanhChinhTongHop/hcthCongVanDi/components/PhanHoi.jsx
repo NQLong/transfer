@@ -30,6 +30,7 @@ class PhanHoi extends AdminPage {
     }
 
     onReturn = (e) => {
+        e.preventDefault();
         const lyDo = this.phanHoi.value();
         if (!lyDo) {
             this.lyDo.focus();
@@ -83,7 +84,7 @@ class PhanHoi extends AdminPage {
                     </div>
                 </div>
             </div>
-        </React.Fragment>
+        </React.Fragment>;
     }
 }
 

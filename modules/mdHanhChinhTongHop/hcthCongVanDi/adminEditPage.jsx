@@ -6,13 +6,13 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect } from 'view/component/AdminPage';
 import { createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy } from '../hcthCongVanTrinhKy/redux';
 import { TaoHoSoModal, ThemVaoHoSoModal } from '../hcthHoSo/component';
 import { createHoSo, updateHoSo } from '../hcthHoSo/redux';
 import { ThemVaoNhiemVuModal } from '../hcthNhiemVu/component';
 import { themVaoNhiemVu } from '../hcthNhiemVu/redux';
-import { FileHistoryModal } from './component';
+// import { FileHistoryModal } from './component';
 import { LichSu, PhanHoi, VanBanDiFileV2 } from './components/index';
 import { contentAprrove, createHcthCongVanDi, createPhanHoi, deleteFile, deleteHcthCongVanDi, getCongVanDi, getFile, getHcthCongVanDiSearchPage, getHistory, getPhanHoi, ready, updateHcthCongVanDi } from './redux';
 
@@ -23,11 +23,11 @@ const trangThaiCongVanDi = vanBanDi.trangThai;
 
 const getTrangThaiColor = (trangThai) => {
     return vanBanDi.trangThai[trangThai]?.color || 'blue';
-}
+};
 
 const getTrangThaiText = (trangThai) => {
     return vanBanDi.trangThai[trangThai]?.text;
-}
+};
 
 
 
@@ -311,7 +311,7 @@ class AdminEditPage extends AdminPage {
 
         const lengthDv = this.state.listDonViQuanLy.length;
 
-        const soCongVan = this.props.hcthCongVanDi?.item?.soCongVan;
+        // const soCongVan = this.props.hcthCongVanDi?.item?.soCongVan;
         const loaiCongVanArr = Object.values(loaiCongVan);
 
         const loading = (
@@ -382,7 +382,7 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
                 {this.canReadComment() && <PhanHoi id={this.state.id} trangThai={this.state.trangThai} donViGui={this.state.donViGui} isManager={this.isManager()} />}
-                <VanBanDiFileV2 ref={e => this.danhSachVanBan = e} getFile={this.props.getFile} id={this.state.id}/>
+                <VanBanDiFileV2 ref={e => this.danhSachVanBan = e} getFile={this.props.getFile} id={this.state.id} />
                 {this.state.id && <LichSu onChangeSort={this.onChangeHistorySort} historySortType={this.state.historySortType} />}
 
                 <EditModal ref={e => this.donViGuiNhanModal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonViNhanNgoai} />
@@ -399,5 +399,5 @@ class AdminEditPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi, phanHoi: state.hcth.hcthPhanHoi });
-const mapActionsToProps = { contentAprrove, getFile, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, getPhanHoi, createDmDonViGuiCv, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy,createHoSo, updateHoSo, themVaoNhiemVu, ready };
+const mapActionsToProps = { contentAprrove, getFile, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi, createPhanHoi, getHistory, getPhanHoi, createDmDonViGuiCv, createCongVanTrinhKy, deleteCongVanTrinhKy, updateCongVanTrinhKy, createHoSo, updateHoSo, themVaoNhiemVu, ready };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

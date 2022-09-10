@@ -1,7 +1,6 @@
 import React from 'react';
 import { AdminModal, FormCheckbox } from 'view/component/AdminPage';
 import FileBox from 'view/component/FileBox';
-const { vanBanDi } = require('../../constant');
 
 
 
