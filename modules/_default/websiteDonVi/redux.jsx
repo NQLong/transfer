@@ -1,6 +1,7 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
+const DvWebsiteGet = 'DvWebsite:Get';
 const DvWebsiteGetAll = 'DvWebsite:GetAll';
 const DvWebsiteGetPage = 'DvWebsite:GetPage';
 const DvWebsiteUpdate = 'DvWebsite:Update';
@@ -10,6 +11,8 @@ export default function DvWebsiteReducer(state = null, data) {
     switch (data.type) {
         case GtKhoaGetPage:
             return Object.assign({}, state, { page: data.page });
+        case DvWebsiteGet:
+            return Object.assign({}, state, { item: data.item });
         case DvWebsiteGetAll:
             return Object.assign({}, state, { items: data.items });
         case DvWebsiteGetPage:
@@ -82,13 +85,14 @@ export function getDvWebsiteAll(condition, done) {
 }
 
 export function getDvWebsite(id, done) {
-    return () => {
+    return dispatch => {
         const url = typeof id == 'string' ? `/api/website/item/${id}` : '/api/website/item/null';
         T.get(url, { condition: typeof id == 'string' ? null : id }, data => {
             if (data.error) {
                 T.notify('Lấy thông tin website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                dispatch({ type: DvWebsiteGet, item: data.item });
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));

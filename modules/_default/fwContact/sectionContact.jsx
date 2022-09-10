@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createContact } from './redux';
+import dvWebsite from 'modules/_default/websiteDonVi/redux';
 
 const texts = {
     vi: {
@@ -53,8 +54,8 @@ class SectionContact extends React.Component {
         };
     }
     componentDidMount() {
-        if (this.props.dvWebsite && this.props.dvWebsite.items) {
-            this.setState({ ...this.props.dvWebsite.items[0] });
+        if (this.props.dvWebsite && this.props.dvWebsite.item) {
+            this.setState({ ...this.props.dvWebsite.item });
         }
     }
 
