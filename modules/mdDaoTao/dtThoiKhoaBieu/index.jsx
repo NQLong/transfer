@@ -17,6 +17,10 @@ export default {
         {
             path: '/user/dao-tao/import-thoi-khoa-bieu',
             component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
+        },
+        {
+            path: '/user/dao-tao/thoi-khoa-bieu/auto-generate',
+            component: Loadable({ loading: Loading, loader: () => import('./GenSchedPage') })
         }
-    ],
+    ]
 };

@@ -1,7 +1,7 @@
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
-import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
+// import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, FormCheckbox, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
@@ -64,7 +64,7 @@ class RenderListMon extends React.Component {
         try {
             Array.from({ length: this.state.soLop }, (_, i) => i + 1).forEach(nhom => {
                 let eachData = {};
-                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'tietBatDau', 'chuyenNganh', 'maNganh', 'giangVien'].forEach(key => {
+                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien', 'tietBatDau', 'chuyenNganh', 'maNganh'].forEach(key => {
                     eachData[key] = this.ref[key][nhom] ? getValue(this.ref[key][nhom]) : '';
                 });
                 let { soTietBuoi, tietBatDau } = eachData;
@@ -112,7 +112,7 @@ class RenderListMon extends React.Component {
                 tietBatDau: {},
                 maNganh: {},
                 chuyenNganh: {},
-                giangVien: {}
+                // giangVien: {}
             };
             return (<React.Fragment key={nhom}>
                 <div className='form-group col-md-12' style={{ marginBottom: '0.5rem' }}><b>Lớp {maMonHoc}_{nhom}</b>: {tenMonHoc}</div>
@@ -120,9 +120,9 @@ class RenderListMon extends React.Component {
                 <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-1' placeholder='Số buổi /tuần' required min={1} max={3} />
                 <FormTextBox type='number' ref={e => this.ref.tietBatDau[nhom] = e} className='col-md-1' placeholder='Tiết bắt đầu' min={1} max={9} />
                 <FormTextBox type='number' ref={e => this.ref.soLuongDuKien[nhom] = e} className='col-md-1' placeholder='SLDK' required multiple />
-                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-5' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
-                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-5' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
-                <FormSelect ref={e => this.ref.giangVien[nhom] = e} data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' className='col-md-3' />
+                <FormSelect ref={e => this.ref.maNganh[nhom] = e} data={this.state.dataNganh} placeholder='Ngành' multiple className='col-md-8' onChange={value => this.handleSelectNganh(value, maMonHoc, nhom)} style={{ display: maNganh ? 'none' : '' }} required={maNganh ? false : true} />
+                <FormSelect ref={e => this.ref.chuyenNganh[nhom] = e} data={SelectAdapter_DtDanhSachChuyenNganh(maNganh, nam)} placeholder='Chuyên ngành' multiple className='col-md-8' style={{ display: maNganh ? '' : 'none' }} required={maNganh ? true : false} />
+                {/* <FormSelect ref={e => this.ref.giangVien[nhom] = e} data={SelectAdapter_FwCanBoGiangVien} placeholder='Giảng viên' className='col-md-3' /> */}
                 {nhom != soLop && <hr className='col-md-12' />}
             </React.Fragment>);
         });
