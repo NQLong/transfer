@@ -14,6 +14,8 @@ module.exports = app => {
         'dtThoiKhoaBieu:write',
         'dtThoiKhoaBieu:delete',
         'dtThoiKhoaBieu:export',
+        'dtThoiKhoaBieu:import',
+
     );
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
@@ -548,7 +550,7 @@ module.exports = app => {
 
     });
 
-    app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export, dtThoiKhoaBieu:import'), async (req, res) => {
         try {
             let filter = app.utils.parse(req.query.filter || {});
             filter = app.utils.stringify(filter, '');
