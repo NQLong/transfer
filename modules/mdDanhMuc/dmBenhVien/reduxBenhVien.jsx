@@ -165,7 +165,5 @@ export const SelectAdapter_DmBenhVienV2 = {
     data: params => ({ condition: params.term, kichHoat: 1 }),
     url: '/api/danh-muc/benh-vien/page/1/20',
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ten}` })) : [] }),
-    getOne: getDmBenhVien,
-    fetchOne: (ma, done) => (getDmBenhVien(ma,  item  => done && done({ id: item.ma, text: `${item.ten}` })))(),
-    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
+    fetchOne: (ma, done) => (getDmBenhVien(ma, item => done && done({ id: item.ma, text: `${item.ten}` })))(),
 };

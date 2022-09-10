@@ -27,3 +27,18 @@ export function createSvBaoHiemYTe(data, done) {
         });
     };
 }
+
+export function updateSvBaoHiemYTeBhyt(changes, done) {
+    return () => {
+        const url = '/api/student/bhyt';
+        T.put(url, { changes }, result => {
+            if (result.error) {
+                T.notify(`${result.error?.message || 'Lỗi hệ thống. Vui lòng liên hệ để được hỗ trợ!'}`, 'danger');
+            } else {
+                T.notify('Cập nhật thành công!', 'success');
+                done();
+            }
+        });
+    };
+}
+
