@@ -1,28 +1,34 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbDanhGiaNam } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage } from 'view/component/AdminPage';
-import ComponentDiemThuong from '../tccbDiemThuong/componentDiemThuong';
-import ComponentDiemTru from '../tccbDiemTru/componentDiemTru';
+import ComponentDiemThuong from '../tccbDanhGiaDiemThuong/componentDiemThuong';
+import ComponentDiemTru from '../tccbDanhGiaDiemTru/componentDiemTru';
 import ComponentDGCB from './componentDGCB';
 import ComponentDGDV from './componentDGDV';
-import ComponentTLD from '../tccbTyLeDiem/componentTLD';
+import ComponentTLD from '../tccbDanhGiaTyLeDiem/componentTLD';
+import ComponentDMCV from '../tccbDanhGiaDinhMucCongViecGvVaNcv/componentDMCV';
+import { getTccbDanhGiaNamAll } from './redux';
 import T from 'view/js/common';
 
 class TccbKhungDanhGiaCanBoDetails extends AdminPage {
 
+    state = { nam: '', haveData: false }
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/danh-gia/:nam');
-            this.nam = Number(route.parse(window.location.pathname)?.nam);
-            this.setState({ nam: this.nam });
+            let nam = parseInt(route.parse(window.location.pathname)?.nam);
+            this.props.getTccbDanhGiaNamAll({ nam }, (items) => {
+                const haveData = items.length > 0 ? true : false;
+                this.setState({ nam, haveData });
+            });
         });
     }
 
     render() {
         const nam = this.state?.nam || '';
-        const listComponent = nam ? [
+        const listComponent = nam && this.state.haveData ? [
             {
                 title: 'Mức đánh giá cán bộ',
                 component: <ComponentDGCB nam={nam} />,
@@ -40,6 +46,10 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
                 component: <ComponentTLD nam={nam} />
             },
             {
+                title: 'Định mức công việc cho giảng viên và nghiên cứu viên',
+                component: <ComponentDMCV nam={nam} />
+            },
+            {
                 title: 'Khung đánh giá đơn vị',
                 component: <ComponentDGDV nam={nam} />,
             },
@@ -52,7 +62,7 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
                 'Thông tin đánh giá năm',
             ],
             content: <>
-                {nam && <div>
+                {this.state.haveData ? <div>
                     {
                         listComponent.map((item, index) => (<>
                             <div id={`accordion-${index}`} className='mt-2'>
@@ -74,6 +84,7 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
                         ))
                     }
                 </div>
+                    : <div className='tile'><b>Không có dữ liệu đánh giá</b></div>
                 }
             </>,
             backRoute: '/user/tccb/danh-gia',
@@ -82,5 +93,5 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tccbDanhGiaNam: state.tccb.tccbDanhGiaNam });
-const mapActionsToProps = { getTccbDanhGiaNam };
+const mapActionsToProps = { getTccbDanhGiaNamAll };
 export default connect(mapStateToProps, mapActionsToProps)(TccbKhungDanhGiaCanBoDetails);

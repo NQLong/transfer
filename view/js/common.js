@@ -772,6 +772,13 @@ String.prototype.getFirstLetters = function () {
         .join('');
     return firstLetters;
 }
+
+String.prototype.numberDisplay = function (replaceValue = '.') {
+    const decimalSplitter = replaceValue == '.' ? ',' : '.';
+    let [integer, decimal] = this.split('.');
+    if (!decimal) [integer, decimal] = this.split(',');
+    return `${integer.toString().replace(/\B(?=(\d{3})+(?!\d))/g, replaceValue)}${decimal ? decimalSplitter : ''}${decimal || ''}`;
+};
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);
@@ -853,6 +860,40 @@ Date.getDateInputDefaultMin = function () {
 };
 Date.getDateInputDefaultMax = function () {
     return Date.nextYear().roundDate().getTime();
+};
+
+Number.prototype.intToRoman = function () {
+    let num = parseInt(this);
+    const map = {
+        M: 1000,
+        CM: 900,
+        D: 500,
+        CD: 400,
+        C: 100,
+        XC: 90,
+        L: 50,
+        XL: 40,
+        X: 10,
+        IX: 9,
+        V: 5,
+        IV: 4,
+        I: 1,
+    };
+    let result = '';
+
+    for (let key in map) {
+        const repeatCounter = Math.floor(num / map[key]);
+
+        if (repeatCounter !== 0) {
+            result += key.repeat(repeatCounter);
+        }
+
+        num %= map[key];
+
+        if (num === 0) return result;
+    }
+
+    return result;
 };
 
 (function () {

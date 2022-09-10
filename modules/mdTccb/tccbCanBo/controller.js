@@ -695,101 +695,82 @@ module.exports = app => {
             }
         }, 'chuyenNganh', null, (error, items) => res.send({ error, items }));
     });
-    app.get('/api/staff/download-excel/:filter/:searchTerm', checkGetStaffPermission, (req, res) => {
-        let searchTerm = req.params.searchTerm;
-        if (searchTerm == 'null') searchTerm = '';
 
-        app.model.canBo.download(req.params.filter, searchTerm, (error, result) => {
-            if (error || !result) {
-                res.send({ error });
-            } else {
-                const workbook = app.excel.create(),
-                    worksheet = workbook.addWorksheet('Sheet1');
-                new Promise(resolve => {
-                    let cells = [
-                        // Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, chucVuDoanThe, chucVuDang, chucVuKiemNhiem, hoKhau, diaChiHienTai, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, canBoCanBo, canBoCanBoNgay, userModified, lastModified, dangNghiThaiSan, ngayBatDauNghiThaiSan, ngayKetThucNghiThaiSan, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, dangNghiKhongHuongLuong, ngayBatDauNghiKhongHuongLuong, ngayKetThucNghiKhongHuongLuong, lyDoNghiKhongHuongLuong, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, phuCapChucVu, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, loaiHopDong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh }
-                        { cell: 'A1', value: 'STT', bold: true, border: '1234' },
-                        { cell: 'B1', value: 'Mã số VC&NLD', bold: true, border: '1234' },
-                        { cell: 'C1', value: 'Họ', bold: true, border: '1234' },
-                        { cell: 'D1', value: 'Tên', bold: true, border: '1234' },
-                        { cell: 'E1', value: 'Giới tính', bold: true, border: '1234' },
-                        { cell: 'F1', value: 'Ngày sinh', bold: true, border: '1234' },
-                        { cell: 'G1', value: 'Quê quán', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'Dân tộc', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'Tôn giáo', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'Chức vụ', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'Bổ nhiệm ngày', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'Đơn vị công tác', bold: true, border: '1234' },
-                        { cell: 'M1', value: 'Năm bắt đầu công tác', bold: true, border: '1234' },
-                        { cell: 'N1', value: 'Chức danh nghề nghiệp', bold: true, border: '1234' },
-                        { cell: 'O1', value: 'Mã ngạch', bold: true, border: '1234' },
-                        { cell: 'P1', value: 'Hệ số lương hiện hữu', bold: true, border: '1234' },
-                        { cell: 'Q1', value: 'Bậc trong ngạch', bold: true, border: '1234' },
-                        { cell: 'R1', value: 'Phụ cấp thâm niên vượt khung', bold: true, border: '1234' },
-                        { cell: 'S1', value: 'Thời điểm tính nâng bậc lương lần sau', bold: true, border: '1234' },
-                        { cell: 'T1', value: 'Phụ cấp chức vụ', bold: true, border: '1234' },
-                        { cell: 'U1', value: 'Trình độ chuyên môn', bold: true, border: '1234' },
-                        { cell: 'V1', value: 'Quốc gia tốt nghiệp', bold: true, border: '1234' },
-                        { cell: 'W1', value: 'Chuyên ngành', bold: true, border: '1234' },
-                        { cell: 'X1', value: 'Năm đạt học vị TS', bold: true, border: '1234' },
-                        { cell: 'Y1', value: 'Chức danh khoa học', bold: true, border: '1234' },
-                        { cell: 'Z1', value: 'Năm bổ nhiệm', bold: true, border: '1234' },
-                        { cell: 'AA1', value: 'Ngành chuyên môn', bold: true, border: '1234' },
-                        { cell: 'AB1', value: 'Danh hiệu nhà giáo (NGND, NGUT)', bold: true, border: '1234' },
-                        { cell: 'AC1', value: 'Biên chế', bold: true, border: '1234' },
-                        { cell: 'AD1', value: 'Ngày vào biên chế', bold: true, border: '1234' },
-                        { cell: 'AE1', value: 'Đảng viên', bold: true, border: '1234' },
-                        { cell: 'AF1', value: 'Ghi chú', bold: true, border: '1234' },
-                        { cell: 'AG1', value: 'Số CMND', bold: true, border: '1234' },
-                        { cell: 'AH1', value: 'Ngày cấp', bold: true, border: '1234' },
-                        { cell: 'AI1', value: 'Nơi cấp', bold: true, border: '1234' },
-                    ];
-                    result.rows.forEach((item, index) => {
-                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
-                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
-                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.ho });
-                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.ten });
-                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'F' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.queQuan });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenDanToc });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenTonGiao });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.chucVuChinh });
-                        cells.push({ cell: 'K' + (index + 2), alignment: 'center', border: '1234', value: item.boNhiemNgay ? app.date.dateTimeFormat(new Date(item.boNhiemNgay), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.ngayBatDauCongTac ? app.date.dateTimeFormat(new Date(item.ngayBatDauCongTac), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
-                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.ngach });
-                        cells.push({ cell: 'P' + (index + 2), border: '1234', value: item.heSoLuong });
-                        cells.push({ cell: 'Q' + (index + 2), border: '1234', value: item.bacLuong });
-                        cells.push({ cell: 'R' + (index + 2), border: '1234', value: item.tyLeVuotKhung ? item.tyLeVuotKhung.toString() + '%' : '' });
-                        cells.push({ cell: 'S' + (index + 2), border: '1234', value: item.mocNangLuong ? app.date.dateTimeFormat(new Date(item.mocNangLuong), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'T' + (index + 2), border: '1234', value: item.phuCapChucVu });
-                        cells.push({ cell: 'U' + (index + 2), border: '1234', value: item.hocVi ? item.hocVi : item.trinhDoPhoThong });
-                        cells.push({ cell: 'V' + (index + 2), border: '1234', value: item.danhSahcQuocGiaHocViNoiTotNghiep });
-                        cells.push({ cell: 'W' + (index + 2), border: '1234', value: item.chuyenNganh });
-                        cells.push({ cell: 'X' + (index + 2), border: '1234', value: item.namHocVi ? app.date.dateTimeFormat(new Date(item.namHocVi), 'yyyy') : '' });
-                        cells.push({ cell: 'Y' + (index + 2), border: '1234', value: item.hocHam });
-                        cells.push({ cell: 'Z' + (index + 2), border: '1234', value: item.namChucDanh ? app.date.dateTimeFormat(new Date(item.namChucDanh), 'yyyy') : '' });
-                        cells.push({ cell: 'AA' + (index + 2), border: '1234', value: item.chuyenNganhChucDanh });
-                        cells.push({ cell: 'AB' + (index + 2), border: '1234', value: item.danhHieu });
-                        cells.push({ cell: 'AC' + (index + 2), border: '1234', value: item.ngayBienChe ? 'X' : '' });
-                        cells.push({ cell: 'AD' + (index + 2), border: '1234', value: (item.ngayBienChe && item.ngayBienChe != 1) ? app.date.dateTimeFormat(new Date(item.ngayBienChe), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'AE' + (index + 2), border: '1234', value: item.dangVien ? 'X' : '' });
-                        cells.push({ cell: 'AF' + (index + 2), border: '1234', value: item.ghiChu });
-                        cells.push({ cell: 'AG' + (index + 2), border: '1234', value: item.cmnd });
-                        cells.push({ cell: 'AH' + (index + 2), border: '1234', value: item.cmndNgayCap ? app.date.dateTimeFormat(new Date(item.cmndNgayCap), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'AI' + (index + 2), border: '1234', value: item.cmndNoiCap });
-                    });
-                    resolve(cells);
-                }).then((cells) => {
-                    app.excel.write(worksheet, cells);
-                    app.excel.attachment(workbook, res, 'DANH_SACH_CAN_BO.xlsx');
-                }).catch((error) => {
-                    res.send({ error });
-                });
-            }
-        });
+    app.get('/api/staff/download-excel/:filter/:searchTerm', app.permission.check('staff:write'), async (req, res) => {
+        try {
+            let searchTerm = req.params.searchTerm;
+            if (searchTerm == 'null') searchTerm = '';
+            let result = await app.model.canBo.download(req.params.filter, searchTerm);
+            const list = result.rows;
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet('DSCB');
+            ws.columns = [
+                { header: 'STT', key: 'stt' },
+                { header: 'Mã số NLD&VC', key: 'shcc' },
+                { header: 'Họ và tên lót', key: 'ho' },
+                { header: 'Tên', key: 'ten' },
+                { header: 'Giới tính', key: 'gioiTinh' },
+                { header: 'Ngày sinh', key: 'ngaySinh' },
+                { header: 'Quê quán', key: 'tenQueQuan' },
+                { header: 'Dân tộc', key: 'tenDanToc' },
+                { header: 'Tôn giáo', key: 'tenTonGiao' },
+                { header: 'Chức vụ', key: 'chucVuChinh' },
+                { header: 'Bổ nhiệm ngày', key: 'boNhiemNgay' },
+                { header: 'Đơn vị công tác', key: 'tenDonVi' },
+                { header: 'Năm bắt đầu công tác', key: 'ngayBatDauCongTac' },
+                { header: 'Chức danh nghề nghiệp', key: 'tenChucDanhNgheNghiep' },
+                { header: 'Mã ngạch', key: 'ngach' },
+                { header: 'Hệ số lương hiện hữu', key: 'heSoLuong' },
+                { header: 'Bậc trong ngạch', key: 'bacLuong' },
+                { header: 'Phụ cấp thâm niên vượt khung', key: 'tyLeVuotKhung' },
+                { header: 'Phụ cấp thâm niên nghề', key: 'phuCapThamNien' },
+                { header: 'Phụ cấp ưu đãi', key: 'phuCapUuDai' },
+                { header: 'Thời điểm tính nâng bậc lương lần sau', key: 'mocNangLuong' },
+                { header: 'Phụ cấp chức vụ', key: 'phuCapChucVu' },
+                { header: 'Trình độ chuyên môn', key: 'hocVi' },
+                { header: 'Quốc gia tốt nghiệp', key: 'danhSahcQuocGiaHocViNoiTotNghiep' },
+                { header: 'Chuyên ngành', key: 'chuyenNganh' },
+                { header: 'Năm đạt học vị TS', key: 'namHocVi' },
+                { header: 'Chức danh khoa học', key: 'hocHam' },
+                { header: 'Năm bổ nhiệm', key: 'namChucDanh' },
+                { header: 'Ngành chuyên môn', key: 'chuyenNganhChucDanh' },
+                { header: 'Danh hiệu nhà giáo (NGND, NGUT)', key: 'danhHieu' },
+                { header: 'Biên chế', key: 'isBienChe' },
+                { header: 'Ngày vào biên chế', key: 'ngayBienChe' },
+                { header: 'Đảng viên', key: 'dangVien' },
+                { header: 'Ghi chú', key: 'ghiChu' },
+                { header: 'Số CMND', key: 'cmnd' },
+                { header: 'Ngày cấp', key: 'cmndNgayCap' },
+                { header: 'Nơi cấp', key: 'cmndNoiCap' },
+            ];
+            list.forEach((item, index) => {
+                ws.addRow({
+                    ...item,
+                    stt: index + 1,
+                    gioiTinh: item.phai == '01' ? 'Nam' : 'Nữ',
+                    ngaySinh: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '',
+                    boNhiemNgay: item.boNhiemNgay ? app.date.dateTimeFormat(new Date(item.boNhiemNgay), 'dd/mm/yyyy') : '',
+                    ngayBatDauCongTac: item.ngayBatDauCongTac ? app.date.dateTimeFormat(new Date(item.ngayBatDauCongTac), 'dd/mm/yyyy') : '',
+                    tyLeVuotKhung: item.tyLeVuotKhung ? item.tyLeVuotKhung.toString() + '%' : '',
+                    phuCapThamNien: item.phuCapThamNien ? item.phuCapThamNien.toString() + '%' : '',
+                    phuCapUuDai: item.phuCapUuDai ? item.phuCapUuDai.toString() + '%' : '',
+                    mocNangLuong: item.mocNangLuong ? app.date.dateTimeFormat(new Date(item.mocNangLuong), 'dd/mm/yyyy') : '',
+                    hocVi: item.hocVi || item.trinhDoPhoThong,
+                    namHocVi: item.namHocVi ? app.date.dateTimeFormat(new Date(item.namHocVi), 'yyyy') : '',
+                    namChucDanh: item.namChucDanh ? app.date.dateTimeFormat(new Date(item.namChucDanh), 'yyyy') : '',
+                    isBienChe: item.ngayBienChe ? 'X' : '',
+                    ngayBienChe: (item.ngayBienChe && item.ngayBienChe != 1) ? app.date.dateTimeFormat(new Date(item.ngayBienChe), 'dd/mm/yyyy') : '',
+                    dangVien: item.dangVien ? 'X' : '',
+                    cmndNgayCap: item.cmndNgayCap ? app.date.dateTimeFormat(new Date(item.cmndNgayCap), 'dd/mm/yyyy') : ''
+                }, index === 0 ? 'n' : 'i');
+            });
+            let fileName = 'DANH_SACH_CAN_BO.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.log('Error ', error);
+            res.send({ error });
+        }
+
     });
 
     app.get('/api/staff/by-email/:email', app.permission.check('staff:read'), (req, res) => {

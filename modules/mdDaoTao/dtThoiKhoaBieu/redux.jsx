@@ -268,12 +268,13 @@ export function updateDtThoiKhoaBieuConfig(data, done) {
     };
 }
 
-export function dtThoiKhoaBieuGenTime(data, done) {
+export function dtThoiKhoaBieuGenTime(data, doneError, done) {
     return dispatch => {
         const url = '/api/dao-tao/thoi-khoa-bieu/generate-time';
         T.post(url, { data }, result => {
             if (result.error) {
                 T.notify(`Lỗi ${result.error.message || 'hệ thống'}`, 'danger');
+                doneError && doneError();
             } else {
                 dispatch({ type: DtThoiKhoaBieuConfig, items: { dataCanGen: result.dataReturn } });
                 done && done(result.dataReturn);

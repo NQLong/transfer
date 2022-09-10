@@ -5,10 +5,19 @@ import { AdminModal, FormTextBox, AdminPage, getValue } from 'view/component/Adm
 import { Tooltip } from '@mui/material';
 
 class EditModal extends AdminModal {
+
+    parentId = null;
+    thuTu = null;
+
     componentDidMount() {
         $(document).ready(() => this.onShown(() =>
             this.noiDung.focus()
         ));
+    }
+
+    reset = () => {
+        this.parentId = null;
+        this.thuTu = null;
     }
 
     onShow = (item) => {
@@ -18,13 +27,14 @@ class EditModal extends AdminModal {
                 this.noiDung.value(noiDung);
                 this.setState({ item: item.updateItem });
             } else {
-                const thuTu = item.submenus.length != 0 ? Math.max(...item.submenus.map(item => item.thuTu)) : 0;
-                this.setState({ parentId: item.parentId, thuTu });
+                this.parentId = item.parentId;
+                this.thuTu = item.submenus.length != 0 ? Math.max(...item.submenus.map(item => item.thuTu)) : 0;
             }
         } else this.setState({ item });
     };
 
     onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
             noiDung: getValue(this.noiDung),
         };
@@ -32,19 +42,19 @@ class EditModal extends AdminModal {
             this.props.create({
                 ...changes,
                 nam: this.props.nam,
-                parentId: this.state.parentId || null,
-                thuTu: this.state.thuTu ? this.state.thuTu + 1 : this.props.thuTu + 1
-            }, () => this.hide());
-        else this.props.update(this.state.item.id, changes, () => this.hide());
-        this.setState({ item: null });
+                parentId: this.parentId || null,
+                thuTu: this.thuTu ? parseInt(this.thuTu) + 1 : parseInt(this.props.thuTu) + 1
+            }, this.hide);
+        else this.props.update(this.state.item.id, changes, this.hide);
+        this.reset();
         this.noiDung.value('');
-        e.preventDefault();
     };
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.item ? 'Cập nhật' : 'Tạo mới',
+            size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung'
                     readOnly={readOnly} required />
@@ -58,7 +68,7 @@ class ComponentDGDV extends AdminPage {
         this.load();
     }
 
-    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: Number(this.props.nam) }, items => {
+    load = (done) => this.props.nam && this.props.getTccbKhungDanhGiaDonViAll({ nam: parseInt(this.props.nam) }, items => {
         let parentItems = items.filter(item => !item.parentId);
         parentItems = parentItems.map(parent => ({ ...parent, submenus: items.filter(item => item.parentId == parent.id) }));
         this.setState({ items: parentItems });
@@ -104,31 +114,31 @@ class ComponentDGDV extends AdminPage {
     renderMenu = (index, menu, level, hasCreate, hasUpdate, hasDelete) => (
         <li key={menu.id} data-id={menu.id}>
             <div style={{ display: 'inline-flex' }}>
-                {level == 0 ? <b>{`${index + 1}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
+                {level == 0 ? <b>{`${(index + 1).intToRoman()}. ${menu.noiDung}`}</b> : `${index + 1}. ${menu.noiDung}`}
                 &nbsp;
                 <div className='buttons btn-group btn-group-sm'>
                     {hasCreate && level == 0 &&
                         <Tooltip title='Tạo mục con' arrow>
-                            <a className='btn btn-warning' href='#' onClick={() => this.modal.show({ parentId: menu.id, submenus: menu.submenus || [] })}>
+                            <button className='btn btn-warning' onClick={() => this.modal.show({ parentId: menu.id, submenus: menu.submenus || [] })}>
                                 <i className='fa fa-lg fa-plus' />
-                            </a>
+                            </button>
                         </Tooltip>
                     }
                     {hasUpdate && <Tooltip title='Chỉnh sửa' arrow>
-                        <a className='btn btn-info' href='#' onClick={() => this.modal.show({ updateItem: menu })}>
+                        <button className='btn btn-info' onClick={() => this.modal.show({ updateItem: menu })}>
                             <i className='fa fa-lg fa-edit' />
-                        </a>
+                        </button>
                     </Tooltip>}
                     {hasDelete && <Tooltip title='Xoá' arrow>
-                        <a className='btn btn-danger' href='#' onClick={e => this.delete(e, menu)}>
+                        <button className='btn btn-danger' onClick={e => this.delete(e, menu)}>
                             <i className='fa fa-lg fa-trash' />
-                        </a>
+                        </button>
                     </Tooltip>}
                 </div>
             </div>
 
             {menu.submenus ? (
-                <ul className='menuList'>
+                <ul className='menuList' style={{ listStyle: 'none' }}>
                     {menu.submenus.map((subMenu, index) => this.renderMenu(index, subMenu, level + 1, hasCreate, hasUpdate, hasDelete))}
                 </ul>
             ) : null}
@@ -147,14 +157,14 @@ class ComponentDGDV extends AdminPage {
                 {
                     items.length == 0 ? (<b>Không có dữ liệu đánh giá đơn vị</b>) :
                         <div>
-                            <ul id='menuMain' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0 }}>
+                            <ul id='menuMain' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0, listStyle: 'none' }}>
                                 {items.map((item, index) => this.renderMenu(index, item, 0, hasCreate, hasUpdate, hasDelete))}
                             </ul>
                         </div>
                 }
                 {hasCreate && (<div style={{ textAlign: 'right' }}>
                     <button className='btn btn-info' type='button' onClick={() => this.modal.show(null)}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm mục cha
+                        <i className='fa fa-fw fa-lg fa-plus' />Thêm nhóm
                     </button>
                 </div>)}
                 <EditModal ref={e => this.modal = e}

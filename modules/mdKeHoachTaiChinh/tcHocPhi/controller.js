@@ -696,7 +696,6 @@ module.exports = app => {
             const urlRequest = vnpayUrl + '?' + querystring.stringify(params, { encode: false });
 
             await app.model.tcHocPhiOrders.create({ hocKy, namHoc, refId: vnp_TxnRef, amount: congNo, bank: 'VNPAY', orderInfo: vnp_OrderInfo });
-            console.log(urlRequest);
             res.send(urlRequest);
         } catch (error) {
             res.send({ error });
