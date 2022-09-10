@@ -65,7 +65,6 @@ export function getMoreHcthCongVanTrinhKyPage(pageNumber, pageSize, pageConditio
 };
 
 export function getCongVanTrinhKy(id, context, done) {
-    console.log(id);
     if (typeof context === 'function') {
         done = context;
         context = {};
@@ -78,7 +77,6 @@ export function getCongVanTrinhKy(id, context, done) {
                 T.alert('Công văn trình ký', 'Lấy công văn trình ký bị lỗi!');
                 console.error('GET: ' + url + '.', data.error);
             } else {
-                console.log(data.item);
                 dispatch({ type: HcthCongVanTrinhKyGet, item: data.item });
                 done && done(data.item);
             }

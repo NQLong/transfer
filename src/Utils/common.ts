@@ -239,7 +239,6 @@ T.storage = {
 T.setCookie = async () => {
     const data = await T.storage.get('siginInCookie');
     if (data && data.siginInCookie) {
-        console.log({ data })
         await CookieManager.setFromResponse(Config.API_URL, data.siginInCookie);
     }
 }

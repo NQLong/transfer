@@ -9,26 +9,14 @@ import T from '@/Utils/common';
 
 import styles from './styles';
 
-const SelectSignPosition = ({ navigation, route }) => {
+const PositionPreview = ({ navigation, route }) => {
     const { source, page, key, fileIndex, id, x, y, scale, listSignFile } = route.params;
 
     const file = listSignFile[fileIndex];
 
     const [sourcePdf, setSourcePdf] = useState(source);
 
-    const pressHandler = () => {
-        navigation.push('CongVanTrinhKySign', {
-            key,
-            linkFile: source.uri,
-            fileIndex,
-            id,
-            x,
-            y,
-            scale,
-            page,
-            listSignFile
-        });
-    };
+    const pressHandler = () => { navigation.push('CongVanTrinhKySign', { key, linkFile: source.uri, fileIndex, id, x, y, scale, page, listSignFile }) };
 
     useEffect(() => {
         const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${file.vanBanDi}/${file.file.tenFile}`;
@@ -76,4 +64,4 @@ const SelectSignPosition = ({ navigation, route }) => {
     </View>
 }
 
-export default SelectSignPosition;
+export default PositionPreview;

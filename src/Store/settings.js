@@ -52,7 +52,6 @@ export function getState(done) {
 
 export function signOut(done) {
     return dispatch => {
-        console.log('logging out');
         T.post('/logout').catch(error => console.error('Lỗi đăng xuất', error)).finally(() => {
             dispatch({ type: 'system:UpdateState', state: null });
             Promise.all([
@@ -93,7 +92,6 @@ export function switchUser(personId, done) {
     return (dispatch) => {
         const url = '/api/debug/switch-user';
         T.post(url, { personId }).then(data => {
-            console.log(data.user);
             if (data.error) {
                 T.alert('Lỗi', data.error.message);
             } else {

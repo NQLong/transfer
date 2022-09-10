@@ -46,6 +46,16 @@ const trangThaiVanBanDi = {
     DA_PHAT_HANH: { text: 'Đã phát hành', id: 'DA_PHAT_HANH', color: 'green' },
 };
 
+const signType = {
+    KY_NOI_DUNG: { id: 'KY_NOI_DUNG', text: 'Ký nháy nội dung', level: 3, color: 'blue', height: 50, width: 50 },
+    KY_THE_THUC: { id: 'KY_THE_THUC', text: 'Ký nháy thể thức', level: 3, color: 'blue', height: 50, width: 50 },
+    /**NOTE: for van ban noi bo, ky phat hanh has level 1 but if its require red stamp then level would still be 2 */
+    KY_PHAT_HANH: { id: 'KY_PHAT_HANH', text: 'Ký phát hành', level: 2, color: 'green', height: 75, width: 75 },
+    SO_VAN_BAN: { id: 'SO_VAN_BAN', text: 'Số văn bản', color: 'blue' },
+    DONG_DAU: { id: 'DONG_DAU', text: 'Đóng dấu mộc đỏ', level: 1, color: 'red', height: 100, width: 100 },
+    KY_PHU_LUC: { id: 'KY_PHU_LUC', text: 'Ký phụ lục', level: 1, color: 'blue', phuLuc: 1 },
+}
+
 const action = {
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
@@ -295,12 +305,8 @@ const FileList = ({ navigation }) => {
             return <List.Item title={'Chưa có tập tin công văn'} />
         else {
             const items = listFile.map((item, key) => {
-                const
-                    originalName = item.file.tenFile,
-                    linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${item.vanBanDi}/${originalName}`,
-                    style = {};
-                if (key == 0)
-                    style.borderTopWidth = 0;
+                const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/file/${item.id}`, style = {};
+                if (key == 0) style.borderTopWidth = 0;
                 return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.file.ten}</Text></TouchableOpacity>} />
             });
             return items;
@@ -337,9 +343,6 @@ const History = () => {
         } else {
             const data = history.map(item => {
                 const style = {};
-                // if (item.hanhDong == action.)
-
-                // style.lineColor = actionColor(item.hanhDong);
                 style.circleColor = actionColor(item.hanhDong);
 
                 return {
@@ -399,50 +402,58 @@ const VanBanDi = (props) => {
         dispatch(getVanBanDi(vanBanDiId, context, done));
     }
 
-    const onSignVanVanDi = async () => {
+    const onSignVanBanDi = async () => {
         try {
-            const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => cfg.shcc === userInfo.shcc && !cfg.signAt));
 
-            const congVanId = route?.params?.vanBanDiId;
-            const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`; 
-            
-            const key = await RNFS.readFile(keyDir, 'base64');
+            //prepare file list
 
-            const signFile = listSignFile[0];
+            const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => cfg.shcc === userInfo.shcc && !cfg.signAt && cfg.signType == item.trangThai));
+            const congVanId = item.id;
+            console.log(listSignFile);
+            //
+            const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`;
+            let key;
+            try {
+                key = await RNFS.readFile(keyDir, 'base64'); //this is a string of base64
+            } catch (error) {
+                T.alert('Cảnh báo', 'Bạn chưa cấu hình chữ ký. Chữ ký có thể được cấu hình trong trang cá nhân!');
+                return;
+            }
 
-            const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${signFile.vanBanDi}/${signFile.file.tenFile}`;
+            navigation.push('PositionPicker', { files: listSignFile, key, item });
 
-            navigation.push('SelectSignPos', { id: congVanId, key, fileIndex: 0, listSignFile, source: { uri: linkFile, cache: true } });
-            
+            // const signFile = listSignFile[0];
+
+            // const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${signFile.vanBanDi}/${signFile.file.tenFile}`;
+
+            // navigation.push('SelectSignPos', { id: congVanId, key, fileIndex: 0, listSignFile, source: { uri: linkFile, cache: true } });
+
         } catch (error) {
             console.error(error);
         }
     }
 
-    const enabledSignBtn = () => {
-        return files.some(file => {
-            if (file.config.length > 0 && file.config.some(cf => cf.shcc === userInfo.shcc && !cf.signAt)) return true
-            else return false
-        })
-    }
+    // const enabledSignBtn = () => {
+    //     return files.some(file => {
+    //         if (file.config.length > 0 && file.config.some(cf => cf.shcc === userInfo.shcc && !cf.signAt)) return true
+    //         else return false
+    //     })
+    // }
 
     const generalInfo = () => {
         return <Card style={styles.generalInfoWrapper} elevation={4}>
-            <Card.Title title={`Văn bản đi ${item?.id}`} right={headerRightButton}/>
+            <Card.Title title={`Văn bản đi ${item?.id}`} right={headerRightButton} />
             <Card.Content>
                 <List.Item title='Số công văn' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.soCongVan || 'Chưa có'}</Text>} />
                 <List.Item title='Ngày gửi' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayGui ? T.dateToText(item.ngayGui) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày ký' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayKy ? T.dateToText(item.ngayKy) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày tạo' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayTao ? T.dateToText(item.ngayTao) : 'Chưa có'}</Text>} />
 
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item.trangThai]?.color  || 'black', fontWeight: 'bold' }}>{trangThaiVanBanDi[item.trangThai]?.text || 'Nháp'}</Text>} />
-
-                {/* <List.Item title='Ngôn ngữ' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngoaiNgu}</Text>} /> */}
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item.trangThai]?.color || 'black', fontWeight: 'bold' }}>{trangThaiVanBanDi[item.trangThai]?.text || 'Nháp'}</Text>} />
 
                 <List.Item title='Đơn vị gửi' description={item?.tenDonViGui} descriptionNumberOfLines={null} />
 
                 <List.Item title='Trích yếu' description={item?.trichYeu} descriptionNumberOfLines={null} />
-
 
             </Card.Content>
         </Card>
@@ -451,10 +462,14 @@ const VanBanDi = (props) => {
     const openMenu = () => setIsMenuVisible(true);
     const closeMenu = () => setIsMenuVisible(false);
     const menuItems = [];
-    
-    enabledSignBtn && menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
 
-    // const headerRightButton = () => <Text>askdaks</Text>;
+    // enabledSignBtn && menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
+
+    if (item?.files?.some(file => file.config.map(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != trangThaiVanBanDi.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
+        menuItems.push(<Menu.Item key={item.trangThai} onPress={onSignVanBanDi} title={trangThaiVanBanDi[item.trangThai].text} />);
+
+
+
     const headerRightButton = () => menuItems.length ? <Menu
         visible={isMenuVisible}
         onDismiss={closeMenu}
@@ -464,8 +479,7 @@ const VanBanDi = (props) => {
 
     return renderScrollView({
         ...props,
-        content: <>
-            {/* <Text>Hello</Text> */}
+        content: item ? <>
             {generalInfo()}
             <FileList navigation={navigation} />
             <CanBoNhan />
@@ -473,7 +487,7 @@ const VanBanDi = (props) => {
             <DonViNhanNgoai />
             <PhanHoi />
             <History />
-        </>,
+        </> : <></>,
         style: {},
         refreshControl: <RefreshControl colors={['#9Bd35A', '#689F38']} refreshing={refreshing} onRefresh={onRefresh} />
     })

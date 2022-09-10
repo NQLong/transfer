@@ -91,7 +91,6 @@ export function getMoreCongVanDenPage(pageNumber, pageSize, pageCondition, filte
 }
 
 export function getCongVanDen(id, context, done) {
-    console.log(id);
     if (typeof context === 'function') {
         done = context;
         context = {};
@@ -196,7 +195,7 @@ export function getChiDao(id, done) {
                 dispatch({ type: HcthCongVanDenGetChiDao, chiDao: res.items });
                 done && done(res.items);
             }
-        }).catch((error) => { console.log(error); T.alert('Công văn đến', 'Lấy công văn chỉ đạo lỗi') });
+        }).catch((error) => { T.alert('Công văn đến', 'Lấy công văn chỉ đạo lỗi') });
     };
 }
 
@@ -238,7 +237,6 @@ export function getStaffPage(pageNumber, pageSize, pageCondition, filter, done) 
                 done && done(data.page);
             }
         }).catch(error => {
-            console.log(error);
             T.notify('Lấy danh sách cán bộ bị lỗi', 'danger');
 
         });
@@ -259,7 +257,6 @@ export function updateQuyenChiDao(id, shcc, trangThaiCv, status, done) {
             done && done(res);
         })
         .catch((error) => {
-            console.log(error);
             T.alert('Công văn đến', 'Thêm cán bộ chỉ đạo lỗi');
         });
     };

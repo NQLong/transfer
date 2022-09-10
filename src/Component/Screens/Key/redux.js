@@ -65,7 +65,6 @@ export function getMoreHcthCongVanTrinhKyPage(pageNumber, pageSize, pageConditio
 };
 
 export function getCongVanTrinhKy(id, context, done) {
-    console.log(id);
     if (typeof context === 'function') {
         done = context;
         context = {};

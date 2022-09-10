@@ -13,7 +13,7 @@ import Scan from './Scan';
 import HomeScreen from './HomeScreen/HomeScreen'
 import DefaultTabScreen from './DefaultTabScreen';
 import CongVanDen from './hcth/hcthCongVanDen/CongVanDen';
-import ReadFile from './ReadFile/ReadFile';
+// import ReadFile from './ReadFile/ReadFile';
 import CongVanDenFilter from './hcth/hcthCongVanDen/CongVanDenFilter';
 import CongVanTrinhKy from './hcth/hcthCongVanTrinhKy/CongVanTrinhKy';
 import CongVanTrinhKySign from './hcth/hcthCongVanTrinhKy/CongVanTrinhKySign';
@@ -23,6 +23,9 @@ import VanBanDiFilter from './hcth/hcthVanBanDi/VanBanDiFilter';
 import ScanQRCode from './ScanQRCode/ScanQRCode';
 import SelectSignPosition from './SelectSignPos/SelectSignPos';
 import PreviewSignFile from './PreviewSignFile/PreviewSignFile';
+import ReadOnlyFile from './hcth/hcthSigning/ReadOnly';
+import PositionPick from './hcth/hcthSigning/PositionPick';
+import PositionPreview from './hcth/hcthSigning/PositionPreview';
 const Stack = createStackNavigator();
 
 const DefaultScreen: () => Node = ({ navigation, route }) => {
@@ -38,7 +41,7 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerShown: false }} name='Home' component={HomeScreen} />
             <Stack.Screen options={{ headerShown: false }} name='TabScreen' component={DefaultTabScreen} />
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='CongVanDen' component={CongVanDen} />
-            <Stack.Screen options={{ headerTitle: '' }} name='ReadFile' component={ReadFile} />
+            <Stack.Screen options={{ headerTitle: '' }} name='ReadFile' component={ReadOnlyFile} />
             <Stack.Screen options={{ headerTitle: 'Chọn vị trí chữ ký' }} name='SelectSignPos' component={SelectSignPosition} />
             <Stack.Screen options={{ headerTitle: 'Xem lại chữ ký' }} name='PreviewSignFile' component={PreviewSignFile} />
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='FilterCongVanDen' component={CongVanDenFilter} />
@@ -47,6 +50,8 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerTitle: 'Lấy key'}} name="ScanQRCode" component={ScanQRCode}/>
             <Stack.Screen options={{ headerTitle: 'Văn bản đi' }} name='VanBanDi' component={VanBanDi} />
             <Stack.Screen options={{ headerTitle: 'Văn bản đi' }} name='VanBanDiFilter' component={VanBanDiFilter} />
+            <Stack.Screen options={{ headerTitle: 'Chọn vị trí chữ ký' }} name='PositionPicker' component={PositionPick} />
+            <Stack.Screen options={{ headerTitle: 'Xác nhận vị trí chữ ký' }} name='PositionPreview' component={PositionPreview} />
 
         </Stack.Navigator>
     )

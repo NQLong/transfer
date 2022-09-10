@@ -75,7 +75,6 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                 const uploadUrl = T.config.API_URL + 'user/upload';
                 
                 fs.writeFile(path, pdfBuffer.toString('base64'), 'base64').then((success) => {
-                    console.log('FILE WRITTEN!');
                     const fileName = linkFile.substring(linkFile.lastIndexOf('/') + 1, linkFile.length);
                     const originFileName = file.file.ten.substring(0, file.file.ten.lastIndexOf('.'));
                     const extFile = file.file.ten.substring(file.file.ten.lastIndexOf('.') + 1, file.file.ten.length);
@@ -89,13 +88,11 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                     ];
                     var upload = (response) => {
                         var jobId = response.jobId;
-                        console.log('UPLOAD HAS BEGUN! JobId: ' + jobId);
                     };
     
                     var uploadProgress = (response) => {
                         // if (new Date().getTime() - begin.getTime() > timeOut) throw new Error('Lỗi')
                         var percentage = Math.floor((response.totalBytesSent / response.totalBytesExpectedToSend) * 100);
-                        console.log('UPLOAD IS ' + percentage + '% DONE!');
                     };
     
                     fs.uploadFiles({
@@ -119,15 +116,13 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                             } else {
                                 T.alert('Lỗi', resBody.error);
                             }
-                            console.log('FILES UPLOADED!'); // response.statusCode, response.headers, response.body
                         } else {
-                            console.log('SERVER ERROR');
+                            T.alert('Lỗi');
                         }
                     }).catch((err) => {
                         if (err.description === 'cancelled') {
-    
+                            
                         }
-                        console.log(err);
                     });
                 });
 
@@ -144,7 +139,6 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
             }));
         }
         catch (error) {
-            // console.log(response);
             console.error(error);
         }
     }
