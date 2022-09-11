@@ -223,8 +223,18 @@ module.exports = (app, appConfig) => {
                 res.send({ message: 'Get logs error!' });
                 return;
             }
-            app.getLogs(path, 30, from, () => {
-                res.send({});
+            app.getLogs(path, 50, from, (data) => {
+                res.send(data);
+            });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/cluster/fresh-logs', app.permission.check('cluster:manage'), async (req, res) => {
+        try {
+            await app.getFreshLog(data => {
+                res.send(data);
             });
         } catch (error) {
             res.send({ error });

@@ -2,12 +2,11 @@ const Tail = require('tail').Tail;
 const pm2 = require('pm2');
 
 module.exports = (app) => {
-    app.watchFiles = [];
-    app.datas = {};
+    let watchFiles = [], datas = {};
 
     const clearAppDatas = () => {
-        Object.keys(app.datas).forEach(key => {
-            app.datas[key] = '';
+        Object.keys(datas).forEach(key => {
+            datas[key] = '';
         });
     };
 
@@ -30,8 +29,8 @@ module.exports = (app) => {
 
     app.intervalEmitEvent = () => {
         setInterval(() => {
-            if (app.datas) {
-                app.io.to('cluster').emit('tail-log', { datas: app.datas });
+            if (datas) {
+                app.io.to('cluster').emit('tail-log', { datas: datas });
                 clearAppDatas();
             }
         }, 5000);
@@ -39,14 +38,14 @@ module.exports = (app) => {
 
     app.setupTailWatch = (path) => {
         try {
-            console.log('setupTailWatch', app.watchFiles);
-            if (app.watchFiles.includes(path)) return;
-            const options = { separator: /[\r]{0,1}\n/, fromBeginning: false, fsWatchOptions: {}, follow: true, nLines: 30 };
+            console.log('setupTailWatch', watchFiles);
+            if (watchFiles.includes(path)) return;
+            const options = { separator: /[\r]{0,1}\n/, fromBeginning: false, fsWatchOptions: {}, follow: true, nLines: 50 };
             const tail = new Tail(path, options);
-            app.watchFiles.push(path);
+            watchFiles.push(path);
             tail.on('line', (data) => {
-                if (!app.datas[path]) app.datas[path] = '';
-                app.datas[path] = app.datas[path].concat(`${app.datas[path] ? '\n' : ''}${data}`);
+                if (!datas[path]) datas[path] = '';
+                datas[path] = datas[path].concat(`${datas[path] ? '\n' : ''}${data}`);
             });
         } catch (ex) {
             console.log(ex);
@@ -58,22 +57,29 @@ module.exports = (app) => {
             if (err) throw err;
             const lines = data.trim().split('\n');
             nLines = nLines > lines.length ? lines.length : nLines;
-            app.datas[path] = '';
-            for (let index = from; index < nLines; index++) {
-                app.datas[path] = app.datas[path].concat(`${app.datas[path] ? '\n' : ''}${lines[lines.length - nLines + parseInt(index)]}`);
+            // datas[path] = '';
+            let rs = '';
+            for (let index = 0; index < nLines; index++) {
+                rs = rs.concat(`${rs ? '\n' : ''}${lines[lines.length - from - nLines + parseInt(index)]}`);
             }
-            cb();
+            cb({ data: rs });
         });
+    };
+
+    app.getFreshLog = (cb = () => { }) => {
+        const freshData = { ...datas };
+        clearAppDatas();
+        cb({ data: freshData });
     };
 
     // app.setupTailWatch = (path) => {
     //   try {
     //     if (app.primaryWorker) {
-    //       console.log('setupTailWatch', app.watchFiles, app.isIntervalEmitEvent)
-    //       if (app.watchFiles.includes(path)) return;
+    //       console.log('setupTailWatch', watchFiles, app.isIntervalEmitEvent)
+    //       if (watchFiles.includes(path)) return;
     //       let md5Previous = null;
     //       let fsWait = false;
-    //       app.watchFiles.push(path);
+    //       watchFiles.push(path);
     //       app.fs.watch(path, (event, filename) => {
     //         if (filename) {
     //           if (fsWait) return;

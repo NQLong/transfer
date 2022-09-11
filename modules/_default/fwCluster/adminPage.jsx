@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage, watchLogs, unWatchLogs, getAllLogs } from './redux';
+import { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage, watchLogs, unWatchLogs, getAllLogs, getFreshLogs } from './redux';
 import { AdminPage, FormTabs, TableCell, renderTable, FormSelect, getValue } from 'view/component/AdminPage';
 
 const parseImageFilename = (filename) => {
@@ -16,12 +16,15 @@ const parseImageFilename = (filename) => {
 
 class ClusterPage extends AdminPage {
   state = { selectedServiceName: 'main', contentLog: '', listLogs: [], isLoading: false };
+
   logs = {};
   content = {};
   logLength = 0;
   isWaitingViewLog = true;
-  isGetLogFromSocket = true;
-  preData = '';
+  scrollToBottom = true;
+  path = '';
+  intervalGetFreshLog = null;
+
   componentDidMount() {
     T.ready();
     this.props.getClusterAll();
@@ -33,43 +36,72 @@ class ClusterPage extends AdminPage {
       this.setState({ listLogs: tmpListLogs });
     }));
     T.socket.on('services-changed', () => this.props.getClusterAll());
-    T.socket.on('tail-log', (rs) => {
-      const serviceName = this.state.selectedServiceName;
-      const key = getValue(this.logs[serviceName]);
-      const { datas } = rs;
-      if (datas[key] && !this.isWaitingViewLog) {
-        if (datas[key] === this.preData) return;
-        this.preData = datas[key];
-        this.logLength += datas[key].split('\n').length;
-        const tmpContentLog = this.state.contentLog.concat(`\n${datas[key]}`);
-        this.setState({ contentLog: tmpContentLog, isLoading: false }, () => {
-          this.content[serviceName].scrollTo({ top: this.content[serviceName].scrollHeight });
-        });
-      }
-    });
   }
 
   componentWillUnmount() {
     T.socket.off('services-changed');
-    T.socket.off('tail-log');
+    clearInterval(this.intervalGetFreshLog);
   }
 
   viewLog = (path) => {
     this.logLength = 0;
     this.isWaitingViewLog = true;
     this.setState({ contentLog: '', isLoading: true }, () => {
-      this.props.watchLogs(path, 0, () => {
-        this.isWaitingViewLog = false;
+      // set loading & call api watch Logs & append first.
+      this.path = path;
+      this.props.watchLogs(path, 0, (rs) => {
+        this.setContentLog(rs.data);
       });
+      // interval get fresh log
+      if (this.intervalGetFreshLog) return;
+      this.intervalGetFreshLog = setInterval(() => this.intervalGetFreshLogHandle(), 5000);
     });
   }
 
-  // scrollLog = (path) => {
+  intervalGetFreshLogHandle = () => {
+    const { selectedServiceName: serviceName } = this.state;
+    this.props.getFreshLogs((rs) => {
+      const key = getValue(this.logs[serviceName]);
+      const { data } = rs;
+      if (data[key] && !this.isWaitingViewLog) {
+        const tmpContentLog = this.state.contentLog.concat(`\n${data[key]}`);
+        this.setContentLog(tmpContentLog);
+      }
+    });
+  };
 
-  // }
+  onScrollLogToTop = () => {
+    const { selectedServiceName: serviceName } = this.state;
+    const scrollTop = this.content[serviceName].scrollTop;
+
+    // set scrollToBottom when scroll bottom & !scrollToBottom when scroll to top
+    this.scrollToBottom = scrollTop >= this.content[serviceName].scrollHeight - 300; // 300 is height of body content
+
+    if (scrollTop <= 0) {
+      // when scroll to top, call api get log & append first.
+      this.props.watchLogs(this.path, this.logLength, (rs) => {
+        const preHeight = this.content[serviceName].scrollHeight;
+        const tmpContentLog = rs.data.concat(`\n${this.state.contentLog}`);
+        this.setContentLog(tmpContentLog, () => {
+          const curHeight = this.content[serviceName].scrollHeight;
+          this.content[serviceName].scrollTo({ top: curHeight - preHeight });
+        });
+      });
+    }
+  }
+
+  setContentLog = (content, cb = () => { }) => {
+    this.logLength = content.split('\n').length;
+    const { selectedServiceName: serviceName } = this.state;
+    this.setState({ contentLog: content, isLoading: false }, () => {
+      this.scrollToBottom && this.content[serviceName].scrollTo({ top: this.content[serviceName].scrollHeight });
+      this.isWaitingViewLog = false;
+      cb();
+    });
+  }
 
   onServiceTabChanged = (data, serviceNames) => data && data.tabIndex != null && serviceNames[data.tabIndex] &&
-    this.setState({ selectedServiceName: serviceNames[data.tabIndex], contentLog: ''});
+    this.setState({ selectedServiceName: serviceNames[data.tabIndex], contentLog: '' });
 
   resetCluster = (e, serviceName, item) => e.preventDefault() || T.confirm('Reset cluster', `Are you sure you want to reset cluster ${serviceName}:${item.pid}?`, true, isConfirm =>
     isConfirm && this.props.resetCluster(serviceName, item.pid));
@@ -201,7 +233,7 @@ class ClusterPage extends AdminPage {
             </h3>
             <FormSelect style={{ width: 300 }} ref={e => this.logs[serviceName] = e} label='Lựa chọn log' data={listLogs[serviceName]} onChange={data => this.viewLog(data.id)} />
             <div className='tile-body'>
-              <div style={{ overflow: 'auto', height: '300px', backgroundColor: '#000000', color: '#ffffff' }} ref={e => this.content[serviceName] = e}>
+              <div style={{ overflow: 'auto', height: '300px', backgroundColor: '#000000', color: '#ffffff' }} ref={e => this.content[serviceName] = e} onScroll={() => { this.onScrollLogToTop(); }}>
                 <p style={{ padding: '0px 16px', whiteSpace: 'break-spaces' }}>{this.state.contentLog}</p>
                 {this.state.isLoading && <p style={{ padding: '0px 16px' }}>Loading...</p>}
               </div>
@@ -222,5 +254,5 @@ class ClusterPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, cluster: state.framework.cluster });
-const mapActionsToProps = { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage, watchLogs, unWatchLogs, getAllLogs };
+const mapActionsToProps = { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage, watchLogs, unWatchLogs, getAllLogs, getFreshLogs };
 export default connect(mapStateToProps, mapActionsToProps)(ClusterPage);

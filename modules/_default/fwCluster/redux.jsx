@@ -135,9 +135,23 @@ export function watchLogs(path, from, done) {
                 T.notify('Watch logs bị lỗi!', 'danger');
                 console.error(`GET: ${url}. ${data.error}`);
             } else {
-                done && done();
+                done && done(data);
             }
         }, error => console.error(error) || T.notify('Watch logs bị lỗi!', 'danger'));
+    };
+}
+
+export function getFreshLogs(done) {
+    return () => {
+        const url = '/api/cluster/fresh-logs';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Get fresh logs bị lỗi!', 'danger');
+                console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done(data);
+            }
+        }, error => console.error(error) || T.notify('Get fresh logs bị lỗi!', 'danger'));
     };
 }
 

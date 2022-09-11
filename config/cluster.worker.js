@@ -105,6 +105,6 @@ module.exports = (cluster, isDebug) => {
     server.listen(app.port);
 
     //logger
-    app.setupPm2ViewLogs();
-    app.intervalEmitEvent();
+    app.primaryWorker  && app.setupPm2ViewLogs();
+    // app.intervalEmitEvent();
 };
