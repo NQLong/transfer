@@ -197,7 +197,7 @@ class SinhVienPage extends AdminPage {
             if (studentData) {
                 this.props.updateStudentUser({ ...studentData, lastModified: new Date().getTime() }, () => {
                     this.setState({ lastModified: new Date().getTime() });
-                    this.props.history.push('/user/hoc-phi');
+                    this.state.isTanSinhVien && this.props.history.push('/user/hoc-phi');
                 });
             }
         };
@@ -213,7 +213,7 @@ class SinhVienPage extends AdminPage {
         const confirmExport = () => T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường', 'info', true, isConfirm => {
             if (isConfirm) {
                 T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác) và hoàn thiện các bước nhập học', 'success', false, () => {
-                    this.props.history.push('/user/hoc-phi');
+                    this.state.isTanSinhVien && this.props.history.push('/user/hoc-phi');
                 });
                 T.download('/api/students-download-syll');
                 this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime(), ngayNhapHoc: -1, isTanSinhVien: false }));
