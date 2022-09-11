@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.235",
+    "version": "1.0.237",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -18,6 +18,18 @@
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
     "services": {
+        "smsService": {
+            "mainUrl": "http://localhost:7012",
+            "host": "localhost",
+            "port": "7020",
+            "isDebug": false
+        },
+        "registerService": {
+            "mainUrl": "http://localhost:7012",
+            "host": "localhost",
+            "port": "7018",
+            "isDebug": false
+        },
         "emailService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",

@@ -6955,6 +6955,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 2
+                },
+                "SO_DANG_KY": {
+                    "value": "soDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
@@ -14785,20 +14792,6 @@
                     "nullable": true,
                     "size": 4000
                 },
-                "TIME_APPROVED": {
-                    "value": "timeApproved",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "APPROVER": {
-                    "value": "approver",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 50
-                },
                 "PURPOSE": {
                     "value": "purpose",
                     "dataType": "NUMBER",
@@ -14812,6 +14805,20 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "THAM_SO": {
+                    "value": "thamSo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "APPROVER": {
+                    "value": "approver",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
                 }
             },
             "primaryKeys": [
@@ -14867,8 +14874,8 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "ARPPOVED_TIME": {
-                    "value": "arppovedTime",
+                "APPROVED_TIME": {
+                    "value": "approvedTime",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -14880,6 +14887,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "THAM_SO": {
+                    "value": "thamSo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "IS_TIENG_VIET": {
+                    "value": "isTiengViet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -17649,46 +17670,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 50
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "TCCB_DANH_GIA_CA_NHAN_DANG_KY": {
-            "active": true,
-            "moduleName": "tccbDanhGiaCaNhanDangKy",
-            "modelName": "tccbDanhGiaCaNhanDangKy",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_168773\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "SHCC": {
-                    "value": "shcc",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                },
-                "ID_NHOM_DANG_KY": {
-                    "value": "idNhomDangKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "DANG_KY": {
-                    "value": "dangKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "1,0"
                 }
             },
             "primaryKeys": [
