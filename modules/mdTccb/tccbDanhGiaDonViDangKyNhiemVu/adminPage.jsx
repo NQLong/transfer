@@ -8,7 +8,7 @@ import { Tooltip } from '@mui/material';
 class TccbDonViDangKyNhiemVuPage extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user', () => {
             this.props.getTccbDonViDangKyNhiemVuDanhGiaNamAll(items => this.setState({ items }));
         });
     }
@@ -34,7 +34,7 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center', color: `${new Date().getTime() >= item.donViBatDauDangKy && new Date().getTime() <= item.donViKetThucDangKy && 'green'}` }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}>
                         {
-                            (new Date().getTime() >= item.donViBatDauDangKy && new Date().getTime() <= item.donViKetThucDangKy) ?
+                            (Date.now() >= item.donViBatDauDangKy && Date.now() <= item.donViKetThucDangKy) ?
                                 <Tooltip title='Đăng ký nhiệm vụ' arrow>
                                     <button className='btn btn-info' onClick={() => this.props.history.push(`/user/tccb/don-vi-dang-ky-nhiem-vu/${item.nam}`)}>
                                         <i className='fa fa-lg fa-edit' />

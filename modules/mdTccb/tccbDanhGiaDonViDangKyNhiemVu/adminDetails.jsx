@@ -9,9 +9,7 @@ import { Tooltip } from '@mui/material';
 
 class EditModal extends AdminModal {
     componentDidMount() {
-        $(document).ready(() => this.onShown(() =>
-            this.dangKyKpi.focus()
-        ));
+        $(document).ready(() => this.onShown());
     }
 
     onShow = (item) => {
@@ -55,7 +53,7 @@ class EditModal extends AdminModal {
 class TccbDonViDangKyNhiemVuDetails extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user', () => {
             const route = T.routeMatcher('/user/tccb/don-vi-dang-ky-nhiem-vu/:nam');
             this.nam = Number(route.parse(window.location.pathname)?.nam);
             this.maDonVi = this.props.system.user.maDonVi;

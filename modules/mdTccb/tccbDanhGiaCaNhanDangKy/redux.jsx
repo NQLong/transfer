@@ -81,22 +81,22 @@ export function createTccbCaNhanDangKy(item, idNhom, done) {
     };
 }
 
-export function updateTccbCaNhanDangKy(id, changes, idNhom, done) {
-    return dispatch => {
-        const url = '/api/tccb/danh-gia/ca-nhan-dang-ky';
-        T.put(url, { id, changes, idNhom }, data => {
-            if (data.error) {
-                T.notify(`Đăng ký bị lỗi: ${data.error.message}`, 'danger');
-                console.error(`PUT ${url}. ${data.error.message}`);
-            } else {
-                const notice = data.item.dangKy ? 'Đăng ký thành công!' : 'Huỷ đăng ký thành công!';
-                T.notify(notice, 'success');
-                dispatch(getTccbCaNhanDangKyByYear(data.nam));
-                done && done(data.item);
-            }
-        }, () => T.notify('Đăng ký bị lỗi!', 'danger'));
-    };
-}
+// export function updateTccbCaNhanDangKy(id, changes, idNhom, done) {
+//     return dispatch => {
+//         const url = '/api/tccb/danh-gia/ca-nhan-dang-ky';
+//         T.put(url, { id, changes, idNhom }, data => {
+//             if (data.error) {
+//                 T.notify(`Đăng ký bị lỗi: ${data.error.message}`, 'danger');
+//                 console.error(`PUT ${url}. ${data.error.message}`);
+//             } else {
+//                 const notice = data.item.dangKy ? 'Đăng ký thành công!' : 'Huỷ đăng ký thành công!';
+//                 T.notify(notice, 'success');
+//                 dispatch(getTccbCaNhanDangKyByYear(data.nam));
+//                 done && done(data.item);
+//             }
+//         }, () => T.notify('Đăng ký bị lỗi!', 'danger'));
+//     };
+// }
 
 export function changeTccbCaNhanDangKy(item) {
     return { type: TccbCaNhanDangKyUpdate, item };

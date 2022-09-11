@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy, updateTccbCaNhanDangKy } from './redux';
+import { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 
 class TccbCaNhanDangKyDetails extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user', () => {
             const route = T.routeMatcher('/user/tccb/ca-nhan-dang-ky/:nam');
             this.nam = parseInt(route.parse(window.location.pathname)?.nam);
             this.props.getTccbCaNhanDangKyByYear(this.nam);
@@ -15,11 +15,7 @@ class TccbCaNhanDangKyDetails extends AdminPage {
     }
 
     dangKy = (item, value) => {
-        if (item.id) {
-            this.props.updateTccbCaNhanDangKy(item.id, { dangKy: value }, item.idNhomDangKy);
-        } else {
-            this.props.createTccbCaNhanDangKy({ dangKy: value }, item.nhom.id);
-        }
+        this.props.createTccbCaNhanDangKy({ dangKy: value }, item.nhom.id);
     }
 
     render() {
@@ -48,7 +44,7 @@ class TccbCaNhanDangKyDetails extends AdminPage {
                     <tr>
                         <TableCell style={{ textAlign: 'center' }} className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
                         <TableCell style={{ textAlign: 'left' }} className='text-primary' colSpan={5} content={<b>{item.nhom.ten}</b>} />
-                        <TableCell type='checkbox' rowSpan={1 + item.submenus.length * 2} content={item.dangKy || 0} permission={permission} onChanged={value => this.dangKy(item, value)} />
+                        <TableCell type='checkbox' rowSpan={1 + item.submenus.length * 2} content={item.dangKy} permission={permission} onChanged={value => this.dangKy(item, value)} />
                     </tr>
                     {
                         item.submenus.length > 0 &&
@@ -88,5 +84,5 @@ class TccbCaNhanDangKyDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tccbCaNhanDangKy: state.tccb.tccbCaNhanDangKy });
-const mapActionsToProps = { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy, updateTccbCaNhanDangKy };
+const mapActionsToProps = { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy };
 export default connect(mapStateToProps, mapActionsToProps)(TccbCaNhanDangKyDetails);

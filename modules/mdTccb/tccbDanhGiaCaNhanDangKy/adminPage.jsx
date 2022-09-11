@@ -8,7 +8,7 @@ import { Tooltip } from '@mui/material';
 class TccbCaNhanDangKyPage extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user', () => {
             this.props.getTccbCaNhanDangKyDanhGiaNamAll(items => this.setState({ items }));
         });
     }

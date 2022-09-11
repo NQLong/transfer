@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.tccb,
+        parentMenu: app.parentMenu.user,
         menus: {
-            3036: { title: 'Đơn vị đăng ký nhiệm vụ', link: '/user/tccb/don-vi-dang-ky-nhiem-vu', icon: 'fa-pencil', backgroundColor: '#2a99b8', groupIndex: 6 }
+            1003: { title: 'Đơn vị đăng ký nhiệm vụ', link: '/user/tccb/don-vi-dang-ky-nhiem-vu', icon: 'fa-pencil', backgroundColor: '#2a99b8', groupIndex: 6 }
         }
     };
     app.permission.add(

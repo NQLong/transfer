@@ -132,7 +132,7 @@ class TccbDanhGiaNamPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
                     <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}/don-vi`} style={{ textAlign: 'center' }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
-                    <TableCell style={{ textAlign: 'center' }} content={`${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell type='link' url={`/user/tccb/danh-gia-ca-nhan/${item.nam}`} style={{ textAlign: 'center' }} content={`${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete}
                     >
@@ -142,8 +142,18 @@ class TccbDanhGiaNamPage extends AdminPage {
                             </a>
                         </Tooltip>
                         <Tooltip title='Xem thông tin' arrow>
-                            <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || permission.write ? this.props.history.push(`/user/tccb/danh-gia/${item.nam}`) : T.notify('Vui lòng liên hệ người quản lý!', 'danger')}>
+                            <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || permission.write ? this.props.history.push(`/user/tccb/danh-gia/${item.nam}`) : T.notify('Vui lòng liên hệ người quản lý!', 'danger')}>
                                 <i className='fa fa-lg fa-info' />
+                            </a>
+                        </Tooltip>
+                        <Tooltip title='Thông tin đăng ký đơn vị' arrow>
+                            <a className='btn btn-primary' href='#' onClick={() => this.props.history.push(`/user/tccb/danh-gia/${item.nam}/don-vi`)}>
+                                <i className='fa fa-lg fa-users' />
+                            </a>
+                        </Tooltip>
+                        <Tooltip title='Thông tin đăng ký cá nhân' arrow>
+                            <a className='btn btn-warning' href='#' onClick={() => this.props.history.push(`/user/tccb/danh-gia-ca-nhan/${item.nam}`)}>
+                                <i className='fa fa-lg fa-user' />
                             </a>
                         </Tooltip>
                     </TableCell>
