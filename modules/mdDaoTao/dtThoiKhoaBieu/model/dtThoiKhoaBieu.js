@@ -185,9 +185,8 @@ module.exports = app => {
                                 [thu, tietBatDau] = thuTiet.split('_');
                             if (hocPhan.isDuplicated) {
                                 dataCanGen.forEach(item => listNganh.filter(nganh => {
-                                    if (item.maNganh.includes(nganh.idNganh) && item.maMonHoc != hocPhan.maMonHoc && item.thu == hocPhan.thu && item.tietBatDau == hocPhan.tietBatDau) console.log(`${hocPhan.maMonHoc}_${hocPhan.nhom}`, `${item.maMonHoc}_${item.nhom}`);
+                                    if (item.maNganh.includes(nganh.idNganh) && item.maMonHoc != hocPhan.maMonHoc && item.thu == hocPhan.thu && item.tietBatDau == hocPhan.tietBatDau) item.isDuplicated = true;
                                 }));
-                                // let findDuplicate = dataCanGen.find(item => item.maMonHoc != hocPhan.maMonHoc && item.thu == thu && item.tietBatDau == tietBatDau && listNganh.filter(nganh => item.maNganh.split(',').includes(nganh.idNganh)));
                             }
                             dataReturn.push({ ...hocPhan, thu, tietBatDau });
                             let toRemove = new Set(Array.from({ length: soTietBuoi }, (_, i) => i + 1).map(tiet => `${thu}_${tiet}`));

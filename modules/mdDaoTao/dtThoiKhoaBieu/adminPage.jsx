@@ -146,7 +146,6 @@ class DtThoiKhoaBieuPage extends AdminPage {
         const cookie = T.updatePage('pageDtThoiKhoaBieu');
         let { filter } = cookie;
         if (!filter || (typeof filter == 'string' && filter.includes('%'))) filter = {};
-        // console.log(filter);
         if (isInitial) {
             this.showAdvanceSearch();
             ['namFilter', 'hocKyFilter', 'loaiHinhDaoTaoFilter', 'khoaSinhVienFilter'].forEach(e => {
@@ -196,6 +195,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
     renderThoiGianPhanCong = (data) => {
         return renderTable({
             emptyTable: 'Chưa có thời gian phân công',
+            id: 'tkbTable',
             getDataSource: () => data,
             header: 'thead-light',
             stickyHead: false,
@@ -260,7 +260,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
             emptyTable: 'Không có dữ liệu thời khóa biểu',
             getDataSource: () => list, stickyHead: true,
             header: 'thead-light',
-            className: 'table-fix-col',
+            className: 'dataTable',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>#</th>
@@ -350,6 +350,19 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 'Thời khoá biểu'
             ],
             content: <>
+                <p>
+                    <a className='btn btn-primary' data-toggle='collapse' href='#collapseExample' role='button' aria-expanded='false' aria-controls='collapseExample'>
+                        Link with href
+                    </a>
+                    <button className='btn btn-primary' type='button' data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>
+                        Button with data-target
+                    </button>
+                </p>
+                <div className='collapse' id='collapseExample'>
+                    <div className='card card-body'>
+                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                    </div>
+                </div>
                 {/* {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null} */}
                 <div>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}

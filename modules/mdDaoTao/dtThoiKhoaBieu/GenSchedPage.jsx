@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
-import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData } from './redux';
+import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, updateCheckDtThoiKhoaBieu } from './redux';
 import { getDmCaHocAll, getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc/redux';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
@@ -267,12 +267,16 @@ class GenSchedPage extends AdminPage {
         </>);
     }
 
+    handleCheck = (value, item) => {
+        this.props.updateCheckDtThoiKhoaBieu(item.id, { isMo: Number(value) });
+    }
     genData = (data) => renderTable({
         getDataSource: () => data,
         stickyHead: true,
         header: 'thead-light',
         className: 'table-fix-col',
         renderHead: () => <tr>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chọn</th>
             <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Mã</th>
             <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Thứ</th>
@@ -284,6 +288,7 @@ class GenSchedPage extends AdminPage {
         </tr>,
         renderRow: (item, index) => {
             return (<tr key={index}>
+                <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={this.getUserPermission('dtThoiKhoaBieu')} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc}_${item.nhom}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={T.parse(item.tenMonHoc, { vi: '' }).vi} />
                 {this.state.editId == item.id ? this.editElement() : <>
@@ -630,6 +635,6 @@ class GenSchedPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
 const mapActionsToProps = {
-    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, getScheduleSettings
+    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, getScheduleSettings, updateCheckDtThoiKhoaBieu
 };
 export default connect(mapStateToProps, mapActionsToProps)(GenSchedPage);
