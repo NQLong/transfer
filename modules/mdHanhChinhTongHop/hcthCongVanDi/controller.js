@@ -96,7 +96,7 @@ module.exports = app => {
             }
             // console.log(scope);
             console.log(filterData);
-            const page = await app.model.hcthCongVanDi.searchPageAlternate(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), '', app.utils.stringify(scope), app.utils.stringify(filterData));
+            const page = await app.model.hcthCongVanDi.searchPageAlternate(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), searchTerm, app.utils.stringify(scope), app.utils.stringify(filterData));
 
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
             const pageCondition = searchTerm;
@@ -531,7 +531,7 @@ module.exports = app => {
             }
 
             const congVan = await getInstance(id);
-
+            // TODO: check permissions
             // const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
             let donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: LOAI_VAN_BAN, donViNhanNgoai: 0 }, 'donViNhan', 'id');
             let donViNhanNgoai = await app.model.hcthDonViNhan.getAll({ ma: id, loai: LOAI_VAN_BAN, donViNhanNgoai: 1 }, 'donViNhan', 'id');
@@ -540,7 +540,7 @@ module.exports = app => {
             if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            //TODO: use new state system
+
             else if (congVan.trangThai == vanBanDi.trangThai.DA_PHAT_HANH.id && req.session.user?.shcc) {
                 await viewCongVan(id, req.session.user.shcc, congVan.nguoiTao);
             }
@@ -563,7 +563,6 @@ module.exports = app => {
                     parameter: { danhSach: canBoNhan }
                 }, 'shcc,ten,ho,email', 'ten');
             }
-            console.log(donViNhan, donViNhanNgoai, canBoNhan);
 
             if (donViNhan?.length) {
                 danhSachDonViNhan = await app.model.dmDonVi.getAll({
@@ -629,6 +628,7 @@ module.exports = app => {
             };
 
             await app.model.hcthPhanHoi.create(newPhanHoi);
+            res.send({});
         } catch (error) { console.error(error); res.send({ error }); }
     });
 
@@ -770,176 +770,171 @@ module.exports = app => {
     });
 
 
-    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
-        let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
-        let donViXem = '', canBoXem = '';
-        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
 
-        if (donViGui == 'null') donViGui = null;
-        if (donViNhan == 'null') donViNhan = null;
-        if (canBoNhan == 'null') canBoNhan = null;
-        if (loaiCongVan == 'null') loaiCongVan = null;
-        if (loaiVanBan == 'null') loaiVanBan = null;
-        if (donViNhanNgoai == 'null') donViNhanNgoai = null;
-        if (status == 'null') status = null;
-        if (timeType == 'null') timeType = null;
-        if (fromTime == 'null') fromTime = null;
-        if (toTime == 'null') toTime = null;
-        if (congVanYear == 'null') congVanYear = null;
+            const permissions = req.session.user.permissions;
+            const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
 
-        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-        const hcthPermission = getUserPermission(req, 'hcth', ['manage']),
-            hcthManagePermission = getUserPermission(req, 'hcthCongVanDi', ['manage']);
-        const user = req.session.user;
-        const permissions = user.permissions;
+            let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = app.utils.parse(req.params.filter) || { donViGui: '', donViNhan: '', loaiCongVan: '', loaiVanBan: '', donViNhanNgoai: '', status: '', timeType: '', fromTime: '', toTime: '', congVanYear: '' };
 
-        donViXem = req.session?.user?.staff?.donViQuanLy || [];
-        donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes(managerPermission) && req.session?.user?.staff?.maDonVi || '';
-        canBoXem = req.session?.user?.shcc || '';
+            //status scheme
+            let scope = { SELF: [], DEPARTMENT: [], GLOBAL: [], };
 
-        let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.manage ? 2 : 0;
+            scope.SELF = [vanBanDi.trangThai.DA_PHAT_HANH.id];
 
-        if (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent) || hcthManagePermission.manage) {
-            donViXem = '';
-            canBoXem = '';
-        }
+            if (permissions.includes(managerPermission))
+                scope.DEPARTMENT = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('rectors:login') || permissions.includes('hcthCongVanDi:read'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('developer:login'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).map(item => item.id);
+            Object.keys(scope).forEach(key => scope[key] = scope[key].toString());
 
-        if (congVanYear && Number(congVanYear) > 1900) {
-            timeType = 1;
-            fromTime = new Date(`${congVanYear}-01-01`).getTime();
-            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
-        }
+            const userDepartments = new Set(getDonViQuanLy(req));
+            if (getDonVi(req))
+                userDepartments.add(getDonVi(req));
 
-        app.model.hcthCongVanDi.downloadExcel(canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, result) => {
-            if (error || !result) {
-                res.send({ error });
-            } else {
-                const workbook = app.excel.create(),
-                    worksheet = workbook.addWorksheet('congvancacphong');
-                const cells = [
-                    {
-                        header: 'STT', width: 10, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Ngày gửi', width: 15, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Ngày ký', width: 15, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Trích yếu', width: 50, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Số văn bản', width: 20, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Đơn vị gửi', width: 30, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Đơn vị, cán bộ nhận', width: 45, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
+            const userShcc = getShcc(req);
+
+            const filterParam = {
+                userShcc, userDepartments: [...userDepartments].toString(), donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime
+            };
+
+            if (congVanYear && Number(congVanYear) > 1900) {
+                filterParam.timeType = 1;
+                filterParam.fromTime = new Date(`${congVanYear}-01-01`).getTime();
+                filterParam.toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
+            }
+
+            const result = await app.model.hcthCongVanDi.downloadExcel(app.utils.stringify(filterParam), app.utils.stringify(scope), searchTerm);
+
+            const workbook = app.excel.create(),
+                worksheet = workbook.addWorksheet('congvancacphong');
+            const cells = [
+                {
+                    header: 'STT', width: 10, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
                         }
                     }
-                ];
+                },
+                {
+                    header: 'Ngày gửi', width: 15, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Ngày ký', width: 15, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Trích yếu', width: 50, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Số văn bản', width: 20, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Đơn vị gửi', width: 30, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Đơn vị, cán bộ nhận', width: 45, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                }
+            ];
 
-                worksheet.columns = cells;
-                worksheet.getRow(1).alignment = {
-                    ...worksheet.getRow(1).alignment,
+            worksheet.columns = cells;
+            worksheet.getRow(1).alignment = {
+                ...worksheet.getRow(1).alignment,
+                vertical: 'middle',
+                horizontal: 'center',
+                wrapText: true
+            };
+            worksheet.getRow(1).font = {
+                name: 'Times New Roman',
+                family: 4,
+                size: 12,
+                bold: true
+            };
+
+            worksheet.getRow(1).height = 40;
+            result.rows.forEach((item, index) => {
+                worksheet.getRow(index + 2).alignment = {
+                    ...worksheet.getRow(index + 2).alignment,
                     vertical: 'middle',
                     horizontal: 'center',
                     wrapText: true
                 };
-                worksheet.getRow(1).font = {
+                worksheet.getRow(index + 2).font = {
                     name: 'Times New Roman',
-                    family: 4,
-                    size: 12,
-                    bold: true
+                    size: 12
                 };
+                worksheet.getCell('A' + (index + 2)).value = index + 1;
+                worksheet.getCell('B' + (index + 2)).value = item.ngayGui ? app.date.dateTimeFormat(new Date(item.ngayGui), 'dd/mm/yyyy') : '';
+                worksheet.getCell('C' + (index + 2)).value = item.ngayKy ? app.date.dateTimeFormat(new Date(item.ngayKy), 'dd/mm/yyyy') : '';
+                worksheet.getCell('D' + (index + 2)).value = item.trichYeu;
+                worksheet.getCell('D' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+                worksheet.getCell('E' + (index + 2)).value = item.soCongVan;
+                worksheet.getCell('F' + (index + 2)).value = item.tenDonViGui;
+                worksheet.getCell('F' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
 
-                worksheet.getRow(1).height = 40;
-                result.rows.forEach((item, index) => {
-                    worksheet.getRow(index + 2).alignment = {
-                        ...worksheet.getRow(index + 2).alignment,
-                        vertical: 'middle',
-                        horizontal: 'center',
-                        wrapText: true
-                    };
-                    worksheet.getRow(index + 2).font = {
-                        name: 'Times New Roman',
-                        size: 12
-                    };
-                    worksheet.getCell('A' + (index + 2)).value = index + 1;
-                    worksheet.getCell('B' + (index + 2)).value = item.ngayGui ? app.date.dateTimeFormat(new Date(item.ngayGui), 'dd/mm/yyyy') : '';
-                    worksheet.getCell('C' + (index + 2)).value = item.ngayKy ? app.date.dateTimeFormat(new Date(item.ngayKy), 'dd/mm/yyyy') : '';
-                    worksheet.getCell('D' + (index + 2)).value = item.trichYeu;
-                    worksheet.getCell('D' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
-                    worksheet.getCell('E' + (index + 2)).value = item.soCongVan;
-                    worksheet.getCell('F' + (index + 2)).value = item.tenDonViGui;
-                    worksheet.getCell('F' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
-
-                    const donViNhan = item.danhSachDonViNhan?.split(';').map(item => item + '\r\n').join('') || '';
-                    const canBoNhan = item.danhSachCanBoNhan?.split(';').map(item => item + '\r\n').join('') || '';
-                    const donViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';').map(item => item + '\r\n').join('') || '';
-                    worksheet.getCell('G' + (index + 2)).value = donViNhan != '' || donViNhanNgoai != '' || canBoNhan != '' ? donViNhan + donViNhanNgoai + canBoNhan : '';
-                    worksheet.getCell('G' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
-                });
-                let fileName = 'congvancacphong.xlsx';
-                app.excel.attachment(workbook, res, fileName);
-            }
-        });
+                const donViNhan = item.danhSachDonViNhan?.split(';').map(item => item + '\r\n').join('') || '';
+                const canBoNhan = item.danhSachCanBoNhan?.split(';').map(item => item + '\r\n').join('') || '';
+                const donViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';').map(item => item + '\r\n').join('') || '';
+                worksheet.getCell('G' + (index + 2)).value = donViNhan != '' || donViNhanNgoai != '' || canBoNhan != '' ? donViNhan + donViNhanNgoai + canBoNhan : '';
+                worksheet.getCell('G' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+            });
+            let fileName = 'congvancacphong.xlsx';
+            app.excel.attachment(workbook, res, fileName);
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.post('/api/hcth/van-ban-di/file/config', app.permission.check('staff:login'), async (req, res) => {
         try {
             const { id, config } = req.body;
-            console.log({ config });
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
             const promises = config.map(async item => {
                 const { id: itemId, ...data } = item;

@@ -103,20 +103,35 @@ module.exports = app => {
         const randomSerialNumber = () => {
             return makeNumberPositive(forge.util.bytesToHex(forge.random.getBytesSync(20)));
         };
+        const qtChucVu = await app.model.qtChucVu.get({ shcc, chucVuChinh: 1, thoiChucVu: 0 }, 'maChucVu');
+
+        const chucVu = await app.model.dmChucVu.get({ ma: qtChucVu?.maChucVu }, 'ten');
+
+        const canBo = await app.model.canBo.get({ shcc }, 'ho, ten, maDonVi');
+
+        const donVi = await app.model.dmDonVi.get({ ma: canBo?.maDonVi }, 'ten');
+
         // Define the attributes/properties for the Host Certificate
         const attributes = [{
             shortName: 'C',
             value: 'VN'
         }, {
             shortName: 'ST',
-            value: 'Ho Chi Minh'
+            value: 'Hồ Chí Minh'
         }, {
             shortName: 'L',
-            value: 'DAI HOC KHOA HOC VA XA HOI NHAN VAN'
+            value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
         }, {
             shortName: 'CN',
-            value: `${shcc}-${id}`
-        }];
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName()
+        }, {
+            shortName: 'O',
+            value: `${donVi?.ten || ''}`.trim()
+        }, {
+            shortName: 'OU',
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `.${shcc}`
+        }
+        ];
 
         const extensions = [{
             name: 'basicConstraints',
@@ -191,6 +206,7 @@ module.exports = app => {
             await app.model.hcthUserPublicKey.update({ id: khoa.id }, { publicKey });
             res.send({});
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
