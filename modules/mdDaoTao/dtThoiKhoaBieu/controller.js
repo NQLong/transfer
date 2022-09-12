@@ -20,13 +20,13 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '33') {
-            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:delete', 'dtThoiKhoaBieu:export');
+            app.permissionHooks.pushUserPermission(user, 'dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:write', 'dtThoiKhoaBieu:delete', 'dtThoiKhoaBieu:export', 'dtThoiKhoaBieu:import');
             resolve();
         } else resolve();
     }));
 
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
-    app.get('/user/dao-tao/import-thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:manage'), app.templates.admin);
+    app.get('/user/dao-tao/import-thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:import'), app.templates.admin);
     app.get('/user/dao-tao/thoi-khoa-bieu/auto-generate', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
     app.get('/user/dao-tao/thoi-khoa-bieu/tra-cuu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
 
@@ -491,7 +491,7 @@ module.exports = app => {
 
     // Export xlsx
     // Get data Nganh
-    app.get('/api/dao-tao/thoi-khoa-bieu/download-template', app.permission.check('dtThoiKhoaBieu:export, dtThoiKhoaBieu:import'), async (req, res) => {
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-template', app.permission.orCheck('dtThoiKhoaBieu:export', 'dtThoiKhoaBieu:import'), async (req, res) => {
         //Get data Khoa bo mon
         let khoaBoMon = await app.model.dmDonVi.getAll({ kichHoat: 1 }, 'ten');
         khoaBoMon = khoaBoMon.map(ele => ele.ten);
