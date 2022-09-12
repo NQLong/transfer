@@ -375,9 +375,7 @@ const History = () => {
 const VanBanDi = (props) => {
     const { navigation, route } = props;
     const dispatch = useDispatch();
-    const item = useSelector(state => {
-        return state?.hcthVanBanDi?.item;
-    });
+    const item = useSelector(state => state?.hcthVanBanDi?.item);
 
     const files = item?.files || [];
 
@@ -406,11 +404,8 @@ const VanBanDi = (props) => {
         try {
 
             //prepare file list
-
             const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => cfg.shcc === userInfo.shcc && !cfg.signAt && cfg.signType == item.trangThai));
             const congVanId = item.id;
-            console.log(listSignFile);
-            //
             const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`;
             let key;
             try {
