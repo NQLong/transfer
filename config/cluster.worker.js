@@ -12,7 +12,7 @@ module.exports = (cluster, isDebug) => {
         require('https').createServer({
             cert: app.fs.readFileSync('/etc/ssl/hcmussh_certificate.crt'),
             ca: app.fs.readFileSync('/etc/ssl/hcmussh_ca_bundle.crt'),
-            key: app.fs.readFileSync('/etc/ssl/hcmussh_private.key'),
+            key: app.fs.readFileSync('/etc/ssl/hcmussh_private.key')
         }, app);
     if (!app.isDebug && app.fs.existsSync('./asset/config.json')) appConfig = Object.assign({}, appConfig, require('../asset/config.json'));
 
@@ -82,7 +82,7 @@ module.exports = (cluster, isDebug) => {
     app.worker = {
         create: () => process.send({ type: 'createWorker' }),
         reset: (workerId) => process.send({ type: 'resetWorker', workerId, primaryWorker: app.primaryWorker }),
-        shutdown: (workerId) => process.send({ type: 'shutdownWorker', workerId, primaryWorker: app.primaryWorker }),
+        shutdown: (workerId) => process.send({ type: 'shutdownWorker', workerId, primaryWorker: app.primaryWorker })
     };
 
     // Listen from MASTER ---------------------------------------------------------------------------------------------
@@ -105,6 +105,6 @@ module.exports = (cluster, isDebug) => {
     server.listen(app.port);
 
     //logger
-    app.primaryWorker  && app.setupPm2ViewLogs();
+    app.primaryWorker && app.setupPm2ViewLogs();
     // app.intervalEmitEvent();
 };

@@ -1,5 +1,4 @@
 const pm2 = require('pm2');
-
 module.exports = (app, appConfig) => {
     app.fs.createFolder(app.bundlePath);
 
@@ -212,7 +211,7 @@ module.exports = (app, appConfig) => {
             if (user && user.permissions.includes('cluster:manage')) {
                 socket.join('cluster');
             }
-        }),
+        })
     });
 
     //pm2 logs API -------------------------------------------------------------------------------------------------------------------------------
