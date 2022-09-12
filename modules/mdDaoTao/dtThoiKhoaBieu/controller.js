@@ -384,8 +384,18 @@ module.exports = app => {
     app.put('/api/dao-tao/thoi-khoa-bieu/update-check', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         try {
             let id = req.body.id;
-            const item = await app.model.dtThoiKhoaBieu.update({ id }, { isMo: Number(req.body.isMo) });
-            res.send({ item });
+            if (typeof id == 'object') {
+                const item = await app.model.dtThoiKhoaBieu.update({
+                    statement: 'id in (:id)',
+                    parameter: { id }
+                }, { isMo: Number(req.body.isMo) });
+                res.send({ item });
+            } else {
+                const item = await app.model.dtThoiKhoaBieu.update({ id }, { isMo: Number(req.body.isMo) });
+                res.send({ item });
+            }
+
+
         } catch (error) {
             res.send({ error });
         }
@@ -398,6 +408,25 @@ module.exports = app => {
             app.model.dtThoiKhoaBieuNganh.delete({ idThoiKhoaBieu: req.body.id });
             res.end();
         } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.delete('/api/dao-tao/thoi-khoa-bieu/condition', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
+        try {
+            let listChosen = req.body.listChosen.map(item => parseInt(item));
+            let condition1 = {
+                statement: 'id IN (:listChosen)',
+                parameter: { listChosen }
+            }, condition2 = {
+                statement: 'idThoiKhoaBieu IN (:listChosen)',
+                parameter: { listChosen }
+            };
+            app.model.dtThoiKhoaBieu.delete(condition1);
+            app.model.dtThoiKhoaBieuNganh.delete(condition2);
+            res.end();
+        } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });

@@ -242,6 +242,24 @@ export function getDtLichDayHoc(phong, done) {
     };
 }
 
+export function deleteMultipleDtThoiKhoaBieu(listChosen = [], done) {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
+        const url = '/api/dao-tao/thoi-khoa-bieu/condition';
+        T.delete(url, { listChosen }, data => {
+            if (data.error) {
+                T.notify('Xoá bị lỗi!', 'danger');
+                console.error(`DELETE ${url}. ${data.error.message}`);
+            } else {
+                T.alert('Xoá thời khoá biểu thành công!', 'success', false, 1000);
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
+                if (done) done();
+            }
+        });
+    };
+}
+
 // Generate action -----------------------------------------------------------------------------------------------------------------------------------------------------------
 export function getDtThoiKhoaBieuByConfig(config, done) {
     return dispatch => {

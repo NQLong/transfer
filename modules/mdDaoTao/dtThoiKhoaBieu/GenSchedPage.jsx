@@ -5,7 +5,7 @@ import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/red
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
 import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, updateCheckDtThoiKhoaBieu } from './redux';
@@ -270,13 +270,20 @@ class GenSchedPage extends AdminPage {
     handleCheck = (value, item) => {
         this.props.updateCheckDtThoiKhoaBieu(item.id, { isMo: Number(value) });
     }
+
+    updateIsMoAll = (value) => {
+        this.props.updateCheckDtThoiKhoaBieu(this.props.dtThoiKhoaBieu.dataCanGen.map(item => item.id), { isMo: Number(value) });
+    }
+
     genData = (data) => renderTable({
         getDataSource: () => data,
         stickyHead: true,
         header: 'thead-light',
         className: 'table-fix-col',
         renderHead: () => <tr>
-            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chọn</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+                <FormCheckbox onChange={this.updateIsMoAll} />
+            </th>
             <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Mã</th>
             <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Thứ</th>
@@ -288,7 +295,7 @@ class GenSchedPage extends AdminPage {
         </tr>,
         renderRow: (item, index) => {
             return (<tr key={index}>
-                <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={this.getUserPermission('dtThoiKhoaBieu')} />
+                <TableCell type='checkbox' isCheck style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={this.getUserPermission('dtThoiKhoaBieu')} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc}_${item.nhom}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={T.parse(item.tenMonHoc, { vi: '' }).vi} />
                 {this.state.editId == item.id ? this.editElement() : <>

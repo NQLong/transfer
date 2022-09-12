@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule } from './redux';
+import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule, deleteMultipleDtThoiKhoaBieu } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { createDtThoiGianPhanCong } from '../dtThoiGianPhanCong/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
-import { AdminModal, AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
@@ -126,7 +126,8 @@ class AdjustModal extends AdminModal {
 }
 class DtThoiKhoaBieuPage extends AdminPage {
     check = {}
-    state = { page: null, isEdit: {}, sucChua: {}, filter: {}, namFilter: '', hocKy: '' }
+    state = { page: null, isEdit: {}, sucChua: {}, filter: {}, namFilter: '', hocKy: '', listChosen: [] }
+
     componentDidMount() {
         this.props.getDmCaHocAll(items => {
             items = [...new Set(items.map(item => parseInt(item.ten)))];
@@ -253,6 +254,15 @@ class DtThoiKhoaBieuPage extends AdminPage {
         e?.preventDefault();
         T.confirm('Lưu ý', 'Hãy chắc chắn rằng bạn đã chọn mở các môn theo đúng đợt', 'warning', true, isConfirm => isConfirm && this.props.history.push('/user/dao-tao/thoi-khoa-bieu/auto-generate'));
     }
+
+    deleleMultiple = (e) => {
+        e.preventDefault();
+        T.confirm('Xác nhận', 'Bạn chắc chắn muốn xoá những mục đã chọn', 'warning', true, isConfirm => {
+            if (isConfirm) {
+                this.props.deleteMultipleDtThoiKhoaBieu(this.state.listChosen);
+            }
+        });
+    }
     render() {
         const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete', 'manage', 'export']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtThoiKhoaBieu?.page || { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '', list: [] };
@@ -264,9 +274,16 @@ class DtThoiKhoaBieuPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>#</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Mở</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>
+                        <Tooltip title={`Xoá ${this.state.listChosen.length} mục đã chọn`} arrow placement='top'>
+                            <button className='btn btn-warning' type='button' style={{ display: this.state.listChosen.length ? '' : 'none', marginBottom: '10px' }} onClick={this.deleleMultiple}>
+                                <i className='fa fa-sm fa-trash' />
+                            </button>
+                        </Tooltip>
+                        <FormCheckbox ref={e => this.checkAll = e} onChange={value => this.setState({ listChosen: value ? list.map(item => item.id) : [] })} />
+                    </th>
                     <th style={{ width: '25%', textAlign: 'center' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '50%', }} nowrap='true'>Môn học</th>
+                    <th style={{ width: '50%' }} nowrap='true'>Môn học</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Tự chọn</th>
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Tổng tiết</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Phòng</th>
@@ -278,8 +295,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Ngày bắt đầu</th>
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Ngày kết thúc</th>
                     <th style={{ width: '25%' }} nowrap='true'>Khoa <br />Bộ môn</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Giảng viên</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Trợ giảng</th>
+                    {/* <th style={{ width: 'auto' }} nowrap='true'>Giảng viên</th> */}
+                    {/* <th style={{ width: 'auto' }} nowrap='true'>Trợ giảng</th> */}
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Bậc</th>
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Hệ</th>
                     <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>Khoá SV</th>
@@ -293,8 +310,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 return (
                     <tr key={index} style={{ backgroundColor: '#fff' }}>
                         <TableCell style={{ textAlign: 'right' }} content={indexOfItem} />
-                        {official ? <TableCell type='text' style={{ textAlign: 'center' }} content={'x'} /> :
-                            <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={permission} />}
+
+                        <TableCell type='checkbox' isCheck style={{ textAlign: 'center' }} content={this.state.listChosen.includes(item.id)} onChanged={value => this.setState({ listChosen: value ? [...this.state.listChosen, item.id] : this.state.listChosen.filter(i => i != item.id) })} permission={permission} />
 
                         <TableCell style={{ width: 'auto', textAlign: 'center' }} content={`${item.maMonHoc}_${item.nhom}`} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={
@@ -319,8 +336,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayBatDau} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ textAlign: 'center' }} content={item.ngayKetThuc} />
                         <TableCell style={{ textAlign: 'center' }} content={item.tenKhoaDangKy?.getFirstLetters().toUpperCase()} />
-                        <TableCell style={{ whiteSpace: 'pre' }} content={item.listGiangVien?.split(',').map(gvItem => gvItem.split('_')[1]).join('\n')} />
-                        <TableCell style={{ whiteSpace: 'pre' }} content={item.listTroGiang?.split(',').map(tgItem => tgItem.split('_')[1]).join('\n')} />
+                        {/* <TableCell style={{ whiteSpace: 'pre' }} content={item.listGiangVien?.split(',').map(gvItem => gvItem.split('_')[1]).join('\n')} /> */}
+                        {/* <TableCell style={{ whiteSpace: 'pre' }} content={item.listTroGiang?.split(',').map(tgItem => tgItem.split('_')[1]).join('\n')} /> */}
                         <TableCell style={{ textAlign: 'center' }} content={item.bacDaoTao} />
                         <TableCell style={{ textAlign: 'center' }} content={item.loaiHinhDaoTao} />
                         <TableCell style={{ textAlign: 'right' }} content={item.khoaSinhVien} />
@@ -350,21 +367,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 'Thời khoá biểu'
             ],
             content: <>
-                <p>
-                    <a className='btn btn-primary' data-toggle='collapse' href='#collapseExample' role='button' aria-expanded='false' aria-controls='collapseExample'>
-                        Link with href
-                    </a>
-                    <button className='btn btn-primary' type='button' data-toggle='collapse' data-target='#collapseExample' aria-expanded='false' aria-controls='collapseExample'>
-                        Button with data-target
-                    </button>
-                </p>
-                <div className='collapse' id='collapseExample'>
-                    <div className='card card-body'>
-                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-                    </div>
-                </div>
-                {/* {this.state.thoiGianPhanCong && this.state.thoiGianPhanCong.length ? <div className='tile'>{this.renderThoiGianPhanCong(this.state.thoiGianPhanCong)}</div> : null} */}
-                <div>{table}</div>
+                <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDtThoiKhoaBieuPage} />
                 <AdjustModal ref={e => this.modal = e} quanLyKhoa={permission.manage}
@@ -380,18 +383,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <FormSelect ref={e => this.khoaSinhVienFilter = e} className='col-md-3' label='Khoá' data={this.state.dataKhoaSinhVien || []} onChange={value => this.setState({ filter: { ...this.state.filter, khoaSinhVienFilter: value?.id } })} allowClear />
                 <FormSelect ref={e => this.hocKyFilter = e} className='col-md-3' label='Học kỳ' data={dataHocKy} onChange={value => this.setState({ filter: { ...this.state.filter, hocKyFilter: value?.id } })} allowClear />
                 <FormSelect ref={e => this.loaiHinhDaoTaoFilter = e} className='col-md-3' label='Hệ' data={SelectAdapter_DmSvLoaiHinhDaoTaoFilter} onChange={value => this.setState({ filter: { ...this.state.filter, loaiHinhDaoTaoFilter: value?.id } })} allowClear />
-                {/* <FormSelect ref={e => this.bacDaoTaoFilter = e} className='col-md-2' placeholder='Bậc' data={SelectAdapter_DmSvBacDaoTao} onChange={value => this.setState({ filter: { ...this.state.filter, bacDaoTaoFilter: value?.id } })} allowClear /> */}
 
-                {/* <FormSelect ref={e => this.phongFilter = e} className='col-md-2' placeholder='Phòng' data={SelectAdapter_DmPhong} onChange={value => this.setState({ filter: { ...this.state.filter, phongFilter: value?.id } })} allowClear /> */}
-                {/* <FormSelect ref={e => this.thuFilter = e} className='col-md-2' placeholder='Thứ' data={dataThu} onChange={value => this.setState({ filter: { ...this.state.filter, thuFilter: value?.id } })} allowClear /> */}
-                {/* <FormSelect ref={e => this.khoaFilter = e} className='col-md-4' placeholder='Khoa/Bộ môn' data={SelectAdapter_DmDonVi} onChange={value => this.setState({ filter: { ...this.state.filter, donVi: value?.id } })} allowClear /> */}
-
-                {/* <FormSelect ref={e => this.monHocFilter = e} data={SelectAdapter_DmMonHocAll()} className='col-md-4' placeholder='Môn học' onChange={value => this.setState({ filter: { ...this.state.filter, monHocFilter: value?.id } })} allowClear /> */}
                 <div style={{ display: 'flex', justifyContent: 'end' }} className='form-group col-md-12'>
-                    {/* <button className='btn btn-secondary' onClick={
-                        e => e.preventDefault() || this.resetAdvancedSearch()} style={{ marginRight: '15px' }}>
-                        <i className='fa fa-lg fa-times' /> Reset
-                    </button> */}
                     <button className='btn btn-success' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
                         <i className='fa fa-lg fa-search-plus' /> Tìm kiếm
                     </button>
@@ -407,5 +400,5 @@ class DtThoiKhoaBieuPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
-const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule, createDtThoiGianPhanCong, getDmCaHocAll };
+const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, updateDtThoiKhoaBieuCondition, deleteDtThoiKhoaBieu, initSchedule, createDtThoiGianPhanCong, getDmCaHocAll, deleteMultipleDtThoiKhoaBieu };
 export default connect(mapStateToProps, mapActionsToProps)(DtThoiKhoaBieuPage);
