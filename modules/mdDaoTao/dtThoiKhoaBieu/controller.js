@@ -28,6 +28,7 @@ module.exports = app => {
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
     app.get('/user/dao-tao/import-thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:import'), app.templates.admin);
     app.get('/user/dao-tao/thoi-khoa-bieu/auto-generate', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
+    app.get('/user/dao-tao/thoi-khoa-bieu/tra-cuu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/dao-tao/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), async (req, res) => {
@@ -632,5 +633,72 @@ module.exports = app => {
         }
         resolve();
     }));
+
+    //Tra cứu phòng trống------------------------------------------------------------------------------------------
+
+    app.get('/api/dao-tao/thoi-khoa-bieu/tra-cuu', app.permission.check('dtThoiKhoaBieu:manage'), async (req, res) => {
+        try {
+            let allFreeRoom = {};
+            let busyRoom = {};
+            //check coSo
+            let coSo = await app.model.dmCoSo.get({ ma: parseInt(req.query.maCoSo) });
+            if (!coSo) res.send({ error: 'Không tìm thấy cơ sở' });
+            else {
+                let listToaNha = await app.model.dmToaNha.getAll({ coSo: parseInt(req.query.maCoSo), kichHoat: 1 }, 'ma, ten');
+                if (!listToaNha || !listToaNha.length) res.send({ items: [] });
+                else {
+                    let toaNhaCondition = listToaNha.map(item => item.ma);
+                    let condition = {
+                        statement: 'toaNha IN (:toaNhaCondition)',
+                        parameter: {
+                            toaNhaCondition: toaNhaCondition
+                        }
+                    };
+                    if (req.query.condition) {
+                        condition = {
+                            statement: 'lower(ten) LIKE :searchText AND toaNha IN (:toaNhaCondition)',
+                            parameter: {
+                                searchText: `%${req.query.condition.toLowerCase()}%`,
+                                toaNhaCondition: toaNhaCondition
+                            }
+                        };
+                    }
+                    allFreeRoom = await app.model.dmPhong.getAll(condition, 'ten, sucChua, toaNha', 'ten asc');
+                    allFreeRoom = allFreeRoom.map(room => ({ ...room, tenToaNha: listToaNha.find(item => item.ma === room.toaNha).ten }));
+                    if (!allFreeRoom || !allFreeRoom.length) res.send({ items: [] });
+
+                }
+                let currTime = new Date().getTime();
+
+                let roomCondition = {
+                    statement: 'thu= :thu AND ngayBatDau <= :currTime AND ngayKetThuc >= :currTime AND isMo =1 AND (:nam IS NOT NULL OR nam =\'\' OR nam = :nam) AND (:hocKy IS NOT NULL OR hocKy =\'\' OR hocKy = :hocKy) AND (:loaiHinh IS NOT NULL OR loaiHinhDaoTao =\'\' OR loaiHinhDaoTao = :loaiHinh)',
+                    parameter: { thu: parseInt(req.query.thu), currTime: parseInt(currTime), nam: req.query.nam ? parseInt(req.query.nam) : '', hocKy: req.query.hocKy ? parseInt(req.query.hocKy) : '', loaiHinh: req.query.loaiHinh }
+                };
+                busyRoom = await app.model.dtThoiKhoaBieu.getAll(roomCondition, 'maMonHoc, nhom, hocKy, phong, ngayBatDau, giangVien, tietBatDau,soTietBuoi, ngayKetThuc,loaiHinhDaoTao, khoaSinhVien');
+                let caHoc = await app.model.dmCaHoc.getAll({ maCoSo: req.query.maCoSo, kichHoat: 1 }, 'ten');
+                let listCaHoc = caHoc.map(item => parseInt(item.ten));
+                listCaHoc.sort(function (a, b) { return a - b; });
+                allFreeRoom = allFreeRoom.map(item => ({ ...item, available: [...listCaHoc] }));
+            }
+            if (busyRoom) {
+                for (const tkb of busyRoom) {
+                    let phong = allFreeRoom.find(item => item.ten == tkb.phong);
+                    phong[tkb.tietBatDau] = { ...tkb };
+                    for (let i = tkb.tietBatDau; i < (tkb.tietBatDau + tkb.soTietBuoi); i++) {
+                        let index = phong.available.indexOf(i);
+                        if (index != -1) {
+                            phong.available.splice(index, 1);
+                        }
+                    }
+
+                }
+            }
+            res.send({ items: allFreeRoom });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+
+    });
 
 };

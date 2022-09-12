@@ -22,6 +22,11 @@ export default {
         {
             path: '/user/dao-tao/thoi-khoa-bieu/auto-generate',
             component: Loadable({ loading: Loading, loader: () => import('./GenSchedPage') })
-        }
-    ]
+        },
+        {
+            path: '/user/dao-tao/thoi-khoa-bieu/tra-cuu',
+            component: Loadable({ loading: Loading, loader: () => import('./searchRoom') })
+        },
+    ],
+
 };
