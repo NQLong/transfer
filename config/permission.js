@@ -335,9 +335,10 @@ module.exports = app => {
                     app.model.fwStudents.get({ emailTruong: user.email }, (error, student) => {
                         if (student) {
                             app.permissionHooks.pushUserPermission(user, 'student:login');
+                            let { khoa, namTuyenSinh, mssv, emailTruong } = student;
                             user.isStudent = 1;
                             user.active = 1;
-                            user.data = student;
+                            user.data = { khoa, namTuyenSinh, mssv, emailTruong };
                             user.ngayNhapHoc = student.ngayNhapHoc;
                             user.studentId = student.mssv;
                             user.lastName = student.ho;

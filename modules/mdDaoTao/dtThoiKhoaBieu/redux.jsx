@@ -356,3 +356,19 @@ export function updateDtThoiKhoaBieuGenData(data, done) {
         });
     };
 }
+
+export function dtThoiKhoaBieuTraCuu(thu, maCoSo, nam, hocKy, loaiHinh, done) {
+    return () => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/tra-cuu';
+        T.get(url, { thu, maCoSo, nam, hocKy, loaiHinh }, result => {
+            if (result.error) {
+                T.notify(`Lồi: ${result.error.message || 'Tra cứu thất bại'}`, 'danger');
+            }
+            else {
+                if (!result.items.length)
+                    T.notify('Cơ sở này chưa có phòng học', 'warning');
+                done && done(result.items);
+            }
+        });
+    };
+}
