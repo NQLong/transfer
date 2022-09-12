@@ -102,3 +102,18 @@ export function getChuKyDienTuVanBanDi(data, done) {
     }
 }
 
+export function getSignature(done) {
+    return dispatch => {
+        const url = '/api/hcth/chu-ky';
+        T.get(url, res => {
+            if (res.error) {
+                T.alert('Lấy chữ ký thất bại', 'danger');
+                console.error(`GET: ${url}.`, res.error);
+            } else {
+                T.alert('Lấy chữ ký thành công', 'success');
+                dispatch({ type: HcthRequestGetSignature, signature: res.item });
+                done && done(res.item);
+            }
+        }, () => T.notify('Lấy khóa thất bại', 'danger'));
+    };
+}

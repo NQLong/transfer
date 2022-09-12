@@ -376,6 +376,8 @@ const VanBanDi = (props) => {
         return state?.hcthVanBanDi?.item;
     });
 
+    console.log('item :', item?.trangThai);
+
     const files = item?.files || [];
 
     const userInfo = useSelector(state => state?.settings.user);
@@ -435,7 +437,7 @@ const VanBanDi = (props) => {
                 <List.Item title='Ngày ký' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayKy ? T.dateToText(item.ngayKy) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày tạo' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayTao ? T.dateToText(item.ngayTao) : 'Chưa có'}</Text>} />
 
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item.trangThai]?.color  || 'black', fontWeight: 'bold' }}>{trangThaiVanBanDi[item.trangThai]?.text || 'Nháp'}</Text>} />
+                {/* <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item.trangThai]?.color  || 'black', fontWeight: 'bold' }}>{trangThaiVanBanDi[item.trangThai]?.text || 'Nháp'}</Text>} /> */}
 
                 {/* <List.Item title='Ngôn ngữ' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngoaiNgu}</Text>} /> */}
 
