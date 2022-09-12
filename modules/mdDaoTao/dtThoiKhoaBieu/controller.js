@@ -14,6 +14,8 @@ module.exports = app => {
         'dtThoiKhoaBieu:write',
         'dtThoiKhoaBieu:delete',
         'dtThoiKhoaBieu:export',
+        'dtThoiKhoaBieu:import',
+
     );
 
     app.permissionHooks.add('staff', 'addRolesDtThoiKhoaBieu', (user, staff) => new Promise(resolve => {
@@ -24,6 +26,7 @@ module.exports = app => {
     }));
 
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.orCheck('dtThoiKhoaBieu:read', 'dtThoiKhoaBieu:manage'), app.templates.admin);
+    app.get('/user/dao-tao/import-thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:manage'), app.templates.admin);
     app.get('/user/dao-tao/thoi-khoa-bieu/auto-generate', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -389,6 +392,66 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/gen-schedule', app.permission.check('dtThoiKhoaBieu:read'), app.model.dtThoiKhoaBieu.autoGenSched);
+    //Hook upload -------------------------------------------------------------------------------
+    app.uploadHooks.add('DtThoiKhoaBieuData', (req, fields, files, params, done) =>
+        app.permission.has(req, () => dtThoiKhoaBieuImportData(fields, files, done), done, 'dtThoiKhoaBieu:write')
+    );
+    const dtThoiKhoaBieuImportData = async (fields, files, done) => {
+        let worksheet = null;
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'DtThoiKhoaBieuData' && files.DtThoiKhoaBieuData && files.DtThoiKhoaBieuData.length) {
+            const srcPath = files.DtThoiKhoaBieuData[0].path;
+            let workbook = app.excel.create();
+            workbook = await app.excel.readFile(srcPath);
+            if (workbook) {
+                app.fs.deleteFile(srcPath);
+                worksheet = workbook.getWorksheet(1);
+                if (worksheet) {
+                    const items = [];
+                    const duplicateDatas = [];
+                    let index = 2;
+                    try {
+                        while (true) {
+                            if (!worksheet.getCell('A' + index).value) {
+                                done({ items, duplicateDatas });
+                                break;
+                            } else {
+                                // const bacDaoTao = worksheet.getCell('R' + index).value;
+                                // const loaiHinhDaoTao= worksheet.getCell('S'+index).value;
+                                const khoaSinhVien = parseInt(worksheet.getCell('Q' + index).value);
+                                const namStr = worksheet.getCell('R' + index).value;
+                                const nam = await app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namStr }, 'id');
+                                const hocKy = parseInt(worksheet.getCell('S' + index).value);
+                                const maMonHocStr = worksheet.getCell('C' + index).value;
+                                const maMonHoc = await app.model.dtChuongTrinhDaoTao.get({ tenMonHoc: maMonHocStr, kichHoat: 1 }, 'maMonHoc');
+                                const khoaDangKyStr = worksheet.getCell('N' + index).value;
+                                const khoaDangKy = await app.model.dmDonVi.get({ ten: khoaDangKyStr }, 'ma');
+                                const soLop = worksheet.getCell('T' + index).value;
+                                const soTietBuoi = parseInt(worksheet.getCell('H' + index).value);
+                                const soBuoiTuan = parseInt(worksheet.getCell('U' + index).value);
+                                const soLuongDuKien = parseInt(worksheet.getCell('I' + index).value);
+                                const tenNganh = worksheet.getCell('J' + index).value;
+                                const maNganh = await app.model.dtNganhDaoTao.get({ tenNganh: tenNganh, kickHoat: 1 }, '*');
+
+                                // const giangVien = worksheet.getCell('U'+index).value;
+
+
+                                const row = { tenNganh, khoaSinhVien, nam: nam.id, hocKy, maMonHocStr, maMonHoc: maMonHoc.maMonHoc, khoaDangKy: khoaDangKy.ma, khoaDangKyStr, soLop, soTietBuoi, soBuoiTuan, soLuongDuKien, maNganh: maNganh.maNganh, namStr };
+                                items.push(row);
+                                index++;
+
+                            }
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        done({ error });
+                    }
+                } else {
+                    done({ error: 'No worksheet!' });
+                }
+            } else done({ error: 'No workbook!' });
+        }
+    };
+
 
     app.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         try {
@@ -426,6 +489,67 @@ module.exports = app => {
     app.post('/api/dao-tao/thoi-khoa-bieu/generate-room-end-date', app.permission.check('dtThoiKhoaBieu:write'), app.model.dtThoiKhoaBieu.getDataRoomAndEndDate);
 
     // Export xlsx
+    // Get data Nganh
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-template', app.permission.check('dtThoiKhoaBieu:export, dtThoiKhoaBieu:import'), async (req, res) => {
+        //Get data Khoa bo mon
+        let khoaBoMon = await app.model.dmDonVi.getAll({ kichHoat: 1 }, 'ten');
+        khoaBoMon = khoaBoMon.map(ele => ele.ten);
+        //Get data Nganh
+        let nganhDaoTao = await app.model.dtNganhDaoTao.getAll({ kichHoat: 1 }, 'tenNganh');
+        nganhDaoTao = nganhDaoTao.map(ele => ele.tenNganh);
+        //Get mon hoc
+        let monHoc = await app.model.dtChuongTrinhDaoTao.getAll({ kichHoat: 1 }, '*');
+        monHoc = monHoc.map(ele => ele.tenMonHoc);
+        //Get Cau truc dao tao
+        let ctDaoTao = await app.model.dtCauTrucKhungDaoTao.getAll({}, '*');
+        const nam = ctDaoTao.map(ele => ele.namDaoTao);
+        const khoa = ctDaoTao.map(ele => ele.khoa);
+
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Thoi_khoa_bieu_Template');
+        const defaultColumns = [
+            { header: 'STT', key: 'stt', width: 5 },
+            { header: 'MÃ', key: 'ma', width: 20 },
+            { header: 'MÔN HỌC', key: 'monHoc', width: 20 },
+            { header: 'TỰ CHỌN', key: 'tuChon', width: 20 },
+            { header: 'TỔNG TIẾT', key: 'tongTiet', width: 20 },
+            { header: 'THỨ', key: 'thu', width: 25 },
+            { header: 'TIẾT BẮT ĐẦU', key: 'tietBatDau', width: 25 },
+            { header: 'SỐ TIẾT', key: 'soTiet', width: 25 },
+            { header: 'SLDK', key: 'sldk', width: 25 },
+            { header: 'NGÀNH', key: 'nganh', width: 20 },
+            { header: 'CHUYÊN NGÀNH', key: 'chuyenNganh', width: 25 },
+            { header: 'NGÀY BẮT ĐẦU', key: 'ngayBatDau', width: 25 },
+            { header: 'NGÀY KẾT THÚC', key: 'ngayKetThuc', width: 25 },
+            { header: 'KHOA/BỘ MÔN', key: 'khoa', width: 20 },
+            { header: 'GIẢNG VIÊN', key: 'giangVien', width: 25 },
+            { header: 'TRỢ GIẢNG', key: 'troGiang', width: 25 },
+            { header: 'KHOÁ SV', key: 'khoaSV', width: 25 },
+            { header: 'NĂM HỌC', key: 'nam', width: 25 },
+            { header: 'HỌC KỲ', key: 'hocKy', width: 25 },
+            { header: 'NHÓM', key: 'nhom', width: 25 },
+            { header: 'SỐ BUỔI TRÊN TUẦN', key: 'buoiTrenTuan', width: 25 },
+
+        ];
+        ws.columns = defaultColumns;
+        const { dataRange: khoaBM } = workBook.createRefSheet('Khoa_Bo_Mon', khoaBoMon);
+        const { dataRange: nganhHoc } = workBook.createRefSheet('Nganh', nganhDaoTao);
+        const { dataRange: mon } = workBook.createRefSheet('Mon_Hoc', monHoc);
+        const { dataRange: khoaHoc } = workBook.createRefSheet('Khoa_Hoc', khoa);
+        const { dataRange: namHoc } = workBook.createRefSheet('Nam_Hoc', nam);
+
+        const rows = ws.getRows(2, 1000);
+        rows.forEach((row) => {
+            row.getCell('monHoc').dataValidation = { type: 'list', allowBlank: true, formulae: [mon] };
+            row.getCell('nganh').dataValidation = { type: 'list', allowBlank: true, formulae: [nganhHoc] };
+            row.getCell('khoa').dataValidation = { type: 'list', allowBlank: true, formulae: [khoaBM] };
+            row.getCell('nam').dataValidation = { type: 'list', allowBlank: true, formulae: [namHoc] };
+            row.getCell('khoaSV').dataValidation = { type: 'list', allowBlank: true, formulae: [khoaHoc] };
+        });
+        app.excel.attachment(workBook, res, 'Thoi_khoa_bieu_Template.xlsx');
+
+    });
+
     app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {
             let filter = app.utils.parse(req.query.filter || {});
@@ -457,6 +581,7 @@ module.exports = app => {
                 { header: 'NGÀNH', key: 'tenNganh', width: 50 },
                 { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 },
                 { header: 'TRỢ GIẢNG', key: 'giangVien', width: 30 },
+                { header: 'SỐ BUỔI TRÊN TUẦN', key: 'soBuoiTuan', width: 5 }
             ];
             // ws.getRow(1).font = {
             //     name: 'Times New Roman',
@@ -486,7 +611,7 @@ module.exports = app => {
                     khoa: item.tenKhoaDangKy,
                     giangVien: item.listGiangVien?.split(',').map(gvItem => gvItem.split('_')[1]).join('\n'),
                     troGiang: item.listTroGiang?.split(',').map(tgItem => tgItem.split('_')[1]).join('\n'),
-                    tenNganh: item.tenNganh.replaceAll('&&', '\n').replaceAll('%', ': ')
+                    tenNganh: item.tenNganh.replaceAll('&&', '\n').replaceAll('%', ': '),
                 }, index === 0 ? 'n' : 'i');
             });
 
