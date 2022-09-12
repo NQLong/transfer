@@ -375,13 +375,13 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null, autoFormat = true } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
             placeholder: label || placeholder,
             value: this.exactValue ? this.exactValue : this.state.value,
-            thousandSeparator: ',',
+            thousandSeparator: autoFormat ? ',' : null,
             decimalSeparator: step ? '.' : false,
             onValueChange: val => {
                 const newValue = this.checkMinMax(val.floatValue);
