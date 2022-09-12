@@ -16590,10 +16590,10 @@ BEGIN
                                  LEFT JOIN TCCB_NHOM_DANH_GIA_NHIEM_VU NHOM ON PD.ID_NHOM_DANG_KY = NHOM.ID
                         WHERE NHOM.NAM = searchNam) pheDuyet
                        ON CB.SHCC = pheDuyet.SHCC
-    WHERE ((listShcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
+    WHERE ((listShcc IS NOT NULL AND CB.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
                                                  from dual
                                                  connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-        OR (listDonVi IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
+        OR (listDonVi IS NOT NULL AND CB.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
                                                        from dual
                                                        connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
         OR (listShcc IS NULL AND listDonVi IS NULL))
@@ -16632,10 +16632,10 @@ BEGIN
                                            LEFT JOIN TCCB_NHOM_DANH_GIA_NHIEM_VU NHOM ON PD.ID_NHOM_DANG_KY = NHOM.ID
                                   WHERE NHOM.NAM = searchNam) pheDuyet
                                  ON CB.SHCC = pheDuyet.SHCC
-              WHERE ((listShcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
+              WHERE ((listShcc IS NOT NULL AND CB.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
                                                            from dual
                                                            connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-                  OR (listDonVi IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
+                  OR (listDonVi IS NOT NULL AND CB.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
                                                                  from dual
                                                                  connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
                   OR (listShcc IS NULL AND listDonVi IS NULL))
