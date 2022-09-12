@@ -15,6 +15,7 @@ module.exports = app => {
                 }
             } else {
                 req.session.user = null;
+                req.session.save();
                 responseError(req, res);
             }
         } else {
@@ -37,9 +38,9 @@ module.exports = app => {
                 }
             } else {
                 req.session.user = null;
+                req.session.save();
                 responseError(req, res);
             }
-
         } else {
             responseError(req, res);
         }
