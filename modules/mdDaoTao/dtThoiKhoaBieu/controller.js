@@ -396,7 +396,7 @@ module.exports = app => {
     app.uploadHooks.add('DtThoiKhoaBieuData', (req, fields, files, params, done) =>
         app.permission.has(req, () => dtThoiKhoaBieuImportData(fields, files, done), done, 'dtThoiKhoaBieu:write')
     );
-    const dtThoiKhoaBieuImportData= async (fields, files, done) => {
+    const dtThoiKhoaBieuImportData = async (fields, files, done) => {
         let worksheet = null;
         if (fields.userData && fields.userData[0] && fields.userData[0] == 'DtThoiKhoaBieuData' && files.DtThoiKhoaBieuData && files.DtThoiKhoaBieuData.length) {
             const srcPath = files.DtThoiKhoaBieuData[0].path;
@@ -417,25 +417,25 @@ module.exports = app => {
                             } else {
                                 // const bacDaoTao = worksheet.getCell('R' + index).value;
                                 // const loaiHinhDaoTao= worksheet.getCell('S'+index).value;
-                                const khoaSinhVien = parseInt(worksheet.getCell('Q' + index).value) ;
+                                const khoaSinhVien = parseInt(worksheet.getCell('Q' + index).value);
                                 const namStr = worksheet.getCell('R' + index).value;
-                                const nam = await app.model.dtCauTrucKhungDaoTao.get({namDaoTao:namStr},'id');
-                                const hocKy = parseInt(worksheet.getCell('S'+index).value);
-                                const maMonHocStr = worksheet.getCell('C' +index).value;
-                                const maMonHoc= await app.model.dtChuongTrinhDaoTao.get({tenMonHoc:maMonHocStr, kichHoat:1},'maMonHoc');
-                                const khoaDangKyStr =worksheet.getCell('N' +index).value;
-                                const khoaDangKy=await app.model.dmDonVi.get({ten:khoaDangKyStr},'ma');
-                                const soLop =worksheet.getCell('T'+index).value;
-                                const soTietBuoi=parseInt(worksheet.getCell('H'+index).value);
-                                const soBuoiTuan=parseInt(worksheet.getCell('U'+index).value);
-                                const soLuongDuKien =parseInt(worksheet.getCell('I'+index).value);
-                                const tenNganh =worksheet.getCell('J'+index).value;
-                                const maNganh=await app.model.dtNganhDaoTao.get({tenNganh:tenNganh, kickHoat:1},'*');
-                                
+                                const nam = await app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namStr }, 'id');
+                                const hocKy = parseInt(worksheet.getCell('S' + index).value);
+                                const maMonHocStr = worksheet.getCell('C' + index).value;
+                                const maMonHoc = await app.model.dtChuongTrinhDaoTao.get({ tenMonHoc: maMonHocStr, kichHoat: 1 }, 'maMonHoc');
+                                const khoaDangKyStr = worksheet.getCell('N' + index).value;
+                                const khoaDangKy = await app.model.dmDonVi.get({ ten: khoaDangKyStr }, 'ma');
+                                const soLop = worksheet.getCell('T' + index).value;
+                                const soTietBuoi = parseInt(worksheet.getCell('H' + index).value);
+                                const soBuoiTuan = parseInt(worksheet.getCell('U' + index).value);
+                                const soLuongDuKien = parseInt(worksheet.getCell('I' + index).value);
+                                const tenNganh = worksheet.getCell('J' + index).value;
+                                const maNganh = await app.model.dtNganhDaoTao.get({ tenNganh: tenNganh, kickHoat: 1 }, '*');
+
                                 // const giangVien = worksheet.getCell('U'+index).value;
-                                
-                                
-                                const row = { tenNganh, khoaSinhVien, nam:nam.id, hocKy,maMonHocStr, maMonHoc:maMonHoc.maMonHoc,khoaDangKy:khoaDangKy.ma,khoaDangKyStr,soLop,soTietBuoi,soBuoiTuan,soLuongDuKien,maNganh:maNganh.maNganh,namStr};
+
+
+                                const row = { tenNganh, khoaSinhVien, nam: nam.id, hocKy, maMonHocStr, maMonHoc: maMonHoc.maMonHoc, khoaDangKy: khoaDangKy.ma, khoaDangKyStr, soLop, soTietBuoi, soBuoiTuan, soLuongDuKien, maNganh: maNganh.maNganh, namStr };
                                 items.push(row);
                                 index++;
 
@@ -451,7 +451,7 @@ module.exports = app => {
             } else done({ error: 'No workbook!' });
         }
     };
-    
+
 
     app.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
         try {
@@ -490,20 +490,20 @@ module.exports = app => {
 
     // Export xlsx
     // Get data Nganh
-    app.get('/api/dao-tao/thoi-khoa-bieu/download-template', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-template', app.permission.check('dtThoiKhoaBieu:export, dtThoiKhoaBieu:import'), async (req, res) => {
         //Get data Khoa bo mon
-        let khoaBoMon= await app.model.dmDonVi.getAll({kichHoat:1},'ten');
-        khoaBoMon=khoaBoMon.map(ele=>ele.ten);
+        let khoaBoMon = await app.model.dmDonVi.getAll({ kichHoat: 1 }, 'ten');
+        khoaBoMon = khoaBoMon.map(ele => ele.ten);
         //Get data Nganh
-        let nganhDaoTao= await app.model.dtNganhDaoTao.getAll({kichHoat:1},'tenNganh');
-        nganhDaoTao=nganhDaoTao.map(ele=>ele.tenNganh);
+        let nganhDaoTao = await app.model.dtNganhDaoTao.getAll({ kichHoat: 1 }, 'tenNganh');
+        nganhDaoTao = nganhDaoTao.map(ele => ele.tenNganh);
         //Get mon hoc
-        let monHoc= await app.model.dtChuongTrinhDaoTao.getAll({kichHoat:1},'*');
-        monHoc=monHoc.map(ele=>ele.tenMonHoc);
+        let monHoc = await app.model.dtChuongTrinhDaoTao.getAll({ kichHoat: 1 }, '*');
+        monHoc = monHoc.map(ele => ele.tenMonHoc);
         //Get Cau truc dao tao
-        let ctDaoTao= await app.model.dtCauTrucKhungDaoTao.getAll({},'*');
-        const nam=ctDaoTao.map(ele=>ele.namDaoTao);
-        const khoa=ctDaoTao.map(ele=>ele.khoa);
+        let ctDaoTao = await app.model.dtCauTrucKhungDaoTao.getAll({}, '*');
+        const nam = ctDaoTao.map(ele => ele.namDaoTao);
+        const khoa = ctDaoTao.map(ele => ele.khoa);
 
         const workBook = app.excel.create();
         const ws = workBook.addWorksheet('Thoi_khoa_bieu_Template');
@@ -529,15 +529,15 @@ module.exports = app => {
             { header: 'HỌC KỲ', key: 'hocKy', width: 25 },
             { header: 'NHÓM', key: 'nhom', width: 25 },
             { header: 'SỐ BUỔI TRÊN TUẦN', key: 'buoiTrenTuan', width: 25 },
-            
+
         ];
         ws.columns = defaultColumns;
         const { dataRange: khoaBM } = workBook.createRefSheet('Khoa_Bo_Mon', khoaBoMon);
         const { dataRange: nganhHoc } = workBook.createRefSheet('Nganh', nganhDaoTao);
-        const { dataRange: mon} = workBook.createRefSheet('Mon_Hoc', monHoc);
-        const { dataRange: khoaHoc} = workBook.createRefSheet('Khoa_Hoc', khoa);
-        const { dataRange: namHoc} = workBook.createRefSheet('Nam_Hoc', nam);
-        
+        const { dataRange: mon } = workBook.createRefSheet('Mon_Hoc', monHoc);
+        const { dataRange: khoaHoc } = workBook.createRefSheet('Khoa_Hoc', khoa);
+        const { dataRange: namHoc } = workBook.createRefSheet('Nam_Hoc', nam);
+
         const rows = ws.getRows(2, 1000);
         rows.forEach((row) => {
             row.getCell('monHoc').dataValidation = { type: 'list', allowBlank: true, formulae: [mon] };
@@ -550,7 +550,7 @@ module.exports = app => {
 
     });
 
-    app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export, dtThoiKhoaBieu:import'), async (req, res) => {
+    app.get('/api/dao-tao/thoi-khoa-bieu/download-excel', app.permission.check('dtThoiKhoaBieu:export'), async (req, res) => {
         try {
             let filter = app.utils.parse(req.query.filter || {});
             filter = app.utils.stringify(filter, '');
@@ -581,7 +581,7 @@ module.exports = app => {
                 { header: 'NGÀNH', key: 'tenNganh', width: 50 },
                 { header: 'GIẢNG VIÊN', key: 'giangVien', width: 30 },
                 { header: 'TRỢ GIẢNG', key: 'giangVien', width: 30 },
-                {header :'SỐ BUỔI TRÊN TUẦN',key:'soBuoiTuan',width:5}
+                { header: 'SỐ BUỔI TRÊN TUẦN', key: 'soBuoiTuan', width: 5 }
             ];
             // ws.getRow(1).font = {
             //     name: 'Times New Roman',

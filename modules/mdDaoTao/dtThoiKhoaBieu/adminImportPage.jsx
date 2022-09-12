@@ -7,16 +7,13 @@ import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import FileBox from 'view/component/FileBox';
 import { getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
-
-
-
 class DtThoiKhoaBieuImportPage extends AdminPage {
     state = { indexRow: null, thoiKhoaBieu: [], message: '', displayState: 'import', isDisplay: true };
 
     componentDidMount() {
         T.ready('/user/dao-tao');
     }
-
+    
     delete = (e, index) => {
         e.preventDefault();
         T.confirm('Xóa dữ liệu', 'Bạn có muốn xóa dữ liệu học phí này không?', 'warning', true, isConfirm => {
@@ -66,7 +63,7 @@ class DtThoiKhoaBieuImportPage extends AdminPage {
         });
     };
 
-    
+
     saveRow = (e) => {
         e.preventDefault();
         this.setState({ indexRow: null });
@@ -81,7 +78,7 @@ class DtThoiKhoaBieuImportPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                      
+
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học kỳ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Môn học</th>
@@ -89,26 +86,26 @@ class DtThoiKhoaBieuImportPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>Lớp</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Số tiết</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>SLDK</th>
-                        <th style={{ width: '30%', textAlign: 'center' }}>Ngành</th>                        
+                        <th style={{ width: '30%', textAlign: 'center' }}>Ngành</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' style={{ width:'auto',textAlign: 'center' }} content={index + 1} />
-                        <TableCell type='text' style={{ width:'auto',textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.namStr} />
-                        <TableCell type='text' style={{ width:'auto',textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.hocKy} />
-                        <TableCell type='text' style={{width:'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.maMonHocStr} />
-                        <TableCell type='text' style={{ width:'auto',textAlign: 'center', whiteSpace: 'nowrap' }} content={item.khoaDangKyStr} />
-                        <TableCell type='number' style={{width:'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.soLop} />
-                        <TableCell type='number' style={{ width:'auto',textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.soTietBuoi} />
-                        <TableCell type='number' style={{ width:'auto',textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.soLuongDuKien} />
-                        <TableCell type='text' style={{ width:'auto',textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.tenNganh} />
-                        
-                        <TableCell type='buttons' style={{ width:'auto',whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
+                        <TableCell type='number' style={{ width: 'auto', textAlign: 'center' }} content={index + 1} />
+                        <TableCell type='text' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.namStr} />
+                        <TableCell type='text' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.hocKy} />
+                        <TableCell type='text' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.maMonHocStr} />
+                        <TableCell type='text' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.khoaDangKyStr} />
+                        <TableCell type='number' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.soLop} />
+                        <TableCell type='number' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.soTietBuoi} />
+                        <TableCell type='number' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.soLuongDuKien} />
+                        <TableCell type='text' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item?.tenNganh} />
+
+                        <TableCell type='buttons' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}
                             onEdit={this.state.indexRow == index ? '' : () => this.setState({ indexRow: index }, () => { })} onDelete={(e) => this.delete(e, index)}
                         >
                             {this.state.indexRow == index ? <Tooltip title='Lưu' arrow placeholder='bottom'>
-                                <a className='btn btn-success' href='#' onClick={e => this.saveRow(e,index)}><i className='fa fa-lg fa-save' /></a>
+                                <a className='btn btn-success' href='#' onClick={e => this.saveRow(e, index)}><i className='fa fa-lg fa-save' /></a>
                             </Tooltip> : ''}
                         </TableCell>
                     </tr>)
