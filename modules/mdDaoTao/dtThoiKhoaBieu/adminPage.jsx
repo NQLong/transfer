@@ -286,6 +286,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
         e?.preventDefault();
         T.confirm('Lưu ý', 'Hãy chắc chắn rằng bạn đã chọn mở các môn theo đúng đợt', 'warning', true, isConfirm => isConfirm && this.props.history.push('/user/dao-tao/thoi-khoa-bieu/auto-generate'));
     }
+    listFreeRoom = (e) => {
+        e?.preventDefault();
+        this.props.history.push('/user/dao-tao/thoi-khoa-bieu/tra-cuu');
+    }
     render() {
         const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete', 'manage', 'export', 'import']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtThoiKhoaBieu?.page || { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '', list: [] };
@@ -440,8 +444,10 @@ class DtThoiKhoaBieuPage extends AdminPage {
             onImport: permission.import ? (e) => e.preventDefault() || this.props.history.push('/user/dao-tao/import-thoi-khoa-bieu') : null,
             onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/dao-tao/thoi-khoa-bieu/download-excel?filter=${T.stringify(this.state.filter)}`, 'THOI_KHOA_BIEU.xlsx') : null,
             buttons: permission.write && [
+                { className: 'btn-primary', icon: 'fa-list-alt', tooltip: 'Danh sách phòng trống', onClick: this.listFreeRoom },
                 { className: 'btn-warning', icon: 'fa-calendar', tooltip: 'Xếp thời khoá biểu', onClick: this.handleAutoGen }
-            ]
+            ],
+
         });
     }
 }
