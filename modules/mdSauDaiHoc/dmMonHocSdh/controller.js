@@ -5,12 +5,22 @@ module.exports = app => {
             4105: {
                 title: 'Môn học (trước 2022)',
                 subTitle: 'Sau đại học',
-                link: '/user/sau-dai-hoc/mon-hoc'
+                link: '/user/danh-muc/mon-hoc'
+            },
+        },
+    };
+    const menuSDH = {
+        parentMenu: app.parentMenu.sdh,
+        menus: {
+            7510: {
+                title: 'Môn học (trước 2022)',
+                link: '/user/sau-dai-hoc/mon-hoc', icon: 'fa-list', backgroundColor: '#1ca474'
             },
         },
     };
     app.permission.add(
         { name: 'dmMonHocSdh:manage', menu },
+        { name: 'dmMonHocSdh:manage', menu: menuSDH },
         { name: 'dmMonHocSdh:write' },
         { name: 'dmMonHocSdh:delete' },
     );

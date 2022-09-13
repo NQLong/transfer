@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, FormCheckbox, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
 import T from 'view/js/common';
-import { createDtThoiKhoaBieuMultiple } from './redux';
+import { createDtThoiKhoaBieuMultiple, checkIfExistDtThoiKhoaBieu } from './redux';
 import { SelectAdapter_DmMonHocAll } from '../dmMonHoc/redux';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { getDtDanhSachChuyenNganhFilter, SelectAdapter_DtDanhSachChuyenNganhFilter } from '../dtDanhSachChuyenNganh/redux';
@@ -37,13 +37,15 @@ class RenderListMon extends React.Component {
             this.setState({ dataNganh, soLop }, () => {
                 getDmCaHocAllCondition(this.props.data.coSo, items => {
                     let dataTiet = items.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
-                    this.setState({ dataTiet, fullDataTiet: items.map(item => ({ ...item, ten: parseInt(item.ten) })) }, () => console.log(this.state.fullDataTiet));
+                    this.setState({ dataTiet, fullDataTiet: items.map(item => ({ ...item, ten: parseInt(item.ten) })) });
                     let data = this.props.data,
                         { khoaDangKy, maNganh, nam, soLop } = data;
                     if (khoaDangKy == MA_PDT) {
-                        Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
-                            ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
-                            this.ref.tietBatDau[nhom].value('');
+                        this.setState({ hideChuyenNganh: true }, () => {
+                            Array.from({ length: soLop }, (_, i) => i + 1).forEach(nhom => {
+                                ['soTietBuoi', 'soBuoiTuan', 'soLuongDuKien'].forEach(key => this.ref[key][nhom].value(data[key]));
+                                this.ref.tietBatDau[nhom].value('');
+                            });
                         });
                     } else {
                         getDtDanhSachChuyenNganhFilter(maNganh, nam, (items) => {
@@ -101,7 +103,6 @@ class RenderListMon extends React.Component {
             });
             return data;
         } catch (input) {
-            console.log(input);
             if (input) {
                 T.notify('Vui lòng điền đầy đủ dữ liệu', 'danger');
                 input.focus();
@@ -122,7 +123,8 @@ class RenderListMon extends React.Component {
     }
 
     render() {
-        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, tenNganh } = this.props.data;
+        let { soLop, maNganh, nam, tenMonHoc, maMonHoc, tenNganh } = this.props.data,
+            startIndex = this.props.startIndex;
         const { tkbSoBuoiTuanMax, tkbSoBuoiTuanMin, tkbSoLuongDuKienMax, tkbSoLuongDuKienMin, tkbSoTietBuoiMax, tkbSoTietBuoiMin } = this.props.scheduleConfig;
         tenMonHoc = tenMonHoc.split(':')[1];
         let { hideChuyenNganh, dataTiet } = this.state;
@@ -137,7 +139,7 @@ class RenderListMon extends React.Component {
                 // giangVien: {}
             };
             return (<React.Fragment key={nhom}>
-                <div className='form-group col-md-12' style={{ marginBottom: '0.rem', color: 'blue' }}><b>Lớp {maMonHoc}_{nhom}</b>: {tenMonHoc}</div>
+                <div className='form-group col-md-12' style={{ marginBottom: '0.rem', color: 'blue' }}><b>Lớp {maMonHoc}_{nhom + startIndex}</b>: {tenMonHoc}</div>
                 <FormTextBox type='number' ref={e => this.ref.soTietBuoi[nhom] = e} className='col-md-2' label='Số tiết /buổi' required min={tkbSoTietBuoiMin} max={tkbSoTietBuoiMax} smallText={`Nhập từ ${tkbSoTietBuoiMin} đến ${tkbSoTietBuoiMax}`} />
                 <FormTextBox type='number' ref={e => this.ref.soBuoiTuan[nhom] = e} className='col-md-2' label='Số buổi /tuần' required min={tkbSoBuoiTuanMin} max={tkbSoBuoiTuanMax} smallText={`Nhập từ ${tkbSoBuoiTuanMin} đến ${tkbSoBuoiTuanMax}`} />
                 <FormSelect ref={e => this.ref.tietBatDau[nhom] = e} className='col-md-2' label='Tiết bắt đầu' data={dataTiet} />
@@ -191,20 +193,20 @@ class AddingModal extends AdminModal {
                 soTietThucHanh: this.state.soTietThucHanh,
                 coSo: getValue(this.coSo),
                 maNganh: this.maNganh.value(),
-                tenNganh: this.maNganh.data().text.split(': ')[1],
+                tenNganh: this.maNganh.data()?.text.split(': ')[1] || '',
                 khoaSinhVien: getValue(this.khoaSinhVien),
                 soLop: getValue(this.soLop),
                 soTietBuoi: getValue(this.soTiet),
                 soBuoiTuan: getValue(this.soBuoi),
                 soLuongDuKien: getValue(this.soLuongDuKien)
             };
-            this.setState({ data, savedThongTinChung: true }, () => {
+            this.props.checkIfExistDtThoiKhoaBieu(data, (startIndex) => this.setState({ data, savedThongTinChung: true, startIndex }, () => {
                 this.showChiTiet();
-            });
+            }));
 
         } catch (input) {
             if (input) {
-                T.notify(`${input.props.label} bị trống`, 'danger');
+                T.notify(`${input.props?.label} bị trống`, 'danger');
                 input.focus();
             }
             this.setState({ data: null, settings: null }, this.showThongTinChung);
@@ -216,7 +218,7 @@ class AddingModal extends AdminModal {
         let data = this.cpnMon.getData();
         if (data) {
             this.setState({ isCreating: true }, () => {
-                this.props.createDtThoiKhoaBieuMultiple(data, this.state.data, () => {
+                this.props.createDtThoiKhoaBieuMultiple(data, { ...this.state.data, startIndex: this.state.startIndex }, () => {
                     this.setState({ isCreating: false });
                 });
             });
@@ -302,7 +304,7 @@ class AddingModal extends AdminModal {
                         <FormSelect ref={e => this.maMonHoc = e} data={SelectAdapter_DmMonHocAll()} className='col-md-10' placeholder='Môn học' label='Môn học' required onChange={this.handleMonHoc} />
                         <FormCheckbox ref={e => this.loaiMonHoc = e} label='Tự chọn' style={{ marginBottom: '0' }} className='col-md-2' />
                         <FormSelect ref={e => this.khoaDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} className={hideNganhSelect ? 'col-md-12' : 'col-md-6'} label='Đơn vị phụ trách môn' onChange={this.handleDonVi} required />
-                        <FormSelect ref={e => this.maNganh = e} data={this.state.khoaDangKy ? this.state.dataNganh.filter(item => item.khoa == this.state.khoaDangKy) : this.state.dataNganh} style={{ display: hideNganhSelect ? 'none' : 'block' }} className='col-md-6' label='Ngành' required={!hideNganhSelect} />
+                        <FormSelect ref={e => this.maNganh = e} data={this.state.khoaDangKy ? this.state.dataNganh.filter(item => item.khoa == this.state.khoaDangKy) : this.state.dataNganh} style={{ display: hideNganhSelect ? 'none' : '' }} className='col-md-6' label='Ngành' required={!hideNganhSelect} />
 
                         <FormTextBox type='number' ref={e => this.soLop = e} className='col-md-3' label='Số lớp' required min={tkbSoLopMin} max={tkbSoLopMax} smallText={`Nhập từ ${tkbSoLopMin} đến ${tkbSoLopMax}`} />
                         <FormTextBox type='number' ref={e => this.soTiet = e} className='col-md-3' label='Số tiết /buổi' required min={tkbSoTietBuoiMin} max={tkbSoTietBuoiMax} smallText={`Nhập từ ${tkbSoTietBuoiMin} đến ${tkbSoTietBuoiMax}`} />
@@ -322,7 +324,7 @@ class AddingModal extends AdminModal {
                                     <b className='col-md-3 text-white' >Giảng viên</b>
                                 </div> */}
                                 <div className='row'>
-                                    <RenderListMon data={this.state.data} ref={e => this.cpnMon = e} scheduleConfig={this.state.scheduleConfig} />
+                                    <RenderListMon data={this.state.data} ref={e => this.cpnMon = e} scheduleConfig={this.state.scheduleConfig} startIndex={this.state.startIndex} />
                                 </div>
                             </React.Fragment>
                         }
@@ -334,6 +336,6 @@ class AddingModal extends AdminModal {
 
 const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = {
-    createDtThoiKhoaBieuMultiple, getScheduleSettings
+    createDtThoiKhoaBieuMultiple, getScheduleSettings, checkIfExistDtThoiKhoaBieu
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(AddingModal);

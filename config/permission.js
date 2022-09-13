@@ -1,11 +1,21 @@
 module.exports = app => {
     const checkPermissions = (req, res, next, permissions) => {
         if (req.session.user) {
-            if (req.session.user.permissions && req.session.user.permissions.contains(permissions)) {
-                next();
-            } else if (permissions.length == 0) {
-                next();
+            const user = req.session.user, division = Date.now() - req.session.user.expiration;
+            if (division < 60 * 60 * 1000 || app.isDeveloper(user.email)) {
+                req.session.user.expiration = Date.now();
+                req.session.save();
+
+                if (user.permissions && user.permissions.contains(permissions)) {
+                    next();
+                } else if (permissions.length == 0) {
+                    next();
+                } else {
+                    responseError(req, res);
+                }
             } else {
+                req.session.user = null;
+                req.session.save();
                 responseError(req, res);
             }
         } else {
@@ -15,12 +25,20 @@ module.exports = app => {
 
     const checkOrPermissions = (req, res, next, permissions) => {
         if (req.session.user) {
-            const user = req.session.user;
-            if (user.permissions && user.permissions.exists(permissions)) {
-                next();
-            } else if (permissions.length == 0) {
-                next();
+            const user = req.session.user, division = Date.now() - req.session.user.expiration;
+            if (division < 60 * 60 * 1000 || app.isDeveloper(user.email)) {
+                req.session.user.expiration = Date.now();
+                req.session.save();
+                if (user.permissions && user.permissions.exists(permissions)) {
+                    next();
+                } else if (permissions.length == 0) {
+                    next();
+                } else {
+                    responseError(req, res);
+                }
             } else {
+                req.session.user = null;
+                req.session.save();
                 responseError(req, res);
             }
         } else {
@@ -357,6 +375,7 @@ module.exports = app => {
 
                     if (req) {
                         req.session.user = user;
+                        req.session.user.expiration = new Date().getTime();
                         req.session.save();
                     }
                     done && done(user);
