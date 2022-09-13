@@ -58,7 +58,9 @@ class dmHocSdhPage extends AdminPage {
     state = { searching: false };
 
     componentDidMount() {
-        T.ready('/user/category', () => {
+        let route = T.routeMatcher('/user/:menu/bac-sdh').parse(window.location.pathname);
+        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
+        T.ready(`/user/${this.menu}`, () => {
             T.onSearch = (searchText) => this.props.getDmHocSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmHocSdhPage();
@@ -114,7 +116,7 @@ class dmHocSdhPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Bậc sau đại học',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
+                <Link key={0} to={this.menu == 'category' ? '/user/category' : '/user/sau-dai-hoc'}>{this.menu == 'category' ? 'Danh mục' : 'Sau đại học'}</Link>,
                 'Bậc sau đại học'
             ],
             content: <>
@@ -123,7 +125,7 @@ class dmHocSdhPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmHocSdh} update={this.props.updateDmHocSdh} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

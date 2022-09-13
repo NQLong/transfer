@@ -48,7 +48,7 @@ export default {
         },
         {
             path: '/user/sau-dai-hoc',
-            component: () => <SubMenusPage menuLink='/user/sau-dai-hoc' menuKey={7500} headerIcon='fa-graduation-cap' />
+            component: () => <SubMenusCategory menuLink='/user/sau-dai-hoc' menuKey={7500} headerIcon='fa-graduation-cap' />
         }
     ]
 };

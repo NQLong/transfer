@@ -9,9 +9,20 @@ module.exports = app => {
             },
         },
     };
+
+    const menuSdh = {
+        parentMenu: app.parentMenu.sdh,
+        menus: {
+            7503: {
+                title: 'Khoa đào tạo, giảng dạy',
+                link: '/user/sau-dai-hoc/khoa-sau-dai-hoc',
+                backgroundColor: '#1ca474'
+            },
+        },
+    };
     app.permission.add(
         { name: 'dmKhoaSdh:read', menu },
-        { name: 'dmKhoaSdh:write' },
+        { name: 'dmKhoaSdh:write', menu: menuSdh },
         { name: 'dmKhoaSdh:delete' },
     );
     app.get('/user/danh-muc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:read'), app.templates.admin);

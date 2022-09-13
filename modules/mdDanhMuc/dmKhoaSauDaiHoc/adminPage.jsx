@@ -71,7 +71,9 @@ class EditModal extends AdminModal {
 
 class DmDonViPage extends AdminPage {
     componentDidMount() {
-        T.ready('/user/category', () => {
+        let route = T.routeMatcher('/user/:menu/khoa-sau-dai-hoc').parse(window.location.pathname);
+        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
+        T.ready(`/user/${this.menu}`, () => {
             T.onSearch = (searchText) => this.props.getDmKhoaSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmKhoaSdhPage();
@@ -84,7 +86,7 @@ class DmDonViPage extends AdminPage {
     }
 
     changeActive = item => this.props.updateDmKhoaSdh(item.ma, { kichHoat: item.kichHoat ? 0 : 1 });
- 
+
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa danh mục khoa sau đại học', 'Bạn có chắc bạn muốn xóa khoa sau đại học này?', true, isConfirm =>
@@ -125,19 +127,19 @@ class DmDonViPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục khoa sau đại học',
+            title: 'Khoa sau đại học',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục khoa sau đại học'
+                <Link key={0} to={this.menu == 'category' ? '/user/category' : '/user/sau-dai-hoc'}>{this.menu == 'category' ? 'Danh mục' : 'Sau đại học'}</Link>,
+                'Khoa sau đại học'
             ],
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmKhoaSdhPage} />
-                <EditModal ref={e => this.modal = e} 
+                <EditModal ref={e => this.modal = e}
                     create={this.props.createDmKhoaSdh} update={this.props.updateDmKhoaSdh} readOnly={!permission.write} />
             </>,
-            backRoute: '/user/category',
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             // onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/don-vi/upload') : null
         });

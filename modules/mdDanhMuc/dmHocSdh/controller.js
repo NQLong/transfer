@@ -9,8 +9,20 @@ module.exports = app => {
             }
         },
     };
+
+    const menuSdh = {
+        parentMenu: app.parentMenu.sdh,
+        menus: {
+            7527: {
+                title: 'Bậc đào tạo',
+                link: '/user/sau-dai-hoc/bac-sdh',
+                backgroundColor: '#daa520'
+            }
+        },
+    };
     app.permission.add(
         { name: 'dmHocSdh:read', menu },
+        { name: 'dmHocSdh:read', menu: menuSdh },
         { name: 'dmHocSdh:write' },
         { name: 'dmHocSdh:delete' },
     );
