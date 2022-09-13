@@ -44,7 +44,7 @@ const DefaultScreen: () => Node = ({ navigation, route }) => {
             <Stack.Screen options={{ headerTitle: 'Công văn đến' }} name='FilterCongVanDen' component={CongVanDenFilter} />
             <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKy' component={CongVanTrinhKy} />
             <Stack.Screen options={{ headerTitle: 'Công văn trình ký' }} name='CongVanTrinhKySign' component={CongVanTrinhKySign} />
-            <Stack.Screen options={{ headerTitle: 'Lấy key'}} name="ScanQRCode" component={ScanQRCode}/>
+            <Stack.Screen options={{ headerTitle: 'Tạo khoá' }} name="ScanQRCode" component={ScanQRCode}/>
             <Stack.Screen options={{ headerTitle: 'Văn bản đi' }} name='VanBanDi' component={VanBanDi} />
             <Stack.Screen options={{ headerTitle: 'Văn bản đi' }} name='VanBanDiFilter' component={VanBanDiFilter} />
 
