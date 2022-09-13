@@ -84,4 +84,20 @@ module.exports = (app) => {
         }
     });
 
+
+    app.post('/api/finance/loai-phi/ap-dung', app.permission.check('tcLoaiPhi:write'), async (req, res) => {
+        try {
+            const { hocKy, namHoc, loaiPhi, namTuyenSinh, bacDaoTao, loaiDaoTao, soTien } = req.body;
+            const data = { hocKy, namHoc, loaiPhi, namTuyenSinh, bacDaoTao, loaiDaoTao, soTien: parseInt(soTien), ngayTao: new Date().getTime() };
+            Object.values(data).forEach(item => { if (item == null) throw 'Dữ liệu không hợp lệ'; });
+            if (data.soTien < 0) throw 'Số tiền không hợp lệ';
+            data.shcc = req.session.user.shcc;
+            const result = await app.model.tcHocPhiDetail.bulkCreate(app.utils.stringify(data));
+            res.send({ sum: result.outBinds.ret });
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
 };
