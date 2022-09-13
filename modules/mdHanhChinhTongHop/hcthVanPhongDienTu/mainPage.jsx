@@ -20,6 +20,7 @@ class MainPage extends AdminPage {
             { title: 'Văn bản trình ký', link: '/user/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#832391' },
             permissions.some(item => ['manager:write', 'rectors:login'].includes(item)) && { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#DB2C2C' },
             { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#DE602F', pin: true },
+            { title: 'Đăng ký số', link: '/user/dang-ky-so', icon: 'fa-sign-in', backgroundColor: '#b52b79' }
         ];
         return this.renderPage({
             icon: 'fa fa-desktop',

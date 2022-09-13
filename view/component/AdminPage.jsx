@@ -999,12 +999,6 @@ export class AdminPage extends React.Component {
         return permission;
     }
 
-    getDonViQuanLy = () => {
-        return this.props.system?.user?.staff?.donViQuanLy || [];
-    }
-
-    getDonVi = () => this.props.system?.user?.staff?.maDonVi;
-
     showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
 
     hideAdvanceSearch = () => {
