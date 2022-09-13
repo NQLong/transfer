@@ -38,11 +38,6 @@ const timeList = [
     { id: 2, text: 'Theo ngày ký' }
 ];
 
-const selectCongVan = [
-    { id: 1, text: 'Văn bản đơn vị' },
-    { id: 2, text: 'Văn bản trường' }
-];
-
 const start = new Date().getFullYear(),
     end = 1900,
     yearSelector = [...Array(start - end + 1).keys()].map(i => ({
