@@ -44,11 +44,11 @@ class AdminSvSdhUploadPage extends AdminPage {
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Tên tiếng Việt</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Tên tiếng Anh</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>TC Lý thuyết</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>TC Thực hành</th>
+                    <th style={{ width: 'auto' }}>Mã</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên tiếng Việt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên tiếng Anh</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>TC Lý thuyết</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>TC Thực hành</th>
                     <th style={{ width: '50%', textAlign: 'center' }}>Khoa</th>
                 </tr>
             ),

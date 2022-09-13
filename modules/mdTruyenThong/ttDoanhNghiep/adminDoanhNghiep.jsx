@@ -40,11 +40,11 @@ class DoanhNghiepAdminPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                     <th style={{ width: '70%' }}>Tên doanh nghiệp</th>
                     {permission.read && <th style={{ width: '30%' }}>Đơn vị phụ trách</th>}
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Quốc gia</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Hình ảnh</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    {permission.read && <th style={{ width: 'auto' }} nowrap='true' >Hiển thị website trường</th>}
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quốc gia</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình ảnh</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    {permission.read && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hiển thị website trường</th>}
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
@@ -56,7 +56,7 @@ class DoanhNghiepAdminPage extends AdminPage {
                     <TableCell type='image' content={item.image || '/img/hcmussh.png'} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={() => this.changeActive(item)} />
                     {permission.read && <TableCell type='checkbox' content={item.kichHoatTrangTruong} permission={permission} onChanged={() => this.changeActiveTrangTruong(item)} />}
-                    <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete}/>
+                    <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete} />
                 </tr>
             ),
         });

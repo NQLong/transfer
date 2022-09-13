@@ -33,10 +33,10 @@ class DmDonViPage extends AdminPage {
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>STT</th>
-                    <th style={{ width: '50%' }}>Tên đơn vị</th>
-                    <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Phân loại</th>
+                    <th style={{ width: 'auto' }}>STT</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên đơn vị</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên tiếng Anh</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phân loại</th>
                 </tr>
             ),
             renderRow: (item, index) => {
@@ -50,12 +50,10 @@ class DmDonViPage extends AdminPage {
                         <TableCell content={item.ten ? item.ten : ''} />
                         <TableCell content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiDonVi ? item.tenLoaiDonVi.normalizedName() : ''} />
-
                     </tr>
                 );
             }
         });
-
 
         return this.renderPage({
             icon: 'fa fa-list-alt',

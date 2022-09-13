@@ -216,16 +216,16 @@ class BaoHiemInfoModal extends AdminModal {
                             header: 'thead-light',
                             className: 'table-fix-col',
                             renderHead: () => (<tr>
-                                <th style={{ width: 'auto' }} nowrap='true'>STT</th>
-                                <th style={{ width: 'auto' }} nowrap='true'>Họ và tên</th>
-                                <th style={{ width: '20%' }} nowrap='true'>Mã số BHXH</th>
-                                <th style={{ width: 'auto' }} nowrap='true'>Ngày sinh</th>
-                                <th style={{ width: 'auto' }} nowrap='true'>Giới tính</th>
-                                <th style={{ width: '50%' }} nowrap='true' >Nơi cấp giấy khai sinh</th>
-                                <th style={{ width: 'auto' }} nowrap='true'>Mối quan hệ <br /> với chủ hộ</th>
-                                <th style={{ width: 'auto' }} nowrap='true' >CMND/CCCD/Hộ chiếu</th>
-                                <th style={{ width: 'auto' }} nowrap='true'>Ghi chú</th>
-                                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                                <th style={{ width: 'auto' }}>STT</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ và tên</th>
+                                <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Mã số BHXH</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
+                                <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp giấy khai sinh</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mối quan hệ <br /> với chủ hộ</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>CMND/CCCD/Hộ chiếu</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                                <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                             </tr>),
                             renderRow: <>
                                 {dataThanhVien.length ? this.thanhVienCell() : null}

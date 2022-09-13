@@ -22,29 +22,29 @@
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7020",
-            "isDebug": false,
-            "isHttps": false
+            "isHttps": false,
+            "isDebug": false
         },
         "registerService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7018",
-            "isDebug": false,
-            "isHttps": false
+            "isHttps": false,
+            "isDebug": false
         },
         "emailService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7016",
-            "isDebug": false,
-            "isHttps": false
+            "isHttps": false,
+            "isDebug": false
         },
         "bankService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7014",
-            "isDebug": true,
-            "isHttps": true
+            "isHttps": true,
+            "isDebug": true
         }
     },
     "db": {

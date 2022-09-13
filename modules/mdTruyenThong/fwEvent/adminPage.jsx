@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class EventPage extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
     }
     state = { searchText: '' };
@@ -66,8 +66,8 @@ class EventPage extends React.Component {
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                             <th style={{ width: '80%' }}>Tiêu đề</th>
                             <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Tin nội bộ</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tin nội bộ</th>
                             <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                         </tr>
                     </thead>

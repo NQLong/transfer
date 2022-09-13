@@ -350,7 +350,7 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

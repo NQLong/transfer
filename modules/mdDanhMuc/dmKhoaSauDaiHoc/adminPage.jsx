@@ -84,7 +84,7 @@ class DmDonViPage extends AdminPage {
     }
 
     changeActive = item => this.props.updateDmKhoaSdh(item.ma, { kichHoat: item.kichHoat ? 0 : 1 });
- 
+
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa danh mục khoa sau đại học', 'Bạn có chắc bạn muốn xóa khoa sau đại học này?', true, isConfirm =>
@@ -101,11 +101,11 @@ class DmDonViPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '50%' }}>Tên khoa</th>
                         <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -134,7 +134,7 @@ class DmDonViPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmKhoaSdhPage} />
-                <EditModal ref={e => this.modal = e} 
+                <EditModal ref={e => this.modal = e}
                     create={this.props.createDmKhoaSdh} update={this.props.updateDmKhoaSdh} readOnly={!permission.write} />
             </>,
             backRoute: '/user/category',

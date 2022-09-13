@@ -83,14 +83,14 @@ class DmSvToHopTsPage extends AdminPage {
         getDataSource: () => list, stickyHead: false,
         renderHead: () => (
           <tr>
-            <th style={{ width: 'auto' }} nowrap='true'>#</th>
-            <th style={{ width: '40%' }} nowrap='true'>Tổ hợp</th>
-            <th style={{ width: '20%' }} nowrap='true'>Môn 1</th>
-            <th style={{ width: '20%' }} nowrap='true'>Môn 2</th>
-            <th style={{ width: '20%' }} nowrap='true'>Môn 3</th>
-            <th style={{ width: 'auto' }} nowrap='true'>Ghi chú</th>
-            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+            <th style={{ width: 'auto' }}>#</th>
+            <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Tổ hợp</th>
+            <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Môn 1</th>
+            <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Môn 2</th>
+            <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Môn 3</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ghi chú</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
           </tr>),
         renderRow: (item, index) => (
           <tr key={index}>

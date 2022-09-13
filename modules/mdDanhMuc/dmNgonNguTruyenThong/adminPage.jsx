@@ -135,15 +135,15 @@ class DmNgonNguPage extends AdminPage {
                     <th style={{ width: '30%' }}>Mã</th>
                     <th style={{ width: '50%' }}>Tên ngoại ngữ</th>
                     <th style={{ width: '20%', textAlign: 'center' }}>Logo</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={index + 1} />
                     <TableCell type='text' content={item.maCode || ''} />
-                    <TableCell type='link' nowrap='true' content={item.tenNgonNgu || ''} onClick={() => this.modal.show(item)} />
-                    <TableCell type='image'  content={`/img/flag/${item.maCode}.png`} />
+                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.tenNgonNgu || ''} onClick={() => this.modal.show(item)} />
+                    <TableCell type='image' content={`/img/flag/${item.maCode}.png`} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
                 </tr>
             )

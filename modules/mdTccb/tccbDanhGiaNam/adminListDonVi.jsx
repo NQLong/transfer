@@ -28,11 +28,11 @@ class DmDonViPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '50%' }}>Tên đơn vị</th>
-                        <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã PL</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thông tin</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên đơn vị</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên tiếng Anh</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã PL</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (

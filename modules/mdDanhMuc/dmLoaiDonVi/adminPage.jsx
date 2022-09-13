@@ -89,18 +89,18 @@ class DmLoaiDonViPage extends AdminPage {
                 getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên đơn vị</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='link' content={item.ma} style={{ textAlign: 'right' }} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmLoaiDonVi(item.ma, { kichHoat: value ? 1 : 0, })} />
-                        <TableCell type='buttons' content={item} permission={permission} 
+                        <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
                 ),

@@ -1,11 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmNghiPhepPage, createDmNghiPhep, 
-    getDmNghiPhep, updateDmNghiPhep, 
-    deleteDmNghiPhep} 
-from './redux';
+import {
+    getDmNghiPhepPage, createDmNghiPhep,
+    getDmNghiPhep, updateDmNghiPhep,
+    deleteDmNghiPhep
+}
+    from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -19,7 +21,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         const { ma, ten, soNgayPhep } = item ? item : { ma: null, ten: '', soNgayPhep: 0 };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma || '');
         this.ten.value(ten);
         this.soNgayPhep.value(soNgayPhep);
@@ -88,16 +90,16 @@ class DmNghiPhepPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto'}}>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên nghỉ phép</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Số ngày phép</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index} >
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        <TableCell type='link' style={{ whiteSpace: 'nowrap'}} content={item.ma || ''} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.ma || ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten || ''} />
                         <TableCell type='number' content={item.soNgayPhep} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -116,9 +118,9 @@ class DmNghiPhepPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmNghiPhepPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} 
+                <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmNghiPhep} update={this.props.updateDmNghiPhep} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
@@ -128,7 +130,9 @@ class DmNghiPhepPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmNghiPhep: state.danhMuc.dmNghiPhep });
-const mapActionsToProps = {getDmNghiPhepPage, createDmNghiPhep, 
-    getDmNghiPhep, updateDmNghiPhep, 
-    deleteDmNghiPhep };
+const mapActionsToProps = {
+    getDmNghiPhepPage, createDmNghiPhep,
+    getDmNghiPhep, updateDmNghiPhep,
+    deleteDmNghiPhep
+};
 export default connect(mapStateToProps, mapActionsToProps)(DmNghiPhepPage);

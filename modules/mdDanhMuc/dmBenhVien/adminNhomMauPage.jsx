@@ -20,12 +20,12 @@ class EditModal extends AdminModal {
         this.ten.value(ten);
         this.kichHoat.value(kichHoat ? 1 : 0);
     };
-    
+
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value(),
                 ten: this.ten.value(),
@@ -92,14 +92,14 @@ class dmNhomMauPage extends AdminPage {
                 getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' content={item.ma}/>
+                        <TableCell type='text' content={item.ma} />
                         <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.show(item)} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>

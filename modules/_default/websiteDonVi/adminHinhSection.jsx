@@ -157,9 +157,9 @@ class AdminHinhSection extends React.Component {
                             <th style={{ width: 'auto' }}>#</th>
                             <th style={{ width: '30%' }}>Tiêu đề</th>
                             <th style={{ width: '40%', textAlign: 'center' }}>Link</th>
-                            <th style={{ width: '30%', textAlign: 'center' }} nowrap='true'>Hình ảnh</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            {permissionWrite ? <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th> : null}
+                            <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Hình ảnh</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            {permissionWrite ? <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> : null}
                         </tr>
                     </thead>
                     <tbody>

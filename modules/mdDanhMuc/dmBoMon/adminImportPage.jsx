@@ -35,7 +35,7 @@ class EditModal extends AdminModal {
         const changes = {
             ma: this.ma.value(),
             ten: this.ten.value(),
-            tenTiengAnh: this.tenTiengAnh.value(), 
+            tenTiengAnh: this.tenTiengAnh.value(),
             maDv: this.maDv.value(),
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
@@ -57,19 +57,19 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: 'Cập nhật bộ môn',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn'
                     readOnly={this.props.permission && !this.props.permission.write} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)'
                     readOnly={this.props.permission && !this.props.permission.write} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)'
                     readOnly={this.props.permission && !this.props.permission.write} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Mã đơn vị' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Mã đơn vị'
                     readOnly={this.props.permission && !this.props.permission.write} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập'
                     readOnly={this.props.permission && !this.props.permission.write} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên'
                     readOnly={this.props.permission && !this.props.permission.write} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú'
                     readOnly={this.props.permission && !this.props.permission.write} />
             </div>
         });
@@ -148,7 +148,7 @@ class DmBoMonImportPage extends AdminPage {
     }
 
     render() {
-        const { dmBoMon, displayState} = this.state,
+        const { dmBoMon, displayState } = this.state,
             permission = this.getUserPermission('dmBoMon', ['read', 'write', 'delete']);
         let table = 'Không có dữ liệu!';
         if (dmBoMon && dmBoMon.length > 0) {
@@ -157,14 +157,14 @@ class DmBoMonImportPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: 'auto' }}>Mã bộ môn </th>
-                        <th style={{ width: '50%' }}>Tên bộ môn </th>
-                        <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã đơn vị </th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Quyết định thành lập </th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Quyết định xóa tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã bộ môn </th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên bộ môn </th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên tiếng Anh</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã đơn vị </th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định thành lập </th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định xóa tên</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -175,9 +175,9 @@ class DmBoMonImportPage extends AdminPage {
                         <TableCell type='text' content={item.maDv ? item.maDv : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.qdThanhLap ? item.qdThanhLap : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.qdXoaTen ? item.qdXoaTen : ''} style={{ whiteSpace: 'nowrap' }} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={e => this.onChangeCheckBox(e, index)} />
-                        <TableCell type='buttons' content={{ ...item, index: index }} permission={permission} 
+                        <TableCell type='buttons' content={{ ...item, index: index }} permission={permission}
                             onEdit={() => this.modal.show({ ...item, index: index })} onDelete={(e) => this.delete(e, index)}></TableCell>
                     </tr>)
             });
@@ -188,7 +188,7 @@ class DmBoMonImportPage extends AdminPage {
             title: 'Import Bộ môn ',
             breadcrumb: [<Link key={0} to='/user/dm-bo-mon'>Danh mục Bộ môn</Link>, 'Import'],
             content: <>
-                <FileBox postUrl='/user/upload' uploadType='DmBoMonFile' userData='DmBoMonFile' className='tile' 
+                <FileBox postUrl='/user/upload' uploadType='DmBoMonFile' userData='DmBoMonFile' className='tile'
                     accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
                     style={{ width: '50%', margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
                     ajax={true} success={this.onSuccess} error={this.onError} />

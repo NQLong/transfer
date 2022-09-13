@@ -124,8 +124,8 @@ class FormPage extends React.Component {
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: '80%' }}>Tiêu đề</th>
                         <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Khóa bảng câu hỏi</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khóa bảng câu hỏi</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 </thead>

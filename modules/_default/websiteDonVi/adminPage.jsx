@@ -74,12 +74,12 @@ class adminPage extends AdminPage {
             emptyTable: 'Không có dữ liệu',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
-                    <th style={{ width: '20%', textAlign: 'left' }} nowrap='true'>Tên viết tắt</th>
-                    <th style={{ width: '30%' }} nowrap='true'>Website riêng</th>
-                    <th style={{ width: '40%' }} nowrap='true'>Tên đơn vị</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '20%', whiteSpace: 'nowrap', textAlign: 'left' }}>Tên viết tắt</th>
+                    <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Website riêng</th>
+                    <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Tên đơn vị</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ), renderRow: (item, index) => (
                 <tr key={index}>
