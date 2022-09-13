@@ -96,7 +96,7 @@ const User = () => {
                         </TouchableOpacity>
                     </View>
 
-                    { T.isDebug && 
+                    { T.debug && 
                         <View style={styles.buttonView}>
                             <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={() => setShowUserModal(true)} disabled={disableLogout}>
                                 <Text style={{ ...styles.buttonText, color: colors.background}} >Switch user</Text>

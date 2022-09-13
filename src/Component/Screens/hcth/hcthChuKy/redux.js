@@ -14,7 +14,6 @@ export function getSignature(done) {
     return dispatch => {
         const url = '/api/hcth/chu-ky';
         T.get(url).then(res=> {
-            console.log(res);
             if (res.error) {
                 T.alert('Lấy chữ ký thất bại', 'danger');
                 console.error(`GET: ${url}.`, res.error);
@@ -22,6 +21,6 @@ export function getSignature(done) {
                 dispatch({ type: HcthChuKyGet, signature: res.item });
                 done && done(res.item);
             }
-        }).catch(() => T.notify('Lấy khóa thất bại', 'danger'));
+        }).catch(() => T.alert('Lấy khóa thất bại', 'danger'));
     };
 }
