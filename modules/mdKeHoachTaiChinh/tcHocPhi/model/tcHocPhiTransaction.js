@@ -4,8 +4,8 @@ module.exports = app => {
     app.model.tcHocPhiTransaction.sendEmailAndSms = async (data) => {
         try {
             const { student, hocKy, namHoc, amount, payDate } = data;
-            let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'hocPhiSmsDong', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
-            [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, hocPhiSmsDong].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
+            let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
+            [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
                 .replaceAll('{hoc_ky}', hocKy)
                 .replaceAll('{nam_hoc}', `${namHoc} - ${parseInt(namHoc) + 1}`)
                 .replaceAll('{mssv}', student.mssv)
@@ -16,8 +16,10 @@ module.exports = app => {
                 .replaceAll('{amount}', amount.toString().numberDisplay())
                 .replaceAll('{support_phone}', tcSupportPhone) || '');
             app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
-            // app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', [], hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
-            // await app.sms.sendByViettel(student.dienThoaiCaNhan, hocPhiSmsDong, tcEmail);
+
+            let smsContent = await app.model.fwSmsParameter.replaceAllContent(1, student);
+
+            app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
         } catch (error) {
             console.error('Send email and sms tcHocPhi fail!');
         }

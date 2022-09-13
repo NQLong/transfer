@@ -25,17 +25,12 @@ module.exports = app => {
         } else resolve();
     }));
 
-    app.sms.sendByViettel = async (phone, mess, emailSent) => await initViettelSms({ phone, mess }, emailSent);
+    app.sms.sendByViettel = async (phone, mess) => await initViettelSms({ phone, mess });
 
-    const initViettelSms = async (body, email) => {
+    const initViettelSms = async (body) => {
         try {
-            let { usernameViettel: user, passViettel: pass, brandName, totalSMSViettel: currentTotal } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
+            let { usernameViettel: user, passViettel: pass, brandName, } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
             let { phone, mess } = body;
-            // console.log('usernameViettel', user);
-            // console.log('passViettel', pass);
-            // console.log('brandName', brandName);
-            // console.log('totalSMSViettel', currentTotal);
-
             let dataEncode = parseInt(app.sms.checkNonLatinChar(mess));
 
             const tranId = `${phone}_${new Date().getTime()}`;
@@ -57,22 +52,12 @@ module.exports = app => {
                             console.error(e);
                             resolve({ error: e });
                         }
-                        // console.log(resData);
                         if (resData.code == 1) {
                             try {
-                                const item = await app.model.fwSms.create({
-                                    email,
-                                    sentDate: new Date().getTime(),
-                                    total: Math.abs(currentTotal - resData.total)
-                                });
-
-                                if (item) {
-                                    await app.model.setting.setValue({ totalSMSViettel: resData.total });
-                                    resolve({ success: true });
-                                } else resolve({ error: 'Create model SMS fail' });
+                                await app.model.setting.setValue({ totalSMSViettel: resData.total });
+                                resolve({ success: true });
                             } catch (error) {
-                                console.error('Request is successful but callback has error: ', error);
-                                resolve({ error: 'Create model SMS fail' });
+                                resolve({ error });
                             }
                         } else resolve({ error: 'Unsuccessful request' });
                     });
