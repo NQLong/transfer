@@ -38,11 +38,6 @@ const timeList = [
     { id: 2, text: 'Theo ngày ký' }
 ];
 
-const selectCongVan = [
-    { id: 1, text: 'Văn bản đơn vị' },
-    { id: 2, text: 'Văn bản trường' }
-];
-
 const start = new Date().getFullYear(),
     end = 1900,
     yearSelector = [...Array(start - end + 1).keys()].map(i => ({
@@ -114,7 +109,7 @@ class HcthCongVanDi extends AdminPage {
         let congVanYear = this.congVanYear?.value() || null;
 
         let permissions = this.props.system?.user?.permissions;
-        let hcthStaff = permissions.includes('hcth:login') ? { loaiCongVan: 2 } : {};
+        let hcthStaff = permissions.includes('hcth:login') ? { loaiCongVan: 'TRUONG' } : {};
 
         const pageFilter = isInitial ? hcthStaff : { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear };
         this.setState({ filter: pageFilter }, () => {
@@ -249,7 +244,7 @@ class HcthCongVanDi extends AdminPage {
             onCreate: ((unitManagePermission && unitManagePermission.manage) || (hcthManagePermission && hcthManagePermission.manage) || (unitEditPermission && unitEditPermission.edit)) ? () => (window.location.pathname.startsWith('/user/hcth') ? this.props.history.push('/user/hcth/van-ban-di/new') : this.props.history.push('/user/van-ban-di/new')) : null,
             header: <>
                 <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.congVanYear = e} placeholder="Năm" data={yearSelector} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
-                <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Cấp văn bản" data={selectCongVan} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
+                <FormSelect style={{ width: '200px', marginBottom: '0', marginRight: '8px' }} ref={e => this.loaiCongVan = e} placeholder="Cấp văn bản" data={Object.values(vanBanDi.loaiCongVan)} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
             </>,
             content: <>
                 <div className="tile" style={{ overflowX: 'auto' }}>

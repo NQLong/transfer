@@ -45,11 +45,6 @@ module.exports = app => {
     const getDonVi = (req) => req.session?.user?.staff?.maDonVi;
     const getShcc = (req) => req.session.user?.shcc;
     const getCurrentPermissions = (req) => (req.session && req.session.user && req.session.user.permissions) || [];
-    const getUserPermission = (req, prefix, listPermissions = ['read', 'write', 'delete']) => {
-        const permission = {}, currentPermissions = getCurrentPermissions(req);
-        listPermissions.forEach(item => permission[item] = currentPermissions.includes(`${prefix}:${item}`));
-        return permission;
-    };
     const getInstance = async (id) => {
         const instance = await app.model.hcthCongVanDi.get({ id });
         if (!instance) throw 'Văn bản đi không tồn tại';
@@ -77,11 +72,9 @@ module.exports = app => {
                 scope.GLOBAL = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
             if (permissions.includes('developer:login'))
                 scope.GLOBAL = Object.values(vanBanDi.trangThai).map(item => item.id);
-            console.log(scope);
             Object.keys(scope).forEach(key => scope[key] = scope[key].toString());
 
             const userDepartments = new Set(getDonViQuanLy(req));
-            console.log(userDepartments);
             if (getDonVi(req))
                 userDepartments.add(getDonVi(req));
 
@@ -94,9 +87,7 @@ module.exports = app => {
                 filterData.fromTime = new Date(`${congVanYear}-01-01`).getTime();
                 filterData.toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
             }
-            // console.log(scope);
-            console.log(filterData);
-            const page = await app.model.hcthCongVanDi.searchPageAlternate(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), '', app.utils.stringify(scope), app.utils.stringify(filterData));
+            const page = await app.model.hcthCongVanDi.searchPageAlternate(parseInt(req.params.pageNumber), parseInt(req.params.pageSize), searchTerm, app.utils.stringify(scope), app.utils.stringify(filterData));
 
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
             const pageCondition = searchTerm;
@@ -149,24 +140,41 @@ module.exports = app => {
 
     app.put('/api/hcth/van-ban-di/ready/:id', app.permission.orCheck(staffPermission), async (req, res) => {
         try {
-            const instance = await getInstance(req.params.id);
+            const instance = await getInstance(req.params.id),
+                permissions = req.session.user.permissions,
+                error401 = {
+                    status: 401, message: 'permission denied'
+                };
 
-            //TODO: check permission in api level
+            const donViQuanLy = new Set(getDonViQuanLy(req));
+            if (getDonVi(req)) {
+                donViQuanLy.add(getDonVi(req));
+            }
+
+            //TODO: Vcheck permission in api level
             const currentStatus = instance.trangThai;
             let nextStatus;
             switch (currentStatus) {
+                // quyen staffPermission tro len
                 case vanBanDi.trangThai.NHAP.id:
                 case vanBanDi.trangThai.TRA_LAI_NOI_DUNG.id:
-                    nextStatus = vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id;
-                    break;
-                case vanBanDi.trangThai.TRA_LAI_THE_THUC.id:
-                    nextStatus = vanBanDi.trangThai.KIEM_TRA_THE_THUC.id;
-                    break;
                 case vanBanDi.trangThai.TRA_LAI.id:
+                    if (!(permissions.includes(staffPermission) && (getDonVi(req) == instance.donViGui))) {
+                        throw error401;
+                    }
                     nextStatus = vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id;
-
-
+                    await createCanBoQuanLyNotification(instance);
                     break;
+
+                // quyen staffPermission tro len
+                case vanBanDi.trangThai.TRA_LAI_THE_THUC.id:
+                    if (!(permissions.includes(staffPermission) && (getDonVi(req) == instance.donViGui))) {
+                        throw error401;
+                    }
+                    nextStatus = vanBanDi.trangThai.KIEM_TRA_THE_THUC.id;
+                    await createHcthStaffNotification(instance);
+                    break;
+
                 default:
                     throw 'Trạng thái văn bản không hợp lệ';
             }
@@ -186,7 +194,7 @@ module.exports = app => {
 
             await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextStatus });
             await app.model.hcthHistory.create({ loai: 'DI', key: instance.id, shcc: req.session?.user?.shcc, hanhDong: action.UPDATE_STATUS, thoiGian: new Date().getTime() });
-            //TODO: reuse send notification
+            //TODO: Vreuse send notification
             res.send({});
 
         } catch (error) {
@@ -239,9 +247,9 @@ module.exports = app => {
                 id: instance.fileId,
                 ma: instance.id,
                 loai: 'FILE_VBD'
-            }
+            };
             if (version)
-                condition.id = version
+                condition.id = version;
             const file = await app.model.hcthFile.get({ id: instance.fileId });
             if (!instance || !file) return res.status(404).send({ error: 'Tệp tin không tồn tại' });
 
@@ -265,9 +273,14 @@ module.exports = app => {
             // eslint-disable-next-line no-unused-vars            
             const { canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], trangThai, ...data } = req.body;
             const id = req.params.id;
+
+            const trangThaiCongVanDi = vanBanDi.trangThai;
+
             let instance = await getInstance(id);
 
-            //TODO: check suitable status to update if not throw error
+            //TODO: Vcheck suitable status to update if not throw error
+            if (!([trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_NOI_DUNG.id, trangThaiCongVanDi.TRA_LAI_THE_THUC.id].includes(trangThai)))
+                throw 'Trạng thái văn bản không hợp lệ';
 
             instance = await app.model.hcthCongVanDi.update({ id }, data);
 
@@ -305,10 +318,19 @@ module.exports = app => {
             const id = req.params.id;
             const instance = await getInstance(id);
 
+            const donViQuanLy = new Set(getDonViQuanLy(req));
+            if (getDonVi(req)) {
+                donViQuanLy.add(getDonVi(req));
+            }
+
             if (instance.trangThai != vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id)
                 throw 'Trạng thái văn bản không hợp lệ';
 
-            //TODO: check don vi quan ly
+            //TODO: Vcheck don vi quan ly
+            if (!donViQuanLy.has(instance.donViGui)) {
+                throw 'permission denied';
+            }
+
             if (instance.loaiCongVan == vanBanDi.loaiCongVan.TRUONG.id)
                 await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.KIEM_TRA_THE_THUC.id });
             else
@@ -342,32 +364,6 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/hcth/van-ban-di/return/:id', app.permission.check('staff:login'), async (req, res) => {
-        try {
-            const id = req.params.id;
-            const instance = await getInstance(id);
-            const current = instance.trangThai;
-            let nextStatus;
-            //TODO: check permission when return
-            switch (current) {
-                case vanBanDi.trangThai.KIEM_TRA_NOI_DUNG.id:
-                    nextStatus = vanBanDi.trangThai.TRA_LAI_NOI_DUNG.id;
-                    break;
-                case vanBanDi.trangThai.KIEM_TRA_THE_THUC.id:
-                    nextStatus = vanBanDi.trangThai.TRA_LAI_THE_THUC.id; break;
-                case vanBanDi.trangThai.KY_PHAT_HANH.id:
-                    nextStatus = vanBanDi.trangThai.TRA_LAI.id; break;
-                default:
-                    throw 'Trạng thái văn bản không hợp lệ';
-            }
-            await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextStatus });
-            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.RETURN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
-            res.send({});
-        } catch (error) {
-            console.error(error);
-            res.send({ error });
-        }
-    });
     // Upload API  -----------------------------------------------------------------------------------------------
     app.fs.createFolder(app.path.join(app.assetPath, '/congVanDi'));
 
@@ -473,8 +469,12 @@ module.exports = app => {
 
     app.get('/api/hcth/van-ban-di/file-list/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
-            const instance = await getInstance(req.params.id);
-            //TODO: check get permission
+            const id = parseInt(req.params.id);
+            const instance = await getInstance(id);
+            //TODO: Vcheck get permission
+            if (!await isRelated(instance, req)) {
+                throw { status: 401, message: 'permission denied' };
+            }
             res.send({ files: await getFiles(instance.id) });
         } catch (error) {
             console.error(error);
@@ -484,18 +484,42 @@ module.exports = app => {
 
     //TODO: delelte file
 
-    const isRelated = async (congVan, donViNhan, req) => {
+    const isRelated = async (congVan, req) => {
         try {
             const permissions = req.session.user.permissions;
-            const maDonVi = req.session.user.staff?.maDonVi;
-            if (permissions.includes('rectors:login') || permissions.includes('hcth:login')) {
+            const maDonViQuanLy = new Set(getDonViQuanLy(req));
+            if (getDonVi(req)) {
+                maDonViQuanLy.add(getDonVi(req));
+            }
+            const donViGui = congVan.donViGui,
+                userShcc = getShcc(req);
+
+            let donViNhan = await app.model.hcthDonViNhan.getAll({ ma: congVan.id, loai: LOAI_VAN_BAN, donViNhanNgoai: 0 }, 'donViNhan', 'id');
+            let canBoNhan = await app.model.hcthCanBoNhan.getAll({ ma: congVan.id, loai: LOAI_VAN_BAN });
+
+            const danhSachCanBo = canBoNhan.map(item => item.canBoNhan);
+            // nguoi tao
+            if (congVan.nguoiTao == userShcc) {
                 return true;
             }
+            // quản lý don vi gui tro len
+            if (maDonViQuanLy.has(donViGui) && permissions.includes(managerPermission)) return true;
+
+            // ban giám hiệu và nhân viên phòng hcth và trạng thái khác nháp
+            if ((congVan.trangThai != vanBanDi.trangThai.NHAP.id) && (permissions.includes('rectors:login') || permissions.includes('hcthCongVanDi:read'))) {
+                return true;
+            }
+            // quản lý đơn vị nhận trở lên và trạng thái đã phát hành
+            if ((congVan.trangThai == vanBanDi.trangThai.DA_PHAT_HANH.id) && donViNhan.some(item => maDonViQuanLy.has(item.donViNhan)) && permissions.includes(managerPermission)) return true;
+
+            // cán bộ  nhận và trạng thái đã phát hành
+            if ((congVan.trangThai == vanBanDi.trangThai.DA_PHAT_HANH.id) && danhSachCanBo.includes(userShcc)) return true;
+
             if (req.query.nhiemVu) {
                 const count = await app.model.hcthLienKet.count({
                     keyA: req.query.nhiemVu,
                     loaiA: 'NHIEM_VU',
-                    loaiB: 'CONG_VAN_DI',
+                    loaiB: 'VAN_BAN_DI',
                     keyB: req.params.id
                 });
                 if (await app.hcthNhiemVu.checkNhiemVuPermission(req, null, req.query.nhiemVu)
@@ -503,17 +527,6 @@ module.exports = app => {
                     return true;
             }
 
-            const canBoNhan = congVan.canBoNhan;
-            const donViGui = congVan.donViGui;
-            let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
-            if (canBoNhan && canBoNhan.split(',').includes(req.session.user.shcc))
-                return true;
-            else if (donViGui == maDonVi && (permissions.includes(managerPermission) || maDonViQuanLy.find(item => donViGui.includes(item.maDonVi)) || permissions.includes(staffPermission))) {
-                return true;
-            } else {
-                let maDonViNhan = donViNhan.map((item) => item.donViNhan);
-                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes(managerPermission) && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
-            }
         } catch {
             return false;
         }
@@ -537,16 +550,16 @@ module.exports = app => {
             }
 
             const congVan = await getInstance(id);
-
+            // TODO: Vcheck permissions
             // const donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: 'DI' }, 'id, donViNhan, donViNhanNgoai', 'id');
             let donViNhan = await app.model.hcthDonViNhan.getAll({ ma: id, loai: LOAI_VAN_BAN, donViNhanNgoai: 0 }, 'donViNhan', 'id');
             let donViNhanNgoai = await app.model.hcthDonViNhan.getAll({ ma: id, loai: LOAI_VAN_BAN, donViNhanNgoai: 1 }, 'donViNhan', 'id');
             let canBoNhan = await app.model.hcthCanBoNhan.getAll({ ma: id, loai: LOAI_VAN_BAN });
             const banLuu = await app.model.hcthBanLuu.getAll({ ma: id, loai: LOAI_VAN_BAN }, 'donVi', 'id');
-            if (!(req.session.user.permissions.includes('hcthCongVanDi:read') || await isRelated(congVan, donViNhan, req))) {
+            if (!(req.session.user.permissions.includes('developer:login') || await isRelated(congVan, req))) {
                 throw { status: 401, message: 'permission denied' };
             }
-            //TODO: use new state system
+
             else if (congVan.trangThai == vanBanDi.trangThai.DA_PHAT_HANH.id && req.session.user?.shcc) {
                 await viewCongVan(id, req.session.user.shcc, congVan.nguoiTao);
             }
@@ -622,8 +635,14 @@ module.exports = app => {
 
     app.post('/api/hcth/van-ban-di/phan-hoi', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
-            //TODO: check permission
+            //TODO: Vcheck permission
             const { noiDung, key } = req.body.data;
+
+            const instance = await getInstance(Number(key));
+
+            if (!await isRelated(instance, req)) {
+                throw { status: 401, message: 'permission denied' };
+            }
 
             const newPhanHoi = {
                 canBoGui: req.session.user.shcc,
@@ -634,6 +653,7 @@ module.exports = app => {
             };
 
             await app.model.hcthPhanHoi.create(newPhanHoi);
+            res.send({});
         } catch (error) { console.error(error); res.send({ error }); }
     });
 
@@ -775,170 +795,166 @@ module.exports = app => {
     });
 
 
-    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), (req, res) => {
-        let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = req.params.filter ? JSON.parse(req.params.filter) : { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, loaiVanBan: null, donViNhanNgoai: null, status: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
-        let donViXem = '', canBoXem = '';
-        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+    app.get('/api/hcth/van-ban-di/download-excel/:filter', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
 
-        if (donViGui == 'null') donViGui = null;
-        if (donViNhan == 'null') donViNhan = null;
-        if (canBoNhan == 'null') canBoNhan = null;
-        if (loaiCongVan == 'null') loaiCongVan = null;
-        if (loaiVanBan == 'null') loaiVanBan = null;
-        if (donViNhanNgoai == 'null') donViNhanNgoai = null;
-        if (status == 'null') status = null;
-        if (timeType == 'null') timeType = null;
-        if (fromTime == 'null') fromTime = null;
-        if (toTime == 'null') toTime = null;
-        if (congVanYear == 'null') congVanYear = null;
+            const permissions = req.session.user.permissions;
+            const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
 
-        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-        const hcthPermission = getUserPermission(req, 'hcth', ['manage']),
-            hcthManagePermission = getUserPermission(req, 'hcthCongVanDi', ['manage']);
-        const user = req.session.user;
-        const permissions = user.permissions;
+            let { donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime, congVanYear } = app.utils.parse(req.params.filter) || { donViGui: '', donViNhan: '', loaiCongVan: '', loaiVanBan: '', donViNhanNgoai: '', status: '', timeType: '', fromTime: '', toTime: '', congVanYear: '' };
 
-        donViXem = req.session?.user?.staff?.donViQuanLy || [];
-        donViXem = donViXem.map(item => item.maDonVi).toString() || permissions.includes(managerPermission) && req.session?.user?.staff?.maDonVi || '';
-        canBoXem = req.session?.user?.shcc || '';
+            //status scheme
+            let scope = { SELF: [], DEPARTMENT: [], GLOBAL: [], };
 
-        let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.manage ? 2 : 0;
+            scope.SELF = [vanBanDi.trangThai.DA_PHAT_HANH.id];
 
-        if (rectorsPermission.login || hcthPermission.manage || (!user.isStaff && !user.isStudent) || hcthManagePermission.manage) {
-            donViXem = '';
-            canBoXem = '';
-        }
+            if (permissions.includes(managerPermission))
+                scope.DEPARTMENT = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('rectors:login') || permissions.includes('hcthCongVanDi:read'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).filter(item => item.id != vanBanDi.trangThai.NHAP.id).map(item => item.id);
+            if (permissions.includes('developer:login'))
+                scope.GLOBAL = Object.values(vanBanDi.trangThai).map(item => item.id);
+            Object.keys(scope).forEach(key => scope[key] = scope[key].toString());
 
-        if (congVanYear && Number(congVanYear) > 1900) {
-            timeType = 1;
-            fromTime = new Date(`${congVanYear}-01-01`).getTime();
-            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
-        }
+            const userDepartments = new Set(getDonViQuanLy(req));
+            if (getDonVi(req))
+                userDepartments.add(getDonVi(req));
 
-        app.model.hcthCongVanDi.downloadExcel(canBoNhan, donViGui, donViNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, status ? status.toString() : status, timeType, fromTime, toTime, searchTerm, (error, result) => {
-            if (error || !result) {
-                res.send({ error });
-            } else {
-                const workbook = app.excel.create(),
-                    worksheet = workbook.addWorksheet('congvancacphong');
-                const cells = [
-                    {
-                        header: 'STT', width: 10, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Ngày gửi', width: 15, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Ngày ký', width: 15, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Trích yếu', width: 50, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Số văn bản', width: 20, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Đơn vị gửi', width: 30, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
-                        }
-                    },
-                    {
-                        header: 'Đơn vị, cán bộ nhận', width: 45, style: {
-                            border: {
-                                top: { style: 'thin' },
-                                left: { style: 'thin' },
-                                bottom: { style: 'thin' },
-                                right: { style: 'thin' }
-                            }
+            const userShcc = getShcc(req);
+
+            const filterParam = {
+                userShcc, userDepartments: [...userDepartments].toString(), donViGui, donViNhan, canBoNhan, loaiCongVan, loaiVanBan, donViNhanNgoai, status, timeType, fromTime, toTime
+            };
+
+            if (congVanYear && Number(congVanYear) > 1900) {
+                filterParam.timeType = 1;
+                filterParam.fromTime = new Date(`${congVanYear}-01-01`).getTime();
+                filterParam.toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
+            }
+
+            const result = await app.model.hcthCongVanDi.downloadExcel(app.utils.stringify(filterParam), app.utils.stringify(scope), searchTerm);
+
+            const workbook = app.excel.create(),
+                worksheet = workbook.addWorksheet('congvancacphong');
+            const cells = [
+                {
+                    header: 'STT', width: 10, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
                         }
                     }
-                ];
+                },
+                {
+                    header: 'Ngày gửi', width: 15, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Ngày ký', width: 15, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Trích yếu', width: 50, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Số văn bản', width: 20, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Đơn vị gửi', width: 30, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                },
+                {
+                    header: 'Đơn vị, cán bộ nhận', width: 45, style: {
+                        border: {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' }
+                        }
+                    }
+                }
+            ];
 
-                worksheet.columns = cells;
-                worksheet.getRow(1).alignment = {
-                    ...worksheet.getRow(1).alignment,
+            worksheet.columns = cells;
+            worksheet.getRow(1).alignment = {
+                ...worksheet.getRow(1).alignment,
+                vertical: 'middle',
+                horizontal: 'center',
+                wrapText: true
+            };
+            worksheet.getRow(1).font = {
+                name: 'Times New Roman',
+                family: 4,
+                size: 12,
+                bold: true
+            };
+
+            worksheet.getRow(1).height = 40;
+            result.rows.forEach((item, index) => {
+                worksheet.getRow(index + 2).alignment = {
+                    ...worksheet.getRow(index + 2).alignment,
                     vertical: 'middle',
                     horizontal: 'center',
                     wrapText: true
                 };
-                worksheet.getRow(1).font = {
+                worksheet.getRow(index + 2).font = {
                     name: 'Times New Roman',
-                    family: 4,
-                    size: 12,
-                    bold: true
+                    size: 12
                 };
+                worksheet.getCell('A' + (index + 2)).value = index + 1;
+                worksheet.getCell('B' + (index + 2)).value = item.ngayGui ? app.date.dateTimeFormat(new Date(item.ngayGui), 'dd/mm/yyyy') : '';
+                worksheet.getCell('C' + (index + 2)).value = item.ngayKy ? app.date.dateTimeFormat(new Date(item.ngayKy), 'dd/mm/yyyy') : '';
+                worksheet.getCell('D' + (index + 2)).value = item.trichYeu;
+                worksheet.getCell('D' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+                worksheet.getCell('E' + (index + 2)).value = item.soCongVan;
+                worksheet.getCell('F' + (index + 2)).value = item.tenDonViGui;
+                worksheet.getCell('F' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
 
-                worksheet.getRow(1).height = 40;
-                result.rows.forEach((item, index) => {
-                    worksheet.getRow(index + 2).alignment = {
-                        ...worksheet.getRow(index + 2).alignment,
-                        vertical: 'middle',
-                        horizontal: 'center',
-                        wrapText: true
-                    };
-                    worksheet.getRow(index + 2).font = {
-                        name: 'Times New Roman',
-                        size: 12
-                    };
-                    worksheet.getCell('A' + (index + 2)).value = index + 1;
-                    worksheet.getCell('B' + (index + 2)).value = item.ngayGui ? app.date.dateTimeFormat(new Date(item.ngayGui), 'dd/mm/yyyy') : '';
-                    worksheet.getCell('C' + (index + 2)).value = item.ngayKy ? app.date.dateTimeFormat(new Date(item.ngayKy), 'dd/mm/yyyy') : '';
-                    worksheet.getCell('D' + (index + 2)).value = item.trichYeu;
-                    worksheet.getCell('D' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
-                    worksheet.getCell('E' + (index + 2)).value = item.soCongVan;
-                    worksheet.getCell('F' + (index + 2)).value = item.tenDonViGui;
-                    worksheet.getCell('F' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
-
-                    const donViNhan = item.danhSachDonViNhan?.split(';').map(item => item + '\r\n').join('') || '';
-                    const canBoNhan = item.danhSachCanBoNhan?.split(';').map(item => item + '\r\n').join('') || '';
-                    const donViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';').map(item => item + '\r\n').join('') || '';
-                    worksheet.getCell('G' + (index + 2)).value = donViNhan != '' || donViNhanNgoai != '' || canBoNhan != '' ? donViNhan + donViNhanNgoai + canBoNhan : '';
-                    worksheet.getCell('G' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
-                });
-                let fileName = 'congvancacphong.xlsx';
-                app.excel.attachment(workbook, res, fileName);
-            }
-        });
+                const donViNhan = item.danhSachDonViNhan?.split(';').map(item => item + '\r\n').join('') || '';
+                const canBoNhan = item.danhSachCanBoNhan?.split(';').map(item => item + '\r\n').join('') || '';
+                const donViNhanNgoai = item.danhSachDonViNhanNgoai?.split(';').map(item => item + '\r\n').join('') || '';
+                worksheet.getCell('G' + (index + 2)).value = donViNhan != '' || donViNhanNgoai != '' || canBoNhan != '' ? donViNhan + donViNhanNgoai + canBoNhan : '';
+                worksheet.getCell('G' + (index + 2)).alignment = { ...worksheet.getRow(index + 2).alignment, horizontal: 'left' };
+            });
+            let fileName = 'congvancacphong.xlsx';
+            app.excel.attachment(workbook, res, fileName);
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.post('/api/hcth/van-ban-di/file/config', app.permission.check('staff:login'), async (req, res) => {
@@ -982,7 +998,8 @@ module.exports = app => {
                     throw 'Trạng thái văn bản không hợp lệ';
             }
             await app.model.hcthPhanHoi.create({ canBoGui: req.session.user.shcc, noiDung: lyDo, key: id, ngayTao: new Date().getTime(), loai: LOAI_VAN_BAN });
-            //TODO: send creator notification
+            //TODO: Vsend creator notification
+            await createCreatorReturnNotification(instance, req);
             await app.model.hcthHistory.create({ key: instance.id, loai: LOAI_VAN_BAN, hanhDong: action.RETURN, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
             res.send({});
         } catch (error) {
@@ -1009,4 +1026,39 @@ module.exports = app => {
         if (!permissions.includes('rectors:login')) throw 'Bạn không đủ quyền để trả lại văn bản này.';
         await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.TRA_LAI.id });
     };
+
+    const createNotification = async (emails, notification) => {
+        return (emails.map(async email => {
+            await app.notification.send({
+                toEmail: email,
+                ...notification
+            });
+        }));
+    };
+
+    const createCreatorReturnNotification = async (item, req) => {
+        if (item.nguoiTao) {
+            const staff = await app.model.canBo.get({ shcc: item.nguoiTao }, 'email');
+            const canBo = req.session?.user;
+
+            await createNotification([staff.email], { title: `Văn bản đi #${item.id}`, icon: 'fa-undo', subTitle: 'Bạn có một văn bản bị trả lại bởi ' + `${canBo?.lastName || ''} ${canBo?.firstName || ''}`.trim().normalizedName(), iconColor: 'danger', link: `/user/van-ban-di/${item.id}` });
+        }
+    };
+
+    /**
+     * @param item -> công văn đi item
+     * gửi thông báo kiểm tra nội dung tới cán bộ quản lý công văn đi trở lên
+     */
+    const createCanBoQuanLyNotification = async (item) => {
+        const dsQuanLy = await app.model.hcthCongVanDi.getManageStaff(item.donViGui, item.nguoiTao, managerPermission);
+        const emails = dsQuanLy.rows.map(item => item.email);
+        await createNotification(emails, { title: `Văn bản đi #${item.id}`, icon: 'fa-book', subTitle: 'Bạn có một văn bản đi cần kiểm tra', iconColor: 'info', link: `/user/van-ban-di/${item.id}` });
+    };
+
+    const createHcthStaffNotification = async (item) => {
+        const hcthStaff = await app.model.hcthCongVanDi.getHcthStaff();
+        const emails = hcthStaff.rows.map(item => item.email);
+        await createNotification(emails, { title: `Văn bản đi #${item.id}`, icon: 'fa-book', subTitle: 'Bạn có một văn bản đi cần kiểm tra', iconColor: 'info', link: `/user/hcth/van-ban-di/${item.id}` });
+    };
+
 };

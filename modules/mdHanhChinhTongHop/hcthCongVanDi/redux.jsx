@@ -64,7 +64,7 @@ export function updateHcthCongVanDi(id, changes, done) {
             if (data.error || changes == null) {
                 T.notify('Cập nhật văn bản đi bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
-                done && done(data.error);
+                // done && done(data.error);
             } else {
                 T.notify('Cập nhật văn bản đi thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());

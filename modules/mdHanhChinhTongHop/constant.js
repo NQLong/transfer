@@ -143,7 +143,7 @@ module.exports = {
             NHAP: { text: 'Nháp', id: 'NHAP', color: 'red' },
             KIEM_TRA_NOI_DUNG: { text: 'Kiểm tra (nội dung)', id: 'KIEM_TRA_NOI_DUNG', color: 'blue' },
             TRA_LAI_NOI_DUNG: { text: 'Trả lại (nội dung)', id: 'TRA_LAI_NOI_DUNG', color: 'red' },
-            KIEM_TRA_THE_THUC: { text: 'Kiểm tra (thê thức)', id: 'KIEM_TRA_THE_THUC', color: 'blue' },
+            KIEM_TRA_THE_THUC: { text: 'Kiểm tra (thể thức)', id: 'KIEM_TRA_THE_THUC', color: 'blue' },
             TRA_LAI_THE_THUC: { text: 'Trả lại (thể thức)', id: 'TRA_LAI_THE_THUC', color: 'red' },
             TRA_LAI: { text: 'Trả lại', id: 'TRA_LAI', color: 'red' },
             KY_THE_THUC: { text: 'Ký nháy thể thức', id: 'KY_THE_THUC', color: 'blue' },

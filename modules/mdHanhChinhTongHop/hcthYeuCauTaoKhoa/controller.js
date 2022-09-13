@@ -105,20 +105,35 @@ module.exports = app => {
         const randomSerialNumber = () => {
             return makeNumberPositive(forge.util.bytesToHex(forge.random.getBytesSync(20)));
         };
+        const qtChucVu = await app.model.qtChucVu.get({ shcc, chucVuChinh: 1, thoiChucVu: 0 }, 'maChucVu');
+
+        const chucVu = await app.model.dmChucVu.get({ ma: qtChucVu?.maChucVu }, 'ten');
+
+        const canBo = await app.model.canBo.get({ shcc }, 'ho, ten, maDonVi');
+
+        const donVi = await app.model.dmDonVi.get({ ma: canBo?.maDonVi }, 'ten');
+
         // Define the attributes/properties for the Host Certificate
         const attributes = [{
             shortName: 'C',
             value: 'VN'
         }, {
             shortName: 'ST',
-            value: 'Ho Chi Minh'
+            value: 'Hồ Chí Minh'
         }, {
             shortName: 'L',
-            value: 'DAI HOC KHOA HOC VA XA HOI NHAN VAN'
+            value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
         }, {
             shortName: 'CN',
-            value: `${shcc}-${id}`
-        }];
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName()
+        }, {
+            shortName: 'O',
+            value: `${donVi?.ten || ''}`.trim()
+        }, {
+            shortName: 'OU',
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `.${shcc}`
+        }
+        ];
 
         const extensions = [{
             name: 'basicConstraints',
@@ -202,6 +217,7 @@ module.exports = app => {
             res.send({});
 
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
@@ -335,9 +351,9 @@ module.exports = app => {
     app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc;
-            const path = app.path.join(app.assetPath, `/key/${shcc}.png`)
+            const path = app.path.join(app.assetPath, `/key/${shcc}.png`);
             const { format, height, width, background } = req.query;
-            let buffer = app.fs.readFileSync(path, 'base64');;
+            let buffer = app.fs.readFileSync(path, 'base64');
             const sendResponse = (buffer) => {
                 if (!format) {
                     res.writeHead(200, [['Content-Type', 'image/png'], ['Content-Disposition', 'attachment;filename=' + `${shcc}.png`]]);
@@ -348,7 +364,7 @@ module.exports = app => {
                 }
                 else
                     return res.status(400).send({ error: 'format không được hỗ trợ' });
-            }
+            };
             if (height != null && width != null) {
                 let image = await jimp.read(Buffer.from(buffer, 'base64'));
                 if (background)
@@ -358,7 +374,7 @@ module.exports = app => {
                     if (error) throw error;
                     console.log(buffer);
                     sendResponse(buffer.toString('base64'));
-                })
+                });
             }
             else sendResponse(buffer);
         } catch (error) {

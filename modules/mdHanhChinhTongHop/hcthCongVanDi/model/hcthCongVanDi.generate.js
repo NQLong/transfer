@@ -268,9 +268,9 @@ module.exports = app => {
                 }));
         }),
 
-        getAllStaff: (congvanid, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_staff(:congvanid); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        getManageStaff: (donVi, nguoiTao, role, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_manage_staff(:donVi, :nguoiTao, :role); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, donVi, nguoiTao, role }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);
