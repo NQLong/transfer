@@ -14,7 +14,7 @@ module.exports = app => {
         menus: {
             7510: {
                 title: 'Môn học (trước 2022)',
-                link: '/user/sau-dai-hoc/mon-hoc', icon: 'fa-list', backgroundColor: '#1ca474'
+                link: '/user/sau-dai-hoc/mon-hoc', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex:1
             },
         },
     };

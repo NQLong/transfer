@@ -14,7 +14,7 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/sau-dai-hoc/bac-sdh',
+            path: '/user/sau-dai-hoc/phan-he-dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

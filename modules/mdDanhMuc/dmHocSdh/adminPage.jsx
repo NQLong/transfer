@@ -58,8 +58,11 @@ class dmHocSdhPage extends AdminPage {
     state = { searching: false };
 
     componentDidMount() {
-        let route = T.routeMatcher('/user/:menu/bac-sdh').parse(window.location.pathname);
+        let route = T.routeMatcher('/user/:menu/:he').parse(window.location.pathname);
         this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
+        this.he = route.menu == 'bac-sdh' ? 'bac-sdh' : 'phan-he-dao-tao';
+
+        console.log(this.menu);
         T.ready(`/user/${this.menu}`, () => {
             T.onSearch = (searchText) => this.props.getDmHocSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
@@ -114,10 +117,10 @@ class dmHocSdhPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Bậc sau đại học',
+            title: this.menu == 'category' ?'Bậc sau đại học':'Phân hệ đào tạo',
             breadcrumb: [
                 <Link key={0} to={this.menu == 'category' ? '/user/category' : '/user/sau-dai-hoc'}>{this.menu == 'category' ? 'Danh mục' : 'Sau đại học'}</Link>,
-                'Bậc sau đại học'
+                this.menu == 'category' ?'Bậc sau đại học':'Phân hệ đào tạo'
             ],
             content: <>
                 <div className='tile'>{table}</div>

@@ -14,9 +14,10 @@ module.exports = app => {
         parentMenu: app.parentMenu.sdh,
         menus: {
             7527: {
-                title: 'Bậc đào tạo',
-                link: '/user/sau-dai-hoc/bac-sdh',
-                backgroundColor: '#daa520'
+                title: 'Phân hệ đào tạo',
+                link: '/user/sau-dai-hoc/phan-he-dao-tao',
+                backgroundColor: '#daa520',
+                groupIndex: 2
             }
         },
     };
