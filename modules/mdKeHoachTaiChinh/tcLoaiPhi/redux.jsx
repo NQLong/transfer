@@ -145,3 +145,20 @@ export const SelectAdapter_TcLoaiPhi = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
     fetchOne: (id, done) => (getTcLoaiPhi(id, item => done && done({ id: item.id, text: item.ten })))(),
 };
+
+export function apply(data, done, onError) {
+    return () => {
+        const url = '/api/finance/loai-phi/ap-dung';
+        T.post(url, data, (res) => {
+            if (res.error) {
+                T.notify(res.error.message || 'Áp dụng loại phí thất bại', 'danger');
+                console.error('POST: ' + url, res.error);
+                onError && onError();
+            }
+            else {
+                T.notify('Áp dụng loại phí thành công' + (res.sum != null ? ` (${res.sum} sinh viên)` : ''), 'success');
+                done && done();
+            }
+        }, () => T.notify('Áp dụng loại phí thất bại', 'danger'));
+    };
+}

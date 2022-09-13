@@ -484,7 +484,7 @@ export class FormTextBox extends React.Component {
     clear = () => this.input.clear();
 
     render() {
-        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, readOnlyEmptyText = '' } = this.props,
+        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, readOnlyEmptyText = '', disabled = false } = this.props,
             readOnlyText = this.state.value;
         type = type.toLowerCase(); // type = text | number | email | password | phone | year
         if (type == 'number') {
@@ -514,7 +514,7 @@ export class FormTextBox extends React.Component {
             return (
                 <div className={'form-group ' + (className || '')} style={style}>
                     {displayElement}
-                    <input ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} />
+                    <input disabled={disabled} ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} />
                     {smallText ? <small>{smallText}</small> : null}
                 </div>);
         }
