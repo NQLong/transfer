@@ -24,9 +24,9 @@ class EditModal extends AdminModal {
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
-    onSubmit = (e) => { 
+    onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value(),
                 ten: this.ten.value(),
@@ -52,8 +52,8 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật tình trạng đề tài NCKH' : 'Tạo mới tình trạng đề tài NCKH',
             body: <div className='row'>
                 <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã' placeholder='Mã danh mục' maxLength={3} readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' placeholder='Tên' readOnly={readOnly}  />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.stt = e} label='Số thứ tự' placeholder='Số thứ tự' readOnly={readOnly}  />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' placeholder='Tên' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.stt = e} label='Số thứ tự' placeholder='Số thứ tự' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -95,9 +95,9 @@ class DmTinhTrangDeTaiNckhPage extends AdminPage {
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '30%' }}>Tên</th>
                         <th style={{ width: 'auto' }}>STT</th>
-                        <th style={{ width: '70%' }}>Ghi chú</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

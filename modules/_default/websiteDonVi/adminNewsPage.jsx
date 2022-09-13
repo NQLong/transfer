@@ -13,7 +13,7 @@ class NewsPage extends AdminPage {
         T.ready('/user/website', () => {
             const params = T.routeMatcher('/user/news-donvi/:maDonVi').parse(window.location.pathname);
             this.setState({ maDonVi: params.maDonVi }, () => {
-                this.props.getByDonVi('news', params.maDonVi,data => {
+                this.props.getByDonVi('news', params.maDonVi, data => {
                     const categoryPicker = this.props.news && this.props.news.categoryPicker;
                     if (categoryPicker) {
                         data.forEach(item => {
@@ -106,11 +106,11 @@ class NewsPage extends AdminPage {
                     <th style={{ width: '80%' }}>Tiêu đề</th>
                     <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
                     {permission.write && [
-                        <th key={0} style={{ width: 'auto' }} nowrap='true'>Ngày đăng bài</th>,
-                        <th key={1} style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>,
-                        <th key={2} style={{ width: 'auto' }} nowrap='true'>Ghim bài viết</th>,
-                        <th key={3} style={{ width: 'auto' }} nowrap='true'>Tin nội bộ</th>,
-                        <th key={4} style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                        <th key={0} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đăng bài</th>,
+                        <th key={1} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>,
+                        <th key={2} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ghim bài viết</th>,
+                        <th key={3} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tin nội bộ</th>,
+                        <th key={4} style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     ]}
                 </tr>
             ),

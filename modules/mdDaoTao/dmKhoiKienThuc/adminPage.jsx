@@ -89,11 +89,11 @@ class DmKhoiKienThucPage extends AdminPage {
             emptyTable: 'Không có dữ liệu',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Khối cha</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Mã</th>
+                    <th style={{ width: '50%' }}>Tên</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Khối cha</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>

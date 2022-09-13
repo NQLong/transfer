@@ -165,9 +165,9 @@ class DmChuongTrinhDaoTaoPage extends React.Component {
                     <thead>
                         <tr>
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Chương trình đào tạo</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                            <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chương trình đào tạo</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kích hoạt</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>

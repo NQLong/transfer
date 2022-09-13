@@ -278,8 +278,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
             className: 'dataTable',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>
                         <Tooltip title={`Xoá ${this.state.listChosen.length} mục đã chọn`} arrow placement='top'>
                             <button className='btn btn-warning' type='button' style={{ display: this.state.listChosen.length ? '' : 'none', marginBottom: '10px' }} onClick={this.deleleMultiple}>
                                 <i className='fa fa-sm fa-trash' />
@@ -287,27 +287,27 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         </Tooltip>
                         <FormCheckbox ref={e => this.checkAll = e} onChange={value => this.setState({ listChosen: value ? list.map(item => item.id) : [] })} />
                     </th>
-                    <th style={{ width: '25%', textAlign: 'center' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Môn học</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Tự chọn</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Tổng tiết</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Phòng</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }} nowrap='true'>Thứ</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Tiết bắt đầu</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Số tiết</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>SLDK</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Ngành<br />Chuyên ngành</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Ngày bắt đầu</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Ngày kết thúc</th>
-                    <th style={{ width: '25%' }} nowrap='true'>Khoa <br />Bộ môn</th>
+                    <th style={{ width: '25%', textAlign: 'center' }}>Mã</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Môn học</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tự chọn</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng tiết</th>
+                    <th style={{ width: 'auto' }}>Phòng</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thứ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tiết bắt đầu</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết</th>
+                    <th style={{ width: 'auto' }}>SLDK</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành<br />Chuyên ngành</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày bắt đầu</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày kết thúc</th>
+                    <th style={{ width: '25%' }}>Khoa <br />Bộ môn</th>
                     {/* <th style={{ width: 'auto' }} nowrap='true'>Giảng viên</th> */}
                     {/* <th style={{ width: 'auto' }} nowrap='true'>Trợ giảng</th> */}
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Bậc</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Hệ</th>
-                    <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>Khoá SV</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Năm học</th>
-                    <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>Học kỳ</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Bậc</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Hệ</th>
+                    <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Khoá SV</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm học</th>
+                    <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Học kỳ</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
                 let indexOfItem = (pageNumber - 1) * pageSize + index + 1;

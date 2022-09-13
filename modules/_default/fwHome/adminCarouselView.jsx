@@ -96,8 +96,8 @@ class CarouselPage extends React.Component {
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                             <th style={{ width: '100%' }}>Tên</th>
                             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Chiều cao</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Đơn ảnh</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn ảnh</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
                             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                         </tr>
                     </thead>

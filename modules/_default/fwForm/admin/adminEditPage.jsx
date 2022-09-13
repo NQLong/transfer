@@ -298,7 +298,7 @@ class FormEditPage extends React.Component {
                         <th style={{ width: 'auto' }}>STT</th>
                         <th style={{ width: '100%', textAlign: 'center' }}>Câu hỏi</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Loại</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
                         {!readOnly ? <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th> : null}
                     </tr>
                 </thead>
@@ -307,7 +307,7 @@ class FormEditPage extends React.Component {
                         <tr key={index}>
                             <td>{index + 1}</td>
                             <td>{!readOnly ? <a href='#' onClick={e => this.showModal(e, item)}>{item.title}</a> : item.title}</td>
-                            <td nowrap='true'>{AllQuestionTypes[item.typeName]}</td>
+                            <td style={{ whiteSpace: 'nowrap' }}>{AllQuestionTypes[item.typeName]}</td>
                             <td className='toggle' style={{ textAlign: 'center' }}>
                                 <label>
                                     <input type='checkbox' checked={item.active === 1 ? true : false} disabled={readOnly} onChange={() => this.updateQuestion(item.id, { active: item.active === 1 ? 0 : 1 })} /><span className='button-indecator' />

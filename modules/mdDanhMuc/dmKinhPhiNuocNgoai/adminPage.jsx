@@ -25,7 +25,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value().trim(),
                 ten: this.ten.value().trim(),
@@ -94,8 +94,8 @@ class DmKinhPhiNuocNgoaiPage extends AdminPage {
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '40%' }}>Tên</th>
                         <th style={{ width: '60%' }}>Ghi chú</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

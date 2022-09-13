@@ -116,9 +116,9 @@ class DmHoatDongKhcnPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
-                        <th style={{ width: '60%' }} nowrap='true'>Tên danh mục hoạt động KH&CN</th>
-                        <th style={{ width: '40%' }} nowrap='true'>Ghi chú</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Tên danh mục hoạt động KH&CN</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -197,9 +197,9 @@ class DmHoatDongKhcnPage extends AdminPage {
 //                         <tr>
 //                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
 //                             <th style={{ width: 'auto' }}>Mã</th>
-//                             <th style={{ width: '60%' }} nowrap='true'>Tên danh mục hoạt động KH&CN</th>
-//                             <th style={{ width: '40%' }} nowrap='true'>Ghi chú</th>
-//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                             <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Tên danh mục hoạt động KH&CN</th>
+//                             <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Ghi chú</th>
+//                             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
 //                         </tr>
 //                     </thead>
 //                     <tbody>

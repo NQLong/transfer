@@ -136,11 +136,11 @@ class ClusterPage extends AdminPage {
             <tr>
                 <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Id</th>
-                <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Primary</th>
+                <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Version</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Primary</th>
                 {/* <th style={{ width: 'auto' }} nowrap='true'>Image filename</th> */}
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Image date</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Start date</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Image date</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Start date</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Status</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
             </tr>),
@@ -156,9 +156,9 @@ class ClusterPage extends AdminPage {
                 <TableCell type='text' className={item.status == 'running' ? 'text-primary' : 'text-danger'} content={item.status} />
                 <TableCell type='buttons' content={item} style={{ textAlign: 'center' }} permission={permission} onDelete={e => this.deleteCluster(e, serviceName, item)}>
                     {permission.write &&
-                    <a className='btn btn-success' href='#' onClick={e => this.resetCluster(e, serviceName, item)}>
-                        <i className='fa fa-lg fa-refresh' />
-                    </a>}
+                        <a className='btn btn-success' href='#' onClick={e => this.resetCluster(e, serviceName, item)}>
+                            <i className='fa fa-lg fa-refresh' />
+                        </a>}
                 </TableCell>
             </tr>)
     });
@@ -168,9 +168,9 @@ class ClusterPage extends AdminPage {
         renderHead: () => (
             <tr>
                 <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>File</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Created date</th>
+                <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Version</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>File</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Created date</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
             </tr>),
         renderRow: (item, index) => (
@@ -181,9 +181,9 @@ class ClusterPage extends AdminPage {
                 <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={new Date(item.createdDate).getShortText()} />
                 <TableCell type='buttons' content={item} style={{ textAlign: 'center' }} permission={permission} onDelete={e => this.deleteServiceImage(e, serviceName, item)}>
                     {permission.write &&
-                    <a className='btn btn-success' href='#' onClick={e => this.applyServiceImage(e, serviceName, item)}>
-                        <i className='fa fa-lg fa-arrow-up' />
-                    </a>}
+                        <a className='btn btn-success' href='#' onClick={e => this.applyServiceImage(e, serviceName, item)}>
+                            <i className='fa fa-lg fa-arrow-up' />
+                        </a>}
                 </TableCell>
             </tr>)
     });

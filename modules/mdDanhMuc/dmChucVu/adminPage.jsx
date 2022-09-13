@@ -6,20 +6,22 @@ import Pagination from 'view/component/Pagination';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    state = { active: true , listChucVu : [
-       {id : 1, text :  'Chức vụ Chính quyền'},
-       {id : 2, text :  'Chức vụ Hội đồng trường'},
-       {id : 3, text :  'Chức vụ Đảng ủy'},
-       {id : 4, text :  'Chức vụ Công đoàn'},
-       {id : 5, text :  'Chức vụ Hội Cựu Chiến binh'},
-       {id : 6, text :  'Chức vụ Đoàn Thanh niên - Hội Sinh viên'},
+    state = {
+        active: true, listChucVu: [
+            { id: 1, text: 'Chức vụ Chính quyền' },
+            { id: 2, text: 'Chức vụ Hội đồng trường' },
+            { id: 3, text: 'Chức vụ Đảng ủy' },
+            { id: 4, text: 'Chức vụ Công đoàn' },
+            { id: 5, text: 'Chức vụ Hội Cựu Chiến binh' },
+            { id: 6, text: 'Chức vụ Đoàn Thanh niên - Hội Sinh viên' },
 
-    ]};
+        ]
+    };
 
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
-        }));        
+        }));
     }
 
     onShow = (item) => {
@@ -67,8 +69,8 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
                 <FormTextBox type='number' className='col-md-12' ref={e => this.phuCap = e} label='Phụ cấp' readOnly={readOnly} step={0.01} />
-                <FormSelect className='col-md-12' ref={e => this.loaiChucVu = e} label='Loại chức vụ' minimumResultsForSearch={-1} 
-                readOnly={readOnly} data = {this.state.listChucVu} required />
+                <FormSelect className='col-md-12' ref={e => this.loaiChucVu = e} label='Loại chức vụ' minimumResultsForSearch={-1}
+                    readOnly={readOnly} data={this.state.listChucVu} required />
                 <FormCheckbox className='col-md-6' ref={e => this.isCapTruong = e} label='Chức vụ cấp trường' isSwitch={true} readOnly={readOnly} onChange={value => this.isCapTruong.value(value ? 1 : 0)} />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
@@ -125,11 +127,11 @@ class DmChucVuPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '50%' }}>Tên</th>
-                        <th style={{ width: '50%' }}>Loại chức vụ</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Phụ cấp</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Cấp chức vụ</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Loại chức vụ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phụ cấp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp chức vụ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

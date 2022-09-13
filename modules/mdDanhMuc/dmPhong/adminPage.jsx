@@ -98,12 +98,12 @@ class DmPhongPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '20%' }}>Tên phòng</th>
-                        <th style={{ width: '20%' }} nowrap='true'>Tòa nhà</th>
-                        <th style={{ width: '60%' }} nowrap='true'>Ghi chú</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Sức chứa</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Tên phòng</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Tòa nhà</th>
+                        <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Sức chứa</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

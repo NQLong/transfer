@@ -5,10 +5,10 @@ import { AdminPage, renderTable, TableCell, FormSelect, AdminModal } from 'view/
 import { Link } from 'react-router-dom';
 
 const data = [
-    { id: 1, text: 'Học kì 1'},
-    { id: 2, text: 'Học kì 2'},
-    { id: 3, text: 'Học kì 3'},
-    { id: 4, text: 'Học kì 4'}
+    { id: 1, text: 'Học kì 1' },
+    { id: 2, text: 'Học kì 2' },
+    { id: 3, text: 'Học kì 3' },
+    { id: 4, text: 'Học kì 4' }
 ];
 
 class HocKyModal extends AdminModal {
@@ -55,12 +55,12 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                 if (item.hocKy) {
                     if (!chuongTrinhDaoTao[item.hocKy]) {
                         chuongTrinhDaoTao[item.hocKy] = [];
-                    } 
+                    }
                     item.isEdit = false;
                     item.isDelete = false;
                     item.idx = index;
                     chuongTrinhDaoTao[item.hocKy].push(item);
-                } 
+                }
             });
             this.setState({ ma, ctsdh, chuongTrinhDaoTao });
         });
@@ -106,8 +106,8 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                 if (index != -1) ctsdh[index].hocKy = Number(hocKy);
                 this.setState({ chuongTrinhDaoTao, ctsdh });
             });
-        } 
-        
+        }
+
     }
 
     editRow = (e, hocKy, index) => {
@@ -130,7 +130,7 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
             T.notify('Chưa chọn môn học!', 'danger');
             this.this.rows[`selectMh_${hocKy}_${index}`].focus();
         } else {
-            let ctIndex =  this.findCtdtById(newId);
+            let ctIndex = this.findCtdtById(newId);
             if (ctsdh[ctIndex].hocKy) {
                 let hkIndex = chuongTrinhDaoTao[hocKy].findIndex(v => v.id == ctsdh[ctIndex].id);
                 if (hkIndex != -1 && hkIndex == index) {
@@ -138,7 +138,7 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                     this.setState({ chuongTrinhDaoTao });
                 } else T.notify(`Trùng môn học ${ctsdh[ctIndex].maMonHoc}:${ctsdh[ctIndex].tenMonHoc}!`, 'danger');
             } else {
-                this.props.updateSdhChuongTrinhDaoTao(oldItem.id, {hocKy: null}, () => {
+                this.props.updateSdhChuongTrinhDaoTao(oldItem.id, { hocKy: null }, () => {
                     this.props.updateSdhChuongTrinhDaoTao(newId, { hocKy }, (item) => {
                         item.isEdit = false;
                         item.isDelete = false;
@@ -179,15 +179,15 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
             getDataSource: () => list.sort((a, b) => a.id - b.id),
             stickyHead: false,
             header: 'thead-light',
-            emptyTable:'Không có dữ liệu',
+            emptyTable: 'Không có dữ liệu',
             renderHead: () => (
                 <>
                     <tr>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>STT</th>
-                        <th rowSpan='2' style={{ width: '100%', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Môn học</th>
-                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Tự chọn</th>
-                        <th rowSpan='1' colSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Tín chỉ</th>
-                        {isAddMonHoc && !readOnly && <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>}
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>STT</th>
+                        <th rowSpan='2' style={{ width: '100%', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Môn học</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Tự chọn</th>
+                        <th rowSpan='1' colSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Tín chỉ</th>
+                        {isAddMonHoc && !readOnly && <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>}
                     </tr>
                     <tr>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
@@ -198,18 +198,18 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                 return (
                     <React.Fragment key={index}>
                         {item != 'new' && <tr>
-                            <TableCell type='text' style={{ textAlign: 'center' }} content={index+1} />
-                            <TableCell type='text' style={{ fontWeight: 'bold' }} content={isAddMonHoc ? this.selectMh(item, hocKy, index) : item.maMonHoc + ':' + item.tenMonHoc}/>
+                            <TableCell type='text' style={{ textAlign: 'center' }} content={index + 1} />
+                            <TableCell type='text' style={{ fontWeight: 'bold' }} content={isAddMonHoc ? this.selectMh(item, hocKy, index) : item.maMonHoc + ':' + item.tenMonHoc} />
                             <TableCell content={item.loaiMonHoc ? <i className='fa fa-check' aria-hidden='true'></i> : ''} style={{ textAlign: 'center' }} />
-                            <TableCell type='number' style={{ textAlign: 'center',}} content={item.tinChiLyThuyet} />
-                            <TableCell type='number' style={{ textAlign: 'center',}} content={item.tinChiThucHanh} />
+                            <TableCell type='number' style={{ textAlign: 'center', }} content={item.tinChiLyThuyet} />
+                            <TableCell type='number' style={{ textAlign: 'center', }} content={item.tinChiThucHanh} />
                             {isAddMonHoc && <td style={{ textAlign: 'center' }}>
                                 <div className='btn-group'>
                                     {
                                         (!readOnly) ?
                                             <>
-                                                <a className='btn btn-primary' href='#' title={!item.isEdit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => !item.isEdit ?  this.editRow(e, hocKy, index) : this.updateRow(e, hocKy, index)}><i className={'fa fa-lg ' + (!item.isEdit ? 'fa-edit' : 'fa-check')} /></a>
-                                                {!item.isEdit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, item.id, hocKy, index )}><i className='fa fa-lg fa-trash' /></a>}
+                                                <a className='btn btn-primary' href='#' title={!item.isEdit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => !item.isEdit ? this.editRow(e, hocKy, index) : this.updateRow(e, hocKy, index)}><i className={'fa fa-lg ' + (!item.isEdit ? 'fa-edit' : 'fa-check')} /></a>
+                                                {!item.isEdit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, item.id, hocKy, index)}><i className='fa fa-lg fa-trash' /></a>}
                                             </> : ''
                                     }
                                 </div>
@@ -218,10 +218,10 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                         {isAddMonHoc && index == list.length - 1 &&
                             <tr>
                                 <TableCell type='text' style={{ textAlign: 'center' }} content={''} />
-                                <TableCell type='text' style={{ fontWeight: 'bold' }} content={this.selectMh(null, hocKy)}/>
+                                <TableCell type='text' style={{ fontWeight: 'bold' }} content={this.selectMh(null, hocKy)} />
                                 <TableCell content={''} style={{ textAlign: 'center' }} />
-                                <TableCell type='number' style={{ textAlign: 'center',}} content={0} />
-                                <TableCell type='number' style={{ textAlign: 'center',}} content={0} />
+                                <TableCell type='number' style={{ textAlign: 'center', }} content={0} />
+                                <TableCell type='number' style={{ textAlign: 'center', }} content={0} />
                                 <td style={{ textAlign: 'center' }}>
                                     <div className='btn-group'>
                                         {

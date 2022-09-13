@@ -25,7 +25,7 @@ class EditModal extends AdminModal {
 
   onSubmit = (e) => {
     e.preventDefault();
-    const 
+    const
       changes = {
         ma: this.ma.value().trim().toUpperCase(),
         tenTaiKhoan: this.tenTaiKhoan.value().trim(),
@@ -48,9 +48,9 @@ class EditModal extends AdminModal {
     return (this.renderModal({
       title: this.state.ma ? 'Cập nhật tài khoản kế toán' : 'Tạo mới tài khoản kế toán',
       body: <div className='row'>
-          <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã tài khoản' placeholder='Mã tài khoản' readOnly={this.state.ma ? true : readOnly} required />
-          <FormTextBox type='text' className='col-md-12' ref={e => this.tenTaiKhoan = e} label='Tên tài khoản' readOnly={readOnly} required />
-          <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+        <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã tài khoản' placeholder='Mã tài khoản' readOnly={this.state.ma ? true : readOnly} required />
+        <FormTextBox type='text' className='col-md-12' ref={e => this.tenTaiKhoan = e} label='Tên tài khoản' readOnly={readOnly} required />
+        <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
       </div>
     }));
   }
@@ -64,7 +64,7 @@ class DmTaiKhoankeToanPage extends AdminPage {
       T.onSearch = (searchText) => this.props.getDmTaiKhoanKeToanPage(undefined, undefined, searchText || '');
       T.showSearchBox();
       this.props.getDmTaiKhoanKeToanPage();
-  });
+    });
   }
 
   showModal = (e) => {
@@ -88,21 +88,21 @@ class DmTaiKhoankeToanPage extends AdminPage {
       table = renderTable({
         getDataSource: () => this.props.dmTaiKhoanKeToan.page.list, stickyHead: false,
         renderHead: () => (
-            <tr>
-              <th style={{ width: 'auto' }}>Mã</th>
-              <th style={{ width: '40%' }} nowrap='true'>Tên tài khoản</th>
-              <th style={{ width: '10%', textAlign: 'center' }}>Kích hoạt</th>
-              <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-            </tr>),
+          <tr>
+            <th style={{ width: 'auto' }}>Mã</th>
+            <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên tài khoản</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kích hoạt</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
+          </tr>),
         renderRow: (item, index) => (
-            <tr key={index}>
-                <TableCell type='link' content={item.ma ? item.ma : ''} />
-                <TableCell type='text' content={item.tenTaiKhoan} onClick={() => this.modal.show(item)} />
-                <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                    onChanged={value => this.props.updateDmTaiKhoanKeToan(item.ma, { kichHoat: value ? 1 : 0, })} />
-                <TableCell type='buttons' content={item} permission={permission}
-                    onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-            </tr>)
+          <tr key={index}>
+            <TableCell type='link' content={item.ma ? item.ma : ''} />
+            <TableCell type='text' content={item.tenTaiKhoan} onClick={() => this.modal.show(item)} />
+            <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+              onChanged={value => this.props.updateDmTaiKhoanKeToan(item.ma, { kichHoat: value ? 1 : 0, })} />
+            <TableCell type='buttons' content={item} permission={permission}
+              onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+          </tr>)
       });
     }
 
@@ -110,19 +110,19 @@ class DmTaiKhoankeToanPage extends AdminPage {
       icon: 'fa fa-list-alt',
       title: 'Danh mục Tài Khoản Kế Toán',
       breadcrumb: [
-          <Link key={0} to='/user/category'>Danh mục</Link>,
-          'Danh mục Tài Khoản Kế Toán'
+        <Link key={0} to='/user/category'>Danh mục</Link>,
+        'Danh mục Tài Khoản Kế Toán'
       ],
       content: <>
-          <div className='tile'>{table}</div>
-          <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem }} getPage={this.props.getDmTaiKhoanKeToanPage} />
-          <EditModal ref={e => this.modal = e} permission={permission}
-              create={this.props.createDmTaiKhoanKeToan} update={this.props.updateDmTaiKhoanKeToan} permissions={currentPermissions} />
+        <div className='tile'>{table}</div>
+        <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem }} getPage={this.props.getDmTaiKhoanKeToanPage} />
+        <EditModal ref={e => this.modal = e} permission={permission}
+          create={this.props.createDmTaiKhoanKeToan} update={this.props.updateDmTaiKhoanKeToan} permissions={currentPermissions} />
       </>,
       backRoute: '/user/category',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
       onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/tai-khoan-ke-toan/upload') : null
-  });
+    });
   }
 }
 
