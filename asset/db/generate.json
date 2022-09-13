@@ -14570,6 +14570,9 @@
             "active": true,
             "moduleName": "tcHocPhiDetail",
             "modelName": "tcHocPhiDetail",
+            "methods": {
+                "TC_HOC_PHI_DETAIL_BULK_CREATE": "bulkCreate"
+            },
             "columns": {
                 "MSSV": {
                     "value": "mssv",

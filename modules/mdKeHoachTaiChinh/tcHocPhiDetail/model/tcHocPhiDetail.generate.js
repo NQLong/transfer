@@ -215,5 +215,18 @@ module.exports = app => {
                 }
             });
         }),
+
+        bulkCreate: (config, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_detail_bulk_create(:config); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, config }, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                });
+        }),
     };
 };
