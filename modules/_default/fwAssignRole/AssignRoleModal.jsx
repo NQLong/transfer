@@ -76,7 +76,7 @@ class AssignRoleModal extends AdminModal {
                     <th style={{ width: '35%' }}>Quyền</th>
                     <th style={{ width: '35%' }}>Ngày kết thúc</th>
                     <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Người gán</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ), renderRow: (item, index) => {
                 const tenRole = rolesList.find(role => role.id == item.tenRole);

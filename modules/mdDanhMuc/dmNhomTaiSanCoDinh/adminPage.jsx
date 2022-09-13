@@ -148,11 +148,11 @@ class DmNhomTaiSanCoDinhPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }}>Tên nhóm tài sản</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Ngày lập biên bản</th>
-                        <th style={{ width: '100%' }} nowrap='true'>In</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '40%' }}>Tên nhóm tài sản</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Ngày lập biên bản</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>In</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -242,11 +242,11 @@ export default connect(mapStateToProps, mapActionsToProps)(DmNhomTaiSanCoDinhPag
 //                 <table className='table table-hover table-bordered'>
 //                     <thead>
 //                         <tr>
-//                             <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-//                             <th style={{ width: '100%' }}>Tên nhóm tài sản</th>
-//                             <th style={{ width: '100%' }} nowrap='true'>Ngày lập biên bản</th>
-//                             <th style={{ width: '100%' }} nowrap='true'>In</th>
-//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                             <th style={{ width: 'auto' }}>Mã</th>
+//                             <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Tên nhóm tài sản</th>
+//                             <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Ngày lập biên bản</th>
+//                             <th style={{ width: '20%' }}>In</th>
+//                             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
 //                         </tr>
 //                     </thead>
 //                     <tbody>

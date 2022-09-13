@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmDienChinhSachAll, createDmDienChinhSach, updateDmDienChinhSach, deleteDmDienChinhSach, getDmDienChinhSachPage} from './redux';
+import { getDmDienChinhSachAll, createDmDienChinhSach, updateDmDienChinhSach, deleteDmDienChinhSach, getDmDienChinhSachPage } from './redux';
 import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     state = { active: false }
@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: 1 };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
@@ -53,11 +53,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật diện chính sách' : 'Tạo mới diện chính sách',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã chính sách' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã chính sách'
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên chính sách' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên chính sách'
                     readOnly={readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -92,10 +92,10 @@ class DmDienChinhSachPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('dmDienChinhSach', ['read', 'write', 'delete']);
-        
+
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmDienChinhSach && this.props.dmDienChinhSach.page ?
             this.props.dmDienChinhSach.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-    
+
         let table = 'Không có dữ liệu!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -103,10 +103,10 @@ class DmDienChinhSachPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -133,9 +133,9 @@ class DmDienChinhSachPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmDienChinhSachPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} 
+                <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmDienChinhSach} update={this.props.updateDmDienChinhSach} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',

@@ -173,8 +173,8 @@ class UploadDmDonVi extends React.Component {
                                     <td style={{ width: '50%' }}>Tên tiếng Anh</td>
                                     <td style={{ width: 'auto' }}>Tên viết tắt</td>
                                     <td style={{ width: 'auto' }}>QĐ thành lập</td>
-                                    <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-                                    <td style={{ width: 'auto' }} nowrap='true'>QĐ xóa tên</td>
+                                    <td style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</td>
+                                    <td style={{ width: 'auto', whiteSpace: 'nowrap' }}>QĐ xóa tên</td>
                                     <td style={{ width: 'auto' }}>Mã PL</td>
                                     <td style={{ width: 'auto' }}>Ghi chú</td>
                                     <td style={{ width: 'auto' }}>Mã thẻ cán bộ (3 chữ số đầu)</td>

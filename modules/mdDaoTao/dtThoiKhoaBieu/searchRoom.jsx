@@ -97,21 +97,22 @@ class SearchRoom extends AdminPage {
                         <TableCell style={{ textAlign: 'right', whiteSpace: 'nowrap' }} content={item.ten} />
                         <TableCell style={{ textAlign: 'right', }} content={item.tenToaNha} />
                         <TableCell style={{ textAlign: 'right' }} content={item.sucChua} />
-                        {this.state.listTietHoc.map(tiet => {
+                        {this.state.listTietHoc.map((tiet, tietIndex) => {
                             if (item[tiet]) {
                                 if (this.state.loaiHinh) {
-                                    if (item[tiet].loaiHinhDaoTao == this.state.loaiHinh)
-                                        return <TableCell style={{ textAlign: 'center', backgroundColor: 'lightcyan', cursor: 'pointer' }} colSpan={item[tiet].soTietBuoi} content={item[tiet].maMonHoc + ' - ' + item[tiet].nhom} onClick={() => { this.modal.show(item[tiet]); }} />;
-                                    if (item[tiet].loaiHinhDaoTao != this.state.loaiHinh)
-                                        return <TableCell style={{ textAlign: 'center', backgroundColor: 'lightgray', cursor: 'pointer' }} colSpan={item[tiet].soTietBuoi} content={''} />;
+                                    if (item[tiet].loaiHinhDaoTao == this.state.loaiHinh) {
+                                        return <TableCell key={tietIndex} style={{ textAlign: 'center', backgroundColor: 'lightcyan', cursor: 'pointer' }} colSpan={item[tiet].soTietBuoi} content={item[tiet].maMonHoc + ' - ' + item[tiet].nhom} onClick={() => { this.modal.show(item[tiet]); }} />;
+                                    } else if (item[tiet].loaiHinhDaoTao != this.state.loaiHinh) {
+                                        return <TableCell key={tietIndex} style={{ textAlign: 'center', backgroundColor: 'lightgray', cursor: 'pointer' }} colSpan={item[tiet].soTietBuoi} content={''} />;
+                                    }
+                                } else {
+                                    return <TableCell key={tietIndex} style={{ textAlign: 'center', backgroundColor: 'lightcyan', cursor: 'pointer' }} colSpan={item[tiet].soTietBuoi} content={item[tiet].maMonHoc + ' - ' + item[tiet].nhom} onClick={() => { this.modal.show(item[tiet]); }} />;
                                 }
-                                else {
-                                    return <TableCell style={{ textAlign: 'center', backgroundColor: 'lightcyan', cursor: 'pointer' }} colSpan={item[tiet].soTietBuoi} content={item[tiet].maMonHoc + ' - ' + item[tiet].nhom} onClick={() => { this.modal.show(item[tiet]); }} />;
-                                }
+                            } else if (item.available.indexOf(tiet) != -1) {
+                                return <TableCell key={tietIndex} style={{ textAlign: 'center' }} colSpan={1} content={''} />;
+                            } else {
+                                return null;
                             }
-                            else if (item.available.indexOf(tiet) != -1)
-                                return <TableCell style={{ textAlign: 'center' }} colSpan={1} content={''} />;
-                            else return null;
                         })};
                     </tr>
                 );

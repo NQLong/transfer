@@ -134,19 +134,19 @@ class DmDonViPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '50%' }}>Tên đơn vị</th>
                         <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã PL</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã PL</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} />
                         <TableCell type='link' content={item.ten ? item.ten : ''} onClick={() => this.modal.show(item)} />
-                        <TableCell type='link' content={item.tenTiengAnh ? item.tenTiengAnh : ''} onClick={() => this.modal.show(item)}  />
+                        <TableCell type='link' content={item.tenTiengAnh ? item.tenTiengAnh : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiDonVi ? item.tenLoaiDonVi.normalizedName() : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />

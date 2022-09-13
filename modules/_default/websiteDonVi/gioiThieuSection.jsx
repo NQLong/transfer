@@ -29,7 +29,7 @@ class GioiThieuSection extends React.Component {
             content_list.push(
                 <div key={index} className={index == 0 ? 'tab-pane fade in active show' : 'tab-pane fade'} id={index} role='tabpanel'>
                     <div dangerouslySetInnerHTML={{ __html: T.language.parse(item.noiDung) }} className='row' />
-                    <div div className='row mt-auto' >
+                    <div className='row mt-auto'>
                         <div className='col'>
                             <div id='ProjeCarousel' className='carousel slide' data-ride='carousel'>
                                 <div className='carousel-inner d-flex justify-content-center'>

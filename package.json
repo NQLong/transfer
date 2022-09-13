@@ -22,24 +22,28 @@
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7020",
+            "isHttps": false,
             "isDebug": false
         },
         "registerService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7018",
+            "isHttps": false,
             "isDebug": false
         },
         "emailService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7016",
+            "isHttps": false,
             "isDebug": false
         },
         "bankService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7014",
+            "isHttps": true,
             "isDebug": true
         }
     },

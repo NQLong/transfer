@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDmLoaiTaiSanCoDinhPage, createDmLoaiTaiSanCoDinh, updateDmLoaiTaiSanCoDinh, deleteDmLoaiTaiSanCoDinh } from './redux';
-import { getDmDonViTinhAll} from 'modules/mdDanhMuc/dmDonViTinh/redux';
+import { getDmDonViTinhAll } from 'modules/mdDanhMuc/dmDonViTinh/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
@@ -14,13 +14,11 @@ class EditModal extends AdminModal {
 			!this.ma.value() ? this.ma.focus() : this.ten.focus();
 		}));
 		this.props.getDataSelect(items => {
-            if (items) {
-                this.donViTable = [];
-                items.forEach(item => this.donViTable.push({'id': item.ma, 'text': item.ten}));
-            }
-			
-        });
-		
+			if (items) {
+				this.donViTable = [];
+				items.forEach(item => this.donViTable.push({ 'id': item.ma, 'text': item.ten }));
+			}
+		});
 	}
 
 	onShow = (item) => {
@@ -67,7 +65,7 @@ class EditModal extends AdminModal {
 			body: <div className='row'>
 				<FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ma = e} label='Mã loại tài sản cố định' readOnly={this.state.ma ? true : readOnly} placeholder='Mã loại tài sản cố định' required />
 				<FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
-				<FormSelect className='col-12 col-md-6' ref={e => this.donViTinh = e} label='Đơn vị tính' data={this.donViTable}/>
+				<FormSelect className='col-12 col-md-6' ref={e => this.donViTinh = e} label='Đơn vị tính' data={this.donViTable} />
 				<FormTextBox type='text' className='col-12 col-md-6' ref={e => this.maNhom = e} label='Mã nhóm' readOnly={readOnly} placeholder='Mã nhóm' />
 				<FormTextBox type='text' className='col-12 col-md-6' ref={e => this.maTaiKhoan = e} label='Mã tài khoản' readOnly={readOnly} placeholder='Mã tài khoản' />
 				<FormTextBox type='text' className='col-12 col-md-6' ref={e => this.maHieu = e} label='Mã hiệu' readOnly={readOnly} placeholder='Mã hiệu' />
@@ -84,11 +82,11 @@ class dmLoaiTaiSanCoDinhPage extends AdminPage {
 
 	componentDidMount() {
 		this.props.getDmDonViTinhAll(items => {
-            if (items) {
-                this.donViTinhMapper = {};
-                items.forEach(item => this.donViTinhMapper[item.ma] = item.ten);
-            }
-        });
+			if (items) {
+				this.donViTinhMapper = {};
+				items.forEach(item => this.donViTinhMapper[item.ma] = item.ten);
+			}
+		});
 		T.ready('/user/category', () => {
 			T.onSearch = (searchText) => this.props.getDmLoaiTaiSanCoDinhPage(undefined, undefined, searchText || '');
 			T.showSearchBox();
@@ -125,10 +123,10 @@ class dmLoaiTaiSanCoDinhPage extends AdminPage {
 						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Mã </th>
 						<th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}> Tên </th>
 						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Đơn vị tính </th>
-						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>	Mã tài khoản </th>
-						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>	Mã nhóm	</th>
+						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mã tài khoản </th>
+						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mã nhóm</th>
 						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Mã hiệu </th>
-						<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'> Thao tác </th>
+						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Thao tác </th>
 					</tr>),
 				renderRow: (item, index) => (
 					<tr key={index}>
@@ -139,7 +137,7 @@ class dmLoaiTaiSanCoDinhPage extends AdminPage {
 						<TableCell type='text' content={item.maTaiKhoan ? item.maTaiKhoan : ''} />
 						<TableCell type='text' content={item.maNhom ? item.maNhom : ''} />
 						<TableCell type='text' content={item.maHieu ? item.maHieu : ''} />
-						<TableCell type='buttons' content={item} permission={permission} 
+						<TableCell type='buttons' content={item} permission={permission}
 							onEdit={() => this.modal.show(item)} onDelete={this.delete} />
 					</tr>
 				),

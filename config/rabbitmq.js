@@ -6,7 +6,7 @@ module.exports = (app, appConfig) => {
 
     const amqp = require('amqplib');
     amqp.connect(`amqp://${appConfig.rabbitMQ.ip}`).then(connection => {
-        console.log(` - #${process.pid}: The Amqp connection ${appConfig.rabbitMQ.ip} succeeded.`);
+        console.log(` - #${process.pid}: The Amqp connection succeeded.`);
         app.messageQueue.connection = connection;
         return connection.createChannel();
     }).then(channel => {

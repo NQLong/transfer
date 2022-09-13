@@ -13,7 +13,7 @@ class EditModal extends AdminModal {
     }
     onShow = (item) => {
         let { maCode, tenQuocGia, country, shortenName, codeAlpha, maKhuVuc, tenKhac, } = item ? item : { maCode: '', tenQuocGia: '', country: '', shortenName: '', codeAlpha: '', maKhuVuc: '', tenKhac: '', maCu: '' };
-        this.setState({maCode, item});
+        this.setState({ maCode, item });
         this.maCode.value(maCode);
         this.tenQuocGia.value(tenQuocGia);
         this.country.value(country);
@@ -55,22 +55,22 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.maCode ? 'Cập nhật quốc gia' : 'Tạo mới quốc gia',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-12 col-sm-4' maxLength={2} ref={e => this.maCode = e} label='Mã quốc gia' 
+                <FormTextBox type='text' className='col-12 col-sm-4' maxLength={2} ref={e => this.maCode = e} label='Mã quốc gia'
                     readOnly={this.state.maCode ? true : readOnly} required />
-                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.tenQuocGia = e} label='Tên quốc gia' 
+                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.tenQuocGia = e} label='Tên quốc gia'
                     readOnly={readOnly} required />
-                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.country = e} label='Quốc gia' 
+                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.country = e} label='Quốc gia'
                     readOnly={readOnly} required />
 
-                <FormTextBox type='text' className='col-12 col-sm-4' maxLength={2} ref={e => this.shortenName = e} label='Tên viết tắt' 
+                <FormTextBox type='text' className='col-12 col-sm-4' maxLength={2} ref={e => this.shortenName = e} label='Tên viết tắt'
                     readOnly={readOnly} />
-                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.codeAlpha = e} label='Code Alpha' 
-                    readOnly={readOnly}  />
-                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.maKhuVuc = e} label='Mã khu vực' 
-                    readOnly={readOnly}  />
+                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.codeAlpha = e} label='Code Alpha'
+                    readOnly={readOnly} />
+                <FormTextBox type='text' className='col-12 col-sm-4' ref={e => this.maKhuVuc = e} label='Mã khu vực'
+                    readOnly={readOnly} />
                 <div className='col-md-12'>
-                    <FormTextBox type='text' ref={e => this.tenKhac = e} label='Tên khác' 
-                        readOnly={readOnly}  />
+                    <FormTextBox type='text' ref={e => this.tenKhac = e} label='Tên khác'
+                        readOnly={readOnly} />
                     <small className='form-text text-muted'>Có thể có nhiều tên. Mỗi tên cách nhau bằng dấu phẩy (,).</small>
                 </div>
             </div>
@@ -112,12 +112,12 @@ class DmQuocGiaPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
-                        <th style={{ width: '40%' }} nowrap='true'>Tên quốc gia</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
-                        <th style={{ width: '60%' }}>Tên khác</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Tên quốc gia</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Code alpha</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên viết tắt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã khu vực</th>
+                        <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Tên khác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -125,7 +125,7 @@ class DmQuocGiaPage extends AdminPage {
                         <TableCell type='text' content={item.maCode ? item.maCode : ''} />
                         <TableCell type='link' content={<b>{item.tenQuocGia} {item.country ? `(${item.country})` : ''}</b>}
                             onClick={() => this.modal.show(item)} />
-                            <TableCell type='number' content={item.codeAlpha ? item.codeAlpha : ''} />
+                        <TableCell type='number' content={item.codeAlpha ? item.codeAlpha : ''} />
                         <TableCell type='text' content={item.shortenName ? item.shortenName : ''} />
                         <TableCell type='text' content={item.maKhuVuc ? item.maKhuVuc : ''} />
                         <TableCell type='text' content={item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''} />
@@ -144,9 +144,9 @@ class DmQuocGiaPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmQuocGiaPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect = {this.props.getDmDonViAll}
+                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect={this.props.getDmDonViAll}
                     create={this.props.createDmQuocGia} update={this.props.updateDmQuocGia} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',

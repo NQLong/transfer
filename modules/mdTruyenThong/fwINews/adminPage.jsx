@@ -34,7 +34,7 @@ class adminINews extends React.Component {
 						<tr>
 							<th style={{ width: 'auto', textAlign: 'center' }}>#</th>
 							<th style={{ width: '100%' }}>Tiêu đề</th>
-							<th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} nowrap='true'>Thao tác</th>
+							<th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
 						</tr>
 					</thead>
 					<tbody>

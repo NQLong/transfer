@@ -169,7 +169,7 @@ module.exports = (app, appConfig) => {
     app.service = {
         url: (url, serviceConfig) => {
             if (!app.isDebug) {
-                return `http://${serviceConfig.host}:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
+                return `${serviceConfig.isHttps ? 'https' : 'http'}://${serviceConfig.host}:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
             } else if (serviceConfig.isDebug) {
                 return `http://localhost:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
             } else {
@@ -181,6 +181,7 @@ module.exports = (app, appConfig) => {
             const serviceConfig = appConfig.services[serviceName],
                 url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
                 response = await app.service.get(url);
+            console.log('clusterGetAll:', url, response);
             done && done(response);
             return response;
         },

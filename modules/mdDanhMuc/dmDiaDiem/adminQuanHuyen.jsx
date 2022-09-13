@@ -11,25 +11,25 @@ class EditModal extends AdminModal {
 
 	componentDidMount() {
 		$(document).ready(() => this.onShown(() => {
-            !this.maQuanHuyen.value() ? this.maQuanHuyen.focus() : this.tenQuanHuyen.focus();
-        }));
+			!this.maQuanHuyen.value() ? this.maQuanHuyen.focus() : this.tenQuanHuyen.focus();
+		}));
 	}
 
 	onShow = (item) => {
 		let { maQuanHuyen, maTinhThanhPho, tenQuanHuyen, kichHoat } = item ?
 			item : { maQuanHuyen: '', maTinhThanhPho: '', tenQuanHuyen: '', kichHoat: 1 };
-        this.setState({ kichHoat});
-        this.maQuanHuyen.value(maQuanHuyen);
-        this.tenQuanHuyen.value(tenQuanHuyen);
-        this.maTinhThanhPho.value(maTinhThanhPho);
-        this.kichHoat.value(kichHoat ? 1 : 0);
+		this.setState({ kichHoat });
+		this.maQuanHuyen.value(maQuanHuyen);
+		this.tenQuanHuyen.value(tenQuanHuyen);
+		this.maTinhThanhPho.value(maTinhThanhPho);
+		this.kichHoat.value(kichHoat ? 1 : 0);
 	};
 
 	changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
 	onSubmit = (e) => {
 		e.preventDefault();
-		const 
+		const
 			changes = {
 				maQuanHuyen: this.maQuanHuyen.value(),
 				maTinhThanhPho: this.maTinhThanhPho.value(),
@@ -51,12 +51,12 @@ class EditModal extends AdminModal {
 		const readOnly = this.props.readOnly;
 		return this.renderModal({
 			title: this.state.ma ? 'Cập nhật Quận Huyện' : 'Tạo mới Quận Huyện',
-            body: <div className='row'>
-                <FormTextBox className='col-md-12' ref={e => this.maQuanHuyen = e} label='Mã quận/huyện' placeholder='Mã quận huyện' maxLength={3} readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.tenQuanHuyen = e} label='Tên quận/huyện' placeholder='Tên quận huyện' readOnly={readOnly} required />
-                <FormSelect className='col-md-12' label='Tên tỉnh thành' ref={e => this.maTinhThanhPho = e} data={this.props.tinhOptions} required /> 
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-            </div>
+			body: <div className='row'>
+				<FormTextBox className='col-md-12' ref={e => this.maQuanHuyen = e} label='Mã quận/huyện' placeholder='Mã quận huyện' maxLength={3} readOnly={this.state.ma ? true : readOnly} required />
+				<FormTextBox type='text' className='col-md-12' ref={e => this.tenQuanHuyen = e} label='Tên quận/huyện' placeholder='Tên quận huyện' readOnly={readOnly} required />
+				<FormSelect className='col-md-12' label='Tên tỉnh thành' ref={e => this.maTinhThanhPho = e} data={this.props.tinhOptions} required />
+				<FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+			</div>
 		});
 	}
 }
@@ -79,10 +79,10 @@ class DmQuanHuyenPage extends AdminPage {
 		});
 
 		T.ready('/user/category', () => {
-            T.onSearch = (searchText) => this.props.getDmQuanHuyenPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getDmQuanHuyenPage();
-        });
+			T.onSearch = (searchText) => this.props.getDmQuanHuyenPage(undefined, undefined, searchText || '');
+			T.showSearchBox();
+			this.props.getDmQuanHuyenPage();
+		});
 	}
 
 	showModal = (e) => {
@@ -107,42 +107,42 @@ class DmQuanHuyenPage extends AdminPage {
 				getDataSource: () => list, stickyHead: false,
 				renderHead: () => (
 					<tr>
-							<th style={{ width: 'auto' }}>Mã</th>
-							<th style={{ width: '50%' }}>Tên quận/huyện</th>
-							<th style={{ width: '50%' }} nowrap='true'>Tỉnh/thành phố</th>
-							<th style={{ width: 'auto' }} nowrap='true' >Kích hoạt</th>
-							<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+						<th style={{ width: 'auto' }}>Mã</th>
+						<th style={{ width: '50%' }}>Tên quận/huyện</th>
+						<th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tỉnh/thành phố</th>
+						<th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+						<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
 					</tr>
 				),
 				renderRow: (item, index) => (
-                    <tr key={index}>
+					<tr key={index}>
 						<TableCell type='text' content={item.maQuanHuyen} />
-                        <TableCell type='link' content={item.tenQuanHuyen} onClick={() => this.modal.show(item)} />
-                        <TableCell type='text' content={this.tinhMapper[item.maTinhThanhPho] ? this.tinhMapper[item.maTinhThanhPho] : ''} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDmChucVu(item.ma, { kichHoat: value ? 1 : 0, })} />
-                        <TableCell type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-                    </tr>)
+						<TableCell type='link' content={item.tenQuanHuyen} onClick={() => this.modal.show(item)} />
+						<TableCell type='text' content={this.tinhMapper[item.maTinhThanhPho] ? this.tinhMapper[item.maTinhThanhPho] : ''} />
+						<TableCell type='checkbox' content={item.kichHoat} permission={permission}
+							onChanged={value => this.props.updateDmChucVu(item.ma, { kichHoat: value ? 1 : 0, })} />
+						<TableCell type='buttons' content={item} permission={permission}
+							onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+					</tr>)
 			});
 		}
 		return this.renderPage({
-            icon: 'fa fa-list-alt',
-            title: 'Danh mục Quận Huyện',
-            breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục Quận Huyện'
-            ],
-            content: <>
-                <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmQuanHuyenPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createDmQuanHuyen} update={this.props.updateDmQuanHuyen} permissions={currentPermissions} />
-            </>,
-            backRoute: '/user/category',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/quan-huyen/upload') : null
-        });
+			icon: 'fa fa-list-alt',
+			title: 'Danh mục Quận Huyện',
+			breadcrumb: [
+				<Link key={0} to='/user/category'>Danh mục</Link>,
+				'Danh mục Quận Huyện'
+			],
+			content: <>
+				<div className='tile'>{table}</div>
+				<Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmQuanHuyenPage} />
+				<EditModal ref={e => this.modal = e} permission={permission}
+					create={this.props.createDmQuanHuyen} update={this.props.updateDmQuanHuyen} permissions={currentPermissions} />
+			</>,
+			backRoute: '/user/category',
+			onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+			onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/quan-huyen/upload') : null
+		});
 	}
 }
 
