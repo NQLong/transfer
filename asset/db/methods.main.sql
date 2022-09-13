@@ -3706,34 +3706,6 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_GET_ALL_STAFF(
-    congVanId IN NUMBER
-)   RETURN SYS_REFCURSOR
-AS
-    CVD_INFO SYS_REFCURSOR;
-    canBoNhan STRING(200);
-BEGIN
-    SELECT hcth.CAN_BO_NHAN into canBoNhan FROM HCTH_CONG_VAN_DI hcth WHERE hcth.ID = congVanId;
-    OPEN CVD_INFO FOR
-        SELECT UNIQUE cb.email as "email"
-        FROM TCHC_CAN_BO cb
-            LEFT JOIN QT_CHUC_VU qtcv ON qtcv.SHCC = cb.SHCC AND qtcv.CHUC_VU_CHINH = 1
-        WHERE cb.SHCC IN (
-            SELECT regexp_substr(canBoNhan, '[^,]+', 1, level)
-            FROM dual
-            CONNECT BY regexp_substr(canBoNhan, '[^,]+', 1, level) IS NOT NULL
-        ) OR (qtcv.MA_CHUC_VU IN ('003', '005', '007', '009', '011', '013') AND qtcv.MA_DON_VI IN (
-            SELECT dvn.DON_VI_NHAN
-            FROM HCTH_DON_VI_NHAN dvn
-            WHERE dvn.LOAI = 'DI'
-            AND dvn.MA = congVanId)
-            );
-    RETURN CVD_INFO;
-END;
-
-/
---EndMethod--
-
 CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_GET_HCTH_STAFF
 RETURN SYS_REFCURSOR
 AS
@@ -3747,6 +3719,40 @@ BEGIN
             OR (qtcv.MA_CHUC_VU = '003' AND qtcv.MA_DON_VI = '29');
     RETURN CVD_INFO;
 end;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DI_GET_MANAGE_STAFF(
+--     congVanId IN NUMBER,
+-- lay ra email cua truong don vi hoac cua chuyen vien quan ly cong van di
+    donVi IN NUMBER,
+    nguoiTao IN STRING,
+    role IN STRING
+) RETURN SYS_REFCURSOR
+AS
+    CVD_INFO SYS_REFCURSOR;
+BEGIN
+    OPEN CVD_INFO FOR
+        SELECT UNIQUE cb.email as "email"
+        FROM TCHC_CAN_BO cb
+                 LEFT JOIN QT_CHUC_VU qtcv
+                           ON qtcv.SHCC = cb.SHCC AND qtcv.CHUC_VU_CHINH = 1 AND qtcv.MA_DON_VI = donVi AND
+                              qtcv.THOI_CHUC_VU = 0
+        WHERE qtcv.MA_DON_VI = donVi
+          AND cb.SHCC != nguoiTao
+          AND (
+                (qtcv.MA_CHUC_VU IN ('003', '005', '007', '009', '011', '013')
+                    )
+                OR (
+                        cb.SHCC IN (
+                        SELECT UNIQUE fw.NGUOI_DUOC_GAN
+                        FROM FW_ASSIGN_ROLE fw
+                        WHERE fw.TEN_ROLE = role
+                    )
+                    ));
+    RETURN CVD_INFO;
+END;
 
 /
 --EndMethod--
@@ -17269,17 +17275,20 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE function TC_HOC_PHI_DETAIL_BULK_CREATE(config in string) return BOOLEAN
+CREATE OR REPLACE function TC_HOC_PHI_DETAIL_BULK_CREATE(config in string) return NUMBER
 AS
     namHoc       NUMBER(5);
     loaiDaoTao   NVARCHAR2(10);
+    bacDaoTao    NVARCHAR2(10);
     hocKy        NUMBER(2);
     namTuyenSinh NUMBER(5);
     loaiPhi      NUMBER(20);
     ngayTao      NUMBER(20);
     soTien       NUMBER(20);
     counter      NUMBER(20);
+    res          NUMBER(20);
 BEGIN
+    --     set transaction isolation level SERIALIZABLE name 'TC_HOC_PHI_DETAIL_BULK_CREATE_TRANSACTION';
     SELECT JSON_VALUE(config, '$.namHoc') INTO namHoc FROM DUAL;
     SELECT JSON_VALUE(config, '$.loaiDaoTao') INTO loaiDaoTao FROM DUAL;
     SELECT JSON_VALUE(config, '$.hocKy') INTO hocKy FROM DUAL;
@@ -17287,31 +17296,51 @@ BEGIN
     SELECT JSON_VALUE(config, '$.loaiPhi') INTO loaiPhi FROM DUAL;
     SELECT JSON_VALUE(config, '$.ngayTao') INTO ngayTao FROM DUAL;
     SELECT JSON_VALUE(config, '$.soTien') INTO soTien FROM DUAL;
-    set transaction isolation level SERIALIZABLE name 'TC_HOC_PHI_DETAIL_BULK_CREATE_TRANSACTION';
+    SELECT JSON_VALUE(config, '$.bacDaoTao') INTO bacDaoTao FROM DUAL;
+    SELECT count(*)
+    into res
+    from FW_STUDENT fs
+    where fs.LOAI_HINH_DAO_TAO = loaiDaoTao
+      and fs.NAM_TUYEN_SINH = namTuyenSinh
+      and fs.BAC_DAO_TAO = bacDaoTao;
     FOR record IN ( SELECT fs.MSSV as "mssv"
                     from FW_STUDENT fs
                     where fs.LOAI_HINH_DAO_TAO = loaiDaoTao
-                      and fs.NAM_TUYEN_SINH = namTuyenSinh )
+                      and fs.NAM_TUYEN_SINH = namTuyenSinh
+                      and fs.BAC_DAO_TAO = bacDaoTao)
         LOOP
             SELECT COUNT(*)
             into counter
-            from TC_HOC_PHI hp
-            where hp.NAM_HOC = namHoc
-              and hp.MSSV = record."mssv"
-              and hp.HOC_KY = hocKy;
-            if (counter > 0) then
+            from TC_HOC_PHI_DETAIL hpd
+            where hpd.NAM_HOC = namHoc
+              and hpd.MSSV = record."mssv"
+              and hpd.HOC_KY = hocKy
+              and hpd.LOAI_PHI = loaiPhi;
+            if (counter = 0) then
+                SELECT COUNT(*)
+                into counter
+                from TC_HOC_PHI hp
+                where hp.NAM_HOC = namHoc
+                  and hp.MSSV = record."mssv"
+                  and hp.HOC_KY = hocKy;
+                if (counter = 0) then
+                    insert into TC_HOC_PHI (MSSV, HOC_KY, HOC_PHI, CONG_NO, NAM_HOC, NGAY_TAO)
+                    VALUES (record."mssv", hocKy, 0, 0, namHoc, ngayTao);
+                end if;
+
                 INSERT INTO TC_HOC_PHI_DETAIL (MSSV, HOC_KY, NAM_HOC, LOAI_PHI, SO_TIEN, ACTIVE, NGAY_TAO)
                 VALUES (record."mssv", hocKy, namHoc, loaiPhi, soTien, 1, ngayTao);
                 UPDATE TC_HOC_PHI hp
-                SET hp.CONG_NO = hp.CONG_NO + soTien
+                SET hp.CONG_NO = hp.CONG_NO + soTien,
+                    hp.HOC_PHI = hp.HOC_PHI + soTien
                 WHERE hp.NAM_HOC = namHoc
                   and hp.MSSV = record."mssv"
                   and hp.HOC_KY = hocKy;
+            else select res - 1 into res from dual;
             end if;
-
         END LOOP;
     commit;
-    RETURN TRUE;
+    RETURN res;
 end;
 
 /

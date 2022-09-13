@@ -18090,6 +18090,39 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "DT_DM_HOC_KY": {
+            "active": true,
+            "moduleName": "dtDmHocKy",
+            "modelName": "dtDmHocKy",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
