@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao, laySoTuDong, nguoiTao, ngoaiNgu }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, canBoNhan, loaiVanBan, tenVietTatDonViGui, trangThai, soCongVan, soDi, loaiCongVan, ngayTao, laySoTuDong, nguoiTao, ngoaiNgu, soDangKy }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO', 'laySoTuDong': 'LAY_SO_TU_DONG', 'nguoiTao': 'NGUOI_TAO', 'ngoaiNgu': 'NGOAI_NGU' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'canBoNhan': 'CAN_BO_NHAN', 'loaiVanBan': 'LOAI_VAN_BAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'trangThai': 'TRANG_THAI', 'soCongVan': 'SO_CONG_VAN', 'soDi': 'SO_DI', 'loaiCongVan': 'LOAI_CONG_VAN', 'ngayTao': 'NGAY_TAO', 'laySoTuDong': 'LAY_SO_TU_DONG', 'nguoiTao': 'NGUOI_TAO', 'ngoaiNgu': 'NGOAI_NGU', 'soDangKy': 'SO_DANG_KY' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {

@@ -123,3 +123,13 @@ export const SelectAdapter_DtDanhSachChuyenNganh = (maNganh = '', namHoc = '') =
         fetchOne: (id, done) => (getDtDanhSachChuyenNganh(id, item => done && done({ id: item?.id || '', text: item?.ten || '' })))(),
     };
 };
+
+export const SelectAdapter_DtDanhSachChuyenNganhFilter = (maNganh, namHoc) => {
+    return {
+        ajax: true,
+        url: `/api/dao-tao/danh-sach-chuyen-nganh/${maNganh}/${namHoc}`,
+        data: params => ({ searchTerm: params.term }),
+        processResults: response => ({ results: response.page && response.page.list && response.page.list.length ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
+        fetchOne: (id, done) => (getDtDanhSachChuyenNganh(id, item => done && done({ id: item?.id || '', text: item?.ten || '' })))(),
+    };
+};

@@ -1,6 +1,6 @@
-// Table name: SV_BAO_HIEM_Y_TE { id, mssv, dienDong, thoiGian, userModified }
+// Table name: SV_BAO_HIEM_Y_TE { id, mssv, dienDong, thoiGian, userModified, maBhxhHienTai, benhVienDangKy, matTruocThe, matSauThe, thoiGianHoanThanh, namDangKy, giaHan }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'mssv': 'MSSV', 'dienDong': 'DIEN_DONG', 'thoiGian': 'THOI_GIAN', 'userModified': 'USER_MODIFIED' };
+const obj2Db = { 'id': 'ID', 'mssv': 'MSSV', 'dienDong': 'DIEN_DONG', 'thoiGian': 'THOI_GIAN', 'userModified': 'USER_MODIFIED', 'maBhxhHienTai': 'MA_BHXH_HIEN_TAI', 'benhVienDangKy': 'BENH_VIEN_DANG_KY', 'matTruocThe': 'MAT_TRUOC_THE', 'matSauThe': 'MAT_SAU_THE', 'thoiGianHoanThanh': 'THOI_GIAN_HOAN_THANH', 'namDangKy': 'NAM_DANG_KY', 'giaHan': 'GIA_HAN' };
 
 module.exports = app => {
     app.model.svBaoHiemYTe = {

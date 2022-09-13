@@ -5,36 +5,37 @@ import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/red
 import { SelectAdapter_DmSvLoaiHinhDaoTaoFilter } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_DtCauTrucKhungDaoTao } from '../dtCauTrucKhungDaoTao/redux';
 import { SelectAdapter_DtDanhSachChuyenNganh } from '../dtDanhSachChuyenNganh/redux';
-import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData } from './redux';
+import { getDtThoiKhoaBieuByConfig, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, updateCheckDtThoiKhoaBieu } from './redux';
 import { getDmCaHocAll, getDmCaHocAllCondition } from 'modules/mdDanhMuc/dmCaHoc/redux';
 import { getDtNganhDaoTaoAll } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmCoSo } from 'modules/mdDanhMuc/dmCoSo/redux';
 import { GetAllDmPhongInCoSo } from 'modules/mdDanhMuc/dmPhong/redux';
-// import { SelectAdapter_DmPhongFilter } from 'modules/mdDanhMuc/dmPhong/redux';
-const dataThu = [2, 3, 4, 5, 6, 7];
+import { getScheduleSettings } from '../dtSettings/redux';
+
 const fullDataTietThu = [];
 class GenSchedPage extends AdminPage {
     state = {
-        step: 1
+        step: 1, fullDataTietThu: null
     }
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
-            this.setState({ dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) });
-            const cookie = T.updatePage('pageDtThoiKhoaBieu');
-            const { filter } = cookie;
-            this.bacDaoTao.value('DH');
-            if (filter) {
-                let { namFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
-                this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
-                this.nam.value(namFilter);
-                this.hocKy.value(hocKyFilter);
-                this.khoaSinhVien.value(khoaSinhVienFilter);
-            }
-
+            this.props.getScheduleSettings(items => {
+                this.setState({ scheduleConfig: items, dataKhoaSinhVien: Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i) });
+                const cookie = T.updatePage('pageDtThoiKhoaBieu');
+                const { filter } = cookie;
+                this.bacDaoTao.value('DH');
+                if (filter) {
+                    let { namFilter, loaiHinhDaoTaoFilter, hocKyFilter, khoaSinhVienFilter } = filter;
+                    this.loaiHinhDaoTao.value(loaiHinhDaoTaoFilter);
+                    this.nam.value(namFilter);
+                    this.hocKy.value(hocKyFilter);
+                    this.khoaSinhVien.value(khoaSinhVienFilter);
+                }
+            });
         });
     }
 
@@ -50,7 +51,8 @@ class GenSchedPage extends AdminPage {
                 hocKy: getValue(this.hocKy),
                 khoaSinhVien: getValue(this.khoaSinhVien),
                 khoaDangKy: getValue(this.khoaDangKy),
-                ngayBatDau: getValue(this.ngayBatDau).getTime()
+                ngayBatDau: getValue(this.ngayBatDau).getTime(),
+                coSo: getValue(this.coSo)
             };
             this.props.getDtThoiKhoaBieuByConfig(config, result => {
                 this.setState({ onSaveConfig: false });
@@ -107,9 +109,31 @@ class GenSchedPage extends AdminPage {
             maNganh: this.maNganh.value(),
             chuyenNganh: this.chuyenNganh.value()
         };
-        this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData, config: this.state.config }, () => {
-            this.setState({ editId: null });
-        });
+        if (!currentData.soTietBuoi) {
+            T.notify('Số tiết bị trống!', 'danger');
+            this.soTietBuoi.focus();
+        } else if (!currentData.soLuongDuKien) {
+            T.notify('Số lượng dự kiến bị trống!', 'danger');
+            this.soLuongDuKien.focus();
+        } else if (!currentData.maNganh && !currentData.chuyenNganh) {
+            T.notify('Học phần không có ngành/chuyên ngành', 'danger');
+        } else {
+            if (currentData.tietBatDau) {
+                let { soTietBuoi, tietBatDau } = currentData;
+                tietBatDau = parseInt(tietBatDau);
+                soTietBuoi = parseInt(soTietBuoi);
+                let buoiHocBatDau = this.state.fullDataTiet.find(item => item.ten == tietBatDau).buoi;
+                let dataKetThuc = this.state.fullDataTiet.find(item => item.ten == (tietBatDau + soTietBuoi - 1));
+                if (!dataKetThuc) {
+                    return T.notify('Không có tiết kết thúc phù hợp', 'danger');
+                } else if (buoiHocBatDau != dataKetThuc.buoi) {
+                    return T.notify('Bắt đầu và kết thúc ở 2 buổi khác nhau!', 'danger');
+                }
+            }
+            this.props.updateDtThoiKhoaBieuConfig({ currentId, currentData, config: this.state.config }, () => {
+                this.setState({ editId: null });
+            });
+        }
     }
 
     handleResetConfig = (e) => {
@@ -137,21 +161,13 @@ class GenSchedPage extends AdminPage {
     }
 
     handleRenderTiet = () => {
+        let dataThu = this.state.scheduleConfig.dataThu.map(item => parseInt(item.ma));
         this.state.dataTiet.forEach(tiet => {
             dataThu.forEach(thu => {
                 fullDataTietThu.push({ [thu]: tiet });
             });
         });
         this.setState({ fullDataTietThu });
-        // getDmCaHocAllCondition(this.coSo.value(), data => {
-        //     data = data.map(item => parseInt(item.ten)).sort((a, b) => (a - b));
-        //     data.forEach(tiet => {
-        //         dataThu.forEach(thu => {
-        //             fullDataTietThu.push({ [thu]: tiet });
-        //         });
-        //     });
-        //     this.setState({ fullDataTietThu, dataTiet: data });
-        // });
     }
 
     handleSaveTimeConfig = () => {
@@ -211,11 +227,12 @@ class GenSchedPage extends AdminPage {
 
     handleGenTime = (e) => {
         e.preventDefault();
+        this.setState({ isWait: true });
         this.props.dtThoiKhoaBieuGenTime({
             listData: this.props.dtThoiKhoaBieu.dataCanGen,
             config: this.state.config,
             timeConfig: this.state.timeConfig
-        }, () => this.setState({ step: 4 }));
+        }, () => this.setState({ isWait: false }), () => this.setState({ step: 4, isWait: false }));
     }
     // End step 4
 
@@ -227,18 +244,19 @@ class GenSchedPage extends AdminPage {
     }
 
     editElement = () => {
+        const { tkbSoLuongDuKienMax, tkbSoLuongDuKienMin, tkbSoTietBuoiMax, tkbSoTietBuoiMin, dataThu } = this.state.scheduleConfig || {};
         return (<>
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.thu = e} style={{ marginBottom: '0', width: '50px' }} min={2} max={7} />
+                <FormSelect ref={e => this.thu = e} style={{ marginBottom: '0', width: '50px' }} data={dataThu.map(item => ({ id: parseInt(item.ma), text: item.ten }))} />
             } />
             <TableCell content={
-                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0', width: '50px' }} data={this.state.dataTiet} />
+                <FormSelect ref={e => this.tietBatDau = e} style={{ marginBottom: '0', width: '70px' }} data={this.state.dataTiet} />
             } />
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.soTietBuoi = e} style={{ width: '50px', marginBottom: '0' }} min={1} max={5} />
+                <FormTextBox type='number' ref={e => this.soTietBuoi = e} style={{ width: '50px', marginBottom: '0' }} min={tkbSoTietBuoiMin} max={tkbSoTietBuoiMax} />
             } />
             <TableCell content={
-                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ width: '70px', marginBottom: '0' }} />
+                <FormTextBox type='number' ref={e => this.soLuongDuKien = e} style={{ width: '70px', marginBottom: '0' }} min={tkbSoLuongDuKienMin} max={tkbSoLuongDuKienMax} />
             } />
             <TableCell content={
                 <>
@@ -249,12 +267,23 @@ class GenSchedPage extends AdminPage {
         </>);
     }
 
+    handleCheck = (value, item) => {
+        this.props.updateCheckDtThoiKhoaBieu(item.id, { isMo: Number(value) });
+    }
+
+    updateIsMoAll = (value) => {
+        this.props.updateCheckDtThoiKhoaBieu(this.props.dtThoiKhoaBieu.dataCanGen.map(item => item.id), { isMo: Number(value) });
+    }
+
     genData = (data) => renderTable({
         getDataSource: () => data,
         stickyHead: true,
         header: 'thead-light',
         className: 'table-fix-col',
         renderHead: () => <tr>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+                <FormCheckbox onChange={this.updateIsMoAll} />
+            </th>
             <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Mã</th>
             <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Thứ</th>
@@ -266,6 +295,7 @@ class GenSchedPage extends AdminPage {
         </tr>,
         renderRow: (item, index) => {
             return (<tr key={index}>
+                <TableCell type='checkbox' isCheck style={{ textAlign: 'center' }} content={item.isMo} onChanged={value => this.handleCheck(value, item)} permission={this.getUserPermission('dtThoiKhoaBieu')} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc}_${item.nhom}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={T.parse(item.tenMonHoc, { vi: '' }).vi} />
                 {this.state.editId == item.id ? this.editElement() : <>
@@ -276,7 +306,7 @@ class GenSchedPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{
                         item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[0]} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
                         {item.tenChuyenNganh && <br />}
-                        {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={`${nganh.split('%')[0]}_${nganh.split('%')[1].getFirstLetters()}`} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                        {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={`${nganh.split('%')[0]}_${nganh.split('%')[1]?.getFirstLetters()}`} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
                     </>} />
                 </>}
                 <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} >
@@ -321,7 +351,7 @@ class GenSchedPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{
                         item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[0]} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
                         {item.tenChuyenNganh && <br />}
-                        {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={`${nganh.split('%')[0]}_${nganh.split('%')[1].getFirstLetters()}`} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
+                        {item.tenChuyenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={`${nganh.split('%')[0]}_${nganh.split('%')[1]?.getFirstLetters()}`} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenChuyenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
                     </>} />
                 </>}
             </tr>);
@@ -362,7 +392,14 @@ class GenSchedPage extends AdminPage {
             config: this.state.config,
             listRoom
         }, () => {
-            this.setState({ step: 6, isWaitingGenRoom: false });
+            this.setState({ step: 6, isWaitingGenRoom: false }, () => {
+                // let data = this.props.dtThoiKhoaBieu.dataCanGen.filter(item => !item.phong);
+                // if (data.length) {
+                //     T.confirm('Đề xuất', `Có ${data.length} học phần không tìm kiếm được phòng có sức chứa dự kiến phù hợp. Bạn có muốn hệ thống tự động giảm dần số lượng dự kiến của học phần để tìm phòng phù hợp hơn không?`, true, isConfirm => {
+                //         isConfirm && console.log(isConfirm);
+                //     });
+                // }
+            });
         });
     }
 
@@ -389,6 +426,7 @@ class GenSchedPage extends AdminPage {
         renderHead: () => <tr>
             <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Mã</th>
             <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên</th>
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Số tiết</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Thứ</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Tiết bắt đầu</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'right' }}>Tiết/Buổi</th>
@@ -400,16 +438,17 @@ class GenSchedPage extends AdminPage {
             <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành/Chuyên ngành</th>
         </tr>,
         renderRow: (item, index) => {
-            return (<tr key={index}>
+            return (<tr key={index} style={{ backgroundColor: item.phong ? '#ffffff' : '#ffcccb' }}>
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maMonHoc}_${item.nhom}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={T.parse(item.tenMonHoc, { vi: '' }).vi} />
+                <TableCell type='number' content={parseInt(item.soTietLyThuyet) + parseInt(item.soTietThucHanh)} />
                 <TableCell type='number' content={item.thu} />
                 <TableCell type='number' content={item.tietBatDau} />
                 <TableCell type='number' content={item.soTietBuoi} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='date' dateFormat='dd/mm/yyyy' content={parseInt(item.ngayBatDau)} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} type='date' dateFormat='dd/mm/yyyy' content={parseInt(item.ngayKetThuc)} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.phong} />
-                <TableCell type='number' content={parseInt(item.sucChua)} />
+                <TableCell type='number' content={item.sucChua ? parseInt(item.sucChua) : ''} />
                 <TableCell type='number' content={item.soLuongDuKien} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={<>{
                     item.tenNganh?.split('&&').map((nganh, i) => <span key={i}><Tooltip title={nganh.split('%')[0]} arrow><span>{nganh.split('%')[1]}</span></Tooltip>{(i + 1) % 3 == 0 ? <br /> : (i < item.tenNganh?.split('&&').length - 1 ? ', ' : '.')}</span>)}
@@ -422,7 +461,8 @@ class GenSchedPage extends AdminPage {
 
     render() {
         let dtThoiKhoaBieuConfig = this.props.dtThoiKhoaBieu;
-        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess, dataKhoaSinhVien } = this.state;
+        let { onSaveConfig, step, timeConfig, isWaitingGenRoom, isWaitingUpdate, genSuccess, dataKhoaSinhVien, isWait, scheduleConfig } = this.state;
+        let { dataThu } = scheduleConfig || [];
         return this.renderPage({
             title: 'Quản lý sinh thời khoá biểu tự động',
             icon: 'fa fa-cogs',
@@ -461,12 +501,12 @@ class GenSchedPage extends AdminPage {
                                 <i>- Ghi chú: những học phần chưa có thứ, tiết bắt đầu sẽ được hệ thống sinh tự động.</i>
                             </div>
 
-                            <button className='btn btn-outline-secondary' type='button' onClick={this.handleResetConfig} style={{ position: 'absolute', top: '20px', right: '150px' }}>
-                                Cấu hình lại <i className='fa fa-lg fa-repeat' />
+                            <button className='btn btn-outline-secondary' type='button' onClick={this.handleResetConfig} style={{ position: 'absolute', top: '63px', right: '20px' }}>
+                                Cấu hình chung lại <i className='fa fa-lg fa-repeat' />
                             </button>
 
                             <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleSubmitAdjustedData}>
-                                Tiếp theo <i className='fa fa-lg fa-arrow-right' />
+                                Cấu hình thời gian, địa điểm <i className='fa fa-lg fa-arrow-right' />
                             </button>
                         </div>
                         <div className='tile-body'>
@@ -478,7 +518,7 @@ class GenSchedPage extends AdminPage {
                 <section className='col-md-12' style={{ display: step == 3 ? '' : 'none' }} id='configTime'>
                     <div className='tile'>
                         <div className='tile-title'>
-                            <h4>Bước 3: Cấu hình địa điểm, thời gian học.</h4>
+                            <h4>Bước 3: Cấu hình thời gian, địa điểm học.</h4>
                             <div style={{ fontSize: '0.8rem' }}>
                                 <i>- Ghi chú: Vui lòng chọn các tiết không xếp thời khoá biểu của khoa/bộ môn. Sau đó bấm <b>Lưu</b> để sang bước tiếp theo.</i><br />
                                 <i>Nếu không chọn tiết nào hoặc khoa/bộ môn nào, hệ thống sẽ mặc định là tất cả.</i>
@@ -486,8 +526,8 @@ class GenSchedPage extends AdminPage {
                         </div>
                         <div className='tile-body'>
                             <div className='row'>
-                                {timeConfig && timeConfig.length ? <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleGenTime}>
-                                    Tiếp theo <i className='fa fa-lg fa-arrow-right' />
+                                {timeConfig && timeConfig.length ? <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleGenTime} disabled={isWait}>
+                                    Xếp thứ, tiết <i className={isWait ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-arrow-right'} />
                                 </button> : ''}
                                 {/* <FormSelect ref={e => this.coSo = e} data={SelectAdapter_DmCoSo} label='Chọn cơ sở học' className='col-md-6' onChange={this.handleChooseBuilding} />
                                 <div className='col-md-6' /> */}
@@ -499,10 +539,10 @@ class GenSchedPage extends AdminPage {
                                             getDataSource: () => this.state.fullDataTietThu,
                                             header: '',
                                             renderHead: () => <tr>{
-                                                dataThu.map(thu => <th key={thu} style={{ width: '100px', textAlign: 'center' }}>Thứ {thu}</th>)
+                                                dataThu.map(item => parseInt(item.ma)).map(thu => <th key={thu} style={{ width: '100px', textAlign: 'center' }}>Thứ {thu}</th>)
                                             }</tr>,
                                             renderRow: this.state.dataTiet.map(tiet => <tr key={tiet}>
-                                                {dataThu.map(thu => <td key={thu} id={`${thu}_${tiet}`} style={{ textAlign: 'center', backgroundColor: '#0275d8', color: '#fff' }} onClick={e => e.preventDefault() || $(`#${thu}_${tiet}`).css('backgroundColor', (_, cur) => rgbToHex(cur) == '#0275d8' ? '#f0ad4e' : '#0275d8')
+                                                {dataThu.map(item => parseInt(item.ma)).map(thu => <td key={thu} id={`${thu}_${tiet}`} style={{ textAlign: 'center', backgroundColor: '#0275d8', color: '#fff' }} onClick={e => e.preventDefault() || $(`#${thu}_${tiet}`).css('backgroundColor', (_, cur) => rgbToHex(cur) == '#0275d8' ? '#f0ad4e' : '#0275d8')
                                                 }>Tiết {tiet}</td>)}
                                             </tr>)
                                         })}
@@ -526,7 +566,7 @@ class GenSchedPage extends AdminPage {
                                             </Tooltip>
                                         </div>);
                                     })}
-                                    <FormSelect ref={e => this.listDonVi = e} onChange={this.handleChooseFaculty} label='Chọn khoa/bộ môn' placeholder='Chọn khoa/bộ môn' data={SelectAdapter_DmDonViFaculty_V2} multiple />
+                                    <FormSelect ref={e => this.listDonVi = e} onChange={this.handleChooseFaculty} label='Chọn khoa/bộ môn' placeholder='Chọn khoa/bộ môn áp dụng' data={SelectAdapter_DmDonViFaculty_V2} multiple />
                                     <div style={{ textAlign: 'right' }}>
                                         <button className='btn btn-outline-success' type='button' onClick={this.handleSaveTimeConfig}>
                                             <i className='fa fa-lg fa-save' /> Lưu
@@ -542,12 +582,12 @@ class GenSchedPage extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'>
                             <h4>Kết quả tự động xếp thời gian học.</h4>
-                            <button className='btn btn-outline-secondary' type='button' onClick={this.handleGenTime} style={{ position: 'absolute', top: '20px', right: '150px' }}>
+                            <button className='btn btn-outline-secondary' type='button' onClick={this.handleGenTime} style={{ position: 'absolute', top: '20px', right: '190px' }}>
                                 Xếp lại <i className='fa fa-lg fa-repeat' />
                             </button>
 
                             <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleRoomConfig}>
-                                Tiếp theo <i className='fa fa-lg fa-arrow-right' />
+                                Cấu hình phòng <i className='fa fa-lg fa-arrow-right' />
                             </button>
                         </div>
                         <div className='tile-body'>
@@ -565,7 +605,7 @@ class GenSchedPage extends AdminPage {
                                 <i>Nếu không chọn tiết nào hoặc khoa/bộ môn nào, hệ thống sẽ mặc định là tất cả.</i>
                             </div>
                             <button className='btn btn-outline-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.handleGenRoom} disabled={isWaitingGenRoom} >
-                                {isWaitingGenRoom ? 'Loading' : 'Tiếp theo'} <i className={isWaitingGenRoom ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-arrow-right'} />
+                                {isWaitingGenRoom ? 'Loading' : 'Xếp phòng'} <i className={isWaitingGenRoom ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-arrow-right'} />
                             </button>
                         </div>
                         <div className='tile-body'>
@@ -577,12 +617,16 @@ class GenSchedPage extends AdminPage {
                 <section className='col-md-12' style={{ display: step == 6 ? '' : 'none' }} id='resultRoom'>
                     <div className='tile'>
                         <div className='tile-title'>
-                            <h4>Bước 6: Kết quả tự động xếp phòng học, lịch học</h4>
+                            <h4>Kết quả tự động xếp phòng học, lịch học</h4>
+                            {/* <div style={{ fontSize: '0.8rem' }}>
+                                <i>Số học phần xếp thành công: <b>{dtThoiKhoaBieuConfig?.dataCanGen.filter(item => item.phong).length || 0}</b></i><br />
+                                <i>Số học phần xếp thất bại: <b>{dtThoiKhoaBieuConfig?.dataCanGen.filter(item => !item.phong).length || 0}</b></i>
+                            </div> */}
                             {genSuccess ?
                                 <button className='btn btn-success' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={e => e.preventDefault() || this.props.history.push('/user/dao-tao/thoi-khoa-bieu')}>
                                     Hoàn tất <i className='fa fa-lg fa-check' />
                                 </button> : <button className='btn btn-primary' type='button' style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={this.updateGenData} disabled={isWaitingUpdate}>
-                                    {isWaitingUpdate ? 'Loading' : 'Lưu thay đổi'} <i className={isWaitingUpdate ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-save'} />
+                                    {isWaitingUpdate ? 'Loading' : 'Lưu thay đổi'}&nbsp;<i className={isWaitingUpdate ? 'fa fa-spin fa-lg fa-spinner' : 'fa fa-lg fa-save'} />
                                 </button>}
                         </div>
                         <div className='tile-body'>
@@ -598,6 +642,6 @@ class GenSchedPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
 const mapActionsToProps = {
-    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData
+    getDtThoiKhoaBieuByConfig, getDmCaHocAll, updateDtThoiKhoaBieuConfig, updateDtThoiKhoaBieuCondition, resetDtThoiKhoaBieuConfig, dtThoiKhoaBieuGenTime, GetAllDmPhongInCoSo, dtThoiKhoaBieuGenRoom, updateDtThoiKhoaBieuGenData, getScheduleSettings, updateCheckDtThoiKhoaBieu
 };
 export default connect(mapStateToProps, mapActionsToProps)(GenSchedPage);

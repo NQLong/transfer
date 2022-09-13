@@ -1,6 +1,6 @@
 module.exports = (app) => {
 
-    const { canBoType, handleResult, trangThaiNhiemVu, action } = require('../constant');
+    const { canBoType, handleResult, trangThaiNhiemVu, action, NHIEM_VU_TYPE } = require('../constant');
 
     const menu = {
         parentMenu: app.parentMenu.user,
@@ -782,6 +782,23 @@ module.exports = (app) => {
                 phanHoi: content,
                 hanhDong: CAN_BO_NHAN_ACTION.RESET_STATUS
             });
+            res.send({ error: null });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.put('/api/hcth/nhiem-vu/add', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
+        try {
+            const id = parseInt(req.body.id),
+                { vanBan, loaiVanBan } = req.body.changes;
+
+            const checkVanBan = await app.model.hcthLienKet.get({ loaiA: NHIEM_VU_TYPE, keyA: id, loaiB: loaiVanBan, keyB: vanBan });
+            if (checkVanBan) {
+                throw { message: 'Văn bản đã được thêm vào nhiệm vụ này!' };
+            } else {
+                await app.model.hcthLienKet.create({ loaiA: 'NHIEM_VU', keyA: id, loaiB: loaiVanBan, keyB: vanBan });
+            }
             res.send({ error: null });
         } catch (error) {
             res.send({ error });

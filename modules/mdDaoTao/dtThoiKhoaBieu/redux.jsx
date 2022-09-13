@@ -14,8 +14,8 @@ export default function dtThoiKhoaBieuReducer(state = null, data) {
                 let currentState = Object.assign({}, state),
                     dataCanGen = currentState.dataCanGen;
                 for (let i = 0, n = dataCanGen.length; i < n; i++) {
-                    if (dataCanGen[i].id == data.data.currentId) {
-                        dataCanGen.splice(i, 1, { ...dataCanGen[i], ...data.data.currentData });
+                    if (dataCanGen[i].id == data.item.id) {
+                        dataCanGen.splice(i, 1, { ...dataCanGen[i], ...data.item });
                         break;
                     }
                 }
@@ -105,20 +105,44 @@ export function createDtThoiKhoaBieu(item, settings, done) {
     };
 }
 
+export function checkIfExistDtThoiKhoaBieu(data, done) {
+    return () => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/check-if-exist';
+        T.post(url, { data }, result => {
+            if (result.error) {
+                T.notify('Kiểm tra các ràng buộc lỗi', 'danger');
+            } else if (result.warning) {
+                T.confirm('Cảnh báo', `${result.warning}. Bạn vẫn muốn tạo thêm?`, true, isConfirm => {
+                    isConfirm && done(result.maxNhomCurrent);
+                });
+            } else {
+                done && done(0);
+            }
+        });
+    };
+}
+
 export function createDtThoiKhoaBieuMultiple(data, settings, done) {
     return dispatch => {
         const cookie = T.updatePage('pageDtThoiKhoaBieu');
         const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu/create-multiple';
-        T.post(url, { data, settings }, data => {
-            if (data.error) {
+        T.post(url, { data, settings }, result => {
+            if (result.error) {
                 T.notify('Tạo lớp bị lỗi!', 'danger');
-                console.error(`POST ${url}. ${data.error.message}`);
+                console.error(`POST ${url}. ${result.error.message}`);
                 done && done();
-            } else {
+            } else if (result.warning) {
+                T.confirm('Cảnh báo', `${result.warning}. Bạn vẫn muốn tạo thêm?`, true, isConfirm => {
+                    if (isConfirm) {
+                        createDtThoiKhoaBieuMultiple({ ...data, confirmCreate: true }, settings, done);
+                    }
+                });
+            }
+            else {
                 T.notify('Tạo lớp thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
-                if (done) done();
+                if (done) done(result);
             }
         });
     };
@@ -164,15 +188,16 @@ export function updateDtThoiKhoaBieuCondition(condition, changes, done) {
         const cookie = T.updatePage('pageDtThoiKhoaBieu');
         const { pageNumber, pageSize, pageCondition, filter } = cookie;
         const url = '/api/dao-tao/thoi-khoa-bieu-condition';
-        T.put(url, { condition, changes }, data => {
-            if (data.error) {
-                T.notify(`Lỗi: ${data.error.message}`, 'danger');
-                console.error(`PUT ${url}. ${data.error}`);
-                done && done(data);
+        T.put(url, { condition, changes }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${result.error}`);
+                done && done(result);
             } else {
                 // T.notify('Điều chỉnh thành công!', 'success');
                 dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
-                done && done(data);
+                dispatch({ type: DtThoiKhoaBieuConfigUpdate, data: { currentId: result.item.id, currentData: result.item } });
+                done && done(result);
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
     };
@@ -217,6 +242,25 @@ export function getDtLichDayHoc(phong, done) {
     };
 }
 
+export function deleteMultipleDtThoiKhoaBieu(listChosen = [], done) {
+    return dispatch => {
+        const cookie = T.updatePage('pageDtThoiKhoaBieu');
+        const { pageNumber, pageSize, pageCondition, filter } = cookie;
+        const url = '/api/dao-tao/thoi-khoa-bieu/condition';
+        T.delete(url, { listChosen }, data => {
+            if (data.error) {
+                T.notify('Xoá bị lỗi!', 'danger');
+                console.error(`DELETE ${url}. ${data.error.message}`);
+            } else {
+                T.alert('Xoá thời khoá biểu thành công!', 'success', false, 1000);
+                dispatch(getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, filter));
+                if (done) done();
+            }
+        });
+    };
+}
+
+// Generate action -----------------------------------------------------------------------------------------------------------------------------------------------------------
 export function getDtThoiKhoaBieuByConfig(config, done) {
     return dispatch => {
         T.post('/api/dao-tao/thoi-khoa-bieu/get-by-config', { config }, result => {
@@ -239,6 +283,21 @@ export function resetDtThoiKhoaBieuConfig(done) {
     };
 }
 
+export function updateCheckDtThoiKhoaBieu(id, isMo, done) {
+    return dispatch => {
+        T.put('/api/dao-tao/thoi-khoa-bieu/update-check', { id, isMo }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message || 'hệ thống'}`, 'danger');
+                console.error(result.error);
+            } else {
+                dispatch({ type: DtThoiKhoaBieuConfigUpdate, item: result.item });
+                done && done();
+            }
+        });
+
+    };
+}
+
 export function updateDtThoiKhoaBieuConfig(data, done) {
     return dispatch => {
         const url = '/api/dao-tao/thoi-khoa-bieu-condition';
@@ -248,19 +307,20 @@ export function updateDtThoiKhoaBieuConfig(data, done) {
                 console.error(result.error);
             } else {
                 T.notify('Cập nhật thành công', 'success');
-                dispatch(getDtThoiKhoaBieuByConfig(data.config));
+                dispatch(getDtThoiKhoaBieuByConfig(data.conf));
                 done && done();
             }
         });
     };
 }
 
-export function dtThoiKhoaBieuGenTime(data, done) {
+export function dtThoiKhoaBieuGenTime(data, doneError, done) {
     return dispatch => {
         const url = '/api/dao-tao/thoi-khoa-bieu/generate-time';
         T.post(url, { data }, result => {
             if (result.error) {
                 T.notify(`Lỗi ${result.error.message || 'hệ thống'}`, 'danger');
+                doneError && doneError();
             } else {
                 dispatch({ type: DtThoiKhoaBieuConfig, items: { dataCanGen: result.dataReturn } });
                 done && done(result.dataReturn);
@@ -293,6 +353,22 @@ export function updateDtThoiKhoaBieuGenData(data, done) {
                 T.notify('Lưu dữ liệu thành công', 'success');
             }
             done && done(result);
+        });
+    };
+}
+
+export function dtThoiKhoaBieuTraCuu(thu, maCoSo, nam, hocKy, loaiHinh, done) {
+    return () => {
+        const url = '/api/dao-tao/thoi-khoa-bieu/tra-cuu';
+        T.get(url, { thu, maCoSo, nam, hocKy, loaiHinh }, result => {
+            if (result.error) {
+                T.notify(`Lồi: ${result.error.message || 'Tra cứu thất bại'}`, 'danger');
+            }
+            else {
+                if (!result.items.length)
+                    T.notify('Cơ sở này chưa có phòng học', 'warning');
+                done && done(result.items);
+            }
         });
     };
 }

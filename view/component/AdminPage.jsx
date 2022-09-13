@@ -35,8 +35,13 @@ export class TableCell extends React.Component { // type = number | date | link 
                 <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}><img src={content} alt={alt} style={{ height: '32px' }} /></td> :
                 <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}>{alt}</td>;
         } else if (type == 'checkbox') {
-            return (
-                <td style={{ textAlign: 'center', ...style }} className={'toggle ' + className} rowSpan={rowSpan} colSpan={colSpan}>
+            return this.props.isCheck ? (<td className={'animated-checkbox ' + className} style={{ textAlign: 'center', ...style }} rowSpan={rowSpan} colSpan={colSpan}>
+                <label>
+                    <input type='checkbox' checked={content} onChange={() => permission.write && this.props.onChanged(content ? 0 : 1)} />
+                    <span className={'label-text'} />
+                </label>
+            </td>) :
+                (<td style={{ textAlign: 'center', ...style }} className={'toggle ' + className} rowSpan={rowSpan} colSpan={colSpan}>
                     <label>
                         <input type='checkbox' checked={content} onChange={() => permission.write && this.props.onChanged(content ? 0 : 1)} />
                         <span className='button-indecator' />
@@ -117,7 +122,7 @@ export class TableHeader extends React.Component {
 
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
-    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {},
+    renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {}, multipleTbody = false
 }) {
     const list = getDataSource();
     if (list == null) {
@@ -134,7 +139,9 @@ export function renderTable({
         const table = (
             <table className={'table table-hover table-bordered table-responsive ' + className} style={{ margin: 0, ...style }}>
                 <thead className={header}>{renderHead()}</thead>
-                <tbody>{typeof renderRow == 'function' ? list.map(renderRow) : renderRow}</tbody>
+                {
+                    multipleTbody ? <>{typeof renderRow == 'function' ? list.map(renderRow) : renderRow}</> : <tbody>{typeof renderRow == 'function' ? list.map(renderRow) : renderRow}</tbody>
+                }
             </table>
         );
 
@@ -373,13 +380,13 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null, autoFormat = true } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
             placeholder: label || placeholder,
             value: this.exactValue ? this.exactValue : this.state.value,
-            thousandSeparator: ',',
+            thousandSeparator: autoFormat ? ',' : null,
             decimalSeparator: step ? '.' : false,
             onValueChange: val => {
                 const newValue = this.checkMinMax(val.floatValue);
@@ -1005,7 +1012,7 @@ export class AdminPage extends React.Component {
     }
 
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, advanceSearchTitle = 'Tìm kiếm nâng cao', content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
         T.title(title);
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
@@ -1054,7 +1061,7 @@ export class AdminPage extends React.Component {
                     </ul>
                 </div>
                 <div className='app-advance-search' ref={e => this.advanceSearchBox = e}>
-                    <h5>Tìm kiếm nâng cao</h5>
+                    <h5>{advanceSearchTitle}</h5>
                     <div style={{ width: '100%' }}>{advanceSearch}</div>
                 </div>
                 {content}

@@ -1,5 +1,6 @@
 module.exports = app => {
     const forge = require('node-forge');
+    const qrCode = require('qrcode');
     const { trangThaiRequest } = require('../constant');
 
     const staffMenu = {
@@ -182,14 +183,23 @@ module.exports = app => {
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
 
-            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', [{
-                filename: `${shcc}-${khoa.id}.p12`,
-                content: p12b64,
+            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, 2000), { version: 33, errorCorrectionLevel: 'L',  });
+
+            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L'});
+
+            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', 
+            [{
+                filename: `${shcc}-${khoa.id}-1.png`,
+                content:  qrCode_1.replace('data:image/png;base64,', ''),
+                encoding: 'base64'
+            }, {
+                filename: `${shcc}-${khoa.id}-2.png`,
+                content: qrCode_2.replace('data:image/png;base64,', ''),
                 encoding: 'base64'
             }]);
-
             await app.model.hcthUserPublicKey.update({ id: khoa.id }, { publicKey });
             res.send({});
+
         } catch (error) {
             res.send({ error });
         }
