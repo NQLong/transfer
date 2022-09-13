@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminPage, renderComment, FormRichTextBox } from 'view/component/AdminPage';
 import { connect } from 'react-redux';
-import { createPhanHoi, returnVanBan } from '../redux';
+import { createPhanHoi, returnVanBan, getPhanHoi } from '../redux';
 import { vanBanDi } from 'modules/mdHanhChinhTongHop/constant';
 
 class PhanHoi extends AdminPage {
@@ -22,7 +22,10 @@ class PhanHoi extends AdminPage {
                 key: this.props.id,
                 loai: 'DI'
             };
-            this.props.createPhanHoi(newPhanHoi, () => this.getData());
+            this.props.createPhanHoi(newPhanHoi, () => {
+                this.phanHoi.value('');
+                this.props.getPhanHoi(this.props.id);
+            });
         } else {
             T.notify('Nội dung phản hồi bị trống', 'danger');
             this.phanHoi.focus();
@@ -89,5 +92,5 @@ class PhanHoi extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi, phanHoi: state.hcth.hcthPhanHoi });
-const mapActionsToProps = { createPhanHoi, returnVanBan };
+const mapActionsToProps = { createPhanHoi, returnVanBan, getPhanHoi };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(PhanHoi);

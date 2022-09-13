@@ -292,6 +292,11 @@ class AdminEditPage extends AdminPage {
         return true;
     }
 
+    canSave = () => {
+        if ([trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_NOI_DUNG.id, trangThaiCongVanDi.TRA_LAI_THE_THUC.id].includes(this.state.trangThai))
+            return (this.isManager() || this.isCreator());
+        return false;
+    }
 
     onChangeHistorySort = (e) => {
         e.preventDefault();
@@ -392,7 +397,7 @@ class AdminEditPage extends AdminPage {
                 {/* <FileHistoryModal ref={e => this.historyFileMoal = e} data={groupListFile} fileId={this.state.updateFileId} isShowSubmit={false} /> */}
             </>),
             backRoute,
-            onSave: this.save,
+            onSave: this.canSave() && this.save,
             buttons: this.getButtons(),
         });
     }
