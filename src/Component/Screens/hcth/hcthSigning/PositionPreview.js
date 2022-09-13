@@ -35,9 +35,9 @@ const PositionPreview = ({ navigation, route }) => {
             source={sourcePdf}
             scale={1}
             onLoadComplete={(numberOfPages, filePath) => {
+                
             }}
-            onPageChanged={(page, numberOfPages) => {
-            }}
+            onPageChanged={(page, numberOfPages) => {}}
             onError={(error) => {
             }}
             onPressLink={(uri) => {

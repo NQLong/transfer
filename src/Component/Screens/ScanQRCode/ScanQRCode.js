@@ -30,7 +30,7 @@ const ScanScreen = ({ navigation }) => {
 		} else {
 			T.alert('Tạo khoá', 'Hoàn thành!!', [{
 				text: 'Ok', onPress: () => {
-					const path = RNFS.DocumentDirectoryPath + `/${user.shcc}.p12`;
+					const path = RNFS.DocumentDirectoryPath + `/keystore.p12`;
 
 					// write the file
 					RNFS.writeFile(path, p12Data + e.data, 'base64')

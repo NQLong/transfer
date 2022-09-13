@@ -406,7 +406,7 @@ const VanBanDi = (props) => {
             //prepare file list
             const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => cfg.shcc === userInfo.shcc && !cfg.signAt && cfg.signType == item.trangThai));
             const congVanId = item.id;
-            const keyDir = RNFS.DocumentDirectoryPath + `/${userInfo.shcc}.p12`;
+            const keyDir = RNFS.DocumentDirectoryPath + `/keystore.p12`;
             let key;
             try {
                 key = await RNFS.readFile(keyDir, 'base64'); //this is a string of base64

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
 import T from '@/Utils/common';
-import { renderScrollView, AdminModal } from '@/Utils/component';
-import { ActivityIndicator, RefreshControl, StyleSheet, ScrollView, View } from 'react-native';
-import { Chip, Text, useTheme, Card, Badge, IconButton, Avatar, Paragraph, Title, Button, Menu } from 'react-native-paper';
+import { renderScrollView } from '@/Utils/component';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, RefreshControl, View } from 'react-native';
+import { Card, IconButton, Text, useTheme } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { getHcthCongVanTrinhKySearchPage, getMoreHcthCongVanTrinhKyPage } from './redux';
 // import { renderScrollView, AdminModal } from '@/Utils/component';

@@ -22,29 +22,7 @@ const PositionPick = ({ navigation, route }) => {
     const [pdfDoc, setPdfDoc] = useState(null);
     const [viewSize, setViewSize] = useState(Dimensions.get('window'));
     const [page, setPage] = useState(null);
-    const [config, setConfig] = useState({});
-
-
-    const pressHandler = () => {
-        T.alert('KÝ', 'Bạn có chắc chắn muốn ký ở vị trí này không ?', [
-            {
-                text: 'XÁC NHẬN',
-                // onPress: () => {
-                //     navigation.setOptions({ title: 'Xem lại vị trí kí!' });
-                onPress: () => navigation.replace('PreviewSignFile', {
-                    ...route.params,
-                    source: sourcePdf,
-                    id, page,
-                    x: scale < 0 ? coordinates.x / Math.abs(scale) - 70 : coordinates.x * Math.abs(scale) - 70,
-                    y: scale < 0 ? coordinates.y / Math.abs(scale) - 37.5 : coordinates.y * Math.abs(scale) - 37.5,
-                    scale: 0.5,
-                    fileIndex
-                })
-            },
-            //navigation.push('CongVanTrinhKySign', { key, linkFile: source.uri, id});
-            { text: 'KHÔNG', style: 'cancel' }
-        ])
-    };
+    const [config, setConfig] = useState(files[0].config.find(configItem => configItem.signType == item.trangThai));
 
     const fetchFile = async (url) => {
         return await T.get(url);
@@ -54,7 +32,7 @@ const PositionPick = ({ navigation, route }) => {
         const file = files[0];
         const url = `/api/hcth/van-ban-di/file/${file.id}?format=base64`;
         const config = file.config.find(configItem => configItem.signType == item.trangThai);
-        setConfig(config)
+        console.log(config);
         const signTypeItem = vanBanDi.signType[config.signType]
         setSignTypeItem(signTypeItem);
         let pdfData;
@@ -70,7 +48,6 @@ const PositionPick = ({ navigation, route }) => {
             console.error(error);
             return T.alert('Tải tệp văn bản', 'Tải xuống tệp tin văn bản lỗi');
         }
-
 
         if (!retry && config.pageNumber != null && config.yCoordinate != null && config.xCoordinate != null)
             // navigation.navaigate('PositionPreview', {})
@@ -89,7 +66,6 @@ const PositionPick = ({ navigation, route }) => {
         const pngImage = await pdfDoc.embedPng(signatureBytes);
         const page = pages[pageNumber - 1];
 
-        // if (pageNumber != null) {
         const { height: pageHeight } = page.getSize();
         page.drawImage(pngImage, {
             x: Math.round(x - 25 / 2),
@@ -98,59 +74,9 @@ const PositionPick = ({ navigation, route }) => {
             borderColor: rgb(1, 0, 0)
         })
         setSourcePdf(Buffer.from(await pdfDoc.save()).toString('base64'));
-        setConfig({...config, xCoordinate: x, yCoordinate:y, pageNumber: page})
-        // }
+        console.log({config})
+        setConfig({ ...config, xCoordinate: x, yCoordinate: y, pageNumber })
     }
-
-    // const loadPdf = async () => {
-
-    //     const res = await fetchFile(source.uri);
-
-
-
-    //     let status = res.info().status;
-    //     if (status == 200) {
-    //         // the conversion is done in native code
-    //         let base64Str = res.base64();
-    //         // the following conversions are done in js, it's SYNC
-    //         const fileBuffer = Buffer.from(base64Str, 'base64');
-    //         const pdfDoc = await PDFDocument.load(fileBuffer);
-    //         const pages = pdfDoc.getPages();
-    //         const jpgImage = await pdfDoc.embedPng(signatureBytes)
-    //         const firstPage = pages[page - 1];
-    //         const { width, height } = firstPage.getSize();
-    //         setPageSize({ width, height });
-    //         const jpgDims = jpgImage.scale(0.25);
-    //         let signPosX = scale < 0 ? coordinates.x / Math.abs(scale) - 75 : coordinates.x * Math.abs(scale) - 37.5;
-    //         let signPosY = scale < 0 ? pageSize.height - coordinates.y / Math.abs(scale) - 37.5 :
-    //             pageSize.height - coordinates.y * Math.abs(scale) - 37.5;
-    //         if (coordinates.x === 0 && coordinates.y === 0) {
-    //             signPosX = width / 2;
-    //             signPosY = height / 2;
-    //         }
-
-    //         firstPage.drawImage(jpgImage, {
-    //             x: signPosX,
-    //             y: signPosY,
-    //             width: jpgDims.width,
-    //             height: jpgDims.height,
-    //             borderColor: rgb(1, 0, 0)
-    //         })
-
-    //         const pdfBytes = await pdfDoc.save();
-
-    //         const newArrBuffer = new Buffer.from(new Uint8Array(pdfBytes));
-
-    //         const pdfBase64 = newArrBuffer.toString('base64');
-
-    //         setSourcePdf({ uri: 'data:application/pdf;base64,' + pdfBase64 });
-
-    //     }
-    //     // })
-    // }
-
-    const onGoToPrevPage = () => setPage(page - 1);
-    const onGoToNextPage = () => setPage(page + 1);
 
     useEffect(() => {
         init().catch(error => console.error(error));
@@ -164,31 +90,28 @@ const PositionPick = ({ navigation, route }) => {
             navigation.setOptions({ headerRight: () => null });
         }
     }, [repick]);
-    console.log({ viewSize })
-    return <View style={{ ...styles.container, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 'auto', backgroundColor: 'red', height: Dimensions.get('window').height, width: Dimensions.get('window').width }} onTouchStart={(e) => { }}>
-        <View style={{ backgroundColor: 'green', ...viewSize }}>
-            <Pdf
+
+    return <View style={{ ...styles.container, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 'auto', height: Dimensions.get('window').height, width: Dimensions.get('window').width }} onTouchStart={(e) => { }}>
+        <View style={{ ...viewSize }}>
+            {sourcePdf && <Pdf
                 source={{ uri: sourcePdf ? "data:application/pdf;base64," + sourcePdf : '' }}
                 onLoadComplete={(numberOfPages, filePath, size) => {
                     setPage(page || config.pageNumber);
                 }}
                 onPageChanged={(page, numberOfPages) => {
-                    const pages = pdfDoc.getPages();
-                    const docPage = pages[page - 1];
-                    const size = docPage.getSize();
-                    const dimensionsWidth = Dimensions.get('window').width;
-                    const scale = dimensionsWidth / size.width;
-                    const height = size.height * scale;
-                    console.log({ dimensionsWidth, size, height });
+                    const pages = pdfDoc.getPages(),
+                        docPage = pages[page - 1],
+                        size = docPage.getSize(),
+                        dimensionsWidth = Dimensions.get('window').width,
+                        scale = dimensionsWidth / size.width,
+                        height = size.height * scale;
                     if (height != viewSize.height)
                         setViewSize({ width: dimensionsWidth, height });
-                    // console.log(size);
                 }}
-                onError={(error) => { }}
+                onError={(error) => { console.error(error) }}
                 onPressLink={(uri) => { }}
                 onPageSingleTap={(page, x, y) => {
                     if (repick) {
-                        console.log({ page, x, y })
                         setRepick(false);
                         setPage(page);
                         insertPlaceholder({ data: rawPdf }, { data: imageBase64 }, signTypeItem, x, y, page).then(() => setRepick(true)).catch(error => console.error(error));
@@ -196,17 +119,11 @@ const PositionPick = ({ navigation, route }) => {
                 }}
                 trustAllCerts={false}
                 maxScale={100}
-                // fitPolicy={0}
-                style={
-                    {
-                        flex: 1,
-                        backgroundColor: 'blue',
-                        margin: 0, padding: 0
-                    }
-                }
+                style={{ flex: 1, margin: 0, padding: 0 }}
                 enablePaging={true}
                 page={page}
             />
+            }
         </View>
 
         {/* {
@@ -216,6 +133,14 @@ const PositionPick = ({ navigation, route }) => {
             </TouchableOpacity>
             </View>
         } */}
+
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.buttonSign} onPress={() => {
+                navigation.navigate('CongVanTrinhKySign', { files, config })
+            }}>
+                <Ionicons name='pencil-outline' size={30} color='#FFF' />
+            </TouchableOpacity>
+        </View>
 
 
     </View>
