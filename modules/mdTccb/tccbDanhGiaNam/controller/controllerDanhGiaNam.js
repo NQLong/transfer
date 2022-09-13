@@ -58,7 +58,8 @@ module.exports = app => {
     app.delete('/api/tccb/danh-gia', app.permission.check('tccbDanhGiaNam:delete'), async (req, res) => {
         try {
             const item = await app.model.tccbDanhGiaNam.get({ id: req.body.id });
-            const nam = Number(item.nam);
+            const nam = parseInt(item.nam);
+            await app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear(nam);
             await Promise.all([
                 app.model.tccbKhungDanhGiaCanBo.delete({ nam }),
                 app.model.tccbKhungDanhGiaDonVi.update({ nam }, { isDelete: 1 }),
@@ -66,7 +67,6 @@ module.exports = app => {
                 app.model.tccbDiemTru.delete({ nam }),
                 app.model.tccbTyLeDiem.delete({ nam }),
                 app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
-                app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear(nam),
             ]);
             res.end();
         } catch (error) {

@@ -1,6 +1,6 @@
-// Table name: FW_SMS_TEMPLATE_DRAFT { id, donVi, email, content, lastModified, approved, reply, replyTime }
+// Table name: FW_SMS_TEMPLATE_DRAFT { id, donVi, email, content, lastModified, approved, approvedTime, purpose, thamSo, isTiengViet }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'donVi': 'DON_VI', 'email': 'EMAIL', 'content': 'CONTENT', 'lastModified': 'LAST_MODIFIED', 'approved': 'APPROVED', 'reply': 'REPLY', 'replyTime': 'REPLY_TIME' };
+const obj2Db = { 'id': 'ID', 'donVi': 'DON_VI', 'email': 'EMAIL', 'content': 'CONTENT', 'lastModified': 'LAST_MODIFIED', 'approved': 'APPROVED', 'approvedTime': 'APPROVED_TIME', 'purpose': 'PURPOSE', 'thamSo': 'THAM_SO', 'isTiengViet': 'IS_TIENG_VIET' };
 
 module.exports = app => {
     app.model.fwSmsTemplateDraft = {

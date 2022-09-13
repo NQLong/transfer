@@ -1,44 +1,58 @@
 module.exports = app => {
-    app;
-    // app.fs.createFolder(app.path.join(app.assetPath, 'pdf'));
-    // const cacheDir = app.path.join(app.assetPath, 'pdf/cache');
-    // app.fs.createFolder(cacheDir);
 
-    // app.get('/api/hcth/ky-dien-tu/van-ban-di', app.permission.orCheck('manager:write', 'rectors:login', 'developer:login'), async (req, res) => {
-    //     try {
-    //         //TODO: check quyền user đối với văn bản
-    //         const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize } = req.query;
-    //         const file = await app.model.hcthFile.get({ id, loai: 'DI' });
-    //         if (!file) throw 'Không tìm được file';
-    //         const input = app.path.join(app.assetPath, `/congVanDi/${1204}/${file.tenFile}`);
-    //         const extension = app.path.extname(file.tenFile).slice(1);
+    app.fs.createFolder(app.path.join(app.assetPath, 'pdf'));
+    const cacheDir = app.path.join(app.assetPath, 'pdf/cache');
+    app.fs.createFolder(cacheDir);
+    const { vanBanDi } = require('../constant');
+    const jimp = require('jimp')
 
-    //         //TODO: count current signature
+    app.get('/api/hcth/ky-dien-tu/van-ban-di', app.permission.orCheck('manager:write', 'rectors:login', 'developer:login'), async (req, res) => {
+        try {
+            //TODO: check quyền user đối với văn bản
+            const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType } = req.query;
+            //get file imformation
+            const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
+            const file = await app.model.hcthFile.get({ id: vanBanDiFile.fileId });
+            if (!file) throw 'Không tìm được file';
+            const input = app.path.join(app.assetPath, `/congVanDi/${vanBanDiFile.vanBanDi}/${file.tenFile}`);
+            const extension = app.path.extname(file.tenFile);
+            const signTypeItem = vanBanDi.signType[signType];
 
-    //         //TODO: convert file to pdf
-    //         if (extension != 'pdf') throw 'invalid file type';
-    //         const output = app.path.join(cacheDir, file.tenFile.replace(/\.[^/.]+$/, "") + `-${new Date().getTime()}.pdf`);
-    //         const { status } = await app.pdf.signVisualPlaceholder({
-    //             input,
-    //             output,
-    //             keystorePath: app.path.join(app.assetPath, '/pdf/p12placeholder/certificate.p12'),
-    //             imgPath: app.path.join(app.assetPath, '/congVanDen/2003/001.0068.png'),
-    //             // app.mo
-    //         });
-    //         if (status != 0) throw 'lỗi hệ thống';
-    //         const outputBuffer = app.fs.readFileSync(output, 'base64');
+            //TODO: count current signature
 
-    //         //TODO: validate number of signature
+            //TODO: convert file to pdf
+            if (extension != '.pdf') throw 'invalid file type';
 
-    //         //TODO: replace placeholder content with array of 0 (optional) -> make placeholder signature become invalid
-    //         // console.log(typeof outputBuffer);
-    //         res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
-    //         res.end(Buffer.from(outputBuffer, 'base64'));
-    //     } catch (error) {
-    //         console.error(error);
-    //         res.status(400).send({ error });
-    //     }
-    // });
+            // prepare session folder for signing -> this would be deleted -> TODO: schedule delete these folder
+            const sessionFolder = app.path.join(cacheDir, new Date().getTime().toString());
+            app.fs.createFolder(sessionFolder);
+            const output = app.path.join(sessionFolder, file.tenFile);
+
+            //resize image to session folder
+            const imagePath = app.path.join(app.assetPath, `/key/${req.session.user.shcc}.png`);
+            const image = await jimp.read(imagePath);
+            image.resize(signTypeItem.width, signTypeItem.height).write(app.path.join(sessionFolder, req.session.user.shcc + '.png'));
+
+            console.log(output);
+            const { status } = await app.pdf.signVisualPlaceholder({
+                input, scale: '0', output,
+                keystorePath: app.path.join(app.assetPath, '/pdf/p12placeholder/certificate.p12'),
+                imgPath: app.path.join(sessionFolder, `${req.session.user.shcc}.png`),
+            });
+            if (status != 0) throw 'lỗi hệ thống';
+            const outputBuffer = app.fs.readFileSync(output, 'base64');
+
+            //TODO: validate number of signature
+
+            //TODO: replace placeholder content with array of 0 (optional) -> make placeholder signature become invalid
+
+            res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
+            res.end(Buffer.from(outputBuffer, 'base64'));
+        } catch (error) {
+            console.error(error);
+            res.status(400).send({ error });
+        }
+    });
 
     // app.uploadHooks.add('hcthKyDienTu', (req, fields, files, params, done) =>
     //     app.permission.has(req, () => hcthKyDienTu(req, fields, files, params, done), done, 'staff:login'));
