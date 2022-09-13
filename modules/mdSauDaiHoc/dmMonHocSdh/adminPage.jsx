@@ -74,16 +74,18 @@ class EditModal extends AdminModal {
 class DmMonHocSdhPage extends AdminPage {
     state = { dmKhoaSdh: {} };
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/mon-hoc', () => {
-            T.onSearch = (searchText) => this.props.getDmMonHocSdhPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getDmMonHocSdhPage();
-            this.props.getDmDonViFaculty(items => {
-                let dmKhoaSdh = {};
-                items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
-                this.setState({ dmKhoaSdh });
-            });
+        let route = T.routeMatcher('/user/:menu/mon-hoc').parse(window.location.pathname);
+        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
+        T.ready(`/user/${this.menu}`);
+        T.onSearch = (searchText) => this.props.getDmMonHocSdhPage(undefined, undefined, searchText || '');
+        T.showSearchBox();
+        this.props.getDmMonHocSdhPage();
+        this.props.getDmDonViFaculty(items => {
+            let dmKhoaSdh = {};
+            items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
+            this.setState({ dmKhoaSdh });
         });
+
     }
 
     showModal = (e) => {
@@ -152,6 +154,7 @@ class DmMonHocSdhPage extends AdminPage {
                     create={this.props.createDmMonHocSdh} update={this.props.updateDmMonHocSdh}
                     readOnly={!permission.write} />
             </>,
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sau-dai-hoc/mon-hoc/upload') : null
         });
