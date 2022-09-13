@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class EventWaitApprovalPage extends React.Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
     }
 
@@ -41,11 +41,11 @@ class EventWaitApprovalPage extends React.Component {
                     <thead>
                         <tr>
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: '80%' }}>Tiêu đề</th>
-                            <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
+                            <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Tiêu đề</th>
+                            <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Hình ảnh</th>
                             {viewerType == 2 ? <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Người soạn</th> : null}
-                            {viewerType == 1 ? <th style={{ width: 'auto' }} nowrap='true'>Được duyệt</th> : null}
-                            <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                            {viewerType == 1 ? <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Được duyệt</th> : null}
+                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>

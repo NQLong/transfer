@@ -91,7 +91,7 @@ class DmKhenThuongChuThichPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên khen thưởng chú thích</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
