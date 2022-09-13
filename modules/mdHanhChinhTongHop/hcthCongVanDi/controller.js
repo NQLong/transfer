@@ -424,11 +424,8 @@ module.exports = app => {
     const hcthKyDienTu = async (req, fields, files, params, done) => {
         try {
             if (
-                fields.userData &&
-                fields.userData[0] &&
-                fields.userData[0].startsWith('hcthKyDienTu') &&
-                files.file &&
-                files.file.length > 0) {
+                fields.userData && fields.userData[0] && fields.userData[0].startsWith('hcthKyDienTu') && files.file && files.file.length > 0) {
+                console.log(files);
                 const
                     srcPath = files.file[0].path,
                     validUploadFileType = ['.pdf'],

@@ -9,7 +9,7 @@ module.exports = app => {
     app.get('/api/hcth/ky-dien-tu/van-ban-di', app.permission.orCheck('manager:write', 'rectors:login', 'developer:login'), async (req, res) => {
         try {
             //TODO: check quyền user đối với văn bản
-            const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType } = req.query;
+            const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType, format } = req.query;
             //get file imformation
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
             const file = await app.model.hcthFile.get({ id: vanBanDiFile.fileId });
@@ -33,9 +33,8 @@ module.exports = app => {
             const image = await jimp.read(imagePath);
             image.resize(signTypeItem.width, signTypeItem.height).write(app.path.join(sessionFolder, req.session.user.shcc + '.png'));
 
-            console.log(output);
             const { status } = await app.pdf.signVisualPlaceholder({
-                input, scale: '0', output,
+                input, scale: '0', output, name, location, reason, scale: '-50',
                 keystorePath: app.path.join(app.assetPath, '/pdf/p12placeholder/certificate.p12'),
                 imgPath: app.path.join(sessionFolder, `${req.session.user.shcc}.png`),
             });
@@ -45,7 +44,9 @@ module.exports = app => {
             //TODO: validate number of signature
 
             //TODO: replace placeholder content with array of 0 (optional) -> make placeholder signature become invalid
-
+            if (format) {
+                return res.send({ data: outputBuffer });
+            }
             res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
             res.end(Buffer.from(outputBuffer, 'base64'));
         } catch (error) {
