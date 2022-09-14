@@ -1,5 +1,5 @@
 module.exports = (app, serviceConfig) => {
-    app.get('/', (req, res) => res.send(`Hi, my name is ${serviceConfig.name.upFirstChar()}`));
+    !app.isDebug && app.get('/', (req, res) => res.send(`Hi, my name is ${serviceConfig.name.upFirstChar()}`));
 
     // Clusters -------------------------------------------------------------------------------------------------------------------------------------
     app.get(`/api/cluster/service/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {

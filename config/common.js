@@ -178,9 +178,10 @@ module.exports = (app, appConfig) => {
         },
 
         clusterGetAll: async (serviceName, done) => {
+            const agent = new require('https').Agent({ rejectUnauthorized: false });
             const serviceConfig = appConfig.services[serviceName],
                 url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
-                response = await app.service.get(url);
+                response = await app.service.get(url, null, { httpsAgent: agent });
             console.log('clusterGetAll:', url, response);
             done && done(response);
             return response;

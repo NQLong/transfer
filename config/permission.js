@@ -470,8 +470,11 @@ module.exports = (app, appConfig) => {
                 if (typeof checkFlag == 'boolean') break; // Hook trúng => Break luôn
             }
 
-            if (checkFlag) return true;
-            else throw 'Permission denied!';
+            if (checkFlag) {
+                return true;
+            } else {
+                throw 'Permission denied!';
+            }
         }
     };
 
