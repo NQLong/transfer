@@ -13,5 +13,9 @@ export default {
             path: '/user/danh-muc/khoa-sau-dai-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/sau-dai-hoc/khoa-sau-dai-hoc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
     ],
 }; 
