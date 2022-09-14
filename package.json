@@ -19,14 +19,14 @@
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
     "services": {
-        "smsService": {
+        "registerService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7020",
             "isHttps": false,
             "isDebug": false
         },
-        "registerService": {
+        "smsService": {
             "mainUrl": "http://localhost:7012",
             "host": "localhost",
             "port": "7018",
