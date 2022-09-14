@@ -12,6 +12,7 @@ import T from '@/Utils/common';
 
 import { Comment, FormTextBox } from '@/Utils/component';
 import { createPhanHoi, getPhanHoi, getVanBanDi } from './redux';
+import { vanBanDi } from '@/Utils/contants';
 const RNFS = require('react-native-fs');
 
 import commonStyles from '../../../../Asset/Styles/styles';
@@ -417,23 +418,11 @@ const VanBanDi = (props) => {
 
             navigation.push('PositionPicker', { files: listSignFile, key, item });
 
-            // const signFile = listSignFile[0];
-
-            // const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/download/${signFile.vanBanDi}/${signFile.file.tenFile}`;
-
-            // navigation.push('SelectSignPos', { id: congVanId, key, fileIndex: 0, listSignFile, source: { uri: linkFile, cache: true } });
-
         } catch (error) {
             console.error(error);
         }
+        closeMenu();
     }
-
-    // const enabledSignBtn = () => {
-    //     return files.some(file => {
-    //         if (file.config.length > 0 && file.config.some(cf => cf.shcc === userInfo.shcc && !cf.signAt)) return true
-    //         else return false
-    //     })
-    // }
 
     const generalInfo = () => {
         return <Card style={styles.generalInfoWrapper} elevation={4}>
@@ -443,13 +432,9 @@ const VanBanDi = (props) => {
                 <List.Item title='Ngày gửi' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayGui ? T.dateToText(item.ngayGui) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày ký' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayKy ? T.dateToText(item.ngayKy) : 'Chưa có'}</Text>} />
                 <List.Item title='Ngày tạo' right={() => <Text variant='bodyMedium' style={styles.generalInfoItem}>{item?.ngayTao ? T.dateToText(item.ngayTao) : 'Chưa có'}</Text>} />
-
-                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: trangThaiVanBanDi[item.trangThai]?.color || 'black', fontWeight: 'bold' }}>{trangThaiVanBanDi[item.trangThai]?.text || 'Nháp'}</Text>} />
-
+                <List.Item title='Trạng thái' right={() => <Text variant='bodyMedium' style={{ ...styles.generalInfoItem, color: vanBanDi.trangThai[item.trangThai]?.color || 'black', fontWeight: 'bold' }}>{vanBanDi.trangThai[item.trangThai]?.text || 'Nháp'}</Text>} />
                 <List.Item title='Đơn vị gửi' description={item?.tenDonViGui} descriptionNumberOfLines={null} />
-
                 <List.Item title='Trích yếu' description={item?.trichYeu} descriptionNumberOfLines={null} />
-
             </Card.Content>
         </Card>
     }
@@ -459,9 +444,9 @@ const VanBanDi = (props) => {
     const menuItems = [];
 
     // enabledSignBtn && menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
-
-    if (item?.files?.some(file => file.config.map(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != trangThaiVanBanDi.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
-        menuItems.push(<Menu.Item key={item.trangThai} onPress={onSignVanBanDi} title={trangThaiVanBanDi[item.trangThai].text} />);
+    console.log(item?.files?.find(file => file.config.map(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
+    if (item?.files?.some(file => file.config.some(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
+        menuItems.push(<Menu.Item key={item.trangThai} onPress={onSignVanBanDi} title={vanBanDi.trangThai[item.trangThai].text} />);
 
 
 
