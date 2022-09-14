@@ -1,4 +1,32 @@
 module.exports = app => {
+    const menu = {
+        parentMenu: app.parentMenu.students,
+        menus: {
+            6104: { title: 'Bảo hiểm y tế', link: '/user/students/bhyt', icon: 'fa-medkit', backgroundColor: '#ac2d34' }
+        }
+    };
+    app.permission.add({ name: 'bhyt:read', menu });
+
+    app.get('/user/students/bhyt', app.permission.check('bhyt:read'), app.templates.admin);
+
+    // APIs --------------------------------------------------------------------------------------
+    app.get('/api/student/bhyt/all', app.permission.check('bhyt:read'), async (req, res) => {
+        try {
+            let filter = req.query?.filter || {};
+            if (!filter.namHoc) filter.namHoc = new Date().getFullYear();
+            let items = await app.model.svBaoHiemYTe.searchPage('', app.utils.stringify(filter));
+            const condition = {
+                statement: 'idDangKy in (:listId)',
+                parameter: { listId: items.rows.map(item => item.id) }
+            };
+            let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
+
+            res.send({ items: items.rows, dataChuHo, dataThanhVien });
+        } catch (error) {
+            console.log(error);
+            res.send({ error });
+        }
+    });
 
     app.get('/api/student/bhyt', app.permission.check('student:login'), async (req, res) => {
         try {
@@ -36,7 +64,7 @@ module.exports = app => {
                     else {
                         let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
                         if (mapperDienDong[data.dienDong]) {
-                            app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian });
+                            app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian, namDangKy: new Date().getFullYear() });
                             let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
                             const { hocPhi, congNo } = currentFee;
                             app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
@@ -49,7 +77,7 @@ module.exports = app => {
                     }
                 } else res.send({ warning: 'Sinh viên đã đăng ký BHYT cho năm nay!' });
             } else {
-                let item = await app.model.svBaoHiemYTe.create(app.clone(data, { mssv, thoiGian, userModified: emailTruong }));
+                let item = await app.model.svBaoHiemYTe.create(app.clone(data, { mssv, thoiGian, userModified: emailTruong, namDangKy: new Date().getFullYear() }));
                 if (!item) res.send({ error: 'Lỗi hệ thống' });
                 else {
                     let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
@@ -176,7 +204,7 @@ module.exports = app => {
                         destPath = app.path.join(destFolder, fileName);
                     await app.fs.rename(srcPath, destPath);
                     await app.model.svBaoHiemYTe.update({ id }, { matSauThe: fileName });
-                    done && done({ image: `/api/student/get-back-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
+                    done && done({ image: `/api/student/back-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
                 }
             }
         } catch (error) {
@@ -200,7 +228,23 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/student/get-back-bhyt', app.permission.check('student:login'), async (req, res) => {
+    app.get('/api/student/front-bhyt-admin', app.permission.check('bhyt:read'), async (req, res) => {
+        try {
+            let id = req.query.id;
+            const item = await app.model.svBaoHiemYTe.get({ id });
+            if (!item || (item && !item.matTruocThe)) res.send({ error: 'No value returned' });
+            else {
+                let matTruocThe = item.matTruocThe,
+                    path = app.path.join(app.assetPath, '/bhyt/front', item.namDangKy.toString(), item.mssv, matTruocThe);
+                if (app.fs.existsSync(path)) res.sendFile(path);
+                else res.send({ error: 'No value returned' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/student/back-bhyt', app.permission.check('student:login'), async (req, res) => {
         try {
             let user = req.session.user, curYear = new Date().getFullYear();
             const item = await app.model.svBaoHiemYTe.get({ mssv: user.studentId, namDangKy: curYear });
@@ -208,6 +252,22 @@ module.exports = app => {
             else {
                 let matSauThe = item.matSauThe,
                     path = app.path.join(app.assetPath, '/bhyt/back', curYear.toString(), user.studentId, matSauThe);
+                if (app.fs.existsSync(path)) res.sendFile(path);
+                else res.send({ error: 'No value returned' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/student/back-bhyt-admin', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let id = req.query.id;
+            const item = await app.model.svBaoHiemYTe.get({ id });
+            if (!item || (item && !item.matSauThe)) res.send({ error: 'No value returned' });
+            else {
+                let matSauThe = item.matSauThe,
+                    path = app.path.join(app.assetPath, '/bhyt/back', item.namDangKy.toString(), item.mssv, matSauThe);
                 if (app.fs.existsSync(path)) res.sendFile(path);
                 else res.send({ error: 'No value returned' });
             }

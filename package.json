@@ -7,6 +7,7 @@
     "port": 7012,
     "sessionRedisStore": false,
     "rootUrl": "https://hcmussh.edu.vn",
+    "localIpPrefix": "10.22.1.",
     "autoLogin": true,
     "scripts": {
         "nodemon": "nodemon hcmussh.web.js --ignore node_modules/ --ignore public/ --ignore src/view/ --ignore webpack.config.js --ignore *.json",

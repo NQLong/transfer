@@ -32,7 +32,7 @@ export class TableCell extends React.Component { // type = number | date | link 
             }
         } else if (type == 'image') {
             return content ?
-                <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}><img src={content} alt={alt} style={{ height: '32px' }} /></td> :
+                <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}><img src={content} alt={alt} style={{ height: this.props.height || '32px' }} /></td> :
                 <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}>{alt}</td>;
         } else if (type == 'checkbox') {
             return this.props.isCheck ? (<td className={'animated-checkbox ' + className} style={{ textAlign: 'center', ...style }} rowSpan={rowSpan} colSpan={colSpan}>

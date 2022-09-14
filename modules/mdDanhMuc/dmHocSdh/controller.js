@@ -9,8 +9,21 @@ module.exports = app => {
             }
         },
     };
+
+    const menuSdh = {
+        parentMenu: app.parentMenu.sdh,
+        menus: {
+            7527: {
+                title: 'Phân hệ đào tạo',
+                link: '/user/sau-dai-hoc/phan-he-dao-tao',
+                backgroundColor: '#daa520',
+                groupIndex: 2
+            }
+        },
+    };
     app.permission.add(
         { name: 'dmHocSdh:read', menu },
+        { name: 'dmHocSdh:read', menu: menuSdh },
         { name: 'dmHocSdh:write' },
         { name: 'dmHocSdh:delete' },
     );

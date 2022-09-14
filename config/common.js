@@ -92,7 +92,7 @@ module.exports = (app, appConfig) => {
         },
         sdh: {
             index: 7500, title: 'Sau đại học', link: '/user/sau-dai-hoc', icon: 'fa-graduation-cap ',
-            subMenusRender: true
+            subMenusRender: false, groups: ['NGÀNH', 'CÔNG TÁC', 'DANH MỤC']
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
@@ -169,7 +169,7 @@ module.exports = (app, appConfig) => {
     app.service = {
         url: (url, serviceConfig) => {
             if (!app.isDebug) {
-                return `${serviceConfig.isHttps ? 'https' : 'http'}://${serviceConfig.host}:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
+                return `${serviceConfig.isHttps ? 'https' : 'http'}://${serviceConfig.host}${serviceConfig.port ? ':' + serviceConfig.port : ''}` + url + '?t=' + new Date().getTime();
             } else if (serviceConfig.isDebug) {
                 return `http://localhost:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
             } else {
@@ -178,9 +178,10 @@ module.exports = (app, appConfig) => {
         },
 
         clusterGetAll: async (serviceName, done) => {
+            const agent = new require('https').Agent({ rejectUnauthorized: false });
             const serviceConfig = appConfig.services[serviceName],
                 url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
-                response = await app.service.get(url);
+                response = await app.service.get(url, null, { httpsAgent: agent });
             console.log('clusterGetAll:', url, response);
             done && done(response);
             return response;
