@@ -21,7 +21,7 @@ module.exports = (cluster, isDebug) => {
         worker.createdDate = new Date();
         workers[worker.process.pid] = worker;
     }
-    console.log(` - The ${appConfig.name} is ` + (isDebug ? `debugging on http://localhost:${appConfig.port}.` : `running on http://${appConfig.host}:${appConfig.port}`));
+    console.log(` - The ${appConfig.name} is ` + (isDebug ? `debugging on http://localhost:${appConfig.port}.` : `running on ${appConfig.isHttps ? 'https' : 'http'}://${appConfig.host}:${appConfig.port}`));
     console.log(` - Worker${workers.length >= 2 ? 's' : ''} ${Object.keys(workers)} ${workers.length >= 2 ? 'are' : 'is'} online.`);
 
     const workersChanged = () => {

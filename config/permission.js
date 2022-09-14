@@ -1,4 +1,4 @@
-module.exports = app => {
+module.exports = (app, appConfig) => {
     const checkPermissions = (req, res, next, permissions) => {
         if (req.session.user) {
             const user = req.session.user, division = Date.now() - req.session.user.expiration;
@@ -175,6 +175,12 @@ module.exports = app => {
             } else {
                 responseWithPermissions(req, success, fail, permissions);
             }
+        },
+
+        isLocalIp: (req, res, next) => { // ::ffff:10.22.1.53
+            const ip = req.headers['x-real-ip'] || req.connection.remoteAddress;
+            app.isDebug || ip.startsWith(appConfig.localIpPrefix) || ip.startsWith('::ffff:' + appConfig.localIpPrefix) ?
+                next() : res.send({ error: 'Invalid IP!' });
         },
 
         getTreeMenuText: () => {
