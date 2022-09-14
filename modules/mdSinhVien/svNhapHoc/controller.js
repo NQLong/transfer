@@ -116,7 +116,7 @@ module.exports = app => {
                     res.send({ dataNhapHoc });
                 } else {
                     if (dataNhapHoc.ngayNhapHoc === null) {
-                        dataNhapHoc.tinhTrang = 'Sinh viên chưa cập nhật thông tin cá nhân trực tuyến!';
+                        dataNhapHoc.tinhTrang = 'Sinh viên chưa xuất file sơ yếu lí lịch!';
                     } else if (dataNhapHoc.ngayNhapHoc == -1) {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';

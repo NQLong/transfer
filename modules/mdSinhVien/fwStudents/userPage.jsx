@@ -201,11 +201,15 @@ class SinhVienPage extends AdminPage {
                 });
             }
         };
-        if (this.state.daDangKyBhyt) {
-            getData();
-        } else {
-            this.baoHiemModal.show(getData);
-        }
+        T.confirm('CẢNH BÁO', 'Bạn có chắc chắn muốn lưu thay đổi thông tin cá nhân?', 'warning', true, isConfirm => {
+            if (isConfirm) {
+                if (this.state.daDangKyBhyt) {
+                    getData();
+                } else {
+                    this.baoHiemModal.show(getData);
+                }
+            }
+        });
     };
 
     downloadWord = (e) => {
