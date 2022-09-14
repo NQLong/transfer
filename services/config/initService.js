@@ -1,6 +1,8 @@
 module.exports = (app, serviceConfig) => {
+    app.get('/', (req, res) => res.send(`Hi, my name is ${serviceConfig.name.upFirstChar()}`));
+
     // Clusters -------------------------------------------------------------------------------------------------------------------------------------
-    app.get(`/api/cluster/service/${serviceConfig.name}`, (req, res) => {
+    app.get(`/api/cluster/service/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {
         const images = [],
             imagePath = app.path.join(__dirname, '../asset/bundle');
         app.fs.existsSync(imagePath) && app.fs.readdirSync(imagePath).forEach(filename => {
@@ -10,18 +12,18 @@ module.exports = (app, serviceConfig) => {
         res.send({ clusters: app.worker.items, images });
     });
 
-    app.post(`/api/cluster/service/${serviceConfig.name}`, (req, res) => {
+    app.post(`/api/cluster/service/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {
         app.worker.create();
         res.send({});
     });
 
-    app.put(`/api/cluster/service/${serviceConfig.name}`, (req, res) => {
+    app.put(`/api/cluster/service/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {
         const { id } = req.body;
         id && app.worker.reset(id);
         res.send({});
     });
 
-    app.delete(`/api/cluster/service/${serviceConfig.name}`, (req, res) => {
+    app.delete(`/api/cluster/service/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {
         const { id } = req.body;
         id && app.worker.items.length > 1 && app.worker.shutdown(id);
         res.send({});
@@ -30,7 +32,7 @@ module.exports = (app, serviceConfig) => {
 
     // Images ---------------------------------------------------------------------------------------------------------------------------------------
     const multiparty = require('multiparty');
-    app.post(`/api/cluster/service/image/${serviceConfig.name}`, (req, res) => new multiparty.Form({ uploadDir: app.uploadPath }).parse(req, (error, fields, files) => {
+    app.post(`/api/cluster/service/image/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => new multiparty.Form({ uploadDir: app.uploadPath }).parse(req, (error, fields, files) => {
         console.log('User Upload:', files);
         if (error) {
             res.send({ error });
@@ -43,7 +45,7 @@ module.exports = (app, serviceConfig) => {
         }
     }));
 
-    app.put(`/api/cluster/service/image/${serviceConfig.name}`, (req, res) => {
+    app.put(`/api/cluster/service/image/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {
         const { filename } = req.body;
         const imageFile = app.bundlePath + '/' + filename,
             extractPath = app.bundlePath + '/' + app.path.parse(filename).name;
@@ -82,7 +84,7 @@ module.exports = (app, serviceConfig) => {
         }
     });
 
-    app.delete(`/api/cluster/service/image/${serviceConfig.name}`, (req, res) => {
+    app.delete(`/api/cluster/service/image/${serviceConfig.name}`, app.permission.isLocalIp, (req, res) => {
         const { filename } = req.body;
         if (filename) {
             const filepath = app.path.join(app.bundlePath, filename),
