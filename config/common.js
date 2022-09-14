@@ -169,7 +169,7 @@ module.exports = (app, appConfig) => {
     app.service = {
         url: (url, serviceConfig) => {
             if (!app.isDebug) {
-                return `${serviceConfig.isHttps ? 'https' : 'http'}://${serviceConfig.host}:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
+                return `${serviceConfig.isHttps ? 'https' : 'http'}://${serviceConfig.host}${serviceConfig.port ? ':' + serviceConfig.port : ''}` + url + '?t=' + new Date().getTime();
             } else if (serviceConfig.isDebug) {
                 return `http://localhost:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
             } else {

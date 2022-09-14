@@ -46,8 +46,9 @@ module.exports = (cluster, isDebug) => {
         }
     });
 
-    // Init RabbitMQ --------------------------------------------------------------------------------------------------
+    // Load libraries -------------------------------------------------------------------------------------------------
     require('./rabbitmq')(app, appConfig);
+    require('./permission')(app, appConfig);
 
     // Connect databases ----------------------------------------------------------------------------------------------
     app.fs.existsSync('./config/database.redisDB.js') && require('./database.redisDB.js');
@@ -93,7 +94,6 @@ module.exports = (cluster, isDebug) => {
     require('../services/service')(app, { name: appConfig.name, mainUrl: appConfig.mainUrl, isDebug: false });
 
     // Start Express server if necessary ------------------------------------------------------------------------------
-    // const server = require('http').createServer(app);
     const server = app.isDebug || !appConfig.isHttps ?
         require('http').createServer(app) :
         require('https').createServer({
