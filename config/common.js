@@ -160,6 +160,9 @@ module.exports = (app, appConfig) => {
                 } else if (type == 'delete') {
                     data = { data };
                 }
+                requestConfig.httpsAgent = new require('https').Agent({ rejectUnauthorized: false });
+
+                console.log('axiosRequest:', url, data, requestConfig);
                 const response = await axios[type](url, data, requestConfig);
                 return response ? response.data : null;
             } catch (error) {
@@ -178,10 +181,9 @@ module.exports = (app, appConfig) => {
         },
 
         clusterGetAll: async (serviceName, done) => {
-            const agent = new require('https').Agent({ rejectUnauthorized: false });
             const serviceConfig = appConfig.services[serviceName],
                 url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
-                response = await app.service.get(url, null, { httpsAgent: agent });
+                response = await app.service.get(url);
             console.log('clusterGetAll:', url, response);
             done && done(response);
             return response;
