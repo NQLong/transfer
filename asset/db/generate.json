@@ -16732,6 +16732,34 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "DON_VI_BAT_DAU_PHE_DUYET": {
+                    "value": "donViBatDauPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DON_VI_KET_THUC_PHE_DUYET": {
+                    "value": "donViKetThucPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRUONG_BAT_DAU_PHE_DUYET": {
+                    "value": "truongBatDauPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRUONG_KET_THUC_PHE_DUYET": {
+                    "value": "truongKetThucPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -18016,12 +18044,106 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "TCCB_DANH_GIA_PHE_DUYET": {
+        "DT_DM_HOC_KY": {
             "active": true,
-            "moduleName": "tccbDanhGiaPheDuyet",
-            "modelName": "tccbDanhGiaPheDuyet",
+            "moduleName": "dtDmHocKy",
+            "modelName": "dtDmHocKy",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SDH_DM_MON_HOC_MOI": {
+            "active": true,
+            "moduleName": "sdhDmMonHocMoi",
+            "modelName": "sdhDmMonHocMoi",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "TEN_TIENG_VIET": {
+                    "value": "tenTiengViet",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "TEN_TIENG_ANH": {
+                    "value": "tenTiengAnh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "TC_LY_THUYET": {
+                    "value": "tcLyThuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "TC_THUC_HANH": {
+                    "value": "tcThucHanh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "KHOA_SDH": {
+                    "value": "khoaSdh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_PHE_DUYET_DON_VI": {
+            "active": true,
+            "moduleName": "tccbDanhGiaPheDuyetDonVi",
+            "modelName": "tccbDanhGiaPheDuyetDonVi",
             "methods": {
-                "TCCB_DANH_GIA_PHE_DUYET_SEARCH_PAGE": "searchPage"
+                "TCCB_DANH_GIA_PHE_DUYET_DON_VI_SEARCH_PAGE": "searchPage"
             },
             "columns": {
                 "ID": {
@@ -18038,26 +18160,12 @@
                     "nullable": true,
                     "size": 255
                 },
-                "SHCC_DUYET_CAP_TRUONG": {
-                    "value": "shccDuyetCapTruong",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                },
                 "APPROVED_DON_VI": {
                     "value": "approvedDonVi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "null",
                     "nullable": true,
-                    "size": "22,0"
-                },
-                "APPROVED_TRUONG": {
-                    "value": "approvedTruong",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "22,0"
+                    "size": 255
                 },
                 "TIME_DANG_KY": {
                     "value": "timeDangKy",
