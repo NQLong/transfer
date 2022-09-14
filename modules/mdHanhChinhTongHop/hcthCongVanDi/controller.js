@@ -418,50 +418,6 @@ module.exports = app => {
         }
     };
 
-    app.uploadHooks.add('hcthKyDienTu', (req, fields, files, params, done) =>
-        app.permission.has(req, () => hcthKyDienTu(req, fields, files, params, done), done, 'staff:login'));
-
-    const hcthKyDienTu = async (req, fields, files, params, done) => {
-        try {
-            if (
-                fields.userData && fields.userData[0] && fields.userData[0].startsWith('hcthKyDienTu') && files.file && files.file.length > 0) {
-                console.log(files);
-                const
-                    srcPath = files.file[0].path,
-                    validUploadFileType = ['.pdf'],
-                    baseNamePath = app.path.extname(srcPath),
-                    originalFilename = files.file[0].originalFilename,
-                    randomFilename = srcPath.substring(srcPath.lastIndexOf('/') + 1);
-
-                // eslint-disable-next-line no-unused-vars
-                const [rest, congVanId, fileId, signAt] = fields.userData[0].split(':');
-
-
-                if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-                    done({ error: 'Định dạng tập tin không hợp lệ!' });
-                    app.fs.deleteFile(srcPath);
-                } else {
-                    const destPath = app.path.join(app.assetPath, 'congVanDi', congVanId);
-                    await app.fs.createFolder(
-                        destPath
-                    );
-                    //TODO: check number of signature and compare to previous version
-
-                    app.fs.renameSync(srcPath, destPath + `/${randomFilename}`);
-
-                    const item = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: 'FILE_VBD', ma: fileId, tenFile: randomFilename });
-                    await app.model.hcthSigningConfig.update({ vbdfId: fileId, shcc: req.session.user.shcc }, { signAt: new Date().getTime(), status: 'DA_KY' });
-                    await app.model.hcthVanBanDiFile.update({ id: fileId }, { fileId: item.id });
-
-                    done && done({ error: null, item });
-                }
-            }
-        } catch (error) {
-            console.error(error);
-            done && done({ error });
-        }
-    };
-
 
 
     app.get('/api/hcth/van-ban-di/file-list/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
@@ -1057,5 +1013,88 @@ module.exports = app => {
         const emails = hcthStaff.rows.map(item => item.email);
         await createNotification(emails, { title: `Văn bản đi #${item.id}`, icon: 'fa-book', subTitle: 'Bạn có một văn bản đi cần kiểm tra', iconColor: 'info', link: `/user/hcth/van-ban-di/${item.id}` });
     };
+
+    app.uploadHooks.add('hcthKyDienTu', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthKyDienTu(req, fields, files, params, done), done, 'staff:login'));
+
+    const hcthKyDienTu = async (req, fields, files, params, done) => {
+        try {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'hcthKyDienTu' && files.file && files.file.length > 0) {
+                const
+                    file = files.file[0],
+                    path = file.path,
+                    originalFilename = file.originalFilename,
+                    fileName = path.replace(/^.*[\\\/]/, ''),
+                    extName = app.path.extname(path),
+                    data = fields.data && fields.data[0] && app.utils.parse(fields.data[0]);
+                if (extName != '.pdf') throw 'Định dạng file không hợp lệ';
+                if (!data) throw 'Dữ liệu không hợp lệ';
+
+                const { id, signType, configId } = data;
+                const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
+                // TODO: check permission
+                // if (!vanBanDiFile) throw 'Không tìm được file văn bản';
+                const vanBanDi = await getInstance(vanBanDiFile.vanBanDi);
+
+                // const config = await app.model.hcthSigningConfig.getAll({ vbdfId: vanBanDiFile.id });
+                const signAt = new Date().getTime();
+                app.fs.renameSync(path, app.path.join(app.assetPath, `congVanDi/${vanBanDiFile.vanBanDi}`, fileName));
+                const newfile = await app.model.hcthFile.create({ ten: originalFilename, tenFile: fileName, loai: 'FILE_VBD', ma: vanBanDiFile.id, kichThuoc: file.size, nguoiTao: getShcc(req), thoiGian: signAt });
+                await app.model.hcthVanBanDiFile.update({ id: vanBanDiFile.id }, { fileId: newfile.id });
+                await app.model.hcthSigningConfig.update({ id: configId, vbdfId: vanBanDiFile.id, signType }, { signAt });
+
+                await handleUploadSignature(vanBanDi, signType);
+                // eslint-disable-next-line no-unused-vars
+
+                // const [rest, congVanId, fileId, signAt] = fields.userData[0].split(':');
+
+
+                // if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                //     done({ error: 'Định dạng tập tin không hợp lệ!' });
+                //     app.fs.deleteFile(srcPath);
+                // } else {
+                //     const destPath = app.path.join(app.assetPath, 'congVanDi', congVanId);
+                //     await app.fs.createFolder(
+                //         destPath
+                //     );
+                //     //TODO: check number of signature and compare to previous version
+
+                //     app.fs.renameSync(srcPath, destPath + `/${randomFilename}`);
+
+                //     const item = await app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: 'FILE_VBD', ma: fileId, tenFile: randomFilename });
+                //     await app.model.hcthSigningConfig.update({ vbdfId: fileId, shcc: req.session.user.shcc }, { signAt: new Date().getTime(), status: 'DA_KY' });
+                //     await app.model.hcthVanBanDiFile.update({ id: fileId }, { fileId: item.id });
+
+                //     done && done({ error: null, item });
+                // }
+                done({});
+            }
+        } catch (error) {
+            console.error(error);
+            done && done({ error });
+        }
+    };
+
+    const handleUploadSignature = async (instance) => {
+        const files = await getFiles(instance.id);
+        if (!files.some(file => file.config.some(config => config.signType == instance.trangThai && !config.signAt))) {
+            let nextState = null;
+            switch (instance.trangThai) {
+                case vanBanDi.trangThai.KY_THE_THUC.id:
+                    nextState = vanBanDi.trangThai.KY_NOI_DUNG.id;
+                    break;
+                case vanBanDi.trangThai.KY_NOI_DUNG.id:
+                    nextState = vanBanDi.trangThai.KY_PHAT_HANH.id;
+                    break;
+                case vanBanDi.trangThai.KY_PHAT_HANH.id:
+                    nextState = vanBanDi.trangThai.DONG_DAU.id;
+                    break;
+
+                default:
+                    throw new Error();
+            }
+            await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextState });
+        }
+    }
 
 };

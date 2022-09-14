@@ -11,6 +11,7 @@ module.exports = app => {
             //TODO: check quyền user đối với văn bản
             const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType, format } = req.query;
             //get file imformation
+            console.log({ id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType, format })
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
             const file = await app.model.hcthFile.get({ id: vanBanDiFile.fileId });
             if (!file) throw 'Không tìm được file';
@@ -19,8 +20,8 @@ module.exports = app => {
             const signTypeItem = vanBanDi.signType[signType];
 
             //TODO: count current signature
-
             //TODO: convert file to pdf
+
             if (extension != '.pdf') throw 'invalid file type';
 
             // prepare session folder for signing -> this would be deleted -> TODO: schedule delete these folder
@@ -34,7 +35,7 @@ module.exports = app => {
             image.resize(signTypeItem.width, signTypeItem.height).write(app.path.join(sessionFolder, req.session.user.shcc + '.png'));
 
             const { status } = await app.pdf.signVisualPlaceholder({
-                input, scale: '0', output, name, location, reason, scale: '-50',
+                input, scale: '0', output, name, location, reason, scale: '-50', x, y, page,
                 keystorePath: app.path.join(app.assetPath, '/pdf/p12placeholder/certificate.p12'),
                 imgPath: app.path.join(sessionFolder, `${req.session.user.shcc}.png`),
             });
@@ -55,37 +56,5 @@ module.exports = app => {
         }
     });
 
-    // app.uploadHooks.add('hcthKyDienTu', (req, fields, files, params, done) =>
-    //     app.permission.has(req, () => hcthKyDienTu(req, fields, files, params, done), done, 'staff:login'));
 
-    // const hcthKyDienTu = (req, fields, files, params, done) => {
-    //     if (
-    //         fields.userData &&
-    //         fields.userData[0] &&
-    //         fields.userData[0].startsWith('hcthKyDienTu') &&
-    //         files.hcthNhiemVuFile &&
-    //         files.hcthNhiemVuFile.length > 0) {
-    //         const
-    //             srcPath = files.hcthNhiemVuFile[0].path,
-    //             validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
-    //             baseNamePath = app.path.extname(srcPath);
-    //         if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-    //             done({ error: 'Định dạng tập tin không hợp lệ!' });
-    //             app.fs.deleteFile(srcPath);
-    //         } else {
-    //             app.fs.createFolder(
-    //                 app.path.join(app.assetPath, '/nhiemVu/' + (isNew ? '/new' : '/' + id))
-    //             );
-    //             app.fs.rename(srcPath, destPath, error => {
-    //                 if (error) {
-    //                     done && done({ error });
-    //                 } else {
-    //                     app.model.hcthFile.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: NHIEM_VU, ma: id === 'new' ? null : id }, (error, item) => {
-    //                         done && done({ error, item });
-    //                     });
-    //                 }
-    //             });
-    //         }
-    //     }
-    // };
 };
