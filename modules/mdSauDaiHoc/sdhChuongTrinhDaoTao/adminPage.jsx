@@ -371,6 +371,9 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                         <Tooltip title='Xem cây chương trình' arrow placeholder='bottom' >
                             <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
                         </Tooltip>
+                        <Tooltip title='Chỉnh sửa kế hoạch' arrow placeholder='bottom' >
+                            <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${item.id}`)}><i className='fa fa-lg fa-list' /></a>
+                        </Tooltip>
                         {permission.write && <Tooltip title='Sao chép' arrow>
                             <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || this.cloneModal.show(item)}>
                                 <i className='fa fa-lg fa-clone ' />

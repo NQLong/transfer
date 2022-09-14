@@ -13,5 +13,9 @@ export default {
             path: '/user/sau-dai-hoc/khoi-kien-thuc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/danh-muc/khoi-kien-thuc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
     ],
 };
