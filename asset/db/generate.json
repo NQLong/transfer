@@ -16735,6 +16735,34 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "DON_VI_BAT_DAU_PHE_DUYET": {
+                    "value": "donViBatDauPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DON_VI_KET_THUC_PHE_DUYET": {
+                    "value": "donViKetThucPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRUONG_BAT_DAU_PHE_DUYET": {
+                    "value": "truongBatDauPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRUONG_KET_THUC_PHE_DUYET": {
+                    "value": "truongKetThucPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -18019,81 +18047,6 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "TCCB_DANH_GIA_PHE_DUYET": {
-            "active": true,
-            "moduleName": "tccbDanhGiaPheDuyet",
-            "modelName": "tccbDanhGiaPheDuyet",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_170632\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "SHCC_DUYET_CAP_DON_VI": {
-                    "value": "shccDuyetCapDonVi",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                },
-                "SHCC_DUYET_CAP_TRUONG": {
-                    "value": "shccDuyetCapTruong",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                },
-                "APPROVED_DON_VI": {
-                    "value": "approvedDonVi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "APPROVED_TRUONG": {
-                    "value": "approvedTruong",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "TIME_DANG_KY": {
-                    "value": "timeDangKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
-                },
-                "ID_NHOM_DANG_KY": {
-                    "value": "idNhomDangKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "NAM": {
-                    "value": "nam",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "4,0"
-                },
-                "SHCC": {
-                    "value": "shcc",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "SDH_DM_MON_HOC_MOI": {
             "active": true,
             "moduleName": "sdhDmMonHocMoi",
@@ -18169,10 +18122,10 @@
                 },
                 "TEN": {
                     "value": "ten",
-                    "dataType": "NUMBER",
+                    "dataType": "VARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "22,0"
+                    "size": 15
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -18184,6 +18137,67 @@
             },
             "primaryKeys": [
                 "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_PHE_DUYET_DON_VI": {
+            "active": true,
+            "moduleName": "tccbDanhGiaPheDuyetDonVi",
+            "modelName": "tccbDanhGiaPheDuyetDonVi",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_170632\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SHCC_DUYET_CAP_DON_VI": {
+                    "value": "shccDuyetCapDonVi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "APPROVED_DON_VI": {
+                    "value": "approvedDonVi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "null",
+                    "nullable": true,
+                    "size": 255
+                },
+                "TIME_DANG_KY": {
+                    "value": "timeDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "ID_NHOM_DANG_KY": {
+                    "value": "idNhomDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                }
+            },
+            "primaryKeys": [
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"

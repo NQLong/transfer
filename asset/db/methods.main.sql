@@ -15883,22 +15883,6 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION STUDENT_DASHBOARD_TOTAL_GENDER RETURN SYS_REFCURSOR
-AS CUR SYS_REFCURSOR;
-BEGIN
-    OPEN CUR FOR
-            SELECT
-                   COUNT(CASE WHEN SV.MSSV IS NOT NULL THEN 1 END) AS "totalStaff",
-                   COUNT(CASE WHEN SV.GIOI_TINH = 1 THEN 1 END) AS "totalMale",
-                   COUNT(CASE WHEN SV.GIOI_TINH = 2 THEN 1 END) AS "totalFemale"
-           FROM FW_STUDENT SV;
-
-    RETURN CUR;
-END;
-
-/
---EndMethod--
-
 CREATE OR REPLACE PROCEDURE sub_menu_swap_priority (p_ma in NUMBER, p_thu_tu in number, p_is_up in number)
 IS
 BEGIN
@@ -15910,6 +15894,55 @@ BEGIN
     UPDATE FW_SUBMENU SET PRIORITY=p_thu_tu WHERE ID=p_ma;
     commit;
 END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION SV_BAO_HIEM_Y_TE_SEARCH_PAGE(searchTerm IN STRING, filter IN STRING) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(502) := '%' || lower(searchTerm) || '%';
+    namHoc    NVARCHAR2(13);
+
+BEGIN
+    SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
+
+    OPEN my_cursor FOR
+    SELECT BHYT.MSSV                                             AS "mssv",
+           FS.TEN                                                AS "ten",
+           FS.HO                                                 AS "ho",
+           FS.NGAY_SINH                                          AS "ngaySinh",
+           (CASE WHEN FS.GIOI_TINH = 2 THEN 'Nữ' ELSE 'Nam' end) as "gioiTinh",
+
+           xaThuongTru.TEN_PHUONG_XA                             as "xaThuongTru",
+           huyenThuongTru.TEN_QUAN_HUYEN                         as "huyenThuongTru",
+           tinhThuongTru.ten                                     as "tinhThuongTru",
+           FS.THUONG_TRU_SO_NHA                                  AS "soNhaThuongTru",
+
+           FS.DIEN_THOAI_CA_NHAN                                 AS "soDienThoaiCaNhan",
+
+           BHYT.DIEN_DONG                                        AS "dienDong",
+           BHYT.ID                                               AS "id",
+           BHYT.BENH_VIEN_DANG_KY                                AS "benhVienDangKy",
+           BHYT.GIA_HAN                                          AS "giaHan",
+           BHYT.MA_BHXH_HIEN_TAI                                 AS "maBhxhHienTai",
+           BHYT.MAT_SAU_THE                                      AS "matSauThe",
+           BHYT.MAT_TRUOC_THE                                    AS "matTruocThe",
+           kcb.TEN                                               AS "tenBenhVien"
+    FROM SV_BAO_HIEM_Y_TE BHYT
+             LEFT JOIN FW_STUDENT FS on BHYT.MSSV = FS.MSSV
+             LEFT JOIN SV_BHYT_PHU_LUC_CHU_HO PLCH ON PLCH.ID_DANG_KY = BHYT.ID
+             LEFT JOIN SV_BHYT_PHU_LUC_THANH_VIEN PLTV ON PLTV.ID_DANG_KY = BHYT.ID
+             LEFT JOIN DM_PHUONG_THUC_TUYEN_SINH PTTS ON PTTS.MA = FS.PHUONG_THUC_TUYEN_SINH
+             LEFT JOIN DM_PHUONG_XA xaThuongTru ON FS.THUONG_TRU_MA_XA = xaThuongTru.MA_PHUONG_XA
+             LEFT JOIN DM_QUAN_HUYEN huyenThuongTru ON FS.THUONG_TRU_MA_HUYEN = huyenThuongTru.MA_QUAN_HUYEN
+             LEFT JOIN DM_TINH_THANH_PHO tinhThuongTru ON FS.THUONG_TRU_MA_TINH = tinhThuongTru.MA
+             LEFT JOIN DM_CO_SO_KCB_BHYT kcb ON kcb.MA = BHYT.BENH_VIEN_DANG_KY
+    WHERE searchTerm = ''
+                  OR LOWER(TRIM(FS.HO || ' ' || FS.TEN)) LIKE sT
+                  OR FS.MSSV LIKE ST;
+     RETURN my_cursor;
+end;
 
 /
 --EndMethod--
@@ -16568,19 +16601,14 @@ end;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION TCCB_DANH_GIA_PHE_DUYET_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                                      filter IN STRING,
+CREATE OR REPLACE FUNCTION TCCB_DANH_GIA_PHE_DUYET_DON_VI_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
                                                                       searchTerm IN STRING,
                                                                       totalItem OUT NUMBER, pageTotal OUT NUMBER,
-                                                                      searchNam IN NUMBER) RETURN SYS_REFCURSOR
+                                                                      searchNam IN NUMBER, searchDonVi IN STRING) RETURN SYS_REFCURSOR
 AS
     canbosys  SYS_REFCURSOR;
-    listShcc  STRING(100);
-    listDonVi STRING(100);
     ST        STRING(500) := '%' || lower(searchTerm) || '%';
 BEGIN
-    SELECT JSON_VALUE(filter, '$.listShcc') INTO listShcc FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.listDonVi') INTO listDonVi FROM DUAL;
     SELECT COUNT(*)
     INTO totalItem
     FROM TCHC_CAN_BO CB
@@ -16590,20 +16618,12 @@ BEGIN
                                NHOM.TEN as "tenNhomDangKy",
                                PD.TIME_DANG_KY,
                                PD.APPROVED_DON_VI,
-                               PD.APPROVED_TRUONG,
                                NHOM.NAM
-                        FROM TCCB_DANH_GIA_PHE_DUYET PD
+                        FROM TCCB_DANH_GIA_PHE_DUYET_DON_VI PD
                                  LEFT JOIN TCCB_NHOM_DANH_GIA_NHIEM_VU NHOM ON PD.ID_NHOM_DANG_KY = NHOM.ID
                         WHERE NHOM.NAM = searchNam) pheDuyet
                        ON CB.SHCC = pheDuyet.SHCC
-    WHERE ((listShcc IS NOT NULL AND CB.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
-                                                 from dual
-                                                 connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-        OR (listDonVi IS NOT NULL AND CB.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
-                                                       from dual
-                                                       connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
-        OR (listShcc IS NULL AND listDonVi IS NULL))
-      AND (searchTerm = ''
+    WHERE CB.MA_DON_VI = searchDonVi AND (searchTerm = ''
         OR LOWER(CB.SHCC) LIKE ST
         OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE ST);
 
@@ -16622,7 +16642,6 @@ BEGIN
                      pheDuyet."tenNhomDangKy" as         "tenNhomDangKy",
                      pheDuyet.TIME_DANG_KY    as         "timeDangKy",
                      pheDuyet.APPROVED_DON_VI as         "approvedDonVi",
-                     pheDuyet.APPROVED_TRUONG as         "approvedTruong",
                      pheDuyet.NAM             as         "nam",
                      ROW_NUMBER() OVER (ORDER BY CB.TEN) R
               FROM TCHC_CAN_BO CB
@@ -16632,20 +16651,12 @@ BEGIN
                                          NHOM.TEN as "tenNhomDangKy",
                                          PD.TIME_DANG_KY,
                                          PD.APPROVED_DON_VI,
-                                         PD.APPROVED_TRUONG,
                                          NHOM.NAM
-                                  FROM TCCB_DANH_GIA_PHE_DUYET PD
+                                  FROM TCCB_DANH_GIA_PHE_DUYET_DON_VI PD
                                            LEFT JOIN TCCB_NHOM_DANH_GIA_NHIEM_VU NHOM ON PD.ID_NHOM_DANG_KY = NHOM.ID
                                   WHERE NHOM.NAM = searchNam) pheDuyet
                                  ON CB.SHCC = pheDuyet.SHCC
-              WHERE ((listShcc IS NOT NULL AND CB.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
-                                                           from dual
-                                                           connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-                  OR (listDonVi IS NOT NULL AND CB.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
-                                                                 from dual
-                                                                 connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
-                  OR (listShcc IS NULL AND listDonVi IS NULL))
-                AND (searchTerm = ''
+              WHERE CB.MA_DON_VI = searchDonVi AND (searchTerm = ''
                   OR LOWER(CB.SHCC) LIKE ST
                   OR LOWER(TRIM(CB.HO || ' ' || CB.TEN)) LIKE ST)
               ORDER BY CB.TEN)
@@ -17685,9 +17696,12 @@ BEGIN
 
                (
                    SELECT LISTAGG(LP.TEN || '||' || TO_CHAR(dt.SO_TIEN), '|||') WITHIN GROUP (order by dt.LOAI_PHI)
-                   from TC_HOC_PHI_DETAIL dt LEFT JOIN TC_LOAI_PHI LP
-                   on LP.ID = dt.LOAI_PHI
-                   where dt.MSSV = hp.MSSV and dt.HOC_KY = hp.HOC_KY and dt.NAM_HOC = hp.NAM_HOC
+                   from TC_HOC_PHI_DETAIL dt
+                            LEFT JOIN TC_LOAI_PHI LP
+                                      on LP.ID = dt.LOAI_PHI
+                   where dt.MSSV = hp.MSSV
+                     and dt.HOC_KY = hp.HOC_KY
+                     and dt.NAM_HOC = hp.NAM_HOC
                )               AS                           "details",
                ROW_NUMBER() OVER (ORDER BY THPT.TRANS_DATE) R
         FROM TC_HOC_PHI HP
@@ -17698,7 +17712,8 @@ BEGIN
                  LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON FS.LOAI_HINH_DAO_TAO = LHDT.MA
                  LEFT JOIN DM_SV_BAC_DAO_TAO BDT on BDT.MA_BAC = FS.BAC_DAO_TAO
                  LEFT JOIN TC_HOC_PHI_TRANSACTION_INVOICE HPI
-                           on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY and HPI.LY_DO_HUY is null
+                           on HPI.MSSV = HP.MSSV and HPI.NAM_HOC = HP.NAM_HOC and HP.HOC_KY = HPI.HOC_KY and
+                              HPI.LY_DO_HUY is null
                  LEFT JOIN TC_HOC_PHI_TRANSACTION THPT on HP.HOC_KY = THPT.HOC_KY
             AND HP.NAM_HOC = THPT.NAM_HOC
             AND HP.MSSV = THPT.CUSTOMER_ID
@@ -17708,6 +17723,7 @@ BEGIN
                                      AND HP.NAM_HOC = TRANS.NAM_HOC
                                      AND HP.MSSV = TRANS.CUSTOMER_ID)
         WHERE HPI.ID is null
+          and HPI.MSSV != '12345'
           and THPT.TRANS_DATE is not null
           and HP.NAM_HOC = namHoc
           AND HP.HOC_KY = hocKy
@@ -18729,21 +18745,6 @@ BEGIN
         ORDER BY R;
     RETURN my_cursor;
 END ;
-
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION TEST_SEARCH_PAGE(filter IN STRING) RETURN SYS_REFCURSOR
-AS
-    SYS SYS_REFCURSOR;
-BEGIN
-    OPEN SYS FOR
-        SELECT * FROM
-        (
-            SELECT value AS "value" FROM (SELECT JSON_VALUE(filter, '$.name') AS value FROM dual)
-        );
-    RETURN SYS;
-end;
 
 /
 --EndMethod--
