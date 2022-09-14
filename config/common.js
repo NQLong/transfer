@@ -151,19 +151,21 @@ module.exports = (app, appConfig) => {
     const axios = require('axios'),
         axiosRequest = async (type, url, data, requestConfig) => {
             try {
+                let response = null;
                 if (!data) data = {};
                 if (!requestConfig) requestConfig = {};
+                requestConfig.httpsAgent = new require('https').Agent({ rejectUnauthorized: false });
+
                 if (type == 'get') {
                     const params = new URLSearchParams(data).toString();
                     if (params.length) url = url + (url.includes('?') ? '&' : '?') + params;
-                    data = {};
+                    response = await axios.get(url, requestConfig);
                 } else if (type == 'delete') {
-                    data = { data };
+                    response = await axios.delete(url, { data }, requestConfig);
+                } else {
+                    response = await axios[type](url, data, requestConfig);
                 }
-                requestConfig.httpsAgent = new require('https').Agent({ rejectUnauthorized: false });
 
-                console.log('axiosRequest:', url, data, requestConfig);
-                const response = await axios[type](url, data, requestConfig);
                 return response ? response.data : null;
             } catch (error) {
                 return { error };
@@ -184,7 +186,6 @@ module.exports = (app, appConfig) => {
             const serviceConfig = appConfig.services[serviceName],
                 url = app.service.url(`/api/cluster/service/${serviceName}`, serviceConfig),
                 response = await app.service.get(url);
-            console.log('clusterGetAll:', url, response);
             done && done(response);
             return response;
         },
