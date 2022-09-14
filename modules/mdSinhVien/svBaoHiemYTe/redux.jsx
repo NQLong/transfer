@@ -1,5 +1,29 @@
 import T from 'view/js/common';
 
+const SvBHYTAll = 'SvBHYT:GetAll';
+export default function svBaoHiemYTeReducer(state = null, data) {
+    switch (data.type) {
+        case SvBHYTAll:
+            return Object.assign({}, state, { items: data.items, dataChuHo: data.dataChuHo, dataThanhVien: data.dataThanhVien });
+        default:
+            return state;
+    }
+
+}
+export function getAllSvBaoHiemYTe(namHoc, done) {
+    return dispatch => {
+        const url = '/api/student/bhyt/all';
+        T.get(url, { filter: { namHoc } }, result => {
+            if (result.error) {
+                T.notify('Lấy dữ liệu BHYT lỗi', 'danger');
+                console.error(result.error);
+            } else {
+                dispatch({ type: SvBHYTAll, items: result.items, dataChuHo: result.dataChuHo, dataThanhVien: result.dataThanhVien });
+                done && done();
+            }
+        });
+    };
+}
 export function getSvBaoHiemYTe(done) {
     return () => {
         const url = '/api/student/bhyt';
