@@ -1,3 +1,3 @@
-module.exports = (app, serviceConfig) => {
-    app && console.log(`TODO: service ${serviceConfig.name}`);
+module.exports = () => { // (app, serviceConfig)
+    // console.log(`TODO: service ${serviceConfig.name}`);
 };
