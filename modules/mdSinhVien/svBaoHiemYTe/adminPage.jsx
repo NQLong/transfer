@@ -31,8 +31,8 @@ class BaoHiemAdminPage extends AdminPage {
             <td style={{ width: '30%' }} nowrap='true'>Thường trú</td>
             <td style={{ width: 'auto' }} nowrap='true'>Mã số BHXH hiện tại</td>
             <td style={{ width: 'auto', display: dienDong != 0 ? '' : 'none' }} nowrap='true'>Cơ sở KCB</td>
-            <td style={{ width: 'auto' }} nowrap='true'>Mặt trước thẻ BHYT</td>
-            <td style={{ width: 'auto' }} nowrap='true'>Mặt sau thẻ BHYT</td>
+            <td style={{ width: 'auto' }} nowrap='true'>Thẻ BHYT</td>
+            {/* <td style={{ width: 'auto' }} nowrap='true'>Mặt sau thẻ BHYT</td> */}
         </tr>,
         renderRow: (item, index) => <tr key={index}>
             <TableCell type='number' content={index + 1} />
@@ -43,7 +43,7 @@ class BaoHiemAdminPage extends AdminPage {
             <TableCell style={{ textAlign: 'center' }} content={item.maBhxhHienTai} />
             <TableCell style={{ display: dienDong != 0 ? '' : 'none' }} content={item.tenBenhVien} />
             <TableCell content={<a target='_blank' rel='noreferrer' href={`/api/student/front-bhyt-admin?id=${item.id}`}><img src={`/api/student/front-bhyt-admin?id=${item.id}`} style={{ height: '150px' }} /></a>} />
-            <TableCell content={<a target='_blank' rel='noreferrer' href={`/api/student/back-bhyt-admin?id=${item.id}`}><img src={`/api/student/back-bhyt-admin?id=${item.id}`} style={{ height: '150px' }} /></a>} />
+            {/* <TableCell content={<a target='_blank' rel='noreferrer' href={`/api/student/back-bhyt-admin?id=${item.id}`}><img src={`/api/student/back-bhyt-admin?id=${item.id}`} style={{ height: '150px' }} /></a>} /> */}
         </tr>
     });
     render() {

@@ -106,8 +106,8 @@ module.exports = app => {
                     let maBhxhHienTai = changes.maBhxhHienTai.toString();
                     if (maBhxhHienTai.length > 10) return res.send({ error: 'Invalid parameter!' });
                     else {
-                        let { id, matSauThe, matTruocThe } = item;
-                        if (id && matSauThe && matTruocThe) {
+                        let { id, matTruocThe } = item;
+                        if (id && matTruocThe) {
                             await app.model.svBaoHiemYTe.update({ id: item.id }, { maBhxhHienTai, thoiGianHoanThanh: new Date().getTime() });
                             return res.end();
                         } else return res.send({ error: 'Vui lòng bổ sung hình ảnh thẻ BHYT' });
@@ -120,20 +120,20 @@ module.exports = app => {
                         let { maBhxhHienTai, benhVienDangKy, giaHan } = changes;
                         if (maBhxhHienTai.length > 10) return res.send({ error: 'Invalid parameter!' });
                         else {
-                            let { id, matSauThe, matTruocThe } = item;
+                            let { id, matTruocThe } = item;
                             if (giaHan == 0) {
                                 if (matTruocThe) {
                                     let destFolder = app.path.join(app.assetPath, '/bhyt/front', curYear, user.studentId);
                                     app.fs.deleteFolder(destFolder);
                                 }
-                                if (matSauThe) {
-                                    let destFolder = app.path.join(app.assetPath, '/bhyt/back', curYear, user.studentId);
-                                    app.fs.deleteFolder(destFolder);
-                                }
-                                await app.model.svBaoHiemYTe.update({ id }, { maBhxhHienTai, thoiGianHoanThanh: new Date().getTime(), benhVienDangKy, matTruocThe: '', matSauThe: '', giaHan });
+                                // if (matSauThe) {
+                                //     let destFolder = app.path.join(app.assetPath, '/bhyt/back', curYear, user.studentId);
+                                //     app.fs.deleteFolder(destFolder);
+                                // }
+                                await app.model.svBaoHiemYTe.update({ id }, { maBhxhHienTai, thoiGianHoanThanh: new Date().getTime(), benhVienDangKy, matTruocThe: '', giaHan });
                                 return res.end();
                             }
-                            else if (giaHan == 1 && matSauThe && matTruocThe) {
+                            else if (giaHan == 1 && matTruocThe) {
                                 await app.model.svBaoHiemYTe.update({ id }, { maBhxhHienTai, thoiGianHoanThanh: new Date().getTime(), benhVienDangKy, giaHan });
                                 return res.end();
                             } else return res.send({ error: 'Vui lòng bổ sung thông tin chính xác!' });
@@ -144,7 +144,7 @@ module.exports = app => {
 
                         await Promise.all([
                             app.model.svBaoHiemYTe.update({ id: item.id }, {
-                                maBhxhHienTai: '', matTruocThe: '', matSauThe: '', benhVienDangKy, thoiGianHoanThanh: new Date().getTime()
+                                maBhxhHienTai: '', matTruocThe: '', benhVienDangKy, thoiGianHoanThanh: new Date().getTime()
                             }),
                             app.model.svBhytPhuLucChuHo.create({
                                 mssv: user.studentId, idDangKy: item.id, ...dataChuHo
@@ -163,7 +163,7 @@ module.exports = app => {
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
     app.fs.createFolder(app.path.join(app.assetPath, '/bhyt'));
     app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/front'));
-    app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/back'));
+    // app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/back'));
 
     app.uploadHooks.add('uploadBhytSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadImage(req, fields, files, params, done), done, 'student:login'));
@@ -188,25 +188,26 @@ module.exports = app => {
                     await app.model.svBaoHiemYTe.update({ id }, { matTruocThe: fileName });
                     done && done({ image: `/api/student/get-front-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
                 }
-            } else if (fields.userData && fields.userData.length && fields.userData[0].startsWith('BHYTSV_BACK:') && files.BHYTSV_BACK && files.BHYTSV_BACK.length) {
-                let user = req.session.user, [curYear, id] = fields.userData[0].substring('BHYTSV_BACK:'.length).split('_');
-                let item = await app.model.svBaoHiemYTe.get({ id });
-                if (item && item.mssv == user.studentId) {
-                    app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/back', curYear));
-
-                    let destFolder = app.path.join(app.assetPath, '/bhyt/back', curYear, user.studentId);
-
-                    app.fs.deleteFolder(destFolder);
-                    app.fs.createFolder(destFolder);
-
-                    let srcPath = files.BHYTSV_BACK[0].path,
-                        fileName = app.path.basename(srcPath),
-                        destPath = app.path.join(destFolder, fileName);
-                    await app.fs.rename(srcPath, destPath);
-                    await app.model.svBaoHiemYTe.update({ id }, { matSauThe: fileName });
-                    done && done({ image: `/api/student/back-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
-                }
             }
+            // else if (fields.userData && fields.userData.length && fields.userData[0].startsWith('BHYTSV_BACK:') && files.BHYTSV_BACK && files.BHYTSV_BACK.length) {
+            //     let user = req.session.user, [curYear, id] = fields.userData[0].substring('BHYTSV_BACK:'.length).split('_');
+            //     let item = await app.model.svBaoHiemYTe.get({ id });
+            //     if (item && item.mssv == user.studentId) {
+            //         app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/back', curYear));
+
+            //         let destFolder = app.path.join(app.assetPath, '/bhyt/back', curYear, user.studentId);
+
+            //         app.fs.deleteFolder(destFolder);
+            //         app.fs.createFolder(destFolder);
+
+            //         let srcPath = files.BHYTSV_BACK[0].path,
+            //             fileName = app.path.basename(srcPath),
+            //             destPath = app.path.join(destFolder, fileName);
+            //         await app.fs.rename(srcPath, destPath);
+            //         await app.model.svBaoHiemYTe.update({ id }, { matSauThe: fileName });
+            //         done && done({ image: `/api/student/back-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
+            //     }
+            // }
         } catch (error) {
             done && done({ error });
         }
@@ -236,7 +237,7 @@ module.exports = app => {
             else {
                 let matTruocThe = item.matTruocThe,
                     path = app.path.join(app.assetPath, '/bhyt/front', item.namDangKy.toString(), item.mssv, matTruocThe);
-                if (app.fs.existsSync(path)) res.sendFile(path);
+                if (app.fs.existsSync(path)) res.send({ path });
                 else res.send({ error: 'No value returned' });
             }
         } catch (error) {
@@ -244,36 +245,36 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/student/back-bhyt', app.permission.check('student:login'), async (req, res) => {
-        try {
-            let user = req.session.user, curYear = new Date().getFullYear();
-            const item = await app.model.svBaoHiemYTe.get({ mssv: user.studentId, namDangKy: curYear });
-            if (!item || (item && !item.matSauThe)) res.send({ error: 'No value returned' });
-            else {
-                let matSauThe = item.matSauThe,
-                    path = app.path.join(app.assetPath, '/bhyt/back', curYear.toString(), user.studentId, matSauThe);
-                if (app.fs.existsSync(path)) res.sendFile(path);
-                else res.send({ error: 'No value returned' });
-            }
-        } catch (error) {
-            res.send({ error });
-        }
-    });
+    // app.get('/api/student/back-bhyt', app.permission.check('student:login'), async (req, res) => {
+    //     try {
+    //         let user = req.session.user, curYear = new Date().getFullYear();
+    //         const item = await app.model.svBaoHiemYTe.get({ mssv: user.studentId, namDangKy: curYear });
+    //         if (!item || (item && !item.matSauThe)) res.send({ error: 'No value returned' });
+    //         else {
+    //             let matSauThe = item.matSauThe,
+    //                 path = app.path.join(app.assetPath, '/bhyt/back', curYear.toString(), user.studentId, matSauThe);
+    //             if (app.fs.existsSync(path)) res.sendFile(path);
+    //             else res.send({ error: 'No value returned' });
+    //         }
+    //     } catch (error) {
+    //         res.send({ error });
+    //     }
+    // });
 
-    app.get('/api/student/back-bhyt-admin', app.permission.check('student:login'), async (req, res) => {
-        try {
-            let id = req.query.id;
-            const item = await app.model.svBaoHiemYTe.get({ id });
-            if (!item || (item && !item.matSauThe)) res.send({ error: 'No value returned' });
-            else {
-                let matSauThe = item.matSauThe,
-                    path = app.path.join(app.assetPath, '/bhyt/back', item.namDangKy.toString(), item.mssv, matSauThe);
-                if (app.fs.existsSync(path)) res.sendFile(path);
-                else res.send({ error: 'No value returned' });
-            }
-        } catch (error) {
-            res.send({ error });
-        }
-    });
+    // app.get('/api/student/back-bhyt-admin', app.permission.check('student:login'), async (req, res) => {
+    //     try {
+    //         let id = req.query.id;
+    //         const item = await app.model.svBaoHiemYTe.get({ id });
+    //         if (!item || (item && !item.matSauThe)) res.send({ error: 'No value returned' });
+    //         else {
+    //             let matSauThe = item.matSauThe,
+    //                 path = app.path.join(app.assetPath, '/bhyt/back', item.namDangKy.toString(), item.mssv, matSauThe);
+    //             if (app.fs.existsSync(path)) res.sendFile(path);
+    //             else res.send({ error: 'No value returned' });
+    //         }
+    //     } catch (error) {
+    //         res.send({ error });
+    //     }
+    // });
 
 };
