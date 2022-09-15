@@ -5,7 +5,7 @@ import { AdminModal } from 'view/component/AdminPage';
 import { createSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
 import T from 'view/js/common';
 
-class BaoHiemModal extends AdminModal {
+export class BaoHiemModal extends AdminModal {
     state = {
         check12ThangBhyt: false, check15ThangBhyt: false, checkMienBhyt: false
     }
