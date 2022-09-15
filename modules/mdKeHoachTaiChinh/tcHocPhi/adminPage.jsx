@@ -265,6 +265,11 @@ class TcHocPhiAdminPage extends AdminPage {
                 e.preventDefault();
                 this.tachMssvModal.show();
             }
+        }, {
+            className: 'btn-secondary', icon: 'fa-cog', tooltip: 'Chọn BHYT', onClick: (e) => {
+                e.preventDefault();
+                this.props.history.push('/user/finance/bhyt');
+            }
         });
 
         permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
@@ -367,7 +372,7 @@ class TcHocPhiAdminPage extends AdminPage {
                             <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} readOnly={!permission.write} />
                         </div>
                     </div>
-                    <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} getPendingListInvoiceLength={this.props.getPendingListInvoiceLength}/>
+                    <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} getPendingListInvoiceLength={this.props.getPendingListInvoiceLength} />
                     <InvoiceResultModal ref={e => this.resultModal = e} />
 
                     <TachMssvModal ref={e => this.tachMssvModal = e} />
