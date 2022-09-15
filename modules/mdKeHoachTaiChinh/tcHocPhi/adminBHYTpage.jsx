@@ -28,7 +28,7 @@ class AdminBhytModal extends BaoHiemModal {
                 dienDong = dienMapper[key];
             }
         });
-        T.confirm('Xác nhận', `Xác nhận bạn ${tinhTrang}`, 'warning', true, isConfirm => {
+        T.confirm('Xác nhận', `Xác nhận sinh viên ${this.state.mssv} ${tinhTrang}`, 'warning', true, isConfirm => {
             if (isConfirm) {
                 this.props.createSvBaoHiemYTe({ dienDong, mssv: this.state.mssv }, () => {
                     this.hide();

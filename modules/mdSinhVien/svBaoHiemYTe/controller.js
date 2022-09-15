@@ -97,7 +97,6 @@ module.exports = app => {
                 }
             }
         } catch (error) {
-            console.error(error);
             res.send({ error });
         }
     });

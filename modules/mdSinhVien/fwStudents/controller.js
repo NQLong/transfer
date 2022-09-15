@@ -57,7 +57,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:manage'), async (req, res) => {
+    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.orCheck('student:manage', 'tcHocPhi:manage'), async (req, res) => {
         try {
             const _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
