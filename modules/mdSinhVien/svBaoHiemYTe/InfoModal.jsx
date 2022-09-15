@@ -19,7 +19,7 @@ class BaoHiemInfoModal extends AdminModal {
             switch (dienDong) {
                 case '0':
                     this.matTruocThe.setData(`BHYTSV_FRONT:${new Date().getFullYear()}_${id}`);
-                    this.matSauThe.setData(`BHYTSV_BACK:${new Date().getFullYear()}_${id}`);
+                    // this.matSauThe.setData(`BHYTSV_BACK:${new Date().getFullYear()}_${id}`);
                     break;
                 default:
                     break;
@@ -146,7 +146,7 @@ class BaoHiemInfoModal extends AdminModal {
                 if (isConfirm) {
                     this.setState({ isGiaHan: true }, () => {
                         this.matTruocThe.setData(`BHYTSV_FRONT:${new Date().getFullYear()}_${this.state.id}`);
-                        this.matSauThe.setData(`BHYTSV_BACK:${new Date().getFullYear()}_${this.state.id}`);
+                        // this.matSauThe.setData(`BHYTSV_BACK:${new Date().getFullYear()}_${this.state.id}`);
                     });
                 } else {
                     this.setState({ isGiaHan: false });
@@ -161,10 +161,10 @@ class BaoHiemInfoModal extends AdminModal {
     elementMienDong = () => {
         return (
             <div className='row'>
-                <FormTextBox type='number' autoFormat={false} label='Nhập số BHXH hiện tại' className='col-md-12' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
+                <FormTextBox type='number' autoFormat={false} label='Nhập số BHXH hiện tại' className='col-md-6' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
 
                 <FormImageBox className='col-md-6' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' />
-                <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_BACK' />
+                {/* <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_BACK' /> */}
             </div>
         );
     }
@@ -172,9 +172,9 @@ class BaoHiemInfoModal extends AdminModal {
     elementXacNhan = () => {
         return (<div className='row'>
             <FormTextBox type='number' autoFormat={false} label='Nhập số BHXH hiện tại' className='col-md-12' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
-            <FormSelect ref={e => this.benhVienDangKy = e} label='Đăng ký nơi khám chữa bệnh ban đầu' className='col-md-12' data={SelectAdapter_DmCoSoKcbBhyt} onChange={this.handleCheckBenhVien} required />
-            <FormImageBox className='col-md-6' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' style={{ display: this.state.isGiaHan ? '' : 'none' }} />
-            <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' style={{ display: this.state.isGiaHan ? '' : 'none' }} />
+            <FormSelect ref={e => this.benhVienDangKy = e} label='Đăng ký nơi khám chữa bệnh ban đầu' className='col-md-12' data={SelectAdapter_DmCoSoKcbBhyt()} onChange={this.handleCheckBenhVien} required />
+            <FormImageBox className='col-md-12' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' style={{ display: this.state.isGiaHan ? '' : 'none' }} />
+            {/* <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' style={{ display: this.state.isGiaHan ? '' : 'none' }} /> */}
         </div>);
     }
 
@@ -203,7 +203,7 @@ class BaoHiemInfoModal extends AdminModal {
         return (
             <div style={{ height: '70vh', overflow: 'scroll', margin: '0 20 0 20' }}>
                 <div className='row'>
-                    <FormSelect ref={e => this.benhVienDangKy = e} label='Đăng ký nơi khám chữa bệnh ban đầu' className='col-md-12' data={SelectAdapter_DmCoSoKcbBhyt} onChange={this.handleCheckBenhVien} required />
+                    <FormSelect ref={e => this.benhVienDangKy = e} label='Đăng ký nơi khám chữa bệnh ban đầu' className='col-md-12' data={SelectAdapter_DmCoSoKcbBhyt(1)} required />
 
                     <h5 className='col-12' style={{ textAlign: 'center', marginBottom: '1rem' }}>PHỤ LỤC THÀNH VIÊN HỘ GIA ĐÌNH</h5>
                     <FormTextBox ref={e => this.hoTenChuHo = e} label='Họ và tên chủ hộ' className='col-md-6' required />

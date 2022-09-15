@@ -1,11 +1,12 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import sinhVien from './redux';
+import dataSinhVien from './redux';
 
 export default {
     redux: {
-        sinhVien
+        parent: 'sinhVien',
+        reducers: { dataSinhVien }
     },
     routes: [
         {

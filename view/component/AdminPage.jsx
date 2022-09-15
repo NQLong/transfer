@@ -514,7 +514,7 @@ export class FormTextBox extends React.Component {
             return (
                 <div className={'form-group ' + (className || '')} style={style}>
                     {displayElement}
-                    <input disabled={disabled} ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} />
+                    <input disabled={disabled} ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} onKeyDown={this.props.onKeyDown} />
                     {smallText ? <small>{smallText}</small> : null}
                 </div>);
         }

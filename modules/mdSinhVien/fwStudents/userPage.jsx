@@ -28,11 +28,9 @@ class SinhVienPage extends AdminPage {
                     T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
                 } else {
                     let user = this.props.system.user;
-                    let isTanSinhVien = user.isStudent && !data.item.ngayNhapHoc && data.item.namTuyenSinh == new Date().getFullYear();
-                    this.setState({ isTanSinhVien, ngayNhapHoc: data.item.ngayNhapHoc });
-                    if (isTanSinhVien) {
-                        T.notify('Chào mừng tân sinh viên!', 'info');
-                    }
+                    let canEdit = data.item.canEdit;
+                    let isTanSinhVien = user.isStudent && data.item.namTuyenSinh == new Date().getFullYear();
+                    this.setState({ isTanSinhVien, ngayNhapHoc: data.item.ngayNhapHoc, canEdit });
                     this.props.getSvBaoHiemYTe(item => {
                         if (item && !item.thoiGianHoanThanh) {
                             this.infoBhytModal.show(item);
@@ -214,20 +212,29 @@ class SinhVienPage extends AdminPage {
 
     downloadWord = (e) => {
         e.preventDefault();
-        const confirmExport = () => T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường', 'info', true, isConfirm => {
-            if (isConfirm) {
-                T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác) và hoàn thiện các bước nhập học', 'success', false, () => {
-                    this.state.isTanSinhVien && this.props.history.push('/user/hoc-phi');
-                });
-                T.get('/api/students-download-syll');
-                this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime(), ngayNhapHoc: -1, isTanSinhVien: false }));
-            }
-        });
+        const confirmExport = () => this.props.updateStudentUser({ lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }, () => {
+            T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường?', 'info', true, isConfirm => {
+                if (isConfirm) {
+                    T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác) và hoàn thiện các bước nhập học!', 'success', false, () => {
+                        this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0 });
+                        this.setState({ ngayNhapHoc: -1, canEdit: 0 }, () => {
+                            this.state.isTanSinhVien && this.props.history.push('/user/hoc-phi');
+                        });
+                    });
+                    T.get('/api/students-sent-syll');
+                }
+            });
+        }));
+
         if (this.state.daDangKyBhyt) {
             confirmExport();
         } else {
             this.baoHiemModal.show(confirmExport);
         }
+    }
+
+    downloadSyll = () => {
+        T.download('/api/students-download-syll', 'SYLL.pdf');
     }
 
     handleMienDongBhyt = value => {
@@ -247,9 +254,8 @@ class SinhVienPage extends AdminPage {
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
-        let { isTanSinhVien, ngayNhapHoc } = this.state;
-
-        let readOnly = !isTanSinhVien;
+        let { ngayNhapHoc, canEdit } = this.state;
+        let readOnly = !canEdit;
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
             title: 'Lý lịch cá nhân sinh viên',
@@ -270,6 +276,7 @@ class SinhVienPage extends AdminPage {
                                 postUrl='/user/upload'
                                 uploadType='SinhVienImage'
                                 onSuccess={this.imageChanged}
+                                readOnly={readOnly}
                                 className='col-md-3 rounded-circle' isProfile={true}
                             />
                             <div className='form-group col-md-9'>
@@ -281,16 +288,6 @@ class SinhVienPage extends AdminPage {
                                     <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly required />
                                     <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-5' required readOnly />
                                     <FormSelect className='col-md-7' ref={e => this.noiSinhMaTinh = e} data={ajaxSelectTinhThanhPho} readOnly={readOnly} label='Nơi sinh' required />
-                                    {/* <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-5' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnly} /> */}
-
-                                    {/* <FormTextBox type='year' ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' className='col-md-12' readOnly /> */}
-
-                                    {/* <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly />
-                                    <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly />
-                                     <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly />
-                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' data={SelectAdapter_DmSvLoaiHinhDaoTao} readOnly />
-                                    <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' data={SelectAdapter_DmLoaiSinhVienV2} readOnly />
-                                    <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' data={SelectAdapter_DmTinhTrangSinhVienV2} readOnly /> */}
                                 </div>
                             </div>
                             <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
@@ -328,16 +325,29 @@ class SinhVienPage extends AdminPage {
                         </div>
                     </div>
                 </div>
+                <div className='tile'>
+                    <h4 className='tile-title'>Hướng dẫn thao tác</h4>
+                    <div className='tile-body'>
+                        <ul className='col-md-12'>
+                            <li>Để <b>cập nhật và lưu thay đổi thông tin lý lịch</b>, sinh viên nhấp và biểu tượng:<div className='btn btn-circle btn-success' style={{ scale: '80%' }}><i className='fa fa-lg fa-save' /></div>.</li>
+                            <li>Để lưu và nhận tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b>, sinh viên nhấp vào biểu tượng:<div className='btn btn-circle btn-danger' style={{ scale: '80%' }}><i className='fa fa-lg fa-file-pdf-o' /></div>. Sau đó, tệp tin sẽ được gửi đến email <i>{this.props.system?.user?.email || ''}</i>, đồng thời hệ thống ghi nhận <b>hoàn thành cập nhật hồ sơ</b>.</li>
+                            <li>Trong trường hợp sinh viên không nhận được email, vui lòng nhấp vào biểu tượng<div className='btn btn-circle btn-info' style={{ scale: '80%' }}><i className='fa fa-lg fa-arrow-down' /></div> để tải về tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b></li>
+                        </ul>
+                    </div>
+                </div>
                 <BaoHiemYTeModal ref={e => this.baoHiemModal = e} />
                 <InfoModal ref={e => this.infoBhytModal = e} />
             </>,
             backRoute: '/user',
             buttons: [
-                !readOnly && {
+                canEdit && {
                     icon: 'fa-save', className: 'btn-success', onClick: this.save
                 },
-                (isTanSinhVien && !ngayNhapHoc) && {
+                canEdit && {
                     icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord
+                },
+                (ngayNhapHoc == -1 && !canEdit) && {
+                    icon: 'fa-arrow-down', className: 'btn-info', onClick: this.downloadSyll
                 }
             ]
         });

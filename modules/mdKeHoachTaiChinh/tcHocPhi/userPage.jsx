@@ -98,7 +98,7 @@ class UserPage extends AdminPage {
         }
         T.ready('/user/hoc-phi', () => {
             let user = this.props.system.user;
-            if (user.isStudent && !user.ngayNhapHoc && user.data.namTuyenSinh == '2022') {
+            if (user.isStudent && user.data.namTuyenSinh == '2022') {
                 this.props.getHocPhi();
                 this.props.getAllHocPhiStudent('', () => {
                     this.props.getSvBaoHiemYTe(item => {
@@ -204,11 +204,10 @@ class UserPage extends AdminPage {
         const user = this.props.system.user,
             tcHocPhi = this.props.tcHocPhi || {},
             { hocPhiAll, hocPhiDetailAll } = tcHocPhi.dataAll || {};
-        const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
+        // const hocPhiHuongDan = this.props.tcHocPhi?.hocPhiHuongDan;
 
         return this.renderPage({
             title: 'Học phí',
-            subTitle: <a style={{ marginBottom: '20px' }} href='#' onClick={() => { this.modal.show(hocPhiHuongDan); }} >*Hướng dẫn đóng học phí</a>,
             icon: 'fa fa-money',
             breadcrumb: ['Học phí'],
             backRoute: '/user',
