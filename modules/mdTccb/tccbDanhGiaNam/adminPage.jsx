@@ -152,10 +152,10 @@ class TccbDanhGiaNamPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của đơn vị</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của người lao động</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn phê duyệt của đơn vị</th>
-                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn phê duyệt của trường</th>
+                    <th style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của đơn vị</th>
+                    <th style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn đăng ký của người lao động</th>
+                    <th style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn phê duyệt của đơn vị</th>
+                    <th style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn phê duyệt của trường</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
