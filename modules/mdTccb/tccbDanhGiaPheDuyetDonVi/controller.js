@@ -30,12 +30,12 @@ module.exports = app => {
 
     app.put('/api/tccb/danh-gia-phe-duyet-don-vi', app.permission.check('manager:login'), async (req, res) => {
         try {
-            const id = req.body.id, approvedDonVi = req.body.approvedDonVi, shccDuyetCapDonVi = req.session.user.email, nam = parseInt(req.body.nam);
+            const id = req.body.id, approvedDonVi = req.body.approvedDonVi, userDuyetCapDonVi = req.session.user.email, nam = parseInt(req.body.nam);
             const { donViBatDauPheDuyet, donViKetThucPheDuyet } = await app.model.tccbDanhGiaNam.get({ nam });
             if (Date.now() < donViBatDauPheDuyet || Date.now() > donViKetThucPheDuyet) {
                 throw 'Thời gian phê duyệt không phù hợp';
             }
-            const item = await app.model.tccbDanhGiaPheDuyetDonVi.update({ id }, { shccDuyetCapDonVi, approvedDonVi });
+            const item = await app.model.tccbDanhGiaPheDuyetDonVi.update({ id }, { userDuyetCapDonVi, approvedDonVi, dangKyLai: approvedDonVi == 'Không đồng ý' ? 1 : 0 });
             res.send({ item });
         } catch (error) {
             res.send({ error });

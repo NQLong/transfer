@@ -108,8 +108,8 @@ module.exports = app => {
                 let dangKy = index == -1 ? 0 : 1;
                 return { nhom, submenus, dangKy };
             });
-            const { approvedDonVi } = await app.model.tccbDanhGiaPheDuyetDonVi.get({ nam, shcc });
-            res.send({ items: listNhom, approvedDonVi });
+            const pheDuyet = await app.model.tccbDanhGiaPheDuyetDonVi.get({ nam, shcc });
+            res.send({ items: listNhom, approvedDonVi: pheDuyet?.approvedDonVi });
         } catch (error) {
             res.send({ error });
         }
@@ -137,20 +137,22 @@ module.exports = app => {
                 app.model.tccbDanhGiaPheDuyetDonVi.get({ shcc, nam })
             ]);
 
-            if (itemPheDuyet && itemPheDuyet.approvedDonVi == 'Không đồng ý') {
+            if (itemPheDuyet?.dangKyLai == 1) {
                 item = await app.model.tccbDanhGiaCaNhanDangKy.update({ id: item.id }, { idNhomDangKy: idNhom });
-                const { id } = await app.model.tccbDanhGiaPheDuyetDonVi.get({ shcc, nam });
-                await app.model.tccbDanhGiaPheDuyetDonVi.update(id, { timeDangKy: Date.now(), idNhomDangKy: idNhom, approvedDonVi: null });
+                await app.model.tccbDanhGiaPheDuyetDonVi.update({ id: itemPheDuyet.id }, { timeDangKy: Date.now(), idNhomDangKy: idNhom, approvedDonVi: null });
                 res.send({ item, nam });
             } else {
-                const { nldBatDauDangKy, nldKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
+                const danhGia = await app.model.tccbDanhGiaNam.get({ nam });
+                if (!danhGia) {
+                    throw 'Không có dữ liệu năm để đăng ký';
+                }
+                const { nldBatDauDangKy, nldKetThucDangKy } = danhGia;
                 if (nldBatDauDangKy > Date.now() || Date.now() > nldKetThucDangKy) {
                     throw 'Thời gian đăng ký không phù hợp';
                 }
                 if (item) {
                     item = await app.model.tccbDanhGiaCaNhanDangKy.update({ id: item.id }, { idNhomDangKy: idNhom });
-                    const { id } = await app.model.tccbDanhGiaPheDuyetDonVi.get({ shcc, nam });
-                    await app.model.tccbDanhGiaPheDuyetDonVi.update(id, { timeDangKy: Date.now(), idNhomDangKy: idNhom });
+                    await app.model.tccbDanhGiaPheDuyetDonVi.update({ id: itemPheDuyet.id }, { timeDangKy: Date.now(), idNhomDangKy: idNhom });
                     res.send({ item, nam });
                 } else {
                     newItem.shcc = shcc;
