@@ -18148,6 +18148,9 @@
             "active": true,
             "moduleName": "tccbDanhGiaPheDuyetDonVi",
             "modelName": "tccbDanhGiaPheDuyetDonVi",
+            "methods": {
+                "TCCB_DANH_GIA_PHE_DUYET_DON_VI_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
