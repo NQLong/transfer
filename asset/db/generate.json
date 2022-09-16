@@ -6381,7 +6381,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 3
+                    "size": 7
                 },
                 "NGAY_VAO_DOAN": {
                     "value": "ngayVaoDoan",
@@ -14836,6 +14836,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 50
+                },
+                "IS_TIENG_VIET": {
+                    "value": "isTiengViet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -15656,7 +15663,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 256
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -15796,6 +15803,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152474\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "SO_HOC_KY": {
+                    "value": "soHocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -18262,6 +18276,53 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_EMAIL_LOG": {
+            "active": true,
+            "moduleName": "fwEmailLog",
+            "modelName": "fwEmailLog",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173115\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USED_EMAIL": {
+                    "value": "usedEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "TO_USER": {
+                    "value": "toUser",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TO_EMAIL": {
+                    "value": "toEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "MAIL_TYPE": {
+                    "value": "mailType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 128
                 }
             },
             "primaryKeys": [

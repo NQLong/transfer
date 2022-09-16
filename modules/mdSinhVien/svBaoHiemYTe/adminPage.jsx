@@ -24,14 +24,14 @@ class BaoHiemAdminPage extends AdminPage {
     componentTableMienDong = (dienDong = 0) => renderTable({
         getDataSource: () => (this.props.svBaoHiemYTe?.items || []).filter(item => item.dienDong == dienDong && !!item.maBhxhHienTai),
         renderHead: () => <tr>
-            <td style={{ width: 'auto' }} nowrap='true'>#</td>
-            <td style={{ width: '20%' }} nowrap='true'>MSSV</td>
-            <td style={{ width: '40%' }} nowrap='true'>Họ tên</td>
-            <td style={{ width: '10%' }} nowrap='true'>SĐT cá nhân</td>
-            <td style={{ width: '30%' }} nowrap='true'>Thường trú</td>
-            <td style={{ width: 'auto' }} nowrap='true'>Mã số BHXH hiện tại</td>
-            <td style={{ width: 'auto', display: dienDong != 0 ? '' : 'none' }} nowrap='true'>Cơ sở KCB</td>
-            <td style={{ width: 'auto' }} nowrap='true'>Thẻ BHYT</td>
+            <td style={{ width: 'auto', nowrap: 'true' }} >#</td>
+            <td style={{ width: '20%', nowrap: 'true' }} >MSSV</td>
+            <td style={{ width: '40%', nowrap: 'true' }} >Họ tên</td>
+            <td style={{ width: '10%', nowrap: 'true' }} >SĐT cá nhân</td>
+            <td style={{ width: '30%', nowrap: 'true' }} >Thường trú</td>
+            <td style={{ width: 'auto', nowrap: 'true' }} >Mã số BHXH hiện tại</td>
+            <td style={{ width: 'auto', display: dienDong != 0 ? '' : 'none', nowrap: 'true' }} >Cơ sở KCB</td>
+            <td style={{ width: 'auto', nowrap: 'true' }} >Thẻ BHYT</td>
             {/* <td style={{ width: 'auto' }} nowrap='true'>Mặt sau thẻ BHYT</td> */}
         </tr>,
         renderRow: (item, index) => <tr key={index}>
