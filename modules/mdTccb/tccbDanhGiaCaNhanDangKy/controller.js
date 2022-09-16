@@ -160,7 +160,8 @@ module.exports = app => {
                     newItem.nam = nam;
                     delete newItem.dangKy;
                     item = await app.model.tccbDanhGiaCaNhanDangKy.create(newItem);
-                    await app.model.tccbDanhGiaPheDuyetDonVi.create({ shcc, timeDangKy: Date.now(), idNhomDangKy: idNhom, nam });
+                    const pheDuyetDonVi = await app.model.tccbDanhGiaPheDuyetDonVi.create({ shcc, timeDangKy: Date.now(), idNhomDangKy: idNhom, nam });
+                    await app.model.tccbDanhGiaPheDuyetTruong.create({ idPheDuyetCapDonVi: pheDuyetDonVi.id, nam });
                     res.send({ item, nam });
                 }
             }

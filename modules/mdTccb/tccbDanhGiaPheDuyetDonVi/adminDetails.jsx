@@ -23,7 +23,6 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('tccbDanhGiaPDDV');
         const nam = this.state.nam || '';
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tccbDanhGiaPheDuyetDonVi && this.props.tccbDanhGiaPheDuyetDonVi.page ?
             this.props.tccbDanhGiaPheDuyetDonVi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
@@ -49,7 +48,7 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
                         </>} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.tenNhomDangKy || 'Chưa đăng ký'} />
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.approvedDonVi || 'Chưa phê duyệt'} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
+                        <TableCell type='buttons' style={{ textAlign: 'center' }}>
                             <Tooltip title='Đồng ý' arrow>
                                 <button className='btn btn-success' onClick={() => item.id ? this.props.updateTccbDanhGiaPDDV(item.id, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
                                     <i className='fa fa-lg fa-check' />
@@ -70,8 +69,8 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
             icon: 'fa fa-list-alt',
             title: `Thông tin đăng ký năm ${nam}`,
             breadcrumb: [
-                <Link key={0} to='/user/tccb/'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/danh-gia-phe-duyet-don-vi/'>Phê duyệt đơn vị</Link>,
+                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                <Link key={1} to='/user/tccb/danh-gia-phe-duyet-don-vi'>Phê duyệt đơn vị</Link>,
                 `Thông tin phê duyệt năm ${nam}`
             ],
             content: <>
@@ -79,7 +78,7 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getTccbDanhGiaPDDVPage} />
             </>,
-            backRoute: '/user/tccb/danh-gia-phe-duyet-don-vi/',
+            backRoute: '/user/tccb/danh-gia-phe-duyet-don-vi',
         });
     }
 }

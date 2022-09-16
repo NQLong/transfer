@@ -31,7 +31,11 @@ module.exports = app => {
     app.put('/api/tccb/danh-gia-phe-duyet-don-vi', app.permission.check('manager:login'), async (req, res) => {
         try {
             const id = req.body.id, approvedDonVi = req.body.approvedDonVi, userDuyetCapDonVi = req.session.user.email, nam = parseInt(req.body.nam);
-            const { donViBatDauPheDuyet, donViKetThucPheDuyet } = await app.model.tccbDanhGiaNam.get({ nam });
+            const danhGia = await app.model.tccbDanhGiaNam.get({ nam });
+            if (!danhGia) {
+                throw 'Không có dữ liệu phê duyệt của năm';
+            }
+            const { donViBatDauPheDuyet, donViKetThucPheDuyet } = danhGia;
             if (Date.now() < donViBatDauPheDuyet || Date.now() > donViKetThucPheDuyet) {
                 throw 'Thời gian phê duyệt không phù hợp';
             }
