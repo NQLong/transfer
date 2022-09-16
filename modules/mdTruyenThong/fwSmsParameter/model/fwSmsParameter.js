@@ -42,7 +42,9 @@ module.exports = app => {
 
         let content = template.content;
         Object.keys(colMapper).forEach(key => {
-            content = content.replaceAll(key, returnData[colMapper[key]]);
+            let data = returnData[colMapper[key]];
+            if (key == '{trans_date}') content = content.replaceAll(key, `${app.date.viTimeFormat(new Date(parseInt(data)))} ${app.date.dateFormat(new Date(parseInt(data)))}`);
+            else content = content.replaceAll(key, returnData[colMapper[key]]);
         });
 
         if (!template.isTiengViet) content = content.split('').map(item => xoaDau(item)).join('');
