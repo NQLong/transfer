@@ -1956,6 +1956,7 @@ AS
     listLoaiHinhDaoTao    STRING(50);
     listLoaiSinhVien      STRING(50);
     listTinhTrangSinhVien STRING(50);
+    listKhoaSinhVien      STRING(50);
     gender                STRING(5);
 
 BEGIN
@@ -1968,6 +1969,7 @@ BEGIN
     SELECT JSON_VALUE(filter, '$.listLoaiHinhDaoTao') INTO listLoaiHinhDaoTao FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listLoaiSinhVien') INTO listLoaiSinhVien FROM DUAL;
     SELECT JSON_VALUE(filter, '$.listTinhTrangSinhVien') INTO listTinhTrangSinhVien FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listKhoaSinhVien') INTO listKhoaSinhVien FROM DUAL;
     SELECT JSON_VALUE(filter, '$.gender') INTO gender FROM DUAL;
 
     SELECT COUNT(*)
@@ -1990,6 +1992,8 @@ BEGIN
              listFaculty IS NULL)
             AND (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0 OR
                  listFromCity IS NULL)
+            AND (listKhoaSinhVien IS NOT NULL AND INSTR(listKhoaSinhVien, STU.NAM_TUYEN_SINH) != 0 OR
+                 listKhoaSinhVien IS NULL)
             AND (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0 OR listEthnic IS NULL)
             AND
             (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_GIA) != 0 OR listNationality IS NULL)
@@ -2059,6 +2063,8 @@ BEGIN
                        listFaculty IS NULL)
                       AND (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0 OR
                            listFromCity IS NULL)
+                      AND (listKhoaSinhVien IS NOT NULL AND INSTR(listKhoaSinhVien, STU.NAM_TUYEN_SINH) != 0 OR
+                           listKhoaSinhVien IS NULL)
                       AND (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0 OR listEthnic IS NULL)
                       AND (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_GIA) != 0 OR
                            listNationality IS NULL)
