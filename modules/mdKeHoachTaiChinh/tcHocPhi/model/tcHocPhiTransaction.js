@@ -19,7 +19,7 @@ module.exports = app => {
 
             let smsContent = await app.model.fwSmsParameter.replaceAllContent(1, student);
 
-            app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
+            student.dienThoaiCaNhan && app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
         } catch (error) {
             console.error('Send email and sms tcHocPhi fail!');
         }

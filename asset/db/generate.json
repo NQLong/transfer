@@ -17646,20 +17646,6 @@
                     "nullable": true,
                     "size": "22,0"
                 },
-                "PHE_DUYET_CAP_TRUONG": {
-                    "value": "pheDuyetCapTruong",
-                    "dataType": "NUMBER",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "PHE_DUYET_CAP_DON_VI": {
-                    "value": "pheDuyetCapDonVi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "NAM": {
                     "value": "nam",
                     "dataType": "NUMBER",
@@ -18167,8 +18153,8 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "SHCC_DUYET_CAP_DON_VI": {
-                    "value": "shccDuyetCapDonVi",
+                "USER_DUYET_CAP_DON_VI": {
+                    "value": "userDuyetCapDonVi",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
@@ -18208,6 +18194,74 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
+                },
+                "DANG_KY_LAI": {
+                    "value": "dangKyLai",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_PHE_DUYET_TRUONG": {
+            "active": true,
+            "moduleName": "tccbDanhGiaPheDuyetTruong",
+            "modelName": "tccbDanhGiaPheDuyetTruong",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173093\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USER_DUYET_CAP_TRUONG": {
+                    "value": "userDuyetCapTruong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "APPROVED_TRUONG": {
+                    "value": "approvedTruong",
+                    "dataType": "CLOB",
+                    "dataDefault": "null",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "ID_PHE_DUYET_CAP_DON_VI": {
+                    "value": "idPheDuyetCapDonVi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "Y_KIEN_TRUONG_TCCB": {
+                    "value": "yKienTruongTccb",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "TRUONG_TCCB": {
+                    "value": "truongTccb",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
                 }
             },
             "primaryKeys": [

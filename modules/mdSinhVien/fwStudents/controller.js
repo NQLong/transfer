@@ -45,12 +45,17 @@ module.exports = app => {
     //API----------------------------------------------------------------------------------------------------------------
     app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), async (req, res) => {
         try {
-            let mssv = req.session.user.data?.mssv.trim() || '';
+            let mssv = req.session.user?.studentId || '';
             const item = await app.model.fwStudents.get({ mssv });
             if (!item.image) {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
                 item.image = user?.image;
             }
+            const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+
+            let dataHocPhi = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, 'congNo');
+            if (dataHocPhi.congNo) item.chuaDongHocPhi = true;
+            else item.chuaDongHocPhi = false;
             //TODO: Get baohiemyte
             res.send({ item });
         } catch (error) {
@@ -58,7 +63,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:manage'), async (req, res) => {
+    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.orCheck('student:manage', 'tcHocPhi:manage'), async (req, res) => {
         try {
             const _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
@@ -135,6 +140,57 @@ module.exports = app => {
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
     app.fs.createFolder(app.path.join(app.publicPath, '/img/sinhVien'));
+    app.fs.createFolder(app.path.join(app.assetPath, 'image-card'));
+
+    app.uploadHooks.add('uploadAnhThe', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadAnhThe(req, fields, files, params, done), done, 'student:login'));
+
+    const uploadAnhThe = async (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData.length && fields.userData[0].startsWith('CardImage') && files.CardImage && files.CardImage.length) {
+            try {
+                let srcPath = files.CardImage[0].path;
+                if (files.CardImage[0].size > 1000 * 1000) {
+                    app.fs.deleteImage(srcPath);
+                    done && done({ error: 'Vui lòng upload ảnh kích thước nhỏ hơn 1MB!' });
+                } else {
+                    let srcPath = files.CardImage[0].path;
+                    let image = await app.jimp.read(srcPath);
+                    let extPath = app.path.extname(srcPath);
+
+                    await image.resize(113.386, 151.181); // ảnh 3 x 4
+
+                    app.fs.unlinkSync(srcPath);
+                    let user = req.session.user;
+                    const folderPath = app.path.join(app.assetPath, 'image-card', user.data.namTuyenSinh.toString());
+                    app.fs.createFolder(folderPath);
+                    let filePath = app.path.join(folderPath, `${user.studentId}${extPath}`);
+                    app.fs.deleteFile(filePath);
+                    await image.writeAsync(filePath);
+                    // await app.fs.rename(srcPath, filePath);
+                    await app.model.fwStudents.update({ mssv: user.studentId }, { anhThe: `${user.studentId}${extPath}` });
+                    done && done({ image: '/api/student/get-anh-the' });
+                }
+            } catch (error) {
+                done && done({ error });
+            }
+        }
+    };
+
+    app.get('/api/student/get-anh-the', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let user = req.session.user;
+            let item = await app.model.fwStudents.get({ mssv: user.studentId }, 'anhThe');
+            const path = app.path.join(app.assetPath, 'image-card', user.data.namTuyenSinh.toString(), item.anhThe);
+
+            if (app.fs.existsSync(path)) {
+                res.sendFile(path);
+            } else {
+                res.send({ error: 'No valid file' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 
     const uploadSinhVienImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('SinhVienImage:') && files.SinhVienImage && files.SinhVienImage.length) {
@@ -145,7 +201,7 @@ module.exports = app => {
     app.uploadHooks.add('uploadSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSinhVienImage(req, fields, files, params, done), done, 'student:login'));
 
-    app.get('/api/students-sent-syll', app.permission.check('student:login'), async (req, res) => {
+    const initSyll = async (req, res, next) => {
         try {
             const source = app.path.join(__dirname, 'resource', 'syll2022.docx');
             const user = req.session.user;
@@ -212,20 +268,29 @@ module.exports = app => {
                     app.fs.writeFileSync(filePdfPath, pdfBuffer);
 
                     app.fs.deleteFile(qrCodeImage);
-                    let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, defaultEmail, defaultPassword } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
-                    app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
-                        // Success callback
-                        console.log('Send SYLL success');
-                    }, () => {
-                        // Error callback
-                        console.log('Send SYLL failed');
-                    });
+                    next(data, pdfBuffer);
                 }
             });
         } catch (error) {
             res.send({ error });
         }
+    };
 
+    app.get('/api/students-sent-syll', app.permission.check('student:login'), async (req, res) => {
+        await initSyll(req, res, async (data, pdfBuffer) => {
+            let emailData = await app.model.svSetting.getEmail();
+            if (emailData.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+            let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
+            [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml] = [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml].map(item => item?.replaceAll('{ten}', `${data.hoTen}`));
+            app.email.normalSendEmail(emailData.email, emailData.password, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
+                // Success callback
+                app.model.svSetting.updateLimit(data.index);
+                res.end();
+            }, (error) => {
+                // Error callback
+                res.send({ error });
+            });
+        });
     });
 
     app.uploadHooks.add('FwSinhVienImport', (req, fields, files, params, done) =>
@@ -340,7 +405,7 @@ module.exports = app => {
             if (app.fs.existsSync(filePath)) {
                 res.sendFile(filePath);
             } else {
-                res.send({ error: 'No valid file' });
+                initSyll(req, res, () => res.sendFile(filePath));
             }
         } catch (error) {
             res.send({ error });
