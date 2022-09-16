@@ -39,6 +39,7 @@ module.exports = app => {
 
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/students/list', app.permission.check('student:manage'), app.templates.admin);
+    app.get('/user/students/import', app.permission.check('developer:login'), app.templates.admin);
     app.get('/user/students/item/:mssv', app.permission.check('student:manage'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
@@ -226,6 +227,109 @@ module.exports = app => {
         }
 
     });
+
+    app.uploadHooks.add('FwSinhVienImport', (req, fields, files, params, done) =>
+        app.permission.has(req, () => sinhVienImportHandler(fields, files, done), done, 'developer:login'));
+
+
+    const sinhVienImportHandler = async (fields, files, done) => {
+        const khuVucMapper = {
+            '1': 'KV1',
+            '2': 'KV2',
+            '2NT': 'KV2-NT',
+            '3': 'KV3',
+        };
+        const maPhuongThuc = [];
+        const validateRow = async (row) => {
+            const sinhVien = await app.model.fwStudents.get({ mssv: row.mssv });
+            if (sinhVien) throw `Sinh viên ${row.mssv} đã tồn tại`;
+
+            const nganh = await app.model.dtNganhDaoTao.get({ maNganh: row.maNganh });
+            if (!nganh) throw `Sinh viên ${row.mssv}-${row.cmnd} có mã ngành không hợp lệ (${row.maNganh})`;
+
+            row.nganh = nganh;
+            row.khuVuc = khuVucMapper[row.khuVuc];
+
+            if (row.doiTuong == 0 || !row.doiTuong) row.doiTuong = '00';
+            if (!maPhuongThuc.includes(row.maPhuongThuc)) {
+                maPhuongThuc.push(row.maPhuongThuc);
+                if (!await app.model.dmPhuongThucTuyenSinh.get({ ma: row.maPhuongThuc })) {
+                    await app.model.dmPhuongThucTuyenSinh.create({ ma: row.maPhuongThuc, kichHoat: 1, ten: row.phuongThuc });
+                }
+            }
+        };
+        let worksheet = null, lastModified = new Date().getTime();
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'FwSinhVienImport' && files.FwSinhVienImport && files.FwSinhVienImport.length) {
+            const srcPath = files.FwSinhVienImport[0].path;
+            let workbook = app.excel.create();
+            workbook = await app.excel.readFile(srcPath);
+            if (workbook) {
+                app.fs.deleteFile(srcPath);
+                worksheet = workbook.getWorksheet(1);
+                if (worksheet) {
+                    const items = [];
+                    const errors = [];
+                    let sum = 0;
+                    let index = 2;
+                    try {
+                        while (true) {
+                            if (!worksheet.getCell('A' + index).value) {
+                                break;
+                            } else {
+                                const
+                                    mssv = `${worksheet.getCell('A' + index).value}`.trim(),
+                                    cmnd = `${worksheet.getCell('B' + index).value}`.trim(),
+                                    ho = worksheet.getCell('C' + index).value,
+                                    ten = worksheet.getCell('D' + index).value,
+                                    maNganh = worksheet.getCell('F' + index).value,
+                                    toHop = worksheet.getCell('H' + index).value,
+                                    maPhuongThuc = worksheet.getCell('I' + index).value,
+                                    phuongThuc = worksheet.getCell('J' + index).value,
+                                    diemXetTuyen = worksheet.getCell('K' + index).value,
+                                    diemThi = worksheet.getCell('O' + index).value,
+                                    gioiTinh = worksheet.getCell('M' + index).value,
+                                    ngaySinh = worksheet.getCell('N' + index).value,
+                                    khuVuc = worksheet.getCell('P' + index).value,
+                                    doiTuong = worksheet.getCell('Q' + index).value,
+                                    emailTruong = worksheet.getCell('R' + index).value;
+                                const row = { mssv, phuongThuc, diemThi, cmnd, ho, ten, maNganh, toHop, maPhuongThuc, diemXetTuyen, gioiTinh, ngaySinh, khuVuc, doiTuong, emailTruong, nganh: {} };
+                                await validateRow(row);
+                                index++;
+                                items.push(row);
+                            }
+                        }
+                    } catch (error) {
+                        return done({ error });
+                    }
+                    await Promise.all(items.map(async row => {
+                        try {
+                            const ngaySinhData = row.ngaySinh.split('/');
+                            const ngaySinh = new Date(`${ngaySinhData[1]}-${ngaySinhData[0]}-${ngaySinhData[2]}`);
+                            const isCLC = row.maNganh.toLowerCase().includes('clc');
+                            const res = await app.model.fwStudents.create({
+                                ho: row.ho, ten: row.ten, ngaySinh: ngaySinh.getTime(),
+                                gioiTinh: row.gioiTinh.toLowerCase() == 'nam' ? 1 : 2, loaiSinhVien: 'L1', maNganh: row.maNganh,
+                                tinhTrang: 3, emailTruong: row.emailTruong, khoa: row.nganh.khoa, phuongThucTuyenSinh: row.maPhuongThuc,
+                                maKhoa: isCLC ? 'CLC2022' : 'DHCQ2022', loaiHinhDaoTao: isCLC ? 'CLC' : 'CQ',
+                                cmnd: row.cmnd, namTuyenSinh: 2022, mssv: row.mssv, bacDaoTao: 'DH', doiTuongTuyenSinh: row.doiTuong,
+                                khuVucTuyenSinh: row.khuVuc, lastModified, canEdit: 1, diemThi: row.diemThi
+                            });
+                            sum += 1;
+                            return res;
+                        } catch (error) {
+                            console.error(error);
+                            row.error = error;
+                            errors.push(row);
+                        }
+                    }));
+                    done({ errors, sum });
+
+                } else {
+                    done({ error: 'No worksheet!' });
+                }
+            } else done({ error: 'No workbook!' });
+        }
+    };
 
     app.get('/api/students-download-syll', app.permission.check('student:login'), async (req, res) => {
         try {

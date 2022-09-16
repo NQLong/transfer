@@ -67,6 +67,7 @@ class AdminStudentsPage extends AdminPage {
 
     render() {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
+        let developer = this.getUserPermission('developer', ['login']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
             this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
 
@@ -255,7 +256,8 @@ class AdminStudentsPage extends AdminPage {
                 }
             },
             buttons: [
-                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null
+                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null,
+                developer.login && { className: 'btn btn-success', icon: 'fa-upload', tooltip: 'Import dữ liệu sinh viên', onClick: e => e.preventDefault() || this.props.history.push('/user/students/import') }
             ]
         });
     }
