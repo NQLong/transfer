@@ -165,6 +165,7 @@ export default class ImageBox extends React.Component {
     render() {
         const backgroundImage = `url('${(this.state.image ? this.state.image : this.props.image)}')`,
             boxStyle = this.props.isProfile ? Object.assign({}, UploadProfileStyle, { backgroundImage }) : Object.assign({}, UploadBoxStyle, { backgroundImage });
+        if (this.props.height) boxStyle.height = this.props.height;
         return (
             <div style={this.props.style} className={this.props.className}>
                 <div ref={this.box} id={this.props.uploadType} style={boxStyle}

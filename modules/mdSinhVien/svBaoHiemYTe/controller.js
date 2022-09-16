@@ -171,22 +171,27 @@ module.exports = app => {
     const uploadImage = async (req, fields, files, params, done) => {
         try {
             if (fields.userData && fields.userData.length && fields.userData[0].startsWith('BHYTSV_FRONT:') && files.BHYTSV_FRONT && files.BHYTSV_FRONT.length) {
-                let user = req.session.user, [curYear, id] = fields.userData[0].substring('BHYTSV_FRONT:'.length).split('_');
-                let item = await app.model.svBaoHiemYTe.get({ id });
-                if (item && item.mssv == user.studentId) {
-                    app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/front', curYear));
+                if (files.BHYTSV_FRONT[0].size > 1000 * 1000) {
+                    app.fs.deleteImage(files.BHYTSV_FRONT[0].path);
+                    done && done({ error: 'Vui lòng upload ảnh kích thước nhỏ hơn 1MB!' });
+                } else {
+                    let user = req.session.user, [curYear, id] = fields.userData[0].substring('BHYTSV_FRONT:'.length).split('_');
+                    let item = await app.model.svBaoHiemYTe.get({ id });
+                    if (item && item.mssv == user.studentId) {
+                        app.fs.createFolder(app.path.join(app.assetPath, '/bhyt/front', curYear));
 
-                    let destFolder = app.path.join(app.assetPath, '/bhyt/front', curYear, user.studentId);
+                        let destFolder = app.path.join(app.assetPath, '/bhyt/front', curYear, user.studentId);
 
-                    app.fs.deleteFolder(destFolder);
-                    app.fs.createFolder(destFolder);
+                        app.fs.deleteFolder(destFolder);
+                        app.fs.createFolder(destFolder);
 
-                    let srcPath = files.BHYTSV_FRONT[0].path,
-                        fileName = app.path.basename(srcPath),
-                        destPath = app.path.join(destFolder, fileName);
-                    await app.fs.rename(srcPath, destPath);
-                    await app.model.svBaoHiemYTe.update({ id }, { matTruocThe: fileName });
-                    done && done({ image: `/api/student/get-front-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
+                        let srcPath = files.BHYTSV_FRONT[0].path,
+                            fileName = app.path.basename(srcPath),
+                            destPath = app.path.join(destFolder, fileName);
+                        await app.fs.rename(srcPath, destPath);
+                        await app.model.svBaoHiemYTe.update({ id }, { matTruocThe: fileName });
+                        done && done({ image: `/api/student/get-front-bhyt?t=${(new Date().getTime()).toString().slice(-8)}` });
+                    }
                 }
             }
             // else if (fields.userData && fields.userData.length && fields.userData[0].startsWith('BHYTSV_BACK:') && files.BHYTSV_BACK && files.BHYTSV_BACK.length) {

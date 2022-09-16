@@ -158,13 +158,9 @@ export function updateStudentUser(changes, done) {
 
 export function downloadWord(done) {
     return () => {
-        const url = '/api/students-download-syll';
+        const url = '/api/students-sent-syll';
         T.get(url, result => {
-            if (result.error) {
-                T.notify('Tải sơ yếu lý lịch lỗi', 'danger');
-            } else if (done) {
-                done(result.buffer);
-            }
+            done(result);
         });
     };
 }
@@ -180,6 +176,21 @@ export function adminDownloadSyll(mssv, namTuyenSinh) {
                 T.download(`${url}?mssv=${mssv}&namTuyenSinh=${namTuyenSinh}`, 'SYLL.pdf');
             }
 
+        });
+    };
+}
+
+export function studentDownloadSyll(done) {
+    return () => {
+        const url = '/api/students-download-syll';
+        T.get(url, result => {
+            if (result.error) {
+                T.notify(result.error.message || 'Lỗi hệ thống', 'danger');
+                console.error(result.error);
+            } else {
+                T.download(url, 'SYLL.pdf');
+                done && done();
+            }
         });
     };
 }
