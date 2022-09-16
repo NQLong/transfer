@@ -2,14 +2,14 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1002: { title: 'Cá nhân đăng ký', link: '/user/tccb/ca-nhan-dang-ky', icon: 'fa-pencil', backgroundColor: '#fecc2c', groupIndex: 6 }
+            1002: { title: 'Cá nhân đăng ký', link: '/user/danh-gia/ca-nhan-dang-ky', icon: 'fa-pencil', backgroundColor: '#fecc2c', groupIndex: 6 }
         }
     };
     app.permission.add(
         { name: 'staff:login', menu },
     );
-    app.get('/user/tccb/ca-nhan-dang-ky', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/tccb/ca-nhan-dang-ky/:nam', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/danh-gia/ca-nhan-dang-ky', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/danh-gia/ca-nhan-dang-ky/:nam', app.permission.check('staff:login'), app.templates.admin);
 
     app.get('/api/tccb/danh-gia/ca-nhan-dang-ky/danh-gia-nam/all', app.permission.check('staff:login'), (req, res) => {
         app.model.tccbDanhGiaNam.getAll({}, '*', 'nam DESC', (error, items) => res.send({ error, items }));
@@ -108,7 +108,8 @@ module.exports = app => {
                 let dangKy = index == -1 ? 0 : 1;
                 return { nhom, submenus, dangKy };
             });
-            res.send({ items: listNhom });
+            const { approvedDonVi } = await app.model.tccbDanhGiaPheDuyetDonVi.get({ nam, shcc });
+            res.send({ items: listNhom, approvedDonVi });
         } catch (error) {
             res.send({ error });
         }
@@ -131,13 +132,25 @@ module.exports = app => {
             if (!nam) {
                 return res.send({ error: 'Đăng ký không thành công' });
             }
-            const { nldBatDauDangKy, nldKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
-            if (nldBatDauDangKy > Date.now() || Date.now() > nldKetThucDangKy) {
-                res.send({ error: 'Thời gian đăng ký không phù hợp' });
+            let [item, itemPheDuyet] = await Promise.all([
+                app.model.tccbDanhGiaCaNhanDangKy.get({ shcc, nam }),
+                app.model.tccbDanhGiaPheDuyetDonVi.get({ shcc, nam })
+            ]);
+
+            if (itemPheDuyet && itemPheDuyet.approvedDonVi == 'Không đồng ý') {
+                item = await app.model.tccbDanhGiaCaNhanDangKy.update({ id: item.id }, { idNhomDangKy: idNhom });
+                const { id } = await app.model.tccbDanhGiaPheDuyetDonVi.get({ shcc, nam });
+                await app.model.tccbDanhGiaPheDuyetDonVi.update(id, { timeDangKy: Date.now(), idNhomDangKy: idNhom, approvedDonVi: null });
+                res.send({ item, nam });
             } else {
-                let item = await app.model.tccbDanhGiaCaNhanDangKy.get({ shcc, nam });
+                const { nldBatDauDangKy, nldKetThucDangKy } = await app.model.tccbDanhGiaNam.get({ nam });
+                if (nldBatDauDangKy > Date.now() || Date.now() > nldKetThucDangKy) {
+                    throw 'Thời gian đăng ký không phù hợp';
+                }
                 if (item) {
                     item = await app.model.tccbDanhGiaCaNhanDangKy.update({ id: item.id }, { idNhomDangKy: idNhom });
+                    const { id } = await app.model.tccbDanhGiaPheDuyetDonVi.get({ shcc, nam });
+                    await app.model.tccbDanhGiaPheDuyetDonVi.update(id, { timeDangKy: Date.now(), idNhomDangKy: idNhom });
                     res.send({ item, nam });
                 } else {
                     newItem.shcc = shcc;
@@ -145,6 +158,7 @@ module.exports = app => {
                     newItem.nam = nam;
                     delete newItem.dangKy;
                     item = await app.model.tccbDanhGiaCaNhanDangKy.create(newItem);
+                    await app.model.tccbDanhGiaPheDuyetDonVi.create({ shcc, timeDangKy: Date.now(), idNhomDangKy: idNhom, nam });
                     res.send({ item, nam });
                 }
             }

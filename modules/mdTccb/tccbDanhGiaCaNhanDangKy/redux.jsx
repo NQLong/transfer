@@ -5,7 +5,7 @@ const TccbCaNhanDangKyUpdate = 'TccbCaNhanDangKy:Update';
 export default function TccbCaNhanDangKyReducer(state = null, data) {
     switch (data.type) {
         case TccbCaNhanDangKyGetAll:
-            return Object.assign({}, state, { items: data.items });
+            return Object.assign({}, state, { items: data.items, approvedDonVi: data.approvedDonVi });
         case TccbCaNhanDangKyUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -59,7 +59,7 @@ export function getTccbCaNhanDangKyByYear(nam, done) {
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data);
-                dispatch({ type: TccbCaNhanDangKyGetAll, items: data.items ? data.items : [] });
+                dispatch({ type: TccbCaNhanDangKyGetAll, items: data.items ? data.items : [], approvedDonVi: data.approvedDonVi });
             }
         });
     };

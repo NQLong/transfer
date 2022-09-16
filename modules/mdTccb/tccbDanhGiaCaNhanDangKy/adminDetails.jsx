@@ -5,10 +5,9 @@ import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 
 class TccbCaNhanDangKyDetails extends AdminPage {
-
     componentDidMount() {
         T.ready('/user', () => {
-            const route = T.routeMatcher('/user/tccb/ca-nhan-dang-ky/:nam');
+            const route = T.routeMatcher('/user/danh-gia/ca-nhan-dang-ky/:nam');
             this.nam = parseInt(route.parse(window.location.pathname)?.nam);
             this.props.getTccbCaNhanDangKyByYear(this.nam);
         });
@@ -23,6 +22,8 @@ class TccbCaNhanDangKyDetails extends AdminPage {
             write: true,
         };
         const list = this.props.tccbCaNhanDangKy?.items || [];
+        const daDangKy = list.some(item => item.dangKy == 1);
+        const approvedDonVi = this.props.tccbCaNhanDangKy?.approvedDonVi;
         let table = renderTable({
             className: 'dmcv',
             emptyTable: 'Không có dữ liệu đăng ký',
@@ -71,14 +72,15 @@ class TccbCaNhanDangKyDetails extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-pencil',
+            header: `Trạng thái: ${daDangKy ? (approvedDonVi || 'Chưa phê duyệt') : 'Chưa đăng ký'}`,
             title: 'Thông tin đăng ký',
             breadcrumb: [
-                <Link key={0} to='/user/tccb/'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/ca-nhan-dang-ky/'>Cá nhân đăng ký</Link>,
+                <Link key={0} to='/user'>Thông tin cá nhân</Link>,
+                <Link key={1} to='/user/danh-gia/ca-nhan-dang-ky'>Cá nhân đăng ký</Link>,
                 'Thông tin đăng ký'
             ],
             content: <div className='tile'>{table}</div>,
-            backRoute: '/user/tccb/ca-nhan-dang-ky',
+            backRoute: '/user/danh-gia/ca-nhan-dang-ky',
         });
     }
 }

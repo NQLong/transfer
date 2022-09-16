@@ -6,7 +6,7 @@ module.exports = app => {
             const _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
                 nam = parseInt(req.query.nam);
-            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = await app.model.tccbDanhGiaCaNhanDangKy.searchPageDangKyCaNhan(_pageNumber, _pageSize, searchTerm, nam);
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = await app.model.tccbDanhGiaCaNhanDangKy.searchPageDangKy(_pageNumber, _pageSize, searchTerm, nam);
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition: searchTerm, list } });
         } catch (error) {
             res.send({ error });
