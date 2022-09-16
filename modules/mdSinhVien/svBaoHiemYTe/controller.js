@@ -39,12 +39,16 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/student/bhyt', app.permission.check('student:login'), async (req, res) => {
+    app.post('/api/student/bhyt', app.permission.orCheck('student:login', 'tcHocPhi:write'), async (req, res) => {
         try {
-            const user = req.session.user,
-                { mssv, emailTruong } = user.data,
+            let user = req.session.user,
+                { mssv, emailTruong } = user.data || {},
                 thoiGian = Date.now();
             const data = req.body.data;
+            if (req.session.user.permissions.includes('tcHocPhi:write')) {
+                mssv = data.mssv;
+                emailTruong = req.session.user.email;
+            }
 
             // temp
             const mapperDienDong = {
@@ -93,6 +97,7 @@ module.exports = app => {
                 }
             }
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
