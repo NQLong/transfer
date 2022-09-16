@@ -63,12 +63,12 @@ module.exports = app => {
             let currentBhyt = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
             if (currentBhyt) {
                 if (new Date(currentBhyt.thoiGian).getFullYear() != new Date().getFullYear()) {
-                    let item = await app.model.svBaoHiemYTe.create(app.clone(data, { mssv, thoiGian, userModified: emailTruong }));
+                    let item = await app.model.svBaoHiemYTe.create(app.clone(data, { mssv, thoiGian, userModified: emailTruong, namDangKy: new Date().getFullYear() }));
                     if (!item) res.send({ error: 'Lỗi hệ thống' });
                     else {
                         let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
                         if (mapperDienDong[data.dienDong]) {
-                            app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian, namDangKy: new Date().getFullYear() });
+                            app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian });
                             let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
                             const { hocPhi, congNo } = currentFee;
                             app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
