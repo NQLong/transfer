@@ -215,17 +215,21 @@ class SinhVienPage extends AdminPage {
         e.preventDefault();
         const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() });
         this.setState({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
-            this.state.isTanSinhVien && this.state.chuaDongHocPhi && this.props.history.push('/user/hoc-phi');
+            this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để hoàn thành bước nhập học. Đến trang Học phí?', 'warning', true, isConfirm => {
+                if (isConfirm) {
+                    this.props.history.push('/user/hoc-phi');
+                }
+            });
         });
         const confirmExport = () => T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường?', 'info', true, isConfirm => {
             if (isConfirm) {
                 this.props.downloadWord(result => {
                     if (result.error) {
                         this.props.studentDownloadSyll(() => {
-                            T.confirm('HOÀN TẤT', 'Có lỗi trong quá trình gửi email! Trang web sẽ tự động tải SYLL sau vài giây!', 'success', false, saveThongTin);
+                            T.confirm('HOÀN TẤT', 'Có lỗi trong quá trình gửi email! Trang web sẽ tự động tải SYLL sau vài giây!', 'success', false, () => saveThongTin());
                         });
                     } else {
-                        T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác)!', 'success', false, saveThongTin);
+                        T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác)!', 'success', false, () => saveThongTin());
                     }
                 });
             }
