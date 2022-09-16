@@ -80,18 +80,48 @@ module.exports = app => {
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac, ghiChu, secretCode } = data, timeModified = new Date().getTime();
-            if (secretCode == mySecretCode) {
-                if (thaoTac == 'A' || thaoTac == 'D') {
-                    await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+            let student = await app.model.fwStudents.get({ mssv }, 'mssv,ho,ten');
+            if (student) {
+                if (secretCode == mySecretCode) {
+                    if (thaoTac == 'A' || thaoTac == 'D') {
+                        await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+                    }
+                    let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, defaultEmail, defaultPassword } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
+                    [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${data.hoTen}`).replaceAll('{mssv}', student.mssv));
+
+                    thaoTac == 'A' && app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
+                        // Success callback
+                        res.end();
+                    }, (error) => {
+                        // Error callback
+                        res.send({ error });
+                    });
+                    await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu, email: user.email, timeModified });
+                    res.end();
+                } else {
+                    res.send({ error: 'Permission denied!' });
                 }
-                await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu, email: user.email, timeModified });
-                res.end();
             } else {
-                res.send({ error: 'Permission denied!' });
+                res.send({ error: 'Not found student' });
             }
+
         } catch (error) {
             res.send({ error });
         }
+    });
+
+    app.readyHooks.add('initLimitCtsvMail', {
+        ready: () => app.database.redis && app.model && app.model.svSetting,
+        run: () => {
+            app.primaryWorker && app.schedule('10 0 * * *', () => {
+                app.model.svSetting.initLimitCtsvMail();
+            });
+        },
+    });
+
+    app.get('/api/ctsv/hot-init-email', app.permission.check('developer:login'), (req, res) => {
+        app.model.svSetting.initLimitCtsvMail();
+        res.end();
     });
 
     app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
@@ -150,6 +180,20 @@ module.exports = app => {
                     } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
                     else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
+                            if (thaoTac == 'A') {
+                                let data = await app.model.svSetting.getEmail();
+                                if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
+                                [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${data.hoTen}`).replaceAll('{mssv}', student.mssv));
+                                app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
+                                    // Success callback
+                                    app.model.svSetting.updateLimit(data.index);
+                                    res.end();
+                                }, (error) => {
+                                    // Error callback
+                                    res.send({ error });
+                                });
+                            }
                             await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                         }
                         await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
