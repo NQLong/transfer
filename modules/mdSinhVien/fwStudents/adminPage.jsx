@@ -206,7 +206,7 @@ class AdminStudentsPage extends AdminPage {
                             filter: { ...currentFilter, listReligion: currentListReligion.toString() }
                         });
                     }} />
-                    <FormSelect multiple ref={e => this.listFromCity = e} data={ajaxSelectTinhThanhPho} label='Lọc theo tỉnh/thành thường trú' className='col-md-6' allowClear onChange={value => {
+                    <FormSelect multiple ref={e => this.listFromCity = e} data={ajaxSelectTinhThanhPho} label='Lọc theo tỉnh/thành thường trú' className='col-md-4' allowClear onChange={value => {
                         let currentFilter = Object.assign({}, this.state.filter),
                             currentListFromCity = currentFilter.listFromCity?.split(',') || [];
                         if (value.selected) {
@@ -216,7 +216,7 @@ class AdminStudentsPage extends AdminPage {
                             filter: { ...currentFilter, listFromCity: currentListFromCity.toString() }
                         });
                     }} />
-                    <FormSelect multiple ref={e => this.listLoaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Lọc theo loại hình đào tạo' className='col-md-6' allowClear onChange={value => {
+                    <FormSelect multiple ref={e => this.listLoaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Lọc theo loại hình đào tạo' className='col-md-4' allowClear onChange={value => {
                         let currentFilter = Object.assign({}, this.state.filter),
                             currentListLoaiHinhDaoTao = currentFilter.listLoaiHinhDaoTao?.split(',') || [];
                         if (value.selected) {
@@ -224,6 +224,17 @@ class AdminStudentsPage extends AdminPage {
                         } else currentListLoaiHinhDaoTao = currentListLoaiHinhDaoTao.filter(item => item != value.id);
                         this.setState({
                             filter: { ...currentFilter, listLoaiHinhDaoTao: currentListLoaiHinhDaoTao.toString() }
+                        });
+                    }} />
+
+                    <FormSelect multiple ref={e => this.listKhoaSinhVien = e} data={[2022, 2021, 2020, 2019, 2018]} label='Lọc theo khoá' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            current = currentFilter.listKhoaSinhVien?.split(',') || [];
+                        if (value.selected) {
+                            current.push(value.id);
+                        } else current = current.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listKhoaSinhVien: current.toString() }
                         });
                     }} />
                 </div>
