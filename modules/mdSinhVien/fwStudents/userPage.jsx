@@ -44,7 +44,7 @@ class SinhVienPage extends AdminPage {
     }
 
     setVal = (data = {}) => {
-        this.anhThe.setData('CardImage');
+        this.anhThe.setData('CardImage', `/api/student/get-anh-the?t=${new Date().getTime()}`);
         this.mssv.value(data.mssv ? data.mssv : '');
         this.ho.value(data.ho ? data.ho : '');
         this.ten.value(data.ten ? data.ten : '');
@@ -76,7 +76,7 @@ class SinhVienPage extends AdminPage {
         this.thuongTruNguoiLienLac.value(data.lienLacMaTinh, data.lienLacMaHuyen, data.lienLacMaXa, data.lienLacSoNha);
         this.tonGiao.value(data.tonGiao ? data.tonGiao : '');
         this.quocTich.value(data.quocGia ? data.quocGia : '');
-        this.imageBox.setData('SinhVienImage:' + data.mssv, data.image ? data.image : '/img/avatar.png');
+        // this.imageBox.setData('SinhVienImage:' + data.mssv, data.image ? data.image : '/img/avatar.png');
         this.sdtCha.value(data.sdtCha ? data.sdtCha : '');
         this.sdtMe.value(data.sdtMe ? data.sdtMe : '');
         this.hoTenNguoiLienLac.value(data.hoTenNguoiLienLac ? data.hoTenNguoiLienLac : '');
