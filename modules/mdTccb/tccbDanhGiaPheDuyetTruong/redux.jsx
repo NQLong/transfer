@@ -90,3 +90,21 @@ export function updateTccbDanhGiaPDT(id, approvedTruong, done) {
         });
     };
 }
+
+export function updateTccbDanhGiaPDTTruongTccb(id, yKienTruongTccb, done) {
+    const route = T.routeMatcher('/user/tccb/danh-gia-phe-duyet-truong/:nam');
+    const nam = parseInt(route.parse(window.location.pathname)?.nam);
+    return dispatch => {
+        const url = '/api/tccb/danh-gia-phe-duyet-truong-y-kien';
+        T.put(url, { id, yKienTruongTccb, nam }, data => {
+            if (data.error) {
+                T.notify(`Thêm ý kiến bị lỗi: ${data.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${data.error}`);
+            } else {
+                if (done) done(data.item);
+                T.notify('Thêm ý kiến thành công', 'success');
+                dispatch(getTccbDanhGiaPDTPage());
+            }
+        });
+    };
+}

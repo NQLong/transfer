@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbDanhGiaPDTPage, updateTccbDanhGiaPDT } from './redux';
+import { getTccbDanhGiaPDTPage, updateTccbDanhGiaPDT, updateTccbDanhGiaPDTTruongTccb } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, FormTextBox, AdminModal, getValue } from 'view/component/AdminPage';
@@ -10,42 +10,45 @@ import T from 'view/js/common';
 class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() =>
-            this.approvedTruong.focus()
+            this.props.isPresident ? this.approvedTruong.focus() : this.yKienTruongTccb.focus()
         ));
     }
 
     onShow = (item) => {
-        let { ho, ten, shcc, tenDonVi, tenNhom, approvedTruong, approvedDonVi } = item ? item : { ho: '', ten: '', shcc: '', tenDonVi: '', tenNhom: '', approvedTruong: null, approvedDonVi: null };
+        let { ho, ten, shcc, tenNhom, approvedTruong, approvedDonVi, yKienTruongTccb } = item ? item : { ho: '', ten: '', shcc: '', tenNhom: '', approvedTruong: null, approvedDonVi: null, yKienTruongTccb: '' };
         this.setState({ item });
-        if (approvedTruong != 'Đồng ý' && approvedTruong != 'Không đồng ý') {
-            this.approvedTruong.value(approvedTruong);
-        }
+        this.approvedTruong.value(approvedTruong);
         this.hoTen.value(`${ho} ${ten} (${shcc})`);
-        this.tenDonVi.value(tenDonVi);
         this.tenNhom.value(tenNhom);
         this.approvedDonVi.value(approvedDonVi || 'Chưa phê duyệt');
+        this.yKienTruongTccb.value(yKienTruongTccb || 'Không có ý kiến');
     };
 
     onSubmit = (e) => {
         e.preventDefault();
-        this.props.update(this.state.item.id, getValue(this.approvedTruong), this.hide);
+        if (this.props.isPresident) {
+            this.props.updatePresident(this.state.item.id, getValue(this.approvedTruong), this.hide);
+        } else {
+            this.props.updateTruongTccb(this.state.item.id, getValue(this.yKienTruongTccb), this.hide);
+        }
     };
 
     render = () => {
+        const isPresident = this.props.isPresident;
         return this.renderModal({
             title: 'Ý kiến khác',
-            size: 'medium',
+            size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Cán bộ'
+                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.hoTen = e} label='Cán bộ'
                     readOnly={true} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.tenDonVi = e} label='Đơn vị'
+                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.tenNhom = e} label='Nhóm đăng ký'
                     readOnly={true} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.tenNhom = e} label='Nhóm đăng ký'
+                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.approvedDonVi = e} label='Đơn vị phê duyệt'
                     readOnly={true} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.approvedDonVi = e} label='Đơn vị phê duyệt'
-                    readOnly={true} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.yKienTruongTccb = e} label='Ý kiến của Trưởng TCCB'
+                    readOnly={isPresident} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.approvedTruong = e} label='Ý kiến của trường'
-                    readOnly={false} required />
+                    readOnly={!isPresident} required />
             </div>
         });
     }
@@ -66,6 +69,7 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
     }
 
     render() {
+        const isPresident = this.getCurrentPermissions().includes('president:login');
         const nam = this.state.nam || '';
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tccbDanhGiaPheDuyetTruong && this.props.tccbDanhGiaPheDuyetTruong.page ?
             this.props.tccbDanhGiaPheDuyetTruong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
@@ -77,10 +81,11 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
                         <th style={{ width: '10%', textAlign: 'center' }}>Cán bộ</th>
-                        <th style={{ width: '25%', textAlign: 'center' }}>Đơn vị</th>
+                        <th style={{ width: '15%', textAlign: 'center' }}>Đơn vị</th>
                         <th style={{ width: '15%', textAlign: 'center' }}>Nhóm đăng ký</th>
-                        <th style={{ width: '25%', textAlign: 'center' }}>Đơn vị phê duyệt</th>
-                        <th style={{ width: '25%', textAlign: 'center' }}>Trường phê duyệt</th>
+                        <th style={{ width: '20%', textAlign: 'center' }}>Đơn vị phê duyệt</th>
+                        <th style={{ width: '20%', textAlign: 'center' }}>Ý kiến trưởng TCCB</th>
+                        <th style={{ width: '20%', textAlign: 'center' }}>Trường phê duyệt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -94,23 +99,34 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.tenDonVi} />
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.tenNhom || 'Chưa đăng ký'} />
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.approvedDonVi || 'Chưa phê duyệt'} />
-                        <TableCell type='text' style={{ textAlign: 'left' }} content={item.approvedTruong || 'Chưa phê duyệt'} />
+                        <TableCell type='text' style={{ textAlign: 'left' }} content={item.yKienTruongTccb || 'Không có ý kiến'} />
+                        <TableCell type='text' style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }} content={item.approvedTruong || 'Chưa phê duyệt'} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }}>
-                            <Tooltip title='Đồng ý' arrow>
-                                <button className='btn btn-success' onClick={() => item.id ? this.props.updateTccbDanhGiaPDT(item.id, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
-                                    <i className='fa fa-lg fa-check' />
-                                </button>
-                            </Tooltip>
-                            <Tooltip title='Không đồng ý' arrow>
-                                <button className='btn btn-danger' onClick={() => item.id ? this.props.updateTccbDanhGiaPDT(item.id, 'Không đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
-                                    <i className='fa fa-lg fa-times' />
-                                </button>
-                            </Tooltip>
-                            <Tooltip title='Ý kiến khác' arrow>
-                                <button className='btn btn-info' onClick={() => item.id ? this.modal.show(item) : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
-                                    <i className='fa fa-lg fa-edit' />
-                                </button>
-                            </Tooltip>
+                            {
+                                !isPresident ? <>
+                                    <Tooltip title='Thêm ý kiến' arrow>
+                                        <button className='btn btn-info' onClick={() => item.id ? this.modal.show(item) : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                            <i className='fa fa-lg fa-edit' />
+                                        </button>
+                                    </Tooltip>
+                                </> :
+                                    <><Tooltip title='Đồng ý' arrow>
+                                        <button className='btn btn-success' onClick={() => item.id ? this.props.updateTccbDanhGiaPDT(item.id, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                            <i className='fa fa-lg fa-check' />
+                                        </button>
+                                    </Tooltip>
+                                        <Tooltip title='Không đồng ý' arrow>
+                                            <button className='btn btn-danger' onClick={() => item.id ? this.props.updateTccbDanhGiaPDT(item.id, 'Không đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                                <i className='fa fa-lg fa-times' />
+                                            </button>
+                                        </Tooltip>
+                                        <Tooltip title='Ý kiến khác' arrow>
+                                            <button className='btn btn-info' onClick={() => item.id ? this.modal.show(item) : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                                <i className='fa fa-lg fa-edit' />
+                                            </button>
+                                        </Tooltip></>
+                            }
+
                         </TableCell>
                     </tr>
                 )
@@ -130,7 +146,9 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getTccbDanhGiaPDTPage} />
                 <EditModal ref={e => this.modal = e}
-                    update={this.props.updateTccbDanhGiaPDT}
+                    updatePresident={this.props.updateTccbDanhGiaPDT}
+                    updateTruongTccb={this.props.updateTccbDanhGiaPDTTruongTccb}
+                    isPresident={isPresident}
                 />
             </>,
             backRoute: '/user/tccb/danh-gia-phe-duyet-don-vi',
@@ -139,5 +157,5 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tccbDanhGiaPheDuyetTruong: state.tccb.tccbDanhGiaPheDuyetTruong });
-const mapActionsToProps = { getTccbDanhGiaPDTPage, updateTccbDanhGiaPDT };
+const mapActionsToProps = { getTccbDanhGiaPDTPage, updateTccbDanhGiaPDT, updateTccbDanhGiaPDTTruongTccb };
 export default connect(mapStateToProps, mapActionsToProps)(TccbDanhGiaPheDuyetTruongDetails);

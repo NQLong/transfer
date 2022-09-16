@@ -303,10 +303,12 @@ module.exports = (app, appConfig) => {
                             if (user.staff.maDonVi == 68) {
                                 app.permissionHooks.pushUserPermission(user, 'rectors:login');
                                 if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
-                                    app.permissionHooks.pushUserPermission(user, 'president:login');
+                                    app.permissionHooks.pushUserPermission(user, 'president:login', 'tccbDanhGiaPheDuyetTruong:manage', 'tccbDanhGiaPheDuyetTruong:write');
                                 } else {
                                     app.permissionHooks.pushUserPermission(user, 'vice-president:login');
                                 }
+                            } else if (user.staff.donViQuanLy.length && user.staff.maDonVi == 30) {
+                                app.permissionHooks.pushUserPermission(user, 'tccbDanhGiaPheDuyetTruong:manage', 'tccbDanhGiaPheDuyetTruong:write');
                             }
                             app.permissionHooks.run('staff', user, user.staff).then(() => {
                                 resolve();
