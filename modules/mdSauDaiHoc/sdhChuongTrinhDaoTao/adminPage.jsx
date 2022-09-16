@@ -350,7 +350,7 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
@@ -370,6 +370,9 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     >
                         <Tooltip title='Xem cây chương trình' arrow placeholder='bottom' >
                             <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
+                        </Tooltip>
+                        <Tooltip title='Chỉnh sửa kế hoạch' arrow placeholder='bottom' >
+                            <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${item.id}`)}><i className='fa fa-lg fa-list' /></a>
                         </Tooltip>
                         {permission.write && <Tooltip title='Sao chép' arrow>
                             <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || this.cloneModal.show(item)}>

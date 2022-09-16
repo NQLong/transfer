@@ -121,9 +121,9 @@ class NewsPage extends React.Component {
                             <th style={{ width: '80%' }}>Tiêu đề</th>
                             <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
                             {permissionWrite && [
-                                <th key={0} style={{ width: 'auto' }} nowrap='true'>Ngày đăng bài</th>,
-                                <th key={1} style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>,
-                                <th key={2} style={{ width: 'auto' }} nowrap='true'>Tin nội bộ</th>,
+                                <th key={0} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày đăng bài</th>,
+                                <th key={1} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>,
+                                <th key={2} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tin nội bộ</th>,
                                 <th key={3} style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>,
                             ]
                             }

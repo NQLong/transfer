@@ -117,8 +117,8 @@ class UserPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '100%' }} colSpan={2} nowrap='true'>Nội dung</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap' }} colSpan={2}>Nội dung</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => {

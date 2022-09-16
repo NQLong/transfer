@@ -1,6 +1,6 @@
-// Table name: SV_BAO_HIEM_Y_TE { id, mssv, dienDong, thoiGian, userModified }
+// Table name: SV_BAO_HIEM_Y_TE { id, mssv, dienDong, thoiGian, userModified, maBhxhHienTai, benhVienDangKy, matTruocThe, matSauThe, thoiGianHoanThanh, namDangKy, giaHan }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'mssv': 'MSSV', 'dienDong': 'DIEN_DONG', 'thoiGian': 'THOI_GIAN', 'userModified': 'USER_MODIFIED' };
+const obj2Db = { 'id': 'ID', 'mssv': 'MSSV', 'dienDong': 'DIEN_DONG', 'thoiGian': 'THOI_GIAN', 'userModified': 'USER_MODIFIED', 'maBhxhHienTai': 'MA_BHXH_HIEN_TAI', 'benhVienDangKy': 'BENH_VIEN_DANG_KY', 'matTruocThe': 'MAT_TRUOC_THE', 'matSauThe': 'MAT_SAU_THE', 'thoiGianHoanThanh': 'THOI_GIAN_HOAN_THANH', 'namDangKy': 'NAM_DANG_KY', 'giaHan': 'GIA_HAN' };
 
 module.exports = app => {
     app.model.svBaoHiemYTe = {
@@ -214,6 +214,19 @@ module.exports = app => {
                     resolve(result);
                 }
             });
+        }),
+
+        searchPage: (searchterm, filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=sv_bao_hiem_y_te_search_page(:searchterm, :filter); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, searchterm, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
         }),
     };
 };

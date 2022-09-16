@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTrinhDoNgoaiNguPage, getDmTrinhDoNgoaiNguAll, createDmTrinhDoNgoaiNgu, updateDmTrinhDoNgoaiNgu, deleteDmTrinhDoNgoaiNgu } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -13,10 +13,10 @@ class EditModal extends AdminModal {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
     }
-    
+
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: true };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
         this.kichHoat.value(kichHoat);
@@ -47,11 +47,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật trình độ ngoại ngữ' : 'Tạo mới trình độ ngoại ngữ',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' maxLength={2} ref={e => this.ma = e} label='Mã trình độ ngoại ngữ' 
+                <FormTextBox type='text' className='col-md-6' maxLength={2} ref={e => this.ma = e} label='Mã trình độ ngoại ngữ'
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên trình độ ngoại ngữ' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên trình độ ngoại ngữ'
                     readOnly={readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -94,8 +94,8 @@ class DmTrinhDoNgoaiNguPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -121,7 +121,7 @@ class DmTrinhDoNgoaiNguPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmTrinhDoNgoaiNguPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmTrinhDoNgoaiNgu} update={this.props.updateDmTrinhDoNgoaiNgu} permissions={currentPermissions} />

@@ -17,6 +17,10 @@ export default {
         {
             path: '/user/sau-dai-hoc/chuong-trinh-dao-tao/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
+        },
+        {
+            path: '/user/sau-dai-hoc/ke-hoach-dao-tao/:ma',
+            component: Loadable({ loading: Loading, loader: () => import('./adminKeHoachPage') })
         }
     ],
 };

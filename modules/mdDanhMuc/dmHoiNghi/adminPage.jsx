@@ -24,7 +24,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value().trim(),
                 ten: this.ten.value().trim(),
@@ -89,8 +89,8 @@ class DmHoiNghiPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -106,20 +106,20 @@ class DmHoiNghiPage extends AdminPage {
         }
 
         return this.renderPage({
-                icon: 'fa fa-list-alt',
-                title: 'Danh mục Hội nghị',
-                breadcrumb: [
-                    <Link key={0} to='/user/category'>Danh mục</Link>,
-                    'Danh mục Hội nghị'
-                ],
-                content: <>
-                    <div className='tile'>{table}</div>
-                    <EditModal ref={e => this.modal = e} permission={permission}
-                        create={this.props.createDmHoiNghi} update={this.props.updateDmHoiNghi} permissions={currentPermissions} />
-                </>,
-                backRoute: '/user/category',
-                onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-                onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/hoi-nghi/upload') : null
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Hội nghị',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Hội nghị'
+            ],
+            content: <>
+                <div className='tile'>{table}</div>
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmHoiNghi} update={this.props.updateDmHoiNghi} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/hoi-nghi/upload') : null
         });
     }
 }

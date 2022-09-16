@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage } from './redux';
-import { AdminPage, FormTabs, TableCell, renderTable } from 'view/component/AdminPage';
+import { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage, watchLogs, unWatchLogs, getAllLogs, getFreshLogs } from './redux';
+import { AdminPage, FormTabs, TableCell, renderTable, FormSelect, getValue } from 'view/component/AdminPage';
 
 const parseImageFilename = (filename) => {
     const texts = filename.split('-');
@@ -15,19 +15,93 @@ const parseImageFilename = (filename) => {
 };
 
 class ClusterPage extends AdminPage {
-    state = { selectedServiceName: 'main' };
+    state = { selectedServiceName: 'main', contentLog: '', listLogs: [], isLoading: false };
+
+    logs = {};
+    content = {};
+    logLength = 0;
+    isWaitingViewLog = true;
+    scrollToBottom = true;
+    path = '';
+    intervalGetFreshLog = null;
+
     componentDidMount() {
         T.ready();
         this.props.getClusterAll();
+        this.props.getAllLogs((data => {
+            const tmpListLogs = data.reduce(((arr, log) => {
+                const { outLog, errLog } = log;
+                return [...arr, { id: outLog.path, text: outLog.name }, { id: errLog.path, text: errLog.name }];
+            }), []);
+            this.setState({ listLogs: tmpListLogs });
+        }));
         T.socket.on('services-changed', () => this.props.getClusterAll());
     }
 
     componentWillUnmount() {
         T.socket.off('services-changed');
+        clearInterval(this.intervalGetFreshLog);
+    }
+
+    viewLog = (path) => {
+        this.logLength = 0;
+        this.isWaitingViewLog = true;
+        this.setState({ contentLog: '', isLoading: true }, () => {
+            // set loading & call api watch Logs & append first.
+            this.path = path;
+            this.props.watchLogs(path, 0, (rs) => {
+                this.setContentLog(rs.data);
+            });
+            // interval get fresh log
+            if (this.intervalGetFreshLog) return;
+            this.intervalGetFreshLog = setInterval(() => this.intervalGetFreshLogHandle(), 5000);
+        });
+    }
+
+    intervalGetFreshLogHandle = () => {
+        const { selectedServiceName: serviceName } = this.state;
+        this.props.getFreshLogs((rs) => {
+            const key = getValue(this.logs[serviceName]);
+            const { data } = rs;
+            if (data[key] && !this.isWaitingViewLog) {
+                const tmpContentLog = this.state.contentLog.concat(`\n${data[key]}`);
+                this.setContentLog(tmpContentLog);
+            }
+        });
+    };
+
+    onScrollLogToTop = () => {
+        const { selectedServiceName: serviceName } = this.state;
+        const scrollTop = this.content[serviceName].scrollTop;
+
+        // set scrollToBottom when scroll bottom & !scrollToBottom when scroll to top
+        this.scrollToBottom = scrollTop >= this.content[serviceName].scrollHeight - 300; // 300 is height of body content
+
+        if (scrollTop <= 0) {
+            // when scroll to top, call api get log & append first.
+            this.props.watchLogs(this.path, this.logLength, (rs) => {
+                const preHeight = this.content[serviceName].scrollHeight;
+                const tmpContentLog = rs.data.concat(`\n${this.state.contentLog}`);
+                this.setContentLog(tmpContentLog, () => {
+                    const curHeight = this.content[serviceName].scrollHeight;
+                    this.content[serviceName].scrollTo({ top: curHeight - preHeight });
+                });
+            });
+        }
+    }
+
+    setContentLog = (content, cb = () => { }) => {
+        this.logLength = content.split('\n').length;
+        const { selectedServiceName: serviceName } = this.state;
+        this.setState({ contentLog: content, isLoading: false }, () => {
+            this.scrollToBottom && this.content[serviceName].scrollTo({ top: this.content[serviceName].scrollHeight });
+            this.isWaitingViewLog = false;
+            cb();
+        });
     }
 
     onServiceTabChanged = (data, serviceNames) => data && data.tabIndex != null && serviceNames[data.tabIndex] &&
-        this.setState({ selectedServiceName: serviceNames[data.tabIndex] });
+        this.setState({ selectedServiceName: serviceNames[data.tabIndex], contentLog: '' });
 
     resetCluster = (e, serviceName, item) => e.preventDefault() || T.confirm('Reset cluster', `Are you sure you want to reset cluster ${serviceName}:${item.pid}?`, true, isConfirm =>
         isConfirm && this.props.resetCluster(serviceName, item.pid));
@@ -62,11 +136,11 @@ class ClusterPage extends AdminPage {
             <tr>
                 <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Id</th>
-                <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Primary</th>
+                <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Version</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Primary</th>
                 {/* <th style={{ width: 'auto' }} nowrap='true'>Image filename</th> */}
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Image date</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Start date</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Image date</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Start date</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Status</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
             </tr>),
@@ -86,7 +160,7 @@ class ClusterPage extends AdminPage {
                             <i className='fa fa-lg fa-refresh' />
                         </a>}
                 </TableCell>
-            </tr>),
+            </tr>)
     });
 
     renderServiceImages = (permission, service, serviceName) => renderTable({
@@ -94,9 +168,9 @@ class ClusterPage extends AdminPage {
         renderHead: () => (
             <tr>
                 <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                <th style={{ width: '100%', textAlign: 'center' }} nowrap='true'>Version</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>File</th>
-                <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Created date</th>
+                <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Version</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>File</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Created date</th>
                 <th style={{ width: 'auto', textAlign: 'center' }}>Actions</th>
             </tr>),
         renderRow: (item, index) => (
@@ -111,8 +185,9 @@ class ClusterPage extends AdminPage {
                             <i className='fa fa-lg fa-arrow-up' />
                         </a>}
                 </TableCell>
-            </tr>),
+            </tr>)
     });
+
 
     render() {
         const permission = this.getUserPermission('cluster');
@@ -120,6 +195,22 @@ class ClusterPage extends AdminPage {
         const serviceNames = [];
         Object.keys(services).sort((a, b) => a > b ? +1 : -1).forEach(serviceName => serviceName != 'main' && serviceNames.push(serviceName));
         services.main && serviceNames.unshift('main');
+        const tmpListLogs = [...this.state.listLogs];
+        const listLogs = {
+            'main': []
+        };
+        let removedCount = 0;
+        this.state.listLogs.forEach((log, idx) => {
+            serviceNames.forEach(name => {
+                if (log.text.includes(name)) {
+                    const isService = tmpListLogs.splice(idx - removedCount, 1);
+                    removedCount++;
+                    if (!listLogs[name]) listLogs[name] = [];
+                    listLogs[name].push(isService[0]);
+                }
+            });
+        });
+        listLogs['main'] = tmpListLogs;
 
         const tabs = serviceNames.map(serviceName => {
             const service = services[serviceName],
@@ -135,6 +226,17 @@ class ClusterPage extends AdminPage {
                         <div className='tile-body'>
                             {this.renderServiceImages(permission, service, serviceName)}
                         </div>
+                        <h3 className='tile-title mt-4'>Logs
+                            <button className='btn btn-warning' type='button' style={{ float: 'right' }}>
+                                <i className='fa fa-fw fa-lg fa-refresh' />Refresh logs </button>
+                        </h3>
+                        <FormSelect style={{ width: 300 }} ref={e => this.logs[serviceName] = e} label='Lựa chọn log' data={listLogs[serviceName]} onChange={data => this.viewLog(data.id)} />
+                        <div className='tile-body'>
+                            <div style={{ overflow: 'auto', height: '300px', backgroundColor: '#000000', color: '#ffffff' }} ref={e => this.content[serviceName] = e} onScroll={() => { this.onScrollLogToTop(); }}>
+                                <p style={{ padding: '0px 16px', whiteSpace: 'break-spaces' }}>{this.state.contentLog}</p>
+                                {this.state.isLoading && <p style={{ padding: '0px 16px' }}>Loading...</p>}
+                            </div>
+                        </div>
                     </div>);
             return { title, component };
         });
@@ -145,11 +247,11 @@ class ClusterPage extends AdminPage {
             breadcrumb: ['Cluster'],
             content: <FormTabs id='clusterTab' tabs={tabs} onChange={data => this.onServiceTabChanged(data, serviceNames)} />,
             onCreate: () => permission.write && this.state.selectedServiceName ? this.props.createCluster(this.state.selectedServiceName) : null,
-            onRefresh: permission.write ? this.onRefresh : null,
+            onRefresh: permission.write ? this.onRefresh : null
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, cluster: state.framework.cluster });
-const mapActionsToProps = { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage };
+const mapActionsToProps = { getClusterAll, createCluster, resetCluster, deleteCluster, applyServiceImage, deleteServiceImage, watchLogs, unWatchLogs, getAllLogs, getFreshLogs };
 export default connect(mapStateToProps, mapActionsToProps)(ClusterPage);

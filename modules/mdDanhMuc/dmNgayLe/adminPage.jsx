@@ -154,8 +154,8 @@ class DmNgayLePage extends AdminPage {
                         <th rowSpan='2' style={{ width: '20%', textAlign: 'center' }}>Thứ</th>
                         <th rowSpan='2' style={{ width: '30%', textAlign: 'center' }}>Ngày</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'left' }}>Mô tả</th>
-                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }} nowrap='true'>Kích hoạt</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Kích hoạt</th>
+                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                     </tr>
 
                 </>),

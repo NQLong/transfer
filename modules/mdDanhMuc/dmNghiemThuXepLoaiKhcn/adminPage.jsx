@@ -98,8 +98,8 @@ class DmNghiemThuXepLoaiKhcnPage extends AdminPage {
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '20%' }}>Tên</th>
                         <th style={{ width: '80%' }}>Ghi chú</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

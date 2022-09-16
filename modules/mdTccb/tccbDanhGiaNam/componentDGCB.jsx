@@ -135,7 +135,7 @@ class ComponentDGCB extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Đến</th>
                     <th style={{ width: '70%', textAlign: 'left', whiteSpace: 'nowrap' }}>Mức đánh giá</th>
                     <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Mức xếp loại</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

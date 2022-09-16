@@ -31,7 +31,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:delete');
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write');
             resolve();
         } else resolve();
     }));
@@ -57,20 +57,19 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:manage'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender } = (req.query.filter && req.query.filter != '%%%%%%%%%%%%%%%%%%') ? req.query.filter : { listFaculty: null, listFromCity: null, listEthnic: null, listNationality: null, listReligion: null, listLoaiHinhDaoTao: null, listLoaiSinhVien: null, listTinhTrangSinhVien: null, gender: null };
-        app.model.fwStudents.searchPage(pageNumber, pageSize, listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-            }
-        });
+    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:manage'), async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber),
+                _pageSize = parseInt(req.params.pageSize),
+                { condition, filter } = req.query;
+            const searchTerm = typeof condition === 'string' ? condition : '';
+            let page = await app.model.fwStudents.searchPage(_pageNumber, _pageSize, searchTerm, app.utils.stringify(filter));
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            const pageCondition = searchTerm;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/students/item/:mssv', app.permission.check('student:manage'), (req, res) => {
@@ -145,7 +144,7 @@ module.exports = app => {
     app.uploadHooks.add('uploadSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSinhVienImage(req, fields, files, params, done), done, 'student:login'));
 
-    app.get('/api/students-download-syll', app.permission.check('student:login'), async (req, res) => {
+    app.get('/api/students-sent-syll', app.permission.check('student:login'), async (req, res) => {
         try {
             const source = app.path.join(__dirname, 'resource', 'syll2022.docx');
             const user = req.session.user;
@@ -203,14 +202,22 @@ module.exports = app => {
                 if (error)
                     res.send({ error });
                 else {
+                    app.fs.createFolder(app.path.join(app.assetPath, 'so-yeu-ly-lich'));
+                    app.fs.createFolder(app.path.join(app.assetPath, 'so-yeu-ly-lich', new Date().getFullYear().toString()));
+
+                    const filePdfPath = app.path.join(app.assetPath, 'so-yeu-ly-lich', new Date().getFullYear().toString(), data.mssv + '.pdf');
                     const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
+                    app.fs.writeFileSync(filePdfPath, pdfBuffer);
+
                     app.fs.deleteFile(qrCodeImage);
                     let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, defaultEmail, defaultPassword } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
-                    app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, data.emailCaNhan, ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
+                    app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
                         // Success callback
+                        console.log('Send SYLL success');
                     }, () => {
                         // Error callback
+                        console.log('Send SYLL failed');
                     });
                 }
             });
@@ -218,5 +225,36 @@ module.exports = app => {
             res.send({ error });
         }
 
+    });
+
+    app.get('/api/students-download-syll', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let user = req.session.user,
+                { studentId, data } = user;
+
+            const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', data.namTuyenSinh?.toString() || new Date().getFullYear().toString(), studentId + '.pdf');
+            if (app.fs.existsSync(filePath)) {
+                res.sendFile(filePath);
+            } else {
+                res.send({ error: 'No valid file' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/student/get-syll', app.permission.check('student:write'), async (req, res) => {
+        try {
+            let { mssv, namTuyenSinh } = req.query;
+            if (parseInt(namTuyenSinh) < new Date().getFullYear()) return res.send({ error: 'Không thuộc đối tượng nhập học!' });
+            const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', namTuyenSinh?.toString() || new Date().getFullYear().toString(), mssv.toString() + '.pdf');
+            if (app.fs.existsSync(filePath)) {
+                res.sendFile(filePath);
+            } else {
+                res.send({ error: 'No valid file!' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
     });
 };

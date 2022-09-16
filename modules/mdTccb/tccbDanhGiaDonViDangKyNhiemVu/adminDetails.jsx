@@ -98,7 +98,7 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
                     <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Nhiệm vụ</th>
                     <th style={{ width: '60%', textAlign: 'center', whiteSpace: 'nowrap' }}>Đăng ký KPI</th>
                     <th style={{ width: '10%', textAlign: 'center' }}>Diễn giải</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

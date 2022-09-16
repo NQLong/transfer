@@ -29,6 +29,7 @@ module.exports = app => {
 
 
     app.get('/user/finance/hoc-phi', app.permission.check('tcHocPhi:read'), app.templates.admin);
+    app.get('/user/finance/bhyt', app.permission.check('tcHocPhi:write'), app.templates.admin);
     app.get('/user/hoc-phi', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/finance/hoc-phi/:mssv', app.permission.check('tcHocPhi:manage'), app.templates.admin);
     app.get('/user/finance/statistic', app.permission.check('tcHocPhi:read'), app.templates.admin);

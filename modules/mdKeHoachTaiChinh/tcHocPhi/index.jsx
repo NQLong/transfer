@@ -27,6 +27,10 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
+            path: '/user/finance/bhyt',
+            component: Loadable({ loading: Loading, loader: () => import('./adminBHYTpage') })
+        },
+        {
             path: '/user/hoc-phi',
             component: Loadable({ loading: Loading, loader: () => import('./userPage') })
         },

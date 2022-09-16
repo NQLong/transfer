@@ -27,11 +27,11 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-                ma: this.ma.value(),
-                moTa: this.moTa.value(),
-                ghiChu: this.ghiChu.value(),
-                kichHoat: this.kichHoat.value() ? 1 : 0
-            };
+            ma: this.ma.value(),
+            moTa: this.moTa.value(),
+            ghiChu: this.ghiChu.value(),
+            kichHoat: this.kichHoat.value() ? 1 : 0
+        };
         if (changes.moTa == '') {
             T.notify('Mô tả Lương đi nước ngoài bị trống!', 'danger');
             this.moTa.focus();
@@ -103,8 +103,8 @@ class DmLuongDiNuocNgoaiPage extends AdminPage {
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '50%' }}>Mô tả</th>
                         <th style={{ width: '50%' }}>Ghi chú</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

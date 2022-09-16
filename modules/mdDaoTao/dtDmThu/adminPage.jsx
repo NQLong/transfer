@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDtDmThuAll, deleteDtDmThu, createDtDmThu, updateDtDmThu } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, getValue} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox, getValue } from 'view/component/AdminPage';
 class EditModal extends AdminModal {
     componentDidMount() {
         this.onShown(() => {
@@ -12,7 +12,7 @@ class EditModal extends AdminModal {
     }
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: 1 };
-        this.setState({ ma});
+        this.setState({ ma });
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
     };
@@ -24,7 +24,7 @@ class EditModal extends AdminModal {
             kichHoat: Number(getValue(this.kichHoat))
         };
         this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-        
+
     };
 
     render = () => {
@@ -68,10 +68,10 @@ class DtDmThuPage extends AdminPage {
             emptyTable: 'Chưa có dữ liệu Thứ!',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: '90%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '10%' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: '100%' }}>Tên</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>

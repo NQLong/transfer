@@ -85,31 +85,31 @@ class DmSoHuuTriTuePage extends AdminPage {
         let items = this.props.dmSoHuuTriTue && this.props.dmSoHuuTriTue.items ? this.props.dmSoHuuTriTue.items : [];
 
         items.sort((a, b) => a.ma < b.ma ? -1 : 1);
-        const table = !(items && items.length > 0) ? 'Không có dữ liệu Sở hữu trí tuệ' : 
-        renderTable({
-            getDataSource: () => items, stickyHead: false,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '40%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '60%' }} nowrap='true'>Ghi chú</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
-                    <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
-                    <TableCell type='text' content={item.ten} />
-                    <TableCell type='text' content={item.ghiChu} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
-                    onChanged={value => this.props.updateDmSoHuuTriTue(item.ma, { kichHoat: value ? 1 : 0, })} />
-                    <TableCell type='buttons' content={item} permission={permission} 
-                    onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-                </tr>
-            ),
-        });
+        const table = !(items && items.length > 0) ? 'Không có dữ liệu Sở hữu trí tuệ' :
+            renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '40%' }}>Tên</th>
+                        <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Ghi chú</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={item.ten} />
+                        <TableCell type='text' content={item.ghiChu} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmSoHuuTriTue(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
 
 
         return this.renderPage({

@@ -86,13 +86,13 @@ class DtChuanDauRaPage extends AdminPage {
             emptyTable: 'Chưa có dữ liệu chuẩn đầu ra!',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: '30%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '10%' }} nowrap='true'>Thang Đo Min</th>
-                    <th style={{ width: '10%' }} nowrap='true'>Thang Đo Max</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Mô tả</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: '30%' }}>Tên</th>
+                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Thang Đo Min</th>
+                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Thang Đo Max</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mô tả</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
 
                 </tr>),
             renderRow: (item, index) => (

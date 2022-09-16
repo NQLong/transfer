@@ -32,11 +32,16 @@ export class TableCell extends React.Component { // type = number | date | link 
             }
         } else if (type == 'image') {
             return content ?
-                <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}><img src={content} alt={alt} style={{ height: '32px' }} /></td> :
+                <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}><img src={content} alt={alt} style={{ height: this.props.height || '32px' }} /></td> :
                 <td style={{ textAlign: 'center', ...style }} className={className} rowSpan={rowSpan} colSpan={colSpan}>{alt}</td>;
         } else if (type == 'checkbox') {
-            return (
-                <td style={{ textAlign: 'center', ...style }} className={'toggle ' + className} rowSpan={rowSpan} colSpan={colSpan}>
+            return this.props.isCheck ? (<td className={'animated-checkbox ' + className} style={{ textAlign: 'center', ...style }} rowSpan={rowSpan} colSpan={colSpan}>
+                <label>
+                    <input type='checkbox' checked={content} onChange={() => permission.write && this.props.onChanged(content ? 0 : 1)} />
+                    <span className={'label-text'} />
+                </label>
+            </td>) :
+                (<td style={{ textAlign: 'center', ...style }} className={'toggle ' + className} rowSpan={rowSpan} colSpan={colSpan}>
                     <label>
                         <input type='checkbox' checked={content} onChange={() => permission.write && this.props.onChanged(content ? 0 : 1)} />
                         <span className='button-indecator' />
@@ -375,13 +380,13 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null, autoFormat = true } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
             placeholder: label || placeholder,
             value: this.exactValue ? this.exactValue : this.state.value,
-            thousandSeparator: ',',
+            thousandSeparator: autoFormat ? ',' : null,
             decimalSeparator: step ? '.' : false,
             onValueChange: val => {
                 const newValue = this.checkMinMax(val.floatValue);
@@ -479,7 +484,7 @@ export class FormTextBox extends React.Component {
     clear = () => this.input.clear();
 
     render() {
-        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, readOnlyEmptyText = '' } = this.props,
+        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, readOnlyEmptyText = '', disabled = false } = this.props,
             readOnlyText = this.state.value;
         type = type.toLowerCase(); // type = text | number | email | password | phone | year
         if (type == 'number') {
@@ -509,7 +514,7 @@ export class FormTextBox extends React.Component {
             return (
                 <div className={'form-group ' + (className || '')} style={style}>
                     {displayElement}
-                    <input ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} />
+                    <input disabled={disabled} ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} onKeyDown={this.props.onKeyDown} />
                     {smallText ? <small>{smallText}</small> : null}
                 </div>);
         }
@@ -1007,7 +1012,7 @@ export class AdminPage extends React.Component {
     }
 
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, advanceSearchTitle = 'Tìm kiếm nâng cao', content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
         T.title(title);
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
@@ -1056,7 +1061,7 @@ export class AdminPage extends React.Component {
                     </ul>
                 </div>
                 <div className='app-advance-search' ref={e => this.advanceSearchBox = e}>
-                    <h5>Tìm kiếm nâng cao</h5>
+                    <h5>{advanceSearchTitle}</h5>
                     <div style={{ width: '100%' }}>{advanceSearch}</div>
                 </div>
                 {content}

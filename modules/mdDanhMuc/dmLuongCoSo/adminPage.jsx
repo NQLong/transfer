@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getDmLuongCoSoPage, createDmLuongCoSo, updateDmLuongCoSo, deleteDmLuongCoSo } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormDatePicker} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormDatePicker } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     componentDidMount() {
@@ -14,7 +14,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, mucLuong, hieuLucTu, hieuLucDen, nghiDinhChinhPhu } = item ? item : { ma: null, mucLuong: '', hieuLucTu: '', hieuLucDen: '', nghiDinhChinhPhu: '' };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.mucLuong.value(mucLuong);
         this.hieuLucTu.value(hieuLucTu);
         this.hieuLucDen.value(hieuLucDen ? hieuLucDen : '');
@@ -45,13 +45,13 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật lĩnh vực kinh doanh' : 'Tạo mới lĩnh vực kinh doanh',
             body: <div className='row'>
-                <FormTextBox type='number' className='col-md-12' ref={e => this.mucLuong = e} label='Mức lương cơ sở' 
+                <FormTextBox type='number' className='col-md-12' ref={e => this.mucLuong = e} label='Mức lương cơ sở'
                     readOnly={readOnly} required />
-                <FormDatePicker type='date' className='col-md-12' ref={e => this.hieuLucTu = e} label='Hiệu lực từ' 
+                <FormDatePicker type='date' className='col-md-12' ref={e => this.hieuLucTu = e} label='Hiệu lực từ'
                     readOnly={readOnly} required />
-                <FormDatePicker type='date' className='col-md-12' ref={e => this.hieuLucDen = e} label='Hiệu lực đến' 
+                <FormDatePicker type='date' className='col-md-12' ref={e => this.hieuLucDen = e} label='Hiệu lực đến'
                     readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.nghiDinhChinhPhu = e} label='Nghị định chính phủ' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.nghiDinhChinhPhu = e} label='Nghị định chính phủ'
                     readOnly={readOnly} />
             </div>
         });
@@ -95,10 +95,10 @@ class dmLuongCoSoPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mức lương</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực từ</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực đến</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Nghị định chính phủ</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hiệu lực từ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hiệu lực đến</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nghị định chính phủ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -125,7 +125,7 @@ class dmLuongCoSoPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmLuongCoSoPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmLuongCoSo} update={this.props.updateDmLuongCoSo} permissions={currentPermissions} />

@@ -1,11 +1,21 @@
-module.exports = app => {
+module.exports = (app, appConfig) => {
     const checkPermissions = (req, res, next, permissions) => {
         if (req.session.user) {
-            if (req.session.user.permissions && req.session.user.permissions.contains(permissions)) {
-                next();
-            } else if (permissions.length == 0) {
-                next();
+            const user = req.session.user, division = Date.now() - req.session.user.expiration;
+            if (division < 60 * 60 * 1000 || app.isDeveloper(user.email)) {
+                req.session.user.expiration = Date.now();
+                req.session.save();
+
+                if (user.permissions && user.permissions.contains(permissions)) {
+                    next();
+                } else if (permissions.length == 0) {
+                    next();
+                } else {
+                    responseError(req, res);
+                }
             } else {
+                req.session.user = null;
+                req.session.save();
                 responseError(req, res);
             }
         } else {
@@ -15,12 +25,20 @@ module.exports = app => {
 
     const checkOrPermissions = (req, res, next, permissions) => {
         if (req.session.user) {
-            const user = req.session.user;
-            if (user.permissions && user.permissions.exists(permissions)) {
-                next();
-            } else if (permissions.length == 0) {
-                next();
+            const user = req.session.user, division = Date.now() - req.session.user.expiration;
+            if (division < 60 * 60 * 1000 || app.isDeveloper(user.email)) {
+                req.session.user.expiration = Date.now();
+                req.session.save();
+                if (user.permissions && user.permissions.exists(permissions)) {
+                    next();
+                } else if (permissions.length == 0) {
+                    next();
+                } else {
+                    responseError(req, res);
+                }
             } else {
+                req.session.user = null;
+                req.session.save();
                 responseError(req, res);
             }
         } else {
@@ -157,6 +175,12 @@ module.exports = app => {
             } else {
                 responseWithPermissions(req, success, fail, permissions);
             }
+        },
+
+        isLocalIp: (req, res, next) => { // ::ffff:10.22.1.53
+            const ip = req.headers['x-real-ip'] || req.connection.remoteAddress;
+            app.isDebug || ip.startsWith(appConfig.localIpPrefix) || ip.startsWith('::ffff:' + appConfig.localIpPrefix) ?
+                next() : res.send({ error: 'Invalid IP!' });
         },
 
         getTreeMenuText: () => {
@@ -318,9 +342,10 @@ module.exports = app => {
                     app.model.fwStudents.get({ emailTruong: user.email }, (error, student) => {
                         if (student) {
                             app.permissionHooks.pushUserPermission(user, 'student:login');
+                            let { khoa, namTuyenSinh, mssv, emailTruong } = student;
                             user.isStudent = 1;
                             user.active = 1;
-                            user.data = student;
+                            user.data = { khoa, namTuyenSinh, mssv, emailTruong };
                             user.ngayNhapHoc = student.ngayNhapHoc;
                             user.studentId = student.mssv;
                             user.lastName = student.ho;
@@ -356,6 +381,7 @@ module.exports = app => {
 
                     if (req) {
                         req.session.user = user;
+                        req.session.user.expiration = new Date().getTime();
                         req.session.save();
                     }
                     done && done(user);
@@ -444,8 +470,11 @@ module.exports = app => {
                 if (typeof checkFlag == 'boolean') break; // Hook trúng => Break luôn
             }
 
-            if (checkFlag) return true;
-            else throw 'Permission denied!';
+            if (checkFlag) {
+                return true;
+            } else {
+                throw 'Permission denied!';
+            }
         }
     };
 

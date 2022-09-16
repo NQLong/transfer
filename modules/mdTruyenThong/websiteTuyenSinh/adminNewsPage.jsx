@@ -5,6 +5,7 @@ import { getNewsByCategoryAdmin, createNews, updateNews, swapNews, deleteNews } 
 import { getTuyenSinh } from 'modules/_default/_init/reduxCategory';
 import Pagination from 'view/component/Pagination';
 import DropDown from 'view/component/Dropdown';
+
 class adminNewsPage extends React.Component {
     pickerType = React.createRef();
     state = {
@@ -101,8 +102,8 @@ class adminNewsPage extends React.Component {
                         <th style={{ width: '70%' }}>Tiêu đề</th>
                         <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
                         <th style={{ width: '10%', textAlign: 'center' }}>Ngày đăng bài</th>
-                        <th key={0} style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th key={1} style={{ width: 'auto' }} nowrap='true'>Tin nội bộ</th>
+                        <th key={0} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th key={1} style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tin nội bộ</th>
                         <th key={2} style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 </thead>

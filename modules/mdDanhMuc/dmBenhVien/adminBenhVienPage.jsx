@@ -29,7 +29,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value(),
                 ten: this.ten.value(),
@@ -73,7 +73,7 @@ class dmBenhVienPage extends AdminPage {
     state = { searching: false };
     tuyenOptions = [];
     tuyenMapper = []
-    
+
     componentDidMount() {
         T.ready('/user/category', () => {
             T.onSearch = (searchText) => this.props.getDmBenhVienPage(undefined, undefined, searchText || '');
@@ -108,20 +108,20 @@ class dmBenhVienPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '40%' }} nowrap='true'>Tên</th>
-                        <th style={{ width: '30%' }} nowrap='true'>Địa chỉ</th>
-                        <th style={{ width: '30%' }} nowrap='true'>Tên tuyến</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '40%' }}>Tên</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Địa chỉ</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Tên tuyến</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1}/>
-                        <TableCell type='text' content={item.ma}/>
-                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.show(item)}/>
-                        <TableCell type='text' content={T.language.parse(item.diaChi, true).vi} style={{ whiteSpace: 'nowrap' }}/>
-                        <TableCell type='text' content={T.language.parse(this.tuyenMapper[item.maTuyen] ? this.tuyenMapper[item.maTuyen] : '', true).vi} style={{ whiteSpace: 'nowrap' }}/>
+                        <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={item.ma} />
+                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={T.language.parse(item.diaChi, true).vi} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={T.language.parse(this.tuyenMapper[item.maTuyen] ? this.tuyenMapper[item.maTuyen] : '', true).vi} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='checkbox' content={item.kichHoat} permissions={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>)

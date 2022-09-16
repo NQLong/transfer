@@ -7,7 +7,7 @@ import contact from './redux';
 
 export default {
     redux: {
-        contact,
+        contact
     },
     routes: [
         {
@@ -16,6 +16,6 @@ export default {
         }
     ],
     Section: {
-        SectionContact,
+        SectionContact
     }
 };
