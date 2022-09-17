@@ -4,7 +4,8 @@ module.exports = (app, serviceConfig) => { // Run on service project
     if (!app.isDebug) app.assetPath = '/var/www/hcmussh/asset';
 
     const nodemailer = require('nodemailer'),
-        transporters = {};
+        transporters = {},
+        delay = ms => new Promise(res => setTimeout(res, ms));
     const sendMail = async (mailFrom, mailFromPassword, mailTo, cc = null, bcc = null, subject, text, html, attachments = null) => {
         try {
             let transporter = transporters[mailFrom];
@@ -25,6 +26,7 @@ module.exports = (app, serviceConfig) => { // Run on service project
             if (bcc) message.bcc = bcc.toString();
 
             await transporter.sendMail(message);
+            await delay(5000);
             return null;
         } catch (error) {
             console.log(`Send mail to ${mailTo} error!`, error);
