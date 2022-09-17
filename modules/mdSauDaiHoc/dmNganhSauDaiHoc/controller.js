@@ -4,7 +4,6 @@ module.exports = app => {
         menus: {
             7528: {
                 title: 'Ngành đào tạo',
-                // subTitle: 'Sau đại học',
                 link: '/user/sau-dai-hoc/danh-sach-nganh'
             },
         },
