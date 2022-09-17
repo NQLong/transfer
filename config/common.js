@@ -92,7 +92,7 @@ module.exports = (app, appConfig) => {
         },
         sdh: {
             index: 7500, title: 'Sau đại học', link: '/user/sau-dai-hoc', icon: 'fa-graduation-cap ',
-            subMenusRender: false, groups: ['NGÀNH', 'CÔNG TÁC', 'DANH MỤC']
+            subMenusRender: false, groups: ['NGÀNH', 'CÔNG TÁC', 'DANH MỤC', 'SINH VIÊN']
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',

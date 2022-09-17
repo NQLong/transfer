@@ -1,13 +1,13 @@
 module.exports = app => {
-    const menuSvSdh = {
+    const menu = {
         parentMenu: app.parentMenu.sdh,
         menus: {
-            7501: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien', groupIndex: 2 }
+            7501: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien', groupIndex: 3 }
         }
     };
 
     app.permission.add(
-        { name: 'svSdh:manage', menu: menuSvSdh },
+        { name: 'svSdh:manage', menu },
         { name: 'svSdh:write' },
         { name: 'svSdh:delete' }
     );

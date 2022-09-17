@@ -5,7 +5,6 @@ module.exports = app => {
             7503: {
                 title: 'Khoa đào tạo, giảng dạy',
                 link: '/user/sau-dai-hoc/khoa-sau-dai-hoc',
-                backgroundColor: '#1ca474',
                 groupIndex: 2
             },
         },

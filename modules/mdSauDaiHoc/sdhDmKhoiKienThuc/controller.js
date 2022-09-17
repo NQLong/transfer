@@ -4,7 +4,7 @@ module.exports = app => {
         menus: {
             7520: {
                 title: 'Khối kiến thức',
-                link: '/user/sau-dai-hoc/khoi-kien-thuc', icon: 'fa-cube', backgroundColor: '#daa520', groupIndex: 2
+                link: '/user/sau-dai-hoc/khoi-kien-thuc', icon: 'fa-cube', groupIndex: 2
             }
         }
     };
