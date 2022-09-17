@@ -1,10 +1,10 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
+        parentMenu: app.parentMenu.sdh,
         menus: {
-            4106: {
+            7528: {
                 title: 'Ngành đào tạo',
-                subTitle: 'Sau đại học',
+                // subTitle: 'Sau đại học',
                 link: '/user/sau-dai-hoc/danh-sach-nganh'
             },
         },

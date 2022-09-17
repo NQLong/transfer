@@ -2,29 +2,29 @@ module.exports = app => {
     const menuSdh = {
         parentMenu: app.parentMenu.sdh,
         menus: {
-            7510: {
-                title: 'Môn học (trước 2022)',
-                link: '/user/sau-dai-hoc/mon-hoc', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex: 1
+            7511: {
+                title: 'Môn học (kể từ 2022)',
+                link: '/user/sau-dai-hoc/mon-hoc-moi', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex: 1
             },
         },
     };
     app.permission.add(
-        { name: 'dmMonHocSdh:manage', menu: menuSdh },
-        { name: 'dmMonHocSdh:write' },
-        { name: 'dmMonHocSdh:delete' },
+        { name: 'dmMonHocSdhMoi:manage', menu: menuSdh },
+        { name: 'dmMonHocSdhMoi:write' },
+        { name: 'dmMonHocSdhMoi:delete' },
     );
-    app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:manage'), app.templates.admin);
-    app.get('/user/sau-dai-hoc/mon-hoc/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/mon-hoc-moi', app.permission.check('dmMonHocSdhMoi:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/mon-hoc-moi/upload', app.permission.check('dmMonHocSdhMoi:write'), app.templates.admin);
 
-    app.permissionHooks.add('staff', 'addRolesMonHocSdh', (user, staff) => new Promise(resolve => {
+    app.permissionHooks.add('staff', 'addRolesMonHocSdhMoi', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'dmMonHocSdh:manage', 'dmMonHocSdh:write', 'dmMonHocSdh:delete');
+            app.permissionHooks.pushUserPermission(user, 'dmMonHocSdhMoi:manage', 'dmMonHocSdhMoi:write', 'dmMonHocSdhMoi:delete');
             resolve();
         } else resolve();
     }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdh:manage'), (req, res) => {
+    app.get('/api/sau-dai-hoc/mon-hoc-moi/page/:pageNumber/:pageSize', app.permission.check('dmMonHocSdhMoi:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -56,30 +56,30 @@ module.exports = app => {
             };
         }
 
-        app.model.dmMonHocSdh.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        app.model.sdhDmMonHocMoi.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/sau-dai-hoc/mon-hoc/all', app.permission.check('dmMonHocSdh:manage'), (req, res) => {
-        app.model.dmMonHocSdh.getAll((error, items) => res.send({ error, items }));
+    app.get('/api/sau-dai-hoc/mon-hoc-moi/all', app.permission.check('dmMonHocSdhMoi:manage'), (req, res) => {
+        app.model.sdhDmMonHocMoi.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/mon-hoc/item/:ma', app.permission.check('dmMonHocSdh:manage'), (req, res) => {
-        app.model.dmMonHocSdh.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    app.get('/api/sau-dai-hoc/mon-hoc-moi/item/:ma', app.permission.check('dmMonHocSdhMoi:manage'), (req, res) => {
+        app.model.sdhDmMonHocMoi.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {
-        app.model.dmMonHocSdh.create(req.body.item, (error, item) => res.send({ error, item }));
+    app.post('/api/sau-dai-hoc/mon-hoc-moi', app.permission.check('dmMonHocSdhMoi:write'), (req, res) => {
+        app.model.sdhDmMonHocMoi.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:write'), (req, res) => {
-        app.model.dmMonHocSdh.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
+    app.put('/api/sau-dai-hoc/mon-hoc-moi', app.permission.check('dmMonHocSdhMoi:write'), (req, res) => {
+        app.model.sdhDmMonHocMoi.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:delete'), (req, res) => {
-        app.model.dmMonHocSdh.delete({ ma: req.body.ma }, error => res.send({ error }));
+    app.delete('/api/sau-dai-hoc/mon-hoc-moi', app.permission.check('dmMonHocSdhMoi:delete'), (req, res) => {
+        app.model.sdhDmMonHocMoi.delete({ ma: req.body.ma }, error => res.send({ error }));
     });
 
-    app.post('/api/sau-dai-hoc/mon-hoc/multiple', app.permission.check('dmMonHocSdh:write'), async (req, res) => {
+    app.post('/api/sau-dai-hoc/mon-hoc-moi/multiple', app.permission.check('dmMonHocSdhMoi:write'), async (req, res) => {
         try {
             const data = req.body.data;
             let donViMapping = {};
@@ -97,8 +97,8 @@ module.exports = app => {
                     khoaSdh: item.khoaSdh ? donViMapping[item.khoaSdh.toLowerCase()] : '',
                     kichHoat: 1
                 };
-                let dmMonHocSdh = await app.model.dmMonHocSdh.get({ ma: item.ma });
-                if (!dmMonHocSdh) await app.model.dmMonHocSdh.create(newData);
+                let dmMonHocSdhMoi = await app.model.sdhDmMonHocMoi.get({ ma: item.ma });
+                if (!dmMonHocSdhMoi) await app.model.sdhDmMonHocMoi.create(newData);
             }
             res.end();
         } catch (error) {
@@ -107,12 +107,12 @@ module.exports = app => {
     });
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
-    app.uploadHooks.add('dmMonHocSdhImportData', (req, fields, files, params, done) =>
-        app.permission.has(req, () => dmMonHocSdhImportData(req, fields, files, params, done), done, 'dmMonHocSdh:write'));
+    app.uploadHooks.add('dmMonHocSdhMoiImportData', (req, fields, files, params, done) =>
+        app.permission.has(req, () => dmMonHocSdhMoiImportData(req, fields, files, params, done), done, 'dmMonHocSdhMoi:write'));
 
-    const dmMonHocSdhImportData = async (req, fields, files, params, done) => {
-        if (fields.userData && fields.userData[0] && fields.userData[0] == 'dmMonHocSdhImportData' && files.dmMonHocSdhFile && files.dmMonHocSdhFile.length > 0) {
-            const srcPath = files.dmMonHocSdhFile[0].path;
+    const dmMonHocSdhMoiImportData = async (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'dmMonHocSdhMoiImportData' && files.dmMonHocSdhMoiFile && files.dmMonHocSdhMoiFile.length > 0) {
+            const srcPath = files.dmMonHocSdhMoiFile[0].path;
             let workbook = await app.excel.readFile(srcPath);
             if (workbook) {
                 const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
