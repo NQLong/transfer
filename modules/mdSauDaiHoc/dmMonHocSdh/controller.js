@@ -1,15 +1,5 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
-        menus: {
-            4105: {
-                title: 'Môn học (trước 2022)',
-                subTitle: 'Sau đại học',
-                link: '/user/danh-muc/mon-hoc'
-            },
-        },
-    };
-    const menuSDH = {
         parentMenu: app.parentMenu.sdh,
         menus: {
             7510: {
@@ -20,7 +10,6 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'dmMonHocSdh:manage', menu },
-        { name: 'dmMonHocSdh:manage', menu: menuSDH },
         { name: 'dmMonHocSdh:write' },
         { name: 'dmMonHocSdh:delete' },
     );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { getSdhCauTrucKhungDaoTaoPage } from './redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
@@ -72,6 +73,7 @@ class SdhCauTrucKhungDaoTaoPage extends AdminPage {
             icon: 'fa fa-university',
             title: 'Cấu trúc khung CT Đào tạo',
             breadcrumb: [
+                <Link key={0} to='/user/sau-dai-hoc'>Sau đại học</Link>,
                 'Cấu trúc khung CT Đào tạo'
             ],
             content: <>

@@ -17,9 +17,5 @@ export default {
             path: '/user/sau-dai-hoc/mon-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
-        {
-            path: '/user/danh-muc/mon-hoc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
     ],
 }; 

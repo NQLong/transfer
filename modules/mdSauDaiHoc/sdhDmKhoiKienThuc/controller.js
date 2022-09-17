@@ -1,15 +1,5 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
-        menus: {
-            4107: {
-                title: 'Khối kiến thức',
-                link: '/user/danh-muc/khoi-kien-thuc',
-                subTitle: 'Sau đại học'
-            }
-        }
-    };
-    const menuSDH = {
         parentMenu: app.parentMenu.sdh,
         menus: {
             7520: {
@@ -20,7 +10,6 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'sdhDmKhoiKienThuc:read', menu },
-        { name: 'sdhDmKhoiKienThuc:read', menu: menuSDH },
         { name: 'sdhDmKhoiKienThuc:write' },
         { name: 'sdhDmKhoiKienThuc:delete' }
     );
