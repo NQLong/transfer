@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3036: { title: 'Đơn vị phê duyệt', link: '/user/tccb/danh-gia-phe-duyet-don-vi', icon: 'fa-pencil-square-o', backgroundColor: '#2a99b8', groupIndex: 6 },
+            3036: { title: 'Đơn vị phê duyệt', link: '/user/tccb/danh-gia-phe-duyet-don-vi', icon: 'fa-pencil', backgroundColor: '#B8492F', groupIndex: 6 },
         }
     };
     app.permission.add(
@@ -34,6 +34,10 @@ module.exports = app => {
             const danhGia = await app.model.tccbDanhGiaNam.get({ nam });
             if (!danhGia) {
                 throw 'Không có dữ liệu phê duyệt của năm';
+            }
+            const pheDuyetTruong = await app.model.tccbDanhGiaPheDuyetTruong.get({ idPheDuyetCapDonVi: id });
+            if (pheDuyetTruong?.approvedTruong == 'Đồng ý') {
+                throw 'Trường đã duyệt, không được sửa đổi dữ liệu';
             }
             const { donViBatDauPheDuyet, donViKetThucPheDuyet } = danhGia;
             if (Date.now() < donViBatDauPheDuyet || Date.now() > donViKetThucPheDuyet) {

@@ -52,10 +52,10 @@ class TccbDanhGiaPheDuyetTruongPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-pencil',
-            title: 'Phê duyệt cấp trường',
+            title: 'Trường phê duyệt',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Phê duyệt cấp trường'
+                'Trường phê duyệt'
             ],
             content: <div className='tile'>{table}</div>,
             backRoute: '/user/tccb',

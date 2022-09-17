@@ -11,6 +11,16 @@ import T from 'view/js/common';
 class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
     state = { nam: '' }
 
+    showStatus = (status, alternativeText) => {
+        if (status == 'Đồng ý') {
+            return <span style={{ color: 'green' }}>{status}</span>;
+        }
+        if (status == 'Không đồng ý') {
+            return <span style={{ color: 'red' }}>{status}</span>;
+        }
+        return <span dangerouslySetInnerHTML={{ __html: status || alternativeText }} />;
+    }
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/danh-gia/phe-duyet-don-vi/:nam');
@@ -20,6 +30,12 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
             T.showSearchBox();
             this.props.getTccbDanhGiaPDDVPage();
         });
+    }
+
+    approvedDonViAction = (e, item, status) => {
+        e.preventDefault();
+        T.confirm(`${status} phê duyệt`, `Bạn có chắc bạn muốn ${status} mục này`, true, isConfirm =>
+            isConfirm && this.props.updateTccbDanhGiaPDDV(item.id, status));
     }
 
     render() {
@@ -34,8 +50,8 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
                         <th style={{ width: '20%', textAlign: 'center' }}>Cán bộ</th>
-                        <th style={{ width: '40%', textAlign: 'center' }}>Nhóm đăng ký</th>
-                        <th style={{ width: '40%', textAlign: 'center' }}>Trạng thái phê duyệt</th>
+                        <th style={{ width: '40%', textAlign: 'center' }}>Cá nhân đăng ký</th>
+                        <th style={{ width: '40%', textAlign: 'center' }}>Đơn vị phê duyệt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -47,15 +63,15 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
                             {item.shcc}
                         </>} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.tenNhomDangKy || 'Chưa đăng ký'} />
-                        <TableCell type='text' style={{ textAlign: 'left' }} content={item.approvedDonVi || 'Chưa phê duyệt'} />
+                        <TableCell type='text' style={{ textAlign: 'left' }} content={this.showStatus(item.approvedDonVi, 'Chưa phê duyệt')} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }}>
                             <Tooltip title='Đồng ý' arrow>
-                                <button className='btn btn-success' onClick={() => item.id ? this.props.updateTccbDanhGiaPDDV(item.id, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                <button className='btn btn-success' onClick={e => item.id ? this.approvedDonViAction(e, item, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
                                     <i className='fa fa-lg fa-check' />
                                 </button>
                             </Tooltip>
                             <Tooltip title='Không đồng ý' arrow>
-                                <button className='btn btn-danger' onClick={() => item.id ? this.props.updateTccbDanhGiaPDDV(item.id, 'Không đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                <button className='btn btn-danger' onClick={e => item.id ? this.approvedDonViAction(e, item, 'Không đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
                                     <i className='fa fa-lg fa-times' />
                                 </button>
                             </Tooltip>
@@ -70,7 +86,7 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
             title: `Thông tin đăng ký năm ${nam}`,
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/danh-gia-phe-duyet-don-vi'>Phê duyệt đơn vị</Link>,
+                <Link key={1} to='/user/tccb/danh-gia-phe-duyet-don-vi'>Đơn vị phê duyệt</Link>,
                 `Thông tin phê duyệt năm ${nam}`
             ],
             content: <>

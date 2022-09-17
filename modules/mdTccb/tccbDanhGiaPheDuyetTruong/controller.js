@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3037: { title: 'Trường phê duyệt', link: '/user/tccb/danh-gia-phe-duyet-truong', icon: 'fa-pencil-square-o', backgroundColor: '#2a99b8', groupIndex: 6 },
+            3037: { title: 'Trường phê duyệt', link: '/user/tccb/danh-gia-phe-duyet-truong', icon: 'fa-pencil', backgroundColor: '#fecc2c', groupIndex: 6 },
         }
     };
     app.permission.add(
@@ -46,12 +46,34 @@ module.exports = app => {
         }
     });
 
+    app.put('/api/tccb/danh-gia-phe-duyet-truong-phe-duyet-all', app.permission.check('president:login'), async (req, res) => {
+        try {
+            const approvedTruong = req.body.approvedTruong, userDuyetCapTruong = req.session.user.email, nam = parseInt(req.body.nam);
+            const danhGia = await app.model.tccbDanhGiaNam.get({ nam });
+            if (!danhGia) {
+                throw 'Không có dữ liệu phê duyệt của năm';
+            }
+            const { truongBatDauPheDuyet, truongKetThucPheDuyet } = danhGia;
+            if (Date.now() < truongBatDauPheDuyet || Date.now() > truongKetThucPheDuyet) {
+                throw 'Thời gian phê duyệt không phù hợp';
+            }
+            await app.model.tccbDanhGiaPheDuyetTruong.update({}, { userDuyetCapTruong, approvedTruong });
+            res.end();
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
     app.put('/api/tccb/danh-gia-phe-duyet-truong-y-kien', app.permission.check('tccbDanhGiaPheDuyetTruong:write'), async (req, res) => {
         try {
             const id = req.body.id, yKienTruongTccb = req.body.yKienTruongTccb, truongTccb = req.session.user.email, nam = parseInt(req.body.nam);
             const danhGia = await app.model.tccbDanhGiaNam.get({ nam });
             if (!danhGia) {
                 throw 'Không có dữ liệu phê duyệt của năm';
+            }
+            const pheDuyet = await app.model.tccbDanhGiaPheDuyetTruong.get({ id });
+            if (pheDuyet?.approvedTruong == 'Đồng ý') {
+                throw 'Trường đã duyệt, không được sửa đổi dữ liệu';
             }
             const { truongBatDauPheDuyet, truongKetThucPheDuyet } = danhGia;
             if (Date.now() < truongBatDauPheDuyet || Date.now() > truongKetThucPheDuyet) {
