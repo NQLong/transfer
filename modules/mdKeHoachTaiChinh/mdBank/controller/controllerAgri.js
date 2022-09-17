@@ -108,7 +108,7 @@ module.exports = app => {
                 if (!student) res.send({ result_code: '017', result_desc: 'Không tìm thấy sinh viên' });
                 else {
                     await modelTransaction.addBill(namHoc, hocKy, 'AGRI', `AGRI-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, amount, checksum);
-                    // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
+                    // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.notify({ student, hocKy, namHoc, amount: parseInt(amount), trans_date });
                     res.send({ result_code: '000', result_desc: 'Thành công' });
                 }
             }

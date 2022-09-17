@@ -1,12 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.tcHocPhiTransaction.foo = () => { };
-    app.model.tcHocPhiTransaction.sendEmailAndSms = async (data) => {
+    app.model.tcHocPhiTransaction.notify = async (data) => {
         try {
+            const SMS_CONFIRM_SUCCESS_TRANS_ID = 1; //Temporary
             if (student.dienThoaiCaNhan) {
-                let smsContent = await app.model.fwSmsParameter.replaceAllContent(1, student);
-                student.dienThoaiCaNhan && app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
+                let smsContent = await app.model.fwSmsParameter.replaceAllContent(SMS_CONFIRM_SUCCESS_TRANS_ID, student.mssv);
+                app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
             }
+
             const { student, hocKy, namHoc, amount, payDate } = data;
             let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
             [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
