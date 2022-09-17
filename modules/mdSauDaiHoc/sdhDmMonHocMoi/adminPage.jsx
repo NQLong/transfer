@@ -8,7 +8,7 @@ import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbo
 class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
-            this.ten.focus();
+            this.tenTiengViet.focus();
         }));
     }
 
