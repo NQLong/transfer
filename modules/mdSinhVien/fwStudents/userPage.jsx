@@ -213,23 +213,23 @@ class SinhVienPage extends AdminPage {
 
     downloadWord = (e) => {
         e.preventDefault();
-        const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() });
-        this.setState({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
-            this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để hoàn thành bước nhập học. Đến trang Học phí?', 'warning', true, isConfirm => {
-                if (isConfirm) {
-                    this.props.history.push('/user/hoc-phi');
-                }
+        const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
+            this.setState({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
+                this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
+                    if (isConfirm) {
+                        this.props.history.push('/user/hoc-phi');
+                    }
+                });
             });
         });
         const confirmExport = () => T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường?', 'info', true, isConfirm => {
             if (isConfirm) {
                 this.props.downloadWord(result => {
                     if (result.error) {
-                        this.props.studentDownloadSyll(() => {
-                            T.confirm('HOÀN TẤT', 'Có lỗi trong quá trình gửi email! Trang web sẽ tự động tải SYLL sau vài giây!', 'success', false, () => saveThongTin());
-                        });
+                        T.alert('Có lỗi trong quá trình gửi email! Trang web sẽ tự động tải SYLL sau vài giây!', 'error', null, 1000);
+                        setTimeout(() => this.props.studentDownloadSyll(saveThongTin), 1000);
                     } else {
-                        T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác)!', 'success', false, () => saveThongTin());
+                        T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác)!', 'success', false, saveThongTin);
                     }
                 });
             }
@@ -244,7 +244,7 @@ class SinhVienPage extends AdminPage {
 
     downloadSyll = () => {
         this.props.studentDownloadSyll(() => {
-            this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để hoàn thành bước nhập học. Đến trang Học phí?', 'warning', true, isConfirm => {
+            this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
                 if (isConfirm) {
                     this.props.history.push('/user/hoc-phi');
                 }
@@ -283,11 +283,11 @@ class SinhVienPage extends AdminPage {
                                 <div className='row'>
                                     <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-6' readOnly onChange={e => this.ho.value(e.target.value.toUpperCase())} required />
                                     <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly onChange={e => this.ten.value(e.target.value.toUpperCase())} required />
-                                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} required />
-                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-6' readOnly required />
+                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-3' readOnly required />
                                     <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly required />
-                                    <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-5' required readOnly />
-                                    <FormSelect className='col-md-7' ref={e => this.noiSinhMaTinh = e} data={ajaxSelectTinhThanhPho} readOnly={readOnly} label='Nơi sinh' required />
+                                    <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly />
+                                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} required />
+                                    <FormSelect className='col-md-9' ref={e => this.noiSinhMaTinh = e} data={ajaxSelectTinhThanhPho} readOnly={readOnly} label='Nơi sinh' required />
                                 </div>
                             </div>
                             <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
@@ -337,8 +337,8 @@ class SinhVienPage extends AdminPage {
                             />
                             <ul style={{}}>
                                 <li>Vui lòng tải lên ảnh <b className='text-danger'>đúng kích thước (3 x 4cm hay 113,386 x 151,181px)</b>.</li>
-                                <li>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>https://www.iloveimg.com/compress-image</a></li>
-                                <li>Ảnh phải rõ nét, nghiêm túc.</li>
+                                <li>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>đây</a></li>
+                                <li>Ảnh phải có nền 1 màu, chi tiết rõ nét, nghiêm túc.</li>
                                 <li>Đây là ảnh phục vụ cho công tác in thẻ sinh viên, đề nghị sinh viên chịu trách nhiệm với ảnh thẻ mình đã tải lên.</li>
                             </ul>
                         </div>
