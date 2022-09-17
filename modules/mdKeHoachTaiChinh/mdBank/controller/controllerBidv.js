@@ -44,8 +44,9 @@ module.exports = app => {
             res.send({ result_code: '007' });
         } else {
             const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+            const bhyt = await app.model.svBaoHiemYTe.get({ mssv: customer_id, namDangKy: new Date().getFullYear() });
             const hocPhi = await model.get({ namHoc, hocKy, mssv: customer_id.toString() });
-            if (!hocPhi) {
+            if (!hocPhi || !bhyt) {
                 res.send({ result_code: '001' });
             } else if (hocPhi.congNo <= 0) {
                 res.send({ result_code: '025' });

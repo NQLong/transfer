@@ -514,7 +514,7 @@ export class FormTextBox extends React.Component {
             return (
                 <div className={'form-group ' + (className || '')} style={style}>
                     {displayElement}
-                    <input disabled={disabled} ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} />
+                    <input disabled={disabled} ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} onKeyDown={this.props.onKeyDown} />
                     {smallText ? <small>{smallText}</small> : null}
                 </div>);
         }
@@ -808,13 +808,13 @@ export class FormImageBox extends React.Component {
     setData = (data, image) => this.imageBox.setData(data, image);
 
     render() {
-        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null, isProfile = null, description = null } = this.props;
+        let { label = '', className = '', style = {}, boxUploadStye = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null, isProfile = null, description = null, height = '' } = this.props;
         return (
-            <div className={'form-group ' + className} style={style}>
+            <div className={'form-group ' + className} style={style} >
                 <label>{label}&nbsp;</label>
                 {!readOnly && image && onDelete ?
                     <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
-                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} isProfile={isProfile} description={description} />
+                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} isProfile={isProfile} description={description} style={boxUploadStye} height={height} />
             </div>);
     }
 }

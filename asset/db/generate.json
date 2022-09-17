@@ -6381,7 +6381,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 3
+                    "size": 7
                 },
                 "NGAY_VAO_DOAN": {
                     "value": "ngayVaoDoan",
@@ -6487,6 +6487,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "CAN_EDIT": {
+                    "value": "canEdit",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "ANH_THE": {
+                    "value": "anhThe",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -13078,12 +13092,21 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
                 "ID"
             ],
-            "foreignKeys": [],
+            "foreignKeys": [
+                "LOAI"
+            ],
             "type": "table"
         },
         "DM_TIEP_NHAN_VE_NUOC": {
@@ -14822,6 +14845,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 50
+                },
+                "IS_TIENG_VIET": {
+                    "value": "isTiengViet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -15642,7 +15672,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 256
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -15782,6 +15812,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152474\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "SO_HOC_KY": {
+                    "value": "soHocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -17632,20 +17669,6 @@
                     "nullable": true,
                     "size": "22,0"
                 },
-                "PHE_DUYET_CAP_TRUONG": {
-                    "value": "pheDuyetCapTruong",
-                    "dataType": "NUMBER",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "PHE_DUYET_CAP_DON_VI": {
-                    "value": "pheDuyetCapDonVi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "NAM": {
                     "value": "nam",
                     "dataType": "NUMBER",
@@ -18153,8 +18176,8 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "SHCC_DUYET_CAP_DON_VI": {
-                    "value": "shccDuyetCapDonVi",
+                "USER_DUYET_CAP_DON_VI": {
+                    "value": "userDuyetCapDonVi",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
@@ -18194,12 +18217,230 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
+                },
+                "DANG_KY_LAI": {
+                    "value": "dangKyLai",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
                 "ID"
             ],
             "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_PHE_DUYET_TRUONG": {
+            "active": true,
+            "moduleName": "tccbDanhGiaPheDuyetTruong",
+            "modelName": "tccbDanhGiaPheDuyetTruong",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173093\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USER_DUYET_CAP_TRUONG": {
+                    "value": "userDuyetCapTruong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "APPROVED_TRUONG": {
+                    "value": "approvedTruong",
+                    "dataType": "CLOB",
+                    "dataDefault": "null",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "ID_PHE_DUYET_CAP_DON_VI": {
+                    "value": "idPheDuyetCapDonVi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "Y_KIEN_TRUONG_TCCB": {
+                    "value": "yKienTruongTccb",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "TRUONG_TCCB": {
+                    "value": "truongTccb",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_EMAIL_LOG": {
+            "active": true,
+            "moduleName": "fwEmailLog",
+            "modelName": "fwEmailLog",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173115\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USED_EMAIL": {
+                    "value": "usedEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "TO_USER": {
+                    "value": "toUser",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TO_EMAIL": {
+                    "value": "toEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "MAIL_TYPE": {
+                    "value": "mailType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 128
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DM_LOAI_MON_MO": {
+            "active": true,
+            "moduleName": "dtDmLoaiMonMo",
+            "modelName": "dtDmLoaiMonMo",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 5
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_SEMESTER": {
+            "active": true,
+            "moduleName": "dtSemester",
+            "modelName": "dtSemester",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173508\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 11
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "BEGIN_TIME": {
+                    "value": "beginTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "END_TIME": {
+                    "value": "endTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "USER_MODIFIED": {
+                    "value": "userModified",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "TIME_MODIFIED": {
+                    "value": "timeModified",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [
+                "HOC_KY"
+            ],
             "type": "table"
         }
     }

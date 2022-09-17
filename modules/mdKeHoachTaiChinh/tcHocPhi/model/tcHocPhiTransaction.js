@@ -3,6 +3,10 @@ module.exports = app => {
     // app.model.tcHocPhiTransaction.foo = () => { };
     app.model.tcHocPhiTransaction.sendEmailAndSms = async (data) => {
         try {
+            if (student.dienThoaiCaNhan) {
+                let smsContent = await app.model.fwSmsParameter.replaceAllContent(1, student);
+                student.dienThoaiCaNhan && app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
+            }
             const { student, hocKy, namHoc, amount, payDate } = data;
             let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
             [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
@@ -17,9 +21,12 @@ module.exports = app => {
                 .replaceAll('{support_phone}', tcSupportPhone) || '');
             app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
 
-            let smsContent = await app.model.fwSmsParameter.replaceAllContent(1, student);
-
-            app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
+            app.notification.send({
+                toEmail: student.emailTruong,
+                title: 'Thanh toán thành công',
+                subTitle: `Số tiền: ${amount.toString().numberDisplay()}, HK${hocKy}-${namHoc} lúc ${app.date.viDateFormat(app.date.fullFormatToDate(payDate))}`,
+                icon: 'fa-usd', iconColor: 'success'
+            });
         } catch (error) {
             console.error('Send email and sms tcHocPhi fail!');
         }

@@ -42,7 +42,7 @@ module.exports = app => {
             if (![vnp_TmnCodeAgribank, vnp_TmnCodeVnpayAgribank, vnp_TmnCodeVcb, vnp_TmnCodeVnpayVcb].includes(vnp_TmnCode)) res.send({ RspCode: '99', Message: 'Merchant Code Has Been Changed' });
             else if (vnp_TransactionStatus == 99) res.send({ RspCode: '00', Message: 'Confirm Success' });
             else {
-                vnp_Amount = parseInt(vnp_Amount / 100);
+                vnp_Amount = parseInt(parseInt(vnp_Amount) / 100);
                 const student = await app.model.fwStudents.get({ mssv });
                 const order = await app.model.tcHocPhiOrders.get({ refId: vnp_TxnRef });
                 if (!student || !order) return res.send({ RspCode: '01', Message: 'Order Not Found' });
@@ -61,10 +61,10 @@ module.exports = app => {
                         if (transaction) res.send({ Message: 'Order already confirmed', RspCode: '02' });
                         else if (vnp_TransactionStatus == '00') {
                             await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `VNPAY_${vnp_BankCode}`, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
-
-                            // await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate });
-
                             res.send({ RspCode: '00', Message: 'Confirm Success' });
+
+                            app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate.toString() });
+
                         } else {
                             res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });
                         }
@@ -72,10 +72,7 @@ module.exports = app => {
                         res.send({ RspCode: '97', Message: 'Invalid Checksum' });
                     }
                 }
-
             }
-
-
         }
         catch (error) {
             console.error('Error catch VNPAY: ', error);

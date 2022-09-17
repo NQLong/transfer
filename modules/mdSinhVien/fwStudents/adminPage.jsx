@@ -12,7 +12,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { getStudentsPage, loginStudentForTest } from './redux';
+import { getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin } from './redux';
+import { Tooltip } from '@mui/material';
 
 export class LoginToTestModal extends AdminModal {
 
@@ -40,54 +41,19 @@ class AdminStudentsPage extends AdminPage {
         T.ready('/user/students', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.props.getStudentsPage(undefined, undefined, searchText || '', this.state.filter);
-            T.showSearchBox(() => {
-                this.listFaculty?.value('');
-                this.listFromCity?.value('');
-                this.listEthnic?.value('');
-                this.listNationality?.value('');
-                this.listReligion?.value('');
-                this.listLoaiHinhDaoTao?.value('');
-                this.listLoaiSinhVien?.value('');
-                this.listTinhTrangSinhVien?.value('');
-                setTimeout(() => this.changeAdvancedSearch(), 50);
-            });
-            this.props.getStudentsPage(undefined, undefined, '', this.state.filter);
-            this.changeAdvancedSearch(true);
+            T.showSearchBox(() => this.changeAdvancedSearch());
+            this.changeAdvancedSearch();
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 500 };
-        const listFaculty = this.listFaculty.value().toString() || '';
-        const listFromCity = this.listFromCity.value().toString() || '';
-        const listEthnic = this.listEthnic.value().toString() || '';
-        const listNationality = this.listNationality.value().toString() || '';
-        const listReligion = this.listReligion.value().toString() || '';
-        const listLoaiHinhDaoTao = this.listLoaiHinhDaoTao.value().toString() || '';
-        const listLoaiSinhVien = this.listLoaiSinhVien.value().toString() || '';
-        const listTinhTrangSinhVien = this.listTinhTrangSinhVien.value().toString() || '';
-        const gender = this.gender?.value() == '' ? null : this.gender.value();
-        const pageFilter = isInitial ? null : { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender };
-        this.setState({ filter: pageFilter }, () => {
-            this.props.getStudentsPage(pageNumber, pageSize, '', this.state.filter, (page) => {
-                if (isInitial) {
-                    const filter = page.filter || {};
-                    let { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender } = filter;
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.listFaculty?.value(filter.listFaculty || '');
-                    this.listFromCity?.value(filter.listFromCity || '');
-                    this.listEthnic?.value(filter.listEthnic || '');
-                    this.listNationality?.value(filter.listNationality || '');
-                    this.listReligion?.value(filter.listReligion || '');
-                    this.listLoaiHinhDaoTao?.value(filter.listLoaiHinhDaoTao || '');
-                    this.listLoaiSinhVien?.value(filter.listLoaiSinhVien || '');
-                    this.listTinhTrangSinhVien?.value(filter.listTinhTrangSinhVien || '');
-                    this.gender?.value(filter.gender || '');
-
-                    if (!$.isEmptyObject(filter) && filter && ({ listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender })) this.showAdvanceSearch();
-                }
+    changeAdvancedSearch = (isReset = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
+        this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, (page) => page && this.hideAdvanceSearch());
+        if (isReset) {
+            Object.keys(this).forEach(key => {
+                if (this[key].value && this[key].value()) this[key].value('');
             });
-        });
+        }
     }
 
     delete = (item) => {
@@ -101,13 +67,15 @@ class AdminStudentsPage extends AdminPage {
 
     render() {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
-
+        let developer = this.getUserPermission('developer', ['login']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
-            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
+            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu sinh viên',
             stickyHead: true,
+            header: 'thead-light',
+            className: 'table-fix-col',
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
@@ -147,10 +115,27 @@ class AdminStudentsPage extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                         item.namTuyenSinh ? <b>{item.namTuyenSinh}</b> : ''
                     } />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngayNhapHoc ? T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngayNhapHoc ? item.ngayNhapHoc == -1 ? 'Đang chờ nhập học' : T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') : ''} />
                     <TableCell type='text' style={{ textAlign: 'center', color: 'red' }} content={item.tinhTrangSinhVien ? item.tinhTrangSinhVien : ''} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                        onEdit={`/user/students/item/${item.mssv}`} onDelete={this.delete} />
+                        // onEdit={`/user/students/item/${item.mssv}`}
+                        onDelete={this.delete}>
+                        <Tooltip title={item.canEdit ? 'Khoá edit' : 'Cho phép edit'}>
+                            <button className={item.canEdit ? 'btn btn-secondary' : 'btn btn-success'} type='button' onClick={e => e.preventDefault() ||
+                                this.props.updateStudentAdmin(item.mssv, { canEdit: Number(!item.canEdit) })
+                            }>
+                                <i className={item.canEdit ? 'fa fa-lg fa-times' : 'fa fa-lg fa-check'} />
+                            </button>
+                        </Tooltip>
+                        <Tooltip title='Tải SYLL'>
+                            <button style={{ display: parseInt(item.namTuyenSinh) >= new Date().getFullYear() ? '' : 'none' }} className='btn btn-warning' type='button' onClick={e => e.preventDefault() ||
+                                this.props.adminDownloadSyll(item.mssv, item.namTuyenSinh)
+                            }>
+                                <i className='fa fa-lg fa-arrow-down' />
+                            </button>
+                        </Tooltip>
+
+                    </TableCell>
                 </tr>
             )
         });
@@ -163,15 +148,104 @@ class AdminStudentsPage extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     {/*listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender*/}
-                    <FormSelect multiple ref={e => this.listFaculty = e} data={SelectAdapter_DmDonViFaculty_V2} label='Lọc theo khoa' className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listLoaiSinhVien = e} data={SelectAdapter_DmLoaiSinhVienV2} label='Lọc theo loại SV' style={{}} className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listTinhTrangSinhVien = e} data={SelectAdapter_DmTinhTrangSinhVienV2} label='Lọc theo tình trạng SV' className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listNationality = e} data={SelectAdapter_DmQuocGia} label='Lọc theo quốc tịch' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listEthnic = e} data={SelectAdapter_DmDanTocV2} label='Lọc theo dân tộc' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listReligion = e} data={SelectAdapter_DmTonGiaoV2} label='Lọc theo tôn giáo' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listFromCity = e} data={ajaxSelectTinhThanhPho} label='Lọc theo tỉnh/thành thường trú' className='col-md-6' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listLoaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Lọc theo loại hình đào tạo' className='col-md-6' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple ref={e => this.listFaculty = e} data={SelectAdapter_DmDonViFaculty_V2} label='Lọc theo khoa' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListFaculty = currentFilter.listFaculty?.split(',') || [];
+                        if (value.selected) {
+                            currentListFaculty.push(value.id);
+                        } else currentListFaculty = currentListFaculty.filter(item => item != value.id);
+                        this.setState({ filter: { ...currentFilter, listFaculty: currentListFaculty.toString() } });
+                    }} />
+                    <FormSelect multiple ref={e => this.listLoaiSinhVien = e} data={SelectAdapter_DmLoaiSinhVienV2} label='Lọc theo loại SV' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListLoaiSinhVien = currentFilter.listLoaiSinhVien?.split(',') || [];
+                        if (value.selected) {
+                            currentListLoaiSinhVien.push(value.id);
+                        } else currentListLoaiSinhVien = currentListLoaiSinhVien.filter(item => item != value.id);
+                        this.setState({ filter: { ...currentFilter, listLoaiSinhVien: currentListLoaiSinhVien.toString() } });
+                    }} />
+                    <FormSelect multiple ref={e => this.listTinhTrangSinhVien = e} data={SelectAdapter_DmTinhTrangSinhVienV2} label='Lọc theo tình trạng SV' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListTinhTrangSinhVien = currentFilter.listTinhTrangSinhVien?.split(',') || [];
+                        if (value.selected) {
+                            currentListTinhTrangSinhVien.push(value.id);
+                        } else currentListTinhTrangSinhVien = currentListTinhTrangSinhVien.filter(item => item != value.id);
+                        this.setState({ filter: { ...currentFilter, listTinhTrangSinhVien: currentListTinhTrangSinhVien.toString() } });
+                    }} />
+                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' allowClear onChange={value => {
+                        if (value) {
+                            this.setState({ filter: { ...this.state.filter, gender: value.id } });
+                        } else this.setState({ filter: { ...this.state.filter, gender: null } });
+                    }} />
+                    <FormSelect multiple ref={e => this.listNationality = e} data={SelectAdapter_DmQuocGia} label='Lọc theo quốc tịch' className='col-md-3' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListNationality = currentFilter.listNationality?.split(',') || [];
+                        if (value.selected) {
+                            currentListNationality.push(value.id);
+                        } else currentListNationality = currentListNationality.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listNationality: currentListNationality.toString() }
+                        });
+                    }} />
+                    <FormSelect multiple ref={e => this.listEthnic = e} data={SelectAdapter_DmDanTocV2} label='Lọc theo dân tộc' className='col-md-3' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListEthnic = currentFilter.listEthnic?.split(',') || [];
+                        if (value.selected) {
+                            currentListEthnic.push(value.id);
+                        } else currentListEthnic = currentListEthnic.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listEthnic: currentListEthnic.toString() }
+                        });
+                    }} />
+                    <FormSelect multiple ref={e => this.listReligion = e} data={SelectAdapter_DmTonGiaoV2} label='Lọc theo tôn giáo' className='col-md-3' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListReligion = currentFilter.listReligion?.split(',') || [];
+                        if (value.selected) {
+                            currentListReligion.push(value.id);
+                        } else currentListReligion = currentListReligion.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listReligion: currentListReligion.toString() }
+                        });
+                    }} />
+                    <FormSelect multiple ref={e => this.listFromCity = e} data={ajaxSelectTinhThanhPho} label='Lọc theo tỉnh/thành thường trú' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListFromCity = currentFilter.listFromCity?.split(',') || [];
+                        if (value.selected) {
+                            currentListFromCity.push(value.id);
+                        } else currentListFromCity = currentListFromCity.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listFromCity: currentListFromCity.toString() }
+                        });
+                    }} />
+                    <FormSelect multiple ref={e => this.listLoaiHinhDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Lọc theo loại hình đào tạo' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            currentListLoaiHinhDaoTao = currentFilter.listLoaiHinhDaoTao?.split(',') || [];
+                        if (value.selected) {
+                            currentListLoaiHinhDaoTao.push(value.id);
+                        } else currentListLoaiHinhDaoTao = currentListLoaiHinhDaoTao.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listLoaiHinhDaoTao: currentListLoaiHinhDaoTao.toString() }
+                        });
+                    }} />
+
+                    <FormSelect multiple ref={e => this.listKhoaSinhVien = e} data={[2022, 2021, 2020, 2019, 2018]} label='Lọc theo khoá' className='col-md-4' allowClear onChange={value => {
+                        let currentFilter = Object.assign({}, this.state.filter),
+                            current = currentFilter.listKhoaSinhVien?.split(',') || [];
+                        if (value.selected) {
+                            current.push(value.id);
+                        } else current = current.filter(item => item != value.id);
+                        this.setState({
+                            filter: { ...currentFilter, listKhoaSinhVien: current.toString() }
+                        });
+                    }} />
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.setState({ filter: {} }, () => this.changeAdvancedSearch(true))} style={{ marginRight: '20px' }}>
+                        <i className='fa fa-lg fa-times' />Reset
+                    </button>
+                    <button className='btn btn-info' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                        <i className='fa fa-lg fa-search-plus' />Tìm kiếm
+                    </button>
                 </div>
             </>,
             content: <>
@@ -193,13 +267,14 @@ class AdminStudentsPage extends AdminPage {
                 }
             },
             buttons: [
-                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null
+                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null,
+                developer.login && { className: 'btn btn-success', icon: 'fa-upload', tooltip: 'Import dữ liệu sinh viên', onClick: e => e.preventDefault() || this.props.history.push('/user/students/import') }
             ]
         });
     }
 }
-const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
+const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien.dataSinhVien });
 const mapActionsToProps = {
-    getStudentsPage, loginStudentForTest
+    getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminStudentsPage);

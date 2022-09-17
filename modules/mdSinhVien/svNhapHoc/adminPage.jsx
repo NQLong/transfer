@@ -126,7 +126,10 @@ class NhapHocPage extends AdminPage {
                 <div className='col-md-6'>
                     <div className='tile'>
                         <h3 className='tile-title'>Công tác nhập học</h3>
-                        <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' />
+                        <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' onKeyDown={e => {
+                            if (e.keyCode == 13) this.checkMssv();
+                            else if (e.keyCode == 8) this.setState({ showResult: false });
+                        }} />
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-outline-primary' type='button' onClick={this.checkMssv} style={{ marginLeft: '10px' }}>
                                 <i className='fa fa-fw fa-lg fa-search'></i>Kiểm tra

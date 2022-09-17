@@ -31,7 +31,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:delete');
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write');
             resolve();
         } else resolve();
     }));
@@ -39,17 +39,23 @@ module.exports = app => {
 
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/students/list', app.permission.check('student:manage'), app.templates.admin);
+    app.get('/user/students/import', app.permission.check('developer:login'), app.templates.admin);
     app.get('/user/students/item/:mssv', app.permission.check('student:manage'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
     app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), async (req, res) => {
         try {
-            let mssv = req.session.user.data?.mssv.trim() || '';
+            let mssv = req.session.user?.studentId || '';
             const item = await app.model.fwStudents.get({ mssv });
             if (!item.image) {
                 let user = await app.model.fwUser.get({ email: item.emailTruong });
                 item.image = user?.image;
             }
+            const { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+
+            let dataHocPhi = await app.model.tcHocPhi.get({ mssv, namHoc, hocKy }, 'congNo');
+            if (dataHocPhi.congNo) item.chuaDongHocPhi = true;
+            else item.chuaDongHocPhi = false;
             //TODO: Get baohiemyte
             res.send({ item });
         } catch (error) {
@@ -57,20 +63,19 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.check('student:manage'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender } = (req.query.filter && req.query.filter != '%%%%%%%%%%%%%%%%%%') ? req.query.filter : { listFaculty: null, listFromCity: null, listEthnic: null, listNationality: null, listReligion: null, listLoaiHinhDaoTao: null, listLoaiSinhVien: null, listTinhTrangSinhVien: null, gender: null };
-        app.model.fwStudents.searchPage(pageNumber, pageSize, listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-            }
-        });
+    app.get('/api/students/page/:pageNumber/:pageSize', app.permission.orCheck('student:manage', 'tcHocPhi:manage'), async (req, res) => {
+        try {
+            const _pageNumber = parseInt(req.params.pageNumber),
+                _pageSize = parseInt(req.params.pageSize),
+                { condition, filter } = req.query;
+            const searchTerm = typeof condition === 'string' ? condition : '';
+            let page = await app.model.fwStudents.searchPage(_pageNumber, _pageSize, searchTerm, app.utils.stringify(filter));
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            const pageCondition = searchTerm;
+            res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.get('/api/students/item/:mssv', app.permission.check('student:manage'), (req, res) => {
@@ -135,6 +140,57 @@ module.exports = app => {
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
     app.fs.createFolder(app.path.join(app.publicPath, '/img/sinhVien'));
+    app.fs.createFolder(app.path.join(app.assetPath, 'image-card'));
+
+    app.uploadHooks.add('uploadAnhThe', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadAnhThe(req, fields, files, params, done), done, 'student:login'));
+
+    const uploadAnhThe = async (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData.length && fields.userData[0].startsWith('CardImage') && files.CardImage && files.CardImage.length) {
+            try {
+                let srcPath = files.CardImage[0].path;
+                if (files.CardImage[0].size > 1000 * 1000) {
+                    app.fs.deleteImage(srcPath);
+                    done && done({ error: 'Vui lòng upload ảnh kích thước nhỏ hơn 1MB!' });
+                } else {
+                    let srcPath = files.CardImage[0].path;
+                    let image = await app.jimp.read(srcPath);
+                    let extPath = app.path.extname(srcPath);
+
+                    await image.resize(113.386, 151.181); // ảnh 3 x 4
+
+                    app.fs.unlinkSync(srcPath);
+                    let user = req.session.user;
+                    const folderPath = app.path.join(app.assetPath, 'image-card', user.data.namTuyenSinh.toString());
+                    app.fs.createFolder(folderPath);
+                    let filePath = app.path.join(folderPath, `${user.studentId}${extPath}`);
+                    app.fs.deleteFile(filePath);
+                    await image.writeAsync(filePath);
+                    // await app.fs.rename(srcPath, filePath);
+                    await app.model.fwStudents.update({ mssv: user.studentId }, { anhThe: `${user.studentId}${extPath}` });
+                    done && done({ image: '/api/student/get-anh-the' });
+                }
+            } catch (error) {
+                done && done({ error });
+            }
+        }
+    };
+
+    app.get('/api/student/get-anh-the', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let user = req.session.user;
+            let item = await app.model.fwStudents.get({ mssv: user.studentId }, 'anhThe');
+            const path = app.path.join(app.assetPath, 'image-card', user.data.namTuyenSinh.toString(), item.anhThe);
+
+            if (app.fs.existsSync(path)) {
+                res.sendFile(path);
+            } else {
+                res.send({ error: 'No valid file' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 
     const uploadSinhVienImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('SinhVienImage:') && files.SinhVienImage && files.SinhVienImage.length) {
@@ -145,7 +201,7 @@ module.exports = app => {
     app.uploadHooks.add('uploadSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSinhVienImage(req, fields, files, params, done), done, 'student:login'));
 
-    app.get('/api/students-download-syll', app.permission.check('student:login'), async (req, res) => {
+    const initSyll = async (req, res, next) => {
         try {
             const source = app.path.join(__dirname, 'resource', 'syll2022.docx');
             const user = req.session.user;
@@ -203,22 +259,171 @@ module.exports = app => {
                 if (error)
                     res.send({ error });
                 else {
+                    app.fs.createFolder(app.path.join(app.assetPath, 'so-yeu-ly-lich'));
+                    app.fs.createFolder(app.path.join(app.assetPath, 'so-yeu-ly-lich', new Date().getFullYear().toString()));
+
+                    const filePdfPath = app.path.join(app.assetPath, 'so-yeu-ly-lich', new Date().getFullYear().toString(), data.mssv + '.pdf');
                     const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
+                    app.fs.writeFileSync(filePdfPath, pdfBuffer);
+
                     app.fs.deleteFile(qrCodeImage);
-                    let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, defaultEmail, defaultPassword } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
-                    app.email.normalSendEmail(defaultEmail, defaultPassword, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
-                        // Success callback
-                        console.log('Send SYLL success');
-                    }, () => {
-                        // Error callback
-                        console.log('Send SYLL failed');
-                    });
+                    next(data, pdfBuffer);
                 }
             });
         } catch (error) {
             res.send({ error });
         }
+    };
 
+    app.get('/api/students-sent-syll', app.permission.check('student:login'), async (req, res) => {
+        await initSyll(req, res, async (data, pdfBuffer) => {
+            let emailData = await app.model.svSetting.getEmail();
+            if (emailData.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+            let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
+            [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml] = [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml].map(item => item?.replaceAll('{ten}', `${data.hoTen}`));
+            app.email.normalSendEmail(emailData.email, emailData.password, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
+                // Success callback
+                app.model.svSetting.updateLimit(data.index);
+                res.end();
+            }, (error) => {
+                // Error callback
+                res.send({ error });
+            });
+        });
+    });
+
+    app.uploadHooks.add('FwSinhVienImport', (req, fields, files, params, done) =>
+        app.permission.has(req, () => sinhVienImportHandler(fields, files, done), done, 'developer:login'));
+
+
+    const sinhVienImportHandler = async (fields, files, done) => {
+        const khuVucMapper = {
+            '1': 'KV1',
+            '2': 'KV2',
+            '2NT': 'KV2-NT',
+            '3': 'KV3',
+        };
+        const maPhuongThuc = [];
+        const validateRow = async (row) => {
+            const sinhVien = await app.model.fwStudents.get({ mssv: row.mssv });
+            if (sinhVien) throw `Sinh viên ${row.mssv} đã tồn tại`;
+
+            const nganh = await app.model.dtNganhDaoTao.get({ maNganh: row.maNganh });
+            if (!nganh) throw `Sinh viên ${row.mssv}-${row.cmnd} có mã ngành không hợp lệ (${row.maNganh})`;
+
+            row.nganh = nganh;
+            row.khuVuc = khuVucMapper[row.khuVuc];
+
+            if (row.doiTuong == 0 || !row.doiTuong) row.doiTuong = '00';
+            if (!maPhuongThuc.includes(row.maPhuongThuc)) {
+                maPhuongThuc.push(row.maPhuongThuc);
+                if (!await app.model.dmPhuongThucTuyenSinh.get({ ma: row.maPhuongThuc })) {
+                    await app.model.dmPhuongThucTuyenSinh.create({ ma: row.maPhuongThuc, kichHoat: 1, ten: row.phuongThuc });
+                }
+            }
+        };
+        let worksheet = null, lastModified = new Date().getTime();
+        if (fields.userData && fields.userData[0] && fields.userData[0] == 'FwSinhVienImport' && files.FwSinhVienImport && files.FwSinhVienImport.length) {
+            const srcPath = files.FwSinhVienImport[0].path;
+            let workbook = app.excel.create();
+            workbook = await app.excel.readFile(srcPath);
+            if (workbook) {
+                app.fs.deleteFile(srcPath);
+                worksheet = workbook.getWorksheet(1);
+                if (worksheet) {
+                    const items = [];
+                    const errors = [];
+                    let sum = 0;
+                    let index = 2;
+                    try {
+                        while (true) {
+                            if (!worksheet.getCell('A' + index).value) {
+                                break;
+                            } else {
+                                const
+                                    mssv = `${worksheet.getCell('A' + index).value}`.trim(),
+                                    cmnd = `${worksheet.getCell('B' + index).value}`.trim(),
+                                    ho = worksheet.getCell('C' + index).value,
+                                    ten = worksheet.getCell('D' + index).value,
+                                    maNganh = worksheet.getCell('F' + index).value,
+                                    toHop = worksheet.getCell('H' + index).value,
+                                    maPhuongThuc = worksheet.getCell('I' + index).value,
+                                    phuongThuc = worksheet.getCell('J' + index).value,
+                                    diemXetTuyen = worksheet.getCell('K' + index).value,
+                                    diemThi = worksheet.getCell('O' + index).value,
+                                    gioiTinh = worksheet.getCell('M' + index).value,
+                                    ngaySinh = worksheet.getCell('N' + index).value,
+                                    khuVuc = worksheet.getCell('P' + index).value,
+                                    doiTuong = worksheet.getCell('Q' + index).value,
+                                    emailTruong = worksheet.getCell('R' + index).value;
+                                const row = { mssv, phuongThuc, diemThi, cmnd, ho, ten, maNganh, toHop, maPhuongThuc, diemXetTuyen, gioiTinh, ngaySinh, khuVuc, doiTuong, emailTruong, nganh: {} };
+                                await validateRow(row);
+                                index++;
+                                items.push(row);
+                            }
+                        }
+                    } catch (error) {
+                        return done({ error });
+                    }
+                    await Promise.all(items.map(async row => {
+                        try {
+                            const ngaySinhData = row.ngaySinh.split('/');
+                            const ngaySinh = new Date(`${ngaySinhData[1]}-${ngaySinhData[0]}-${ngaySinhData[2]}`);
+                            const isCLC = row.maNganh.toLowerCase().includes('clc');
+                            const res = await app.model.fwStudents.create({
+                                ho: row.ho, ten: row.ten, ngaySinh: ngaySinh.getTime(),
+                                gioiTinh: row.gioiTinh.toLowerCase() == 'nam' ? 1 : 2, loaiSinhVien: 'L1', maNganh: row.maNganh,
+                                tinhTrang: 3, emailTruong: row.emailTruong, khoa: row.nganh.khoa, phuongThucTuyenSinh: row.maPhuongThuc,
+                                maKhoa: isCLC ? 'CLC2022' : 'DHCQ2022', loaiHinhDaoTao: isCLC ? 'CLC' : 'CQ',
+                                cmnd: row.cmnd, namTuyenSinh: 2022, mssv: row.mssv, bacDaoTao: 'DH', doiTuongTuyenSinh: row.doiTuong,
+                                khuVucTuyenSinh: row.khuVuc, lastModified, canEdit: 1, diemThi: row.diemThi
+                            });
+                            sum += 1;
+                            return res;
+                        } catch (error) {
+                            console.error(error);
+                            row.error = error;
+                            errors.push(row);
+                        }
+                    }));
+                    done({ errors, sum });
+
+                } else {
+                    done({ error: 'No worksheet!' });
+                }
+            } else done({ error: 'No workbook!' });
+        }
+    };
+
+    app.get('/api/students-download-syll', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let user = req.session.user,
+                { studentId, data } = user;
+
+            const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', data.namTuyenSinh?.toString() || new Date().getFullYear().toString(), studentId + '.pdf');
+            if (app.fs.existsSync(filePath)) {
+                res.sendFile(filePath);
+            } else {
+                initSyll(req, res, () => res.sendFile(filePath));
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/student/get-syll', app.permission.check('student:write'), async (req, res) => {
+        try {
+            let { mssv, namTuyenSinh } = req.query;
+            if (parseInt(namTuyenSinh) < new Date().getFullYear()) return res.send({ error: 'Không thuộc đối tượng nhập học!' });
+            const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', namTuyenSinh?.toString() || new Date().getFullYear().toString(), mssv.toString() + '.pdf');
+            if (app.fs.existsSync(filePath)) {
+                res.sendFile(filePath);
+            } else {
+                res.send({ error: 'No valid file!' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
     });
 };

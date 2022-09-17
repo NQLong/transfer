@@ -1,11 +1,12 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import sinhVien from './redux';
+import dataSinhVien from './redux';
 
 export default {
     redux: {
-        sinhVien
+        parent: 'sinhVien',
+        reducers: { dataSinhVien }
     },
     routes: [
         {
@@ -17,8 +18,8 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/students/item/:mssv',
-            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+            path: '/user/students/import',
+            component: Loadable({ loading: Loading, loader: () => import('./importPage') })
         }
     ],
 };
