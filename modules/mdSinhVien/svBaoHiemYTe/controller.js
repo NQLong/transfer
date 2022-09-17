@@ -246,7 +246,7 @@ module.exports = app => {
             else {
                 let matTruocThe = item.matTruocThe,
                     path = app.path.join(app.assetPath, '/bhyt/front', item.namDangKy.toString(), item.mssv, matTruocThe);
-                if (app.fs.existsSync(path)) res.send({ path });
+                if (app.fs.existsSync(path)) res.sendFile(path);
                 else res.send({ error: 'No value returned' });
             }
         } catch (error) {
