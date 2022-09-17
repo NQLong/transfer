@@ -183,7 +183,7 @@ class UserPage extends AdminPage {
                         <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >
                             <div>
                                 <div>Miễn giảm: <b>{current.mienGiam || 'Không'}</b> </div>
-                                {/* <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div> */}
+                                <div>Thời gian thu học phí: 00:00:00 19/9/2022 - 23:59:59 30/9/2022</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <div>Tổng học phí: <b>{T.numberDisplay(Number(current.hocPhi))} VNĐ </b></div>

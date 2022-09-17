@@ -215,11 +215,11 @@ class SinhVienPage extends AdminPage {
         e.preventDefault();
         const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
             this.setState({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
-                this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
+                setTimeout(() => this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
                     if (isConfirm) {
                         this.props.history.push('/user/hoc-phi');
                     }
-                });
+                }), 3000);
             });
         });
         const confirmExport = () => T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường?', 'info', true, isConfirm => {

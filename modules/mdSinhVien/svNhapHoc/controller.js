@@ -156,6 +156,11 @@ module.exports = app => {
         res.end();
     });
 
+    app.get('/api/ctsv/get-ctsv-data', app.permission.check('developer:login'), async (req, res) => {
+        let data = await app.model.svSetting.getEmail();
+        res.send({ data });
+    });
+
     app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
         try {
             const mssv = req.body.mssv;
