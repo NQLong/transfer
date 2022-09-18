@@ -179,21 +179,6 @@ export function adminDownloadSyll(mssv, namTuyenSinh) {
     };
 }
 
-export function studentDownloadSyll(done) {
-    return () => {
-        const url = '/api/students-download-syll';
-        T.get(url, result => {
-            if (result.error) {
-                T.notify(result.error.message || 'Lỗi hệ thống', 'danger');
-                console.error(result.error);
-            } else {
-                T.download(url, 'SYLL.pdf');
-                done && done();
-            }
-        });
-    };
-}
-
 export function loginStudentForTest(data) {
     return () => {
         const url = '/api/students-login-test';

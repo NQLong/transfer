@@ -273,7 +273,6 @@ module.exports = app => {
                     const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
                     app.fs.writeFileSync(filePdfPath, pdfBuffer);
-
                     app.fs.deleteFile(qrCodeImage);
                     next(data, pdfBuffer);
                 }
@@ -411,7 +410,8 @@ module.exports = app => {
                 { studentId, data } = user;
 
             const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', data.namTuyenSinh?.toString() || new Date().getFullYear().toString(), studentId + '.pdf');
-            initSyll(req, res, () => res.sendFile(filePath));
+            if (app.fs.existsSync(filePath)) res.download(filePath, `SYLL_${studentId}.pdf`);
+            else initSyll(req, res, () => res.download(filePath, `SYLL_${studentId}.pdf`));
         } catch (error) {
             res.send({ error });
         }

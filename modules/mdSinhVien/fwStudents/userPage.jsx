@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormTextBox, FormSelect, FormImageBox, FormDatePicker, FormCheckbox } from 'view/component/AdminPage';
-import { getSinhVienEditUser, updateStudentUser, downloadWord, studentDownloadSyll } from './redux';
+import { getSinhVienEditUser, updateStudentUser, downloadWord } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
@@ -241,7 +241,7 @@ class SinhVienPage extends AdminPage {
                             loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
                             successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
                             failText: 'Hệ thống sẽ tự động tải về sơ yếu lý lịch sau vài giây!'
-                        }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), () => this.props.studentDownloadSyll(saveThongTin), saveThongTin);
+                        }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), this.downloadSyll, saveThongTin);
                 }
             });
         }
@@ -249,7 +249,8 @@ class SinhVienPage extends AdminPage {
     }
 
     downloadSyll = () => {
-        this.props.studentDownloadSyll();
+        T.alert('Vui lòng chờ trong giấy lát', 'info', false);
+        T.download('/api/students-download-syll');
     }
 
     render() {
@@ -377,6 +378,6 @@ class SinhVienPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
 const mapActionsToProps = {
-    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord, getSvSettingKeys, getSvBaoHiemYTe, studentDownloadSyll
+    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord, getSvSettingKeys, getSvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(SinhVienPage);
