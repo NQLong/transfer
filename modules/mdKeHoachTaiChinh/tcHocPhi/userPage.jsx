@@ -170,11 +170,11 @@ class UserPage extends AdminPage {
                                 }
                                 {
                                     current.congNo ?
-                                        (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
+                                        <Tooltip title='Thanh toán' placement='top' arrow>
                                             <button disabled={this.state.chuaDongBhyt} className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                                 Thanh toán
                                             </button>
-                                        </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
+                                        </Tooltip> : <b>Đã thanh toán đủ.</b>
                                 }
                             </div>
                         </div>

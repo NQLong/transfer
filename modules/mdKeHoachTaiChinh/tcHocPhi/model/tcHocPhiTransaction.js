@@ -3,6 +3,13 @@ module.exports = app => {
     // app.model.tcHocPhiTransaction.foo = () => { };
     app.model.tcHocPhiTransaction.notify = async (data) => {
         try {
+            app.notification.send({
+                toEmail: student.emailTruong,
+                title: 'Thanh toán thành công',
+                subTitle: `Số tiền: ${amount.toString().numberDisplay()}, HK${hocKy}-${namHoc} lúc ${app.date.viDateFormat(app.date.fullFormatToDate(payDate))}`,
+                icon: 'fa-usd', iconColor: 'success'
+            });
+
             const SMS_CONFIRM_SUCCESS_TRANS_ID = 1; //Temporary
             if (student.dienThoaiCaNhan) {
                 let smsContent = await app.model.fwSmsParameter.replaceAllContent(SMS_CONFIRM_SUCCESS_TRANS_ID, student.mssv);
@@ -22,13 +29,6 @@ module.exports = app => {
                 .replaceAll('{amount}', amount.toString().numberDisplay())
                 .replaceAll('{support_phone}', tcSupportPhone) || '');
             app.email.normalSendEmail(email, emailPassword, student.emailTruong, '', hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, null);
-
-            app.notification.send({
-                toEmail: student.emailTruong,
-                title: 'Thanh toán thành công',
-                subTitle: `Số tiền: ${amount.toString().numberDisplay()}, HK${hocKy}-${namHoc} lúc ${app.date.viDateFormat(app.date.fullFormatToDate(payDate))}`,
-                icon: 'fa-usd', iconColor: 'success'
-            });
         } catch (error) {
             console.error('Send email and sms tcHocPhi fail!');
         }
