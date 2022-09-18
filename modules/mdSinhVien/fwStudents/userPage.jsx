@@ -228,18 +228,24 @@ class SinhVienPage extends AdminPage {
                     2000);
             });
         });
-        if (!this.state.daDangKyBhyt) {
-            T.notify('Đăng ký tham gia BHYT trước khi hoàn tất cập nhật', 'danger');
-            this.baoHiemModal.show(this.getData);
-        } else {
-            T.confirmLoading('LƯU Ý',
-                '<div>Vui lòng đảm bảo bạn ĐÃ HOÀN THIỆN thông tin cá nhân trước khi tạo file sơ yếu lý lịch!<br/> Bạn sẽ không thể thay đổi thông tin cá nhân sau khi chọn \"Đồng ý\"</div>', 'info',
-                {
-                    loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
-                    successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
-                    failText: 'Hệ thống sẽ tự động tải về sơ yếu lý lịch sau vài giây!'
-                }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), () => this.props.studentDownloadSyll(saveThongTin), saveThongTin);
+        const studentData = this.getAndValidate();
+        if (studentData) {
+            this.props.updateStudentUser({ ...studentData, lastModified: new Date().getTime() }, () => {
+                if (!this.state.daDangKyBhyt) {
+                    T.notify('Đăng ký tham gia BHYT trước khi hoàn tất cập nhật', 'danger');
+                    this.baoHiemModal.show();
+                } else {
+                    T.confirmLoading('LƯU Ý',
+                        '<div>Vui lòng đảm bảo bạn ĐÃ HOÀN THIỆN thông tin cá nhân trước khi tạo file sơ yếu lý lịch!<br/> Bạn sẽ không thể thay đổi thông tin cá nhân sau khi chọn \"Đồng ý\"</div>', 'info',
+                        {
+                            loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
+                            successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
+                            failText: 'Hệ thống sẽ tự động tải về sơ yếu lý lịch sau vài giây!'
+                        }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), () => this.props.studentDownloadSyll(saveThongTin), saveThongTin);
+                }
+            });
         }
+
     }
 
     downloadSyll = () => {
