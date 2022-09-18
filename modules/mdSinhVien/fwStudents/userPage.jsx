@@ -82,9 +82,11 @@ class SinhVienPage extends AdminPage {
         this.hoTenNguoiLienLac.value(data.hoTenNguoiLienLac ? data.hoTenNguoiLienLac : '');
         this.sdtNguoiLienLac.value(data.sdtNguoiLienLac ? data.sdtNguoiLienLac : '');
         data.ngayVaoDang && this.setState({ isDangVien: true }, () => {
+            this.isDangVien.value();
             this.ngayVaoDang.value(data.ngayVaoDang);
         });
         data.ngayVaoDoan && this.setState({ isDoanVien: true }, () => {
+            this.isDoanVien.value();
             this.ngayVaoDoan.value(data.ngayVaoDoan);
         });
     };
