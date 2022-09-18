@@ -122,6 +122,14 @@ export const SelectAdapter_FwStudent = {
     fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
 };
 
+export const SelectAdapter_FwNamTuyenSinh = {
+    ajax: true,
+    url: '/api/students/nam-tuyen-sinh',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.namTuyenSinh, text: `${item.namTuyenSinh}` })) : [] }),
+    // fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
+};
+
 
 
 //User -----------------------------------------------------------------------------------------------

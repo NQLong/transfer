@@ -6037,7 +6037,8 @@
             "modelName": "fwStudents",
             "methods": {
                 "FW_STUDENT_SEARCH_PAGE": "searchPage",
-                "FW_STUDENT_GET_DATA": "getData"
+                "FW_STUDENT_GET_DATA": "getData",
+                "FW_STUDENT_GET_NAM_TUYEN_SINH_LIST": "getNamTuyenSinhList"
             },
             "columns": {
                 "HO": {
@@ -6460,13 +6461,6 @@
                     "nullable": true,
                     "size": 10
                 },
-                "DIEM_THI": {
-                    "value": "diemThi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
                 "DOI_TUONG_CHINH_SACH": {
                     "value": "doiTuongChinhSach",
                     "dataType": "NVARCHAR2",
@@ -6501,6 +6495,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "DIEM_THI": {
+                    "value": "diemThi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,2"
                 }
             },
             "primaryKeys": [
