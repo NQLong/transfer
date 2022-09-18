@@ -277,20 +277,22 @@ module.exports = app => {
     };
 
     app.get('/api/students-sent-syll', app.permission.check('student:login'), async (req, res) => {
-        await initSyll(req, res, async (data, pdfBuffer) => {
-            let emailData = await app.model.svSetting.getEmail();
-            if (emailData.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
-            let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
-            [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml] = [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml].map(item => item?.replaceAll('{ten}', `${data.hoTen}`));
-            app.email.normalSendEmail(emailData.email, emailData.password, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
-                // Success callback
-                app.model.svSetting.updateLimit(data.index);
-                res.end();
-            }, (error) => {
-                // Error callback
-                res.send({ error });
-            });
+        await initSyll(req, res, async () => {
+            res.send({ error: 'Close mail temporary' });
         });
+        //     let emailData = await app.model.svSetting.getEmail();
+        //     if (emailData.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+        //     let { ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml', 'defaultEmail', 'defaultPassword');
+        //     [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml] = [ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml].map(item => item?.replaceAll('{ten}', `${data.hoTen}`));
+        //     app.email.normalSendEmail(emailData.email, emailData.password, data.emailTruong, '', ctsvEmailGuiLyLichTitle, ctsvEmailGuiLyLichEditorText, ctsvEmailGuiLyLichEditorHtml, [{ filename: `SYLL_${data.mssv}_${data.dd}/${data.mm}/${data.yyyy}.pdf`, content: pdfBuffer, encoding: 'base64' }], () => {
+        //         // Success callback
+        //         app.model.svSetting.updateLimit(data.index);
+        //         res.end();
+        //     }, (error) => {
+        //         // Error callback
+        //         res.send({ error });
+        //     });
+        // });
     });
 
     app.uploadHooks.add('FwSinhVienImport', (req, fields, files, params, done) =>
@@ -402,11 +404,7 @@ module.exports = app => {
                 { studentId, data } = user;
 
             const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', data.namTuyenSinh?.toString() || new Date().getFullYear().toString(), studentId + '.pdf');
-            if (app.fs.existsSync(filePath)) {
-                res.sendFile(filePath);
-            } else {
-                initSyll(req, res, () => res.sendFile(filePath));
-            }
+            initSyll(req, res, () => res.sendFile(filePath));
         } catch (error) {
             res.send({ error });
         }
