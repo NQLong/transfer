@@ -23,10 +23,12 @@ module.exports = app => {
         const title = config.hocPhiEmailNhacNhoTitle.replace('{hoc_ky}', '1').replace('{nam_hoc}', '2022');
         const html = config.hocPhiEmailNhacNhoEditorHtml.replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.normalizedName().trim()).replace('{mssv}', sinhVien.mssv).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail);
         const text = config.hocPhiEmailNhacNhoEditorText.replace('{name}', `${sinhVien.ho} ${sinhVien.ten}`.normalizedName().trim()).replace('{mssv}', sinhVien.mssv).replace('{tc_address}', config.tcAddress).replace('{tc_phone}', config.tcPhone).replace('{support_phone}', config.tcSupportPhone).replace('{tc_email}', config.tcEmail);
-        if (!app.isDebug)
+        if (!app.isDebug) {
+            // app.service.emailService.send(email.email, email.password, sinhVien.emailTruong, [], (app.isDebug ? 'TEST: ' : '') + title, text, html, []); //TODO: Long
             await app.email.normalSendEmail(email.email, email.password, sinhVien.emailTruong, [], (app.isDebug ? 'TEST: ' : '') + title, text, html, []);
-        else
+        } else {
             await app.email.normalSendEmail(email.email, email.password, 'nqlong.dev@gmail.com', [], (app.isDebug ? 'TEST: ' : '') + title, text, html, [{ filename, content, encoding: 'base64' }]);
+        }
     };
 
 
