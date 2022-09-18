@@ -28,12 +28,65 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/student/bhyt', app.permission.check('student:login'), async (req, res) => {
+    app.get('/api/student/bhyt', app.permission.orCheck('student:login', 'developer:login'), async (req, res) => {
         try {
-            const user = req.session.user,
-                { mssv } = user.data;
+            let user = req.session.user, mssv;
+            if (req.session.user.permissions.includes('developer:login'))
+                mssv = req.query.mssv;
+            else mssv = user.data.mssv;
             const item = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
             res.send({ item });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+
+    app.post('/api/student/admin/bhyt', app.permission.orCheck('developer:login'), async (req, res) => {
+        try {
+            let user = req.session.user,
+                thoiGian = Date.now();
+            const data = req.body.data;
+            const mssv = data.mssv,
+                emailTruong = user.email;
+
+            const mapperDienDong = { 12: 23, 15: 41 },
+                mapperSoTien = { 15: 704025, 12: 563220, 0: 0 };
+
+            let item = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
+
+            //chỉ cập nhật cho sinh viên đã đăng ký bảo hiểm y tế
+            if (!item || new Date(item.thoiGian).getFullYear() != new Date().getFullYear()) {
+                throw 'Sinh viên chưa tham gia bảo hiểm y tế';
+            }
+
+            let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+            console.log(data);
+            if (data.dienDong != null && item.dienDong != data.dienDong) {
+                // nếu người dùng được miến trước đó thì không có loại phí
+                let loaiPhi = { soTien: 0 };
+                if (mapperDienDong[item.dienDong])
+                    loaiPhi = await app.model.tcHocPhiDetail.get({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[item.dienDong] });
+
+                const diff = mapperSoTien[data.dienDong] - loaiPhi.soTien;
+
+                //Tạm không cho sinh viên thay đổi gói bhyt nếu đã đóng tiền
+                let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
+                if (!currentFee || (currentFee.hocPhi != currentFee.congNo)) throw 'Sinh viên không đủ điều kiện để thay đổi Bảo hiểm y tế!';
+                const { hocPhi, congNo } = currentFee;
+                await app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
+                    hocPhi: parseInt(hocPhi) + diff,
+                    congNo: parseInt(congNo) + diff,
+                    ngayTao: thoiGian
+                });
+                if (loaiPhi && loaiPhi.soTien != 0)
+                    await app.model.tcHocPhiDetail.delete({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[item.dienDong] });
+                if (mapperDienDong[data.dienDong])
+                    await app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian });
+                await app.model.svBaoHiemYTe.update({ id: item.id }, { dienDong: data.dienDong, userModified: emailTruong, thoiGian });
+                res.send({});
+            }
+
         } catch (error) {
             res.send({ error });
         }
@@ -97,6 +150,7 @@ module.exports = app => {
                 }
             }
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
@@ -160,6 +214,7 @@ module.exports = app => {
                 }
             }
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
