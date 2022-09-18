@@ -225,8 +225,14 @@ module.exports = app => {
                 data.ngayVaoDoan = '';
             }
             data.diemThi = Number(data.diemThi).toFixed(2);
-            data.ngaySinhCha = new Date(data.ngaySinhCha).getFullYear();
-            data.ngaySinhMe = new Date(data.ngaySinhMe).getFullYear();
+            data.ngaySinhCha = data.ngaySinhCha ? new Date(data.ngaySinhCha).getFullYear() : '';
+            data.tenCha = data.tenCha || '';
+            data.ngheNghiepCha = data.ngheNghiepCha || '';
+            data.sdtCha = data.sdtCha || '';
+            data.ngaySinhMe = data.ngaySinhMe ? new Date(data.ngaySinhMe).getFullYear() : '';
+            data.tenMe = data.tenMe || '';
+            data.ngheNghiepMe = data.ngheNghiepMe || '';
+            data.sdtMe = data.sdtMe || '';
             data.thuongTru = (data.soNhaThuongTru ? data.soNhaThuongTru + ', ' : '')
                 + (data.xaThuongTru ? data.xaThuongTru + ', ' : '')
                 + (data.huyenThuongTru ? data.huyenThuongTru + ', ' : '')
