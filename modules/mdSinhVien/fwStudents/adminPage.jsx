@@ -182,7 +182,6 @@ class AdminStudentsPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    {/*listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender*/}
                     <FormSelect multiple ref={e => this.listFaculty = e} data={SelectAdapter_DmDonViFaculty_V2} label='Lọc theo khoa' className='col-md-4' allowClear onChange={value => {
                         let currentFilter = Object.assign({}, this.state.filter),
                             currentListFaculty = currentFilter.listFaculty?.split(',') || [];

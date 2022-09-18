@@ -237,7 +237,7 @@ class SinhVienPage extends AdminPage {
                 {
                     loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
                     successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
-                    failText: 'Hệ thống sẽ tự động sơ yếu lý lịch sau vài giây!'
+                    failText: 'Hệ thống sẽ tự động tải về sơ yếu lý lịch sau vài giây!'
                 }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), () => this.props.studentDownloadSyll(saveThongTin), saveThongTin);
         }
     }
@@ -286,7 +286,7 @@ class SinhVienPage extends AdminPage {
                             </div>
                             <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
 
-                            <FormTextBox type='number' autoFormat={false} ref={e => this.cmnd = e} label='CCCD' className='col-md-4' required readOnly={readOnly} />
+                            <FormTextBox ref={e => this.cmnd = e} label='CCCD/Mã định danh' className='col-md-4' required readOnly={readOnly} />
                             <FormDatePicker type='date-mask' ref={e => this.cmndNgayCap = e} label='Ngày cấp' className='col-md-4' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp' className='col-md-4' required readOnly={readOnly} />
                             <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} required readOnly={readOnly} />
