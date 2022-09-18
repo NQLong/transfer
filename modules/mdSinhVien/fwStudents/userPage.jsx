@@ -114,7 +114,6 @@ class SinhVienPage extends AdminPage {
                     cmndNgayCap: this.getValue(this.cmndNgayCap, 'date'),
                     cmndNoiCap: this.getValue(this.cmndNoiCap),
                     noiSinhMaTinh: this.getValue(this.noiSinhMaTinh),
-                    ngaySinh: this.getValue(this.ngaySinh, 'date'),
                     danToc: this.getValue(this.danToc),
                     dienThoaiCaNhan: this.getValue(this.dienThoaiCaNhan),
                     emailCaNhan,
@@ -339,7 +338,7 @@ class SinhVienPage extends AdminPage {
                             <ul style={{}}>
                                 <li>Vui lòng tải lên ảnh <b className='text-danger'>đúng kích thước (3 x 4cm hay 113,386 x 151,181px)</b>.</li>
                                 <li>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>đây</a></li>
-                                <li>Ảnh phải có nền 1 màu, chi tiết rõ nét, nghiêm túc.</li>
+                                <li>Ảnh phải có nền 1 màu (trắng hoặc xanh), chi tiết rõ nét, nghiêm túc.</li>
                                 <li>Đây là ảnh phục vụ cho công tác in thẻ sinh viên, đề nghị sinh viên chịu trách nhiệm với ảnh thẻ mình đã tải lên.</li>
                             </ul>
                         </div>
