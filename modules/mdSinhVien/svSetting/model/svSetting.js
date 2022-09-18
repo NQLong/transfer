@@ -74,6 +74,7 @@ module.exports = app => {
     app.model.svSetting.getEmail = () => new Promise(resolve => {
         app.database.redis.get('ctsvMail', async (_, value) => {
             let listMail = value.split(',').map(item => parseInt(item));
+            console.log(listMail);
             let index = listMail.findIndex(item => item > 0) + 1;
             const { defaultEmail, defaultPassword } = await app.model.svSetting.getValue('defaultEmail', 'defaultPassword');
             const email = `${defaultEmail}${('0' + index).slice(-2)}@hcmussh.edu.vn`;

@@ -148,7 +148,6 @@ export function updateStudentUser(changes, done) {
                 T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
-                T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
                 done && done(data.item);
                 dispatch({ type: sinhVienUserGet, item: data.item });
             }
