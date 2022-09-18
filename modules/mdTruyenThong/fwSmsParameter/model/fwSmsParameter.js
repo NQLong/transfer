@@ -57,6 +57,7 @@ module.exports = app => {
         Object.keys(colMapper).forEach(key => {
             let data = returnData[colMapper[key]];
             if (key == '{trans_date}') content = content.replaceAll(key, app.date.dateTimeFormat(new Date(parseInt(data)), 'HH:MM:ss dd/mm/yyyy'));
+            else if (key == '{nam_hoc}') content = content.replaceAll(key, '22-23'); //TODO: Thay chỗ này sau
             else if (key == '{hoc_phi}') content = content.replaceAll(key, data.toString().numberDisplay());
             else content = content.replaceAll(key, returnData[colMapper[key]]);
         });

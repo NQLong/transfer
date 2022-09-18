@@ -3,6 +3,8 @@ module.exports = app => {
     // app.model.tcHocPhiTransaction.foo = () => { };
     app.model.tcHocPhiTransaction.notify = async (data) => {
         try {
+            const { student, hocKy, namHoc, amount, payDate } = data;
+
             app.notification.send({
                 toEmail: student.emailTruong,
                 title: 'Thanh toán thành công',
@@ -16,7 +18,6 @@ module.exports = app => {
                 app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
             }
 
-            const { student, hocKy, namHoc, amount, payDate } = data;
             let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
             [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml] = [hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml].map(item => item?.replaceAll('{name}', `${student.ho} ${student.ten}`)
                 .replaceAll('{hoc_ky}', hocKy)
