@@ -426,4 +426,13 @@ module.exports = app => {
             res.send({ error });
         }
     });
+
+    app.get('/api/students/nam-tuyen-sinh', app.permission.orCheck('student:write', 'tcHocPhi:write'), async (req, res) => {
+        try {
+            const data = await app.model.fwStudents.getNamTuyenSinhList();
+            res.send({ items: data.rows || [] });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
 };

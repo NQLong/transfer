@@ -6037,7 +6037,8 @@
             "modelName": "fwStudents",
             "methods": {
                 "FW_STUDENT_SEARCH_PAGE": "searchPage",
-                "FW_STUDENT_GET_DATA": "getData"
+                "FW_STUDENT_GET_DATA": "getData",
+                "FW_STUDENT_GET_NAM_TUYEN_SINH_LIST": "getNamTuyenSinhList"
             },
             "columns": {
                 "HO": {
