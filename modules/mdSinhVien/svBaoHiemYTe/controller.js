@@ -61,7 +61,6 @@ module.exports = app => {
             }
 
             let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
-            console.log(data);
             if (data.dienDong != null && item.dienDong != data.dienDong) {
                 // nếu người dùng được miến trước đó thì không có loại phí
                 let loaiPhi = { soTien: 0 };
@@ -84,8 +83,8 @@ module.exports = app => {
                 if (mapperDienDong[data.dienDong])
                     await app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian });
                 await app.model.svBaoHiemYTe.update({ id: item.id }, { dienDong: data.dienDong, userModified: emailTruong, thoiGian });
-                res.send({});
             }
+            res.send({});
 
         } catch (error) {
             res.send({ error });
