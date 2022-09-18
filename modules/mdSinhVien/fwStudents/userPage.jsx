@@ -190,22 +190,31 @@ class SinhVienPage extends AdminPage {
         return '';
     }
 
+    getData = (done) => {
+        const studentData = this.getAndValidate();
+        if (studentData) {
+            this.props.updateStudentUser({ ...studentData, lastModified: new Date().getTime() }, done);
+        }
+    }
+
     save = () => {
-        const getData = () => {
-            const studentData = this.getAndValidate();
-            if (studentData) {
-                this.props.updateStudentUser({ ...studentData, lastModified: new Date().getTime() }, () => {
-                    this.setState({ lastModified: new Date().getTime() });
-                    this.state.isTanSinhVien && this.state.chuaDongHocPhi && this.props.history.push('/user/hoc-phi');
-                });
-            }
-        };
+        // const goToHocPhi = () => T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
+        //     if (isConfirm) {
+        //         this.props.history.push('/user/hoc-phi');
+        //     }
+        // });
         T.confirm('CẢNH BÁO', 'Bạn có chắc chắn muốn lưu thay đổi thông tin cá nhân?', 'warning', true, isConfirm => {
             if (isConfirm) {
                 if (this.state.daDangKyBhyt) {
-                    getData();
+                    this.getData(() => {
+                        T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
+                        // this.state.isTanSinhVien && this.state.chuaDongHocPhi && goToHocPhi();
+                    });
                 } else {
-                    this.baoHiemModal.show(getData);
+                    this.baoHiemModal.show(() => this.getData(() => {
+                        T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
+                        // this.state.isTanSinhVien && this.state.chuaDongHocPhi && goToHocPhi();
+                    }));
                 }
             }
         });
@@ -214,42 +223,27 @@ class SinhVienPage extends AdminPage {
     downloadWord = (e) => {
         e.preventDefault();
         const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
-            this.setState({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
-                this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
-                    if (isConfirm) {
-                        this.props.history.push('/user/hoc-phi');
-                    }
-                });
+            this.setState({ ngayNhapHoc: -1, canEdit: 0 }, () => {
+                setTimeout(() => this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.alert('Bạn đã hoàn tất cập nhật lý lịch sinh viên', 'success', false, 2000),
+                    2000);
             });
         });
-        const confirmExport = () => T.confirm('XÁC NHẬN', 'Sinh viên cam đoan những lời khai trên là đúng sự thật. Nếu có gì sai tôi xin chịu trách nhiệm theo Quy chế hiện hành của Bộ GD&DT, ĐHQG-HCM và Nhà trường?', 'info', true, isConfirm => {
-            if (isConfirm) {
-                this.props.downloadWord(result => {
-                    if (result.error) {
-                        T.alert('Có lỗi trong quá trình gửi email! Trang web sẽ tự động tải SYLL sau vài giây!', 'error', null, 1000);
-                        setTimeout(() => this.props.studentDownloadSyll(saveThongTin), 1000);
-                    } else {
-                        T.confirm('HOÀN TẤT', 'Bản Sơ yếu lý lịch đã được gửi đến email sinh viên. Vui lòng kiểm tra (kể cả ở mục spam, thư rác)!', 'success', false, saveThongTin);
-                    }
-                });
-            }
-        });
-
-        if (this.state.daDangKyBhyt) {
-            confirmExport();
+        if (!this.state.daDangKyBhyt) {
+            T.notify('Đăng ký tham gia BHYT trước khi hoàn tất cập nhật', 'danger');
+            this.baoHiemModal.show(this.getData);
         } else {
-            this.baoHiemModal.show(confirmExport);
+            T.confirmLoading('LƯU Ý',
+                '<div>Vui lòng đảm bảo bạn ĐÃ HOÀN THIỆN thông tin cá nhân trước khi tạo file sơ yếu lý lịch!<br/> Bạn sẽ không thể thay đổi thông tin cá nhân sau khi chọn \"Đồng ý\"</div>', 'info',
+                {
+                    loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
+                    successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
+                    failText: 'Hệ thống sẽ tự động sơ yếu lý lịch sau vài giây!'
+                }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), () => this.props.studentDownloadSyll(saveThongTin), saveThongTin);
         }
     }
 
     downloadSyll = () => {
-        this.props.studentDownloadSyll(() => {
-            this.state.chuaDongHocPhi && T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
-                if (isConfirm) {
-                    this.props.history.push('/user/hoc-phi');
-                }
-            });
-        });
+        this.props.studentDownloadSyll();
     }
 
     render() {
@@ -304,7 +298,7 @@ class SinhVienPage extends AdminPage {
                             <FormSelect ref={e => this.khuVucTuyenSinh = e} label='Khu vực tuyển sinh' className='col-md-6' data={['KV1', 'KV2', 'KV2-NT', 'KV3']} readOnly required />
                             <FormSelect ref={e => this.phuongThucTuyenSinh = e} label='Phương thức tuyển sinh' className='col-md-6' data={SelectAdapter_DmPhuongThucTuyenSinh} readOnly required />
                             <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' type='number' readOnly />
-                            <FormTextBox ref={e => this.doiTuongChinhSach = e} label='Đối tượng chính sách' placeholder='Ghi rõ đối tượng chính sách, nếu không thuộc diện này thì ghi là Không' className='col-md-12' readOnly required />
+                            <FormTextBox ref={e => this.doiTuongChinhSach = e} label='Đối tượng chính sách' placeholder='Ghi rõ đối tượng chính sách, nếu không thuộc diện này thì ghi là Không' className='col-md-12' readOnly={readOnly} required />
                             <FormTextBox ref={e => this.tenCha = e} label='Họ và tên cha' className='form-group col-md-6' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.sdtCha = e} label='Số điện thoại' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
                             <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly={readOnly} />
@@ -362,13 +356,13 @@ class SinhVienPage extends AdminPage {
             backRoute: '/user',
             buttons: [
                 canEdit && {
-                    icon: 'fa-save', className: 'btn-success', onClick: this.save
+                    icon: 'fa-save', className: 'btn-success', onClick: this.save, tooltip: 'Lưu thay đổi thông tin của bạn'
                 },
                 canEdit && {
-                    icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord
+                    icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord, tooltip: 'Xuất Sơ yếu lý lịch của bạn'
                 },
                 (ngayNhapHoc == -1 && !canEdit) && {
-                    icon: 'fa-arrow-down', className: 'btn-info', onClick: this.downloadSyll
+                    icon: 'fa-arrow-down', className: 'btn-info', onClick: this.downloadSyll, tooltip: 'Tải Sơ yếu lý lịch của bạn'
                 }
             ]
         });
