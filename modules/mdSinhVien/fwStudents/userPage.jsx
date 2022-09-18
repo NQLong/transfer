@@ -61,7 +61,7 @@ class SinhVienPage extends AdminPage {
         this.doiTuongTuyenSinh.value(data.doiTuongTuyenSinh);
         this.khuVucTuyenSinh.value(data.khuVucTuyenSinh);
         this.phuongThucTuyenSinh.value(data.phuongThucTuyenSinh);
-        this.diemThi.value(data.diemThi || '');
+        this.diemThi.value(data.diemThi ? Number(data.diemThi).toFixed(2) : '');
         this.doiTuongChinhSach.value(data.doiTuongChinhSach);
         this.maNganh.value(data.maNganh ? data.maNganh : '');
         this.thuongTru.value(data.thuongTruMaTinh, data.thuongTruMaHuyen, data.thuongTruMaXa, data.thuongTruSoNha);
