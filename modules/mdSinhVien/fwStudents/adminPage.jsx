@@ -98,6 +98,7 @@ class AdminStudentsPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã ngành</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên ngành</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoá</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email cá nhân</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email sinh viên</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT cá nhân</th>
@@ -126,24 +127,25 @@ class AdminStudentsPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ho || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ten || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.gioiTinh ? (item.gioiTinh == 1 ? 'Nam' : 'Nữ') : ''} />
-                    <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngaySinh} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngaySinh} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tinhNoiSinh} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.maNganh || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenNganh || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.namTuyenSinh || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.loaiHinhDaoTao || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.emailCaNhan || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.emailTruong || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.dienThoaiCaNhan || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.danToc || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tonGiao || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.quocTich || ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.soNhaThuongTru ? item.soNhaThuongTru + ', ' : '')
+                    <TableCell type='text' contentClassName='multiple-lines-5' content={(item.soNhaThuongTru ? item.soNhaThuongTru + ', ' : '')
                         + (item.xaThuongTru ? item.xaThuongTru + ', ' : '')
                         + (item.huyenThuongTru ? item.huyenThuongTru + ', ' : '')
                         + (item.tinhThuongTru ? item.tinhThuongTru : '')} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hoTenNguoiLienLac || ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.soNhaLienLac ? item.soNhaLienLac + ', ' : '')
+                    <TableCell type='text' contentClassName='multiple-lines-5' content={(item.soNhaLienLac ? item.soNhaLienLac + ', ' : '')
                         + (item.xaLienLac ? item.xaLienLac + ', ' : '')
                         + (item.huyenLienLac ? item.huyenLienLac + ', ' : '')
                         + (item.tinhLienLac ? item.tinhLienLac : '')} />
@@ -283,7 +285,7 @@ class AdminStudentsPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    {list && list.length ? <i><b>{T.numberDisplay(pageSize)}</b>/{T.numberDisplay(pageTotal)} sinh viên</i> : ''}
+                    {list && list.length ? <i><b>{T.numberDisplay(pageSize)}</b>/{T.numberDisplay(totalItem)} sinh viên</i> : ''}
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
