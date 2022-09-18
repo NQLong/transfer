@@ -241,7 +241,10 @@ class SinhVienPage extends AdminPage {
                             loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
                             successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
                             failText: 'Hệ thống sẽ tự động tải về sơ yếu lý lịch sau vài giây!'
-                        }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), this.downloadSyll, saveThongTin);
+                        }, () => new Promise((resolve) => this.props.downloadWord(result => resolve(result))), () => {
+                            T.download('/api/students-download-syll');
+                            saveThongTin();
+                        }, saveThongTin);
                 }
             });
         }
