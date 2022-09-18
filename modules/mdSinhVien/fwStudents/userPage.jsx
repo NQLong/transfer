@@ -18,6 +18,7 @@ import { SelectAdapter_DmPhuongThucTuyenSinh } from 'modules/mdDanhMuc/dmPhuongT
 import { getSvBaoHiemYTe } from '../svBaoHiemYTe/redux';
 import BaoHiemYTeModal from 'modules/mdKeHoachTaiChinh/tcHocPhi/BaoHiemYTeModal';
 import InfoModal from '../svBaoHiemYTe/InfoModal';
+
 class SinhVienPage extends AdminPage {
     state = { item: null, lastModified: null, image: '' }
 
@@ -101,9 +102,7 @@ class SinhVienPage extends AdminPage {
                 this.emailCaNhan.focus();
                 T.notify('Email cá nhân không hợp lệ', 'danger');
                 return false;
-            }
-
-            else {
+            } else {
                 const data = {
                     mssv: this.getValue(this.mssv),
                     ho: this.getValue(this.ho),
@@ -140,13 +139,11 @@ class SinhVienPage extends AdminPage {
                     hoTenNguoiLienLac: this.getValue(this.hoTenNguoiLienLac),
                     sdtNguoiLienLac: this.getValue(this.sdtNguoiLienLac),
                     ngayVaoDang: this.state.isDangVien ? this.getValue(this.ngayVaoDang, 'date') : '',
-                    ngayVaoDoan: this.state.isDoanVien ? this.getValue(this.ngayVaoDoan, 'date') : '',
+                    ngayVaoDoan: this.state.isDoanVien ? this.getValue(this.ngayVaoDoan, 'date') : ''
                 };
                 return data;
             }
-        }
-
-        catch (selector) {
+        } catch (selector) {
             selector.focus();
             T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
             return false;
@@ -329,12 +326,7 @@ class SinhVienPage extends AdminPage {
                     <h4 className='tile-title'>Ảnh thẻ sinh viên</h4>
                     <div className='tile-body'>
                         <div className='d-flex justify-content-evently align-items-center' style={{ gap: 10 }}>
-                            <FormImageBox ref={e => this.anhThe = e}
-                                uploadType='CardImage'
-                                readOnly={readOnly}
-                                boxUploadStye={{ width: '150px' }}
-                                height='200px'
-                            />
+                            <FormImageBox ref={e => this.anhThe = e} uploadType='CardImage' readOnly={readOnly} boxUploadStye={{ width: '150px' }} height='200px' />
                             <ul style={{}}>
                                 <li>Vui lòng tải lên ảnh <b className='text-danger'>đúng kích thước (3 x 4cm hay 113,386 x 151,181px)</b>.</li>
                                 <li>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>đây</a></li>
@@ -348,11 +340,17 @@ class SinhVienPage extends AdminPage {
                     <h4 className='tile-title'>Hướng dẫn thao tác</h4>
                     <div className='tile-body'>
                         <ul className='col-md-12'>
-                            <li>Để <b>cập nhật và lưu thay đổi thông tin lý lịch</b>, sinh viên nhấp và biểu tượng:<div className='btn btn-circle btn-success' style={{ scale: '80%' }}><i className='fa fa-lg fa-save' /></div></li>
+                            <li>Để <b>cập nhật và lưu thay đổi thông tin lý lịch</b>, sinh viên nhấp và biểu tượng:
+                                <div className='btn btn-circle btn-success' style={{ scale: '80%' }}><i className='fa fa-lg fa-save' /></div>
+                            </li>
 
-                            <li>Để lưu và nhận tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b>, sinh viên nhấp vào biểu tượng:<div className='btn btn-circle btn-danger' style={{ scale: '80%' }}><i className='fa fa-lg fa-file-pdf-o' /></div>. Sau đó, tệp tin sẽ được gửi đến email <i>{this.props.system?.user?.email || ''}</i>, đồng thời hệ thống ghi nhận <b>hoàn thành cập nhật hồ sơ</b></li>
+                            <li>Để lưu và nhận tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b>, sinh viên nhấp vào biểu tượng:
+                                <div className='btn btn-circle btn-danger' style={{ scale: '80%' }}><i className='fa fa-lg fa-file-pdf-o' /></div>
+                                . Sau đó, tệp tin sẽ được gửi đến email <i>{this.props.system?.user?.email || ''}</i>, đồng thời hệ thống ghi nhận <b>hoàn thành cập nhật hồ sơ</b></li>
 
-                            <li>Trong trường hợp sinh viên không nhận được email, vui lòng nhấp vào biểu tượng<div className='btn btn-circle btn-info' style={{ scale: '80%' }}><i className='fa fa-lg fa-arrow-down' /></div> để tải về tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b></li>
+                            <li>Trong trường hợp sinh viên không nhận được email, vui lòng nhấp vào biểu tượng
+                                <div className='btn btn-circle btn-info' style={{ scale: '80%' }}><i className='fa fa-lg fa-arrow-down' /></div>
+                                để tải về tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b></li>
                         </ul>
                     </div>
                 </div>
