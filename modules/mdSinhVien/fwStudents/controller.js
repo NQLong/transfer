@@ -307,31 +307,31 @@ module.exports = app => {
 
 
     const sinhVienImportHandler = async (fields, files, done) => {
-        const khuVucMapper = {
-            '1': 'KV1',
-            '2': 'KV2',
-            '2NT': 'KV2-NT',
-            '3': 'KV3',
-        };
-        const maPhuongThuc = [];
-        const validateRow = async (row) => {
-            const sinhVien = await app.model.fwStudents.get({ mssv: row.mssv });
-            if (sinhVien) throw `Sinh viên ${row.mssv} đã tồn tại`;
+        // const khuVucMapper = {
+        //     '1': 'KV1',
+        //     '2': 'KV2',
+        //     '2NT': 'KV2-NT',
+        //     '3': 'KV3',
+        // };
+        // const maPhuongThuc = [];
+        // const validateRow = async (row) => {
+        //     const sinhVien = await app.model.fwStudents.get({ mssv: row.mssv });
+        //     if (sinhVien) throw `Sinh viên ${row.mssv} đã tồn tại`;
 
-            const nganh = await app.model.dtNganhDaoTao.get({ maNganh: row.maNganh });
-            if (!nganh) throw `Sinh viên ${row.mssv}-${row.cmnd} có mã ngành không hợp lệ (${row.maNganh})`;
+        //     const nganh = await app.model.dtNganhDaoTao.get({ maNganh: row.maNganh });
+        //     if (!nganh) throw `Sinh viên ${row.mssv}-${row.cmnd} có mã ngành không hợp lệ (${row.maNganh})`;
 
-            row.nganh = nganh;
-            row.khuVuc = khuVucMapper[row.khuVuc];
+        //     row.nganh = nganh;
+        //     row.khuVuc = khuVucMapper[row.khuVuc];
 
-            if (row.doiTuong == 0 || !row.doiTuong) row.doiTuong = '00';
-            if (!maPhuongThuc.includes(row.maPhuongThuc)) {
-                maPhuongThuc.push(row.maPhuongThuc);
-                if (!await app.model.dmPhuongThucTuyenSinh.get({ ma: row.maPhuongThuc })) {
-                    await app.model.dmPhuongThucTuyenSinh.create({ ma: row.maPhuongThuc, kichHoat: 1, ten: row.phuongThuc });
-                }
-            }
-        };
+        //     if (row.doiTuong == 0 || !row.doiTuong) row.doiTuong = '00';
+        //     if (!maPhuongThuc.includes(row.maPhuongThuc)) {
+        //         maPhuongThuc.push(row.maPhuongThuc);
+        //         if (!await app.model.dmPhuongThucTuyenSinh.get({ ma: row.maPhuongThuc })) {
+        //             await app.model.dmPhuongThucTuyenSinh.create({ ma: row.maPhuongThuc, kichHoat: 1, ten: row.phuongThuc });
+        //         }
+        //     }
+        // };
         let worksheet = null, lastModified = new Date().getTime();
         if (fields.userData && fields.userData[0] && fields.userData[0] == 'FwSinhVienImport' && files.FwSinhVienImport && files.FwSinhVienImport.length) {
             const srcPath = files.FwSinhVienImport[0].path;
@@ -366,9 +366,10 @@ module.exports = app => {
                                     khuVuc = worksheet.getCell('P' + index).value,
                                     doiTuong = worksheet.getCell('Q' + index).value,
                                     emailTruong = worksheet.getCell('R' + index).value;
-                                const row = { mssv, phuongThuc, diemThi, cmnd, ho, ten, maNganh, toHop, maPhuongThuc, diemXetTuyen, gioiTinh, ngaySinh, khuVuc, doiTuong, emailTruong, nganh: {} };
-                                await validateRow(row);
+                                // const row = { mssv, phuongThuc, diemThi, cmnd, ho, ten, maNganh, toHop, maPhuongThuc, diemXetTuyen, gioiTinh, ngaySinh, khuVuc, doiTuong, emailTruong, nganh: {} };
+                                // await validateRow(row);
                                 index++;
+                                const row = { mssv, emailTruong, diemThi, ngaySinh }
                                 items.push(row);
                             }
                         }
@@ -377,19 +378,36 @@ module.exports = app => {
                     }
                     await Promise.all(items.map(async row => {
                         try {
-                            const ngaySinhData = row.ngaySinh.split('/');
-                            const ngaySinh = new Date(`${ngaySinhData[1]}-${ngaySinhData[0]}-${ngaySinhData[2]}`);
-                            const isCLC = row.maNganh.toLowerCase().includes('clc');
-                            const res = await app.model.fwStudents.create({
-                                ho: row.ho, ten: row.ten, ngaySinh: ngaySinh.getTime(),
-                                gioiTinh: row.gioiTinh.toLowerCase() == 'nam' ? 1 : 2, loaiSinhVien: 'L1', maNganh: row.maNganh,
-                                tinhTrang: 3, emailTruong: row.emailTruong, khoa: row.nganh.khoa, phuongThucTuyenSinh: row.maPhuongThuc,
-                                maKhoa: isCLC ? 'CLC2022' : 'DHCQ2022', loaiHinhDaoTao: isCLC ? 'CLC' : 'CQ',
-                                cmnd: row.cmnd, namTuyenSinh: 2022, mssv: row.mssv, bacDaoTao: 'DH', doiTuongTuyenSinh: row.doiTuong,
-                                khuVucTuyenSinh: row.khuVuc, lastModified, canEdit: 1, diemThi: row.diemThi
-                            });
-                            sum += 1;
-                            return res;
+                            // const ngaySinhData = row.ngaySinh.split('/');
+                            // // const ngaySinh = new Date();
+                            // const [ngay, thang, nam] = ngaySinhData
+                            // let ngaySinh = new Date(`${nam}-${thang}-${ngay}`);
+                            // ngaySinh = new Date(ngaySinh.getTime() + 3600 * 7 * 1000);
+                            // console.log(app.date.dateTimeFormat(ngaySinh), )
+                            // if (row.mssv == '2256240040') {
+                            // }
+                            // const updateData = {};
+                            const sinhVien = await app.model.fwStudents.get({ mssv: row.mssv });
+                            if (app.date.dateTimeFormat(new Date(sinhVien.ngaySinh), 'dd/mm/yyyy') != row.ngaySinh) {
+                                const ngaySinhData = row.ngaySinh.split('/');
+                                // const ngaySinh = new Date();
+                                const [ngay, thang, nam] = ngaySinhData
+                                let ngaySinh = new Date(`${nam}-${thang}-${ngay}`);
+                                ngaySinh = new Date(ngaySinh.getTime() + 3600 * 7 * 1000);
+
+                                const data = ({
+                                    current: app.date.dateTimeFormat(new Date(sinhVien.ngaySinh), 'dd/mm/yyyy'), origin: row.ngaySinh,
+                                    update: app.date.dateTimeFormat(new Date(ngaySinh), 'dd/mm/yyyy'),
+                                    mssv: row.mssv
+                                });
+                                if (data.update == data.origin) {
+                                    console.log('update from', data.current, 'to', data.update, 'of', data.origin, 'for', row.mssv);
+                                    const res = await app.model.fwStudents.update({
+                                        emailTruong: row.emailTruong, namTuyenSinh: 2022, mssv: row.mssv,
+                                    }, {ngaySinh: ngaySinh.getTime()});
+                                }
+                            };
+                            // return res;
                         } catch (error) {
                             console.error(error);
                             row.error = error;
@@ -411,7 +429,11 @@ module.exports = app => {
                 { studentId, data } = user;
 
             const filePath = app.path.join(app.assetPath, 'so-yeu-ly-lich', data.namTuyenSinh?.toString() || new Date().getFullYear().toString(), studentId + '.pdf');
-            initSyll(req, res, () => res.sendFile(filePath));
+            if (app.fs.existsSync(filePath)) {
+                res.sendFile(filePath);
+            } else {
+                initSyll(req, res, () => res.sendFile(filePath));
+            }
         } catch (error) {
             res.send({ error });
         }
@@ -427,15 +449,6 @@ module.exports = app => {
             } else {
                 res.send({ error: 'No valid file!' });
             }
-        } catch (error) {
-            res.send({ error });
-        }
-    });
-
-    app.get('/api/students/nam-tuyen-sinh', app.permission.orCheck('student:write', 'tcHocPhi:write'), async (req, res) => {
-        try {
-            const data = await app.model.fwStudents.getNamTuyenSinhList();
-            res.send({ items: data.rows || [] });
         } catch (error) {
             res.send({ error });
         }
