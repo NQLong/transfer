@@ -120,7 +120,6 @@ class SinhVienPage extends AdminPage {
                     doiTuongTuyenSinh: this.getValue(this.doiTuongTuyenSinh),
                     khuVucTuyenSinh: this.getValue(this.khuVucTuyenSinh),
                     phuongThucTuyenSinh: this.getValue(this.phuongThucTuyenSinh),
-                    diemThi: Number(this.getValue(this.diemThi)).toFixed(2),
                     doiTuongChinhSach: this.getValue(this.doiTuongChinhSach),
                     tenCha: this.getValue(this.tenCha),
                     ngaySinhCha: this.getValue(this.ngaySinhCha, 'date'),
@@ -300,16 +299,16 @@ class SinhVienPage extends AdminPage {
                             <FormSelect ref={e => this.doiTuongTuyenSinh = e} label='Đối tượng tuyển sinh' className='col-md-6' data={SelectAdapter_DmSvDoiTuongTs} required readOnly />
                             <FormSelect ref={e => this.khuVucTuyenSinh = e} label='Khu vực tuyển sinh' className='col-md-6' data={['KV1', 'KV2', 'KV2-NT', 'KV3']} readOnly required />
                             <FormSelect ref={e => this.phuongThucTuyenSinh = e} label='Phương thức tuyển sinh' className='col-md-6' data={SelectAdapter_DmPhuongThucTuyenSinh} readOnly required />
-                            <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' type='number' readOnly />
+                            <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' readOnly />
                             <FormTextBox ref={e => this.doiTuongChinhSach = e} label='Đối tượng chính sách' placeholder='Ghi rõ đối tượng chính sách, nếu không thuộc diện này thì ghi là Không' className='col-md-12' readOnly={readOnly} required />
-                            <FormTextBox ref={e => this.tenCha = e} label='Họ và tên cha' className='form-group col-md-6' required readOnly={readOnly} />
-                            <FormTextBox ref={e => this.sdtCha = e} label='Số điện thoại' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
-                            <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly={readOnly} />
-                            <FormTextBox ref={e => this.ngheNghiepCha = e} label='Nghề nghiệp' className='form-group col-md-6' required readOnly={readOnly} />
+                            <FormTextBox ref={e => this.tenCha = e} label='Họ và tên cha' className='form-group col-md-6' readOnly={readOnly} />
+                            <FormTextBox ref={e => this.sdtCha = e} label='Số điện thoại' className='form-group col-md-6' type='phone' readOnly={readOnly} />
+                            <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' readOnly={readOnly} />
+                            <FormTextBox ref={e => this.ngheNghiepCha = e} label='Nghề nghiệp' className='form-group col-md-6' readOnly={readOnly} />
                             <ComponentDiaDiem ref={e => this.thuongTruCha = e} label={<span>Địa chỉ thường trú {!readOnly && <a href='#' onClick={this.copyAddressCha}>(Giống địa chỉ thường trú của <b>sinh viên</b>)</a>}</span>} className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
-                            <FormTextBox ref={e => this.tenMe = e} label='Họ và tên mẹ' className='form-group col-md-6' required readOnly={readOnly} />
-                            <FormTextBox ref={e => this.sdtMe = e} label='Số điện thoại' className='form-group col-md-6' required readOnly={readOnly} />
-                            <FormDatePicker ref={e => this.ngaySinhMe = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly={readOnly} />
+                            <FormTextBox ref={e => this.tenMe = e} label='Họ và tên mẹ' className='form-group col-md-6' readOnly={readOnly} />
+                            <FormTextBox ref={e => this.sdtMe = e} label='Số điện thoại' className='form-group col-md-6' readOnly={readOnly} />
+                            <FormDatePicker ref={e => this.ngaySinhMe = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' readOnly={readOnly} />
                             <FormTextBox ref={e => this.ngheNghiepMe = e} label='Nghề nghiệp' className='form-group col-md-6' readOnly={readOnly} />
                             <ComponentDiaDiem ref={e => this.thuongTruMe = e} label={<span>Địa chỉ thường trú {!readOnly && <a href='#' onClick={this.copyAddressMe}>(Giống địa chỉ thường trú của <b>cha</b>)</a>}</span>} className='form-group col-md-12' requiredSoNhaDuong={true} readOnly={readOnly} />
                             <FormCheckbox label='Đảng viên' className={this.state.isDangVien ? 'col-md-3' : 'col-md-12'} onChange={value => this.setState({ isDangVien: value })} ref={e => this.isDangVien = e} readOnly={readOnly} />

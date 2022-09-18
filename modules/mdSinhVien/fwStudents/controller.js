@@ -224,6 +224,7 @@ module.exports = app => {
                 data.dov = '';
                 data.ngayVaoDoan = '';
             }
+            data.diemThi = Number(data.diemThi).toFixed(2);
             data.ngaySinhCha = new Date(data.ngaySinhCha).getFullYear();
             data.ngaySinhMe = new Date(data.ngaySinhMe).getFullYear();
             data.thuongTru = (data.soNhaThuongTru ? data.soNhaThuongTru + ', ' : '')
