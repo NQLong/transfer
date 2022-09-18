@@ -201,6 +201,8 @@ module.exports = app => {
     app.uploadHooks.add('uploadSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSinhVienImage(req, fields, files, params, done), done, 'student:login'));
 
+    const qrCode = require('qrcode');
+    const toPdf = require('office-to-pdf');
     const initSyll = async (req, res, next) => {
         try {
             const source = app.path.join(__dirname, 'resource', 'syll2022.docx');
@@ -257,7 +259,6 @@ module.exports = app => {
             data.mm = now.substring(4, 6);
             data.dd = now.substring(6, 8);
             data.image = '';
-            const qrCode = require('qrcode');
             let qrCodeImage = app.path.join(app.assetPath, '/qr-syll', data.mssv + '.png');
             app.fs.createFolder(app.path.join(app.assetPath, '/qr-syll'));
             await qrCode.toFile(qrCodeImage, JSON.stringify({ mssv: data.mssv, updatedAt: data.lastModified }));
@@ -270,7 +271,6 @@ module.exports = app => {
                     app.fs.createFolder(app.path.join(app.assetPath, 'so-yeu-ly-lich', new Date().getFullYear().toString()));
 
                     const filePdfPath = app.path.join(app.assetPath, 'so-yeu-ly-lich', new Date().getFullYear().toString(), data.mssv + '.pdf');
-                    const toPdf = require('office-to-pdf');
                     const pdfBuffer = await toPdf(buffer);
                     app.fs.writeFileSync(filePdfPath, pdfBuffer);
                     app.fs.deleteFile(qrCodeImage);
