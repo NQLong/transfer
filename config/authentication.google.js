@@ -4,8 +4,8 @@ module.exports = (app) => {
     const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
     const GoogleStrategyConfig = {
-        clientID: '318805336792-3g9b03uc6tk8b6ra1v49otm7ajddb8oi.apps.googleusercontent.com',
-        clientSecret: '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',
+        clientID: '318805336792-qn8orbdduo1qv0lm7bg6jp14nprcu1cu.apps.googleusercontent.com',
+        clientSecret: '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',
         callbackURL: '/auth/google/callback'
     };
 
@@ -63,7 +63,9 @@ module.exports = (app) => {
     };
 
     // Do Google login action
-    app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+    // app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+
+
     // Do Google login callback action
     app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login-fail' }), (req, res) => {
         // const redirectUrl = req.cookies.userUrl && req.cookies.userUrl.startsWith('/user') ? req.cookies.userUrl : '/user';
