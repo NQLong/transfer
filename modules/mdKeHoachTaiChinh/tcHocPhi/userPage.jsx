@@ -169,7 +169,7 @@ class UserPage extends AdminPage {
                                     this.state.chuaDongBhyt ? <a href='#' onClick={e => e.preventDefault() || this.baoHiemModal.show()}>Chọn mức BHYT</a> : ''
                                 }
                                 {
-                                    current.congNo ?
+                                    current.congNo && parseInt(current.congNo) > 0 ?
                                         <Tooltip title='Thanh toán' placement='top' arrow>
                                             <button disabled={this.state.chuaDongBhyt} className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                                 Thanh toán
