@@ -200,7 +200,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/student/anh-the/:mssv', app.permission.check('student:login'), async (req, res) => {
+    app.get('/api/student/anh-the/:mssv', app.permission.check('student:write'), async (req, res) => {
         try {
             let mssv = req.params.mssv;
             let stud = await app.model.fwStudents.get({ mssv }, 'anhThe,namTuyenSinh');
