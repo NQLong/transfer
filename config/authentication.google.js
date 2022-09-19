@@ -63,7 +63,7 @@ module.exports = (app) => {
     };
 
     // Do Google login action
-    // app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+    app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 
     // Do Google login callback action

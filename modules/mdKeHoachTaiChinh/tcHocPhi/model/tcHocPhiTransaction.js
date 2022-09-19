@@ -4,6 +4,7 @@ module.exports = app => {
     app.model.tcHocPhiTransaction.notify = async (data) => {
         try {
             const { student, hocKy, namHoc, amount, payDate } = data;
+            console.log(student.mssv, hocKy, namHoc, amount, payDate);
 
             app.notification.send({
                 toEmail: student.emailTruong,
@@ -15,7 +16,7 @@ module.exports = app => {
             const SMS_CONFIRM_SUCCESS_TRANS_ID = 1; //Temporary
             if (student.dienThoaiCaNhan) {
                 let smsContent = await app.model.fwSmsParameter.replaceAllContent(SMS_CONFIRM_SUCCESS_TRANS_ID, student.mssv);
-                app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
+                app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent);
 
                 // app.service.smsService.send(student.dienThoaiCaNhan, smsContent);
             }

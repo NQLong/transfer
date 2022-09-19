@@ -150,13 +150,12 @@ module.exports = app => {
             try {
                 let srcPath = files.CardImage[0].path;
                 if (files.CardImage[0].size > 1000 * 1000) {
-                    app.fs.deleteImage(srcPath);
+                    app.fs.unlinkSync(srcPath);
                     done && done({ error: 'Vui lòng upload ảnh kích thước nhỏ hơn 1MB!' });
                 } else {
                     let srcPath = files.CardImage[0].path;
                     let image = await app.jimp.read(srcPath);
                     let extPath = app.path.extname(srcPath);
-
                     await image.resize(113.386, 151.181); // ảnh 3 x 4
 
                     app.fs.unlinkSync(srcPath);

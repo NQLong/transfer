@@ -50,11 +50,12 @@ module.exports = app => {
                             resData = JSON.parse(chunk.toString());
                         } catch (e) {
                             console.error(e);
-                            resolve({ error: e });
+                            return resolve({ error: e });
                         }
+
                         if (resData.code == 1) {
                             try {
-                                await app.model.setting.setValue({ totalSMSViettel: resData.total });
+                                // await app.model.setting.setValue({ totalSMSViettel: resData.total });
                                 resolve({ success: true });
                             } catch (error) {
                                 resolve({ error });
@@ -73,10 +74,16 @@ module.exports = app => {
         }
     };
 
+    app.get('/api/test-sms', app.permission.check('developer:login'), async (req, res) => {
+        let student = await app.model.fwStudents.get({ mssv: '12345' });
+        await app.model.tcHocPhiTransaction.notify({ student, hocKy: 1, namHoc: 2022, amount: 10000, payDate: '20220919202000' });
+        res.end();
+    });
+
     app.post('/api/sms-service/viettel', app.permission.check('fwSmsViettel:send'), async (req, res) => {
         try {
-            let email = req.session.user.email, body = req.body;
-            const result = await initViettelSms(body, email);
+            let body = req.body;
+            const result = await initViettelSms(body);
             if (result && result.success) res.send({ success: 'Sent SMS successfully!' });
             else throw (result.error || result);
         } catch (error) {

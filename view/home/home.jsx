@@ -81,7 +81,7 @@ class App extends React.Component {
     }
 
     showLoginModal = e => {
-        e.preventDefault();
+        e && e.preventDefault();
         if (this.props.system && this.props.system.user) {
             this.props.logout();
         } else {

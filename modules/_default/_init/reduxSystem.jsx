@@ -146,7 +146,7 @@ export function login(data, done) {
     return () => {
         T.post('/login', data, res => {
             if (res.error) {
-                done({ error: res.error ? res.error : '' });
+                done({ error: res.error.message || '' });
             } else {
                 done({ user: res.user });
                 if (res.user) {
