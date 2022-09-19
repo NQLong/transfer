@@ -1,13 +1,15 @@
 module.exports = (app, serviceConfig) => { // Run on service project
     require('../config/initService')(app, serviceConfig);
 
+    // eslint-disable-next-line no-control-regex
+    const checkNonLatinChar = (string) => /[^\u0000-\u00ff]/.test(string);
     const http = require('http');
     app.messageQueue.consume(`${serviceConfig.name}:send`, async (message) => {
         try {
             const { phoneNumber, content } = JSON.parse(message);
             console.log('Send SMS:', phoneNumber, content);
             let { usernameViettel: user, passViettel: pass, brandName, } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
-            let dataEncode = parseInt(app.sms.checkNonLatinChar(content));
+            let dataEncode = parseInt(checkNonLatinChar(content));
 
             const tranId = `${phoneNumber}_${new Date().getTime()}`;
             const dataRequest = JSON.stringify({ user, pass, tranId, phone: phoneNumber, dataEncode, mess: content, brandName });
