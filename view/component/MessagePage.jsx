@@ -17,7 +17,6 @@ export default class MessagePage extends React.Component {
 
     goToHomePage = (e) => {
         this.props.history.push('/');
-        T.cookie('dhkhxhnv-dhbk-dhqgtphcm', null);
         e.preventDefault();
     }
 
