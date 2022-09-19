@@ -132,7 +132,7 @@ module.exports = app => {
                 });
             }
         } catch (error) {
-            res.setHeader('Clear-Site-Data', '\“cache\”, \“cookies\”');
+            res.setHeader('Clear-Site-Data', '“cache”, “cookies”');
             res.send({ error });
         }
     });
