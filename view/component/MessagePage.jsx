@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default class MessagePage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {};
     }
@@ -17,6 +17,7 @@ export default class MessagePage extends React.Component {
 
     goToHomePage = (e) => {
         this.props.history.push('/');
+        localStorage.clear();
         e.preventDefault();
     }
 
