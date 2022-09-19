@@ -20,6 +20,10 @@ export default {
         {
             path: '/user/students/import',
             component: Loadable({ loading: Loading, loader: () => import('./importPage') })
+        },
+        {
+            path: '/user/students/profile/:mssv',
+            component: Loadable({ loading: Loading, loader: () => import('./editPage') })
         }
     ],
 };
