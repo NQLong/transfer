@@ -16,6 +16,8 @@ module.exports = app => {
             if (student.dienThoaiCaNhan) {
                 let smsContent = await app.model.fwSmsParameter.replaceAllContent(SMS_CONFIRM_SUCCESS_TRANS_ID, student.mssv);
                 app.sms.sendByViettel(student.dienThoaiCaNhan, smsContent, tcEmail);
+
+                // app.service.smsService.send(student.dienThoaiCaNhan, smsContent);
             }
 
             let { hocPhiEmailDongTitle, hocPhiEmailDongEditorText, hocPhiEmailDongEditorHtml, tcAddress, tcPhone, tcEmail, tcSupportPhone, email, emailPassword } = await app.model.tcSetting.getValue('hocPhiEmailDongTitle', 'hocPhiEmailDongEditorText', 'hocPhiEmailDongEditorHtml', 'tcAddress', 'tcPhone', 'tcEmail', 'tcSupportPhone', 'email', 'emailPassword');
