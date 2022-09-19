@@ -64,6 +64,7 @@ module.exports = app => {
             const template = req.query.template, link = req.query.link, maDonVi = req.query.maDonVi;
             const data = await app.state.get();
             if (data == null) {
+                res.setHeader('Clear-Site-Data', '“cache”, “cookies”');
                 res.send({ error: 'System has error!' });
             } else {
                 Object.keys(data).forEach(key => {
@@ -131,6 +132,7 @@ module.exports = app => {
                 });
             }
         } catch (error) {
+            res.setHeader('Clear-Site-Data', '“cache”, “cookies”');
             res.send({ error });
         }
     });

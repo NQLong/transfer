@@ -219,8 +219,8 @@ class SinhVienPage extends AdminPage {
 
     downloadWord = (e) => {
         e.preventDefault();
-        const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, canEdit: 0, lastModified: new Date().getTime() }, () => {
-            this.setState({ ngayNhapHoc: -1, canEdit: 0 }, () => {
+        const saveThongTin = () => this.props.updateStudentUser({ ngayNhapHoc: -1, lastModified: new Date().getTime() }, () => {
+            this.setState({ ngayNhapHoc: -1 }, () => {
                 setTimeout(() => this.state.isTanSinhVien && this.state.chuaDongHocPhi && T.alert('Bạn đã hoàn tất cập nhật lý lịch sinh viên', 'success', false, 2000),
                     2000);
             });
@@ -233,7 +233,7 @@ class SinhVienPage extends AdminPage {
                     this.baoHiemModal.show();
                 } else {
                     T.confirmLoading('LƯU Ý',
-                        '<div>Vui lòng đảm bảo bạn ĐÃ HOÀN THIỆN thông tin cá nhân trước khi tạo file sơ yếu lý lịch!<br/> Bạn sẽ không thể thay đổi thông tin cá nhân sau khi chọn \"Đồng ý\"</div>', 'info',
+                        '<div>Vui lòng đảm bảo bạn ĐÃ HOÀN THIỆN thông tin cá nhân trước khi tạo file sơ yếu lý lịch!</div>', 'info',
                         {
                             loadingText: 'Hệ thống đang gửi sơ yếu lý lịch đến email sinh viên',
                             successText: 'Vui lòng kiểm tra email sinh viên (kể cả ở mục spam, thư rác)!',
@@ -350,7 +350,7 @@ class SinhVienPage extends AdminPage {
 
                             <li>Để lưu và nhận tệp tin <b className='text-primary'>Sơ yếu lí lịch</b> và <b className='text-primary'>Biên nhận nhập học</b>, sinh viên nhấp vào biểu tượng:
                                 <div className='btn btn-circle btn-danger' style={{ scale: '80%' }}><i className='fa fa-lg fa-file-pdf-o' /></div>
-                                . Sau đó, tệp tin sẽ được gửi đến email <i>{this.props.system?.user?.email || ''}</i>, đồng thời hệ thống ghi nhận <b>hoàn thành cập nhật hồ sơ</b></li>
+                                . Sau đó, tệp tin sẽ được gửi đến email <i>{this.props.system?.user?.email || ''}</i> hoặc tự động tải về, đồng thời hệ thống ghi nhận <b>hoàn thành cập nhật hồ sơ</b></li>
 
                             <li>Trong trường hợp sinh viên không nhận được email, vui lòng nhấp vào biểu tượng
                                 <div className='btn btn-circle btn-info' style={{ scale: '80%' }}><i className='fa fa-lg fa-arrow-down' /></div>
