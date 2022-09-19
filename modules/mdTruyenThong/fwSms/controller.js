@@ -50,11 +50,12 @@ module.exports = app => {
                             resData = JSON.parse(chunk.toString());
                         } catch (e) {
                             console.error(e);
-                            resolve({ error: e });
+                            return resolve({ error: e });
                         }
+
                         if (resData.code == 1) {
                             try {
-                                await app.model.setting.setValue({ totalSMSViettel: resData.total });
+                                // await app.model.setting.setValue({ totalSMSViettel: resData.total });
                                 resolve({ success: true });
                             } catch (error) {
                                 resolve({ error });

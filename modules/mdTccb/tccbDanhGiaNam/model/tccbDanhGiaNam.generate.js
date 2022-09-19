@@ -1,6 +1,6 @@
-// Table name: TCCB_DANH_GIA_NAM { id, nam, donViBatDauDangKy, donViKetThucDangKy, nldBatDauDangKy, nldKetThucDangKy }
+// Table name: TCCB_DANH_GIA_NAM { id, nam, donViBatDauDangKy, donViKetThucDangKy, nldBatDauDangKy, nldKetThucDangKy, donViBatDauPheDuyet, donViKetThucPheDuyet, truongBatDauPheDuyet, truongKetThucPheDuyet }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'donViBatDauDangKy': 'DON_VI_BAT_DAU_DANG_KY', 'donViKetThucDangKy': 'DON_VI_KET_THUC_DANG_KY', 'nldBatDauDangKy': 'NLD_BAT_DAU_DANG_KY', 'nldKetThucDangKy': 'NLD_KET_THUC_DANG_KY' };
+const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'donViBatDauDangKy': 'DON_VI_BAT_DAU_DANG_KY', 'donViKetThucDangKy': 'DON_VI_KET_THUC_DANG_KY', 'nldBatDauDangKy': 'NLD_BAT_DAU_DANG_KY', 'nldKetThucDangKy': 'NLD_KET_THUC_DANG_KY', 'donViBatDauPheDuyet': 'DON_VI_BAT_DAU_PHE_DUYET', 'donViKetThucPheDuyet': 'DON_VI_KET_THUC_PHE_DUYET', 'truongBatDauPheDuyet': 'TRUONG_BAT_DAU_PHE_DUYET', 'truongKetThucPheDuyet': 'TRUONG_KET_THUC_PHE_DUYET' };
 
 module.exports = app => {
     app.model.tccbDanhGiaNam = {
@@ -19,7 +19,7 @@ module.exports = app => {
                 reject('Data is empty!');
             } else {
                 const sql = 'INSERT INTO TCCB_DANH_GIA_NAM (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.tccbDanhGiaNam.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -56,7 +56,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM TCCB_DANH_GIA_NAM' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -88,7 +88,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TCCB_DANH_GIA_NAM' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -121,7 +121,7 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sqlCount = 'SELECT COUNT(*) FROM TCCB_DANH_GIA_NAM' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+            app.database.oracle.connection.main.executeExtra(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -132,7 +132,7 @@ module.exports = app => {
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                     const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT TCCB_DANH_GIA_NAM.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM TCCB_DANH_GIA_NAM' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                    app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                         if (error) {
                             done && done(error);
                             reject(error);
@@ -152,7 +152,7 @@ module.exports = app => {
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
                 const sql = 'UPDATE TCCB_DANH_GIA_NAM SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.tccbDanhGiaNam.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -183,7 +183,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'DELETE FROM TCCB_DANH_GIA_NAM' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, error => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, error => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -205,7 +205,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM TCCB_DANH_GIA_NAM' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, result) => {
                 if (error) {
                     done && done(error);
                     reject(error);
