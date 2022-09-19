@@ -40,7 +40,7 @@ module.exports = app => {
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
     app.get('/user/students/list', app.permission.check('student:manage'), app.templates.admin);
     app.get('/user/students/import', app.permission.check('developer:login'), app.templates.admin);
-    app.get('/user/students/item/:mssv', app.permission.check('student:manage'), app.templates.admin);
+    app.get('/user/students/profile/:mssv', app.permission.check('student:manage'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
     app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), async (req, res) => {
@@ -74,6 +74,7 @@ module.exports = app => {
             const pageCondition = searchTerm;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });
@@ -85,10 +86,18 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/students/item/:mssv', app.permission.check('student:write'), (req, res) => {
-        const mssv = req.params.mssv;
-        const changes = req.body.changes;
-        app.model.fwStudents.update({ mssv }, changes, (error, items) => res.send({ error, items }));
+    app.put('/api/students/item/:mssv', app.permission.check('student:write'), async (req, res) => {
+        try {
+            const mssv = req.params.mssv;
+            const changes = req.body.changes;
+            changes.gioiTinh = parseInt(changes.gioiTinh);
+            let items = await app.model.fwStudents.update({ mssv }, changes);
+            res.send({ items });
+        } catch (error) {
+            console.log(error);
+            res.send({ error });
+        }
+
     });
 
     app.delete('/api/students/:mssv', app.permission.check('student:delete'), (req, res) => {
@@ -180,6 +189,22 @@ module.exports = app => {
             let user = req.session.user;
             let item = await app.model.fwStudents.get({ mssv: user.studentId }, 'anhThe');
             const path = app.path.join(app.assetPath, 'image-card', user.data.namTuyenSinh.toString(), item.anhThe);
+
+            if (app.fs.existsSync(path)) {
+                res.sendFile(path);
+            } else {
+                res.send({ error: 'No valid file' });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/student/anh-the/:mssv', app.permission.check('student:login'), async (req, res) => {
+        try {
+            let mssv = req.params.mssv;
+            let stud = await app.model.fwStudents.get({ mssv }, 'anhThe,namTuyenSinh');
+            const path = app.path.join(app.assetPath, 'image-card', stud.namTuyenSinh.toString(), stud.anhThe);
 
             if (app.fs.existsSync(path)) {
                 res.sendFile(path);

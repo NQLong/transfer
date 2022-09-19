@@ -69,7 +69,7 @@ export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, don
 }
 
 export function getStudentAdmin(mssv, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/students/item/${mssv}`;
         T.get(url, data => {
             if (data.error) {
@@ -77,7 +77,7 @@ export function getStudentAdmin(mssv, done) {
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 done && done(data.items);
-                dispatch({ type: sinhVienGetEditPage, items: data.items });
+                // dispatch({ type: sinhVienGetEditPage, items: data.items });
             }
         });
     };

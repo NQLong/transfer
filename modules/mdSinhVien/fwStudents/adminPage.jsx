@@ -124,7 +124,7 @@ class AdminStudentsPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.mssv} />
+                    <TableCell type='link' url={`/user/students/profile/${item.mssv}`} style={{ whiteSpace: 'nowrap' }} content={item.mssv} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ho || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ten || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.gioiTinh ? (item.gioiTinh == 1 ? 'Nam' : 'Nữ') : ''} />
