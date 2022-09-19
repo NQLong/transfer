@@ -15,7 +15,8 @@ import Pagination from 'view/component/Pagination';
 import { getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin } from './redux';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
-
+import { AdminBhytModal } from 'modules/mdKeHoachTaiChinh/tcHocPhi/adminBHYTpage';
+import { getMssvBaoHiemYTe, createMssvBaoHiemYTe } from '../svBaoHiemYTe/redux';
 export class LoginToTestModal extends AdminModal {
 
     onSubmit = (e) => {
@@ -169,6 +170,18 @@ class AdminStudentsPage extends AdminPage {
                                 <i className='fa fa-lg fa-arrow-down' />
                             </button>
                         </Tooltip>
+                        {developer.login && <Tooltip title='BHYT'>
+                            <button className='btn btn-secondary' type='button' onClick={e => {
+                                e.preventDefault();
+                                this.props.getMssvBaoHiemYTe({ mssv: item.mssv }, (bhyt) => {
+                                    if (!bhyt) return T.notify('Sinh viên chưa đăng ký bảo hiểm y tế');
+                                    this.bhytModal.initBhyt(bhyt.dienDong);
+                                    this.bhytModal.show(item.mssv);
+                                });
+                            }}>
+                                <i className='fa fa-lg fa-cog' />
+                            </button>
+                        </Tooltip>}
 
                     </TableCell>
                 </tr>
@@ -289,6 +302,7 @@ class AdminStudentsPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getStudentsPage} />
+                <AdminBhytModal ref={e => this.bhytModal = e} createSvBaoHiemYTe={this.props.createMssvBaoHiemYTe} />
                 <LoginToTestModal ref={e => this.loginModal = e} loginStudentForTest={this.props.loginStudentForTest} />
             </>
             ,
@@ -310,6 +324,6 @@ class AdminStudentsPage extends AdminPage {
 }
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien.dataSinhVien });
 const mapActionsToProps = {
-    getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin
+    getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin, getMssvBaoHiemYTe, createMssvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminStudentsPage);
