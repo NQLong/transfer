@@ -5,6 +5,7 @@ module.exports = (app, serviceConfig) => { // Run on service project
     app.messageQueue.consume(`${serviceConfig.name}:send`, async (message) => {
         try {
             const { phoneNumber, content } = JSON.parse(message);
+            console.log('Send SMS:', phoneNumber, content);
             let { usernameViettel: user, passViettel: pass, brandName, } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
             let dataEncode = parseInt(app.sms.checkNonLatinChar(content));
 
