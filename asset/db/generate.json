@@ -6508,7 +6508,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 20
+                    "size": 100
                 }
             },
             "primaryKeys": [

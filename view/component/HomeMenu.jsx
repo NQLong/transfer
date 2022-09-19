@@ -83,8 +83,8 @@ class HomeMenu extends React.Component {
         if (this.props.system && this.props.system.user) {
             this.props.logout();
         } else {
-            this.props.showLoginModal();
-            // window.location = '/auth/google';
+            // this.props.showLoginModal();
+            window.location = '/auth/google';
         }
     }
 

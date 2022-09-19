@@ -13,7 +13,7 @@ module.exports = app => {
     );
 
     app.get('/user/member', app.permission.check('user:read'), app.templates.admin);
-    app.post('/login', app.loginByPassword);
+    // app.post('/login', app.loginByPassword);
 
     app.readyHooks.add('readyUser', {
         ready: () => app.database.oracle.connected && app.model.fwRole != null && app.model.fwUser != null,

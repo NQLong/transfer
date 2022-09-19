@@ -72,7 +72,7 @@ module.exports = app => {
                 let email = req.body.email.trim(), password = req.body.password;
                 const student = await app.model.fwStudents.get({ emailTruong: email });
                 if (student) { // Nếu có sinh viên
-                    if (password == student.matKhau) {
+                    if (app.utils.equalPassword(password, student.matKhau)) {
                         let user = await app.model.fwUser.get({ email });
                         if (!user) user = await app.model.fwUser.create({ email, active: 1 });
                         if (user.active) {
