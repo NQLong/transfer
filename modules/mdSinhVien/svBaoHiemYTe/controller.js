@@ -137,14 +137,16 @@ module.exports = app => {
                 if (!item) res.send({ error: 'Lỗi hệ thống' });
                 else {
                     let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
-                    app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong] });
-                    let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
-                    const { hocPhi, congNo } = currentFee;
-                    app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
-                        hocPhi: parseInt(hocPhi) + mapperSoTien[data.dienDong],
-                        congNo: parseInt(congNo) + mapperSoTien[data.dienDong],
-                        ngayTao: thoiGian
-                    });
+                    if (mapperDienDong[data.dienDong]) {
+                        app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong] });
+                        let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
+                        const { hocPhi, congNo } = currentFee;
+                        app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
+                            hocPhi: parseInt(hocPhi) + mapperSoTien[data.dienDong],
+                            congNo: parseInt(congNo) + mapperSoTien[data.dienDong],
+                            ngayTao: thoiGian
+                        });
+                    }
                     res.end();
                 }
             }
