@@ -76,8 +76,8 @@ module.exports = app => {
 
     app.post('/api/sms-service/viettel', app.permission.check('fwSmsViettel:send'), async (req, res) => {
         try {
-            let email = req.session.user.email, body = req.body;
-            const result = await initViettelSms(body, email);
+            let body = req.body;
+            const result = await initViettelSms(body);
             if (result && result.success) res.send({ success: 'Sent SMS successfully!' });
             else throw (result.error || result);
         } catch (error) {
