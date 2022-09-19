@@ -76,7 +76,8 @@ module.exports = app => {
 
     app.get('/api/test-sms', app.permission.check('developer:login'), async (req, res) => {
         let student = await app.model.fwStudents.get({ mssv: '12345' });
-        await app.model.tcHocPhiTransaction.notify({ student, hocKy: 1, namHoc: 2022, amount: 10000, payDate: '20220919202000' });
+        app.service.smsService.send(student.dienThoaiCaNhan, req.query.content || 'Tien');
+        // await app.model.tcHocPhiTransaction.notify({ student, hocKy: 1, namHoc: 2022, amount: 10000, payDate: '20220919202000' });
         res.end();
     });
 
