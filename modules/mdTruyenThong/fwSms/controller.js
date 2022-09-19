@@ -74,6 +74,11 @@ module.exports = app => {
         }
     };
 
+    app.get('/api/test-sms', app.permission.check('developer:login'), async (req, res) => {
+        await app.model.tcHocPhiTransaction.notify();
+        res.end();
+    });
+
     app.post('/api/sms-service/viettel', app.permission.check('fwSmsViettel:send'), async (req, res) => {
         try {
             let body = req.body;
