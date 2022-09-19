@@ -63,7 +63,9 @@ module.exports = (app) => {
     };
 
     // Do Google login action
-    app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+    // app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+
+
     // Do Google login callback action
     app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login-fail' }), (req, res) => {
         // const redirectUrl = req.cookies.userUrl && req.cookies.userUrl.startsWith('/user') ? req.cookies.userUrl : '/user';

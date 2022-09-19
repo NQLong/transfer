@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default class MessagePage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {};
     }
