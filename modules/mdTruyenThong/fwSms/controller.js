@@ -55,7 +55,7 @@ module.exports = app => {
 
                         if (resData.code == 1) {
                             try {
-                                await app.model.setting.setValue({ totalSMSViettel: resData.total });
+                                // await app.model.setting.setValue({ totalSMSViettel: resData.total });
                                 resolve({ success: true });
                             } catch (error) {
                                 resolve({ error });
