@@ -130,10 +130,9 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
 
-                                let error = await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
-                                if (!error) {
-                                    app.model.svSetting.updateLimit(data.index);
-                                }
+                                await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+
+                                app.model.svSetting.updateLimit(data.index);
                                 res.end();
                             } else {
                                 res.end();
@@ -239,10 +238,9 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
 
-                                let error = await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
-                                if (!error) {
-                                    app.model.svSetting.updateLimit(data.index);
-                                }
+                                await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                app.model.svSetting.updateLimit(data.index);
+
                                 res.end();
                             } else res.send();
                         }
