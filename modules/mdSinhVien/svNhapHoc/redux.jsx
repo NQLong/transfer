@@ -20,7 +20,7 @@ export function setSinhVienNhapHoc(data, done) {
                 T.notify(`${data.error.message || 'Lỗi hệ thống'}`, 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                // T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
+                T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
                 done && done(data.dataNhapHoc);
             }
         }, () => T.notify('Cập nhật thống tin nhập học sinh viên bị lỗi!', 'danger'));
