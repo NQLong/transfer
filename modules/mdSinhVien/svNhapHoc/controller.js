@@ -92,29 +92,36 @@ module.exports = app => {
     app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
         try {
             const secretCode = req.body.secretCode;
-            if (secretCode != mySecretCode) return res.send({ error: 'Permission denied!' });
+            if (secretCode != mySecretCode) {
+                return res.send({ error: 'Permission denied!' });
+            }
+
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
             const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
-            if (!student) res.send({ error: 'Không tìm thấy sinh viên' });
-            else {
+            if (!student) {
+                res.send({ error: 'Không tìm thấy sinh viên' });
+            } else {
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
-                if (!cauHinhNhapHoc) res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
-                else {
-                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc,
-                        { loaiHinhDaoTao, namTuyenSinh } = student;
-
+                if (!cauHinhNhapHoc) {
+                    res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
+                } else {
+                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc, { loaiHinhDaoTao, namTuyenSinh } = student;
                     if (!heDaoTao.includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
                         res.send({ error: 'Không thuộc đối tượng nhập học!' });
-                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
-                    else {
+                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) {
+                        res.send({ error: 'Không thuộc thời gian thao tác' });
+                    } else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
                             await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                             if (thaoTac == 'A') {
                                 await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
                                 let data = await app.model.svSetting.getEmail();
-                                if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                if (data.index == 0) {
+                                    return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                }
+
                                 let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
                                 [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${student.ho} ${student.ten}`).replaceAll('{mssv}', student.mssv));
 
@@ -133,7 +140,11 @@ module.exports = app => {
                                     // Error callback
                                     res.send({ error });
                                 });
-                            } else res.end();
+                            } else {
+                                res.end();
+                            }
+                        } else {
+                            res.end();
                         }
                     }
                 }
