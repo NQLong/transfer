@@ -566,7 +566,7 @@ module.exports = app => {
             language = req.query.language;
 
         let condition = {
-            statement: 'maDonVi = :maDonVi AND active = :active AND (startPost <= :startPost )',
+            statement: 'maDonVi = :maDonVi AND active = :active AND startPost <= :startPost',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
         };
 
@@ -576,7 +576,7 @@ module.exports = app => {
         }
 
         if (language) {
-            condition.statement += ' AND languages like :languages)';
+            condition.statement += ' AND languages like :languages';
             condition.parameter.languages = `%${language}%`;
         }
 
