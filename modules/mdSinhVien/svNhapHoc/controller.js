@@ -147,7 +147,7 @@ module.exports = app => {
                 }
             }
         } catch (error) {
-            res.send({ error });
+            res.send({ error: 'Thao tác nhập học gặp lỗi' });
         }
     });
 
