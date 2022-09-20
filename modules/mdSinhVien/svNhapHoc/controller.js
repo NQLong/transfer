@@ -130,9 +130,13 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
 
-                                await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                try {
+                                    await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                    app.model.svSetting.updateLimit(data.index);
 
-                                app.model.svSetting.updateLimit(data.index);
+                                } catch (_) {
+                                    console.log(`Sent mail to ${student.emailTruong} failed`);
+                                }
                                 res.end();
                             } else {
                                 res.end();
@@ -237,9 +241,13 @@ module.exports = app => {
                                     subTitle: `${app.date.viTimeFormat(new Date())} ${app.date.viDateFormat(new Date())}`,
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
+                                try {
+                                    await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                    app.model.svSetting.updateLimit(data.index);
+                                } catch (_) {
+                                    console.log(`Sent mail to ${student.emailTruong} failed`);
+                                }
 
-                                await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
-                                app.model.svSetting.updateLimit(data.index);
 
                                 res.end();
                             } else res.send();
