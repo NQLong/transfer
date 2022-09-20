@@ -5,11 +5,13 @@ import { Link } from 'react-router-dom';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
 import T from 'view/js/common';
 import { checkSinhVienNhapHoc, setSinhVienNhapHoc, createCauHinhNhapHoc, getCauHinhNhapHoc } from './redux';
+
 class NhapHocPage extends AdminPage {
     state = { dataNhapHoc: {} }
     componentDidMount() {
         T.ready('/user/students', () => {
-            this.props.getCauHinhNhapHoc(item => {
+            this.props.getCauHinhNhapHoc(result => {
+                let { item } = result;
                 Object.keys(item).forEach(key => {
                     if (key == 'heDaoTao') item[key] = item[key].split(',');
                     this[key] && this[key].value(item[key]);
@@ -171,7 +173,6 @@ class NhapHocPage extends AdminPage {
                         </div>
                     </div>
                 </div>
-
             </div>,
             backRoute: '/user/students'
         });
