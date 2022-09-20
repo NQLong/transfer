@@ -50,7 +50,7 @@ module.exports = app => {
         try {
             const secretCode = req.body.secretCode;
             if (secretCode == mySecretCode) {
-                const mssv = req.body.mssv;
+                const mssv = req.body.mssv.trim();
                 const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                     timeModified = Date.now();
                 let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
@@ -72,7 +72,8 @@ module.exports = app => {
                             dataNhapHoc.ngayNhapHoc = null;
                             dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                         } else {
-                            dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+                            if (dataNhapHoc.hoTenNguoiLienLac) dataNhapHoc.tinhTrang = 'Đã cập nhật thông tin trực tuyến';
+                            else dataNhapHoc.tinhTrang = 'Chưa cập nhật thông tin trực tuyến'.toUpperCase();
                         }
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
@@ -172,7 +173,7 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
         try {
-            const mssv = req.body.mssv;
+            const mssv = req.body.mssv.trim();
             const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                 timeModified = Date.now();
 
@@ -195,7 +196,8 @@ module.exports = app => {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                     } else {
-                        dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+                        if (dataNhapHoc.hoTenNguoiLienLac) dataNhapHoc.tinhTrang = 'Đã cập nhật thông tin trực tuyến';
+                        else dataNhapHoc.tinhTrang = ('Chưa cập nhật thông tin trực tuyến').toUpperCase();
                     }
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
@@ -286,14 +288,7 @@ module.exports = app => {
     app.get('/api/ctsv/cau-hinh-nhap-hoc', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
             let item = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
-            const data = await app.model.fwStudents.getAll({
-                statement: 'namTuyenSinh = :namTuyenSinh AND loaiHinhDaoTao IN (:loaiHinh)',
-                parameter: {
-                    namTuyenSinh: new Date().getFullYear(),
-                    loaiHinh: ['CQ', 'CLC']
-                }
-            }, 'mssv,ngayNhapHoc,namTuyenSinh,loaiHinhDaoTao');
-            res.send({ item, data });
+            res.send({ item });
         } catch (error) {
             res.send({ error });
         }

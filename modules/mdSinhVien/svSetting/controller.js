@@ -9,7 +9,7 @@ module.exports = app => {
     const menuDashboad = {
         parentMenu: app.parentMenu.students,
         menus: {
-            6105: { title: 'Dashboard', link: '/user/students/dashboard', pin: true, icon: 'fa-tachometer' },
+            6105: { title: 'Dashboard', link: '/user/students/dashboard', pin: true, icon: 'fa-tachometer', backgroundColor: '#319DA0' },
         },
     };
 
@@ -30,11 +30,15 @@ module.exports = app => {
                     namTuyenSinh: new Date().getFullYear(),
                     loaiHinh: ['CQ', 'CLC']
                 }
-            }, '*', 'ngayNhapHoc DESC');
-            const dataFee = await app.model.tcHocPhi.count({
-                statement: 'hocPhi != 11000000 AND congNo <= 0',
+            }, '*', 'ngayNhapHoc DESC,ten,ho');
+            const dataFee = await app.model.tcHocPhi.getAll({
+                statement: 'hocPhi != :hocPhi AND congNo <= 0',
+                parameter: {
+                    hocPhi: 11000000
+                }
             });
-            res.send({ data, dataFee });
+            const listThaoTac = await app.model.svNhapHoc.getAll({ thaoTac: 'A' }, 'mssv,email', 'email');
+            res.send({ data, dataFee, listThaoTac });
         } catch (error) {
             res.send({ error });
         }

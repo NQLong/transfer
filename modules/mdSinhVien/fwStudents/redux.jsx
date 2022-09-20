@@ -12,7 +12,6 @@ export default function sinhVienReducer(state = null, data) {
         case sinhVienGetAll:
             return Object.assign({}, state, { items: data.items });
         case sinhVienGetPage:
-            console.log(Object.assign({}, state, { page: data.page }));
             return Object.assign({}, state, { page: data.page });
         case sinhVienUserGet:
             return Object.assign({}, state, { selectedItem: data.item });
