@@ -120,7 +120,7 @@ module.exports = app => {
                                     return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
                                 }
 
-                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
+                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailXacNhanNhapHocTitle', 'ctsvEmailXacNhanNhapHocEditorText', 'ctsvEmailXacNhanNhapHocEditorHtml');
                                 [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${student.ho} ${student.ten}`).replaceAll('{mssv}', student.mssv));
 
                                 app.notification.send({
@@ -232,7 +232,7 @@ module.exports = app => {
                             if (thaoTac == 'A') {
                                 let data = await app.model.svSetting.getEmail();
                                 if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
-                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
+                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailXacNhanNhapHocTitle', 'ctsvEmailXacNhanNhapHocEditorText', 'ctsvEmailXacNhanNhapHocEditorHtml');
                                 [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${student.ho} ${student.ten}`).replaceAll('{mssv}', student.mssv));
 
                                 app.notification.send({
