@@ -15103,12 +15103,19 @@
                     "nullable": true,
                     "size": 10
                 },
-                "EXPIRED_DATE": {
-                    "value": "expiredDate",
+                "EXPIRED_TIME": {
+                    "value": "expiredTime",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -15834,13 +15841,6 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152474\".nextval",
                     "nullable": false,
                     "size": "22,0"
-                },
-                "SO_HOC_KY": {
-                    "value": "soHocKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -15937,6 +15937,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "THU": {
+                    "value": "thu",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "TIET_BAT_DAU": {
+                    "value": "tietBatDau",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -16036,6 +16050,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152489\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "SO_HOC_KY": {
+                    "value": "soHocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
