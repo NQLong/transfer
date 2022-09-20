@@ -15059,7 +15059,7 @@
         },
         "HCTH_USER_PUBLIC_KEY": {
             "active": true,
-            "moduleName": "hcthUserPublicKey",
+            "moduleName": "hcthYeuCauTaoKhoa",
             "modelName": "hcthUserPublicKey",
             "columns": {
                 "SHCC": {
