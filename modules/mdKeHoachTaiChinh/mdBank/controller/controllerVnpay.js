@@ -63,7 +63,7 @@ module.exports = app => {
                             await app.model.tcHocPhiTransaction.addBill(namHoc, hocKy, `VNPAY_${vnp_BankCode}`, vnp_TxnRef, app.date.fullFormatToDate(vnp_PayDate).getTime(), mssv, vnp_TransactionNo, vnp_TmnCode, vnp_Amount, secureHash);
                             res.send({ RspCode: '00', Message: 'Confirm Success' });
 
-                            app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate.toString() });
+                            app.model.tcHocPhiTransaction.notify({ student, hocKy, namHoc, amount: vnp_Amount, payDate: vnp_PayDate.toString() });
 
                         } else {
                             res.send({ RspCode: vnp_TransactionStatus, Message: 'Confirm Fail' });

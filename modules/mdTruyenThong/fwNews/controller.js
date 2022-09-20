@@ -59,15 +59,20 @@ module.exports = app => {
         if (req.originalUrl.startsWith('/news/item/')) id = req.originalUrl.substring('/news/item/'.length).split('?')[0];
         if (req.originalUrl.startsWith('/tin-tuc/')) link = req.originalUrl.substring('/tin-tuc/'.length).split('?')[0];
         if (req.originalUrl.startsWith('/megastory/')) link = req.originalUrl.substring('/megastory/'.length).split('?')[0];
-        app.model.fwNews.get(id ? { id } : { link }, (error, item) => {
-            if (error || !item) {
-                app.templates.home(req, res);
-            } else if (item.maDonVi == 0) {
-                app.templates.home(req, { send: (data) => changeMeta(item, data) });
-            } else {
-                app.templates.unit(req, { send: (data) => changeMeta(item, data) });
-            }
-        });
+
+        if ((id && !isNaN(id)) || link) {
+            app.model.fwNews.get(id && !isNaN(id) ? { id } : { link }, (error, item) => {
+                if (error || !item) {
+                    app.templates.home(req, res);
+                } else if (item.maDonVi == 0) {
+                    app.templates.home(req, { send: (data) => changeMeta(item, data) });
+                } else {
+                    app.templates.unit(req, { send: (data) => changeMeta(item, data) });
+                }
+            });
+        } else {
+            res.redirect('/');
+        }
     }));
 
     ['/news-en/item/:newsId', '/article/:link'].forEach(route => app.get(route, (req, res) => {
@@ -97,19 +102,23 @@ module.exports = app => {
         if (req.originalUrl.startsWith('/news-en/item/')) id = req.originalUrl.substring('/news-en/item/'.length).split('?')[0];
         if (req.originalUrl.startsWith('/article/')) link = req.originalUrl.substring('/article/'.length).split('?')[0];
 
-        app.model.fwNews.get(id ? { id } : { link }, (error, item) => {
-            if (error || !item) {
-                app.templates.home(req, res);
-            } else {
-                if (item && item.language == 'vi' && item.isTranslate == 0) {
-                    res.redirect('/404.html');
-                } else if (item.maDonVi == 0) {
-                    app.templates.home(req, { send: (data) => changeMeta(item, data) });
+        if ((id && !isNaN(id)) || link) {
+            app.model.fwNews.get(id && !isNaN(id) ? { id } : { link }, (error, item) => {
+                if (error || !item) {
+                    app.templates.home(req, res);
                 } else {
-                    app.templates.unit(req, { send: (data) => changeMeta(item, data) });
+                    if (item && item.language == 'vi' && item.isTranslate == 0) {
+                        res.redirect('/404.html');
+                    } else if (item.maDonVi == 0) {
+                        app.templates.home(req, { send: (data) => changeMeta(item, data) });
+                    } else {
+                        app.templates.unit(req, { send: (data) => changeMeta(item, data) });
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            res.redirect('/');
+        }
     }));
 
     app.get('/user/news/category', app.permission.check('category:read'), app.templates.admin);
@@ -557,7 +566,7 @@ module.exports = app => {
             language = req.query.language;
 
         let condition = {
-            statement: 'maDonVi = :maDonVi AND active = :active AND (startPost <= :startPost )',
+            statement: 'maDonVi = :maDonVi AND active = :active AND startPost <= :startPost',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
         };
 
@@ -567,7 +576,7 @@ module.exports = app => {
         }
 
         if (language) {
-            condition.statement += ' AND languages like :languages)';
+            condition.statement += ' AND languages like :languages';
             condition.parameter.languages = `%${language}%`;
         }
 
@@ -630,7 +639,7 @@ module.exports = app => {
     app.get('/news/item/id/:newsId', (req, res) => {
         app.model.fwNews.readById(req.params.newsId, (error, item) => {
             let listAttachment = [];
-            if (item.attachment) {
+            if (item && item.attachment) {
                 const handleGetAttachment = (index) => {
                     if (index == item.attachment.split(',').length) {
                         item.listAttachment = listAttachment;

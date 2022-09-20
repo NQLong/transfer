@@ -18,7 +18,7 @@ module.exports = app => {
         str = str.replace(/Đ/g, 'D');
         return str;
     };
-    app.model.fwSmsParameter.replaceAllContent = async (id, data) => {
+    app.model.fwSmsParameter.replaceAllContent = async (id, mssv) => {
         let template = await app.model.fwSmsTemplate.get({ id });
         let listParams = await app.model.fwSmsParameter.getAll({
             statement: 'id IN (:listId)',
@@ -29,21 +29,36 @@ module.exports = app => {
 
         listParams = listParams.groupBy('modelName');
         Object.keys(listParams).forEach(key => {
-            listParams[key] = listParams[key].map(item => item.columnName).join(',');
+            listParams[key] = listParams[key].map(item => item.columnName);
         });
 
         let returnData = {};
-        if (data.mssv) {
-            for (const model of Object.keys(listParams)) {
-                let item = await app.model[model].get({ mssv: data.mssv }, listParams[model]);
-                returnData = Object.assign({}, returnData, item);
+        for (const model of Object.keys(listParams)) {
+            let item = {};
+            switch (model) {
+                case 'fwStudents':
+                    item = await app.model[model].get({ mssv }, listParams[model].join(','));
+                    break;
+                case 'tcHocPhi':
+                    item = await app.model[model].get({ mssv }, listParams[model].join(',')), 'namHoc DESC, hocKy DESC';
+                    break;
+                case 'tcSetting':
+                    item = await app.model[model].getValue(...listParams[model]);
+                    break;
+                case 'tcHocPhiTransaction':
+                    item = await app.model[model].get({ customerId: mssv }, listParams[model].join(','), 'transDate DESC');
+                    break;
+                default: break;
             }
+            returnData = Object.assign({}, returnData, item);
         }
-
         let content = template.content;
+
         Object.keys(colMapper).forEach(key => {
             let data = returnData[colMapper[key]];
-            if (key == '{trans_date}') content = content.replaceAll(key, `${app.date.viTimeFormat(new Date(parseInt(data)))} ${app.date.dateFormat(new Date(parseInt(data)))}`);
+            if (key == '{trans_date}') content = content.replaceAll(key, app.date.dateTimeFormat(new Date(parseInt(data)), 'HH:MM:ss dd/mm/yyyy'));
+            else if (key == '{nam_hoc}') content = content.replaceAll(key, '22-23'); //TODO: Thay chỗ này sau
+            else if (key == '{hoc_phi}') content = content.replaceAll(key, data.toString().numberDisplay());
             else content = content.replaceAll(key, returnData[colMapper[key]]);
         });
 

@@ -18,6 +18,10 @@ module.exports = app => {
             }
         },
 
+        hashPassword: (password) => app.crypt.hashSync(password, app.crypt.genSaltSync(8), null),
+
+        equalPassword: (password, encryptedPassword) => app.crypt.compareSync(password, encryptedPassword),
+
         toIsoString: (date) => {
             let tzo = -date.getTimezoneOffset(),
                 dif = tzo >= 0 ? '+' : '-',

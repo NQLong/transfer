@@ -15,7 +15,7 @@ module.exports = app => {
 
     // Temp
     app.permissionHooks.add('staff', 'addRoleCtsvNhapHoc', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && staff.maDonVi == 32) {
+        if (staff.maDonVi && staff.maDonVi == '32') {
             app.permissionHooks.pushUserPermission(user, 'ctsvNhapHoc:write');
             resolve();
         } else resolve();
@@ -36,6 +36,7 @@ module.exports = app => {
             app.updateSessionUser(null, user, sessionUser => {
                 if ((sessionUser.permissions || []).contains(['student:write', 'ctsvNhapHoc:write'])) {
                     req.session.user = sessionUser;
+                    req.session.user.expiration = new Date().getTime();
                     req.session.save();
                     res.send({ user: sessionUser });
                 } else res.send({ error: 'Permission denied!' });
@@ -45,14 +46,13 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/ctsv/nhap-hoc/get-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
+    app.post('/api/ctsv/nhap-hoc/get-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
             const secretCode = req.body.secretCode;
             if (secretCode == mySecretCode) {
                 const mssv = req.body.mssv;
                 const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                     timeModified = Date.now();
-
                 let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
                 dataNhapHoc = dataNhapHoc.rows ? dataNhapHoc.rows[0] : {};
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
@@ -68,9 +68,7 @@ module.exports = app => {
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
                     } else {
-                        if (dataNhapHoc.ngayNhapHoc === null) {
-                            dataNhapHoc.tinhTrang = 'Sinh viên chưa xuất file sơ yếu lí lịch!';
-                        } else if (dataNhapHoc.ngayNhapHoc == -1) {
+                        if (dataNhapHoc.ngayNhapHoc == -1) {
                             dataNhapHoc.ngayNhapHoc = null;
                             dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                         } else {
@@ -88,30 +86,40 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
+    app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
             const secretCode = req.body.secretCode;
-            if (secretCode != mySecretCode) return res.send({ error: 'Permission denied!' });
+            if (secretCode != mySecretCode) {
+                return res.send({ error: 'Permission denied!' });
+            }
+
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
-            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong');
-            if (!student) res.send({ error: 'Không tìm thấy sinh viên' });
-            else {
+            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
+            if (!student) {
+                res.send({ error: 'Không tìm thấy sinh viên' });
+            } else {
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
-                if (!cauHinhNhapHoc) res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
-                else {
-                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc,
-                        { loaiHinhDaoTao, namTuyenSinh } = student;
-                    if (!heDaoTao.split(',').includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
+                if (!cauHinhNhapHoc) {
+                    res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
+                } else {
+                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc, { loaiHinhDaoTao, namTuyenSinh } = student;
+                    if (!heDaoTao.includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
                         res.send({ error: 'Không thuộc đối tượng nhập học!' });
-                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
-                    else {
+                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) {
+                        res.send({ error: 'Không thuộc thời gian thao tác' });
+                    } else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
+                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                             if (thaoTac == 'A') {
+                                await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
                                 let data = await app.model.svSetting.getEmail();
-                                if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
-                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
+                                if (data.index == 0) {
+                                    return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                }
+
+                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailXacNhanNhapHocTitle', 'ctsvEmailXacNhanNhapHocEditorText', 'ctsvEmailXacNhanNhapHocEditorHtml');
                                 [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${student.ho} ${student.ten}`).replaceAll('{mssv}', student.mssv));
 
                                 app.notification.send({
@@ -121,24 +129,25 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
 
-                                app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
-                                    // Success callback
+                                try {
+                                    await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
                                     app.model.svSetting.updateLimit(data.index);
-                                    res.end();
-                                }, (error) => {
-                                    // Error callback
-                                    res.send({ error });
-                                });
+
+                                } catch (_) {
+                                    console.log(`Sent mail to ${student.emailTruong} failed`);
+                                }
+                                res.end();
+                            } else {
+                                res.end();
                             }
-                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+                        } else {
+                            res.end();
                         }
-                        await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
-                        res.end();
                     }
                 }
             }
         } catch (error) {
-            res.send({ error });
+            res.send({ error: 'Thao tác nhập học gặp lỗi' });
         }
     });
 
@@ -154,6 +163,11 @@ module.exports = app => {
     app.get('/api/ctsv/hot-init-email', app.permission.check('developer:login'), (req, res) => {
         app.model.svSetting.initLimitCtsvMail();
         res.end();
+    });
+
+    app.get('/api/ctsv/get-ctsv-data', app.permission.check('developer:login'), async (req, res) => {
+        let data = await app.model.svSetting.getEmail();
+        res.send({ data });
     });
 
     app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
@@ -177,9 +191,7 @@ module.exports = app => {
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
                 } else {
-                    if (dataNhapHoc.ngayNhapHoc === null) {
-                        dataNhapHoc.tinhTrang = 'Sinh viên chưa xuất file sơ yếu lí lịch!';
-                    } else if (dataNhapHoc.ngayNhapHoc == -1) {
+                    if (dataNhapHoc.ngayNhapHoc == -1) {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                     } else {
@@ -199,23 +211,30 @@ module.exports = app => {
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
-            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv');
-            if (!student) res.send({ error: 'Không tìm thấy sinh viên' });
-            else {
+            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
+            if (!student) {
+                res.send({ error: 'Không tìm thấy sinh viên' });
+            } else {
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
-                if (!cauHinhNhapHoc) res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
-                else {
-                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc,
-                        { loaiHinhDaoTao, namTuyenSinh } = student;
+                if (!cauHinhNhapHoc) {
+                    res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
+                } else {
+                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc, { loaiHinhDaoTao, namTuyenSinh } = student;
                     if (!heDaoTao.split(',').includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
                         res.send({ error: 'Không thuộc đối tượng nhập học!' });
-                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
-                    else {
+                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) {
+                        res.send({ error: 'Không thuộc thời gian thao tác' });
+                    } else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
+                            await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
+                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                             if (thaoTac == 'A') {
                                 let data = await app.model.svSetting.getEmail();
-                                if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
-                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
+                                if (data.index == 0) {
+                                    return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                }
+
+                                let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailXacNhanNhapHocTitle', 'ctsvEmailXacNhanNhapHocEditorText', 'ctsvEmailXacNhanNhapHocEditorHtml');
                                 [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${student.ho} ${student.ten}`).replaceAll('{mssv}', student.mssv));
 
                                 app.notification.send({
@@ -224,20 +243,20 @@ module.exports = app => {
                                     subTitle: `${app.date.viTimeFormat(new Date())} ${app.date.viDateFormat(new Date())}`,
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
-
-                                app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
-                                    // Success callback
+                                try {
+                                    await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
                                     app.model.svSetting.updateLimit(data.index);
-                                    res.end();
-                                }, (error) => {
-                                    // Error callback
-                                    res.send({ error });
-                                });
+                                } catch (_) {
+                                    console.log(`Sent mail to ${student.emailTruong} failed`);
+                                }
+
+                                res.end();
+                            } else {
+                                res.end();
                             }
-                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+                        } else {
+                            res.end();
                         }
-                        await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
-                        res.end();
                     }
                 }
             }

@@ -222,6 +222,17 @@ const T = {
         done ? swal(options).then(done) : swal(options);
     },
 
+    customConfirm: (title, html, icon, dangerMode, buttonObj, done) => {
+        var content = document.createElement('div');
+        content.innerHTML = html;
+        // buttons : [ { }]
+        let buttons = {
+            cancel: buttonObj.cancel || 'Huỷ',
+            ...buttonObj
+        };
+        swal({ icon, title, content, dangerMode: true, buttons }).then(done);
+    },
+
     confirm: (title, html, icon, dangerMode, done) => {
         if (typeof icon == 'function') {
             done = icon;
@@ -240,40 +251,44 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
-    confirmLoading: (title, text, successText = 'Thành công', failText = 'Thất bại', icon, buttonText, content, done) => {
+    confirmLoading: (title, html, icon, custom, func, failFunc, successFunc) => {
+        var { successText = 'Thao tác thành công!', failText = 'Thao tác thất bại!', loadingText = 'Vui lòng chờ', confirmText = 'Đồng ý' } = custom;
+        var content = document.createElement('div');
+        content.innerHTML = html;
         swal({
-            title,
-            text,
-            icon,
-            content,
+            title, content, icon,
             closeOnClickOutside: false,
             closeOnEsc: false,
-            dangerMode: true,
-            buttons: {
+            dangerMode: true, buttons: {
                 cancel: 'Hủy',
-                confirm: buttonText,
-                // closeModal: false,
+                confirm: confirmText,
             },
-        })
-            .then((value) => {
-                if (value) {
-                    swal({
-                        title: "Loading",
-                        text: "Vui lòng giữ nguyên trang",
-                        icon: "warning",
+        }).then((value) => {
+            if (value) {
+                swal({
+                    text: loadingText,
+                    icon: 'warning',
+                    button: null,
+                    closeOnClickOutside: false,
+                    closeOnEsc: false
+                });
+                func().then((result) => {
+                    var options = {
+                        text: result.error ? failText : successText,
+                        title: result.error ? 'Thất bại' : 'Thành công',
+                        icon: result.error ? 'error' : 'success',
                         button: null,
-                    });
-                    done(value).then((data) => {
-                        swal({
-                            title: data.success ? successText : failText,
-                            text: data.success ? data.success : data.error.message,
-                            icon: data.success ? "success" : "error",
-                            button: null,
-                            timer: 3000
-                        });
-                    });
-                }
-            });
+                        timer: 3000
+                    };
+                    if (result.error && failFunc) {
+                        swal(options).then(failFunc);
+                    } else if (!result.error && successFunc) {
+                        options.timer = null;
+                        swal(options).then(successFunc);
+                    } else swal(options);
+                });
+            }
+        });
     },
 
     randomHexColor: () => {
