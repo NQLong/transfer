@@ -15,7 +15,7 @@ module.exports = app => {
 
     // Temp
     app.permissionHooks.add('staff', 'addRoleCtsvNhapHoc', (user, staff) => new Promise(resolve => {
-        if (staff.maDonVi && staff.maDonVi == 32) {
+        if (staff.maDonVi && staff.maDonVi == '32') {
             app.permissionHooks.pushUserPermission(user, 'ctsvNhapHoc:write');
             resolve();
         } else resolve();
@@ -41,6 +41,7 @@ module.exports = app => {
                 } else res.send({ error: 'Permission denied!' });
             });
         } catch (error) {
+            console.log(error);
             res.send({ error });
         }
     });
@@ -109,7 +110,9 @@ module.exports = app => {
                     } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
                     else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
+                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                             if (thaoTac == 'A') {
+                                await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
                                 let data = await app.model.svSetting.getEmail();
                                 if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
                                 let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
@@ -130,11 +133,8 @@ module.exports = app => {
                                     // Error callback
                                     res.send({ error });
                                 });
-                            }
-                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+                            } else res.end();
                         }
-                        await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
-                        res.end();
                     }
                 }
             }
@@ -220,7 +220,9 @@ module.exports = app => {
                         res.send({ error: 'Không thuộc thời gian thao tác' });
                     } else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
+                            await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
                             if (thaoTac == 'A') {
+                                await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                                 let data = await app.model.svSetting.getEmail();
                                 if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
                                 let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
@@ -240,11 +242,8 @@ module.exports = app => {
                                     // Error callback
                                     console.error(error);
                                 });
-                            }
-                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
+                            } else res.send();
                         }
-                        await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
-                        res.end();
                     }
                 }
             }
