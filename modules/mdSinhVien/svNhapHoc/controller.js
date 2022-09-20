@@ -206,17 +206,19 @@ module.exports = app => {
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
             const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,loaiHinhDaoTao,namTuyenSinh');
-            if (!student) res.send({ error: 'Không tìm thấy sinh viên' });
-            else {
+            if (!student) {
+                res.send({ error: 'Không tìm thấy sinh viên' });
+            } else {
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
-                if (!cauHinhNhapHoc) res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
-                else {
-                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc,
-                        { loaiHinhDaoTao, namTuyenSinh } = student;
+                if (!cauHinhNhapHoc) {
+                    res.send({ error: 'Vui lòng liên hệ người quản lý nhập học' });
+                } else {
+                    const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc, { loaiHinhDaoTao, namTuyenSinh } = student;
                     if (!heDaoTao.split(',').includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
                         res.send({ error: 'Không thuộc đối tượng nhập học!' });
-                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
-                    else {
+                    } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) {
+                        res.send({ error: 'Không thuộc thời gian thao tác' });
+                    } else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
                             if (thaoTac == 'A') {
                                 let data = await app.model.svSetting.getEmail();
@@ -234,10 +236,9 @@ module.exports = app => {
                                 app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
                                     // Success callback
                                     app.model.svSetting.updateLimit(data.index);
-                                    res.end();
                                 }, (error) => {
                                     // Error callback
-                                    res.send({ error });
+                                    console.error(error);
                                 });
                             }
                             await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
