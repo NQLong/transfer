@@ -69,9 +69,7 @@ module.exports = app => {
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
                     } else {
-                        if (dataNhapHoc.ngayNhapHoc === null) {
-                            dataNhapHoc.tinhTrang = 'Sinh viên chưa xuất file sơ yếu lí lịch!';
-                        } else if (dataNhapHoc.ngayNhapHoc == -1) {
+                        if (dataNhapHoc.ngayNhapHoc == -1) {
                             dataNhapHoc.ngayNhapHoc = null;
                             dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                         } else {
@@ -191,9 +189,7 @@ module.exports = app => {
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
                 } else {
-                    if (dataNhapHoc.ngayNhapHoc === null) {
-                        dataNhapHoc.tinhTrang = 'Sinh viên chưa xuất file sơ yếu lí lịch!';
-                    } else if (dataNhapHoc.ngayNhapHoc == -1) {
+                    if (dataNhapHoc.ngayNhapHoc == -1) {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                     } else {
