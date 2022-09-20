@@ -231,7 +231,10 @@ module.exports = app => {
                             await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                             if (thaoTac == 'A') {
                                 let data = await app.model.svSetting.getEmail();
-                                if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                if (data.index == 0) {
+                                    return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
+                                }
+
                                 let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailXacNhanNhapHocTitle', 'ctsvEmailXacNhanNhapHocEditorText', 'ctsvEmailXacNhanNhapHocEditorHtml');
                                 [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml] = [ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml].map(item => item?.replaceAll('{ten}', `${student.ho} ${student.ten}`).replaceAll('{mssv}', student.mssv));
 
@@ -248,9 +251,12 @@ module.exports = app => {
                                     console.log(`Sent mail to ${student.emailTruong} failed`);
                                 }
 
-
                                 res.end();
-                            } else res.send();
+                            } else {
+                                res.end();
+                            }
+                        } else {
+                            res.end();
                         }
                     }
                 }
