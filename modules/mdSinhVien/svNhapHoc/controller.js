@@ -132,14 +132,11 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
 
-                                app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
-                                    // Success callback
+                                let error = await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                if (!error) {
                                     app.model.svSetting.updateLimit(data.index);
-                                    res.end();
-                                }, (error) => {
-                                    // Error callback
-                                    res.send({ error });
-                                });
+                                }
+                                res.end();
                             } else {
                                 res.end();
                             }
@@ -232,8 +229,8 @@ module.exports = app => {
                     } else {
                         if (thaoTac == 'A' || thaoTac == 'D') {
                             await app.model.svNhapHoc.create({ mssv, thaoTac, ghiChu: '', email: user.email, timeModified });
+                            await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                             if (thaoTac == 'A') {
-                                await app.model.fwStudents.update({ mssv }, { ngayNhapHoc: thaoTac == 'A' ? timeModified : -1 });
                                 let data = await app.model.svSetting.getEmail();
                                 if (data.index == 0) return res.send({ error: 'Không có email no-reply-ctsv nào đủ lượt gửi nữa!' });
                                 let { ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml } = await app.model.svSetting.getValue('ctsvEmailGuiLyLichTitle', 'ctsvEmailGuiLyLichEditorText', 'ctsvEmailGuiLyLichEditorHtml');
@@ -246,13 +243,11 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
 
-                                app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '', () => {
-                                    // Success callback
+                                let error = await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                if (!error) {
                                     app.model.svSetting.updateLimit(data.index);
-                                }, (error) => {
-                                    // Error callback
-                                    console.error(error);
-                                });
+                                }
+                                res.end();
                             } else res.send();
                         }
                     }
