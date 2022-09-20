@@ -1,18 +1,80 @@
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
+import { ChartArea } from 'modules/mdHanhChinhTongHop/dashboardHCTH/adminPage';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import CountUp from 'view/js/countUp';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
+import { DefaultColors } from 'view/component/Chart';
 import T from 'view/js/common';
 import { checkSinhVienNhapHoc, setSinhVienNhapHoc, createCauHinhNhapHoc, getCauHinhNhapHoc } from './redux';
+
+class DashboardIcon extends React.Component {
+    componentDidMount() {
+        setTimeout(() => {
+            const endValue = this.props.value ? parseInt(this.props.value) : 0;
+            new CountUp(this.valueElement, 0, endValue, 0, 2, { separator: '.', decimal: ',' }).start();
+        }, 100);
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.value !== this.props.value)
+            setTimeout(() => {
+                const endValue = this.props.value ? parseInt(this.props.value) : 0;
+                new CountUp(this.valueElement, prevProps.value, endValue, 0, 2, { separator: '.', decimal: ',' }).start();
+            }, 100);
+    }
+
+    render() {
+        let isShow = true;
+        if (this.props.isShowValue != undefined) {
+            if (this.props.isShowValue == false) isShow = false;
+        }
+        const content = (
+            <div className={'widget-small coloured-icon ' + this.props.type}>
+                <i className={'icon fa fa-3x ' + this.props.icon} />
+                <div className='info'>
+                    <h4>
+                        {this.props.title}
+                    </h4>
+                    {isShow && <p style={{ fontWeight: 'bold' }} ref={e => this.valueElement = e} />}
+                </div>
+            </div>
+        );
+        return this.props.link ? <Link to={this.props.link} style={{ textDecoration: 'none' }}>{content}</Link> : content;
+    }
+}
+
 class NhapHocPage extends AdminPage {
     state = { dataNhapHoc: {} }
     componentDidMount() {
         T.ready('/user/students', () => {
-            this.props.getCauHinhNhapHoc(item => {
+            this.props.getCauHinhNhapHoc(result => {
+                let { item, data } = result;
                 Object.keys(item).forEach(key => {
                     if (key == 'heDaoTao') item[key] = item[key].split(',');
                     this[key] && this[key].value(item[key]);
+                });
+                let dataNgayNhapHoc = data.filter(item => item.ngayNhapHoc != null && item.ngayNhapHoc != -1).map(item => ({ ...item, ngayNhapHoc: T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') })).groupBy('ngayNhapHoc');
+                // let numOfCq = dataNhapHoc.groupBy('ngayNhapHoc').filter(item => item.loaiHinhDaoTao == 'CQ').length;
+                // let numOfClc = dataNhapHoc.groupBy('ngayNhapHoc').filter(item => item.loaiHinhDaoTao == 'CLC').length;
+                console.log(dataNgayNhapHoc);
+                this.setState({
+                    sumNewStud: data.length,
+                    dataChart: {
+                        labels: Object.keys(dataNgayNhapHoc),
+                        datas: {
+                            'CLC': Object.keys(dataNgayNhapHoc).map(key => dataNgayNhapHoc[key].filter(item => item.loaiHinhDaoTao == 'CLC').length),
+                            'CQ': Object.keys(dataNgayNhapHoc).map(key => dataNgayNhapHoc[key].filter(item => item.loaiHinhDaoTao == 'CQ').length),
+                        },
+                        colors: {
+                            'CLC': DefaultColors.red,
+                            'CQ': DefaultColors.blue
+                        }
+
+                    },
+                }, () => {
+                    console.log(this.state.dataChart);
                 });
             });
         });
@@ -171,7 +233,10 @@ class NhapHocPage extends AdminPage {
                         </div>
                     </div>
                 </div>
-
+                <div className='col-md-3'>
+                    <DashboardIcon type='primary' icon='fa-users' title='Tổng sô tân sinh viên' value={this.state.sumNewStud || 0} link='/user/students/list' />
+                </div>
+                {this.state.dataChart && <ChartArea title='Mật độ số lượng nhập học' chartType='bar' data={this.state.dataChart} className='col-lg-12' aspectRatio={3} />}
             </div>,
             backRoute: '/user/students'
         });

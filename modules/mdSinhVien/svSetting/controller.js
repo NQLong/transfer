@@ -6,12 +6,39 @@ module.exports = app => {
         },
     };
 
+    const menuDashboad = {
+        parentMenu: app.parentMenu.students,
+        menus: {
+            6105: { title: 'Dashboard', link: '/user/students/dashboard', pin: true, icon: 'fa-tachometer' },
+        },
+    };
+
     app.permission.add(
         { name: 'student:manage', menu },
+        { name: 'student:manage', menu: menuDashboad },
     );
+
+    app.get('/user/students/dashboard', app.permission.check('student:manage'), app.templates.admin);
 
     app.get('/user/students/setting', app.permission.check('student:manage'), app.templates.admin);
 
+    app.get('/api/students/dashboard', app.permission.check('student:manage'), async (req, res) => {
+        try {
+            const data = await app.model.fwStudents.getAll({
+                statement: 'namTuyenSinh = :namTuyenSinh AND loaiHinhDaoTao IN (:loaiHinh)',
+                parameter: {
+                    namTuyenSinh: new Date().getFullYear(),
+                    loaiHinh: ['CQ', 'CLC']
+                }
+            }, '*', 'ngayNhapHoc DESC');
+            const dataFee = await app.model.tcHocPhi.count({
+                statement: 'hocPhi != 11000000 AND congNo <= 0',
+            });
+            res.send({ data, dataFee });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
     app.get('/api/students/setting/keys', app.permission.orCheck('student:manage', 'student:login'), async (req, res) => {
         try {
             const { keys } = req.query;

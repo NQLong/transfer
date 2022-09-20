@@ -286,7 +286,14 @@ module.exports = app => {
     app.get('/api/ctsv/cau-hinh-nhap-hoc', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
             let item = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
-            res.send({ item });
+            const data = await app.model.fwStudents.getAll({
+                statement: 'namTuyenSinh = :namTuyenSinh AND loaiHinhDaoTao IN (:loaiHinh)',
+                parameter: {
+                    namTuyenSinh: new Date().getFullYear(),
+                    loaiHinh: ['CQ', 'CLC']
+                }
+            }, 'mssv,ngayNhapHoc,namTuyenSinh,loaiHinhDaoTao');
+            res.send({ item, data });
         } catch (error) {
             res.send({ error });
         }

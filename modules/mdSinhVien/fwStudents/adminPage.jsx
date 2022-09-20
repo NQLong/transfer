@@ -52,7 +52,6 @@ class AdminStudentsPage extends AdminPage {
         let { pageNumber, pageSize, pageCondition } = this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
         this.getStudentsPage(pageNumber, pageSize, pageCondition, page => page && this.hideAdvanceSearch());
         const filter = T.updatePage('pageStudentsAdmin').filter;
-        console.log(filter);
         Object.keys(this).forEach(key => {
             filter[key] && this[key].value(filter[key]);
         });
