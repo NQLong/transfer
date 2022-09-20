@@ -46,7 +46,7 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/ctsv/nhap-hoc/get-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
+    app.post('/api/ctsv/nhap-hoc/get-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
             const secretCode = req.body.secretCode;
             if (secretCode == mySecretCode) {
@@ -89,7 +89,7 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
+    app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
             const secretCode = req.body.secretCode;
             if (secretCode != mySecretCode) {
