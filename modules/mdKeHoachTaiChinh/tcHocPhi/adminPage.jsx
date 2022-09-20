@@ -3,6 +3,7 @@ import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
+import { SelectAdapter_FwNamTuyenSinh } from 'modules/mdSinhVien/fwStudents/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -184,20 +185,20 @@ class TcHocPhiAdminPage extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
             hocKy = this.term.value(),
+            namTuyenSinh = this.namTuyenSinh.value(),
             { tuNgay, denNgay } = getTimeFilter(this.tuNgay.value() || null, this.denNgay.value() || null);
-        const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
+        const pageFilter = (isInitial || isReset) ? {} : { namTuyenSinh, daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
+                const { settings: { namHoc, hocKy, totalPaid, totalCurrent } } = page;
                 if (isInitial) {
-                    const { settings: { namHoc, hocKy, totalPaid, totalCurrent } } = page;
                     this.year.value(namHoc);
                     this.term.value(hocKy);
-                    this.setState({ totalCurrent, totalPaid });
                     const filter = page.filter || {};
                     const filterCookie = T.getCookiePage('pageTcHocPhi', 'F');
                     let { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-
+                    this.namTuyenSinh.value(namTuyenSinh || filterCookie.namTuyenSinh);
                     this.daDong.value(daDong || filterCookie.daDong || '');
                     this.bacDaoTao.value(listBacDaoTao || filterCookie.listBacDaoTao || '');
                     this.loaiHinhDaoTao.value(listLoaiHinhDaoTao || filterCookie.listLoaiHinhDaoTao || '');
@@ -207,6 +208,7 @@ class TcHocPhiAdminPage extends AdminPage {
                     ['daDong', 'bacDaoTao', 'loaiHinhDaoTao', 'nganh', 'khoa'].forEach(e => this[e].value(''));
                     this.hideAdvanceSearch();
                 }
+                this.setState({ totalCurrent, totalPaid });
             });
         });
     }
@@ -344,8 +346,9 @@ class TcHocPhiAdminPage extends AdminPage {
                 <FormSelect ref={e => this.daDong = e} label='Tình trạng' data={[{ id: 0, text: 'Chưa đóng' }, { id: 1, text: 'Đã đóng' }]} className='col-md-4' allowClear />
                 <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' allowClear multiple />
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' allowClear multiple />
-                <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' allowClear multiple />
-                <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' allowClear multiple />
+                <FormSelect ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' data={SelectAdapter_FwNamTuyenSinh} className='col-md-4' allowClear />
+                <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-4' allowClear multiple />
+                <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-4' allowClear multiple />
                 <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
                 <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear />
                 <div className='col-md-12 d-flex justify-content-end' style={{ gap: 10 }}>
@@ -358,7 +361,7 @@ class TcHocPhiAdminPage extends AdminPage {
             content:
                 <div className='row'>
                     <div className='col-md-6'>
-                        <NumberIcon type='primary' icon='fa-users' title='Tổng số sinh viên đóng học phí' value={this.state.totalCurrent || 0} />
+                        <NumberIcon type='primary' icon='fa-users' title='Tổng số sinh viên đóng học phí' value={totalItem || 0} />
                     </div>
                     <div className='col-md-6'>
                         <NumberIcon type='info' icon='fa-users' title='Số sinh viên đã đóng đủ' value={this.state.totalPaid || 0} />
@@ -380,7 +383,6 @@ class TcHocPhiAdminPage extends AdminPage {
             onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
             onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
             buttons: buttons,
-            // { type: 'danger', icon: 'fa-reply-all', tooltip: 'Gửi mail nhắc nhở', onClick: this.sendEmailNhacNho }
         });
     }
 }

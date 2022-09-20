@@ -8,7 +8,7 @@ import { updateProfile } from '../_init/reduxSystem';
 class ProfileCommon extends AdminPage {
 
     value(item) {
-        this.imageBox.setData('UserImage:' + item.email, item.image ? item.image : '/img/avatar.png');
+        // this.imageBox.setData('UserImage:' + item.email, item.image ? item.image : '/img/avatar.png');
         this.hoTen.value(item.lastName + ' ' + item.firstName);
         this.email.value(item.email ? item.email : '');
         this.phai.value(item.phai);

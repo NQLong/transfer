@@ -19,7 +19,7 @@ module.exports = app => {
                 reject('Data is empty!');
             } else {
                 const sql = 'INSERT INTO TC_HOC_PHI (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.tcHocPhi.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -56,7 +56,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM TC_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -88,7 +88,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TC_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -121,7 +121,7 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sqlCount = 'SELECT COUNT(*) FROM TC_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+            app.database.oracle.connection.main.executeExtra(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -132,7 +132,7 @@ module.exports = app => {
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                     const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT TC_HOC_PHI.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM TC_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                    app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                         if (error) {
                             done && done(error);
                             reject(error);
@@ -152,7 +152,7 @@ module.exports = app => {
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
                 const sql = 'UPDATE TC_HOC_PHI SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.tcHocPhi.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -183,7 +183,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'DELETE FROM TC_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, error => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, error => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -205,7 +205,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM TC_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, result) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -217,7 +217,7 @@ module.exports = app => {
         }),
 
         searchPage: (pagenumber, pagesize, imssv, searchterm, filter, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_search_page(:pagenumber, :pagesize, :imssv, :searchterm, :filter, :totalitem, :pagetotal, :totalcurrent, :totalpaid); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_search_page(:pagenumber, :pagesize, :imssv, :searchterm, :filter, :totalitem, :pagetotal, :totalcurrent, :totalpaid); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, imssv, searchterm, filter, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, totalcurrent: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, totalpaid: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -230,7 +230,7 @@ module.exports = app => {
         }),
 
         getAllFeeOfStudent: (imssv, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_get_all_mssv(:imssv, :hocphidetailall); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_get_all_mssv(:imssv, :hocphidetailall); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, imssv, hocphidetailall: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -243,7 +243,7 @@ module.exports = app => {
         }),
 
         downloadPSC: (filter, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_download_psc(:filter); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_download_psc(:filter); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -256,7 +256,7 @@ module.exports = app => {
         }),
 
         getInvoiceInfo: (masosinhvien, namhoc, hocky, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_get_invoice_info(:masosinhvien, :namhoc, :hocky); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_get_invoice_info(:masosinhvien, :namhoc, :hocky); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, masosinhvien, namhoc, hocky }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -269,7 +269,7 @@ module.exports = app => {
         }),
 
         getInvoiceList: (tungay, denngay, hocky, namhoc, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_get_invoice_list(:tungay, :denngay, :hocky, :namhoc); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_get_invoice_list(:tungay, :denngay, :hocky, :namhoc); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, tungay, denngay, hocky, namhoc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -282,7 +282,7 @@ module.exports = app => {
         }),
 
         getStatistic: (filter, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_statistic(:filter, :transactions, :invoice); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_statistic(:filter, :transactions, :invoice); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, transactions: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, invoice: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -295,7 +295,7 @@ module.exports = app => {
         }),
 
         getDetail: (masosinhvien, hocky, namhoc, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_get_detail(:masosinhvien, :hocky, :namhoc); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_get_detail(:masosinhvien, :hocky, :namhoc); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, masosinhvien, hocky, namhoc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -308,7 +308,7 @@ module.exports = app => {
         }),
 
         downloadExcel: (filter, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_download_excel(:filter); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_download_excel(:filter); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);

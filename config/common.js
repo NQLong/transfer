@@ -40,9 +40,7 @@ module.exports = (app, appConfig) => {
                         response.on('end', () => res.send(data));
                     });
                 } else {
-                    app.fs.readFile(app.publicPath + path, 'utf8', (error, data) => {
-                        res.send(data);
-                    });
+                    app.fs.readFile(app.publicPath + path, 'utf8', (_, data) => res.send(data));
                 }
             };
         }

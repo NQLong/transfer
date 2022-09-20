@@ -14,7 +14,9 @@ import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, 
 import Pagination from 'view/component/Pagination';
 import { getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin } from './redux';
 import { Tooltip } from '@mui/material';
-
+import T from 'view/js/common';
+import { AdminBhytModal } from 'modules/mdKeHoachTaiChinh/tcHocPhi/adminBHYTpage';
+import { getMssvBaoHiemYTe, createMssvBaoHiemYTe } from '../svBaoHiemYTe/redux';
 export class LoginToTestModal extends AdminModal {
 
     onSubmit = (e) => {
@@ -40,7 +42,7 @@ class AdminStudentsPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/students', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => this.props.getStudentsPage(undefined, undefined, searchText || '', this.state.filter);
+            T.onSearch = (searchText) => this.getStudentsPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => this.changeAdvancedSearch());
             this.changeAdvancedSearch();
         });
@@ -48,13 +50,20 @@ class AdminStudentsPage extends AdminPage {
 
     changeAdvancedSearch = (isReset = false) => {
         let { pageNumber, pageSize, pageCondition } = this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
-        this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, (page) => page && this.hideAdvanceSearch());
+        this.getStudentsPage(pageNumber, pageSize, pageCondition, page => page && this.hideAdvanceSearch());
+        const filter = T.updatePage('pageStudentsAdmin').filter;
+        console.log(filter);
+        Object.keys(this).forEach(key => {
+            filter[key] && this[key].value(filter[key]);
+        });
         if (isReset) {
             Object.keys(this).forEach(key => {
                 if (this[key].value && this[key].value()) this[key].value('');
             });
         }
     }
+
+    getStudentsPage = (pageNumber, pageSize, pageCondition, done) => this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, done);
 
     delete = (item) => {
         T.confirm('Xóa sinh viên', 'Xóa sinh viên này?', 'warning', true, isConfirm => {
@@ -79,14 +88,34 @@ class AdminStudentsPage extends AdminPage {
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'right' }}>STT</th>
-                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Sinh viên</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phái</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Dân tộc<br />Quốc tịch</th>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>MSSV</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên lót</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi sinh</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoa</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã ngành</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên ngành</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoá</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email cá nhân</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email sinh viên</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT cá nhân</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Dân tộc</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tôn giáo</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quốc tịch</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thường trú</th>
-                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Khoa</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Năm TS</th>
+                    {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ tên cha</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Địa chỉ cha</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT cha</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ tên mẹ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Địa chỉ mẹ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT mẹ</th> */}
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ tên liên lạc</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Địa chỉ liên lạc</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT liên lạc</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày nhập học</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Tình trạng</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -94,31 +123,38 @@ class AdminStudentsPage extends AdminPage {
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                        <a href={`/user/students/item/${item.mssv}`} >
-                            <span>
-                                {item.ho + ' ' + item.ten} <br />
-                                {item.mssv}
-                            </span>
-                        </a>
-                    )} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.gioiTinh ? (item.gioiTinh === 1 ? 'Nam' : 'Nữ') : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
-                        <span><b>Dân tộc: </b>{item.danToc}<br /></span>
-                        <span><b>Quốc tịch: </b>{item.quocTich}</span>
-                    </>} />
-                    <TableCell type='text' content={item.tonGiao ? item.tonGiao : ''} />
-
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tinhThanhThuongTru ? item.tinhThanhThuongTru : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa ? item.tenKhoa : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
-                        item.namTuyenSinh ? <b>{item.namTuyenSinh}</b> : ''
-                    } />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngayNhapHoc ? item.ngayNhapHoc == -1 ? 'Đang chờ nhập học' : T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') : ''} />
-                    <TableCell type='text' style={{ textAlign: 'center', color: 'red' }} content={item.tinhTrangSinhVien ? item.tinhTrangSinhVien : ''} />
+                    <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='link' url={`/user/students/profile/${item.mssv}`} style={{ whiteSpace: 'nowrap' }} content={item.mssv} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ho || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ten || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.gioiTinh ? (item.gioiTinh == 1 ? 'Nam' : 'Nữ') : ''} />
+                    <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngaySinh} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tinhNoiSinh} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.maNganh || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenNganh || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.namTuyenSinh || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.loaiHinhDaoTao || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.emailCaNhan || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.emailTruong || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.dienThoaiCaNhan || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.danToc || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tonGiao || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.quocTich || ''} />
+                    <TableCell type='text' contentClassName='multiple-lines-5' content={(item.soNhaThuongTru ? item.soNhaThuongTru + ', ' : '')
+                        + (item.xaThuongTru ? item.xaThuongTru + ', ' : '')
+                        + (item.huyenThuongTru ? item.huyenThuongTru + ', ' : '')
+                        + (item.tinhThuongTru ? item.tinhThuongTru : '')} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hoTenNguoiLienLac || ''} />
+                    <TableCell type='text' contentClassName='multiple-lines-5' content={(item.soNhaLienLac ? item.soNhaLienLac + ', ' : '')
+                        + (item.xaLienLac ? item.xaLienLac + ', ' : '')
+                        + (item.huyenLienLac ? item.huyenLienLac + ', ' : '')
+                        + (item.tinhLienLac ? item.tinhLienLac : '')} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.sdtNguoiLienLac || ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngayNhapHoc ? (item.ngayNhapHoc == -1 ? 'Đang chờ nhập học'
+                        : (item.ngayNhapHoc.toString().length == 20 ? T.dateToText(new Date(item.ngayNhapHoc), 'dd/mm/yyyy') : '')) : ''} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tinhTrang || ''} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                        // onEdit={`/user/students/item/${item.mssv}`}
                         onDelete={this.delete}>
                         <Tooltip title={item.canEdit ? 'Khoá edit' : 'Cho phép edit'}>
                             <button className={item.canEdit ? 'btn btn-secondary' : 'btn btn-success'} type='button' onClick={e => e.preventDefault() ||
@@ -134,6 +170,18 @@ class AdminStudentsPage extends AdminPage {
                                 <i className='fa fa-lg fa-arrow-down' />
                             </button>
                         </Tooltip>
+                        {developer.login && <Tooltip title='BHYT'>
+                            <button className='btn btn-secondary' type='button' onClick={e => {
+                                e.preventDefault();
+                                this.props.getMssvBaoHiemYTe({ mssv: item.mssv }, (bhyt) => {
+                                    if (!bhyt) return T.notify('Sinh viên chưa đăng ký bảo hiểm y tế');
+                                    this.bhytModal.initBhyt(bhyt.dienDong);
+                                    this.bhytModal.show(item.mssv);
+                                });
+                            }}>
+                                <i className='fa fa-lg fa-cog' />
+                            </button>
+                        </Tooltip>}
 
                     </TableCell>
                 </tr>
@@ -147,7 +195,6 @@ class AdminStudentsPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    {/*listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender*/}
                     <FormSelect multiple ref={e => this.listFaculty = e} data={SelectAdapter_DmDonViFaculty_V2} label='Lọc theo khoa' className='col-md-4' allowClear onChange={value => {
                         let currentFilter = Object.assign({}, this.state.filter),
                             currentListFaculty = currentFilter.listFaculty?.split(',') || [];
@@ -250,10 +297,12 @@ class AdminStudentsPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
+                    {list && list.length ? <i><b>{T.numberDisplay(pageSize)}</b>/{T.numberDisplay(totalItem)} sinh viên</i> : ''}
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getStudentsPage} />
+                    getPage={this.getStudentsPage} />
+                <AdminBhytModal ref={e => this.bhytModal = e} createSvBaoHiemYTe={this.props.createMssvBaoHiemYTe} />
                 <LoginToTestModal ref={e => this.loginModal = e} loginStudentForTest={this.props.loginStudentForTest} />
             </>
             ,
@@ -275,6 +324,6 @@ class AdminStudentsPage extends AdminPage {
 }
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien.dataSinhVien });
 const mapActionsToProps = {
-    getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin
+    getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin, getMssvBaoHiemYTe, createMssvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminStudentsPage);

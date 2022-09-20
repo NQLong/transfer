@@ -139,7 +139,7 @@ class NhapHocPage extends AdminPage {
                             <h3 className='tile-title'>Kết quả</h3>
                             <div className='row'>
                                 <span className='col-md-4'>Họ và tên:</span>
-                                <b className='text-primary col-md-8'><a href={`/user/students/item/${mssv}`} target='blank'>{hoTen}</a></b><br /><br />
+                                <b className='text-primary col-md-8'><a href={`/user/students/profile/${mssv}`} target='blank'>{hoTen}</a></b><br /><br />
 
                                 <span className='col-md-4'>MSSV:</span>
                                 <b className='col-md-8'>{mssv}</b><br /><br />

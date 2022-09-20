@@ -2,20 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormTextBox, FormSelect, FormImageBox, FormDatePicker, FormCheckbox } from 'view/component/AdminPage';
-import { getSinhVienEditUser, updateStudentUser, downloadWord } from './redux';
+import { getStudentAdmin, updateStudentAdmin } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
-import { getSvSettingKeys } from '../svSetting/redux';
-import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
 import { SelectAdapter_DtNganhDaoTaoStudent } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
 import { ajaxSelectTinhThanhPho } from 'modules/mdDanhMuc/dmDiaDiem/reduxTinhThanhPho';
 import { SelectAdapter_DmSvDoiTuongTs } from 'modules/mdDanhMuc/dmSvDoiTuongTs/redux';
 import { SelectAdapter_DmPhuongThucTuyenSinh } from 'modules/mdDanhMuc/dmPhuongThucTuyenSinh/redux';
-import { getSvBaoHiemYTe } from '../svBaoHiemYTe/redux';
 import BaoHiemYTeModal from 'modules/mdKeHoachTaiChinh/tcHocPhi/BaoHiemYTeModal';
 import InfoModal from '../svBaoHiemYTe/InfoModal';
 
@@ -23,29 +20,22 @@ class SinhVienPage extends AdminPage {
     state = { item: null, lastModified: null, image: '' }
 
     componentDidMount() {
-        T.ready('/user', () => {
-            this.props.getSinhVienEditUser(data => {
+        T.ready('/user/students', () => {
+            let route = T.routeMatcher('/user/students/profile/:mssv'),
+                mssv = route.parse(window.location.pathname).mssv;
+            this.props.getStudentAdmin(mssv, data => {
                 if (data.error) {
                     T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
                 } else {
-                    let user = this.props.system.user;
-                    let { canEdit, namTuyenSinh, chuaDongHocPhi } = data.item;
-                    let isTanSinhVien = user.isStudent && namTuyenSinh == new Date().getFullYear();
-                    this.setState({ isTanSinhVien, chuaDongHocPhi, ngayNhapHoc: data.item.ngayNhapHoc, canEdit });
-                    this.props.getSvBaoHiemYTe(item => {
-                        if (item && !item.thoiGianHoanThanh) {
-                            this.infoBhytModal.show(item);
-                        }
-                        this.setState({ daDangKyBhyt: !!item });
-                        this.setVal(data.item);
-                    });
+                    this.setState({ mssv, canEdit: true });
+                    this.setVal(data);
                 }
             });
         });
     }
 
     setVal = (data = {}) => {
-        this.anhThe.setData('CardImage', `/api/student/get-anh-the?t=${new Date().getTime()}`);
+        this.anhThe.setData('CardImage', `/api/student/anh-the/?mssv=${this.state.mssv}&t=${new Date().getTime()}`);
         this.mssv.value(data.mssv ? data.mssv : '');
         this.ho.value(data.ho ? data.ho : '');
         this.ten.value(data.ten ? data.ten : '');
@@ -106,7 +96,6 @@ class SinhVienPage extends AdminPage {
                 return false;
             } else {
                 const data = {
-                    mssv: this.getValue(this.mssv),
                     ho: this.getValue(this.ho),
                     ten: this.getValue(this.ten),
                     cmnd: this.getValue(this.cmnd),
@@ -187,32 +176,17 @@ class SinhVienPage extends AdminPage {
         return '';
     }
 
-    getData = (done) => {
+    getData = () => {
         const studentData = this.getAndValidate();
         if (studentData) {
-            this.props.updateStudentUser({ ...studentData, lastModified: new Date().getTime() }, done);
+            this.props.updateStudentAdmin(this.state.mssv, { ...studentData });
         }
     }
 
     save = () => {
-        // const goToHocPhi = () => T.confirm('LƯU Ý', 'Bạn phải thanh toán học phí để được xác nhận sơ yếu lý lịch. Đến trang Học phí?', 'warning', true, isConfirm => {
-        //     if (isConfirm) {
-        //         this.props.history.push('/user/hoc-phi');
-        //     }
-        // });
-        T.confirm('CẢNH BÁO', 'Bạn có chắc chắn muốn lưu thay đổi thông tin cá nhân?', 'warning', true, isConfirm => {
+        T.confirm('CẢNH BÁO', 'Bạn có chắc chắn muốn lưu thay đổi thông tin cá nhân sinh viên?', 'warning', true, isConfirm => {
             if (isConfirm) {
-                if (this.state.daDangKyBhyt) {
-                    this.getData(() => {
-                        T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
-                        // this.state.isTanSinhVien && this.state.chuaDongHocPhi && goToHocPhi();
-                    });
-                } else {
-                    this.baoHiemModal.show(() => this.getData(() => {
-                        T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
-                        // this.state.isTanSinhVien && this.state.chuaDongHocPhi && goToHocPhi();
-                    }));
-                }
+                this.getData();
             }
         });
     };
@@ -255,7 +229,7 @@ class SinhVienPage extends AdminPage {
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
-        let { ngayNhapHoc, canEdit } = this.state;
+        let { canEdit } = this.state;
         let readOnly = !canEdit;
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
@@ -282,11 +256,11 @@ class SinhVienPage extends AdminPage {
                             /> */}
                             <div className='form-group col-md-12'>
                                 <div className='row'>
-                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-6' readOnly onChange={e => this.ho.value(e.target.value.toUpperCase())} required />
-                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly onChange={e => this.ten.value(e.target.value.toUpperCase())} required />
-                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-3' readOnly required />
-                                    <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly required />
-                                    <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly />
+                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-6' readOnly={readOnly} onChange={e => this.ho.value(e.target.value.toUpperCase())} required />
+                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-3' readOnly={readOnly} onChange={e => this.ten.value(e.target.value.toUpperCase())} required />
+                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-3' readOnly={readOnly} required />
+                                    <FormSelect ref={e => this.maNganh = e} label='Ngành' className='form-group col-md-6' data={SelectAdapter_DtNganhDaoTaoStudent} readOnly={readOnly} required />
+                                    <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-6' required readOnly={readOnly} />
                                     <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} required />
                                     <FormSelect className='col-md-9' ref={e => this.noiSinhMaTinh = e} data={ajaxSelectTinhThanhPho} readOnly={readOnly} label='Nơi sinh' required />
                                 </div>
@@ -301,10 +275,10 @@ class SinhVienPage extends AdminPage {
                             <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-4' data={SelectAdapter_DmTonGiaoV2} required readOnly={readOnly} />
                             <FormTextBox ref={e => this.dienThoaiCaNhan = e} label='Điện thoại cá nhân' className='form-group col-md-6' type='phone' required readOnly={readOnly} />
                             <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' required readOnly={readOnly} />
-                            <FormSelect ref={e => this.doiTuongTuyenSinh = e} label='Đối tượng tuyển sinh' className='col-md-6' data={SelectAdapter_DmSvDoiTuongTs} required readOnly />
-                            <FormSelect ref={e => this.khuVucTuyenSinh = e} label='Khu vực tuyển sinh' className='col-md-6' data={['KV1', 'KV2', 'KV2-NT', 'KV3']} readOnly required />
-                            <FormSelect ref={e => this.phuongThucTuyenSinh = e} label='Phương thức tuyển sinh' className='col-md-6' data={SelectAdapter_DmPhuongThucTuyenSinh} readOnly required />
-                            <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' readOnly />
+                            <FormSelect ref={e => this.doiTuongTuyenSinh = e} label='Đối tượng tuyển sinh' className='col-md-6' data={SelectAdapter_DmSvDoiTuongTs} required readOnly={readOnly} />
+                            <FormSelect ref={e => this.khuVucTuyenSinh = e} label='Khu vực tuyển sinh' className='col-md-6' data={['KV1', 'KV2', 'KV2-NT', 'KV3']} readOnly={readOnly} required />
+                            <FormSelect ref={e => this.phuongThucTuyenSinh = e} label='Phương thức tuyển sinh' className='col-md-6' data={SelectAdapter_DmPhuongThucTuyenSinh} readOnly={readOnly} required />
+                            <FormTextBox ref={e => this.diemThi = e} label='Điểm thi (THPT/ĐGNL)' className='col-md-6' readOnly={readOnly} />
                             <FormTextBox ref={e => this.doiTuongChinhSach = e} label='Đối tượng chính sách' placeholder='Ghi rõ đối tượng chính sách, nếu không thuộc diện này thì ghi là Không' className='col-md-12' readOnly={readOnly} required />
                             <FormTextBox ref={e => this.tenCha = e} label='Họ và tên cha' className='form-group col-md-6' readOnly={readOnly} />
                             <FormTextBox ref={e => this.sdtCha = e} label='Số điện thoại' className='form-group col-md-6' type='phone' readOnly={readOnly} />
@@ -366,19 +340,19 @@ class SinhVienPage extends AdminPage {
                 canEdit && {
                     icon: 'fa-save', className: 'btn-success', onClick: this.save, tooltip: 'Lưu thay đổi thông tin của bạn'
                 },
-                canEdit && {
-                    icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord, tooltip: 'Xuất Sơ yếu lý lịch của bạn'
-                },
-                (ngayNhapHoc == -1 && !canEdit) && {
-                    icon: 'fa-arrow-down', className: 'btn-info', onClick: this.downloadSyll, tooltip: 'Tải Sơ yếu lý lịch của bạn'
-                }
+                // canEdit && {
+                //     icon: 'fa-file-pdf-o', className: 'btn-danger', onClick: this.downloadWord, tooltip: 'Xuất Sơ yếu lý lịch của bạn'
+                // },
+                // (ngayNhapHoc == -1 && !canEdit) && {
+                //     icon: 'fa-arrow-down', className: 'btn-info', onClick: this.downloadSyll, tooltip: 'Tải Sơ yếu lý lịch của bạn'
+                // }
             ]
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
+const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = {
-    getSinhVienEditUser, updateStudentUser, updateSystemState, downloadWord, getSvSettingKeys, getSvBaoHiemYTe
+    getStudentAdmin, updateStudentAdmin
 };
 export default connect(mapStateToProps, mapActionsToProps)(SinhVienPage);
