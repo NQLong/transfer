@@ -218,13 +218,11 @@ module.exports = (app, appConfig) => {
     app.get('/api/cluster/logs', app.permission.check('cluster:manage'), (req, res) => {
         try {
             const { path, from } = req.query;
-            if (!path) {
+            if (path) {
+                app.getLogs(path, 50, from, (data) => res.send(data));
+            } else {
                 res.send({ message: 'Get logs error!' });
-                return;
             }
-            app.getLogs(path, 50, from, (data) => {
-                res.send(data);
-            });
         } catch (error) {
             res.send({ error });
         }
@@ -232,9 +230,7 @@ module.exports = (app, appConfig) => {
 
     app.get('/api/cluster/fresh-logs', app.permission.check('cluster:manage'), async (req, res) => {
         try {
-            await app.getFreshLog(data => {
-                res.send(data);
-            });
+            await app.getFreshLog(data => res.send(data));
         } catch (error) {
             res.send({ error });
         }
