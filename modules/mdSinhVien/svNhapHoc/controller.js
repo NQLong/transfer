@@ -95,7 +95,7 @@ module.exports = app => {
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
-            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong');
+            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
             if (!student) res.send({ error: 'Không tìm thấy sinh viên' });
             else {
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
@@ -103,7 +103,8 @@ module.exports = app => {
                 else {
                     const { khoaSinhVien, heDaoTao, thoiGianBatDau, thoiGianKetThuc } = cauHinhNhapHoc,
                         { loaiHinhDaoTao, namTuyenSinh } = student;
-                    if (!heDaoTao.split(',').includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
+
+                    if (!heDaoTao.includes(loaiHinhDaoTao) || khoaSinhVien != namTuyenSinh) {
                         res.send({ error: 'Không thuộc đối tượng nhập học!' });
                     } else if (timeModified < thoiGianBatDau || timeModified > thoiGianKetThuc) res.send({ error: 'Không thuộc thời gian thao tác' });
                     else {
@@ -204,7 +205,7 @@ module.exports = app => {
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
-            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv');
+            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,khoaSinhVien,loaiHinhDaoTao,namTuyenSinh');
             if (!student) res.send({ error: 'Không tìm thấy sinh viên' });
             else {
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
