@@ -216,7 +216,7 @@ module.exports = app => {
             const user = req.session.user;
             let data = req.body.data;
             let { mssv, thaoTac } = data, timeModified = new Date().getTime();
-            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,loaiHinhDaoTao,namTuyenSinh');
+            const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
             if (!student) {
                 res.send({ error: 'Không tìm thấy sinh viên' });
             } else {
