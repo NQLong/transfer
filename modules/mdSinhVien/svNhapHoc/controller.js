@@ -41,7 +41,6 @@ module.exports = app => {
                 } else res.send({ error: 'Permission denied!' });
             });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
