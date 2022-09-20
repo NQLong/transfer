@@ -5,7 +5,7 @@ module.exports = (cluster, isDebug) => {
         appConfigPath = path.join(__dirname, '../package.json'),
         imageInfoPath = path.dirname(require.main.filename) + '/imageInfo.txt';
 
-    const workers = {}, numWorkers = 2; //isDebug ? 2 : require('os').cpus().length; //TODO: Tùng phong ấn, đừng mở
+    const workers = {}, numWorkers = isDebug ? 2 : require('os').cpus().length;
     for (let i = 0; i < numWorkers; i++) {
         const primaryWorker = i == 0;
         const worker = cluster.fork({ primaryWorker });
