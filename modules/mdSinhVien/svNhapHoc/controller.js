@@ -36,6 +36,7 @@ module.exports = app => {
             app.updateSessionUser(null, user, sessionUser => {
                 if ((sessionUser.permissions || []).contains(['student:write', 'ctsvNhapHoc:write'])) {
                     req.session.user = sessionUser;
+                    req.session.user.expiration = new Date().getTime();
                     req.session.save();
                     res.send({ user: sessionUser });
                 } else res.send({ error: 'Permission denied!' });
@@ -52,7 +53,6 @@ module.exports = app => {
                 const mssv = req.body.mssv;
                 const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                     timeModified = Date.now();
-
                 let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
                 dataNhapHoc = dataNhapHoc.rows ? dataNhapHoc.rows[0] : {};
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
