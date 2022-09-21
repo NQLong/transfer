@@ -68,6 +68,7 @@ module.exports = app => {
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
                     } else {
+                        if (dataNhapHoc.congNo && parseInt(dataNhapHoc.congNo) <= 0) dataNhapHoc.congNo = 0;
                         if (dataNhapHoc.ngayNhapHoc == -1) {
                             dataNhapHoc.ngayNhapHoc = null;
                             dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
@@ -89,15 +90,13 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
-            console.log('BODY_SET_DATA', req.body.secretCode, mySecretCode);
-            const secretCode = req.body.secretCode;
+            const user = req.session.user;
+            let data = req.body.data;
+            let { mssv, thaoTac, secretCode } = data, timeModified = new Date().getTime();
             if (secretCode != mySecretCode) {
                 return res.send({ error: 'Permission denied!' });
             }
 
-            const user = req.session.user;
-            let data = req.body.data;
-            let { mssv, thaoTac } = data, timeModified = new Date().getTime();
             const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
             if (!student) {
                 res.send({ error: 'Không tìm thấy sinh viên' });
