@@ -5,11 +5,13 @@ import { Link } from 'react-router-dom';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue } from 'view/component/AdminPage';
 import T from 'view/js/common';
 import { checkSinhVienNhapHoc, setSinhVienNhapHoc, createCauHinhNhapHoc, getCauHinhNhapHoc } from './redux';
+
 class NhapHocPage extends AdminPage {
     state = { dataNhapHoc: {} }
     componentDidMount() {
         T.ready('/user/students', () => {
-            this.props.getCauHinhNhapHoc(item => {
+            this.props.getCauHinhNhapHoc(result => {
+                let { item } = result;
                 Object.keys(item).forEach(key => {
                     if (key == 'heDaoTao') item[key] = item[key].split(',');
                     this[key] && this[key].value(item[key]);
@@ -126,7 +128,10 @@ class NhapHocPage extends AdminPage {
                 <div className='col-md-6'>
                     <div className='tile'>
                         <h3 className='tile-title'>Công tác nhập học</h3>
-                        <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' />
+                        <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' onKeyDown={e => {
+                            if (e.keyCode == 13) this.checkMssv();
+                            else if (e.keyCode == 8) this.setState({ showResult: false });
+                        }} />
                         <div style={{ textAlign: 'right' }}>
                             <button className='btn btn-outline-primary' type='button' onClick={this.checkMssv} style={{ marginLeft: '10px' }}>
                                 <i className='fa fa-fw fa-lg fa-search'></i>Kiểm tra
@@ -136,7 +141,7 @@ class NhapHocPage extends AdminPage {
                             <h3 className='tile-title'>Kết quả</h3>
                             <div className='row'>
                                 <span className='col-md-4'>Họ và tên:</span>
-                                <b className='text-primary col-md-8'><a href={`/user/students/item/${mssv}`} target='blank'>{hoTen}</a></b><br /><br />
+                                <b className='text-primary col-md-8'><a href={`/user/students/profile/${mssv}`} target='blank'>{hoTen}</a></b><br /><br />
 
                                 <span className='col-md-4'>MSSV:</span>
                                 <b className='col-md-8'>{mssv}</b><br /><br />
@@ -152,7 +157,7 @@ class NhapHocPage extends AdminPage {
 
 
                                 <span className='col-md-4'>Học phí:</span>
-                                <b className={congNo ? 'text-danger col-md-8' : 'text-success col-md-8'}>{congNo ? 'Chưa thanh toán học phí' : 'Đã thanh toán học phí'}</b><br /><br />
+                                <b className={congNo ? 'text-danger col-md-8' : 'text-success col-md-8'}>{congNo && congNo > 0 ? 'Chưa thanh toán học phí' : 'Đã thanh toán học phí'}</b><br /><br />
 
                                 <span className='col-md-4'>Tình trạng:</span>
                                 <b className={ngayNhapHoc ? 'text-success col-md-8' : 'text-secondary col-md-8'}>{tinhTrang}</b>
@@ -168,7 +173,6 @@ class NhapHocPage extends AdminPage {
                         </div>
                     </div>
                 </div>
-
             </div>,
             backRoute: '/user/students'
         });

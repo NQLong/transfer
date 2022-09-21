@@ -8,13 +8,13 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbo
 class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
-          this.ten.focus();
+            this.ten.focus();
         }));
     }
     onShow = (item) => {
-        let {ma, ten, kichHoat } = item ? item : {ma: '', ten: '', kichHoat: true };
+        let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: true };
 
-        this.setState({ma, ten, item });
+        this.setState({ ma, ten, item });
         this.ten.value(ten);
         this.kichHoat.value(kichHoat ? 1 : 0);
     };
@@ -91,8 +91,8 @@ class dmChiBoPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (

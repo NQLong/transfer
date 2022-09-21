@@ -58,7 +58,12 @@ class dmHocSdhPage extends AdminPage {
     state = { searching: false };
 
     componentDidMount() {
-        T.ready('/user/category', () => {
+        let route = T.routeMatcher('/user/:menu/:he').parse(window.location.pathname);
+        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
+        this.he = route.menu == 'bac-sdh' ? 'bac-sdh' : 'phan-he-dao-tao';
+
+        console.log(this.menu);
+        T.ready(`/user/${this.menu}`, () => {
             T.onSearch = (searchText) => this.props.getDmHocSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmHocSdhPage();
@@ -94,8 +99,8 @@ class dmHocSdhPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -112,10 +117,10 @@ class dmHocSdhPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Bậc sau đại học',
+            title: this.menu == 'category' ?'Bậc sau đại học':'Phân hệ đào tạo',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Bậc sau đại học'
+                <Link key={0} to={this.menu == 'category' ? '/user/category' : '/user/sau-dai-hoc'}>{this.menu == 'category' ? 'Danh mục' : 'Sau đại học'}</Link>,
+                this.menu == 'category' ?'Bậc sau đại học':'Phân hệ đào tạo'
             ],
             content: <>
                 <div className='tile'>{table}</div>
@@ -123,7 +128,7 @@ class dmHocSdhPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmHocSdh} update={this.props.updateDmHocSdh} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

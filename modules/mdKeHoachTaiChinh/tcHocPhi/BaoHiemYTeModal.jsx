@@ -5,12 +5,12 @@ import { AdminModal } from 'view/component/AdminPage';
 import { createSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
 import T from 'view/js/common';
 
-class BaoHiemModal extends AdminModal {
+export class BaoHiemModal extends AdminModal {
     state = {
         check12ThangBhyt: false, check15ThangBhyt: false, checkMienBhyt: false
     }
-    onShow = () => {
-
+    onShow = (func) => {
+        func && this.setState({ func });
     }
     handleMienDongBhyt = value => {
         this.setState({
@@ -69,7 +69,11 @@ class BaoHiemModal extends AdminModal {
         T.confirm('Xác nhận', `Xác nhận bạn ${tinhTrang}`, 'warning', true, isConfirm => {
             if (isConfirm) {
                 this.props.createSvBaoHiemYTe({ dienDong }, () => {
-                    location.reload();
+                    if (this.state.func) {
+                        this.hide();
+                        this.state.func();
+                    }
+                    else location.reload();
                 });
             }
         });

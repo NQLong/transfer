@@ -83,12 +83,12 @@ class FwSmsParameterPage extends AdminPage {
             emptyTable: 'Không có dữ liệu',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Cột</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Model</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cột</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Model</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>

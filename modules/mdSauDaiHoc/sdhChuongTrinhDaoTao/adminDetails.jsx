@@ -12,7 +12,7 @@ import T from 'view/js/common';
 import { SelectAdapter_DmHocSdhVer2 } from 'modules/mdDanhMuc/dmHocSdh/redux';
 import { SelectAdapter_DmKhoaSdh } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux';
 // import ComponentKT from './ComponentKT';
-
+import { Tooltip } from '@mui/material';
 
 class SdhChuongTrinhDaoTaoDetails extends AdminPage {
     state = {
@@ -79,12 +79,12 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
             const mucTieu = T.parse(data.mucTieu || '{}');
             this.khoaSdh = !isClone ? data.namDaoTao : khoaSdh;
             this.props.getSdhChuongTrinhDaoTao(id, (ctsdh) => {
+                console.log(ctsdh);
                 SelectAdapter_SdhCauTrucKhungDaoTao.fetchOne(this.khoaSdh, (rs) => {
                     this.setNamDaoTao(rs, mucTieu, ctsdh);
                     this.namDaoTao.value(rs.id);
                 });
             });
-
         });
     }
 
@@ -267,6 +267,13 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
                     })
                 }
                 {this.ma && <CirclePageButton type='custom' tooltip='Tải về chương trình đào tạo' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '60px' }} onClick={(e) => this.downloadWord(e)} />}
+                {this.ma && 
+                    <Tooltip title={'Kế hoạch đào tạo'} arrow placement='top'>
+                        <Link type='button' to={`/user/sau-dai-hoc/ke-hoach-dao-tao/${this.ma}`} className='btn btn-info btn-circle' style={{ zIndex: 100, position: 'fixed', right: '130px', bottom: '10px', color: 'white' }}>
+                            <i className='fa fa-lg fa-list' />
+                        </Link>
+                    </Tooltip>
+                }
             </>,
             backRoute: '/user/sau-dai-hoc/chuong-trinh-dao-tao',
             onSave: permission.write || permission.manage ? this.save : null,

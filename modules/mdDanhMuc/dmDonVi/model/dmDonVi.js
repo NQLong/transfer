@@ -6,7 +6,7 @@ function lcs(a, b) {
     for (j = 0; j < n; j++) C[0].push(0);
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : Math.max(C[i+1][j], C[i][j+1]);
+            C[i + 1][j + 1] = a[i] === b[j] ? C[i][j] + 1 : Math.max(C[i + 1][j], C[i][j + 1]);
     return C[m][n];
 }
 
@@ -15,8 +15,7 @@ function bestChoice(s, t) {
     let n = s.length, m = t.length, cost = -1;
     if (m < n) {
         cost = lcs(s, t);
-    }
-    else {
+    } else {
         let i;
         for (i = 0; i < m - n + 1; i++) {
             let subT = t.substring(i, i + n);
@@ -25,9 +24,9 @@ function bestChoice(s, t) {
     }
     return cost;
 }
+
 module.exports = app => {
     // app.model.dmDonVi.foo = () => { };
-    const {handleResult} = require('../../../mdHanhChinhTongHop/constant');
 
     app.model.dmDonVi.getMaDonVi = (ten, done) => { // Tìm mã đơn vị theo tên
         if (!ten) {
@@ -52,6 +51,7 @@ module.exports = app => {
 
     app.model.dmDonVi.getDonVi = (condition, selectedColumns, orderBy) => new Promise((resolve, reject) => {
         app.model.dmDonVi.get(condition, selectedColumns, orderBy, (error, item) => {
+            const { handleResult } = require('../../../mdHanhChinhTongHop/constant');
             handleResult(resolve, reject, item, error);
         });
     });

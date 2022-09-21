@@ -4,7 +4,8 @@ module.exports = app => {
         menus: {
             7505: {
                 title: 'Cấu trúc CTĐT',
-                link: '/user/sau-dai-hoc/cau-truc-khung-dao-tao'
+                link: '/user/sau-dai-hoc/cau-truc-khung-dao-tao',
+                groupIndex: 2
             },
         },
     };

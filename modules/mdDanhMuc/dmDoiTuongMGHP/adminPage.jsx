@@ -77,7 +77,7 @@ class EditModal extends React.Component {
                         <div className='modal-body'>
                             <div className='form-group'>
                                 <label htmlFor='dmDoiTuongMghpMa'>Mã</label>
-                                <input className='form-control' id='dmDoiTuongMghpMa' placeholder='Mã' type='text' auto-focus='' readOnly={readOnly} />
+                                <input className='form-control' id='dmDoiTuongMghpMa' placeholder='Mã' type='text' autoFocus='' readOnly={readOnly} />
                             </div>
                             <div className='form-group'>
                                 <label htmlFor='dmDoiTuongMghpTen'>Tên</label>
@@ -93,7 +93,7 @@ class EditModal extends React.Component {
                             </div>
                             <div style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
                                 <label htmlFor='dmDoiTuongMghpKichHoat'>Kích hoạt: </label>&nbsp;&nbsp;
-                                        <div className='toggle'>
+                                <div className='toggle'>
                                     <label>
                                         <input type='checkbox' id='dmChauKichHoat' checked={this.state.active} onChange={() => !readOnly && this.setState({ active: !this.state.active })} />
                                         <span className='button-indecator' />
@@ -144,12 +144,12 @@ class AdminPage extends React.Component {
                 <table className='table table-hover table-bordered table-responsive'>
                     <thead>
                         <tr>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '40%' }} nowrap='true'>Tên</th>
-                            <th style={{ width: '60%' }} nowrap='true'>Mô tả</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Tỉ lệ miễn giảm (%)</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                            <th style={{ width: 'auto' }}>Mã</th>
+                            <th style={{ width: '40%' }}>Tên</th>
+                            <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Mô tả</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tỉ lệ miễn giảm (%)</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>

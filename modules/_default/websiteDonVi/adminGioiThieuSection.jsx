@@ -171,10 +171,10 @@ class websiteGTPage extends React.Component {
                         <tr>
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                             <th style={{ width: '100%', textAlign: 'left' }}>Tên</th>
-                            {/* <th style={{ width: '60%', textAlign: 'center' }} nowrap='true'>Nội dung</th> */}
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Trọng số</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                            {/* <th style={{ width: '60%', textAlign: 'center', whiteSpace: 'nowrap' }}>Nội dung</th> */}
+                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Trọng số</th>
+                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody >

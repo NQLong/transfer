@@ -197,11 +197,11 @@ class TcDinhMucHocPhiAdminPage extends AdminPage {
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Năm học</th>
-                    <th style={{ width: '30%', textAlign: 'center' }} nowrap='true'>Học kỳ</th>
-                    <th style={{ width: '70%', textAlign: 'center' }} nowrap='true'>Loại phí</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Năm học</th>
+                    <th style={{ width: '30%', whiteSpace: 'nowrap', textAlign: 'center' }}>Học kỳ</th>
+                    <th style={{ width: '70%', whiteSpace: 'nowrap', textAlign: 'center' }}>Loại phí</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>

@@ -106,11 +106,11 @@ class DmNgachCdnnPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }}>#</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã ngạch</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mã ngạch</th>
                         <th style={{ width: '50%' }}>Tên ngạch</th>
                         <th style={{ width: '50%' }}>Nhóm ngạch</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -127,22 +127,22 @@ class DmNgachCdnnPage extends AdminPage {
             });
 
 
-            return this.renderPage({
-                icon: 'fa fa-list-alt',
-                title: 'Ngạch chức năng nghề nghiệp',
-                breadcrumb: [
-                    <Link key={0} to='/user/category'>Danh mục</Link>,
-                    'Ngạch chức năng nghề nghiệp'
-                ],
-                content: <>
-                    <div className='tile'>{table}</div>
-                    <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmNgachCdnnPage} />
-                    <EditModal ref={e => this.modal = e} permission={permission}
-                        create={this.props.createDmNgachCdnn} update={this.props.updateDmNgachCdnn} permissions={currentPermissions} />
-                </>,
-                backRoute: '/user/category',
-                onCreate: permission && permission.write ? (e) => this.showModal(e) : null
-            });
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Ngạch chức năng nghề nghiệp',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Ngạch chức năng nghề nghiệp'
+            ],
+            content: <>
+                <div className='tile'>{table}</div>
+                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmNgachCdnnPage} />
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmNgachCdnn} update={this.props.updateDmNgachCdnn} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+        });
     }
 }
 

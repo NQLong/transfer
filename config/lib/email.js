@@ -88,5 +88,4 @@ module.exports = app => {
             }
         });
     });
-
 };

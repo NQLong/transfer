@@ -40,9 +40,7 @@ module.exports = (app, appConfig) => {
                         response.on('end', () => res.send(data));
                     });
                 } else {
-                    app.fs.readFile(app.publicPath + path, 'utf8', (error, data) => {
-                        res.send(data);
-                    });
+                    app.fs.readFile(app.publicPath + path, 'utf8', (_, data) => res.send(data));
                 }
             };
         }
@@ -92,7 +90,7 @@ module.exports = (app, appConfig) => {
         },
         sdh: {
             index: 7500, title: 'Sau đại học', link: '/user/sau-dai-hoc', icon: 'fa-graduation-cap ',
-            subMenusRender: true
+            subMenusRender: false, groups: ['NGÀNH', 'CÔNG TÁC', 'DANH MỤC']
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
@@ -151,16 +149,21 @@ module.exports = (app, appConfig) => {
     const axios = require('axios'),
         axiosRequest = async (type, url, data, requestConfig) => {
             try {
+                let response = null;
                 if (!data) data = {};
                 if (!requestConfig) requestConfig = {};
+                requestConfig.httpsAgent = new require('https').Agent({ rejectUnauthorized: false });
+
                 if (type == 'get') {
                     const params = new URLSearchParams(data).toString();
                     if (params.length) url = url + (url.includes('?') ? '&' : '?') + params;
-                    data = {};
+                    response = await axios.get(url, requestConfig);
                 } else if (type == 'delete') {
-                    data = { data };
+                    response = await axios.delete(url, { data }, requestConfig);
+                } else {
+                    response = await axios[type](url, data, requestConfig);
                 }
-                const response = await axios[type](url, data, requestConfig);
+
                 return response ? response.data : null;
             } catch (error) {
                 return { error };
@@ -169,7 +172,7 @@ module.exports = (app, appConfig) => {
     app.service = {
         url: (url, serviceConfig) => {
             if (!app.isDebug) {
-                return `http://${serviceConfig.host}:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
+                return `${serviceConfig.isHttps ? 'https' : 'http'}://${serviceConfig.host}${serviceConfig.port ? ':' + serviceConfig.port : ''}` + url + '?t=' + new Date().getTime();
             } else if (serviceConfig.isDebug) {
                 return `http://localhost:${serviceConfig.port}` + url + '?t=' + new Date().getTime();
             } else {

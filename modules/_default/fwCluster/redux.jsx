@@ -112,3 +112,59 @@ export function deleteServiceImage(serviceName, filename) {
         }, error => console.error(error) || T.notify('Xóa image bị lỗi!', 'danger'));
     };
 }
+
+export function getAllLogs(done) {
+    return () => {
+        const url = '/api/cluster/list-logs';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách logs bị lỗi!', 'danger');
+                console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done(data.list);
+            }
+        }, error => console.error(error) || T.notify('Lấy danh sách logs bị lỗi!', 'danger'));
+    };
+}
+
+export function watchLogs(path, from, done) {
+    return () => {
+        const url = '/api/cluster/logs';
+        T.get(url, { path, from }, data => {
+            if (data.error) {
+                T.notify('Watch logs bị lỗi!', 'danger');
+                console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done(data);
+            }
+        }, error => console.error(error) || T.notify('Watch logs bị lỗi!', 'danger'));
+    };
+}
+
+export function getFreshLogs(done) {
+    return () => {
+        const url = '/api/cluster/fresh-logs';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Get fresh logs bị lỗi!', 'danger');
+                console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done(data);
+            }
+        }, error => console.error(error) || T.notify('Get fresh logs bị lỗi!', 'danger'));
+    };
+}
+
+export function unWatchLogs(done) {
+    return () => {
+        const url = '/api/cluster/logs';
+        T.post(url, data => {
+            if (data.error) {
+                T.notify('Unwatch logs bị lỗi!', 'danger');
+                console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done();
+            }
+        }, error => console.error(error) || T.notify('Unwatch logs bị lỗi!', 'danger'));
+    };
+}

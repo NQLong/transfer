@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon} from './redux';
-import { getDmDonViAll} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon } from './redux';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     DonViTable = [];
@@ -21,7 +21,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu } = item ? item : { ma: '', ten: '', tenTiengAnh: '', maDv: '', qdThanhLap: '', qdXoaTen: '', kichHoat: false, ghiChu: '' };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ten.value(ten ? ten : '');
         this.maDv.value(maDv);
         this.tenTiengAnh.value(tenTiengAnh ? tenTiengAnh : '');
@@ -37,7 +37,7 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             ten: this.ten.value(),
-            tenTiengAnh: this.tenTiengAnh.value(), 
+            tenTiengAnh: this.tenTiengAnh.value(),
             maDv: this.maDv.value(),
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
@@ -62,12 +62,12 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật đơn vị thuộc khoa' : 'Tạo mới đơn vị thuộc khoa',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên đơn vị thuộc khoa (tiếng Việt)' readOnly={readOnly} required/>
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên đơn vị thuộc khoa (tiếng Việt)' readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenTiengAnh = e} label='Tên đơn vị thuộc khoa (tiếng Anh)' readOnly={readOnly} />
                 <FormSelect className='col-md-12' ref={e => this.maDv = e} data={this.DonViTable} label='Mã đơn vị' required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-12' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
@@ -109,7 +109,7 @@ class DmBoMonPage extends AdminPage {
             permission = this.getUserPermission('dmBoMon', ['read', 'write', 'delete']);
 
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmBoMon && this.props.dmBoMon.page ?
-        this.props.dmBoMon.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
+            this.props.dmBoMon.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         let table = 'Không có dữ liệu đơn vị thuộc khoa';
         if (list && list.length > 0) {
             table = renderTable({
@@ -117,22 +117,22 @@ class DmBoMonPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Mã</th>
-                        <th style={{ width: '60%' }}>Bộ môn</th>
-                        <th style={{ width: '40%' }}>Đơn vị</th>
-                        <th style={{ width: 'auto'}} nowrap='true'>QĐ thành lập</th>
-                        <th style={{ width: 'auto'}} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center'}} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Bộ môn</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Đơn vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>QĐ thành lập</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} />
-                        <TableCell type='link' content={<b> {item.ten ? item.ten : ''} <br /> {item.tenTiengAnh ? item.tenTiengAnh : ''} </b>} 
+                        <TableCell type='link' content={<b> {item.ten ? item.ten : ''} <br /> {item.tenTiengAnh ? item.tenTiengAnh : ''} </b>}
                             className={item.qdXoaTen ? 'text-danger' : 'text-primary'} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={this.donViMapper && this.donViMapper[item.maDv] ? this.donViMapper[item.maDv] : ''} />
                         <TableCell type='text' content={item.qdThanhLap ? item.qdThanhLap : ''} style={{ whiteSpace: 'nowrap' }} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={() => this.props.updateDmBoMon(item.ma, { kichHoat: Number(!item.kichHoat) })} />
-                        <TableCell type='buttons' content={item} permission={permission} 
+                        <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>)
             });
@@ -146,9 +146,9 @@ class DmBoMonPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmBoMonPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect = {this.props.getDmDonViAll}
+                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect={this.props.getDmDonViAll}
                     create={this.props.createDmBoMon} update={this.props.updateDmBoMon} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',

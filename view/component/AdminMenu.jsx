@@ -83,8 +83,8 @@ class AdminMenu extends React.Component {
         }
 
         let firstname = '', lastname = '';
-        firstname = user && user.data ? user.data.ten : (user.firstName ? user.firstName : '');
-        lastname = user && user.data ? user.data.ho : (user.lastName ? user.lastName : '');
+        firstname = user.firstName || '';
+        lastname = user.lastName || '';
 
         return [
             <div key={1} className='app-sidebar__overlay' data-toggle='sidebar' />,

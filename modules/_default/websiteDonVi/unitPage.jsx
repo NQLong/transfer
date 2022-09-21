@@ -163,7 +163,7 @@ class UnitPage extends React.Component {
                                     <div id='carousel-gt' className='carousel-testimony1 owl-carousel owl-theme' style={{ paddingBottom: 3, minWidth: 225, maxWidth: 950 }}>
                                         {this.props.dvWebsiteGioiThieu && this.props.dvWebsiteGioiThieu.homeDv.length ? this.props.dvWebsiteGioiThieu.homeDv[this.state.hoverItem].hinhAnh.map((item, index) => (
                                             <div key={index} className='item'>
-                                                <img src={item.image} resizemode='strich'
+                                                <img src={item.image}
                                                     onClick={() => this.setState({ isOpen: true, photoIndex: index })}
                                                     style={{ paddingLeft: 5, height: 150, width: 225, maxWidth: 225, cursor: 'pointer' }} />
                                             </div>
