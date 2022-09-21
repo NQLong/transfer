@@ -25,11 +25,11 @@ module.exports = app => {
         app.model.svDmDienDongBhyt.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/students/dien-dong-bhyt/all', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/students/dien-dong-bhyt/all', app.permission.check('dmDienDongBhyt:read'), (req, res) => {
         app.model.svDmDienDongBhyt.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/students/dien-dong-bhyt/item/:ma', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/students/dien-dong-bhyt/item/:ma', app.permission.check('dmDienDongBhyt:read'), (req, res) => {
         app.model.svDmDienDongBhyt.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 

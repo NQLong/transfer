@@ -5,7 +5,7 @@ import dmDienDongBhyt from './redux';
 
 export default {
     redux: {
-        parent: 'danhMuc',
+        parent: 'sinhVien',
         reducers: { dmDienDongBhyt}
     },
     routes: [
