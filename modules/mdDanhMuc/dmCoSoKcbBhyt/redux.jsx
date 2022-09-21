@@ -121,6 +121,7 @@ export function createDmCoSoKcb(item, done) {
     const url = '/api/danh-muc/co-so-kham-chua-benh';
     T.post(url, { item }, (data) => {
         if (data.error) {
+          T.notify(data.error.message ? data.error.message : 'Tạo mới cơ sở khám chữa bệnh bị lỗi', 'danger');
           console.error(`POST: ${url}.`, data.error);
         } else {
           T.notify('Tạo cơ sở khám chữa bệnh BHYT thành công!', 'success');

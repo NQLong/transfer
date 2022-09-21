@@ -65,8 +65,8 @@ class EditModal extends AdminModal {
           <FormTextBox className='col-md-12' ref={(e) => (this.ma = e)} label='Mã' readOnly={this.state.ma ? true : readOnly} required />
           <FormTextBox type='text' className='col-md-12' ref={(e) => (this.ten = e)} label='Tên' readOnly={readOnly} required />
           <FormTextBox type='text' className='col-md-12' ref={(e) => (this.diachi = e)} label='Địa chỉ' readOnly={readOnly} required />
-          <FormTextBox type='number' className='col-md-12' ref={(e) => (this.loaiDangKy = e)} label='Loại đăng ký' readOnly={readOnly} step={1} />
-          <FormTextBox type='number' className='col-md-12' ref={(e) => (this.loaiCoSo = e)} label='Loại cơ sở' readOnly={readOnly} step={1} />
+          <FormTextBox type='number' className='col-md-6' ref={(e) => (this.loaiDangKy = e)} label='Loại đăng ký' readOnly={readOnly} step={1} />
+          <FormTextBox type='number' className='col-md-6' ref={(e) => (this.loaiCoSo = e)} label='Loại cơ sở' readOnly={readOnly} step={1} />
           <FormTextBox type='text' className='col-md-12' ref={(e) => (this.ghiChu = e)} label='Ghi chú' readOnly={readOnly} />
         </div>
       ),
@@ -117,10 +117,10 @@ class DmCoSoKcbPage extends AdminPage {
       ),
       renderRow: (item, index) => (
         <tr key={index}>
-          <TableCell type='number' content={index + 1} />
+          <TableCell type='number' content={pageSize * pageNumber + index + 1 - pageSize} />
           <TableCell type='text' content={item.ma.toString()} />
-          <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
-          <TableCell type='text' content={item.diaChi} style={{ whiteSpace: 'nowrap' }} />
+          <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)}  style={{ whiteSpace: 'nowrap' }} />
+          <TableCell type='text' content={item.diaChi} />
           <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={(e) => this.delete(e, item)}></TableCell>
         </tr>
       ),

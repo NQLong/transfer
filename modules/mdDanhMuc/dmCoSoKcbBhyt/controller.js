@@ -59,7 +59,16 @@ module.exports = (app) => {
   });
 
   app.post('/api/danh-muc/co-so-kham-chua-benh', app.permission.check('dmCoSoKcb:write'), (req, res) => {
-    app.model.dmCoSoKcbBhyt.create(req.body.item, (error, item) => res.send({ error, item }));
+    const newItem = req.body.item;
+    app.model.dmCoSoKcbBhyt.get({ma: newItem.ma}, (error, item)=>{
+      if(item){
+        res.send({error: {exist: true, message: 'Cơ sở khám chữa bệnh mã ' + newItem.ma.toString() + ' đã tồn tại' }});
+      } else if(error) {
+        res.send({error});
+      } else {
+        app.model.dmCoSoKcbBhyt.create(newItem, (error, item) => res.send({ error, item }));
+      }
+    });
   });
 
   app.put('/api/danh-muc/co-so-kham-chua-benh', app.permission.check('dmCoSoKcb:write'), (req, res) => {
