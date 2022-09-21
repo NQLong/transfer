@@ -12,34 +12,6 @@ export default function dmCoSoKcbReducer(state = null, data) {
       return Object.assign({}, state, { items: data.items });
     case DmCoSoKcbGetPage:
       return Object.assign({}, state, { page: data.page });
-    case DmCoSoKcbUpdate:
-      if (state) {
-        let updatedItems = Object.assign({}, state.items),
-          updatedPage = Object.assign({}, state.page),
-          updatedItem = data.item;
-        if (updatedItems) {
-          for (let i = 0, n = updatedItems.length; i < n; i++) {
-            if (updatedItems[i].ma == updatedItem.ma) {
-              updatedItems.splice(i, 1, updatedItem);
-              break;
-            }
-          }
-        }
-        if (updatedPage) {
-          for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-            if (updatedPage.list[i].ma == updatedItem.ma) {
-              updatedPage.list.splice(i, 1, updatedItem);
-              break;
-            }
-          }
-        }
-        return Object.assign({}, state, {
-          items: updatedItems,
-          page: updatedPage,
-        });
-      } else {
-        return null;
-      }
     default:
       return state;
   }
@@ -176,7 +148,7 @@ export function changeDmCoSoKcb(item) {
 
 export const SelectAdapter_DmCoSoKcbBhyt = {
   ajax: true,
-  url: '/api/danh-muc/co-so-kcb-bhyt/get-all-for-adapter',
+  url: '/api/danh-muc/co-so-kham-chua-benh/page/1/50',
   data: (params) => ({ searchTerm: params.term }),
   processResults: (response) => ({ results: response && response.items ? response.items.map((item) => ({id: item.ma, text: `[${item.ma}] ${item.ten}: ${item.diaChi}`, ten: item.ten, loaiDangKy: item.loaiDangKy,})) : [],}),
   fetchOne: (ma, done) => getDmCoSoKcb(ma, (item) => item && done && done({ id: item.ma, text: `[${item.ma}] ${item.ten}: ${item.diaChi}` }))(),

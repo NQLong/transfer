@@ -42,7 +42,7 @@ module.exports = (app) => {
       res.send({ error });
     }
   });
-  //api-------------------------------------
+
   app.get('/api/danh-muc/co-so-kham-chua-benh/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
     const pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize);
     app.model.dmCoSoKcbBhyt.getPage(pageNumber, pageSize, {}, (error, page) => {
@@ -50,7 +50,7 @@ module.exports = (app) => {
     });
   });
 
-  app.get('/api/danh-muc/co-so-kham-chua-benh/all', app.permission.orCheck('dmCoSoKcb:read', 'dmCoSoKcb:read'), (req, res) => {
+  app.get('/api/danh-muc/co-so-kham-chua-benh/all', app.permission.check('user:login'), (req, res) => {
     app.model.dmCoSoKcbBhyt.getAll((error, items) => res.send({ error, items }));
   });
 

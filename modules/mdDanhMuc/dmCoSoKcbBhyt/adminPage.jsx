@@ -2,13 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmCoSoKcbPage, createDmCoSoKcb, getDmCoSoKcbAll, updateDmCoSoKcb, deleteDmCoSoKcb } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, getValue } from 'view/component/AdminPage';
 import T from 'view/js/common';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
-  state = { active: true };
-
   componentDidMount() {
     $(document).ready(() =>
       this.onShown(() => {
@@ -18,9 +16,7 @@ class EditModal extends AdminModal {
   }
 
   onShow = (item) => {
-    const { ma, ten, diaChi, ghiChu, loaiDangKy, loaiCoSo } = item
-      ? item
-      : {ma: '', ten: '', diaChi: '', ghiChu: '', loaiDangKy: 0, loaiCoSo: 0};
+    const { ma, ten, diaChi, ghiChu, loaiDangKy, loaiCoSo } = item ? item : {ma: '', ten: '', diaChi: '', ghiChu: '', loaiDangKy: 0, loaiCoSo: 0};
     this.setState({ ma, item });
     this.ma.value(ma);
     this.ten.value(ten);
@@ -33,27 +29,14 @@ class EditModal extends AdminModal {
   onSubmit = (e) => {
     e.preventDefault();
     const changes = {
-      ma: this.ma.value(),
-      ten: this.ten.value(),
-      diaChi: this.diachi.value(),
-      loaiDangKy: this.loaiDangKy.value(),
-      loaiCoSo: this.loaiCoSo.value(),
-      ghiChu: this.ghiChu.value(),
+      ma: getValue(this.ma),
+      ten: getValue(this.ten),
+      diaChi: getValue(this.diachi),
+      loaiDangKy: getValue(this.loaiDangKy),
+      loaiCoSo: getValue(this.loaiCoSo),
+      ghiChu: getValue(this.ghiChu),
     };
-
-    if (!this.state.ma && !this.ma.value()) {
-      T.notify('Mã cơ sở bị trống!', 'danger');
-      this.ma.focus();
-    } else if (changes.ten == '') {
-      T.notify('Tên cơ sở bị trống!', 'danger');
-      this.ten.focus();
-    } else if (changes.diaChi == '') {
-      T.notify('Địa chỉ cơ sở bị trống!', 'danger');
-      this.diaChi.focus();
-    } else {
-      console.log(changes);
       this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-    }
   };
 
   render = () => {
@@ -75,8 +58,6 @@ class EditModal extends AdminModal {
 }
 
 class DmCoSoKcbPage extends AdminPage {
-  state = { searching: false };
-  menu = '';
   componentDidMount() {
     T.ready('/user/category', () => {
       T.onSearch = (searchText) => this.props.getDmCoSoKcbPage(undefined, undefined, searchText || '');
