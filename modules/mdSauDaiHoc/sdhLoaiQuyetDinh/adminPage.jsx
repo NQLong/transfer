@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getSdhLoaiHvPage, updateSdhLoaiHv, deleteSdhLoaiHv, createSdhLoaiHv} from './redux';
+import { getSdhLoaiQdPage, updateSdhLoaiQd, deleteSdhLoaiQd, createSdhLoaiQd} from './redux';
 import { AdminModal, AdminPage, FormCheckbox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import T from 'view/js/common';
 import Pagination from 'view/component/Pagination';
@@ -54,12 +54,12 @@ class EditModal extends AdminModal {
         });
     }
 }
-class sdhLoaiHocVienPage extends AdminPage {
+class sdhLoaiQuyetDinhPage extends AdminPage {
     state = { list: [] }
     componentDidMount() {
         console.log(123);
         T.ready('/user/sau-dai-hoc', () => {
-            this.props.getSdhLoaiHvPage();
+            this.props.getSdhLoaiQdPage();
             console.log(this.props);
         });
     }
@@ -75,10 +75,10 @@ class sdhLoaiHocVienPage extends AdminPage {
     }
 
     delete = (e,item) => {
-        T.confirm('Xóa Loại hoc viên sau đại học', `Bạn có chắc bạn muốn xóa Loại hoc viên sau đại học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteSdhLoaiHv(item.ma, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá Loại hoc viên sau đại học ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá Loại hoc viên sau đại học ${item.ten} thành công!`, 'success', false, 800);
+        T.confirm('Xóa Loại quyết định sau đại học', `Bạn có chắc bạn muốn xóa Loại quyết định sau đại học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteSdhLoaiQd(item.ma, error => {
+                if (error) T.notify(error.message ? error.message : `Xoá Bậc sau đại học ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá Loại quyết định sau đại học ${item.ten} thành công!`, 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -90,8 +90,8 @@ class sdhLoaiHocVienPage extends AdminPage {
 
     render() {
         this.props.getDmHocSdhPage;
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhLoaiHocVien ? this.props.sdhLoaiHocVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] },
-            permission = this.getUserPermission('sdhLoaiHocVien', ['read', 'write', 'delete']);
+        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhLoaiQuyetDinh ? this.props.sdhLoaiQuyetDinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] },
+            permission = this.getUserPermission('sdhLoaiQuyetDinh', ['read', 'write', 'delete']);
         let table = 'Chua co du lieu';
         if (list && list.length > 0) {
             table = renderTable({
@@ -111,7 +111,7 @@ class sdhLoaiHocVienPage extends AdminPage {
                         <TableCell type='text' content={item.ma} />
                         <TableCell type='text' content={item.ten} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                         onChanged={value => this.props.updateSdhLoaiHv(item.ma, { kichHoat: value ? 1 : 0, })} />
+                         onChanged={value => this.props.updateSdhLoaiQd(item.ma, { kichHoat: value ? 1 : 0, })} />
                         
                         <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
@@ -124,15 +124,15 @@ class sdhLoaiHocVienPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Loại hoc viên đào tạo',
+            title: 'Loại quyết định đào tạo',
             breadcrumb: [
                 <Link key={0} to={'/user/sau-dai-hoc'}>{'Sau đại học'}</Link>,
-                'Loại hoc viên đào tạo'
+                'Loại quyết định đào tạo'
             ],
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} />
-                <EditModal ref={e => this.modal = e} update={this.props.updateSdhLoaiHv} create={this.props.createSdhLoaiHv} />
+                <EditModal ref={e => this.modal = e} update={this.props.updateSdhLoaiQd} create={this.props.createSdhLoaiQd} />
             </>,
             backRoute: '/user/sau-dai-hoc',
             onCreate: (e) => this.showModal(e)
@@ -140,6 +140,6 @@ class sdhLoaiHocVienPage extends AdminPage {
     }
 
 }
-const mapStateToProps = state => ({ system: state.system, sdhLoaiHocVien: state.sdh.sdhLoaiHocVien });
-const mapActionsToProps = { getSdhLoaiHvPage, updateSdhLoaiHv , deleteSdhLoaiHv, createSdhLoaiHv};
-export default connect(mapStateToProps, mapActionsToProps)(sdhLoaiHocVienPage);
+const mapStateToProps = state => ({ system: state.system, sdhLoaiQuyetDinh: state.sdh.sdhLoaiQuyetDinh });
+const mapActionsToProps = { getSdhLoaiQdPage, updateSdhLoaiQd , deleteSdhLoaiQd, createSdhLoaiQd};
+export default connect(mapStateToProps, mapActionsToProps)(sdhLoaiQuyetDinhPage);
