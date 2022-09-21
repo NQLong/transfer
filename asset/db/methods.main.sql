@@ -6210,6 +6210,11 @@ BEGIN
                           AND (loaiVanBan IS NULL OR loaiVanBan = dks.LOAI_VAN_BAN)
                       )
                   AND (
+                              maCongVan IS NULL OR
+                              ((loaiVanBan IS NULL AND dks.LOAI_VAN_BAN IS NULL)
+                                  OR (loaiVanBan = dks.LOAI_VAN_BAN))
+                      )
+                  AND (
                               dks.SU_DUNG = 0
                           OR (
                                           dks.SU_DUNG = 1
@@ -6258,6 +6263,11 @@ BEGIN
                                     (donViGui IS NULL OR donViGui = dks.DON_VI_GUI)
                                     AND (loaiCongVan IS NULL OR loaiCongVan = dks.LOAI_CONG_VAN)
                                     AND (loaiVanBan IS NULL OR loaiVanBan = dks.LOAI_VAN_BAN)
+                                )
+                            AND (
+                                        maCongVan IS NULL OR
+                                        ((loaiVanBan IS NULL AND dks.LOAI_VAN_BAN IS NULL)
+                                            OR (loaiVanBan = dks.LOAI_VAN_BAN))
                                 )
                             AND (
                                         dks.SU_DUNG = 0
@@ -18831,9 +18841,10 @@ BEGIN
     SELECT JSON_VALUE(filter, '$.namHoc') INTO namHoc FROM DUAL;
     SELECT JSON_VALUE(filter, '$.hocKy') INTO hocKy FROM DUAL;
     SELECT JSON_VALUE(filter, '$.namTuyenSinh') INTO namTuyenSinh FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.bac') INTO bac FROM DUAL;
-    SELECT JSON_VALUE(filter, '$.loaiHinh') INTO loaiHinh FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.bacDaoTao') INTO bac FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.loaiDaoTao') INTO loaiHinh FROM DUAL;
     SELECT JSON_VALUE(filter, '$.loaiPhi') INTO loaiPhi FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.nganh') INTO nganh FROM DUAL;
 
 
     OPEN my_cursor for
@@ -18899,7 +18910,8 @@ BEGIN
         FROM TC_LOAI_PHI LP
         WHERE LP.ID in (SELECT regexp_substr(loaiPhi, '[^,]+', 1, level)
                         from dual
-                        connect by regexp_substr(loaiPhi, '[^,]+', 1, level) is NOT NULL);
+                        connect by regexp_substr(loaiPhi, '[^,]+', 1, level) is NOT NULL)
+    ORDER BY LP.ID;
     return my_cursor;
 END;
 
