@@ -32,7 +32,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:export');
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:export', 'student:dashboard');
             resolve();
         } else resolve();
     }));
