@@ -91,7 +91,7 @@ class DmDienDongBhytPage extends AdminPage {
 
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Diện đóng', 'Bạn có chắc bạn muốn xóa diện đóng này?', 'warning', true, isConfirm =>
+        T.confirm('Châu', 'Bạn có chắc bạn muốn xóa diện đóng này?', 'warning', true, isConfirm =>
             isConfirm && this.props.deleteDmDienDongBhyt(item.ma));
     };
 

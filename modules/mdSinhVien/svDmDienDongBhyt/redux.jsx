@@ -124,7 +124,7 @@ export function updateDmDienDongBhyt(ma, changes, done) {
 
 export function deleteDmDienDongBhyt(ma, done) {
     return dispatch => {
-        const url = '/api/students/dien-dong-bhyt';
+        const url = '/api/danh-muc/dien-dong-bhyt';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa diện đóng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
