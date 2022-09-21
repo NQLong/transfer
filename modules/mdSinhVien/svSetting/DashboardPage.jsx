@@ -45,29 +45,41 @@ class DashboardCtsv extends AdminPage {
     componentDidMount() {
         T.ready('/user/students', () => {
             this.props.GetDashboard(result => {
-                let { data, dataFee, listThaoTac } = result;
-                let dataNgayNhapHoc = data.filter(item => item.ngayNhapHoc != null && item.ngayNhapHoc != -1).map(item => ({ ...item, ngayNhapHoc: T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') })).groupBy('ngayNhapHoc');
-
+                let { data, dataFee, listThaoTac } = result,
+                    dataFilter = data.filter(item => item.ngayNhapHoc != null && item.ngayNhapHoc != -1).map(item => ({ ...item, ngayNhapHoc: T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') }));
+                let dataNgayNhapHoc = dataFilter.groupBy('ngayNhapHoc');
                 this.setState({
                     data, listThaoTac,
                     dataFee,
                     sumNewStud: data.length,
                     clc: data.filter(item => item.loaiHinhDaoTao == 'CLC').length,
                     cq: data.filter(item => item.loaiHinhDaoTao == 'CQ').length,
-                    dataTong: {
-                        labels: Object.keys(dataNgayNhapHoc),
-                        datas: {
-                            'Số lượng': Object.keys(dataNgayNhapHoc).map(key => dataNgayNhapHoc[key].length),
-                        },
-                        colors: {
-                            'Số lượng': DefaultColors.navy,
-                        }
-                    },
+                    dataTong: this.setUp([...new Set(dataFilter)], 'ngayNhapHoc', DefaultColors.navy),
                     dataTable: Object.keys(dataNgayNhapHoc).map(date => ({ date, clc: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CLC').length, cq: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CQ').length }))
                 }, () => {
                 });
             });
         });
+    }
+
+    setUp = (data = [], keyGroup, colors, mapper) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        delete dataGroupBy[null];
+        return {
+            labels: Object.keys(dataGroupBy).sort().map(item => {
+                if (mapper) return mapper[item] || 'Chưa xác định';
+                else return item;
+            }),
+            datas: {
+                'Số lượng': Object.values(dataGroupBy).sort().map(item => {
+                    if (item[0] && item[0].numOfStaff) return item[0].numOfStaff;
+                    else {
+                        return item.length;
+                    }
+                })
+            },
+            colors: colors
+        };
     }
 
     loaiHinhRender = (data) => renderTable({
@@ -176,7 +188,7 @@ class DashboardCtsv extends AdminPage {
                     <DashboardIcon type='warning' icon='fa-money' title='Đã đóng học phí' value={this.state.dataFee?.length || 0} />
                 </div>
                 <div className='col-lg-8'>
-                    <div className='tile' style={{ height: '40vh' }}>
+                    <div className='tile'>
                         <h5 className='tile-title'>Số lượng nhập học theo ngày</h5>
                         <AdminChart type='bar' data={this.state.dataTong} aspectRatio={3} />
                     </div>
