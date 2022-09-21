@@ -89,14 +89,13 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
-            const secretCode = req.body.secretCode;
+            const user = req.session.user;
+            let data = req.body.data;
+            let { mssv, thaoTac, secretCode } = data, timeModified = new Date().getTime();
             if (secretCode != mySecretCode) {
                 return res.send({ error: 'Permission denied!' });
             }
 
-            const user = req.session.user;
-            let data = req.body.data;
-            let { mssv, thaoTac } = data, timeModified = new Date().getTime();
             const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
             if (!student) {
                 res.send({ error: 'Không tìm thấy sinh viên' });
