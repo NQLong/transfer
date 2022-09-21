@@ -72,7 +72,7 @@ class TccbCaNhanDangKyDetails extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-pencil',
-            header: `Trạng thái: ${daDangKy ? (approvedDonVi || 'Chưa phê duyệt') : 'Chưa đăng ký'}`,
+            header: `${daDangKy ? (`Đơn vị phê duyệt: ${approvedDonVi || 'Chưa phê duyệt'}`) : 'Cá nhân chưa đăng ký'}`,
             title: 'Thông tin đăng ký',
             breadcrumb: [
                 <Link key={0} to='/user'>Thông tin cá nhân</Link>,

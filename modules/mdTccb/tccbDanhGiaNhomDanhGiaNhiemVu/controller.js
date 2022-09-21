@@ -18,10 +18,10 @@ module.exports = app => {
                 }
             };
             const items = await app.model.tccbNhomDanhGiaNhiemVu.getAll(condition, '*', 'nam DESC, thuTu ASC');
-            if (_condition.searchText === undefined || 'Chưa đăng ký'.includes(_condition.searchText)) {
+            if (_condition.searchText === undefined || 'Chưa đăng ký'.toLowerCase().includes(_condition.searchText.toLowerCase())) {
                 items.unshift({ id: -2, ten: 'Chưa đăng ký' });
             }
-            if (_condition.searchText === undefined || 'Tất cả'.includes(_condition.searchText)) {
+            if (_condition.searchText === undefined || 'Tất cả'.toLowerCase().includes(_condition.searchText.toLowerCase())) {
                 items.unshift({ id: -1, ten: 'Tất cả' });
             }
             res.send({ items });

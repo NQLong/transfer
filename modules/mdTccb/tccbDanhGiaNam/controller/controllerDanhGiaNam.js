@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3034: { title: 'Đánh giá', link: '/user/tccb/danh-gia', icon: 'fa-pencil-square-o', backgroundColor: '#2a99b8', groupIndex: 6 },
+            3034: { title: 'Đánh giá năm', link: '/user/tccb/danh-gia', icon: 'fa-pencil-square-o', backgroundColor: '#2a99b8', groupIndex: 6 },
         }
     };
     app.permission.add(
