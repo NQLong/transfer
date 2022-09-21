@@ -49,7 +49,7 @@ export function getCauHinhNhapHoc(done) {
                 T.notify('Lấy cấu hình bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${result.error}`);
             } else {
-                done && done(result.item);
+                done && done(result);
             }
         });
     };

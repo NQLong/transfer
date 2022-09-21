@@ -10,7 +10,7 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin } from './redux';
 import { Tooltip } from '@mui/material';
@@ -52,9 +52,12 @@ class AdminStudentsPage extends AdminPage {
         let { pageNumber, pageSize, pageCondition } = this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
         this.getStudentsPage(pageNumber, pageSize, pageCondition, page => page && this.hideAdvanceSearch());
         const filter = T.updatePage('pageStudentsAdmin').filter;
-        console.log(filter);
         Object.keys(this).forEach(key => {
-            filter[key] && this[key].value(filter[key]);
+            if (filter[key]) {
+                if (['toNhapHoc', 'fromNhapHoc'].includes(key)) this[key].value(filter[key]);
+                else this[key].value(filter[key].toString().split(','));
+            }
+
         });
         if (isReset) {
             Object.keys(this).forEach(key => {
@@ -75,7 +78,7 @@ class AdminStudentsPage extends AdminPage {
     }
 
     render() {
-        let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
+        let permission = this.getUserPermission('student', ['read', 'write', 'delete', 'export']);
         let developer = this.getUserPermission('developer', ['login']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
             this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
@@ -152,7 +155,7 @@ class AdminStudentsPage extends AdminPage {
                         + (item.tinhLienLac ? item.tinhLienLac : '')} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.sdtNguoiLienLac || ''} />
                     <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngayNhapHoc ? (item.ngayNhapHoc == -1 ? 'Đang chờ nhập học'
-                        : (item.ngayNhapHoc.toString().length == 20 ? T.dateToText(new Date(item.ngayNhapHoc), 'dd/mm/yyyy') : '')) : ''} />
+                        : (item.ngayNhapHoc.toString().length > 10 ? T.dateToText(new Date(item.ngayNhapHoc), 'dd/mm/yyyy') : '')) : ''} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tinhTrang || ''} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                         onDelete={this.delete}>
@@ -275,7 +278,7 @@ class AdminStudentsPage extends AdminPage {
                         });
                     }} />
 
-                    <FormSelect multiple ref={e => this.listKhoaSinhVien = e} data={[2022, 2021, 2020, 2019, 2018]} label='Lọc theo khoá' className='col-md-4' allowClear onChange={value => {
+                    <FormSelect multiple ref={e => this.listKhoaSinhVien = e} data={[2022, 2021, 2020, 2019, 2018]} label='Lọc theo khoá SV' className='col-md-4' allowClear onChange={value => {
                         let currentFilter = Object.assign({}, this.state.filter),
                             current = currentFilter.listKhoaSinhVien?.split(',') || [];
                         if (value.selected) {
@@ -285,9 +288,23 @@ class AdminStudentsPage extends AdminPage {
                             filter: { ...currentFilter, listKhoaSinhVien: current.toString() }
                         });
                     }} />
+                    <FormDatePicker type='date-mask' ref={e => this.fromNhapHoc = e} label='Ngày nhập học (từ)' onChange={fromNhapHoc => {
+                        if (fromNhapHoc && !isNaN(fromNhapHoc.getTime())) this.setState({
+                            filter: { ...this.state.filter, fromNhapHoc: fromNhapHoc.setHours(0, 0, 0, 0) }
+                        }); else this.setState({
+                            filter: { ...this.state.filter, fromNhapHoc: '' }
+                        });
+                    }} className='col-md-4' />
+                    <FormDatePicker type='date-mask' ref={e => this.toNhapHoc = e} label='Ngày nhập học (đến)' className='col-md-4' onChange={toNhapHoc => {
+                        if (toNhapHoc && !isNaN(toNhapHoc.getTime())) this.setState({
+                            filter: { ...this.state.filter, toNhapHoc: toNhapHoc.setHours(23, 59, 59, 99) }
+                        }); else this.setState({
+                            filter: { ...this.state.filter, toNhapHoc: '' }
+                        });
+                    }} />
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.setState({ filter: {} }, () => this.changeAdvancedSearch(true))} style={{ marginRight: '20px' }}>
+                    <button className='btn btn-secondary' onClick={e => e.preventDefault() || this.setState({ filter: {} }, () => this.changeAdvancedSearch(true))} style={{ marginRight: '15px' }}>
                         <i className='fa fa-lg fa-times' />Reset
                     </button>
                     <button className='btn btn-info' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
@@ -297,7 +314,7 @@ class AdminStudentsPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    {list && list.length ? <i><b>{T.numberDisplay(pageSize)}</b>/{T.numberDisplay(totalItem)} sinh viên</i> : ''}
+                    {list && list.length ? <i>{T.numberDisplay(totalItem)} sinh viên</i> : ''}
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
@@ -315,6 +332,7 @@ class AdminStudentsPage extends AdminPage {
                     T.confirm('Cảnh báo', 'Bạn không có quyền thêm mới sinh viên. Liên hệ người có quyền để thao tác', 'warning', true);
                 }
             },
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'ALL_COL_STUDENTS.xlsx') : null,
             buttons: [
                 permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null,
                 developer.login && { className: 'btn btn-success', icon: 'fa-upload', tooltip: 'Import dữ liệu sinh viên', onClick: e => e.preventDefault() || this.props.history.push('/user/students/import') }

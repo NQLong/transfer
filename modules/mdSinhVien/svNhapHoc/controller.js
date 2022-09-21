@@ -36,12 +36,12 @@ module.exports = app => {
             app.updateSessionUser(null, user, sessionUser => {
                 if ((sessionUser.permissions || []).contains(['student:write', 'ctsvNhapHoc:write'])) {
                     req.session.user = sessionUser;
+                    req.session.user.expiration = new Date().getTime();
                     req.session.save();
                     res.send({ user: sessionUser });
                 } else res.send({ error: 'Permission denied!' });
             });
         } catch (error) {
-            console.log(error);
             res.send({ error });
         }
     });
@@ -50,10 +50,9 @@ module.exports = app => {
         try {
             const secretCode = req.body.secretCode;
             if (secretCode == mySecretCode) {
-                const mssv = req.body.mssv;
+                const mssv = req.body.mssv.trim();
                 const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                     timeModified = Date.now();
-
                 let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
                 dataNhapHoc = dataNhapHoc.rows ? dataNhapHoc.rows[0] : {};
                 let cauHinhNhapHoc = await app.model.svCauHinhNhapHoc.get({}, '*', 'id DESC');
@@ -69,11 +68,13 @@ module.exports = app => {
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
                     } else {
+                        if (dataNhapHoc.congNo && parseInt(dataNhapHoc.congNo) <= 0) dataNhapHoc.congNo = 0;
                         if (dataNhapHoc.ngayNhapHoc == -1) {
                             dataNhapHoc.ngayNhapHoc = null;
                             dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                         } else {
-                            dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+                            if (dataNhapHoc.hoTenNguoiLienLac) dataNhapHoc.tinhTrang = 'Đã cập nhật thông tin trực tuyến';
+                            else dataNhapHoc.tinhTrang = 'Chưa cập nhật thông tin trực tuyến'.toUpperCase();
                         }
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
@@ -89,14 +90,13 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
-            const secretCode = req.body.secretCode;
+            const user = req.session.user;
+            let data = req.body.data;
+            let { mssv, thaoTac, secretCode } = data, timeModified = new Date().getTime();
             if (secretCode != mySecretCode) {
                 return res.send({ error: 'Permission denied!' });
             }
 
-            const user = req.session.user;
-            let data = req.body.data;
-            let { mssv, thaoTac } = data, timeModified = new Date().getTime();
             const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
             if (!student) {
                 res.send({ error: 'Không tìm thấy sinh viên' });
@@ -148,7 +148,7 @@ module.exports = app => {
                 }
             }
         } catch (error) {
-            res.send({ error });
+            res.send({ error: 'Thao tác nhập học gặp lỗi' });
         }
     });
 
@@ -173,7 +173,7 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
         try {
-            const mssv = req.body.mssv;
+            const mssv = req.body.mssv.trim();
             const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                 timeModified = Date.now();
 
@@ -196,7 +196,8 @@ module.exports = app => {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                     } else {
-                        dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+                        if (dataNhapHoc.hoTenNguoiLienLac) dataNhapHoc.tinhTrang = 'Đã cập nhật thông tin trực tuyến';
+                        else dataNhapHoc.tinhTrang = ('Chưa cập nhật thông tin trực tuyến').toUpperCase();
                     }
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
