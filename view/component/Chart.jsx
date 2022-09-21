@@ -49,9 +49,10 @@ export class AdminChart extends React.Component {
             scales: type === 'bar' || type === 'line' ? {
                 yAxes: [{
                     ticks: {
-                        display: false
+                        display: false,
+                        beginAtZero: true
                     }
-                }]
+                }],
             } : null,
             animation: {
                 duration: 1000,
