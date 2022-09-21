@@ -15,13 +15,13 @@ module.exports = app => {
             let filter = req.query?.filter || {};
             if (!filter.namHoc) filter.namHoc = new Date().getFullYear();
             let items = await app.model.svBaoHiemYTe.searchPage('', app.utils.stringify(filter));
-            const condition = {
-                statement: 'idDangKy in (:listId)',
-                parameter: { listId: items.rows.map(item => item.id) }
-            };
-            let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
+            // const condition = {
+            //     statement: 'idDangKy in (:listId)',
+            //     parameter: { listId: items.rows.map(item => item.id) }
+            // };
+            // let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
 
-            res.send({ items: items.rows, dataChuHo, dataThanhVien });
+            res.send({ items: items.rows });
         } catch (error) {
             console.log(error);
             res.send({ error });

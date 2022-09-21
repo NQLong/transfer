@@ -15,14 +15,14 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'student:manage', menu },
-        { name: 'student:manage', menu: menuDashboad },
+        { name: 'student:dashboard', menu: menuDashboad },
     );
 
-    app.get('/user/students/dashboard', app.permission.check('student:manage'), app.templates.admin);
+    app.get('/user/students/dashboard', app.permission.check('student:dashboard'), app.templates.admin);
 
     app.get('/user/students/setting', app.permission.check('student:manage'), app.templates.admin);
 
-    app.get('/api/students/dashboard', app.permission.check('student:manage'), async (req, res) => {
+    app.get('/api/students/dashboard', app.permission.check('student:dashboard'), async (req, res) => {
         try {
             const data = await app.model.fwStudents.getAll({
                 statement: 'namTuyenSinh = :namTuyenSinh AND loaiHinhDaoTao IN (:loaiHinh)',

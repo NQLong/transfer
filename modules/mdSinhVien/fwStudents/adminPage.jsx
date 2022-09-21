@@ -314,11 +314,14 @@ class AdminStudentsPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    {list && list.length ? <i>{T.numberDisplay(totalItem)} sinh viên</i> : ''}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginBottom: '10px' }}>
+                        <div>{list && list.length ? <i>{T.numberDisplay(totalItem)} sinh viên</i> : ''}</div>
+                        <Pagination style={{ position: '', bottom: '', width: '' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                            getPage={this.getStudentsPage} />
+                    </div>
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.getStudentsPage} />
+
                 <AdminBhytModal ref={e => this.bhytModal = e} createSvBaoHiemYTe={this.props.createMssvBaoHiemYTe} />
                 <LoginToTestModal ref={e => this.loginModal = e} loginStudentForTest={this.props.loginStudentForTest} />
             </>
