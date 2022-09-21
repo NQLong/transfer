@@ -54,7 +54,7 @@ class DashboardCtsv extends AdminPage {
                     sumNewStud: data.length,
                     clc: data.filter(item => item.loaiHinhDaoTao == 'CLC').length,
                     cq: data.filter(item => item.loaiHinhDaoTao == 'CQ').length,
-                    dataTong: this.setUp([...new Set(dataFilter)], 'ngayNhapHoc', DefaultColors.navy),
+                    dataTong: this.setUp([...new Set(dataFilter)], 'ngayNhapHoc', Object.keys(DefaultColors)),
                     dataTable: Object.keys(dataNgayNhapHoc).map(date => ({ date, clc: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CLC').length, cq: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CQ').length }))
                 }, () => {
                 });
@@ -71,12 +71,8 @@ class DashboardCtsv extends AdminPage {
                 else return item;
             }),
             datas: {
-                'Số lượng': Object.values(dataGroupBy).sort().map(item => {
-                    if (item[0] && item[0].numOfStaff) return item[0].numOfStaff;
-                    else {
-                        return item.length;
-                    }
-                })
+                'CQ': Object.values(dataGroupBy).sort().map(item => item.filter(item => item.loaiHinhDaoTao == 'CQ').length),
+                'CLC': Object.values(dataGroupBy).sort().map(item => item.filter(item => item.loaiHinhDaoTao == 'CLC').length)
             },
             colors: colors
         };
@@ -93,13 +89,22 @@ class DashboardCtsv extends AdminPage {
                 <th style={{ whiteSpace: 'nowrap', width: '50%', textAlign: 'center' }}>CLC</th>
             </tr>
         ),
-        renderRow: (item, index) => (
-            <tr key={index}>
-                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.date} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.cq} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.clc} />
+        renderRow: <>
+            {data.map((item, index) => (
+                <tr key={index}>
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.date} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#EFB7B7' }} content={item.cq} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#9AD0EC' }} content={item.clc} />
+                </tr>
+            ))}
+            {data && <><tr>
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={'Tổng'} rowSpan={2} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#BD4B4B', color: '#FFF' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.cq), 0)} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#1572A1', color: '#FFF' }} content={data.reduce((pre, cur) => (parseInt(pre) + parseInt(cur.clc)), 0)} />
             </tr>
-        )
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#FFEF82' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.clc) + parseInt(cur.cq), 0)} colSpan={2} />
+            </>}
+        </>
     });
 
 
@@ -188,13 +193,13 @@ class DashboardCtsv extends AdminPage {
                     <DashboardIcon type='warning' icon='fa-money' title='Đã đóng học phí' value={this.state.dataFee?.length || 0} />
                 </div>
                 <div className='col-lg-8'>
-                    <div className='tile'>
+                    <div className='tile' style={{ height: '60vh', overflow: 'scroll' }}>
                         <h5 className='tile-title'>Số lượng nhập học theo ngày</h5>
-                        <AdminChart type='bar' data={this.state.dataTong} aspectRatio={3} />
+                        <AdminChart type='horizontalBar' data={this.state.dataTong} stack aspectRatio={3} />
                     </div>
                 </div>
                 <div className='col-lg-4'>
-                    <div className='tile' style={{ height: '40vh', overflow: 'scroll' }}>
+                    <div className='tile' style={{ height: '60vh', overflow: 'scroll' }}>
                         <h5 className='tile-title'>Số lượng theo hệ</h5>
                         {this.loaiHinhRender(this.state.dataTable)}
                     </div>
