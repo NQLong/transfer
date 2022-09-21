@@ -78,10 +78,7 @@ class DmCoSoKcbPage extends AdminPage {
   state = { searching: false };
   menu = '';
   componentDidMount() {
-    let route = T.routeMatcher('/user/:menu/co-so-kham-chua-benh').parse(window.location.pathname);
-    this.menu = route.menu;
-
-    T.ready(`/user/${this.menu == '' ? 'students' : 'category'}`, () => {
+    T.ready('/user/category', () => {
       T.onSearch = (searchText) => this.props.getDmCoSoKcbPage(undefined, undefined, searchText || '');
       T.showSearchBox();
       this.props.getDmCoSoKcbPage();
@@ -115,7 +112,7 @@ class DmCoSoKcbPage extends AdminPage {
           <th style={{ width: 'auto', textAlign: 'center' }}>Mã</th>
           <th style={{ width: '40%' }}>Tên cơ sở</th>
           <th style={{ width: '60%' }}>Địa chỉ</th>
-          <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+          <th style={{ width: 'auto',  whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
         </tr>
       ),
       renderRow: (item, index) => (
@@ -133,8 +130,8 @@ class DmCoSoKcbPage extends AdminPage {
       icon: 'fa fa-list-alt',
       title: 'Danh mục cơ sở khám chữa bệnh BHYT',
       breadcrumb: [
-        <Link key={0} to={`/user/${this.menu}`}>
-          {this.menu == 'danh-muc' ? 'Danh mục' : 'Sinh viên'}
+        <Link key={0} to={'/user/category'}>
+          Danh mục
         </Link>,
         'Danh mục cơ sở khám chữa bệnh',
       ],
@@ -145,7 +142,7 @@ class DmCoSoKcbPage extends AdminPage {
           <EditModal ref={(e) => (this.modal = e)} readOnly={!permission.write} create={this.props.createDmCoSoKcb} update={this.props.updateDmCoSoKcb} />
         </>
       ),
-      backRoute: `/user/${this.menu == 'danh-muc' ? 'category' : 'students'}`,
+      backRoute: '/user/category',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
     });
   }

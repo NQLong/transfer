@@ -1,17 +1,5 @@
 import T from 'view/js/common';
 
-export function getDmCoSoKcbBhyt(ma, done) {
-  return () => {
-    const url = `/api/danh-muc/co-so-kcb-bhyt/item/${ma}`;
-    T.get(url, (result) => {
-      if (result.error) {
-        T.notify('Lỗi lấy thông tin cơ sở KCB BHYT', 'danger');
-      } else {
-        done && done(result.item);
-      }
-    });
-  };
-}
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const DmCoSoKcbGetAll = 'DmCoSoKcb:GetAll';
@@ -58,6 +46,19 @@ export default function dmCoSoKcbReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
+export function getDmCoSoKcbBhyt(ma, done) {
+  return () => {
+    const url = `/api/danh-muc/co-so-kcb-bhyt/item/${ma}`;
+    T.get(url, (result) => {
+      if (result.error) {
+        T.notify('Lỗi lấy thông tin cơ sở KCB BHYT', 'danger');
+      } else {
+        done && done(result.item);
+      }
+    });
+  };
+}
+
 export function getDmCoSoKcbAll(done) {
   return (dispatch) => {
     const url = '/api/danh-muc/co-so-kham-chua-benh/all';
@@ -176,16 +177,6 @@ export const SelectAdapter_DmCoSoKcbBhyt = {
   ajax: true,
   url: '/api/danh-muc/co-so-kcb-bhyt/get-all-for-adapter',
   data: (params) => ({ searchTerm: params.term }),
-  processResults: (response) => ({
-    results:
-      response && response.items
-        ? response.items.map((item) => ({
-            id: item.ma,
-            text: `[${item.ma}] ${item.ten}: ${item.diaChi}`,
-            ten: item.ten,
-            loaiDangKy: item.loaiDangKy,
-          }))
-        : [],
-  }),
+  processResults: (response) => ({ results: response && response.items ? response.items.map((item) => ({id: item.ma, text: `[${item.ma}] ${item.ten}: ${item.diaChi}`, ten: item.ten, loaiDangKy: item.loaiDangKy,})) : [],}),
   fetchOne: (ma, done) => getDmCoSoKcb(ma, (item) => item && done && done({ id: item.ma, text: `[${item.ma}] ${item.ten}: ${item.diaChi}` }))(),
 };
