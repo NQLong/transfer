@@ -110,8 +110,8 @@ class DmCoSoKcbPage extends AdminPage {
         <tr>
           <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
           <th style={{ width: 'auto', textAlign: 'center' }}>Mã</th>
-          <th style={{ width: '40%' }}>Tên cơ sở</th>
-          <th style={{ width: '60%' }}>Địa chỉ</th>
+          <th style={{ width: '50%' }}>Tên cơ sở</th>
+          <th style={{ width: '50%' }}>Địa chỉ</th>
           <th style={{ width: 'auto',  whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
         </tr>
       ),
@@ -119,7 +119,7 @@ class DmCoSoKcbPage extends AdminPage {
         <tr key={index}>
           <TableCell type='number' content={pageSize * pageNumber + index + 1 - pageSize} />
           <TableCell type='text' content={item.ma.toString()} />
-          <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)}  style={{ whiteSpace: 'nowrap' }} />
+          <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
           <TableCell type='text' content={item.diaChi} />
           <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={(e) => this.delete(e, item)}></TableCell>
         </tr>
