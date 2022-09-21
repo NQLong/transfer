@@ -7,19 +7,31 @@ module.exports = app => {
         app.model.tccbNhomDanhGiaNhiemVu.getPage(pageNumber, pageSize, condition, '*', 'nam DESC, thuTu ASC', (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/all', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
-        let _condition = req.query.condition || {};
-        const condition = {
-            statement: 'lower(ten) LIKE :searchText AND nam = :nam',
-            parameter: {
-                searchText: `%${_condition.searchText || ''}%`,
-                nam: _condition.nam
+    app.get('/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/all', app.permission.orCheck('tccbDanhGiaNam:manage', 'president:login'), async (req, res) => {
+        try {
+            let _condition = req.query.condition || {};
+            const condition = {
+                statement: 'lower(ten) LIKE :searchText AND nam = :nam',
+                parameter: {
+                    searchText: `%${_condition.searchText || ''}%`,
+                    nam: _condition.nam
+                }
+            };
+            const items = await app.model.tccbNhomDanhGiaNhiemVu.getAll(condition, '*', 'nam DESC, thuTu ASC');
+            if (_condition.searchText === undefined || 'Chưa đăng ký'.includes(_condition.searchText)) {
+                items.unshift({ id: -2, ten: 'Chưa đăng ký' });
             }
-        };
-        app.model.tccbNhomDanhGiaNhiemVu.getAll(condition, '*', 'nam DESC, thuTu ASC', (error, items) => res.send({ error, items }));
+            if (_condition.searchText === undefined || 'Tất cả'.includes(_condition.searchText)) {
+                items.unshift({ id: -1, ten: 'Tất cả' });
+            }
+            res.send({ items });
+        } catch (error) {
+            res.send({ error });
+        }
+
     });
 
-    app.get('/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/item/:id', app.permission.check('tccbDanhGiaNam:manage'), (req, res) => {
+    app.get('/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/item/:id', app.permission.orCheck('tccbDanhGiaNam:manage', 'president:login'), (req, res) => {
         app.model.tccbNhomDanhGiaNhiemVu.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 

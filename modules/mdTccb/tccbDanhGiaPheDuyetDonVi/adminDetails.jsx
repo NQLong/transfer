@@ -23,7 +23,7 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/danh-gia/phe-duyet-don-vi/:nam');
+            const route = T.routeMatcher('/user/tccb/danh-gia-phe-duyet-don-vi/:nam');
             const nam = parseInt(route.parse(window.location.pathname)?.nam);
             this.setState({ nam });
             T.onSearch = (searchText) => this.props.getTccbDanhGiaPDDVPage(undefined, undefined, searchText || '');
@@ -65,16 +65,18 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'left' }} content={item.tenNhomDangKy || 'Chưa đăng ký'} />
                         <TableCell type='text' style={{ textAlign: 'left' }} content={this.showStatus(item.approvedDonVi, 'Chưa phê duyệt')} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }}>
-                            <Tooltip title='Đồng ý' arrow>
-                                <button className='btn btn-success' onClick={e => item.id ? this.approvedDonViAction(e, item, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
-                                    <i className='fa fa-lg fa-check' />
-                                </button>
-                            </Tooltip>
-                            <Tooltip title='Không đồng ý' arrow>
-                                <button className='btn btn-danger' onClick={e => item.id ? this.approvedDonViAction(e, item, 'Không đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
-                                    <i className='fa fa-lg fa-times' />
-                                </button>
-                            </Tooltip>
+                            {
+                                item.approvedTruong != 'Đồng ý' && <><Tooltip title='Đồng ý' arrow>
+                                    <button className='btn btn-success' onClick={e => item.id ? this.approvedDonViAction(e, item, 'Đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                        <i className='fa fa-lg fa-check' />
+                                    </button>
+                                </Tooltip>
+                                    <Tooltip title='Không đồng ý' arrow>
+                                        <button className='btn btn-danger' onClick={e => item.id ? this.approvedDonViAction(e, item, 'Không đồng ý') : T.notify('Cá nhân chưa đăng ký!', 'danger')}>
+                                            <i className='fa fa-lg fa-times' />
+                                        </button>
+                                    </Tooltip></>
+                            }
                         </TableCell>
                     </tr>
                 )
