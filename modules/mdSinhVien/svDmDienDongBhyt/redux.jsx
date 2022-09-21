@@ -124,12 +124,14 @@ export function updateDmDienDongBhyt(ma, changes, done) {
 
 export function deleteDmDienDongBhyt(ma, done) {
     return dispatch => {
-        const url = '/api/danh-muc/dien-dong-bhyt';
+        console.log('Begin');
+        const url = '/api/students/dien-dong-bhyt/delete';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa diện đóng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
+                console.log('Inside');
                 T.alert('Xóa diện đóng thành công!', 'success', false, 800);
                 dispatch(getDmDienDongBhytPage());
             }

@@ -50,8 +50,7 @@ module.exports = app => {
         app.model.svDmDienDongBhyt.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/danh-muc/dien-dong-bhyt', app.permission.check('dmDienDongBhyt:delete'), (req, res) => {
-        // console.log(req.body);
-        app.model.svDmDienDongBhyt.delete({ ma: req.body.ma }, req.body.changes, error => res.send({ error }));
+    app.delete('/api/students/dien-dong-bhyt/delete', app.permission.check('dmDienDongBhyt:delete'), (req, res) => {
+        app.model.svDmDienDongBhyt.delete({ ma: req.body.ma }, error => res.send({ error }));
     });
 };
