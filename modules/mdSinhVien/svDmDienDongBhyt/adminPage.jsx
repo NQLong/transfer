@@ -58,17 +58,17 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật diện đóngo' : 'Tạo mới diện đóng',
+            title: this.state.ma ? 'Cập nhật diện đóng BHYT' : 'Tạo mới diện đóng BHYT',
             body: <div className = 'row'>
-               <FormTextBox type='number' className='col-md-12' ref={e => this.ma = e} label='Mã diện đóng' 
+               <FormTextBox type='number' className='col-md-12' ref={e => this.ma = e} label='Mã' 
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên diện đóng' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' 
                     readOnly={readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả ' 
                     readOnly={readOnly} required />
                 <FormTextBox type='number' className='col-md-12' ref={e => this.soTien = e} label='Số tiền'
                     readOnly={readOnly} required/>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.namHoc = e} label='Năm học' 
+                <FormTextBox type='scholastic' className='col-md-12' ref={e => this.namHoc = e} label='Năm học' 
                     readOnly={readOnly} required />
             </div>
         });
@@ -91,7 +91,7 @@ class DmDienDongBhytPage extends AdminPage {
 
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Châu', 'Bạn có chắc bạn muốn xóa diện đóng này?', 'warning', true, isConfirm =>
+        T.confirm('Diện đóng BHYT', 'Bạn có chắc bạn muốn xóa diện đóng BHYT này?', 'warning', true, isConfirm =>
             isConfirm && this.props.deleteDmDienDongBhyt(item.ma));
     };
 
@@ -108,10 +108,10 @@ class DmDienDongBhytPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' ,whiteSpace: 'nowrap'}} >Mã</th>
-                        <th style={{ width: '100%' ,whiteSpace: 'nowrap'}} >Tên</th>
-                        <th style={{ width: '100%' ,whiteSpace: 'nowrap'}} >Mô tả</th>
-                        <th style={{ width: '100%' ,whiteSpace: 'nowrap'}} >Số tiền</th>
-                        <th style={{ width: '100%' ,whiteSpace: 'nowrap'}} >Năm học</th>
+                        <th style={{ width: '30%' ,whiteSpace: 'nowrap'}} >Tên</th>
+                        <th style={{ width: '40%' ,whiteSpace: 'nowrap'}} >Mô tả</th>
+                        <th style={{ width: 'auto' ,whiteSpace: 'nowrap'}} >Số tiền</th>
+                        <th style={{ width: 'auto' ,whiteSpace: 'nowrap'}} >Năm học</th>
                         <th style={{ width: 'auto', textAlign: 'center' , whiteSpace: 'nowrap'}} >Thao tác</th>
                     </tr>
                 ),

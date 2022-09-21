@@ -50,14 +50,14 @@ export function getDmDienDongBhytPage(pageNumber, pageSize, pageCondition, done)
         const url = `/api/students/dien-dong-bhyt/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách diện đóng bị lỗi ' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách diện đóng BHYT bị lỗi ' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: DmDienDongBhytGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách diện đóng bị lỗi ' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách diện đóng BHYT bị lỗi ' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -66,13 +66,13 @@ export function getDmDienDongBhytAll(done) {
         const url = '/api/students/dien-dong-bhyt/all';
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách diện đóng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách diện đóng BHYT bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
                 dispatch({ type: DmDienDongBhytGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách diện đóng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách diện đóng BHYT bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -95,7 +95,7 @@ export function createDmDienDongBhyt(dmDienDongBhyt, done) {
         const url = '/api/students/dien-dong-bhyt';
         T.post(url, { dmDienDongBhyt }, data => {
             if (data.error) {
-                T.notify(data.error.message ? data.error.message : 'Tạo mới một diện đóng bị lỗi!', 'danger');
+                T.notify(data.error.message ? data.error.message : 'Tạo mới một diện đóng BHYT bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 T.notify('Tạo mới một diện đóng thành công!', 'success');
@@ -111,14 +111,14 @@ export function updateDmDienDongBhyt(ma, changes, done) {
         const url = '/api/students/dien-dong-bhyt';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật dữ liệu diện đóng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Cập nhật dữ liệu diện đóng BHYT bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 T.notify('Cập nhật dữ liệu diện đóng thành công!', 'success');
                 done && done(data.item);
                 dispatch(getDmDienDongBhytPage());
             }
-        }, (error) => T.notify('Cập nhật dữ liệu diện đóng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu diện đóng BHYT bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -132,11 +132,11 @@ export function deleteDmDienDongBhyt(ma, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 console.log('Inside');
-                T.alert('Xóa diện đóng thành công!', 'success', false, 800);
+                T.alert('Xóa diện đóng BHYT thành công!', 'success', false, 800);
                 dispatch(getDmDienDongBhytPage());
             }
             done && done();
-        }, () => T.notify('Xóa diện đóng bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa diện đóng BHYT bị lỗi!', 'danger'));
     };
 }
 
