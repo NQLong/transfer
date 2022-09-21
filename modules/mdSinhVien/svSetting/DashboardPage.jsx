@@ -54,7 +54,7 @@ class DashboardCtsv extends AdminPage {
                     sumNewStud: data.length,
                     clc: data.filter(item => item.loaiHinhDaoTao == 'CLC').length,
                     cq: data.filter(item => item.loaiHinhDaoTao == 'CQ').length,
-                    dataTong: this.setUp([...new Set(dataFilter)].sort((a, b) => b.ngayNhapHoc - a.ngayNhapHoc), 'ngayNhapHoc', DefaultColors.navy),
+                    dataTong: this.setUp([...new Set(dataFilter)], 'ngayNhapHoc', DefaultColors.navy),
                     dataTable: Object.keys(dataNgayNhapHoc).map(date => ({ date, clc: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CLC').length, cq: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CQ').length }))
                 }, () => {
                 });
@@ -66,12 +66,12 @@ class DashboardCtsv extends AdminPage {
         let dataGroupBy = data.groupBy(keyGroup);
         delete dataGroupBy[null];
         return {
-            labels: Object.keys(dataGroupBy).map(item => {
+            labels: Object.keys(dataGroupBy).sort().map(item => {
                 if (mapper) return mapper[item] || 'Chưa xác định';
                 else return item;
             }),
             datas: {
-                'Số lượng': Object.values(dataGroupBy).map(item => {
+                'Số lượng': Object.values(dataGroupBy).sort().map(item => {
                     if (item[0] && item[0].numOfStaff) return item[0].numOfStaff;
                     else {
                         return item.length;
