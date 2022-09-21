@@ -136,7 +136,7 @@ class DashboardCtsv extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.emailCaNhan || ''} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.emailTruong || ''} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.dienThoaiCaNhan || ''} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<>{T.dateToText(item.ngayNhapHoc, 'HH:MM:ss dd/mm/yyyy')}<br /><i>{this.state.listThaoTac.find(thaoTac => thaoTac.mssv == item.mssv).email}</i></>} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<>{T.dateToText(item.ngayNhapHoc, 'HH:MM:ss dd/mm/yyyy')}<br /><i>{this.state.listThaoTac.find(thaoTac => thaoTac.mssv == item.mssv)?.email || ''}</i></>} />
             </tr>
         )
     });

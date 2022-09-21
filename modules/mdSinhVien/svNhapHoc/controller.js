@@ -89,6 +89,7 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
+            console.log('BODY_SET_DATA', req.body.secretCode, mySecretCode);
             const secretCode = req.body.secretCode;
             if (secretCode != mySecretCode) {
                 return res.send({ error: 'Permission denied!' });
