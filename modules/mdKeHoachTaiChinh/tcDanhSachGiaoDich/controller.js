@@ -13,7 +13,7 @@ module.exports = app => {
         } else resolve();
     }));
 
-    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write');
+    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write', 'tcGiaoDich:check');
 
     app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:read'), app.templates.admin);
 
@@ -118,7 +118,7 @@ module.exports = app => {
     });
 
 
-    app.post('/api/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:write'), async (req, res) => {
+    app.post('/api/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:check'), async (req, res) => {
         try {
             let { soTien, sinhVien, namHoc, hocKy } = req.body;
             soTien = parseInt(soTien);
