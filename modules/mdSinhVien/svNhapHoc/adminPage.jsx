@@ -157,7 +157,7 @@ class NhapHocPage extends AdminPage {
 
 
                                 <span className='col-md-4'>Học phí:</span>
-                                <b className={congNo ? 'text-danger col-md-8' : 'text-success col-md-8'}>{congNo ? 'Chưa thanh toán học phí' : 'Đã thanh toán học phí'}</b><br /><br />
+                                <b className={congNo ? 'text-danger col-md-8' : 'text-success col-md-8'}>{congNo && congNo > 0 ? 'Chưa thanh toán học phí' : 'Đã thanh toán học phí'}</b><br /><br />
 
                                 <span className='col-md-4'>Tình trạng:</span>
                                 <b className={ngayNhapHoc ? 'text-success col-md-8' : 'text-secondary col-md-8'}>{tinhTrang}</b>
