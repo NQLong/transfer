@@ -37,8 +37,12 @@ module.exports = app => {
                     hocPhi: 11000000
                 }
             });
-            const listThaoTac = await app.model.svNhapHoc.getAll({ thaoTac: 'A' }, 'mssv,email', 'email');
-            res.send({ data, dataFee, listThaoTac });
+            let [listAccept, listDecline] = await Promise.all([
+                app.model.svNhapHoc.getAll({ thaoTac: 'A' }),
+                app.model.svNhapHoc.getAll({ thaoTac: 'D' }),
+            ]);
+            const listThaoTac = listAccept.filter(item => !listDecline.map(item => item.mssv).includes(item.mssv));
+            res.send({ data, dataFee, listThaoTac, listDecline });
         } catch (error) {
             res.send({ error });
         }
