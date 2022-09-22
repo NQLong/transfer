@@ -267,5 +267,18 @@ module.exports = app => {
                     }
                 }));
         }),
+
+        getStatistic: (filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_transaction_get_statistic(:filter, :tongsogiaodich); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, filter, tongsogiaodich: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                });
+        }),
     };
 };
