@@ -66,7 +66,7 @@ class DashboardCtsv extends AdminPage {
         let dataGroupBy = data.groupBy(keyGroup);
         delete dataGroupBy[null];
         return {
-            labels: Object.keys(dataGroupBy).sort(),
+            labels: Object.keys(dataGroupBy),
             datas: {
                 'CQ': Object.values(dataGroupBy).map(item => item.filter(item => item.loaiHinhDaoTao == 'CQ').length),
                 'CLC': Object.values(dataGroupBy).map(item => item.filter(item => item.loaiHinhDaoTao == 'CLC').length)
