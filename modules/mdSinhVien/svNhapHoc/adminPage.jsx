@@ -35,19 +35,25 @@ class NhapHocPage extends AdminPage {
 
     tuChoiNhapHoc = () => {
         T.confirm('TỪ CHỐI NHẬP HỌC', 'Bạn có chắc muốn TỪ CHỐI nhập học sinh viên này không', 'warning', true, isConfirm => {
-            isConfirm && this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'D' }, () => {
-                T.alert(`Từ chối nhập học ${this.state.dataNhapHoc.hoTen} vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null, 1000);
-                this.checkMssv();
-            });
+            if (isConfirm) {
+                T.notify('Vui lòng chờ giây lát');
+                this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'D' }, () => {
+                    T.alert(`Từ chối nhập học ${this.state.dataNhapHoc.hoTen} vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null, 1000);
+                    this.checkMssv();
+                });
+            }
         });
     }
 
     chapNhanNhapHoc = () => {
         T.confirm('CHẤP NHẬN NHẬP HỌC', 'Bạn có chắc muốn CHẤP NHẬN nhập học sinh viên này không', 'warning', true, isConfirm => {
-            isConfirm && this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'A' }, () => {
-                T.alert(`SV ${this.state.dataNhapHoc.hoTen} nhập học vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null, 1000);
-                this.checkMssv();
-            });
+            if (isConfirm) {
+                T.notify('Vui lòng chờ giây lát');
+                this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'A' }, () => {
+                    T.alert(`SV ${this.state.dataNhapHoc.hoTen} nhập học vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null, 1000);
+                    this.checkMssv();
+                });
+            }
         });
     }
 
