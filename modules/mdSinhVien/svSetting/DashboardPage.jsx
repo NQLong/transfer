@@ -55,24 +55,21 @@ class DashboardCtsv extends AdminPage {
                     clc: data.filter(item => item.loaiHinhDaoTao == 'CLC').length,
                     cq: data.filter(item => item.loaiHinhDaoTao == 'CQ').length,
                     dataTong: this.setUp([...new Set(dataFilter)], 'ngayNhapHoc', Object.keys(DefaultColors)),
-                    dataTable: Object.keys(dataNgayNhapHoc).map(date => ({ date, clc: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CLC').length, cq: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CQ').length }))
+                    dataTable: Object.keys(dataNgayNhapHoc).sort().map(date => ({ date, clc: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CLC').length, cq: dataNgayNhapHoc[date].filter(item => item.loaiHinhDaoTao == 'CQ').length }))
                 }, () => {
                 });
             });
         });
     }
 
-    setUp = (data = [], keyGroup, colors, mapper) => {
+    setUp = (data = [], keyGroup, colors) => {
         let dataGroupBy = data.groupBy(keyGroup);
         delete dataGroupBy[null];
         return {
-            labels: Object.keys(dataGroupBy).sort().map(item => {
-                if (mapper) return mapper[item] || 'Chưa xác định';
-                else return item;
-            }),
+            labels: Object.keys(dataGroupBy).sort(),
             datas: {
-                'CQ': Object.values(dataGroupBy).sort().map(item => item.filter(item => item.loaiHinhDaoTao == 'CQ').length),
-                'CLC': Object.values(dataGroupBy).sort().map(item => item.filter(item => item.loaiHinhDaoTao == 'CLC').length)
+                'CQ': Object.values(dataGroupBy).map(item => item.filter(item => item.loaiHinhDaoTao == 'CQ').length),
+                'CLC': Object.values(dataGroupBy).map(item => item.filter(item => item.loaiHinhDaoTao == 'CLC').length)
             },
             colors: colors
         };
@@ -98,11 +95,11 @@ class DashboardCtsv extends AdminPage {
                 </tr>
             ))}
             {data && <><tr>
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={'Tổng'} rowSpan={2} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#BD4B4B', color: '#FFF' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.cq), 0)} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#1572A1', color: '#FFF' }} content={data.reduce((pre, cur) => (parseInt(pre) + parseInt(cur.clc)), 0)} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', fontWeight: 'bold' }} content={'Tổng'} rowSpan={2} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#BD4B4B', color: '#FFF', fontWeight: 'bold' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.cq), 0)} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#1572A1', color: '#FFF', fontWeight: 'bold' }} content={data.reduce((pre, cur) => (parseInt(pre) + parseInt(cur.clc)), 0)} />
             </tr>
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#FFEF82' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.clc) + parseInt(cur.cq), 0)} colSpan={2} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#FFEF82', fontWeight: 'bold' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.clc) + parseInt(cur.cq), 0)} colSpan={2} />
             </>}
         </>
     });
