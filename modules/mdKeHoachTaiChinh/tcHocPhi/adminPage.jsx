@@ -14,8 +14,9 @@ import CountUp from 'view/js/countUp';
 import Detail from './modal/DetailModal';
 import { EditModal } from './modal/EditModal';
 import { createInvoice, createInvoiceList, createMultipleHocPhi, getHocPhi, getTcHocPhiPage, updateHocPhi, getPendingListInvoiceLength } from './redux';
-
+import { getMssvBaoHiemYTe, createMssvBaoHiemYTe, createSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
 import TachMssvModal from './tachMssvModal';
+import { AdminBhytModal } from './adminBHYTpage';
 export class NumberIcon extends React.Component {
     componentDidMount() {
         setTimeout(() => {
@@ -281,6 +282,7 @@ class TcHocPhiAdminPage extends AdminPage {
             getDataSource: () => list,
             stickyHead: true,
             header: 'thead-light',
+            className: 'table-fix-col',
             emptyTable: 'Chưa có dữ liệu học phí học kỳ hiện tại',
             renderHead: () => (<tr>
                 <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -321,6 +323,25 @@ class TcHocPhiAdminPage extends AdminPage {
                                 <i className='fa fa-lg fa-eye' />
                             </button>
                         </Tooltip>
+                        <Tooltip title='Bảo hiểm y tế' arrow>
+                            <button className='btn btn-secondary' onClick={e => {
+                                e.preventDefault();
+                                this.props.getMssvBaoHiemYTe({ mssv: item.mssv }, (bhyt) => {
+                                    if (!bhyt) {
+                                        T.confirm('Sinh viên chưa chọn bảo hiểm y tế', `Xác nhận đăng ký bảo hiểm y tế cho sinh viên ${item.mssv}!`, 'warning', true, isConfirm => {
+                                            if (isConfirm)
+                                                this.adminCreateBhytModal.show(item.mssv);
+                                        });
+                                    } else {
+                                        this.adminBhytModal.initBhyt(bhyt.dienDong);
+                                        this.adminBhytModal.show(item.mssv);
+                                    }
+                                });
+                            }}>
+                                <i className='fa fa-lg fa-cog' />
+                            </button>
+                        </Tooltip>
+
                         {item.invoiceId ? <Tooltip title='Xem hóa đơn' arrow>
                             <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.invoiceId}`}>
                                 <i className='fa fa-lg fa-credit-card' />
@@ -377,6 +398,8 @@ class TcHocPhiAdminPage extends AdminPage {
                     </div>
                     <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} getPendingListInvoiceLength={this.props.getPendingListInvoiceLength} />
                     <InvoiceResultModal ref={e => this.resultModal = e} />
+                    <AdminBhytModal ref={e => this.adminBhytModal = e} createSvBaoHiemYTe={this.props.createMssvBaoHiemYTe} />
+                    <AdminBhytModal ref={e => this.adminCreateBhytModal = e} createSvBaoHiemYTe={this.props.createSvBaoHiemYTe} />
 
                     <TachMssvModal ref={e => this.tachMssvModal = e} />
                 </div>,
@@ -389,6 +412,6 @@ class TcHocPhiAdminPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList, getPendingListInvoiceLength
+    getMssvBaoHiemYTe, getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList, getPendingListInvoiceLength, createMssvBaoHiemYTe, createSvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiAdminPage);
