@@ -13995,7 +13995,8 @@
                 "TC_HOC_PHI_TRANSACTION_ADD_BILL": "addBill",
                 "TC_HOC_PHI_TRANSACTION_SEARCH_PAGE": "searchPage",
                 "TC_HOC_PHI_TRANSACTION_DOWNLOAD_PSC": "downloadPsc",
-                "TC_HOC_PHI_TRANSACTION_LIST_BANK": "listBank"
+                "TC_HOC_PHI_TRANSACTION_LIST_BANK": "listBank",
+                "TC_HOC_PHI_TRANSACTION_GET_STATISTIC": "getStatistic"
             },
             "columns": {
                 "TRANS_ID": {
@@ -14669,6 +14670,9 @@
             "active": true,
             "moduleName": "tcLoaiPhi",
             "modelName": "tcLoaiPhi",
+            "methods": {
+                "TC_LOAI_PHI_GET_STATISTIC": "getStatistic"
+            },
             "columns": {
                 "ID": {
                     "value": "id",

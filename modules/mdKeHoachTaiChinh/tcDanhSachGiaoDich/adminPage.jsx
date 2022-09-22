@@ -8,7 +8,8 @@ import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/red
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
-import { SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
+import { SelectAdapter_FwNamTuyenSinh, SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
+import { SelectAdapter_TcLoaiPhi } from '../tcLoaiPhi/redux';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -16,6 +17,43 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
+class StatisticModal extends AdminModal {
+    onSubmit = () => {
+        const data = { loaiPhi: this.state.loaiPhi };
+        try {
+            ['namHoc', 'hocKy', 'namTuyenSinh', 'bacDaoTao', 'loaiDaoTao', 'batDau', 'ketThuc', 'loaiPhi'].forEach(key => {
+                data[key] = this[key].value();
+                if (data[key] == null || (Array.isArray(data[key]) && !data[key].length)) {
+                    T.notify(`${this[key].props.label} trống`, 'danger');
+                    throw new Error();
+                }
+            });
+            data.loaiDaoTao = data.loaiDaoTao.toString();
+            data.loaiPhi = data.loaiPhi.toString();
+            data.batDau = data.batDau.getTime();
+            data.ketThuc = data.ketThuc.getTime();
+            T.download(`/api/finance/danh-sach-giao-dich/stat?data=${JSON.stringify(data)}`, 'Thống kê.xlsx');
+        } catch (error) { console.error(error); return; }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thống kê giao dịch',
+            size: 'elarge',
+            isLoading: this.state.isLoading,
+            body: <div className='row'>
+                <FormSelect ref={e => this.loaiPhi = e} label='Loại phí' className='col-md-12' data={SelectAdapter_TcLoaiPhi} multiple required />
+                <FormSelect ref={e => this.namHoc = e} data={yearDatas().reverse()} label='Năm học' className='col-md-6' required />
+                <FormSelect ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' className='col-md-6' required />
+                <FormSelect ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' data={SelectAdapter_FwNamTuyenSinh} className='col-md-4' required />
+                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} label='Bậc đào tạo' className='col-md-4' required />
+                <FormSelect ref={e => this.loaiDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Hệ đào tạo' className='col-md-4' required multiple />
+                <FormDatePicker ref={e => this.batDau = e} type='time' className='col-md-6' label='Từ thời điểm' required allowClear />
+                <FormDatePicker ref={e => this.ketThuc = e} type='time' className='col-md-6' label='Đến thời điểm' required allowClear />
+            </div>
+        });
+    }
+}
 class EditModal extends AdminModal {
 
     onChangeQuery = () => {
@@ -237,6 +275,8 @@ class DanhSachGiaoDich extends AdminPage {
         };
         // const developer = this.getUserPermission('developer', ['login']);
         let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write', 'check']);
+        const buttons = [];
+        if (permission.write) buttons.push({ className: 'btn-secondary', icon: 'fa-bar-chart', tooltip: 'Tách MSSV', onClick: (e) => e.preventDefault() || this.statisModal.show() });
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -305,9 +345,11 @@ class DanhSachGiaoDich extends AdminPage {
                 </div>
                 <AdminEditModal ref={e => this.adminModal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
+                <StatisticModal ref={e => this.statisModal = e} />
             </div>),
             onCreate: permission.check ? () => this.adminModal.show() : null,
             onExport: permission.export ? e => this.onDownloadPsc(e) : null,
+            buttons,
         });
     }
 }
