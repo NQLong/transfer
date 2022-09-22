@@ -90,14 +90,14 @@ class DashboardCtsv extends AdminPage {
             {data.map((item, index) => (
                 <tr key={index}>
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.date} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#EFB7B7' }} content={item.cq} />
-                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#9AD0EC' }} content={item.clc} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#9AD0EC' }} content={item.cq} />
+                    <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#EFB7B7' }} content={item.clc} />
                 </tr>
             ))}
             {data && <><tr>
                 <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', fontWeight: 'bold' }} content={'Tổng'} rowSpan={2} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#BD4B4B', color: '#FFF', fontWeight: 'bold' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.cq), 0)} />
-                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#1572A1', color: '#FFF', fontWeight: 'bold' }} content={data.reduce((pre, cur) => (parseInt(pre) + parseInt(cur.clc)), 0)} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#1572A1', color: '#FFF', fontWeight: 'bold' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.cq), 0)} />
+                <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#BD4B4B', color: '#FFF', fontWeight: 'bold' }} content={data.reduce((pre, cur) => (parseInt(pre) + parseInt(cur.clc)), 0)} />
             </tr>
                 <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center', backgroundColor: '#FFEF82', fontWeight: 'bold' }} content={data.reduce((pre, cur) => parseInt(pre) + parseInt(cur.clc) + parseInt(cur.cq), 0)} colSpan={2} />
             </>}
