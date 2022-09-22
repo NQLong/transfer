@@ -192,6 +192,7 @@ module.exports = app => {
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
                 } else {
+                    if (dataNhapHoc.congNo && parseInt(dataNhapHoc.congNo) < 0) dataNhapHoc.congNo = 0;
                     if (dataNhapHoc.ngayNhapHoc == -1) {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
@@ -246,8 +247,8 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
                                 try {
-                                    await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
-                                    app.model.svSetting.updateLimit(data.index);
+                                    // await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                    // app.model.svSetting.updateLimit(data.index);
                                 } catch (_) {
                                     console.log(`Sent mail to ${student.emailTruong} failed`);
                                 }

@@ -69,7 +69,7 @@ export function setSinhVienNhapHoc(data, done) {
                 console.error(`GET ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
+                // T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
                 done && done(data.dataNhapHoc);
             }
         }, () => T.notify('Cập nhật thống tin nhập học sinh viên bị lỗi!', 'danger'));
