@@ -20,10 +20,10 @@ export function setSinhVienNhapHoc(data, done) {
                 T.notify(`${data.error.message || 'Lỗi hệ thống'}`, 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
+                // T.notify('Cập nhật thống tin nhập học sinh viên thành công!', 'success');
                 done && done(data.dataNhapHoc);
             }
-        }, () => T.notify('Cập nhật thống tin nhập học sinh viên bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin nhập học sinh viên bị lỗi!', 'danger'));
     };
 }
 
@@ -49,7 +49,7 @@ export function getCauHinhNhapHoc(done) {
                 T.notify('Lấy cấu hình bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${result.error}`);
             } else {
-                done && done(result.item);
+                done && done(result);
             }
         });
     };

@@ -8,7 +8,7 @@ import { AdminModal, FormDatePicker, FormImageBox, FormRichTextBox, FormSelect, 
 import T from 'view/js/common';
 import { getSvBaoHiemYTe, updateSvBaoHiemYTeBhyt } from './redux';
 class BaoHiemInfoModal extends AdminModal {
-    state = { coBhxh: true, dataThanhVien: [] }
+    state = { coBhxh: true, dataThanhVien: [], isLoading: false }
     componentDidMount() {
         this.disabledClickOutside();
     }
@@ -50,7 +50,7 @@ class BaoHiemInfoModal extends AdminModal {
             <FormTextBox ref={e => this.hoTen = e} placeholder='Họ và tên' style={{ marginBottom: 0, width: '200px' }} required />
         } />
         <TableCell content={
-            <FormTextBox type='number' autoFormat={false} ref={e => this.maSoBhxh = e} placeholder='Mã số BHXH' style={{ marginBottom: 0, width: '120px' }} onChange={this.handleSizeBhxh} />
+            <FormTextBox ref={e => this.maSoBhxh = e} placeholder='Mã số BHXH' style={{ marginBottom: 0, width: '120px' }} onChange={this.handleSizeBhxh} />
         } />
         <TableCell content={
             <FormDatePicker type='date-mask' ref={e => this.ngaySinh = e} placeholder='Ngày sinh' style={{ marginBottom: 0, width: '100px' }} required />
@@ -65,7 +65,7 @@ class BaoHiemInfoModal extends AdminModal {
             <FormSelect ref={e => this.moiQuanHeChuHo = e} placeholder='Quan hệ' data={SelectAdapter_DmQuanHeGiaDinh} style={{ marginBottom: 0, width: '100px' }} required />
         } />
         <TableCell content={
-            <FormTextBox type='number' autoFormat={false} ref={e => this.cccd = e} placeholder='CMND/CCCD/Hộ chiếu' style={{ marginBottom: 0, width: '200px' }} required />
+            <FormTextBox autoFormat={false} ref={e => this.cccd = e} placeholder='CMND/CCCD/Hộ chiếu' style={{ marginBottom: 0, width: '200px' }} required />
         } />
         <TableCell content={
             <FormRichTextBox ref={e => this.ghiChu = e} placeholder='Ghi chú' style={{ marginBottom: 0, width: '200px' }} />
@@ -161,7 +161,7 @@ class BaoHiemInfoModal extends AdminModal {
     elementMienDong = () => {
         return (
             <div className='row'>
-                <FormTextBox type='number' autoFormat={false} label='Nhập số BHXH hiện tại' className='col-md-6' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
+                <FormTextBox label='Nhập số BHXH hiện tại' className='col-md-6' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
 
                 <FormImageBox className='col-md-6' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' description={<div>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>đây</a></div>} />
                 {/* <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_BACK' /> */}
@@ -171,7 +171,7 @@ class BaoHiemInfoModal extends AdminModal {
 
     elementXacNhan = () => {
         return (<div className='row'>
-            <FormTextBox type='number' autoFormat={false} label='Nhập số BHXH hiện tại' className='col-md-12' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
+            <FormTextBox label='Nhập số BHXH hiện tại' className='col-md-12' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
             <FormSelect ref={e => this.benhVienDangKy = e} label='Đăng ký nơi khám chữa bệnh ban đầu' className='col-md-12' data={SelectAdapter_DmCoSoKcbBhyt()} onChange={this.handleCheckBenhVien} required />
             <FormImageBox className='col-md-12' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' style={{ display: this.state.isGiaHan ? '' : 'none' }} description={<div>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>đây</a></div>} />
             {/* <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' style={{ display: this.state.isGiaHan ? '' : 'none' }} /> */}
@@ -245,12 +245,16 @@ class BaoHiemInfoModal extends AdminModal {
     onSubmit = () => {
         T.confirm('XÁC NHẬN', 'Bạn cam đoan những nội dung kê khai là đúng và chịu trách nhiệm trước pháp luật về những nội dung đã kê khai', 'warning', true, isConfirm => {
             if (isConfirm) {
+                this.setState({ isLoading: true });
                 switch (this.state.dienDong) {
                     case '0': {
                         const data = {
                             maBhxhHienTai: getValue(this.maBhxhHienTai)
                         };
-                        this.props.updateSvBaoHiemYTeBhyt(data, this.hide);
+                        this.props.updateSvBaoHiemYTeBhyt(data, (result) => {
+                            !result.error && this.hide();
+                            this.setState({ isLoading: false });
+                        });
                         break;
                     }
                     case '12':
@@ -266,7 +270,10 @@ class BaoHiemInfoModal extends AdminModal {
                                 this.maBhxhHienTai.focus();
                                 return T.notify('Mã BHXH phải chứa 10 ký tự', 'warning');
                             }
-                            this.props.updateSvBaoHiemYTeBhyt(data, this.hide);
+                            this.props.updateSvBaoHiemYTeBhyt(data, result => {
+                                !result.error && this.hide();
+                                this.setState({ isLoading: false });
+                            });
                             break;
                         } else {
                             const data = {
@@ -319,6 +326,7 @@ class BaoHiemInfoModal extends AdminModal {
         return this.renderModal({
             title: <>Hoàn thành thông tin BHYT <br />{subTitle}</>,
             size: 'elarge',
+            isLoading: this.state.isLoading,
             body: bodyToRender,
             showCloseButton: false
         });

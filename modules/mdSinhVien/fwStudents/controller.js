@@ -26,12 +26,13 @@ module.exports = app => {
         { name: 'student:login', menu: menuHocPhi },
         { name: 'student:manage', menu: menuStudents },
         { name: 'student:write' },
-        { name: 'student:delete' }
+        { name: 'student:delete' },
+        'student:export'
     );
 
     app.permissionHooks.add('staff', 'addRoleStudent', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '32') {
-            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write');
+            app.permissionHooks.pushUserPermission(user, 'student:manage', 'student:write', 'student:export', 'student:dashboard');
             resolve();
         } else resolve();
     }));
@@ -460,6 +461,26 @@ module.exports = app => {
         try {
             const data = await app.model.fwStudents.getNamTuyenSinhList();
             res.send({ items: data.rows || [] });
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/students/download-excel', app.permission.check('student:export'), async (req, res) => {
+        try {
+            let { filter, searchTerm } = req.query;
+            const data = await app.model.fwStudents.downloadExcel(searchTerm || '', filter),
+                list = data.rows;
+            const workBook = app.excel.create(),
+                ws = workBook.addWorksheet('Students List');
+
+            ws.columns = [{ header: 'stt', key: 'stt', width: 5 }, ...Object.keys(list[0]).map(key => ({ header: key.toString(), key, width: 20 }))];
+            list.forEach((item, index) => {
+                ws.addRow({ stt: index + 1, ...item }, index === 0 ? 'n' : 'i');
+            });
+            let fileName = 'ALL_STUDENT_DATA.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+
         } catch (error) {
             res.send({ error });
         }
