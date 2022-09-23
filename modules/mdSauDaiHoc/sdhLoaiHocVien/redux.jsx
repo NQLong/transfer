@@ -112,3 +112,6 @@ export function deleteSdhLoaiHv(ma) {
     };
 }
 
+export function changeSdhLoaiHv(item) {
+    return { type: SdhLoaiHocVienUpdate, item };
+}

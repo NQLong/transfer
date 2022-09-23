@@ -26,64 +26,43 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
-    let dataTest = {
-        totalItem: 4,
-        pageSize: 50,
-        pageTotal: 1,
-        pageNumber: 1,
-        list: [
-            {
-                ma: 1,
-                ten: 'Học viên trúng tuyển',
-                kichHoat: 1
-            },
-            {
-                ma: 2,
-                ten: 'Học viên chính thức',
-                kichHoat: 1
-            },
-        ]
-    };
-
-    app.put('/api/sau-dai-hoc/loai-hoc-vien', app.permission.check('staff:login'), (req, res) => {
-        const changes = req.body.changes;
-        let result = [];
-        console.log(changes);
-        dataTest.list.forEach(element => {
-            if (element.ma == parseInt(changes.ma) || element.ma == parseInt(req.body.ma)) {
-                element.ten = changes.ten ? changes.ten : element.ten;
-                element.kichHoat = parseInt(changes.kichHoat);
-            }
-            result.push(element);
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/page/:pageNumber/:pageSize', app.permission.check('sdhLoaiHocVien:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize);
+        let searchTerm = { statement: null };
+        if (req.query.condition) {
+            searchTerm = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.sdhLoaiHocVien.getPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            res.send({ error, page });
         });
-        dataTest = { ...dataTest, list: [...result] };
-
-        res.send({ err: '', page: dataTest });
-
-
-
     });
 
-    app.delete('/api/sau-dai-hoc/loai-hoc-vien', app.permission.check('staff:login'), (req, res) => {
-        const changes = req.body.ma;
-        const rs1 = dataTest.list.filter(element => element.ma != parseInt(changes));
-        console.log('delete before', dataTest);
-        dataTest = { ...dataTest, list: [...rs1] };
-        console.log('delete', dataTest);
-
-        res.send({ err: '', page: dataTest });
-
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/all', app.permission.check('staff:login'), (req, res) => {
+        app.model.sdhLoaiHocVien.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/sau-dai-hoc/loai-hoc-vien', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/item/:ma', app.permission.check('sdhLoaiHocVien:read'), (req, res) => {
+        app.model.sdhLoaiHocVien.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    });
+
+    app.post('/api/sau-dai-hoc/loai-hoc-vien', app.permission.check('sdhLoaiHocVien:write'), (req, res) => {
         const changes = req.body.changes;
-        dataTest = { ...dataTest, list: [...dataTest.list, { ma: parseInt(changes.ma), ten: changes.ten, kichHoat: parseInt(changes.kichHoat) }] };
-        res.send({ err: '', page: dataTest });
-
+        app.model.sdhLoaiHocVien.create(changes, (error, item) => { res.send({ error, item }); });
     });
 
-    app.get('/api/sau-dai-hoc/loai-hoc-vien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
-        res.send({ err: '', page: dataTest });
+    app.put('/api/sau-dai-hoc/loai-hoc-vien', app.permission.check('sdhLoaiHocVien:write'), (req, res) => {
+        let newItem = req.body.changes;
+        app.model.sdhLoaiHocVien.update({ ma: req.body.ma }, newItem, (error, item) => {
+            res.send({ error, item });
+        });
+    });
+
+    app.delete('/api/sau-dai-hoc/loai-hoc-vien', app.permission.check('sdhLoaiHocVien:write'), (req, res) => {
+        app.model.sdhLoaiHocVien.delete({ ma: req.body.ma }, error => res.send({ error }));
     });
 
 

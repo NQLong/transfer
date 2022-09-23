@@ -56,7 +56,6 @@ export function getSdhLoaiQdPage(pageNumber, pageSize, pageCondition, done) {
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                console.log(data.page);
                 dispatch({ type: SdhLoaiQuyetDinhGetPage, page: data.page });
             }
         }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
@@ -73,7 +72,6 @@ export function updateSdhLoaiQd(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin học Sau đại học thành công!', 'success');
-                console.log(data);
                 done && done(data.page);
                 dispatch(getSdhLoaiQdPage());
             }
@@ -112,3 +110,6 @@ export function deleteSdhLoaiQd(ma) {
     };
 }
 
+export function changeSdhLoaiQd(item) {
+    return { type: SdhLoaiQuyetDinhUpdate, item };
+}
