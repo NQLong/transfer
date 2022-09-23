@@ -300,20 +300,18 @@ class CloneModal extends AdminModal {
 class SdhChuongTrinhDaoTaoPage extends AdminPage {
     state = { donViFilter: '', idNamDaoTao: '', heDaoTaoFilter: '' }
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/chuong-trinh-dao-tao', () => {
-            T.clearSearchBox();
-            let permission = this.getUserPermission('sdhChuongTrinhDaoTao'),
-                user = this.props.system.user,
-                donViFilter = user.staff?.maDonVi;
-            if (permission.read) donViFilter = '';
-            this.setState({ donViFilter, idNamDaoTao: '', heDaoTaoFilter: '' });
-            T.onSearch = (searchText) => this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, {
-                searchTerm: searchText || '',
-            });
-            T.showSearchBox(() => { });
-            this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
-
+        T.ready('/user/sau-dai-hoc');
+        T.clearSearchBox();
+        let permission = this.getUserPermission('sdhChuongTrinhDaoTao'),
+            user = this.props.system.user,
+            donViFilter = user.staff?.maDonVi;
+        if (permission.read) donViFilter = '';
+        this.setState({ donViFilter, idNamDaoTao: '', heDaoTaoFilter: '' });
+        T.onSearch = (searchText) => this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, {
+            searchTerm: searchText || '',
         });
+        T.showSearchBox(() => { });
+        this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
     }
 
     delete = (e, item) => {

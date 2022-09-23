@@ -11,7 +11,7 @@ import { Tooltip } from '@mui/material';
 class SdhCauTrucKhungDaoTaoPage extends AdminPage {
     state = { donViFilter: '' }
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/cau-truc-khung-dao-tao', () => {
+        T.ready('/user/sau-dai-hoc', () => {
             T.clearSearchBox();
             this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
             T.onSearch = (searchText) => this.props.getSdhCauTrucKhungDaoTaoPage(undefined, undefined, {

@@ -124,10 +124,10 @@ class sdhLoaiQuyetDinhPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Loại quyết định đào tạo',
+            title: 'Loại quyết định sau đại học',
             breadcrumb: [
                 <Link key={0} to={'/user/sau-dai-hoc'}>{'Sau đại học'}</Link>,
-                'Loại quyết định đào tạo'
+                'Loại quyết định sau đại học'
             ],
             content: <>
                 <div className='tile'>{table}</div>
