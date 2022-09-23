@@ -37,15 +37,16 @@ export default class Pagination extends React.Component {
 
     render() {
         const pageCondition = this.props.pageCondition ? this.props.pageCondition : undefined;
+        const pageRange = (Number.isInteger(this.props.pageRange) && this.props.pageRange > 1) ? this.props.pageRange -1 : 6;
         let pageItems = [], firstButton = '', lastButton = '';
         if (this.props.pageTotal > 1) {
-            let minPageNumber = Math.max(this.props.pageNumber - 3, 1),
-                maxPageNumber = Math.min(this.props.pageNumber + 3, this.props.pageTotal);
-            if (minPageNumber + 6 > maxPageNumber) {
-                maxPageNumber = Math.min(minPageNumber + 6, this.props.pageTotal);
+            let minPageNumber = Math.max(this.props.pageNumber - Math.floor(pageRange / 2), 1),
+                maxPageNumber = Math.min(this.props.pageNumber + Math.ceil(pageRange / 2), this.props.pageTotal);
+            if (minPageNumber + pageRange > maxPageNumber) {
+                maxPageNumber = Math.min(minPageNumber + pageRange, this.props.pageTotal);
             }
-            if (maxPageNumber - 6 < minPageNumber) {
-                minPageNumber = Math.max(1, maxPageNumber - 6);
+            if (maxPageNumber - pageRange < minPageNumber) {
+                minPageNumber = Math.max(1, maxPageNumber - pageRange);
             }
             for (let i = minPageNumber; i <= maxPageNumber; i++) {
                 pageItems.push(

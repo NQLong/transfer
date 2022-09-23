@@ -276,7 +276,7 @@ class DanhSachGiaoDich extends AdminPage {
         // const developer = this.getUserPermission('developer', ['login']);
         let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write', 'check']);
         const buttons = [];
-        if (permission.write) buttons.push({ className: 'btn-secondary', icon: 'fa-bar-chart', tooltip: 'Tách MSSV', onClick: (e) => e.preventDefault() || this.statisModal.show() });
+        if (permission.write) buttons.push({ className: 'btn-secondary', icon: 'fa-bar-chart', tooltip: 'Tách theo loại phí', onClick: (e) => e.preventDefault() || this.statisModal.show() });
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
