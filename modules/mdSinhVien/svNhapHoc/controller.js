@@ -247,8 +247,8 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
                                 try {
-                                    // await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
-                                    // app.model.svSetting.updateLimit(data.index);
+                                    student.emailTruong && await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                    app.model.svSetting.updateLimit(data.index);
                                 } catch (_) {
                                     console.log(`Sent mail to ${student.emailTruong} failed`);
                                 }
