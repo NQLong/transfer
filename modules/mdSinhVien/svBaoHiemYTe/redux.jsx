@@ -87,8 +87,8 @@ export function updateSvBaoHiemYTeBhyt(changes, done) {
                 T.notify(`${result.error?.message || 'Lỗi hệ thống. Vui lòng liên hệ để được hỗ trợ!'}`, 'danger');
             } else {
                 T.notify('Cập nhật thành công!', 'success');
-                done();
             }
+            done(result);
         });
     };
 }

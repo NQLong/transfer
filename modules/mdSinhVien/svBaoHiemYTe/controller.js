@@ -6,6 +6,7 @@ module.exports = app => {
         }
     };
     app.permission.add({ name: 'bhyt:read', menu });
+    app.permission.add({ name: 'bhyt:write' });
 
     app.get('/user/students/bhyt', app.permission.check('bhyt:read'), app.templates.admin);
 
@@ -15,34 +16,35 @@ module.exports = app => {
             let filter = req.query?.filter || {};
             if (!filter.namHoc) filter.namHoc = new Date().getFullYear();
             let items = await app.model.svBaoHiemYTe.searchPage('', app.utils.stringify(filter));
-            const condition = {
-                statement: 'idDangKy in (:listId)',
-                parameter: { listId: items.rows.map(item => item.id) }
-            };
-            let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
+            // const condition = {
+            //     statement: 'idDangKy in (:listId)',
+            //     parameter: { listId: items.rows.map(item => item.id) }
+            // };
+            // let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
 
-            res.send({ items: items.rows, dataChuHo, dataThanhVien });
+            res.send({ items: items.rows });
         } catch (error) {
             console.log(error);
             res.send({ error });
         }
     });
 
-    app.get('/api/student/bhyt', app.permission.orCheck('student:login', 'developer:login'), async (req, res) => {
+    app.get('/api/student/bhyt', app.permission.orCheck('student:login', 'developer:login', 'bhyt:write'), async (req, res) => {
         try {
             let user = req.session.user, mssv;
-            if (req.session.user.permissions.includes('developer:login'))
+            if (req.session.user.permissions.some(item => ['developer:login', 'bhyt:write'].includes(item)))
                 mssv = req.query.mssv;
             else mssv = user.data.mssv;
             const item = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
             res.send({ item });
         } catch (error) {
+            // console.error(error);
             res.send({ error });
         }
     });
 
 
-    app.post('/api/student/admin/bhyt', app.permission.orCheck('developer:login'), async (req, res) => {
+    app.post('/api/student/admin/bhyt', app.permission.orCheck('developer:login', 'bhyt:write'), async (req, res) => {
         try {
             let user = req.session.user,
                 thoiGian = Date.now();
