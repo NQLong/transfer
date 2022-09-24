@@ -19,7 +19,7 @@ module.exports = app => {
                 reject('Data is empty!');
             } else {
                 const sql = 'INSERT INTO TC_HOC_PHI_DETAIL (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.tcHocPhiDetail.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -56,7 +56,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -88,7 +88,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -121,7 +121,7 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sqlCount = 'SELECT COUNT(*) FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+            app.database.oracle.connection.main.executeExtra(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -132,7 +132,7 @@ module.exports = app => {
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                     const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT TC_HOC_PHI_DETAIL.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                    app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                         if (error) {
                             done && done(error);
                             reject(error);
@@ -152,7 +152,7 @@ module.exports = app => {
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
                 const sql = 'UPDATE TC_HOC_PHI_DETAIL SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.tcHocPhiDetail.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -183,7 +183,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'DELETE FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, error => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, error => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -205,7 +205,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM TC_HOC_PHI_DETAIL' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, result) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -217,7 +217,7 @@ module.exports = app => {
         }),
 
         bulkCreate: (config, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tc_hoc_phi_detail_bulk_create(:config); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_detail_bulk_create(:config); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, config }, (error, result) => {
                     if (error) {
                         done && done(error);

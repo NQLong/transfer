@@ -63,6 +63,36 @@ module.exports = app => {
             }
         })
     );
+
+    app.loginByPassword = async (req, res) => {
+        try {
+            if (req.session.user != null) {
+                res.send({ error: 'You are logged in!' });
+            } else {
+                let email = req.body.email.trim(), password = req.body.password;
+                const student = await app.model.fwStudents.get({ emailTruong: email });
+                if (student) { // Nếu có sinh viên
+                    if (app.utils.equalPassword(password, student.matKhau)) {
+                        let user = await app.model.fwUser.get({ email });
+                        if (!user) user = await app.model.fwUser.create({ email, active: 1 });
+                        if (user.active) {
+                            app.updateSessionUser(req, user, sessionUser => res.send({ user: sessionUser }));
+                        } else {
+                            res.send({ error: 'Your account is inactive or not a company user!' });
+                        }
+                    } else {
+                        res.send({ error: 'Invalid email or password!' });
+                    }
+                } else {
+                    // TODO: Cán bộ - later
+                    res.send({ error: 'Login fail!' });
+                }
+            }
+        } catch {
+            res.send({ error: 'Login fail!' });
+        }
+    };
+
     // app.registerUser = (req, res) => {
     //     if (req.session.user != null) {
     //         res.send({ error: 'You are logged in!' });

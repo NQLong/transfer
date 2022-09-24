@@ -120,6 +120,15 @@ module.exports = (app, appConfig) => {
                 if (connection) {
                     console.log(` - #${process.pid}: The Oracle connection ${db.username} succeeded.`);
                     app.database.oracle.connection[dbName] = connection;
+                    app.database.oracle.connection[dbName].executeExtra = (sql, parameter, done) => {
+                        connection.execute(sql, parameter, (error, result) => {
+                            if (error) {
+                                console.error(`${dbName} execute error - sql:`, sql, parameter);
+                                console.error(`${dbName} execute error - error:`, error);
+                            }
+                            done && done(error, result);
+                        });
+                    };
                     app.database.oracle.connected = true;
 
                     setTimeout(() => { //Test model functions

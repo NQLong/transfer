@@ -17,6 +17,19 @@ export function getSvSettingKeys() {
     };
 }
 
+export function GetDashboard(done) {
+    return () => {
+        const url = '/api/students/dashboard';
+        T.get(url, result => {
+            if (result.error) {
+                T.notify('Lỗi!', 'danger');
+            } else {
+                done && done(result);
+            }
+        });
+    };
+}
+
 export function updatSvSettingKeys(changes, done) {
     return () => {
         const url = '/api/students/setting';
@@ -33,7 +46,7 @@ export function updatSvSettingKeys(changes, done) {
     };
 }
 
-export function  checkSinhVienNhapHoc(mssv, done) {
+export function checkSinhVienNhapHoc(mssv, done) {
     return () => {
         const url = '/api/ctsv/nhap-hoc/check-svnh-data';
         T.post(url, { mssv }, data => {
@@ -47,7 +60,7 @@ export function  checkSinhVienNhapHoc(mssv, done) {
     };
 }
 
-export function  setSinhVienNhapHoc(data, done) {
+export function setSinhVienNhapHoc(data, done) {
     return () => {
         const url = '/api/ctsv/nhap-hoc/set-svnh-data';
         T.post(url, { data }, data => {

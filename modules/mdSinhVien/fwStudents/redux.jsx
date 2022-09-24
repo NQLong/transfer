@@ -12,7 +12,6 @@ export default function sinhVienReducer(state = null, data) {
         case sinhVienGetAll:
             return Object.assign({}, state, { items: data.items });
         case sinhVienGetPage:
-            console.log(Object.assign({}, state, { page: data.page }));
             return Object.assign({}, state, { page: data.page });
         case sinhVienUserGet:
             return Object.assign({}, state, { selectedItem: data.item });
@@ -69,7 +68,7 @@ export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, don
 }
 
 export function getStudentAdmin(mssv, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/students/item/${mssv}`;
         T.get(url, data => {
             if (data.error) {
@@ -77,7 +76,7 @@ export function getStudentAdmin(mssv, done) {
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 done && done(data.items);
-                dispatch({ type: sinhVienGetEditPage, items: data.items });
+                // dispatch({ type: sinhVienGetEditPage, items: data.items });
             }
         });
     };
@@ -122,6 +121,14 @@ export const SelectAdapter_FwStudent = {
     fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
 };
 
+export const SelectAdapter_FwNamTuyenSinh = {
+    ajax: true,
+    url: '/api/students/nam-tuyen-sinh',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.namTuyenSinh, text: `${item.namTuyenSinh}` })) : [] }),
+    // fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
+};
+
 
 
 //User -----------------------------------------------------------------------------------------------
@@ -148,7 +155,6 @@ export function updateStudentUser(changes, done) {
                 T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
-                T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
                 done && done(data.item);
                 dispatch({ type: sinhVienUserGet, item: data.item });
             }
@@ -176,21 +182,6 @@ export function adminDownloadSyll(mssv, namTuyenSinh) {
                 T.download(`${url}?mssv=${mssv}&namTuyenSinh=${namTuyenSinh}`, 'SYLL.pdf');
             }
 
-        });
-    };
-}
-
-export function studentDownloadSyll(done) {
-    return () => {
-        const url = '/api/students-download-syll';
-        T.get(url, result => {
-            if (result.error) {
-                T.notify(result.error.message || 'Lỗi hệ thống', 'danger');
-                console.error(result.error);
-            } else {
-                T.download(url, 'SYLL.pdf');
-                done && done();
-            }
         });
     };
 }

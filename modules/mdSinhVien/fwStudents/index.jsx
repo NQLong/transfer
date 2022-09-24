@@ -18,8 +18,12 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/students/item/:mssv',
-            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+            path: '/user/students/import',
+            component: Loadable({ loading: Loading, loader: () => import('./importPage') })
+        },
+        {
+            path: '/user/students/profile/:mssv',
+            component: Loadable({ loading: Loading, loader: () => import('./editPage') })
         }
     ],
 };

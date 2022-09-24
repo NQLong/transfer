@@ -6,6 +6,7 @@ module.exports = app => {
         }
     };
     app.permission.add({ name: 'bhyt:read', menu });
+    app.permission.add({ name: 'bhyt:write' });
 
     app.get('/user/students/bhyt', app.permission.check('bhyt:read'), app.templates.admin);
 
@@ -15,25 +16,78 @@ module.exports = app => {
             let filter = req.query?.filter || {};
             if (!filter.namHoc) filter.namHoc = new Date().getFullYear();
             let items = await app.model.svBaoHiemYTe.searchPage('', app.utils.stringify(filter));
-            const condition = {
-                statement: 'idDangKy in (:listId)',
-                parameter: { listId: items.rows.map(item => item.id) }
-            };
-            let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
+            // const condition = {
+            //     statement: 'idDangKy in (:listId)',
+            //     parameter: { listId: items.rows.map(item => item.id) }
+            // };
+            // let [dataChuHo, dataThanhVien] = await Promise.all([app.model.svBhytPhuLucChuHo.getAll(condition), app.model.svBhytPhuLucThanhVien.getAll(condition)]);
 
-            res.send({ items: items.rows, dataChuHo, dataThanhVien });
+            res.send({ items: items.rows });
         } catch (error) {
             console.log(error);
             res.send({ error });
         }
     });
 
-    app.get('/api/student/bhyt', app.permission.check('student:login'), async (req, res) => {
+    app.get('/api/student/bhyt', app.permission.orCheck('student:login', 'developer:login', 'bhyt:write'), async (req, res) => {
         try {
-            const user = req.session.user,
-                { mssv } = user.data;
+            let user = req.session.user, mssv;
+            if (req.session.user.permissions.some(item => ['developer:login', 'bhyt:write'].includes(item)))
+                mssv = req.query.mssv;
+            else mssv = user.data.mssv;
             const item = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
             res.send({ item });
+        } catch (error) {
+            // console.error(error);
+            res.send({ error });
+        }
+    });
+
+
+    app.post('/api/student/admin/bhyt', app.permission.orCheck('developer:login', 'bhyt:write'), async (req, res) => {
+        try {
+            let user = req.session.user,
+                thoiGian = Date.now();
+            const data = req.body.data;
+            const mssv = data.mssv,
+                emailTruong = user.email;
+
+            const mapperDienDong = { 12: 23, 15: 41 },
+                mapperSoTien = { 15: 704025, 12: 563220, 0: 0 };
+
+            let item = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
+
+            //chỉ cập nhật cho sinh viên đã đăng ký bảo hiểm y tế
+            if (!item || new Date(item.thoiGian).getFullYear() != new Date().getFullYear()) {
+                throw 'Sinh viên chưa tham gia bảo hiểm y tế';
+            }
+
+            let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
+            if (data.dienDong != null && item.dienDong != data.dienDong) {
+                // nếu người dùng được miến trước đó thì không có loại phí
+                let loaiPhi = { soTien: 0 };
+                if (mapperDienDong[item.dienDong])
+                    loaiPhi = await app.model.tcHocPhiDetail.get({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[item.dienDong] });
+
+                const diff = mapperSoTien[data.dienDong] - loaiPhi.soTien;
+
+                //Tạm không cho sinh viên thay đổi gói bhyt nếu đã đóng tiền
+                let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
+                if (!currentFee || (currentFee.hocPhi != currentFee.congNo)) throw 'Sinh viên không đủ điều kiện để thay đổi Bảo hiểm y tế!';
+                const { hocPhi, congNo } = currentFee;
+                await app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
+                    hocPhi: parseInt(hocPhi) + diff,
+                    congNo: parseInt(congNo) + diff,
+                    ngayTao: thoiGian
+                });
+                if (loaiPhi && loaiPhi.soTien != 0)
+                    await app.model.tcHocPhiDetail.delete({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[item.dienDong] });
+                if (mapperDienDong[data.dienDong])
+                    await app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian });
+                await app.model.svBaoHiemYTe.update({ id: item.id }, { dienDong: data.dienDong, userModified: emailTruong, thoiGian });
+            }
+            res.send({});
+
         } catch (error) {
             res.send({ error });
         }
@@ -63,12 +117,12 @@ module.exports = app => {
             let currentBhyt = await app.model.svBaoHiemYTe.get({ mssv }, '*', 'id DESC');
             if (currentBhyt) {
                 if (new Date(currentBhyt.thoiGian).getFullYear() != new Date().getFullYear()) {
-                    let item = await app.model.svBaoHiemYTe.create(app.clone(data, { mssv, thoiGian, userModified: emailTruong }));
+                    let item = await app.model.svBaoHiemYTe.create(app.clone(data, { mssv, thoiGian, userModified: emailTruong, namDangKy: new Date().getFullYear() }));
                     if (!item) res.send({ error: 'Lỗi hệ thống' });
                     else {
                         let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
                         if (mapperDienDong[data.dienDong]) {
-                            app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian, namDangKy: new Date().getFullYear() });
+                            app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong], ngayTao: thoiGian });
                             let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
                             const { hocPhi, congNo } = currentFee;
                             app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
@@ -85,14 +139,16 @@ module.exports = app => {
                 if (!item) res.send({ error: 'Lỗi hệ thống' });
                 else {
                     let { hocPhiNamHoc: namHoc, hocPhiHocKy: hocKy } = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy');
-                    app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong] });
-                    let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
-                    const { hocPhi, congNo } = currentFee;
-                    app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
-                        hocPhi: parseInt(hocPhi) + mapperSoTien[data.dienDong],
-                        congNo: parseInt(congNo) + mapperSoTien[data.dienDong],
-                        ngayTao: thoiGian
-                    });
+                    if (mapperDienDong[data.dienDong]) {
+                        app.model.tcHocPhiDetail.create({ namHoc, hocKy, mssv, loaiPhi: mapperDienDong[data.dienDong], soTien: mapperSoTien[data.dienDong] });
+                        let currentFee = await app.model.tcHocPhi.get({ namHoc, hocKy, mssv });
+                        const { hocPhi, congNo } = currentFee;
+                        app.model.tcHocPhi.update({ namHoc, hocKy, mssv }, {
+                            hocPhi: parseInt(hocPhi) + mapperSoTien[data.dienDong],
+                            congNo: parseInt(congNo) + mapperSoTien[data.dienDong],
+                            ngayTao: thoiGian
+                        });
+                    }
                     res.end();
                 }
             }
@@ -246,7 +302,7 @@ module.exports = app => {
             else {
                 let matTruocThe = item.matTruocThe,
                     path = app.path.join(app.assetPath, '/bhyt/front', item.namDangKy.toString(), item.mssv, matTruocThe);
-                if (app.fs.existsSync(path)) res.send({ path });
+                if (app.fs.existsSync(path)) res.sendFile(path);
                 else res.send({ error: 'No value returned' });
             }
         } catch (error) {

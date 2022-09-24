@@ -8,7 +8,7 @@ import { AdminModal, FormDatePicker, FormImageBox, FormRichTextBox, FormSelect, 
 import T from 'view/js/common';
 import { getSvBaoHiemYTe, updateSvBaoHiemYTeBhyt } from './redux';
 class BaoHiemInfoModal extends AdminModal {
-    state = { coBhxh: true, dataThanhVien: [] }
+    state = { coBhxh: true, dataThanhVien: [], isLoading: false }
     componentDidMount() {
         this.disabledClickOutside();
     }
@@ -245,12 +245,16 @@ class BaoHiemInfoModal extends AdminModal {
     onSubmit = () => {
         T.confirm('XÁC NHẬN', 'Bạn cam đoan những nội dung kê khai là đúng và chịu trách nhiệm trước pháp luật về những nội dung đã kê khai', 'warning', true, isConfirm => {
             if (isConfirm) {
+                this.setState({ isLoading: true });
                 switch (this.state.dienDong) {
                     case '0': {
                         const data = {
                             maBhxhHienTai: getValue(this.maBhxhHienTai)
                         };
-                        this.props.updateSvBaoHiemYTeBhyt(data, this.hide);
+                        this.props.updateSvBaoHiemYTeBhyt(data, (result) => {
+                            !result.error && this.hide();
+                            this.setState({ isLoading: false });
+                        });
                         break;
                     }
                     case '12':
@@ -266,7 +270,10 @@ class BaoHiemInfoModal extends AdminModal {
                                 this.maBhxhHienTai.focus();
                                 return T.notify('Mã BHXH phải chứa 10 ký tự', 'warning');
                             }
-                            this.props.updateSvBaoHiemYTeBhyt(data, this.hide);
+                            this.props.updateSvBaoHiemYTeBhyt(data, result => {
+                                !result.error && this.hide();
+                                this.setState({ isLoading: false });
+                            });
                             break;
                         } else {
                             const data = {
@@ -319,6 +326,7 @@ class BaoHiemInfoModal extends AdminModal {
         return this.renderModal({
             title: <>Hoàn thành thông tin BHYT <br />{subTitle}</>,
             size: 'elarge',
+            isLoading: this.state.isLoading,
             body: bodyToRender,
             showCloseButton: false
         });
