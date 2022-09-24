@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_TRANSACTION { transId, transDate, customerId, billId, serviceId, amount, checksum, namHoc, hocKy, status, bank }
+// Table name: TC_HOC_PHI_TRANSACTION { transId, transDate, customerId, billId, serviceId, amount, checksum, namHoc, hocKy, status, bank, ghiChu }
 const keys = ['TRANS_ID'];
-const obj2Db = { 'transId': 'TRANS_ID', 'transDate': 'TRANS_DATE', 'customerId': 'CUSTOMER_ID', 'billId': 'BILL_ID', 'serviceId': 'SERVICE_ID', 'amount': 'AMOUNT', 'checksum': 'CHECKSUM', 'namHoc': 'NAM_HOC', 'hocKy': 'HOC_KY', 'status': 'STATUS', 'bank': 'BANK' };
+const obj2Db = { 'transId': 'TRANS_ID', 'transDate': 'TRANS_DATE', 'customerId': 'CUSTOMER_ID', 'billId': 'BILL_ID', 'serviceId': 'SERVICE_ID', 'amount': 'AMOUNT', 'checksum': 'CHECKSUM', 'namHoc': 'NAM_HOC', 'hocKy': 'HOC_KY', 'status': 'STATUS', 'bank': 'BANK', 'ghiChu': 'GHI_CHU' };
 
 module.exports = app => {
     app.model.tcHocPhiTransaction = {
