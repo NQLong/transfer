@@ -70,11 +70,11 @@ class DtDmBuoiHocPage extends AdminPage {
             emptyTable: 'Chưa có dữ liệu Buổi học!',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: '20%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '80%' }} nowrap='true'>Hệ</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: '20%' }}>Tên</th>
+                    <th style={{ width: '80%' }}>Hệ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
 
                 </tr>),
             renderRow: (item, index) => (

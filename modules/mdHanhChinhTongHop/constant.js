@@ -58,6 +58,7 @@ module.exports = {
     MA_HCTH: '29',
     MA_TRUONG_PHONG: '003',
     MA_TRUONG_KHOA: '009',
+    TIENG_VIET: '10',
 
     handleResult: (resolve, reject, item, error) => {
         if (error) {

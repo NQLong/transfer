@@ -84,9 +84,9 @@ class DMTinhThanhPhoImportPage extends React.Component {
                     <thead>
                         <tr>
                             <th style={{ width: 'auto' }}>#</th>
-                            <th style={{ minWidth: '50%' }} nowrap='true'>Mã tỉnh/thành phố</th>
-                            <th style={{ minWidth: '50%' }} nowrap='true'>Tên tỉnh/thành phố</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                            <th style={{ minWidth: '50%', whiteSpace: 'nowrap' }}>Mã tỉnh/thành phố</th>
+                            <th style={{ minWidth: '50%', whiteSpace: 'nowrap' }}>Tên tỉnh/thành phố</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>

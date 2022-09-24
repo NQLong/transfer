@@ -188,9 +188,9 @@ class WebsiteGioiThieuEditPage extends React.Component {
                         <tr>
                             <th style={{ width: 'auto' }}>#</th>
                             <th style={{ width: '60%', textAlign: 'center' }}>Link</th>
-                            <th style={{ width: '30%', textAlign: 'center' }} nowrap='true'>Hình ảnh</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
-                            {permissionWrite ? <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th> : null}
+                            <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Hình ảnh</th>
+                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            {permissionWrite ? <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> : null}
                         </tr>
                     </thead>
                     <tbody id='mainListCarousel'>
@@ -316,8 +316,8 @@ class WebsiteGioiThieuEditPage extends React.Component {
                                 <div className='col-md-12' style={{ textAlign: 'right' }}>
                                     <button className='btn btn-primary' type='button' onClick={this.createItem}>
                                         <i className='fa fa-fw fa-lg fa-plus' />Thêm hình ảnh
-                                        </button>&nbsp;
-                                    </div>
+                                    </button>&nbsp;
+                                </div>
                             </div>
                         </div>
                     </div>

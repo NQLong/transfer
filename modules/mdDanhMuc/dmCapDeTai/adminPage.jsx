@@ -178,10 +178,10 @@ class AdminPage extends React.Component {
                         <tr>
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                             <th style={{ width: '100%' }}>Tên cấp</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã cấp</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Thời gian đăng ký</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Thời gian phản biện</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã cấp</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian đăng ký</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian phản biện</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>

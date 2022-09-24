@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNgoaiNguPage, createDmNgoaiNgu, getDmNgoaiNguAll, updateDmNgoaiNgu, deleteDmNgoaiNgu } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: false };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
         this.kichHoat.value(kichHoat);
@@ -44,11 +44,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật danh mục ngoại ngữ' : 'Tạo mới danh mục ngoại ngữ',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã ngoại ngữ' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã ngoại ngữ'
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên ngoại ngữ' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên ngoại ngữ'
                     readOnly={readOnly} />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -89,16 +89,16 @@ class DmNgoaiNguPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên ngoại ngữ</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index} >
                         <TableCell type='text' content={item.ma ? item.ma : ''} />
-                        <TableCell type='link' nowrap='true' content={item.ten ? item.ten : ''}
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.ten ? item.ten : ''}
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeKichHoat(item)} />
@@ -118,7 +118,7 @@ class DmNgoaiNguPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmNgoaiNguPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmNgoaiNgu} update={this.props.updateDmNgoaiNgu} permissions={currentPermissions} />

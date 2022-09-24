@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createDmHinhThucKyLuat, getDmHinhThucKyLuatAll, updateDmHinhThucKyLuat, deleteDmHinhThucKyLuat, getDmHinhThucKyLuatPage} from './reduxHinhThucKyLuat';
+import { createDmHinhThucKyLuat, getDmHinhThucKyLuatAll, updateDmHinhThucKyLuat, deleteDmHinhThucKyLuat, getDmHinhThucKyLuatPage } from './reduxHinhThucKyLuat';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         const { ma, dienGiai, kichHoat, ghiChu } = item ? item : { ma: null, dienGiai: '', kichHoat: 0, ghiChu: '' };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma ? ma : '');
         this.dienGiai.value(dienGiai);
         this.kichHoat.value(kichHoat);
@@ -47,14 +47,14 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật hình thức kỷ luật' : 'Tạo mới hình thức kỷ luật',
             body: <div className='row'>
-                <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã hình thức kỷ luật' 
+                <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã hình thức kỷ luật'
                     readOnly={this.state.ma ? true : readOnly} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.dienGiai = e} label='Tên hình thức kỷ luật' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.dienGiai = e} label='Tên hình thức kỷ luật'
                     readOnly={readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú'
                     rows={3} readOnly={readOnly} />
             </div>
         });
@@ -95,15 +95,15 @@ class dmHinhThucKyLuatPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index} >
-                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} 
+                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.dienGiai ? item.dienGiai : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
@@ -124,9 +124,9 @@ class dmHinhThucKyLuatPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmHinhThucKyLuatPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} 
+                <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmHinhThucKyLuat} update={this.props.updateDmHinhThucKyLuat} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
@@ -136,5 +136,5 @@ class dmHinhThucKyLuatPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmHinhThucKyLuat: state.danhMuc.dmHinhThucKyLuat });
-const mapActionsToProps = { getDmHinhThucKyLuatAll, createDmHinhThucKyLuat, updateDmHinhThucKyLuat, deleteDmHinhThucKyLuat, getDmHinhThucKyLuatPage};
+const mapActionsToProps = { getDmHinhThucKyLuatAll, createDmHinhThucKyLuat, updateDmHinhThucKyLuat, deleteDmHinhThucKyLuat, getDmHinhThucKyLuatPage };
 export default connect(mapStateToProps, mapActionsToProps)(dmHinhThucKyLuatPage);

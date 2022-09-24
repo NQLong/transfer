@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getDmTonGiaoPage, createDmTonGiao, updateDmTonGiao, deleteDmTonGiao } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     state = { kichHoat: true, visible: false };
@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: true };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
         this.kichHoat.value(kichHoat);
@@ -51,13 +51,13 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật tôn giáo' : 'Tạo mới tôn giáo',
             body: <div className='row'>
                 <div className='col-md-12'>
-                    <FormTextBox type='text' maxLength={2} ref={e => this.ma = e} label='Mã tôn giáo' 
+                    <FormTextBox type='text' maxLength={2} ref={e => this.ma = e} label='Mã tôn giáo'
                         readOnly={this.state.ma ? true : readOnly} required />
                     {help}
                 </div>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên tôn giáo' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên tôn giáo'
                     readOnly={readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -102,8 +102,8 @@ class DmTonGiaoPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -130,7 +130,7 @@ class DmTonGiaoPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmTonGiaoPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmTonGiao} update={this.props.updateDmTonGiao} permissions={currentPermissions} />

@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: true };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
         this.kichHoat.value(kichHoat);
@@ -44,11 +44,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật danh mục phụ cấp' : 'Tạo mới danh mục phụ cấp',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' maxLength={2} ref={e => this.ma = e} label='Mã phụ cấp' 
+                <FormTextBox type='text' className='col-md-6' maxLength={2} ref={e => this.ma = e} label='Mã phụ cấp'
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên phụ cấp' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên phụ cấp'
                     readOnly={readOnly} />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -91,8 +91,8 @@ class DmPhuCapPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -118,7 +118,7 @@ class DmPhuCapPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmPhuCapPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmPhuCap} update={this.props.updateDmPhuCap} permissions={currentPermissions} />

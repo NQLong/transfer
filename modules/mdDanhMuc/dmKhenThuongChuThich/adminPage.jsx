@@ -1,11 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmKhenThuongChuThichPage, createDmKhenThuongChuThich, 
-    getDmKhenThuongChuThich, updateDmKhenThuongChuThich, 
-    deleteDmKhenThuongChuThich} 
-from './redux';
+import {
+    getDmKhenThuongChuThichPage, createDmKhenThuongChuThich,
+    getDmKhenThuongChuThich, updateDmKhenThuongChuThich,
+    deleteDmKhenThuongChuThich
+}
+    from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -18,8 +20,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { ma, ten } = item ? item : { ma: null, ten: ''};
-        this.setState({ma, item});
+        const { ma, ten } = item ? item : { ma: null, ten: '' };
+        this.setState({ ma, item });
         this.ma.value(ma || '');
         this.ten.value(ten);
     }
@@ -45,9 +47,9 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật khen thưởng chú thích' : 'Tạo mới khen thưởng chú thích',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã chú thích khen thưởng' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã chú thích khen thưởng'
                     readOnly={this.state.ma ? true : readOnly} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên chú thích khen thưởng' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên chú thích khen thưởng'
                     readOnly={readOnly} required />
             </div>
         });
@@ -87,15 +89,15 @@ class DmKhenThuongChuThichPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto'}}>Mã</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên khen thưởng chú thích</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index} >
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        <TableCell type='link' style={{ whiteSpace: 'nowrap'}} content={item.ma || ''} 
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.ma || ''}
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten || ''} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -114,9 +116,9 @@ class DmKhenThuongChuThichPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmKhenThuongChuThichPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} 
+                <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmKhenThuongChuThich} update={this.props.updateDmKhenThuongChuThich} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
@@ -126,7 +128,9 @@ class DmKhenThuongChuThichPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmKhenThuongChuThich: state.danhMuc.dmKhenThuongChuThich });
-const mapActionsToProps = {getDmKhenThuongChuThichPage, createDmKhenThuongChuThich, 
-    getDmKhenThuongChuThich, updateDmKhenThuongChuThich, 
-    deleteDmKhenThuongChuThich };
+const mapActionsToProps = {
+    getDmKhenThuongChuThichPage, createDmKhenThuongChuThich,
+    getDmKhenThuongChuThich, updateDmKhenThuongChuThich,
+    deleteDmKhenThuongChuThich
+};
 export default connect(mapStateToProps, mapActionsToProps)(DmKhenThuongChuThichPage);

@@ -26,7 +26,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value(),
                 ten: this.ten.value(),
@@ -87,8 +87,8 @@ class dmTuyenBenhVienPage extends AdminPage {
             permissionWrite = currentPermissions.includes('dmTuyenBenhVien:write'),
             permissionDelete = currentPermissions.includes('dmTuyenBenhVien:delete'),
             permission = this.getUserPermission('dmTuyenBenhVien', ['read', 'write', 'delete']);
-            let { pageNumber, pageSize, pageTotal, totalItem, pageCondition} = this.props.dmTuyenBenhVien && this.props.dmTuyenBenhVien.page ?
-                this.props.dmTuyenBenhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}};
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition } = this.props.dmTuyenBenhVien && this.props.dmTuyenBenhVien.page ?
+            this.props.dmTuyenBenhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {} };
         let table = 'Không có dữ liệu!',
             items = this.props.dmTuyenBenhVien && this.props.dmTuyenBenhVien.items;
         if (items && items.length > 0) {
@@ -98,8 +98,8 @@ class dmTuyenBenhVienPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -113,13 +113,13 @@ class dmTuyenBenhVienPage extends AdminPage {
         }
 
         return this.renderPage({
-                icon: 'fa fa-list-alt',
-                title: 'Danh mục Tuyến Bệnh viện',
-                breadcrumb: [
-                    <Link key={0} to='/user/category'>Danh mục</Link>,
-                    'Danh mục Tuyến Bệnh viện'
-                ], 
-                content: <>
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Tuyến Bệnh viện',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Tuyến Bệnh viện'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmTuyenBenhVienAll} />
                 <EditModal ref={e => this.modal = e} permission={permission}

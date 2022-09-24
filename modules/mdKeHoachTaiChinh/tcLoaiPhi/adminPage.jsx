@@ -1,8 +1,70 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTcLoaiPhiPage, createTcLoaiPhi, updateTcLoaiPhi, deleteTcLoaiPhi } from './redux';
+import { getTcLoaiPhiPage, createTcLoaiPhi, updateTcLoaiPhi, deleteTcLoaiPhi, apply } from './redux';
 import Pagination from 'view/component/Pagination';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
+import { Tooltip } from '@mui/material';
+import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
+
+const yearDatas = () => {
+    return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 13);
+};
+
+const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
+
+class ApplyModal extends AdminModal {
+    onShow = (data) => {
+        this.setState({ loaiPhi: data.id, isLoading: false });
+        this.tenLoaiPhi.value(data.ten);
+        this.soTien.value('');
+        this.thanhChu.value('');
+    }
+
+    onAmountChange = () => {
+        const value = `${this.soTien?.value() || ''}`;
+        if (value) {
+            this.thanhChu?.value(T.numberToVnText(value) + ' đồng');
+        } else {
+            this.thanhChu?.value('');
+        }
+    }
+
+    onSubmit = () => {
+        const data = { loaiPhi: this.state.loaiPhi };
+        try {
+            ['namHoc', 'hocKy', 'namTuyenSinh', 'bacDaoTao', 'loaiDaoTao', 'soTien'].forEach(key => {
+                data[key] = this[key].value();
+                if (data[key] == null) {
+                    T.notify(`${this[key].props.label} trống`, 'danger');
+                    throw new Error();
+                }
+            });
+        } catch { return; }
+        this.setState({ isLoading: true }, () => {
+            this.props.submit(data, () => this.hide(), () => this.setState({ isLoading: false }));
+        });
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Áp dụng loại phí',
+            size: 'elarge',
+            isLoading: this.state.isLoading,
+            body: <div className='row'>
+                <FormTextBox ref={e => this.tenLoaiPhi = e} label='Loại phí' readOnly className='col-md-12' required />
+                <FormTextBox type='number' ref={e => this.soTien = e} label='Số tiền' className='col-md-12' required onChange={this.onAmountChange} />
+                <FormTextBox ref={e => this.thanhChu = e} label='Số tiền (thành chữ)' disabled className='col-md-12' required />
+                <FormSelect ref={e => this.namHoc = e} data={yearDatas().reverse()} label='Năm học' className='col-md-6' required />
+                <FormSelect ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' className='col-md-6' required />
+                {/* TODO: get nam tuyen sinh from fwStudents table */}
+                <FormSelect ref={e => this.namTuyenSinh = e} data={yearDatas().reverse()} label='Năm tuyển sinh' className='col-md-4' required />
+                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} label='Bậc đào tạo' className='col-md-4' required />
+                <FormSelect ref={e => this.loaiDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Hệ đào tạo' className='col-md-4' required />
+            </div>
+        });
+    }
+}
 
 class EditModal extends AdminModal {
 
@@ -89,10 +151,10 @@ class tcLoaiPhiAdminPage extends AdminPage {
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                    <th style={{ width: 'auto' }}>Mã</th>
                     <th style={{ width: '100%' }}>Tên</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
@@ -101,7 +163,11 @@ class tcLoaiPhiAdminPage extends AdminPage {
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={value => this.props.updateTcLoaiPhi(item.id, { kichHoat: value ? 1 : 0, })} />
                     <TableCell type='buttons' content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete}>
+                        <Tooltip title='Áp dụng loại phí' arrow>
+                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.applyModal.show(item)}><i className='fa fa-lg fa-plus' /></button>
+                        </Tooltip>
+                    </TableCell>
                 </tr>
             )
 
@@ -119,6 +185,7 @@ class tcLoaiPhiAdminPage extends AdminPage {
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getTcLoaiPhiPage} />
                 <EditModal ref={e => this.modal = e}
                     create={this.props.createTcLoaiPhi} update={this.props.updateTcLoaiPhi} readOnly={!permission.write} />
+                <ApplyModal ref={e => this.applyModal = e} submit={this.props.apply} />
             </>,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
@@ -126,5 +193,5 @@ class tcLoaiPhiAdminPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcLoaiPhi: state.finance.tcLoaiPhi });
-const mapActionsToProps = { getTcLoaiPhiPage, createTcLoaiPhi, updateTcLoaiPhi, deleteTcLoaiPhi };
+const mapActionsToProps = { getTcLoaiPhiPage, createTcLoaiPhi, updateTcLoaiPhi, deleteTcLoaiPhi, apply };
 export default connect(mapStateToProps, mapActionsToProps)(tcLoaiPhiAdminPage);

@@ -62,4 +62,31 @@ module.exports = app => {
         };
         solveAnItem(0);
     };
+
+    app.model.svSetting.initLimitCtsvMail = () => {
+        const listMail = [];
+        for (let i = 0; i < 25; i++) {
+            listMail.push(400);
+        }
+        app.database.redis.set('ctsvMail', listMail.toString());
+    };
+
+    app.model.svSetting.getEmail = () => new Promise(resolve => {
+        app.database.redis.get('ctsvMail', async (_, value) => {
+            let listMail = value.split(',').map(item => parseInt(item));
+            console.log(listMail);
+            let index = listMail.findIndex(item => item > 0) + 1;
+            const { defaultEmail, defaultPassword } = await app.model.svSetting.getValue('defaultEmail', 'defaultPassword');
+            const email = `${defaultEmail}${('0' + index).slice(-2)}@hcmussh.edu.vn`;
+            resolve({ email, password: defaultPassword, index });
+        });
+    });
+
+    app.model.svSetting.updateLimit = (index) => app.database.redis.get('ctsvMail', async (_, value) => {
+        let listMail = value.split(',').map(item => parseInt(item));
+        let item = listMail[parseInt(index) - 1];
+        item = parseInt(item) - 1;
+        listMail.splice(parseInt(index) - 1, 1, item);
+        app.database.redis.set('ctsvMail', listMail.toString());
+    });
 };

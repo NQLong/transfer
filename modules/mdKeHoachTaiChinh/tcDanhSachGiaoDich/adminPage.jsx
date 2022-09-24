@@ -85,6 +85,75 @@ class EditModal extends AdminModal {
     }
 }
 
+class AdminEditModal extends AdminModal {
+
+    onChangeQuery = () => {
+        const mssv = this.sinhVien.value();
+        const hocKy = this.hocKy.value();
+        const namHoc = this.namHoc.value();
+        if (mssv && hocKy && namHoc) {
+            this.props.get(mssv, namHoc, hocKy, (hocPhi) => {
+                this.soTien.value(hocPhi.congNo);
+                this.setAmountText(hocPhi.congNo);
+            });
+        }
+    }
+
+
+    setAmountText = (value) => {
+        if (Number.isInteger(value))
+            this.thanhChu?.value(T.numberToVnText(value.toString()) + ' đồng');
+    }
+
+    onShow = () => {
+        this.soTien?.value('');
+        this.thanhChu?.value('');
+        this.sinhVien?.value('');
+    }
+
+    onSubmit = () => {
+        const data = {
+            soTien: this.soTien.value(),
+            hocKy: this.hocKy.value(),
+            namHoc: this.namHoc.value(),
+            sinhVien: this.sinhVien.value()
+        };
+        if (!data.namHoc) {
+            T.notify('Năm học trống ', 'danger');
+            this.namHoc.focus();
+        }
+        else if (!data.hocKy) {
+            T.notify('Học kỳ trống ', 'danger');
+            this.hocKy.focus();
+        }
+        else if (!data.sinhVien) {
+            T.notify('Sinh viên trống ', 'danger');
+            this.sinhVien.focus();
+        }
+        else if (!data.soTien) {
+            T.notify('Số tiền trống', 'danger');
+            this.soTien.focus();
+        }
+        else {
+            this.props.create(data, () => this.hide());
+        }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thêm giao dịch',
+            size: 'large',
+            body: <div className='row'>
+                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
+                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())}/>
+                <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
+            </div>
+        });
+    }
+}
+
 class DanhSachGiaoDich extends AdminPage {
     state = {
         filter: {},
@@ -166,7 +235,8 @@ class DanhSachGiaoDich extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcGiaoDich && this.props.tcGiaoDich.page ? this.props.tcGiaoDich.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write']);
+        // const developer = this.getUserPermission('developer', ['login']);
+        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write', 'check']);
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -233,9 +303,10 @@ class DanhSachGiaoDich extends AdminPage {
                             getPage={this.getPage} />
                     </div>
                 </div>
+                <AdminEditModal ref={e => this.adminModal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
             </div>),
-            onCreate: permission.write ? () => this.modal.show() : null,
+            onCreate: permission.check ? () => this.adminModal.show() : null,
             onExport: permission.export ? e => this.onDownloadPsc(e) : null,
         });
     }

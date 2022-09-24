@@ -10,9 +10,9 @@ class EditModal extends AdminModal {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
     }
-    
+
     onShow = (item) => {
-        let { ma,ten, tenTiengAnh, vietTat, vietTatTiengAnh, kichHoat } = item ? item : { ma: '', ten: '', tenTiengAnh: '', vietTat: '', vietTatTiengAnh: '', kichHoat: 1 };
+        let { ma, ten, tenTiengAnh, vietTat, vietTatTiengAnh, kichHoat } = item ? item : { ma: '', ten: '', tenTiengAnh: '', vietTat: '', vietTatTiengAnh: '', kichHoat: 1 };
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
@@ -25,13 +25,13 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-                ma: this.ma.value(),
-                ten: this.ten.value(),
-                tenTiengAnh: this.tenTiengAnh.value(),
-                vietTat: this.vietTat.value(),
-                vietTatTiengAnh: this.vietTatTiengAnh.value(),
-                kichHoat: Number(this.kichHoat.value()),
-            };
+            ma: this.ma.value(),
+            ten: this.ten.value(),
+            tenTiengAnh: this.tenTiengAnh.value(),
+            vietTat: this.vietTat.value(),
+            vietTatTiengAnh: this.vietTatTiengAnh.value(),
+            kichHoat: Number(this.kichHoat.value()),
+        };
         if (!this.state.ma && !this.ma.value()) {
             T.notify('Mã trình độ không được trống!', 'danger');
             this.ma.focus();
@@ -102,13 +102,13 @@ class dmTrinhDoAdminPage extends AdminPage {
                 getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Tên tiếng Anh</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Viết tắt</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Viết tắt tiếng Anh</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '25%' }}>Tên</th>
+                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Tên tiếng Anh</th>
+                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Viết tắt</th>
+                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Viết tắt tiếng Anh</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

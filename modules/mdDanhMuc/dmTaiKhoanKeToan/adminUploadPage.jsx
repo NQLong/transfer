@@ -145,8 +145,8 @@ class adminUploadPage extends React.Component {
                         <tr>
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                             <th style={{ width: 'auto' }}>Mã</th>
-                            <th style={{ width: '50%' }} nowrap='true'>Tên Tài Khoản</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                            <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên Tài Khoản</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>

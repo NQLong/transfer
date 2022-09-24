@@ -57,12 +57,12 @@ class EditModal extends AdminModal {
 
 class SdhDmKhoiKienThucPage extends AdminPage {
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/khoi-kien-thuc', () => {
-            T.onSearch = (searchText) => this.props.getSdhDmKhoiKienThucPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getSdhDmKhoiKienThucPage();
-        });
-
+        let route = T.routeMatcher('/user/:menu/khoi-kien-thuc').parse(window.location.pathname);
+        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
+        T.ready(`/user/${this.menu}`);
+        T.onSearch = (searchText) => this.props.getSdhDmKhoiKienThucPage(undefined, undefined, searchText || '');
+        T.showSearchBox();
+        this.props.getSdhDmKhoiKienThucPage();
     }
 
     showModal = (e) => {
@@ -91,11 +91,11 @@ class SdhDmKhoiKienThucPage extends AdminPage {
             emptyTable: 'Không có dữ liệu',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Khối cha</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto' }}>#</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Mã</th>
+                    <th style={{ width: '50%' }}>Tên</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Khối cha</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
@@ -119,7 +119,7 @@ class SdhDmKhoiKienThucPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getSdhDmKhoiKienThucPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createSdhDmKhoiKienThuc} update={this.props.updateSdhDmKhoiKienThuc} />
             </>,
-            backRoute: '/user/category',
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

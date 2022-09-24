@@ -46,7 +46,7 @@ class SdhCauTrucKhungDaoTaoPage extends AdminPage {
                     <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm đào tạo</th>
                     <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Bắt đầu đăng ký</th>
                     <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap' }}>Kết thúc đăng ký</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

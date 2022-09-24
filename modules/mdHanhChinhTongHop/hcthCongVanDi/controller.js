@@ -102,10 +102,21 @@ module.exports = app => {
 
     app.post('/api/hcth/van-ban-di', app.permission.check('staff:login'), async (req, res) => {
         try {
-            const { files = [], canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], ...data } = req.body.data;
-            //create vanBanDi instance
-            const instance = await app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user.shcc, ngayTao: new Date().getTime(), trangThai: vanBanDi.trangThai.NHAP.id });
+            const { files = [], canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], soCongVan, ...data } = req.body.data;
+
+            let soDangKy = null;
+            if (data.laySoTuDong == 0) {
+                soDangKy = await app.model.hcthSoDangKy.get({ id: soCongVan });
+            }
+
+            const instance = await app.model.hcthCongVanDi.create({ ...data, nguoiTao: req.session.user.shcc, ngayTao: new Date().getTime(), trangThai: vanBanDi.trangThai.NHAP.id, soDangKy: soDangKy ? soDangKy.id : null });
             const id = instance.id;
+
+            // cap nhat soDangKy voi ma la id congvan
+            if (data.laySoTuDong == 0) {
+                await app.model.hcthSoDangKy.update({ id: soCongVan }, { ma: id, suDung: 1 });
+            }
+
             try {
                 //create don vi nhan from list
                 await app.model.hcthDonViNhan.createFromList(donViNhan, instance.id, LOAI_VAN_BAN);
@@ -271,18 +282,29 @@ module.exports = app => {
         try {
             //NOTE this api will not accept modification of status
             // eslint-disable-next-line no-unused-vars            
-            const { canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], trangThai, ...data } = req.body;
+            const { canBoNhan = [], donViNhan = [], donViNhanNgoai = [], banLuu = [], soCongVan, trangThai, ...data } = req.body;
             const id = req.params.id;
 
             const trangThaiCongVanDi = vanBanDi.trangThai;
 
-            let instance = await getInstance(id);
+            let current = await getInstance(id);
 
             //TODO: Vcheck suitable status to update if not throw error
             if (!([trangThaiCongVanDi.NHAP.id, trangThaiCongVanDi.TRA_LAI.id, trangThaiCongVanDi.TRA_LAI_NOI_DUNG.id, trangThaiCongVanDi.TRA_LAI_THE_THUC.id].includes(trangThai)))
                 throw 'Trạng thái văn bản không hợp lệ';
 
-            instance = await app.model.hcthCongVanDi.update({ id }, data);
+            // cập nhật số đăng ký
+            let instance = await app.model.hcthCongVanDi.update({ id }, { ...data, soDangKy: soCongVan });
+
+            /*  Xét khi số đăng ký hiện tại khác số đăng ký mới
+            *   1. Nếu mà số đăng ký hiện tại có thì cập nhật ở db soDangKy là suDung: 0, ma: null
+            *   2. Nếu mà số đăng ký mới có thì cập nhật ở db soDangKy là suDung: 1, ma: congVanId
+            *   3. Xét if ở if (soCongVan) do có 2 trường hợp số công văn mới là có số ở db hoặc là null
+            */
+            if (current.soDangKy != soCongVan) {
+                if (current.soDangKy) await app.model.hcthSoDangKy.update({ id: current.soDangKy }, { suDung: 0, ma: null });
+                if (soCongVan) await app.model.hcthSoDangKy.update({ id: soCongVan }, { suDung: 1, ma: instance.id });
+            }
 
             //update don vi nhan
             // NOTE: this is just a quick solution
@@ -312,6 +334,24 @@ module.exports = app => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
+    // cập nhật số công văn 
+    const capNhatSoCongVan = async (instance) => {
+        if (instance.laySoTuDong) {
+            const currentYear = new Date().getFullYear();
+            const firstDayOfYear = new Date(currentYear, 0, 1);
+            const nam = Date.parse(firstDayOfYear);
+            try {
+                const so = await app.model.hcthCongVanDi.updateSoCongVan(instance.id, Number(instance.donViGui), nam);
+                let dvg = Number(instance.donViGui);
+                console.log({ so, dvg, nam });
+            } catch {
+                throw { message: 'Cập nhật số văn bản thất bại' };
+            }
+        } else {
+            const soDangKy = await app.model.hcthSoDangKy.get({ id: instance.soDangKy });
+            await app.model.hcthCongVanDi.update({ id: instance.id }, { soCongVan: soDangKy.soCongVan });
+        }
+    };
 
     app.put('/api/hcth/van-ban-di/content/approve/:id', app.permission.check(managerPermission), async (req, res) => {
         try {
@@ -329,6 +369,10 @@ module.exports = app => {
             //TODO: Vcheck don vi quan ly
             if (!donViQuanLy.has(instance.donViGui)) {
                 throw 'permission denied';
+            }
+
+            if (instance.loaiCongVan == vanBanDi.loaiCongVan.DON_VI.id) {
+                await capNhatSoCongVan(instance);
             }
 
             if (instance.loaiCongVan == vanBanDi.loaiCongVan.TRUONG.id)
@@ -358,6 +402,24 @@ module.exports = app => {
 
             res.send({});
 
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
+    // Cập nhật trạng thái và thêm số công văn khi đẫ ký phát hành ở công văn cấp trường
+    app.put('/api/hcth/van-ban-di/publish/approve/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = req.params.id;
+            const instance = await getInstance(id);
+            if (instance.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id) throw 'Trạng thái văn bản không hợp lệ';
+
+            await capNhatSoCongVan(instance);
+
+            await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: vanBanDi.trangThai.DONG_DAU.id });
+            await app.model.hcthHistory.create({ key: id, loai: LOAI_VAN_BAN, hanhDong: action.UPDATE_STATUS, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc });
+            res.send({});
         } catch (error) {
             console.error(error);
             res.send({ error });

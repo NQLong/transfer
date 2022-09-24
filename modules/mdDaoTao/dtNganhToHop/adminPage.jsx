@@ -42,14 +42,14 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-                title: this.state.id ? 'Chỉnh sửa' : 'Tạo mới',
-                size: 'large',
-                body: <div className='row'>
-                    <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DtNganhDaoTao} required />
-                    <FormSelect className='col-12' ref={e => this.maToHop = e} label='Tổ hợp' readOnly={readOnly} data={SelectAdapter_DmSvToHopTs} required />
-                    <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                </div>
-            }
+            title: this.state.id ? 'Chỉnh sửa' : 'Tạo mới',
+            size: 'large',
+            body: <div className='row'>
+                <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DtNganhDaoTao} required />
+                <FormSelect className='col-12' ref={e => this.maToHop = e} label='Tổ hợp' readOnly={readOnly} data={SelectAdapter_DmSvToHopTs} required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+            </div>
+        }
         );
     }
 }
@@ -95,13 +95,13 @@ class DtNganhToHopPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto', textAlign: 'right' }} nowrap='true'>#</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '70%' }} nowrap='true'>Tên Ngành</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Tổ hợp thi</th>
-                        <th style={{ width: '30%' }} nowrap='true'>Danh sách môn thi</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên Ngành</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tổ hợp thi</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Danh sách môn thi</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

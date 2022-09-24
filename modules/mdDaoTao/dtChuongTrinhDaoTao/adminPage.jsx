@@ -351,7 +351,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Loại hình</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

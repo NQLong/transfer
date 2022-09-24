@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmViTriTuyenDungPage, getDmViTriTuyenDungAll, deleteDmViTriTuyenDung, createDmViTriTuyenDung, updateDmViTriTuyenDung } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -13,10 +13,10 @@ class EditModal extends AdminModal {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
     }
-    
+
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: true };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
         this.kichHoat.value(kichHoat);
@@ -44,11 +44,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật vị trí tuyển dụng' : 'Tạo mới vị trí tuyển dụng',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' maxLength={2} ref={e => this.ma = e} label='Mã' 
+                <FormTextBox type='text' className='col-md-6' maxLength={2} ref={e => this.ma = e} label='Mã'
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên'
                     readOnly={readOnly} />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -83,7 +83,7 @@ class DmViTriTuyenDungPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('dmViTriTuyenDung', ['read', 'write', 'delete']);
-            let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmViTriTuyenDung && this.props.dmViTriTuyenDung.page ?
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmViTriTuyenDung && this.props.dmViTriTuyenDung.page ?
             this.props.dmViTriTuyenDung.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -94,8 +94,8 @@ class DmViTriTuyenDungPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -122,7 +122,7 @@ class DmViTriTuyenDungPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmViTriTuyenDungPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmViTriTuyenDung} update={this.props.updateDmViTriTuyenDung} permissions={currentPermissions} />

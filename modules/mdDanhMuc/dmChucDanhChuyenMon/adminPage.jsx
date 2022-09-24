@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {getDmChucDanhChuyenMonAll, createDmChucDanhChuyenMon, updateDmChucDanhChuyenMon, deleteDmChucDanhChuyenMon} from './redux';
+import { getDmChucDanhChuyenMonAll, createDmChucDanhChuyenMon, updateDmChucDanhChuyenMon, deleteDmChucDanhChuyenMon } from './redux';
 import { AdminModal, AdminPage, FormCheckbox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
@@ -25,7 +25,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value(),
                 ten: this.ten.value(),
@@ -89,16 +89,16 @@ class DmChucDanhChuyenMon extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: '100%' }}>Tên chức danh</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={index + 1} />
                     <TableCell type='text' content={item.ten} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={() => this.changeActive(item)} />
-                    <TableCell type='buttons' content={item} permission={permission} 
+                    <TableCell type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)}></TableCell>
                 </tr>)
         });
@@ -112,7 +112,7 @@ class DmChucDanhChuyenMon extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={e => this.modal = e} permission={permission} 
+                <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmChucDanhChuyenMon} update={this.props.updateDmChucDanhChuyenMon} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
@@ -123,7 +123,7 @@ class DmChucDanhChuyenMon extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmChucDanhChuyenMon: state.danhMuc.dmChucDanhChuyenMon });
-const mapActionsToProps = { 
+const mapActionsToProps = {
     getDmChucDanhChuyenMonAll, createDmChucDanhChuyenMon, updateDmChucDanhChuyenMon, deleteDmChucDanhChuyenMon
 };
 export default connect(mapStateToProps, mapActionsToProps)(DmChucDanhChuyenMon);

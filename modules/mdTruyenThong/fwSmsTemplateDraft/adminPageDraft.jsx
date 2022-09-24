@@ -26,11 +26,11 @@ class FwSmsTemplateDraftPage extends AdminPage {
             stickyHead: true,
             renderHead: () => <tr>
                 <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                <th style={{ width: '60%' }} nowrap='true'>Nội dung đã soạn</th>
-                <th style={{ width: '20%' }} nowrap='true'>Mục đích</th>
-                <th style={{ width: '20%' }} nowrap='true'>Người soạn</th>
-                <th style={{ width: 'auto' }} nowrap='true'>Tình trạng</th>
-                <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                <th style={{ width: '60%', whiteSpace: 'nowrap' }}>Nội dung đã soạn</th>
+                <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Mục đích</th>
+                <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Người soạn</th>
+                <th style={{ width: 'auto' }}>Tình trạng</th>
+                <th style={{ width: 'auto' }}>Thao tác</th>
             </tr>,
             renderRow: (item, index) => (
                 <tr key={index}>

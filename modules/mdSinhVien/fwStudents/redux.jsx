@@ -52,29 +52,23 @@ export default function sinhVienReducer(state = null, data) {
 //Admin -----------------------------------------------------------------------------------------------------
 T.initPage('pageStudentsAdmin');
 export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, done) {
-    if (typeof filter === 'function') {
-        done = filter;
-        filter = {};
-    }
     const page = T.updatePage('pageStudentsAdmin', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/students/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
-            if (data.error) {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, result => {
+            if (result.error) {
                 T.notify('Lấy danh sách sinh viên, học sinh bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
+                console.error(`GET: ${url}.`, result.error);
             } else {
-                if (page.filter) data.page.filter = page.filter;
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
-                dispatch({ type: sinhVienGetPage, page: data.page });
+                dispatch({ type: sinhVienGetPage, page: result.page });
+                if (done) done(result.page);
             }
         }, () => T.notify('Lấy danh sách sinh viên, học sinh bị lỗi!', 'danger'));
     };
 }
 
 export function getStudentAdmin(mssv, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/students/item/${mssv}`;
         T.get(url, data => {
             if (data.error) {
@@ -82,7 +76,7 @@ export function getStudentAdmin(mssv, done) {
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 done && done(data.items);
-                dispatch({ type: sinhVienGetEditPage, items: data.items });
+                // dispatch({ type: sinhVienGetEditPage, items: data.items });
             }
         });
     };
@@ -98,7 +92,7 @@ export function updateStudentAdmin(mssv, changes, done) {
             } else {
                 T.notify('Cập nhật thành công!', 'success');
                 done && done(data.items);
-                dispatch({ type: sinhVienGetEditPage, items: data.items });
+                dispatch(getStudentsPage());
             }
         });
     };
@@ -127,6 +121,14 @@ export const SelectAdapter_FwStudent = {
     fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
 };
 
+export const SelectAdapter_FwNamTuyenSinh = {
+    ajax: true,
+    url: '/api/students/nam-tuyen-sinh',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.namTuyenSinh, text: `${item.namTuyenSinh}` })) : [] }),
+    // fetchOne: (mssv, done) => (getStudentAdmin(mssv, item => done && done({ id: item.mssv, text: `${item.mssv}: ${item.ho} ${item.ten}` })))(),
+};
+
 
 
 //User -----------------------------------------------------------------------------------------------
@@ -153,7 +155,6 @@ export function updateStudentUser(changes, done) {
                 T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
-                T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
                 done && done(data.item);
                 dispatch({ type: sinhVienUserGet, item: data.item });
             }
@@ -163,13 +164,24 @@ export function updateStudentUser(changes, done) {
 
 export function downloadWord(done) {
     return () => {
-        const url = '/api/students-download-syll';
+        const url = '/api/students-sent-syll';
         T.get(url, result => {
+            done(result);
+        });
+    };
+}
+
+export function adminDownloadSyll(mssv, namTuyenSinh) {
+    return () => {
+        const url = '/api/student/get-syll';
+        T.get(url, { mssv, namTuyenSinh }, result => {
             if (result.error) {
-                T.notify('Tải sơ yếu lý lịch lỗi', 'danger');
-            } else if (done) {
-                done(result.buffer);
+                T.notify(result.error.message || 'Lỗi hệ thống', 'danger');
+                console.error(result.error);
+            } else {
+                T.download(`${url}?mssv=${mssv}&namTuyenSinh=${namTuyenSinh}`, 'SYLL.pdf');
             }
+
         });
     };
 }

@@ -6037,7 +6037,9 @@
             "modelName": "fwStudents",
             "methods": {
                 "FW_STUDENT_SEARCH_PAGE": "searchPage",
-                "FW_STUDENT_GET_DATA": "getData"
+                "FW_STUDENT_GET_DATA": "getData",
+                "FW_STUDENT_GET_NAM_TUYEN_SINH_LIST": "getNamTuyenSinhList",
+                "FW_STUDENT_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "HO": {
@@ -6381,7 +6383,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 3
+                    "size": 7
                 },
                 "NGAY_VAO_DOAN": {
                     "value": "ngayVaoDoan",
@@ -6460,13 +6462,6 @@
                     "nullable": true,
                     "size": 10
                 },
-                "DIEM_THI": {
-                    "value": "diemThi",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
                 "DOI_TUONG_CHINH_SACH": {
                     "value": "doiTuongChinhSach",
                     "dataType": "NVARCHAR2",
@@ -6487,6 +6482,34 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "CAN_EDIT": {
+                    "value": "canEdit",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "ANH_THE": {
+                    "value": "anhThe",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "DIEM_THI": {
+                    "value": "diemThi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,2"
+                },
+                "MAT_KHAU": {
+                    "value": "matKhau",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -13079,12 +13102,21 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
                 "ID"
             ],
-            "foreignKeys": [],
+            "foreignKeys": [
+                "LOAI"
+            ],
             "type": "table"
         },
         "DM_TIEP_NHAN_VE_NUOC": {
@@ -14571,6 +14603,9 @@
             "active": true,
             "moduleName": "tcHocPhiDetail",
             "modelName": "tcHocPhiDetail",
+            "methods": {
+                "TC_HOC_PHI_DETAIL_BULK_CREATE": "bulkCreate"
+            },
             "columns": {
                 "MSSV": {
                     "value": "mssv",
@@ -14820,6 +14855,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 50
+                },
+                "IS_TIENG_VIET": {
+                    "value": "isTiengViet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -15018,7 +15060,7 @@
         },
         "HCTH_USER_PUBLIC_KEY": {
             "active": true,
-            "moduleName": "hcthUserPublicKey",
+            "moduleName": "hcthYeuCauTaoKhoa",
             "modelName": "hcthUserPublicKey",
             "columns": {
                 "SHCC": {
@@ -15055,6 +15097,27 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "OTP_CODE": {
+                    "value": "otpCode",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "EXPIRED_TIME": {
+                    "value": "expiredTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
@@ -15640,7 +15703,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 50
+                    "size": 256
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -15876,6 +15939,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "THU": {
+                    "value": "thu",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "TIET_BAT_DAU": {
+                    "value": "tietBatDau",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
                 }
             },
             "primaryKeys": [
@@ -15975,6 +16052,13 @@
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_152489\".nextval",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "SO_HOC_KY": {
+                    "value": "soHocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -16733,6 +16817,34 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "DON_VI_BAT_DAU_PHE_DUYET": {
+                    "value": "donViBatDauPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DON_VI_KET_THUC_PHE_DUYET": {
+                    "value": "donViKetThucPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRUONG_BAT_DAU_PHE_DUYET": {
+                    "value": "truongBatDauPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TRUONG_KET_THUC_PHE_DUYET": {
+                    "value": "truongKetThucPheDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -16745,6 +16857,9 @@
             "active": true,
             "moduleName": "svBaoHiemYTe",
             "modelName": "svBaoHiemYTe",
+            "methods": {
+                "SV_BAO_HIEM_Y_TE_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -18005,6 +18120,827 @@
             },
             "primaryKeys": [
                 "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_BHYT_PHU_LUC_CHU_HO": {
+            "active": true,
+            "moduleName": "svBaoHiemYTe",
+            "modelName": "svBhytPhuLucChuHo",
+            "columns": {
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "ID_DANG_KY": {
+                    "value": "idDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "HO_TEN_CHU_HO": {
+                    "value": "hoTenChuHo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "DIEN_THOAI_CHU_HO": {
+                    "value": "dienThoaiChuHo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "SO_NHA_CHU_HO": {
+                    "value": "soNhaChuHo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "MA_XA_CHU_HO": {
+                    "value": "maXaChuHo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "MA_HUYEN_CHU_HO": {
+                    "value": "maHuyenChuHo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "MA_TINH_CHU_HO": {
+                    "value": "maTinhChuHo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                }
+            },
+            "primaryKeys": [
+                "MSSV"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_DM_DIEN_DONG_BHYT": {
+            "active": true,
+            "moduleName": "svDmDienDongBhyt",
+            "modelName": "svDmDienDongBhyt",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "MO_TA": {
+                    "value": "moTa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "SO_TIEN": {
+                    "value": "soTien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 13
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DM_CO_SO_KCB_BHYT": {
+            "active": true,
+            "moduleName": "dmCoSoKcbBhyt",
+            "modelName": "dmCoSoKcbBhyt",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "5,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "DIA_CHI": {
+                    "value": "diaChi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
+                },
+                "LOAI_DANG_KY": {
+                    "value": "loaiDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "LOAI_CO_SO": {
+                    "value": "loaiCoSo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SV_BHYT_PHU_LUC_THANH_VIEN": {
+            "active": true,
+            "moduleName": "svBaoHiemYTe",
+            "modelName": "svBhytPhuLucThanhVien",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_169979\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MSSV": {
+                    "value": "mssv",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "ID_DANG_KY": {
+                    "value": "idDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "HO_TEN": {
+                    "value": "hoTen",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "MA_SO_BHXH": {
+                    "value": "maSoBhxh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "NGAY_SINH": {
+                    "value": "ngaySinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "GIOI_TINH": {
+                    "value": "gioiTinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "MA_XA_NOI_CAP_KHAI_SINH": {
+                    "value": "maXaNoiCapKhaiSinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "MA_HUYEN_NOI_CAP_KHAI_SINH": {
+                    "value": "maHuyenNoiCapKhaiSinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "MA_TINH_NOI_CAP_KHAI_SINH": {
+                    "value": "maTinhNoiCapKhaiSinh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "MOI_QUAN_HE_CHU_HO": {
+                    "value": "moiQuanHeChuHo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2
+                },
+                "CCCD": {
+                    "value": "cccd",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 12
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "SDH_DM_MON_HOC_MOI": {
+            "active": true,
+            "moduleName": "sdhDmMonHocMoi",
+            "modelName": "sdhDmMonHocMoi",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "TEN_TIENG_VIET": {
+                    "value": "tenTiengViet",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "TEN_TIENG_ANH": {
+                    "value": "tenTiengAnh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "TC_LY_THUYET": {
+                    "value": "tcLyThuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "TC_THUC_HANH": {
+                    "value": "tcThucHanh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                },
+                "KHOA_SDH": {
+                    "value": "khoaSdh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "2,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DM_HOC_KY": {
+            "active": true,
+            "moduleName": "dtDmHocKy",
+            "modelName": "dtDmHocKy",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "VARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 15
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_EMAIL_LOG": {
+            "active": true,
+            "moduleName": "fwEmailLog",
+            "modelName": "fwEmailLog",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173115\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USED_EMAIL": {
+                    "value": "usedEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "TO_USER": {
+                    "value": "toUser",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TO_EMAIL": {
+                    "value": "toEmail",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "MAIL_TYPE": {
+                    "value": "mailType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 128
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DM_LOAI_MON_MO": {
+            "active": true,
+            "moduleName": "dtDmLoaiMonMo",
+            "modelName": "dtDmLoaiMonMo",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 5
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_SEMESTER": {
+            "active": true,
+            "moduleName": "dtSemester",
+            "modelName": "dtSemester",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173508\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 11
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "BEGIN_TIME": {
+                    "value": "beginTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "END_TIME": {
+                    "value": "endTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "ACTIVE": {
+                    "value": "active",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "USER_MODIFIED": {
+                    "value": "userModified",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "TIME_MODIFIED": {
+                    "value": "timeModified",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [
+                "HOC_KY"
+            ],
+            "type": "table"
+        },
+        "HCTH_SIGNING_CONFIG": {
+            "active": true,
+            "moduleName": "hcthSigningConfig",
+            "modelName": "hcthSigningConfig",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_163743\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "VBDF_ID": {
+                    "value": "vbdfId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "SIGN_TYPE": {
+                    "value": "signType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "STATUS": {
+                    "value": "status",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "SIGN_AT": {
+                    "value": "signAt",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "PAGE_NUMBER": {
+                    "value": "pageNumber",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                },
+                "X_COORDINATE": {
+                    "value": "xCoordinate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "Y_COORDINATE": {
+                    "value": "yCoordinate",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "FONT_NAME": {
+                    "value": "fontName",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "FONT_SIZE": {
+                    "value": "fontSize",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "3,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_USER_OTP": {
+            "active": true,
+            "moduleName": "hcthUserOtp",
+            "modelName": "hcthUserOtp",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "OTP": {
+                    "value": "otp",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "CREATED_AT": {
+                    "value": "createdAt",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_VAN_BAN_DI_FILE": {
+            "active": true,
+            "moduleName": "hcthVanBanDiFile",
+            "modelName": "hcthVanBanDiFile",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_163745\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "PHU_LUC": {
+                    "value": "phuLuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "FILE_ID": {
+                    "value": "fileId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "VAN_BAN_DI": {
+                    "value": "vanBanDi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_PHE_DUYET_DON_VI": {
+            "active": true,
+            "moduleName": "tccbDanhGiaPheDuyetDonVi",
+            "modelName": "tccbDanhGiaPheDuyetDonVi",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_170632\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USER_DUYET_CAP_DON_VI": {
+                    "value": "userDuyetCapDonVi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "APPROVED_DON_VI": {
+                    "value": "approvedDonVi",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "null",
+                    "nullable": true,
+                    "size": 255
+                },
+                "TIME_DANG_KY": {
+                    "value": "timeDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "ID_NHOM_DANG_KY": {
+                    "value": "idNhomDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "DANG_KY_LAI": {
+                    "value": "dangKyLai",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_PHE_DUYET_TRUONG": {
+            "active": true,
+            "moduleName": "tccbDanhGiaPheDuyetTruong",
+            "modelName": "tccbDanhGiaPheDuyetTruong",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_173093\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "USER_DUYET_CAP_TRUONG": {
+                    "value": "userDuyetCapTruong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "APPROVED_TRUONG": {
+                    "value": "approvedTruong",
+                    "dataType": "CLOB",
+                    "dataDefault": "null",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "ID_PHE_DUYET_CAP_DON_VI": {
+                    "value": "idPheDuyetCapDonVi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "Y_KIEN_TRUONG_TCCB": {
+                    "value": "yKienTruongTccb",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "TRUONG_TCCB": {
+                    "value": "truongTccb",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"

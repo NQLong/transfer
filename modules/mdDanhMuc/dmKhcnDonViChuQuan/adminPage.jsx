@@ -12,7 +12,7 @@ class EditModal extends AdminModal {
         }));
     }
     onShow = (item) => {
-        let { ma, ten} = item ? item : { ma: '', ten: ''};
+        let { ma, ten } = item ? item : { ma: '', ten: '' };
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
@@ -89,7 +89,7 @@ class dmKhcnDonViChuQuanAdminPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>

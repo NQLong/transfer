@@ -86,11 +86,11 @@ class DmSvKhuVucTuyenSinhPage extends AdminPage {
             emptyTable: 'Không có dữ liệu khu vực tuyển sinh',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: '10%' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '40%' }} nowrap='true'>Tên</th>
-                    <th style={{ width: '50%' }} nowrap='true'>Mô tả</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: '10%' }}>Mã</th>
+                    <th style={{ width: '40%' }}>Tên</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mô tả</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>

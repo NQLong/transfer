@@ -101,11 +101,11 @@ class StoragePage extends AdminPage {
             emptyTable: 'Chưa có tài liệu nào!',
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
-                    <th style={{ width: '40%' }} nowrap='true'>Tên hiện thị trang chủ</th>
-                    <th style={{ width: '50%', textAlign: 'left' }} nowrap='true'>Người tạo</th>
-                    <th style={{ width: '10%' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Tên hiện thị trang chủ</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'left' }}>Người tạo</th>
+                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

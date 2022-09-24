@@ -205,8 +205,8 @@ class CarouselEditPage extends React.Component {
                         <tr>
                             <th style={{ width: '80%' }}>Tiêu đề</th>
                             <th style={{ width: '20%', textAlign: 'center' }}>Hình ảnh</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            {permissionWrite ? <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th> : null}
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            {permissionWrite ? <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th> : null}
                         </tr>
                     </thead>
                     <tbody id='mainListCarousel'>

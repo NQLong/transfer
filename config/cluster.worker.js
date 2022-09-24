@@ -12,7 +12,7 @@ module.exports = (cluster, isDebug) => {
         require('https').createServer({
             cert: app.fs.readFileSync('/etc/ssl/hcmussh_certificate.crt'),
             ca: app.fs.readFileSync('/etc/ssl/hcmussh_ca_bundle.crt'),
-            key: app.fs.readFileSync('/etc/ssl/hcmussh_private.key'),
+            key: app.fs.readFileSync('/etc/ssl/hcmussh_private.key')
         }, app);
     if (!app.isDebug && app.fs.existsSync('./asset/config.json')) appConfig = Object.assign({}, appConfig, require('../asset/config.json'));
 
@@ -50,6 +50,7 @@ module.exports = (cluster, isDebug) => {
     require('./permission')(app, appConfig);
     require('./authentication.google')(app, appConfig);
     require('./rabbitmq')(app, appConfig);
+    require('./tail')(app);
 
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');
@@ -81,7 +82,7 @@ module.exports = (cluster, isDebug) => {
     app.worker = {
         create: () => process.send({ type: 'createWorker' }),
         reset: (workerId) => process.send({ type: 'resetWorker', workerId, primaryWorker: app.primaryWorker }),
-        shutdown: (workerId) => process.send({ type: 'shutdownWorker', workerId, primaryWorker: app.primaryWorker }),
+        shutdown: (workerId) => process.send({ type: 'shutdownWorker', workerId, primaryWorker: app.primaryWorker })
     };
 
     // Listen from MASTER ---------------------------------------------------------------------------------------------
@@ -102,4 +103,8 @@ module.exports = (cluster, isDebug) => {
     // Launch website -------------------------------------------------------------------------------------------------
     require('./debug')(app);
     server.listen(app.port);
+
+    //logger
+    app.primaryWorker && app.setupPm2ViewLogs();
+    // app.intervalEmitEvent();
 };

@@ -166,8 +166,8 @@ class RolePage extends React.Component {
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                             <th style={{ width: 'auto' }}>Tên</th>
                             <th style={{ width: '100%', textAlign: 'center' }}>Quyền</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mặc định</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kích hoạt</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mặc định</th>
                             {permissionWrite || permissionDelete ? <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> : ''}
                         </tr>
                     </thead>

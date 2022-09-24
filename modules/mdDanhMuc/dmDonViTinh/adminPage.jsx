@@ -88,8 +88,8 @@ class dmDonViTinhAdminPage extends AdminPage {
         renderHead: () => (
           <tr>
             <th style={{ width: 'auto' }}>Mã</th>
-            <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+            <th style={{ width: '100%' }}>Tên</th>
+            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
           </tr>),
         renderRow: (item, index) => (
           <tr key={index}>

@@ -1,14 +1,14 @@
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormDatePicker, FormImageBox, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { updateProfile } from '../_init/reduxSystem';
 
 class ProfileCommon extends AdminPage {
 
     value(item) {
-        this.imageBox.setData('UserImage:' + item.email, item.image ? item.image : '/img/avatar.png');
+        // this.imageBox.setData('UserImage:' + item.email, item.image ? item.image : '/img/avatar.png');
         this.hoTen.value(item.lastName + ' ' + item.firstName);
         this.email.value(item.email ? item.email : '');
         this.phai.value(item.phai);
@@ -47,8 +47,8 @@ class ProfileCommon extends AdminPage {
                             <FormTextBox ref={e => this.dienThoai = e} label='Điện thoại' className='col-md-12' />
                         </div>
                     </div>
-                        <FormImageBox ref={e => this.imageBox = e} label='Hình đại diện' className='col-md-3 order-1 order-lg-2 rounded-circle' isProfile={true}
-                            postUrl='/user/upload' uploadType='UserImage' onSuccess={this.imageChanged} />
+                        {/*<FormImageBox ref={e => this.imageBox = e} label='Hình đại diện' className='col-md-3 order-1 order-lg-2 rounded-circle' isProfile={true}*/}
+                        {/*    postUrl='/user/upload' uploadType='UserImage' onSuccess={this.imageChanged} />*/}
                     </div>
                 </div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>

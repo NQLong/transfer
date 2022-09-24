@@ -204,7 +204,7 @@ module.exports = app => {
                                     }
                                     context.status = 'SUCCESS';
                                     if (!billResult.length) {
-                                        // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: totalPaymentAmount, payDate: dateFormat(new Date(requestDateTime, 'yyyymmddHHmmss')) });
+                                        // type == types.PRODUCTION && await app.model.tcHocPhiTransaction.notify({ student, hocKy, namHoc, amount: totalPaymentAmount, payDate: dateFormat(new Date(requestDateTime, 'yyyymmddHHmmss')) });
                                     }
                                     return res.send({
                                         context,
