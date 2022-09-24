@@ -27,12 +27,19 @@ export default class VanBanDiFileV2 extends React.Component {
             renderRow: (item, index) => {
                 return <tr key={item.id || index}>
                     <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={index + 1} />
-                    <TableCell type='link' onClick={() => this.pdfModal.show({ id: 13 })} style={{ textAlign: 'left' }} content={item.file.ten} />
+                    <TableCell type='link' onClick={() => this.pdfModal.show({ id: item.id })} style={{ textAlign: 'left' }} content={item.file.ten} />
                     <TableCell type='checkbox' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.phuLuc} />
                     <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} type='buttons' >
-                        <Tooltip title='Cấu hình chữ ký' arrow>
-                            <button className='btn btn-outline-info' onClick={(e) => e.preventDefault() || e.stopPropagation() || this.configModal.show(item)}><i className='fa fa-lg fa-sliders' /></button>
-                        </Tooltip>
+                        {item.id && <>
+                            <Tooltip title='Cấu hình chữ ký' arrow>
+                                <button className='btn btn-outline-info' onClick={(e) => e.preventDefault() || e.stopPropagation() || this.configModal.show(item)}><i className='fa fa-lg fa-sliders' /></button>
+                            </Tooltip>
+                            <Tooltip title='Tải xuống' arrow>
+                                <a className='btn btn-info' href={`/api/hcth/van-ban-di/file/${item.id}`} download title='Tải về'>
+                                    <i className='fa fa-lg fa-download' />
+                                </a>
+                            </Tooltip>
+                        </>}
                     </TableCell>
                 </tr>;
             }
@@ -47,7 +54,7 @@ export default class VanBanDiFileV2 extends React.Component {
         if (!this.props.id) {
             this.setState({ files: [...this.state.files, file] }, () => done && done());
         }
-        else this.props.getFile(this.props.id, (files) => { this.setFiles(files) || (done && done(files));});
+        else this.props.getFile(this.props.id, (files) => { this.setFiles(files) || (done && done(files)); });
     }
 
     render() {
