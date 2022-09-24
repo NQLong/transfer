@@ -14,10 +14,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import SignPDF from './SignPDF';
 import { vanBanDi } from '@/Utils/contants';
 // const RNFS = require('react-native-fs');
-
+import commonStyles from '@/Asset/Styles/styles';
 const CongVanTrinhKySign = ({ navigation, route }) => {
     const dispatch = useDispatch();
-    const { files, config } = route.params;
+    const { files, config, item } = route.params;
     const [submitting, setSubmitting] = useState(false);
     const file = files[0];
     const user = useSelector(state => state?.settings?.user);
@@ -60,7 +60,15 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                         progress: uploadProgress,
                     }).promise.then((response) => {
                         if (response.statusCode == 200) {
+                            const body = response.body && JSON.parse(response.body);
+                            if (body.error)
+                                T.alert('Lỗi');
                             T.alert('Thông báo', 'Chữ kí hợp lệ. Tải lên thành công !!');
+                            const remain = files.slice(1);
+                            if (remain.length)
+                                navigation.navigate('PositionPicker', { files: remain, item });
+                            else
+                                navigation.navigate('vanBanDiPage', {});
                         } else {
                             T.alert('Lỗi');
                         }

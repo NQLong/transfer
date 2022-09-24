@@ -136,7 +136,7 @@ const PositionPick = ({ navigation, route }) => {
 
         <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.buttonSign} onPress={() => {
-                navigation.navigate('CongVanTrinhKySign', { files, config })
+                navigation.navigate('CongVanTrinhKySign', { files, config, item })
             }}>
                 <Ionicons name='pencil-outline' size={30} color='#FFF' />
             </TouchableOpacity>
