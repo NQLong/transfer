@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createDmMonHocSdhMoi, getDmMonHocSdhMoiPage, updateDmMonHocSdhMoi, deleteDmMonHocSdhMoi } from './redux';
-import { SelectAdapter_DmDonViFaculty_V2, getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { Link } from 'react-router-dom';
+import { SelectAdapter_DmKhoaSdh, getDmKhoaSdhAll } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux';
 import Pagination from 'view/component/Pagination';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect, getValue } from 'view/component/AdminPage';
 
@@ -38,12 +39,12 @@ class EditModal extends AdminModal {
         this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
     }
 
-    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+    changeKichHoat = value => this.kichHoat.value(Number(value));
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật môn học sau đại học' : 'Tạo mới môn học sau đại học',
+            title: this.state.ma ? 'Cập nhật môn học mới (sau 2022)' : 'Tạo mới môn học mới (sau 2022)',
             size: 'large',
             body: <div className='row'>
                 <FormTextBox className='col-md-6' ref={e => this.ma = e} label='Mã môn học' readOnly={readOnly} required />
@@ -51,10 +52,10 @@ class EditModal extends AdminModal {
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox className='col-md-12' ref={e => this.tenTiengViet = e} label='Tên tiếng Việt' readOnly={readOnly} required />
-                <FormTextBox className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} />
-                <FormTextBox type='number' className='col-md-3' ref={e => this.tcLyThuyet = e} label='Tín chỉ lý thuyết' min={1} max={99} readOnly={readOnly} />
-                <FormTextBox type='number' className='col-md-3' ref={e => this.tcThucHanh = e} label='Tín chỉ thực hành' min={1} max={99} readOnly={readOnly} />
-                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmDonViFaculty_V2} label='Khoa sau đại học' readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} />
+                <FormTextBox type='number' className='col-md-3' ref={e => this.tcLyThuyet = e} label='Tín chỉ lý thuyết' readOnly={readOnly} />
+                <FormTextBox type='number' className='col-md-3' ref={e => this.tcThucHanh = e} label='Tín chỉ thực hành' readOnly={readOnly} />
+                <FormSelect ref={e => this.khoaSdh = e} className='col-md-6' data={SelectAdapter_DmKhoaSdh} label='Khoa phụ trách' readOnly={readOnly} />
             </div>
         });
     }
@@ -63,14 +64,15 @@ class EditModal extends AdminModal {
 class DmMonHocSdhMoiPage extends AdminPage {
     state = { dmKhoaSdh: {} };
     componentDidMount() {
-        let route = T.routeMatcher('/user/:menu/mon-hoc-moi').parse(window.location.pathname);
+        let route = T.routeMatcher('/user/sau-dai-hoc/mon-hoc-moi').parse(window.location.pathname);
         this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
-        T.ready(`/user/${this.menu}`);
-        this.props.getDmDonViFaculty(items => {
-            this.props.getDmMonHocSdhMoiPage();
-            let dmKhoaSdh = {};
-            items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
-            this.setState({ dmKhoaSdh });
+        T.ready('/user/sau-dai-hoc', () => {
+            this.props.getDmKhoaSdhAll(items => {
+                this.props.getDmMonHocSdhMoiPage();
+                let dmKhoaSdh = {};
+                items.forEach(item => dmKhoaSdh[item.ma] = item.ten);
+                this.setState({ dmKhoaSdh });
+            });
         });
 
     }
@@ -84,7 +86,7 @@ class DmMonHocSdhMoiPage extends AdminPage {
 
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa danh mục môn học sau đại học', 'Bạn có chắc bạn muốn xóa môn học này?', true, isConfirm =>
+        T.confirm('Xóa danh mục môn học mới (sau 2022)', 'Bạn có chắc bạn muốn xóa môn học này?', true, isConfirm =>
             isConfirm && this.props.deleteDmMonHocSdhMoi(item.ma));
     }
 
@@ -93,8 +95,8 @@ class DmMonHocSdhMoiPage extends AdminPage {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHocSdhMoi && this.props.dmMonHocSdhMoi.page ?
             this.props.dmMonHocSdhMoi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         let table = renderTable({
-            getDataSource: () => list, stickyHead: false,
-            emptyTable: 'Không có danh sách môn học sau đại học!',
+            getDataSource: () => list, stickyHead: true,
+            emptyTable: 'Không có danh sách môn học mới (sau 2022)!',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>STT</th>
@@ -129,9 +131,10 @@ class DmMonHocSdhMoiPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục môn học sau đại học',
+            title: 'Danh mục môn học mới (sau 2022) ',
             breadcrumb: [
-                'Danh mục môn học sau đại học'
+                <Link key={0} to='/user/sau-dai-hoc'>Sau đại học</Link>,
+                'Môn học mới (sau 2022)'
             ],
             content: <>
                 <div className='tile'>{table}</div>
@@ -141,12 +144,12 @@ class DmMonHocSdhMoiPage extends AdminPage {
                     create={this.props.createDmMonHocSdhMoi} update={this.props.updateDmMonHocSdhMoi}
                     readOnly={!permission.write} />
             </>,
-            backRoute: `/user/${this.menu}`,
+            backRoute: '/user/sau-dai-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmMonHocSdhMoi: state.sdh.dmMonHocSdhMoi });
-const mapActionsToProps = { createDmMonHocSdhMoi, getDmMonHocSdhMoiPage, updateDmMonHocSdhMoi, deleteDmMonHocSdhMoi, getDmDonViFaculty };
+const mapActionsToProps = { createDmMonHocSdhMoi, getDmMonHocSdhMoiPage, updateDmMonHocSdhMoi, deleteDmMonHocSdhMoi, getDmKhoaSdhAll };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocSdhMoiPage);

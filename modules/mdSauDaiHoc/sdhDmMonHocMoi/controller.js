@@ -3,7 +3,7 @@ module.exports = app => {
         parentMenu: app.parentMenu.sdh,
         menus: {
             7511: {
-                title: 'Môn học (kể từ 2022)',
+                title: 'Môn học mới (sau 2022)',
                 link: '/user/sau-dai-hoc/mon-hoc-moi', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex: 1
             },
         },
