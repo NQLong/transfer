@@ -44,7 +44,7 @@ module.exports = app => {
         }, '*', 'khoa', (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/dao-tao/nganh-dao-tao-student', app.permission.check('student:login'), (req, res) => {
+    app.get('/api/dao-tao/nganh-dao-tao-student', app.permission.check('user:login'), (req, res) => {
         app.model.dtNganhDaoTao.getAll({
             statement: '(lower(tenNganh) LIKE :searchText OR maNganh LIKE :searchText) AND kichHoat = 1',
             parameter: { searchText: `%${(req.query.condition || '').toLowerCase()}%` }

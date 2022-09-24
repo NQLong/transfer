@@ -128,6 +128,7 @@ module.exports = (app, appConfig) => {
                 };
                 app.model.fwUser.get(condition, (error, user) => {
                     if (error || user == null) {
+                        res.setHeader('Clear-Site-Data', '“cache”, “cookies”');
                         res.send({ error: 'System has errors!' });
                     } else {
                         app.updateSessionUser(req, user, () => checkPermissions(req, res, next, permissions));
@@ -147,6 +148,7 @@ module.exports = (app, appConfig) => {
                 };
                 app.model.fwUser.get(condition, (error, user) => {
                     if (error || user == null) {
+                        res.setHeader('Clear-Site-Data', '“cache”, “cookies”');
                         res.send({ error: 'System has errors!' });
                     } else {
                         app.updateSessionUser(req, user, () => checkOrPermissions(req, res, next, permissions));

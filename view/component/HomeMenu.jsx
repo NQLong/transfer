@@ -7,7 +7,7 @@ import { divisionHomeMenuGetAll, homeMenuGet2 } from 'modules/_default/fwMenu/re
 import { getDvWebsite } from 'modules/_default/websiteDonVi/redux';
 
 class HomeMenu extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             width: 0, divisionMenu: null, headerTitle: '', searchValue: '',
@@ -83,6 +83,7 @@ class HomeMenu extends React.Component {
         if (this.props.system && this.props.system.user) {
             this.props.logout();
         } else {
+            // this.props.showLoginModal();
             window.location = '/auth/google';
         }
     }
@@ -102,51 +103,51 @@ class HomeMenu extends React.Component {
                     isExternalLink = link.startsWith('http://') || link.startsWith('https://');
                 const title = item.link !== '/' ? T.language.parse(item.title) : <span className='fa fa-home fa-lg' />;
                 if (!item.parentId) return (item.submenus && item.submenus.length > 0) ? (
-                        <li key={index} className={`nav-item has-down ${index !== (menus.length - 1) && link !== '/' && 'menuStyle'} ${link !== '/' ? 'flex-lg-grow-1' : 'pr-4'}`}>
-                            {isExternalLink ? <a href={link} target='_blank' className='nav-link d-flex align-items-center' style={{ margin: 0, justifyContent: 'center' }} htmlFor={`link${index}MenuCheck`} rel='noreferrer'><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
-                                (item.link ? <Link to={link} className='nav-link d-flex align-items-center' htmlFor={`link${index}MenuCheck`} style={{ margin: 0, justifyContent: 'center' }} onClick={this.onMenuClick}><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></Link> :
-                                    <a href='#' className='nav-link' style={{ margin: '0 10px', justifyContent: 'center' }} onClick={e => e.preventDefault()}>{title}</a>)
-                            }
-                            <label className='nav-link' htmlFor={`link${index}MenuCheck`}><h6 style={{ margin: '0 10px' }}><b>{title} <i className='fa fa-angle-down' aria-hidden='true' /></b></h6></label>
-                            <input id={`link${index}MenuCheck`} type='checkbox' style={{ visibility: 'hidden', position: 'absolute' }} />
-                            <ul className='menu-dropdown' style={{ backgroundColor: '#0139A6' }}>{
-                                item.submenus.map((subMenu, subIndex) => {
-                                    const link = subMenu.link ? subMenu.link.trim() : '/',
-                                        isExternalLink = link.startsWith('http://') || link.startsWith('https://');
-                                    if (subMenu.title == '-') {
-                                        return <li key={subIndex}>---</li>;
-                                    } else if (subMenu.active) {
-                                        let submenu2 = null;
-                                        if (subMenu.submenus && subMenu.submenus.length > 0) {
-                                            submenu2 =
-                                                <ul className='dropdown-menu' style={{ backgroundColor: '#0139A6' }}>
-                                                    {subMenu.submenus.map((item, index) =>
-                                                        <li className='dropdown-item' key={index}>
-                                                            {item.link.includes('http')
-                                                                ? <a href={'#'} onClick={() => window.open(item.link, '_blank')} target='_blank' style={{ color: 'white', padding: 0 }} rel='noreferrer'>
-                                                                    {T.language.parse(item.title)}</a>
-                                                                : <Link to={item.link} onClick={this.onMenuClick} style={{ color: 'white', padding: 0 }}>{T.language.parse(item.title)}
-                                                                </Link>}
-                                                        </li>)}
-                                                </ul>;
-                                        }
-                                        return isExternalLink ?
-                                            <li className='dropdown' key={subIndex}>
-                                                <a href={link} id='menu' target='_blank' style={{ color: 'white', padding: '0 20px', marginLeft: 8, marginRight: 8, marginBottom: 0 }} data-toggle={submenu2 ? 'dropdown' : ''} className={submenu2 ? 'dropdown-toggle' : ''} data-display='static' rel='noreferrer'>{T.language.parse(subMenu.title)}</a>
-                                                {submenu2}
-                                            </li> :
-                                            <li className='dropdown' key={subIndex}>
-                                                <Link onClick={this.onMenuClick} to={link}>
-                                                    <p id='menu' style={{ color: 'white', padding: 0, marginLeft: 8, marginRight: 8, marginBottom: 0 }} data-toggle={submenu2 ? 'dropdown' : ''} className={submenu2 ? 'dropdown-toggle' : ''} data-display='static'>{T.language.parse(subMenu.title)}</p>
-                                                    {submenu2}
-                                                </Link>
-                                            </li>
-                                            ;
+                    <li key={index} className={`nav-item has-down ${index !== (menus.length - 1) && link !== '/' && 'menuStyle'} ${link !== '/' ? 'flex-lg-grow-1' : 'pr-4'}`}>
+                        {isExternalLink ? <a href={link} target='_blank' className='nav-link d-flex align-items-center' style={{ margin: 0, justifyContent: 'center' }} htmlFor={`link${index}MenuCheck`} rel='noreferrer'><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
+                            (item.link ? <Link to={link} className='nav-link d-flex align-items-center' htmlFor={`link${index}MenuCheck`} style={{ margin: 0, justifyContent: 'center' }} onClick={this.onMenuClick}><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></Link> :
+                                <a href='#' className='nav-link' style={{ margin: '0 10px', justifyContent: 'center' }} onClick={e => e.preventDefault()}>{title}</a>)
+                        }
+                        <label className='nav-link' htmlFor={`link${index}MenuCheck`}><h6 style={{ margin: '0 10px' }}><b>{title} <i className='fa fa-angle-down' aria-hidden='true' /></b></h6></label>
+                        <input id={`link${index}MenuCheck`} type='checkbox' style={{ visibility: 'hidden', position: 'absolute' }} />
+                        <ul className='menu-dropdown' style={{ backgroundColor: '#0139A6' }}>{
+                            item.submenus.map((subMenu, subIndex) => {
+                                const link = subMenu.link ? subMenu.link.trim() : '/',
+                                    isExternalLink = link.startsWith('http://') || link.startsWith('https://');
+                                if (subMenu.title == '-') {
+                                    return <li key={subIndex}>---</li>;
+                                } else if (subMenu.active) {
+                                    let submenu2 = null;
+                                    if (subMenu.submenus && subMenu.submenus.length > 0) {
+                                        submenu2 =
+                                            <ul className='dropdown-menu' style={{ backgroundColor: '#0139A6' }}>
+                                                {subMenu.submenus.map((item, index) =>
+                                                    <li className='dropdown-item' key={index}>
+                                                        {item.link.includes('http')
+                                                            ? <a href={'#'} onClick={() => window.open(item.link, '_blank')} target='_blank' style={{ color: 'white', padding: 0 }} rel='noreferrer'>
+                                                                {T.language.parse(item.title)}</a>
+                                                            : <Link to={item.link} onClick={this.onMenuClick} style={{ color: 'white', padding: 0 }}>{T.language.parse(item.title)}
+                                                            </Link>}
+                                                    </li>)}
+                                            </ul>;
                                     }
-                                })}
-                            </ul>
-                        </li>
-                    ) :
+                                    return isExternalLink ?
+                                        <li className='dropdown' key={subIndex}>
+                                            <a href={link} id='menu' target='_blank' style={{ color: 'white', padding: '0 20px', marginLeft: 8, marginRight: 8, marginBottom: 0 }} data-toggle={submenu2 ? 'dropdown' : ''} className={submenu2 ? 'dropdown-toggle' : ''} data-display='static' rel='noreferrer'>{T.language.parse(subMenu.title)}</a>
+                                            {submenu2}
+                                        </li> :
+                                        <li className='dropdown' key={subIndex}>
+                                            <Link onClick={this.onMenuClick} to={link}>
+                                                <p id='menu' style={{ color: 'white', padding: 0, marginLeft: 8, marginRight: 8, marginBottom: 0 }} data-toggle={submenu2 ? 'dropdown' : ''} className={submenu2 ? 'dropdown-toggle' : ''} data-display='static'>{T.language.parse(subMenu.title)}</p>
+                                                {submenu2}
+                                            </Link>
+                                        </li>
+                                        ;
+                                }
+                            })}
+                        </ul>
+                    </li>
+                ) :
                     (<li key={index} className={`nav-item d-flex justify-content-lg-center justify-content-left ${index !== (menus.length - 1) && link !== '/' && 'menuStyle'} ${link !== '/' ? 'flex-lg-grow-1' : 'pr-4'}`}>
                         {isExternalLink ? <a href={link} target='_blank' className='nav-link d-flex align-items-center' rel='noreferrer'><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
                             <Link to={link} className='nav-link d-flex align-items-center' onClick={this.onMenuClick}><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></Link>}

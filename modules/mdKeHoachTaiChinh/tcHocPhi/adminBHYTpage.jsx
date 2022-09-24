@@ -5,9 +5,15 @@ import { BaoHiemModal } from './BaoHiemYTeModal';
 import { connect } from 'react-redux';
 import { createSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
 
-class AdminBhytModal extends BaoHiemModal {
+export class AdminBhytModal extends BaoHiemModal {
     onShow = (mssv) => {
         this.setState({ mssv });
+    }
+
+    initBhyt = (value) => {
+        if (value == 15) this.handleDong15Thang(true);
+        else if (value == 12) this.handleDong12Thang(true);
+        else if (value == 0) this.handleMienDongBhyt(true);
     }
 
     onSubmit = () => {

@@ -13,7 +13,7 @@ module.exports = app => {
         } else resolve();
     }));
 
-    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write');
+    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write', 'tcGiaoDich:check');
 
     app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:read'), app.templates.admin);
 
@@ -118,7 +118,7 @@ module.exports = app => {
     });
 
 
-    app.post('/api/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:write'), async (req, res) => {
+    app.post('/api/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:check'), async (req, res) => {
         try {
             let { soTien, sinhVien, namHoc, hocKy } = req.body;
             soTien = parseInt(soTien);
@@ -151,5 +151,77 @@ module.exports = app => {
             res.send({ error });
         }
 
+    });
+
+    app.get('/api/finance/danh-sach-giao-dich/stat', app.permission.check('tcGiaoDich:write'), async (req, res) => {
+        try {
+            let condition = {
+                statement: '( (maPl = :maPl OR ma = 33 OR ma = 32) AND kichHoat = 1 )',
+                paramater: { maPl: 1 }
+            };
+            let data = app.utils.parse(req.query.data);
+            const soLoaiPhi = data.loaiPhi.split(',').length;
+
+            let result = await app.model.dmDonVi.getAll(condition, 'ma,ten', 'ma');
+            result = await Promise.all(result.map(async khoa => ({ ...khoa, nganh: await app.model.dtNganhDaoTao.getAll({ kichHoat: 1, khoa: khoa.ma }, 'maNganh, tenNganh') })));
+            result = result.filter(khoa => khoa.nganh.length > 0);
+            await Promise.all(result.map((khoa) => Promise.all(khoa.nganh.map(async (nganh) => {
+                nganh.statistic = await app.model.tcLoaiPhi.getStatistic(app.utils.stringify({ nganh: nganh.maNganh, ...data }));
+                nganh.statistic = nganh.statistic.rows;
+                nganh.transactionStatistic = await app.model.tcHocPhiTransaction.getStatistic(app.utils.stringify({ nganh: nganh.maNganh, ...data }));
+                nganh.transactionStatistic = nganh.transactionStatistic.outBinds;
+            }))));
+            const all = await app.model.tcLoaiPhi.getStatistic(app.utils.stringify(data));
+            const allTransaction = await app.model.tcHocPhiTransaction.getStatistic(app.utils.stringify(data));
+            result.splice(0, 0, { ten: 'Tổng quát', nganh: [{ tenNganh: '', statistic: all.rows || [], transactionStatistic: allTransaction.outBinds }], });
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet('Thống kê');
+            ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', wrapText: true };
+            ws.getRow(1).font = {
+                name: 'Times New Roman',
+                family: 4,
+                size: 12,
+                bold: true,
+                color: { argb: 'FF000000' }
+            };
+            let index = 1;
+            for (const khoa of result) {
+
+                ws.getCell('A' + (index)).value = khoa.ten;
+                ws.getCell('A' + (++index)).value = 'Ngành';
+                ws.getCell(`B${index}`).value = 'Loại phí';
+                ws.getCell(`C${index}`).value = 'Số lượng dự kiến';
+                ws.getCell(`D${index}`).value = 'Số tiền dự kiến';
+                ws.getCell(`E${index}`).value = 'Số lượng đã đóng';
+                ws.getCell(`F${index}`).value = 'Số tiền đã đóng';
+                ws.getCell(`G${index}`).value = 'Số lượng giao dịch';
+                ws.getCell(`H${index++}`).value = 'Số tiền giao dịch';
+                khoa.nganh.forEach((nganh, i) => {
+                    ws.mergeCells(`A${index + soLoaiPhi * i}:A${index + soLoaiPhi * (i + 1) - 1}`);
+                    ws.mergeCells(`G${index + soLoaiPhi * i}:G${index + soLoaiPhi * (i + 1) - 1}`);
+                    ws.mergeCells(`H${index + soLoaiPhi * i}:H${index + soLoaiPhi * (i + 1) - 1}`);
+                    ws.getCell(`A${index + soLoaiPhi * i}`).value = nganh.tenNganh;
+                    console.log(nganh);
+                    ws.getCell(`G${index + soLoaiPhi * i}`).value = nganh.transactionStatistic.tongsogiaodich;
+                    ws.getCell(`H${index + soLoaiPhi * i}`).value = nganh.transactionStatistic.ret || 0;
+
+
+                    nganh.statistic.forEach((item, k) => {
+                        ws.getCell(`B${index + soLoaiPhi * i + k}`).value = item.ten;
+                        ws.getCell(`C${index + soLoaiPhi * i + k}`).value = item.soLuongDuKien;
+                        ws.getCell(`D${index + soLoaiPhi * i + k}`).value = item.soTienDuKien;
+                        ws.getCell(`E${index + soLoaiPhi * i + k}`).value = item.soLuongDaDong;
+                        ws.getCell(`F${index + soLoaiPhi * i + k}`).value = item.soTienDaDong;
+                    });
+                });
+                index += khoa.nganh.length * soLoaiPhi + 2;
+            }
+
+            let fileName = 'Thống kê.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
     });
 };

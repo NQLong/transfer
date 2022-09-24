@@ -8,6 +8,7 @@ import InputMask from 'react-input-mask';
 import NumberFormat from 'react-number-format';
 import 'react-datetime/css/react-datetime.css';
 import Tooltip from '@mui/material/Tooltip';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
@@ -1011,10 +1012,43 @@ export class AdminPage extends React.Component {
         $(this.advanceSearchBox).addClass('hide');
     }
 
-
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, advanceSearchTitle = 'Tìm kiếm nâng cao', content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, advanceSearchTitle = 'Tìm kiếm nâng cao', content, backRoute, onCreate, onSave, onExport, onImport, buttons = null, collapse = null }) => {
         T.title(title);
-        let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
+
+        const typeMapper = {
+            'info': {
+                color: 'white', backgroundColor: 'info.main', '&:hover': {
+                    color: 'info.main',
+                    backgroundColor: 'white',
+                },
+            },
+            'primary': {
+                color: 'white', backgroundColor: 'primary.main', '&:hover': {
+                    color: 'primary.main',
+                    backgroundColor: 'white',
+                },
+            },
+            'success': {
+                color: 'white', backgroundColor: 'success.main', '&:hover': {
+                    color: 'success.main',
+                    backgroundColor: 'white',
+                },
+            },
+            'warning': {
+                color: 'black', backgroundColor: 'warning.main', '&:hover': {
+                    color: 'warning.main',
+                    backgroundColor: 'black',
+                },
+            },
+            'danger': {
+                color: 'black', backgroundColor: 'danger.main', '&:hover': {
+                    color: 'danger.main',
+                    backgroundColor: 'black',
+                },
+            },
+        };
+
+        let right = 10, createButton, saveButton, exportButton, importButton, customButtons, collapseButtons;
         if (onCreate) {
             createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới' />;
             right += 60;
@@ -1047,6 +1081,24 @@ export class AdminPage extends React.Component {
             }
         }
 
+        if (!onCreate && !onSave && !onExport && !onImport && !buttons && collapse && collapse.length && collapse.some(action => action.permission)) {
+            collapseButtons = <SpeedDial
+                className='collapsant'
+                ariaLabel='Công cụ'
+                icon={<SpeedDialIcon />}
+            >
+                {collapse.map(action => (
+                    action.permission && <SpeedDialAction
+                        sx={Object.assign({}, typeMapper[action.type], action.style || {})}
+                        key={action.name}
+                        icon={action.icon}
+                        tooltipTitle={action.name}
+                        onClick={action.onClick}
+                    />
+                ))}
+            </SpeedDial>;
+        }
+
         return (
             <main className='app-content'>
                 <div className='app-title'>
@@ -1066,7 +1118,7 @@ export class AdminPage extends React.Component {
                 </div>
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
-                {importButton} {exportButton} {saveButton} {createButton} {customButtons}
+                {importButton} {exportButton} {saveButton} {createButton} {customButtons} {collapseButtons}
             </main>);
     }
 

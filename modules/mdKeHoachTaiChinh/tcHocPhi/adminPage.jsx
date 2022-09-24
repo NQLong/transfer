@@ -3,18 +3,20 @@ import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
+import { SelectAdapter_FwNamTuyenSinh } from 'modules/mdSinhVien/fwStudents/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell, AdminModal, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import CountUp from 'view/js/countUp';
 import Detail from './modal/DetailModal';
 import { EditModal } from './modal/EditModal';
 import { createInvoice, createInvoiceList, createMultipleHocPhi, getHocPhi, getTcHocPhiPage, updateHocPhi, getPendingListInvoiceLength } from './redux';
-
+import { getMssvBaoHiemYTe, createMssvBaoHiemYTe, createSvBaoHiemYTe } from 'modules/mdSinhVien/svBaoHiemYTe/redux';
 import TachMssvModal from './tachMssvModal';
+import { AdminBhytModal } from './adminBHYTpage';
 export class NumberIcon extends React.Component {
     componentDidMount() {
         setTimeout(() => {
@@ -150,11 +152,8 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 class TcHocPhiAdminPage extends AdminPage {
-    state = {
-        filter: {},
-        totalCurrent: 0,
-        totalPaid: 0
-    }
+    state = { filter: {}, totalCurrent: 0, totalPaid: 0, isButtonsExpanded: false }
+
     componentDidMount() {
         T.ready('/user/finance/hoc-phi', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
@@ -169,6 +168,9 @@ class TcHocPhiAdminPage extends AdminPage {
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
+            this.setState({ thaoTacNhanh: true }, () => {
+                this.thaoTacNhanh?.value(true);
+            });
         });
     }
 
@@ -184,20 +186,20 @@ class TcHocPhiAdminPage extends AdminPage {
             listKhoa = this.khoa.value().toString(),
             namHoc = this.year.value(),
             hocKy = this.term.value(),
+            namTuyenSinh = this.namTuyenSinh.value(),
             { tuNgay, denNgay } = getTimeFilter(this.tuNgay.value() || null, this.denNgay.value() || null);
-        const pageFilter = (isInitial || isReset) ? {} : { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
+        const pageFilter = (isInitial || isReset) ? {} : { namTuyenSinh, daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa, namHoc, hocKy, tuNgay, denNgay };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
+                const { settings: { namHoc, hocKy, totalPaid, totalCurrent } } = page;
                 if (isInitial) {
-                    const { settings: { namHoc, hocKy, totalPaid, totalCurrent } } = page;
                     this.year.value(namHoc);
                     this.term.value(hocKy);
-                    this.setState({ totalCurrent, totalPaid });
                     const filter = page.filter || {};
                     const filterCookie = T.getCookiePage('pageTcHocPhi', 'F');
                     let { daDong, listBacDaoTao, listLoaiHinhDaoTao, listNganh, listKhoa } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-
+                    this.namTuyenSinh.value(namTuyenSinh || filterCookie.namTuyenSinh);
                     this.daDong.value(daDong || filterCookie.daDong || '');
                     this.bacDaoTao.value(listBacDaoTao || filterCookie.listBacDaoTao || '');
                     this.loaiHinhDaoTao.value(listLoaiHinhDaoTao || filterCookie.listLoaiHinhDaoTao || '');
@@ -207,6 +209,7 @@ class TcHocPhiAdminPage extends AdminPage {
                     ['daDong', 'bacDaoTao', 'loaiHinhDaoTao', 'nganh', 'khoa'].forEach(e => this[e].value(''));
                     this.hideAdvanceSearch();
                 }
+                this.setState({ totalCurrent, totalPaid });
             });
         });
     }
@@ -245,40 +248,44 @@ class TcHocPhiAdminPage extends AdminPage {
     render() {
         let invoicePermission = this.getUserPermission('tcInvoice');
         let permission = this.getUserPermission('tcHocPhi', ['read', 'write', 'delete', 'manage', 'export']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list, settings } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
         const buttons = [];
 
-        invoicePermission.write && buttons.push({
-            className: 'btn-info', icon: 'fa-print', tooltip: 'Xuất hóa đơn', onClick: (e) => {
-                e.preventDefault();
-                this.invoiceModal.show({
-                    tuNgay: this.tuNgay?.value(),
-                    denNgay: this.denNgay?.value(),
-                    hocKy: this.term.value(),
-                    namHoc: this.year.value(),
-                });
-            }
-        }, {
-            className: 'btn-primary', icon: 'fa-scissors', tooltip: 'Tách MSSV', onClick: (e) => {
-                e.preventDefault();
-                this.tachMssvModal.show();
-            }
-        }, {
-            className: 'btn-secondary', icon: 'fa-cog', tooltip: 'Chọn BHYT', onClick: (e) => {
-                e.preventDefault();
-                this.props.history.push('/user/finance/bhyt');
-            }
-        });
+        if (this.state.isButtonsExpanded) {
+            buttons.push({ className: 'btn-secondary', icon: 'fa-caret-right', tooltip: 'Thu gọn', onClick: e => e.preventDefault() || this.setState({ isButtonsExpanded: false }) });
+            invoicePermission.write && buttons.push({
+                className: 'btn-info', icon: 'fa-print', tooltip: 'Xuất hóa đơn', onClick: (e) => {
+                    e.preventDefault();
+                    this.invoiceModal.show({
+                        tuNgay: this.tuNgay?.value(),
+                        denNgay: this.denNgay?.value(),
+                        hocKy: this.term.value(),
+                        namHoc: this.year.value(),
+                    });
+                }
+            }, {
+                className: 'btn-primary', icon: 'fa-scissors', tooltip: 'Tách MSSV', onClick: (e) => {
+                    e.preventDefault();
+                    this.tachMssvModal.show();
+                }
+            });
+            permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
+            permission.write && buttons.push({ type: 'primary', icon: 'fa-cloud-upload', className: 'btn-success', tooltip: 'Import', onClick: e => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') });
+            permission.export && buttons.push({ type: 'primary', icon: 'fa-file-excel-o', className: 'btn-success', tooltip: 'export', onClick: e => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') });
+        } else {
+            buttons.push({ className: 'btn-info', icon: 'fa-caret-left', tooltip: 'Mở rộng', onClick: e => e.preventDefault() || this.setState({ isButtonsExpanded: true }) });
+        }
 
-        permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
+
 
 
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
             header: 'thead-light',
+            className: this.state.thaoTacNhanh ? 'table-fix-col' : '',
             emptyTable: 'Chưa có dữ liệu học phí học kỳ hiện tại',
             renderHead: () => (<tr>
                 <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -319,6 +326,25 @@ class TcHocPhiAdminPage extends AdminPage {
                                 <i className='fa fa-lg fa-eye' />
                             </button>
                         </Tooltip>
+                        <Tooltip title='Bảo hiểm y tế' arrow>
+                            <button className='btn btn-secondary' onClick={e => {
+                                e.preventDefault();
+                                this.props.getMssvBaoHiemYTe({ mssv: item.mssv }, (bhyt) => {
+                                    if (!bhyt) {
+                                        T.confirm('Sinh viên chưa chọn bảo hiểm y tế', `Xác nhận đăng ký bảo hiểm y tế cho sinh viên ${item.mssv}!`, 'warning', true, isConfirm => {
+                                            if (isConfirm)
+                                                this.adminCreateBhytModal.show(item.mssv);
+                                        });
+                                    } else {
+                                        this.adminBhytModal.initBhyt(bhyt.dienDong);
+                                        this.adminBhytModal.show(item.mssv);
+                                    }
+                                });
+                            }}>
+                                <i className='fa fa-lg fa-cog' />
+                            </button>
+                        </Tooltip>
+
                         {item.invoiceId ? <Tooltip title='Xem hóa đơn' arrow>
                             <a className='btn btn-warning' target='_blank' rel='noopener noreferrer' href={`/api/finance/invoice/view/${item.invoiceId}`}>
                                 <i className='fa fa-lg fa-credit-card' />
@@ -344,8 +370,9 @@ class TcHocPhiAdminPage extends AdminPage {
                 <FormSelect ref={e => this.daDong = e} label='Tình trạng' data={[{ id: 0, text: 'Chưa đóng' }, { id: 1, text: 'Đã đóng' }]} className='col-md-4' allowClear />
                 <FormSelect ref={e => this.bacDaoTao = e} label='Bậc đào tạo' data={SelectAdapter_DmSvBacDaoTao} className='col-md-4' allowClear multiple />
                 <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Hệ đào tạo' data={SelectAdapter_DmSvLoaiHinhDaoTao} className='col-md-4' allowClear multiple />
-                <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-6' allowClear multiple />
-                <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-6' allowClear multiple />
+                <FormSelect ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' data={SelectAdapter_FwNamTuyenSinh} className='col-md-4' allowClear />
+                <FormSelect ref={e => this.khoa = e} label='Khoa' data={SelectAdapter_DmDonViFaculty_V2} className='col-md-4' allowClear multiple />
+                <FormSelect ref={e => this.nganh = e} label='Ngành' data={SelectAdapter_DtNganhDaoTao} className='col-md-4' allowClear multiple />
                 <FormDatePicker className='col-md-6' ref={e => this.tuNgay = e} label='Từ ngày' allowClear />
                 <FormDatePicker className='col-md-6' ref={e => this.denNgay = e} label='Đến ngày' allowClear />
                 <div className='col-md-12 d-flex justify-content-end' style={{ gap: 10 }}>
@@ -358,15 +385,16 @@ class TcHocPhiAdminPage extends AdminPage {
             content:
                 <div className='row'>
                     <div className='col-md-6'>
-                        <NumberIcon type='primary' icon='fa-users' title='Tổng số sinh viên đóng học phí' value={this.state.totalCurrent || 0} />
+                        <NumberIcon type='primary' icon='fa-users' title='Tổng số sinh viên đóng học phí' value={totalItem || 0} />
                     </div>
                     <div className='col-md-6'>
-                        <NumberIcon type='info' icon='fa-users' title='Số sinh viên đã đóng đủ' value={this.state.totalPaid || 0} />
+                        <NumberIcon type='info' icon='fa-users' title='Số sinh viên đã đóng đủ' value={settings?.totalPaid || 0} />
                     </div>
                     <div className='col-md-12'>
                         <div className='tile'>
+                            <div><FormCheckbox isSwitch label={'Thao tác nhanh'} ref={e => this.thaoTacNhanh = e} onChange={value => this.setState({ thaoTacNhanh: value })} /></div>
                             {table}
-                            <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                            <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} pageRange={3}
                                 getPage={this.getPage} />
                             <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} readOnly={!permission.readOnly} />
                             <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} readOnly={!permission.write} />
@@ -374,19 +402,20 @@ class TcHocPhiAdminPage extends AdminPage {
                     </div>
                     <InvoiceModal ref={e => this.invoiceModal = e} onCreate={this.onCreateInvoiceList} permissions={invoicePermission} getPendingListInvoiceLength={this.props.getPendingListInvoiceLength} />
                     <InvoiceResultModal ref={e => this.resultModal = e} />
+                    <AdminBhytModal ref={e => this.adminBhytModal = e} createSvBaoHiemYTe={this.props.createMssvBaoHiemYTe} />
+                    <AdminBhytModal ref={e => this.adminCreateBhytModal = e} createSvBaoHiemYTe={this.props.createSvBaoHiemYTe} />
 
                     <TachMssvModal ref={e => this.tachMssvModal = e} />
                 </div>,
-            onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
-            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
+            // onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
+            // onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
             buttons: buttons,
-            // { type: 'danger', icon: 'fa-reply-all', tooltip: 'Gửi mail nhắc nhở', onClick: this.sendEmailNhacNho }
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tcHocPhi: state.finance.tcHocPhi });
 const mapActionsToProps = {
-    getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList, getPendingListInvoiceLength
+    getMssvBaoHiemYTe, getTcHocPhiPage, updateHocPhi, getHocPhi, createMultipleHocPhi, createInvoice, createInvoiceList, getPendingListInvoiceLength, createMssvBaoHiemYTe, createSvBaoHiemYTe
 };
 export default connect(mapStateToProps, mapActionsToProps)(TcHocPhiAdminPage);

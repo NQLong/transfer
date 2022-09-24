@@ -19,7 +19,7 @@ module.exports = app => {
                 reject('Data is empty!');
             } else {
                 const sql = 'INSERT INTO HCTH_CONG_VAN_DI (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.hcthCongVanDi.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -56,7 +56,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -88,7 +88,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -121,7 +121,7 @@ module.exports = app => {
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
             const sqlCount = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sqlCount, parameter, (error, res) => {
+            app.database.oracle.connection.main.executeExtra(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -132,7 +132,7 @@ module.exports = app => {
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                     const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT HCTH_CONG_VAN_DI.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                    app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                    app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                         if (error) {
                             done && done(error);
                             reject(error);
@@ -152,7 +152,7 @@ module.exports = app => {
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
                 const sql = 'UPDATE HCTH_CONG_VAN_DI SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.hcthCongVanDi.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
@@ -183,7 +183,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'DELETE FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, error => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, error => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -205,7 +205,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM HCTH_CONG_VAN_DI' + (condition.statement ? ' WHERE ' + condition.statement : '');
-            app.database.oracle.connection.main.execute(sql, parameter, (error, result) => {
+            app.database.oracle.connection.main.executeExtra(sql, parameter, (error, result) => {
                 if (error) {
                     done && done(error);
                     reject(error);
@@ -217,7 +217,7 @@ module.exports = app => {
         }),
 
         searchPage: (pagenumber, pagesize, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_page(:pagenumber, :pagesize, :macanbo, :donvigui, :donvi, :loaicongvan, :loaivanban, :donvinhanngoai, :donvixem, :canboxem, :loaicanbo, :status, :timetype, :fromtime, :totime, :searchterm, :totalitem, :pagetotal); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_cong_van_di_search_page(:pagenumber, :pagesize, :macanbo, :donvigui, :donvi, :loaicongvan, :loaivanban, :donvinhanngoai, :donvixem, :canboxem, :loaicanbo, :status, :timetype, :fromtime, :totime, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -230,7 +230,7 @@ module.exports = app => {
         }),
 
         updateSoCongVanDi: (ma, donvigui, nam, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN hcth_cong_van_di_update_so_cong_van(:ma, :donvigui, :nam); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN hcth_cong_van_di_update_so_cong_van(:ma, :donvigui, :nam); END;',
                 { ma, donvigui, nam }, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -243,7 +243,7 @@ module.exports = app => {
         }),
 
         getAllPhanHoi: (idnhiemvu, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_phan_hoi(:idnhiemvu); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_cong_van_di_get_all_phan_hoi(:idnhiemvu); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idnhiemvu }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -256,7 +256,7 @@ module.exports = app => {
         }),
 
         getHcthStaff: (done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_hcth_staff(); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_cong_van_di_get_hcth_staff(); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -268,9 +268,9 @@ module.exports = app => {
                 }));
         }),
 
-        getAllStaff: (congvanid, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_staff(:congvanid); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        searchSelector: (pagenumber, pagesize, filterparam, scope, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_cong_van_di_search_selector(:pagenumber, :pagesize, :filterparam, :scope, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filterparam, scope, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);
@@ -281,22 +281,9 @@ module.exports = app => {
                 }));
         }),
 
-        searchSelector: (pagenumber, pagesize, filterparam, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_selector(:pagenumber, :pagesize, :filterparam, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filterparam, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                }));
-        }),
-
-        downloadExcel: (macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_download_excel(:macanbo, :donvigui, :donvi, :loaicongvan, :loaivanban, :donvinhanngoai, :donvixem, :canboxem, :loaicanbo, :status, :timetype, :fromtime, :totime, :searchterm, :totalitem); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, macanbo, donvigui, donvi, loaicongvan, loaivanban, donvinhanngoai, donvixem, canboxem, loaicanbo, status, timetype, fromtime, totime, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        downloadExcel: (filter, scope, searchterm, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_cong_van_di_download_excel(:filter, :scope, :searchterm, :totalitem); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, scope, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);
@@ -308,7 +295,7 @@ module.exports = app => {
         }),
 
         getSignStaff: (congvanid, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_sign_staff(:congvanid); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_cong_van_di_get_sign_staff(:congvanid); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, congvanid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -321,7 +308,7 @@ module.exports = app => {
         }),
 
         validateSoCongVan: (ma, donvigui, nam, trangthaimoi, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN hcth_cong_van_di_validate_so_cong_van(:ma, :donvigui, :nam, :trangthaimoi); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN hcth_cong_van_di_validate_so_cong_van(:ma, :donvigui, :nam, :trangthaimoi); END;',
                 { ma, donvigui, nam, trangthaimoi }, (error, result) => {
                     if (error) {
                         done && done(error);
@@ -334,7 +321,7 @@ module.exports = app => {
         }),
 
         dashboardGetData: (timeselect, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_dashboard_get_data(:timeselect, :totalVanBanDen, :totalVanBanDi, :vanBanDenNam, :vanBanDiNam); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=hcth_dashboard_get_data(:timeselect, :totalVanBanDen, :totalVanBanDi, :vanBanDenNam, :vanBanDiNam); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, timeselect, totalVanBanDen: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, totalVanBanDi: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDenNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, vanBanDiNam: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);

@@ -44,8 +44,12 @@ module.exports = app => {
             res.send({ result_code: '007' });
         } else {
             const model = type === types.PRODUCTION ? app.model.tcHocPhi : app.model.tcHocPhiSandbox;
+            const bhyt = await app.model.svBaoHiemYTe.get({ mssv: customer_id, namDangKy: new Date().getFullYear() });
             const hocPhi = await model.get({ namHoc, hocKy, mssv: customer_id.toString() });
-            if (!hocPhi) {
+            if (!bhyt) {
+                res.send({ result_code: '072' });
+            }
+            else if (!hocPhi) {
                 res.send({ result_code: '001' });
             } else if (hocPhi.congNo <= 0) {
                 res.send({ result_code: '025' });
@@ -122,7 +126,7 @@ module.exports = app => {
                 let student = await app.model.fwStudents.get({ mssv: customer_id });
                 await modelHocPhiTransaction.addBill(namHoc, hocKy, 'BIDV', `BIDV-${trans_id}`, app.date.fullFormatToDate(trans_date).getTime(), customer_id, bill_id, service_id, parseInt(amount), checksum);
                 res.send({ result_code: '000', result_desc: 'success' });
-                type == types.PRODUCTION && app.model.tcHocPhiTransaction.sendEmailAndSms({ student, hocKy, namHoc, amount: parseInt(amount), payDate: trans_date.toString() });
+                type == types.PRODUCTION && app.model.tcHocPhiTransaction.notify({ student, hocKy, namHoc, amount: parseInt(amount), payDate: trans_date.toString() });
             }
         }
     };

@@ -169,12 +169,12 @@ class UserPage extends AdminPage {
                                     this.state.chuaDongBhyt ? <a href='#' onClick={e => e.preventDefault() || this.baoHiemModal.show()}>Chọn mức BHYT</a> : ''
                                 }
                                 {
-                                    current.congNo ?
-                                        (this.props.system.user.studentId == '12345' ? <Tooltip title='Thanh toán' placement='top' arrow>
+                                    current.congNo && parseInt(current.congNo) > 0 ?
+                                        <Tooltip title='Thanh toán' placement='top' arrow>
                                             <button disabled={this.state.chuaDongBhyt} className='btn btn-outline-primary' onClick={e => e.preventDefault() || this.thanhToanModal.show()}>
                                                 Thanh toán
                                             </button>
-                                        </Tooltip> : <b>Còn nợ: {T.numberDisplay(current.congNo)} VNĐ</b>) : <b>Đã thanh toán đủ.</b>
+                                        </Tooltip> : <b>Đã thanh toán đủ.</b>
                                 }
                             </div>
                         </div>
@@ -183,7 +183,7 @@ class UserPage extends AdminPage {
                         <div className='tile-footer' style={{ marginTop: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }} >
                             <div>
                                 <div>Miễn giảm: <b>{current.mienGiam || 'Không'}</b> </div>
-                                {/* <div>Thời gian đóng:  <b>Từ {current.fromTime || ''} đến {current.fromTime || ''}</b> </div> */}
+                                <div>Thời gian thu học phí: 00:00:00 19/9/2022 - 23:59:59 30/9/2022</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <div>Tổng học phí: <b>{T.numberDisplay(Number(current.hocPhi))} VNĐ </b></div>

@@ -8,5 +8,9 @@ export default {
             path: '/user/students/setting',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/students/dashboard',
+            component: Loadable({ loading: Loading, loader: () => import('./DashboardPage') })
+        },
     ],
 };
