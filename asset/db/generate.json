@@ -12671,12 +12671,21 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "LOAI_MON_MO": {
+                    "value": "loaiMonMo",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
                 }
             },
             "primaryKeys": [
                 "ID"
             ],
-            "foreignKeys": [],
+            "foreignKeys": [
+                "LOAI_MON_MO"
+            ],
             "type": "table"
         },
         "HCTH_HISTORY": {
@@ -13443,10 +13452,10 @@
                 },
                 "HOC_KY": {
                     "value": "hocKy",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "1,0"
+                    "size": 11
                 },
                 "NAM": {
                     "value": "nam",
@@ -14082,6 +14091,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 256
                 }
             },
             "primaryKeys": [
