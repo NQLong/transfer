@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbDanhGiaHoiDongDonViAll, createTccbDanhGiaHoiDongDonVi, updateTccbDanhGiaHoiDongDonVi, deleteTccbDanhGiaHoiDongDonVi } from './redux';
+import { getTccbDanhGiaHoiDongDonViAllByYear, createTccbDanhGiaHoiDongDonVi, updateTccbDanhGiaHoiDongDonVi, deleteTccbDanhGiaHoiDongDonVi } from './redux';
 import { FormSelect, AdminPage, AdminModal, getValue, TableCell, renderTable } from 'view/component/AdminPage';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import T from 'view/js/common';
@@ -26,7 +26,7 @@ class EditModal extends AdminModal {
         if (!this.state.item) {
             this.props.create({ ...changes, nam: this.props.nam }, () => this.hide());
         } else {
-            this.props.update(this.state.item.id, changes, () => this.hide());
+            this.props.update(this.state.item.id, { ...changes, nam: this.props.nam }, () => this.hide());
         }
     };
 
@@ -49,8 +49,8 @@ class ComponentHDDonVi extends AdminPage {
         this.load();
     }
 
-    load = (done) => this.props.nam && this.props.getTccbDanhGiaHoiDongDonViAll(parseInt(this.props.nam), items => {
-        this.setState({ items });
+    load = (done) => this.props.nam && this.props.getTccbDanhGiaHoiDongDonViAllByYear(parseInt(this.props.nam), items => {
+        this.setState({ items: items.rows || [] });
         done && done();
     });
 
@@ -73,15 +73,18 @@ class ComponentHDDonVi extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                    <th style={{ width: '70%', textAlign: 'center', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                    <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Đơn vị</th>
+                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                    <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
-                    <TableCell style={{ textAlign: 'left' }} content={item.ho + ' ' + item.ten} />
+                    <TableCell type='text' content={<>
+                        <span>{`${item.ho} ${item.ten}`}<br /></span>
+                        {item.shcc}
+                    </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell style={{ textAlign: 'center' }} content={item.tenDonVi} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)}
@@ -109,5 +112,5 @@ class ComponentHDDonVi extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { getTccbDanhGiaHoiDongDonViAll, createTccbDanhGiaHoiDongDonVi, updateTccbDanhGiaHoiDongDonVi, deleteTccbDanhGiaHoiDongDonVi };
+const mapActionsToProps = { getTccbDanhGiaHoiDongDonViAllByYear, createTccbDanhGiaHoiDongDonVi, updateTccbDanhGiaHoiDongDonVi, deleteTccbDanhGiaHoiDongDonVi };
 export default connect(mapStateToProps, mapActionsToProps)(ComponentHDDonVi);

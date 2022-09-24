@@ -1,6 +1,6 @@
 // Table name: TCCB_DANH_GIA_NAM { id, nam, donViBatDauDangKy, donViKetThucDangKy, nldBatDauDangKy, nldKetThucDangKy, donViBatDauPheDuyet, donViKetThucPheDuyet, truongBatDauPheDuyet, truongKetThucPheDuyet }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'donViBatDauDangKy': 'DON_VI_BAT_DAU_DANG_KY', 'donViKetThucDangKy': 'DON_VI_KET_THUC_DANG_KY', 'nldBatDauDangKy': 'NLD_BAT_DAU_DANG_KY', 'nldKetThucDangKy': 'NLD_KET_THUC_DANG_KY', 'donViBatDauPheDuyet': 'DON_VI_BAT_DAU_PHE_DUYET', 'donViKetThucPheDuyet': 'DON_VI_KET_THUC_PHE_DUYET', 'truongBatDauPheDuyet': 'TRUONG_BAT_DAU_PHE_DUYET', 'truongKetThucPheDuyet': 'TRUONG_KET_THUC_PHE_DUYET' };
+const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'donViBatDauDangKy': 'DON_VI_BAT_DAU_DANG_KY', 'donViKetThucDangKy': 'DON_VI_KET_THUC_DANG_KY', 'nldBatDauDangKy': 'NLD_BAT_DAU_DANG_KY', 'nldKetThucDangKy': 'NLD_KET_THUC_DANG_KY', 'donViBatDauPheDuyet': 'DON_VI_BAT_DAU_PHE_DUYET', 'donViKetThucPheDuyet': 'DON_VI_KET_THUC_PHE_DUYET', 'truongBatDauPheDuyet': 'TRUONG_BAT_DAU_PHE_DUYET', 'truongKetThucPheDuyet': 'TRUONG_KET_THUC_PHE_DUYET', 'caNhanBatDauTuDanhGia': 'CA_NHAN_BAT_DAU_TU_DANH_GIA', 'caNhanKetThucTuDanhGia': 'CA_NHAN_KET_THUC_TU_DANH_GIA', 'donViBatDauTuDanhGia': 'DON_VI_BAT_DAU_TU_DANH_GIA', 'donViKetThucTuDanhGia': 'DON_VI_KET_THUC_TU_DANH_GIA' };
 
 module.exports = app => {
     app.model.tccbDanhGiaNam = {

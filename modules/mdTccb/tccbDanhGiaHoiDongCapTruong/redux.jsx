@@ -39,9 +39,9 @@ export default function TccbDanhGiaHoiDongTruongReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-export function getTccbDanhGiaHoiDongTruongAll(nam, done) {
+export function getTccbDanhGiaHoiDongTruongAllByYear(nam, done) {
     return dispatch => {
-        const url = '/api/tccb/danh-gia-hoi-dong-truong/all';
+        const url = '/api/tccb/danh-gia-hoi-dong-truong/all-by-year';
         T.get(url, { nam }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hội đồng trường bị lỗi', 'danger');
@@ -69,7 +69,7 @@ export function getTccbDanhGiaHoiDongTruong(id, done) {
 }
 
 export function createTccbDanhGiaHoiDongTruong(item, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/tccb/danh-gia-hoi-dong-truong';
         T.post(url, { item }, data => {
             if (data.error) {
@@ -77,7 +77,6 @@ export function createTccbDanhGiaHoiDongTruong(item, done) {
                 console.error(`POST ${url}. ${data.error.message}`);
             } else {
                 T.notify('Thêm thành viên thành công!', 'success');
-                dispatch(getTccbDanhGiaHoiDongTruongAll());
                 if (done) done(data.item);
             }
         });
@@ -85,7 +84,7 @@ export function createTccbDanhGiaHoiDongTruong(item, done) {
 }
 
 export function deleteTccbDanhGiaHoiDongTruong(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/tccb/danh-gia-hoi-dong-truong';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -93,7 +92,6 @@ export function deleteTccbDanhGiaHoiDongTruong(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xoá thành viên thành công!', 'success', false, 800);
-                dispatch(getTccbDanhGiaHoiDongTruongAll());
                 done && done();
             }
         }, () => T.notify('Xóa thành viên bị lỗi!', 'danger'));
@@ -101,15 +99,14 @@ export function deleteTccbDanhGiaHoiDongTruong(id, done) {
 }
 
 export function updateTccbDanhGiaHoiDongTruong(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/tccb/danh-gia-hoi-dong-truong';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thành viên bị lỗi!', 'danger');
+                T.notify(`Cập nhật thành viên bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật thành viên thành công!', 'success');
-                dispatch(getTccbDanhGiaHoiDongTruongAll());
                 done && done(data.item);
             }
         }, () => T.notify('Cập nhật thành viên bị lỗi!', 'danger'));
