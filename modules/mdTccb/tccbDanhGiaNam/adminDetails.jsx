@@ -10,6 +10,7 @@ import ComponentTLD from '../tccbDanhGiaTyLeDiem/componentTLD';
 import ComponentDMCV from '../tccbDanhGiaDinhMucCongViecGvVaNcv/componentDMCV';
 import ComponentHDDonVi from '../tccbDanhGiaHoiDongCapDonVi/componentHDDonVi';
 import ComponentHDTruong from '../tccbDanhGiaHoiDongCapTruong/componentHDTruong';
+import ComponentFormChuyenVien from 'modules/_default/tccbDanhGiaFormChuyenVienParent/componentFormChuyenVien';
 import { getTccbDanhGiaNamAll } from './redux';
 import T from 'view/js/common';
 
@@ -62,6 +63,10 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
             {
                 title: 'Hội đồng đánh giá cấp trường',
                 component: <ComponentHDTruong nam={nam} />,
+            },
+            {
+                title: 'Form chuyên viên',
+                component: <ComponentFormChuyenVien nam={nam} />,
             },
         ] : [];
         return this.renderPage({
