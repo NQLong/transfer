@@ -8,7 +8,8 @@ import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/red
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DtNganhDaoTao } from 'modules/mdDaoTao/dtNganhDaoTao/redux';
-import { SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
+import { SelectAdapter_FwNamTuyenSinh, SelectAdapter_FwStudent } from 'modules/mdSinhVien/fwStudents/redux';
+import { SelectAdapter_TcLoaiPhi } from '../tcLoaiPhi/redux';
 
 const yearDatas = () => {
     return Array.from({ length: 15 }, (_, i) => i + new Date().getFullYear() - 10);
@@ -16,6 +17,43 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
+class StatisticModal extends AdminModal {
+    onSubmit = () => {
+        const data = { loaiPhi: this.state.loaiPhi };
+        try {
+            ['namHoc', 'hocKy', 'namTuyenSinh', 'bacDaoTao', 'loaiDaoTao', 'batDau', 'ketThuc', 'loaiPhi'].forEach(key => {
+                data[key] = this[key].value();
+                if (data[key] == null || (Array.isArray(data[key]) && !data[key].length)) {
+                    T.notify(`${this[key].props.label} trống`, 'danger');
+                    throw new Error();
+                }
+            });
+            data.loaiDaoTao = data.loaiDaoTao.toString();
+            data.loaiPhi = data.loaiPhi.toString();
+            data.batDau = data.batDau.getTime();
+            data.ketThuc = data.ketThuc.getTime();
+            T.download(`/api/finance/danh-sach-giao-dich/stat?data=${JSON.stringify(data)}`, 'Thống kê.xlsx');
+        } catch (error) { console.error(error); return; }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thống kê giao dịch',
+            size: 'elarge',
+            isLoading: this.state.isLoading,
+            body: <div className='row'>
+                <FormSelect ref={e => this.loaiPhi = e} label='Loại phí' className='col-md-12' data={SelectAdapter_TcLoaiPhi} multiple required />
+                <FormSelect ref={e => this.namHoc = e} data={yearDatas().reverse()} label='Năm học' className='col-md-6' required />
+                <FormSelect ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' className='col-md-6' required />
+                <FormSelect ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' data={SelectAdapter_FwNamTuyenSinh} className='col-md-4' required />
+                <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} label='Bậc đào tạo' className='col-md-4' required />
+                <FormSelect ref={e => this.loaiDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Hệ đào tạo' className='col-md-4' required multiple />
+                <FormDatePicker ref={e => this.batDau = e} type='time' className='col-md-6' label='Từ thời điểm' required allowClear />
+                <FormDatePicker ref={e => this.ketThuc = e} type='time' className='col-md-6' label='Đến thời điểm' required allowClear />
+            </div>
+        });
+    }
+}
 class EditModal extends AdminModal {
 
     onChangeQuery = () => {
@@ -80,6 +118,75 @@ class EditModal extends AdminModal {
                 <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
                 <FormTextBox readOnly label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} />
                 <FormTextBox readOnly label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
+            </div>
+        });
+    }
+}
+
+class AdminEditModal extends AdminModal {
+
+    onChangeQuery = () => {
+        const mssv = this.sinhVien.value();
+        const hocKy = this.hocKy.value();
+        const namHoc = this.namHoc.value();
+        if (mssv && hocKy && namHoc) {
+            this.props.get(mssv, namHoc, hocKy, (hocPhi) => {
+                this.soTien.value(hocPhi.congNo);
+                this.setAmountText(hocPhi.congNo);
+            });
+        }
+    }
+
+
+    setAmountText = (value) => {
+        if (Number.isInteger(value))
+            this.thanhChu?.value(T.numberToVnText(value.toString()) + ' đồng');
+    }
+
+    onShow = () => {
+        this.soTien?.value('');
+        this.thanhChu?.value('');
+        this.sinhVien?.value('');
+    }
+
+    onSubmit = () => {
+        const data = {
+            soTien: this.soTien.value(),
+            hocKy: this.hocKy.value(),
+            namHoc: this.namHoc.value(),
+            sinhVien: this.sinhVien.value()
+        };
+        if (!data.namHoc) {
+            T.notify('Năm học trống ', 'danger');
+            this.namHoc.focus();
+        }
+        else if (!data.hocKy) {
+            T.notify('Học kỳ trống ', 'danger');
+            this.hocKy.focus();
+        }
+        else if (!data.sinhVien) {
+            T.notify('Sinh viên trống ', 'danger');
+            this.sinhVien.focus();
+        }
+        else if (!data.soTien) {
+            T.notify('Số tiền trống', 'danger');
+            this.soTien.focus();
+        }
+        else {
+            this.props.create(data, () => this.hide());
+        }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thêm giao dịch',
+            size: 'large',
+            body: <div className='row'>
+                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
+                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())}/>
+                <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
             </div>
         });
     }
@@ -166,7 +273,10 @@ class DanhSachGiaoDich extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcGiaoDich && this.props.tcGiaoDich.page ? this.props.tcGiaoDich.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
-        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write']);
+        // const developer = this.getUserPermission('developer', ['login']);
+        let permission = this.getUserPermission('tcGiaoDich', ['read', 'export', 'write', 'check']);
+        const buttons = [];
+        if (permission.write) buttons.push({ className: 'btn-secondary', icon: 'fa-bar-chart', tooltip: 'Tách theo loại phí', onClick: (e) => e.preventDefault() || this.statisModal.show() });
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
@@ -233,10 +343,13 @@ class DanhSachGiaoDich extends AdminPage {
                             getPage={this.getPage} />
                     </div>
                 </div>
+                <AdminEditModal ref={e => this.adminModal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
+                <StatisticModal ref={e => this.statisModal = e} />
             </div>),
-            onCreate: permission.write ? () => this.modal.show() : null,
+            onCreate: permission.check ? () => this.adminModal.show() : null,
             onExport: permission.export ? e => this.onDownloadPsc(e) : null,
+            buttons,
         });
     }
 }

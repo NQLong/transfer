@@ -50,7 +50,7 @@ module.exports = app => {
         try {
             const secretCode = req.body.secretCode;
             if (secretCode == mySecretCode) {
-                const mssv = req.body.mssv;
+                const mssv = req.body.mssv.trim();
                 const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                     timeModified = Date.now();
                 let dataNhapHoc = await app.model.svNhapHoc.getData(mssv, app.utils.stringify(config, ''));
@@ -68,11 +68,13 @@ module.exports = app => {
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
                     } else {
+                        if (dataNhapHoc.congNo && parseInt(dataNhapHoc.congNo) <= 0) dataNhapHoc.congNo = 0;
                         if (dataNhapHoc.ngayNhapHoc == -1) {
                             dataNhapHoc.ngayNhapHoc = null;
                             dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                         } else {
-                            dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+                            if (dataNhapHoc.hoTenNguoiLienLac) dataNhapHoc.tinhTrang = 'Đã cập nhật thông tin trực tuyến';
+                            else dataNhapHoc.tinhTrang = 'Chưa cập nhật thông tin trực tuyến'.toUpperCase();
                         }
                         await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                         res.send({ dataNhapHoc });
@@ -88,14 +90,13 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/set-data', app.permission.check('ctsvNhapHoc:write'), async (req, res) => {
         try {
-            const secretCode = req.body.secretCode;
+            const user = req.session.user;
+            let data = req.body.data;
+            let { mssv, thaoTac, secretCode } = data, timeModified = new Date().getTime();
             if (secretCode != mySecretCode) {
                 return res.send({ error: 'Permission denied!' });
             }
 
-            const user = req.session.user;
-            let data = req.body.data;
-            let { mssv, thaoTac } = data, timeModified = new Date().getTime();
             const student = await app.model.fwStudents.get({ mssv }, 'ho,ten,mssv,emailTruong,loaiHinhDaoTao,namTuyenSinh');
             if (!student) {
                 res.send({ error: 'Không tìm thấy sinh viên' });
@@ -172,7 +173,7 @@ module.exports = app => {
 
     app.post('/api/ctsv/nhap-hoc/check-svnh-data', app.permission.check('student:write', 'ctsvNhapHoc:write'), async (req, res) => {
         try {
-            const mssv = req.body.mssv;
+            const mssv = req.body.mssv.trim();
             const config = await app.model.tcSetting.getValue('hocPhiNamHoc', 'hocPhiHocKy'),
                 timeModified = Date.now();
 
@@ -191,11 +192,13 @@ module.exports = app => {
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
                 } else {
+                    if (dataNhapHoc.congNo && parseInt(dataNhapHoc.congNo) < 0) dataNhapHoc.congNo = 0;
                     if (dataNhapHoc.ngayNhapHoc == -1) {
                         dataNhapHoc.ngayNhapHoc = null;
                         dataNhapHoc.tinhTrang = 'Chờ xác nhận nhập học';
                     } else {
-                        dataNhapHoc.tinhTrang = 'Đã xác nhận nhập học';
+                        if (dataNhapHoc.hoTenNguoiLienLac) dataNhapHoc.tinhTrang = 'Đã cập nhật thông tin trực tuyến';
+                        else dataNhapHoc.tinhTrang = ('Chưa cập nhật thông tin trực tuyến').toUpperCase();
                     }
                     await app.model.svNhapHoc.create({ mssv: dataNhapHoc.mssv, thaoTac: 'R', ghiChu: '', email: req.session.user.email, timeModified: new Date().getTime() });
                     res.send({ dataNhapHoc });
@@ -244,7 +247,7 @@ module.exports = app => {
                                     icon: 'fa-check', iconColor: 'primary'
                                 });
                                 try {
-                                    await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
+                                    student.emailTruong && await app.email.normalSendEmail(data.email, data.password, student.emailTruong, '', ctsvEmailXacNhanNhapHocTitle, ctsvEmailXacNhanNhapHocEditorText, ctsvEmailXacNhanNhapHocEditorHtml, '');
                                     app.model.svSetting.updateLimit(data.index);
                                 } catch (_) {
                                     console.log(`Sent mail to ${student.emailTruong} failed`);
