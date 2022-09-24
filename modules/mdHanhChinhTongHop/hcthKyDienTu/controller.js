@@ -4,12 +4,13 @@ module.exports = app => {
     const cacheDir = app.path.join(app.assetPath, 'pdf/cache');
     app.fs.createFolder(cacheDir);
     const { vanBanDi } = require('../constant');
-    const jimp = require('jimp')
+    const jimp = require('jimp');
 
     app.get('/api/hcth/ky-dien-tu/van-ban-di', app.permission.orCheck('manager:write', 'rectors:login', 'developer:login'), async (req, res) => {
         try {
             //TODO: check quyền user đối với văn bản
-            const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType, format } = req.query;
+            // eslint-disable-next-line no-unused-vars            
+            const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType } = req.query;
             //get file imformation
             console.log({ id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType, format })
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });

@@ -60,14 +60,6 @@ module.exports = {
     MA_TRUONG_KHOA: '009',
     TIENG_VIET: '10',
 
-    handleResult: (resolve, reject, item, error) => {
-        if (error) {
-            reject(error);
-        }
-        else
-            resolve(item);
-    },
-
     vaiTro: {
         MANAGER: { id: 'MANAGER', text: 'Quản trị viên', color: 'red' },
         PARTICIPANT: { id: 'PARTICIPANT', text: 'Người tham gia', color: 'blue' },

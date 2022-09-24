@@ -1,6 +1,6 @@
 module.exports = (app) => {
 
-    const { canBoType, handleResult, trangThaiNhiemVu, action, NHIEM_VU_TYPE } = require('../constant');
+    const { canBoType, trangThaiNhiemVu, action, NHIEM_VU_TYPE } = require('../constant');
 
     const menu = {
         parentMenu: app.parentMenu.user,
@@ -601,11 +601,10 @@ module.exports = (app) => {
 
     // liên kết API
     const createListLienKet = (lienKet, loaiLienKet, ma, loai) => {
-        const promises = lienKet.map(key => new Promise((resolve, reject) => app.model.hcthLienKet.create({
+        const promises = lienKet.map(key => app.model.hcthLienKet.create({
             keyA: ma, loaiA: loai,
             loaiB: loaiLienKet, keyB: key
-        }, (error, item) => handleResult(resolve, reject, item, error))
-        ));
+        }));
         return Promise.all(promises);
     };
 
