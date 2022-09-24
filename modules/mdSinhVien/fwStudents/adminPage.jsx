@@ -10,13 +10,14 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin } from './redux';
 import { Tooltip } from '@mui/material';
 import T from 'view/js/common';
 import { AdminBhytModal } from 'modules/mdKeHoachTaiChinh/tcHocPhi/adminBHYTpage';
 import { getMssvBaoHiemYTe, createMssvBaoHiemYTe } from '../svBaoHiemYTe/redux';
+
 export class LoginToTestModal extends AdminModal {
 
     onSubmit = (e) => {
@@ -87,12 +88,13 @@ class AdminStudentsPage extends AdminPage {
             emptyTable: 'Không có dữ liệu sinh viên',
             stickyHead: true,
             header: 'thead-light',
-            className: 'table-fix-col',
+            className: this.state.quickAction ? 'table-fix-col' : '',
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>MSSV</th>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>MSSV</th>
+                    {/* <TableHead content='MSSV' sortable /> */}
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên lót</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
@@ -185,11 +187,11 @@ class AdminStudentsPage extends AdminPage {
                                 <i className='fa fa-lg fa-cog' />
                             </button>
                         </Tooltip>}
-
                     </TableCell>
                 </tr>
             )
         });
+
         return this.renderPage({
             title: 'Danh sách sinh viên',
             icon: 'fa fa-users',
@@ -315,30 +317,21 @@ class AdminStudentsPage extends AdminPage {
             content: <>
                 <div className='tile'>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginBottom: '10px' }}>
-                        <div>{list && list.length ? <i>{T.numberDisplay(totalItem)} sinh viên</i> : ''}</div>
+                        <FormCheckbox label='Thao tác nhanh' onChange={value => this.setState({ quickAction: value })} style={{ marginBottom: '0' }} />
+                        {/* <div>{list && list.length ? <i>{T.numberDisplay(totalItem)} sinh viên</i> : ''}</div> */}
                         <Pagination style={{ position: '', bottom: '', width: '' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                            getPage={this.getStudentsPage} />
+                            getPage={this.getStudentsPage} pageRange={3} />
                     </div>
                     {table}
                 </div>
-
                 <AdminBhytModal ref={e => this.bhytModal = e} createSvBaoHiemYTe={this.props.createMssvBaoHiemYTe} />
                 <LoginToTestModal ref={e => this.loginModal = e} loginStudentForTest={this.props.loginStudentForTest} />
             </>
             ,
             backRoute: '/user/students',
-            onCreate: (e) => {
-                if (permission.write) {
-                    e.preventDefault();
-                    this.props.history.push('/user/students/new');
-                } else {
-                    T.confirm('Cảnh báo', 'Bạn không có quyền thêm mới sinh viên. Liên hệ người có quyền để thao tác', 'warning', true);
-                }
-            },
-            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'ALL_COL_STUDENTS.xlsx') : null,
-            buttons: [
-                permission.write ? { className: 'btn btn-danger', icon: 'fa-code-fork', tooltip: 'Xem giao diện sinh viên Test', onClick: e => e.preventDefault() || this.loginModal.show() } : null,
-                developer.login && { className: 'btn btn-success', icon: 'fa-upload', tooltip: 'Import dữ liệu sinh viên', onClick: e => e.preventDefault() || this.props.history.push('/user/students/import') }
+            collapse: [
+                { icon: <i className='fa fa-lg fa-print' />, name: 'Export', permission: permission.export, onClick: () => T.download(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx'), type: 'info' },
+                { icon: <i className='fa fa-lg fa-upload' />, name: 'Import', permission: developer.login, onClick: () => this.props.history.push('/user/students/import'), type: 'danger' }
             ]
         });
     }
