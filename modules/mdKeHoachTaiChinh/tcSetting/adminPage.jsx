@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTcSettingAll, updateTcSetting, deleteTcSetting, getTcSettingKeys } from './redux';
-import { AdminPage, FormSelect, FormTextBox, FormRichTextBox, FormEditor } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, FormTextBox, FormEditor } from 'view/component/AdminPage';
 // import { getTcThongTin } from '../tcThongTin/redux';
 import { loginStudentForTest } from 'modules/mdSinhVien/fwStudents/redux';
 import { LoginToTestModal } from 'modules/mdSinhVien/fwStudents/adminPage';
@@ -153,9 +153,9 @@ class TcSettingAdminPage extends AdminPage {
                             <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiEmailTraHoaDon'>Email trả hóa đơn</a>
                             </li>
-                            <li className='nav-item'>
+                            {/* <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiSmsDong'>SMS đóng học phí</a>
-                            </li>
+                            </li> */}
                             {/* <li className='nav-item'>
                                 <a className='nav-link' data-toggle='tab' href='#hocPhiSmsPhatSinh'>SMS phát sinh học phí</a>
                             </li>
@@ -225,7 +225,7 @@ class TcSettingAdminPage extends AdminPage {
                                 </div>
                             </div>
 
-                            <div className='tab-pane fade' id='hocPhiSmsDong'>
+                            {/* <div className='tab-pane fade' id='hocPhiSmsDong'>
                                 <div className='tile-body'>
                                     <small className='form-text text-muted'>Tham số: {'{name}, {subject}, {message}'}</small>
                                     <FormRichTextBox ref={e => this.hocPhiSmsDong = e} />
@@ -235,7 +235,7 @@ class TcSettingAdminPage extends AdminPage {
                                         <i className='fa fa-fw fa-lg fa-save'></i>Lưu
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* <div className='tab-pane fade' id='hocPhiSmsPhatSinh'>
                                 <div className='tile-body'>

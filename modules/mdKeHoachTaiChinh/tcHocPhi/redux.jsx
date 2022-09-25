@@ -56,6 +56,7 @@ export function getTcHocPhiPage(pageNumber, pageSize, pageCondition, pageFilter,
     const page = T.updatePage('pageTcHocPhi', pageNumber, pageSize, pageCondition, pageFilter);
     return dispatch => {
         const url = `/api/finance/page/${page.pageNumber}/${page.pageSize}`;
+        dispatch({ type: TcHocPhiGetPage, page: null });
         T.get(url, { searchTerm: pageCondition, filter: pageFilter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách học phí bị lỗi!', 'danger');

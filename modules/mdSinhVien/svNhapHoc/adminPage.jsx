@@ -35,19 +35,25 @@ class NhapHocPage extends AdminPage {
 
     tuChoiNhapHoc = () => {
         T.confirm('TỪ CHỐI NHẬP HỌC', 'Bạn có chắc muốn TỪ CHỐI nhập học sinh viên này không', 'warning', true, isConfirm => {
-            isConfirm && this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'D' }, () => {
-                T.alert(`Từ chối nhập học ${this.state.dataNhapHoc.hoTen} vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null, 1000);
-                this.checkMssv();
-            });
+            if (isConfirm) {
+                T.alert('Vui lòng chờ giây lát');
+                this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'D' }, () => {
+                    T.alert(`Từ chối nhập học ${this.state.dataNhapHoc.hoTen} vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null);
+                    this.checkMssv();
+                });
+            }
         });
     }
 
     chapNhanNhapHoc = () => {
         T.confirm('CHẤP NHẬN NHẬP HỌC', 'Bạn có chắc muốn CHẤP NHẬN nhập học sinh viên này không', 'warning', true, isConfirm => {
-            isConfirm && this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'A' }, () => {
-                T.alert(`SV ${this.state.dataNhapHoc.hoTen} nhập học vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null, 1000);
-                this.checkMssv();
-            });
+            if (isConfirm) {
+                T.alert('Vui lòng chờ giây lát');
+                this.props.setSinhVienNhapHoc({ mssv: this.state.dataNhapHoc.mssv, thaoTac: 'A' }, () => {
+                    T.alert(`SV ${this.state.dataNhapHoc.hoTen} nhập học vào ${T.dateToText(Date.now(), 'HH:mm dd/mm/yyyy')}`, 'success', null);
+                    this.checkMssv();
+                });
+            }
         });
     }
 
@@ -104,7 +110,7 @@ class NhapHocPage extends AdminPage {
                 <Link key={1} to='/user/students'>Sinh viên</Link>,
                 'Nhập học'
             ],
-            content: <div className='row'>
+            content: <div className='row' >
                 <div className='col-md-6'>
                     <div className='tile'>
                         <h3 className='tile-title'>Cấu hình nhập học</h3>
@@ -163,13 +169,13 @@ class NhapHocPage extends AdminPage {
                                 <b className={ngayNhapHoc ? 'text-success col-md-8' : 'text-secondary col-md-8'}>{tinhTrang}</b>
                             </div>
                         </div>
-                        <div className='tile-footer' style={{ textAlign: 'right', display: invalid ? 'none' : '' }}>
-                            {ngayNhapHoc && showResult && <button className='btn btn-outline-danger' type='button' onClick={this.tuChoiNhapHoc} >
+                        <div className='tile-footer' style={{ display: invalid ? 'none' : 'flex', justifyContent: 'space-between' }}>
+                            {ngayNhapHoc && showResult && <><button className='btn btn-outline-danger' type='button' onClick={this.tuChoiNhapHoc} >
                                 <i className='fa fa-fw fa-lg fa-times' />Huỷ nhập học
-                            </button>}
-                            {!ngayNhapHoc && showResult && <button className='btn btn-outline-success' type='button' onClick={this.chapNhanNhapHoc} >
+                            </button><div></div></>}
+                            {!ngayNhapHoc && showResult && <><div></div><button className='btn btn-outline-success' type='button' onClick={this.chapNhanNhapHoc} >
                                 <i className='fa fa-fw fa-lg fa-save' /> Chấp nhận
-                            </button>}
+                            </button></>}
                         </div>
                     </div>
                 </div>
