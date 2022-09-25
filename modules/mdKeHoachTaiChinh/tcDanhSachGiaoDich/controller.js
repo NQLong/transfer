@@ -170,10 +170,10 @@ module.exports = app => {
                 namhoc: hocPhi.namHoc, hocKy: hocPhi.hocKy,
                 mssv: hocPhi.mssv,
                 email: req.session.user.email,
-                thaoTac: 'r',
+                thaoTac: 'd',
                 ngay: timeStamp,
-                duLieuCu: app.utils.stringify({}),
-                duLieuMoi: app.utils.stringify({ hocPhi: `${soTien}`, transId: transId })
+                duLieuCu: app.utils.stringify({ congNo: `${hocPhi.congNo}`, transId: transId }),
+                duLieuMoi: app.utils.stringify({ congNo: `${soTien}`})
             });
 
             res.send();
