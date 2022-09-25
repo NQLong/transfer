@@ -90,7 +90,7 @@ export function updateTccbDanhGiaFormChuyenVienParent(id, changes, done) {
         const url = '/api/tccb/danh-gia-form-chuyen-vien-parent';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật tiêu chí bị lỗi!', 'danger');
+                T.notify(`Cập nhật tiêu chí bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật tiêu chí thành công!', 'success');
@@ -141,7 +141,7 @@ export function updateTccbDanhGiaFormChuyenVienChild(id, changes, done) {
         const url = '/api/tccb/danh-gia-form-chuyen-vien-child';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật nội dung bị lỗi!', 'danger');
+                T.notify(`Cập nhật nội dung bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
             } else {
                 T.notify('Cập nhật nội dung thành công!', 'success');

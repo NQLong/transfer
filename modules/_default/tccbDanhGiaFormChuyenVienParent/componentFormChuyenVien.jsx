@@ -19,8 +19,8 @@ class EditModalNhom extends AdminModal {
         this.onHide();
         let { tieuDe, diemLonNhat, loaiCongViec } = item ? item : { tieuDe: '', diemLonNhat: 0, loaiCongViec: 1 };
         this.tieuDe.value(tieuDe || '');
-        this.diemLonNhat.value(Number(diemLonNhat) || '');
-        this.loaiCongViec.value(loaiCongViec ? Number(loaiCongViec) : 1);
+        this.diemLonNhat.value(Number(diemLonNhat).toFixed(2));
+        this.loaiCongViec.value(Number(loaiCongViec));
         this.setState({ item });
     };
 
@@ -28,7 +28,7 @@ class EditModalNhom extends AdminModal {
         e.preventDefault();
         const changes = {
             tieuDe: getValue(this.tieuDe),
-            diemLonNhat: Number(getValue(this.diemLonNhat)),
+            diemLonNhat: Number(getValue(this.diemLonNhat)).toFixed(2),
             nam: Number(this.props.nam),
             loaiCongViec: getValue(this.loaiCongViec),
         };
@@ -39,16 +39,23 @@ class EditModalNhom extends AdminModal {
         }
     };
 
-    changeKichHoat = value => this.loaiCongViec.value(Number(value));
+    changeKichHoat = value => {
+        if (this.state.item.submenus.length > 0) {
+            T.notify('Đã có thông tin, không thể đổi loại công việc', 'danger');
+        } else {
+            this.loaiCongViec.value(Number(value));
+        }
+    }
 
     render = () => {
         const readOnly = this.props.readOnly;
+        const isReadOnlyLoaiCongViec = this.state?.item?.submenus.length > 0;
         return this.renderModal({
             title: !this.state.item ? 'Tạo mới nội dung' : 'Cập nhật nội dung',
             body: <div className='row'>
                 <FormTextBox className='col-12' ref={e => this.tieuDe = e} label='Tiêu đề' readOnly={readOnly} placeholder='Tiêu đề' required />
-                <FormTextBox type='number' className='col-12' ref={e => this.diemLonNhat = e} label='Điểm tối đa' readOnly={readOnly} placeholder='Điểm tối đa' required />
-                <FormCheckbox className='col-md-6' ref={e => this.loaiCongViec = e} label='Loại công việc' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
+                <FormTextBox type='number' min={0} step={true} className='col-12' ref={e => this.diemLonNhat = e} label='Điểm tối đa' readOnly={readOnly} placeholder='Điểm tối đa' required />
+                <FormCheckbox className='col-md-6' ref={e => this.loaiCongViec = e} label='Loại công việc' isSwitch={true} readOnly={readOnly || isReadOnlyLoaiCongViec} style={{ display: 'inline-flex' }}
                     onChange={value => this.changeKichHoat(value)} required />
             </div>
         });
@@ -67,10 +74,11 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         this.onHide();
-        let { tieuDe, diemLonNhat, parentName } = item ? item : { tieuDe: '', diemLonNhat: 0, parentName };
+        let editItem = item.item;
+        let { tieuDe, diemLonNhat, parentName } = editItem ? editItem : { tieuDe: '', diemLonNhat: 0, parentName };
         this.parentName.value(parentName);
         this.tieuDe.value(tieuDe || '');
-        this.diemLonNhat.value(Number(diemLonNhat) || '');
+        this.diemLonNhat.value(Number(diemLonNhat).toFixed(2));
         this.setState({ item });
     };
 
@@ -78,12 +86,12 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             tieuDe: getValue(this.tieuDe),
-            diemLonNhat: getValue(this.diemLonNhat),
+            diemLonNhat: Number(getValue(this.diemLonNhat)).toFixed(2),
         };
         if (this.state.item.add) {
             this.props.create({ ...changes, parentId: this.state.item.parentId }, this.hide);
         } else {
-            this.props.update(this.state.item.id, changes, this.hide);
+            this.props.update(this.state.item.item.id, changes, this.hide);
         }
     };
 
@@ -94,7 +102,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox className='col-12' ref={e => this.parentName = e} label='Nội dung' readOnly={true} placeholder='Nội dung' />
                 <FormTextBox className='col-12' ref={e => this.tieuDe = e} label='Tiêu đề' readOnly={readOnly} placeholder='Tiêu đề' required />
-                <FormTextBox className='col-12' ref={e => this.diemLonNhat = e} label='Điểm tối đa' readOnly={readOnly} placeholder='Điểm tối đa' required />
+                <FormTextBox type='number' min={0} step={true} className='col-12' ref={e => this.diemLonNhat = e} label='Điểm tối đa' readOnly={readOnly} placeholder='Điểm tối đa' required />
             </div>
         });
     }
@@ -186,7 +194,7 @@ class ComponentFormChuyenVien extends AdminPage {
                     <tr key={`${index}-1`}>
                         <TableCell style={{ textAlign: 'center' }} content={<b>{(index + 1)}</b>} />
                         <TableCell style={{ textAlign: 'left' }} content={<b>{`Nội dung ${index + 1}: ${item.tieuDe}`}</b>} />
-                        <TableCell style={{ textAlign: 'center' }} content={<b>{`${item.diemLonNhat} điểm`}</b>} />
+                        <TableCell style={{ textAlign: 'center' }} content={<b>{`${Number(item.diemLonNhat).toFixed(2)} điểm`}</b>} />
                         <TableCell type='checkbox' content={item.loaiCongViec} permission={permission}
                             onChanged={value => item.submenus.length == 0 ? this.props.updateTccbDanhGiaFormChuyenVienParent(item.id, { loaiCongViec: value ? 1 : 0, }, this.load) : T.notify('Đã có thông tin, không thể đổi loại công việc', 'danger')} />
                         <TableCell style={{ textAlign: 'center', width: '20%' }} type='buttons' content={item} permission={permission}
@@ -209,7 +217,7 @@ class ComponentFormChuyenVien extends AdminPage {
                                 <tr key={`${index}-${stt}-1`}>
                                     <TableCell style={{ textAlign: 'center' }} content={this.indexToAlpha(stt)} />
                                     <TableCell style={{ textAlign: 'left' }} content={menu.tieuDe} />
-                                    <TableCell style={{ textAlign: 'center' }} content={`${menu.diemLonNhat} điểm`} />
+                                    <TableCell style={{ textAlign: 'center' }} content={`${Number(menu.diemLonNhat).toFixed(2)} điểm`} />
                                     <TableCell style={{ textAlign: 'center' }} content='' />
                                     <TableCell style={{ textAlign: 'center' }} colSpan={1} type='buttons' content={menu} permission={permission}
                                         onEdit={() => this.modal.show({ item: menu, add: false, parentId: item.id, parentName: item.tieuDe })}
