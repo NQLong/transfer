@@ -11,11 +11,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/don-vi-dang-ky-nhiem-vu',
+            path: '/user/danh-gia/don-vi-dang-ky-nhiem-vu',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/tccb/don-vi-dang-ky-nhiem-vu/:nam',
+            path: '/user/danh-gia/don-vi-dang-ky-nhiem-vu/:nam',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
         }
     ],

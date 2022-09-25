@@ -1898,7 +1898,7 @@ BEGIN
                LSV.TEN                       AS "loaiSinhVien",
                LHDT.TEN                      AS "loaiHinhDaoTao",
                TTSV.TEN                      AS "tinhTrangSinhVien",
-               NS.TEN                      AS "noiSinh",
+               NS.TEN                        AS "noiSinh",
                KHOA.TEN                      AS "khoaBoMon",
                STU.MA_NGANH                  AS "maNganh",
                NDT.TEN_NGANH                 AS "tenNganh",
@@ -2277,7 +2277,7 @@ BEGIN
                      STU.NAM_TUYEN_SINH            AS                                          "namTuyenSinh",
                      STU.NGAY_NHAP_HOC             AS                                          "ngayNhapHoc",
                      STU.CAN_EDIT                  AS                                          "canEdit",
-                     ROW_NUMBER() OVER (ORDER BY STU.NAM_TUYEN_SINH DESC NULLS LAST, STU.TEN ) R
+                     ROW_NUMBER() OVER (ORDER BY NULL) R
               FROM FW_STUDENT STU
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
                        LEFT JOIN DM_LOAI_SINH_VIEN LSV on LSV.MA = STU.LOAI_SINH_VIEN
@@ -2365,8 +2365,9 @@ BEGIN
                   OR LOWER(STU.DIEN_THOAI_CA_NHAN) LIKE sT
                   OR LOWER(STU.DIEN_THOAI_LIEN_LAC) LIKE sT
                   OR LOWER(STU.EMAIL_CA_NHAN) LIKE sT)
-              ORDER BY STU.NAM_TUYEN_SINH DESC NULLS LAST, STU.TEN)
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+                ) dataTable
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
+        ORDER BY dataTable."ten";
     RETURN STUDENT_INFO;
 end;
 
@@ -19769,6 +19770,23 @@ BEGIN
         WHERE isSHCC = tdnn.SHCC;
     return cur;
 END;
+
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION UTILS_CHECK_SPLIT(colValue IN VARCHAR2, fullString IN STRING) RETURN NUMBER IS
+    RESULT NUMBER;
+BEGIN
+    CASE
+        WHEN (fullString IS NULL OR colValue IN (SELECT regexp_substr(fullString, '[^,]+', 1, level)
+                                                 from dual
+                                                 connect by regexp_substr(fullString, '[^,]+', 1, level) is not null))
+            THEN RESULT := 1;
+        ELSE RESULT := 0;
+        END CASE;
+    RETURN RESULT;
+
+end UTILS_CHECK_SPLIT;
 
 /
 --EndMethod--
