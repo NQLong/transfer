@@ -217,7 +217,7 @@ module.exports = app => {
         }),
 
         searchPageDangKy: (pagenumber, pagesize, searchterm, searchnam, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_danh_gia_ca_nhan_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal, :searchnam); END;',
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tccb_danh_gia_ca_nhan_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal, :searchnam); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, searchnam }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
