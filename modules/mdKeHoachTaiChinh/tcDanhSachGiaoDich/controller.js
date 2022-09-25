@@ -160,6 +160,7 @@ module.exports = app => {
             let {ghiChu, transId } = req.body;
             const giaoDich = await app.model.tcHocPhiTransaction.get({transId});
             if (!giaoDich) throw 'Dữ liệu không hợp lệ.';
+            if (giaoDich.status == 0) throw 'Giao dịch đã được hủy.';
             const hocPhi = await app.model.tcHocPhi.get({ mssv: giaoDich.customerId, namHoc: giaoDich.namHoc, hocKy: giaoDich.hocKy });
             if (!hocPhi) throw 'Dữ liệu không hợp lệ.';
             await app.model.tcHocPhiTransaction.update({transId}, {ghiChu, status: 0});
