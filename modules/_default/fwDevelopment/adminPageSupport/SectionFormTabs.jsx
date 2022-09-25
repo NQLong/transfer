@@ -57,7 +57,7 @@ export default class SectionFormTabs extends React.Component {
                     <thead>
                     <tr>
                         <th>Field</th>
-                        <th nowrap='true' className='text-center'>Mặc định</th>
+                        <th style={{whiteSpace: 'nowrap'}} className='text-center'>Mặc định</th>
                         <th>Mô tả</th>
                     </tr>
                     </thead>

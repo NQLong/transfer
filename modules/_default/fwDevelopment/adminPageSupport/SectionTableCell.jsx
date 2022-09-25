@@ -292,7 +292,7 @@ export default class SectionTableCell extends React.Component {
                     <thead>
                     <tr>
                         <th>Props</th>
-                        <th nowrap='true'>Mặc định</th>
+                        <th style={{whiteSpace: 'nowrap'}}>Mặc định</th>
                         <th>Mô tả</th>
                     </tr>
                     </thead>

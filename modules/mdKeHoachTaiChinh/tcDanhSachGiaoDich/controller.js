@@ -120,7 +120,7 @@ module.exports = app => {
 
     app.post('/api/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:check'), async (req, res) => {
         try {
-            let { soTien, sinhVien, namHoc, hocKy } = req.body;
+            let { soTien, sinhVien, namHoc, hocKy, ghiChu } = req.body;
             soTien = parseInt(soTien);
             hocKy = parseInt(hocKy);
             namHoc = parseInt(namHoc);
@@ -135,7 +135,9 @@ module.exports = app => {
             //: (namhoc, hocky, ebank, transid, transdate, customerid, billid, serviceid, eamount, echecksum, done)
             if (!result?.outBinds?.ret)
                 throw {};
-
+            
+            await app.model.tcHocPhiTransaction.update({transId: manualTransid}, {ghiChu});
+                
             await app.model.tcHocPhiLog.create({
                 namHoc, hocKy,
                 mssv: sinhVien,
@@ -144,6 +146,34 @@ module.exports = app => {
                 ngay: timeStamp,
                 duLieuCu: app.utils.stringify({}),
                 duLieuMoi: app.utils.stringify({ hocPhi: `${soTien}`, transId: manualTransid })
+            });
+
+            res.send();
+        } catch (error) {
+            res.send({ error });
+        }
+
+    });
+//app.permission.check('tcGiaoDich:cancel'),
+    app.post('/api/finance/danh-sach-giao-dich/huy',  async (req, res) => {
+        try {
+            let {ghiChu, transId } = req.body;
+            const giaoDich = await app.model.tcHocPhiTransaction.get({transId});
+            if (!giaoDich) throw 'Dữ liệu không hợp lệ.';
+            const hocPhi = await app.model.tcHocPhi.get({ mssv: giaoDich.customerId, namHoc: giaoDich.namHoc, hocKy: giaoDich.hocKy });
+            if (!hocPhi) throw 'Dữ liệu không hợp lệ.';
+            await app.model.tcHocPhiTransaction.update({transId}, {ghiChu, status: 0});
+            let soTien = hocPhi.congNo + giaoDich.amount;
+            await app.model.tcHocPhi.update({mssv: hocPhi.mssv, namHoc: hocPhi.namHoc, hocKy: hocPhi.hocKy}, {congNo: soTien});
+            const timeStamp = new Date().getTime();
+            await app.model.tcHocPhiLog.create({
+                namhoc: hocPhi.namHoc, hocKy: hocPhi.hocKy,
+                mssv: hocPhi.mssv,
+                email: req.session.user.email,
+                thaoTac: 'r',
+                ngay: timeStamp,
+                duLieuCu: app.utils.stringify({}),
+                duLieuMoi: app.utils.stringify({ hocPhi: `${soTien}`, transId: transId })
             });
 
             res.send();
