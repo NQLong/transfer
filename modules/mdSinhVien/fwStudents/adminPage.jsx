@@ -10,7 +10,7 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTextBox, getValue, renderDataTable, TableCell, TableHead } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { getStudentsPage, loginStudentForTest, adminDownloadSyll, updateStudentAdmin } from './redux';
 import { Tooltip } from '@mui/material';
@@ -39,7 +39,7 @@ export class LoginToTestModal extends AdminModal {
     }
 }
 class AdminStudentsPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, sortTerm: [] };
     componentDidMount() {
         T.ready('/user/students', () => {
             T.clearSearchBox();
@@ -67,7 +67,7 @@ class AdminStudentsPage extends AdminPage {
         }
     }
 
-    getStudentsPage = (pageNumber, pageSize, pageCondition, done) => this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, done);
+    getStudentsPage = (pageNumber, pageSize, pageCondition, done) => this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, this.state.sortTerm.join(','), done);
 
     delete = (item) => {
         T.confirm('Xóa sinh viên', 'Xóa sinh viên này?', 'warning', true, isConfirm => {
@@ -84,16 +84,16 @@ class AdminStudentsPage extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
             this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
 
-        let table = renderTable({
+        let table = renderDataTable({
             emptyTable: 'Không có dữ liệu sinh viên',
             stickyHead: true,
             header: 'thead-light',
             className: this.state.quickAction ? 'table-fix-col' : '',
-            getDataSource: () => list,
+            data: list,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: 'auto', textAlign: 'right' }}>MSSV</th>
+                    <TableHead content='MSSV' keyCol='mssv' onClick={this} />
                     {/* <TableHead content='MSSV' sortable /> */}
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên lót</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên</th>

@@ -121,6 +121,65 @@ export class TableHeader extends React.Component {
     }
 }
 
+export class TableHead extends React.Component {
+    changeSort = (key) => {
+        let cur = $(`#${key}`).attr('aria-sort'), sortTerm = '';
+        switch (cur) {
+            case null || 'none':
+                $(`#${key}`).attr('aria-sort', 'descending');
+                sortTerm = key + ' DESC';
+                break;
+            case 'descending':
+                $(`#${key}`).attr('aria-sort', 'ascending');
+                sortTerm = key + ' ASC';
+                break;
+            case 'ascending':
+                $(`#${key}`).attr('aria-sort', 'none');
+                sortTerm = key + ' ASC';
+                break;
+        }
+        this.props.onClick && this.props.onClick(sortTerm);
+    }
+    render() {
+        const { content, keyCol } = this.props;
+        return <th className='table-head' id={keyCol} aria-sort='none' onClick={e => e.preventDefault() || this.changeSort(keyCol)}>
+            <div>{content}</div>
+            <span />
+        </th>;
+    }
+}
+
+export function renderDataTable({
+    data = [], style = {}, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = true, loadingOverlay = true, loadingClassName = '', loadingStyle = {}, className = '', renderHead = () => null, renderRow = () => null,
+}) {
+    if (data == null) {
+        return (
+            <div className={(loadingOverlay ? 'overlay' : '') + loadingClassName} style={{ minHeight: '120px', ...loadingStyle }}>
+                <div className='m-loader mr-4'>
+                    <svg className='m-circular' viewBox='25 25 50 50'>
+                        <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+                    </svg>
+                </div>
+                <h3 className='l-text'>{loadingText}</h3>
+            </div>);
+    } else if (data.length) {
+        const table = (
+            <table className={'table table-hover table-bordered table-responsive ' + className} style={{ margin: 0, ...style }}>
+                <thead className='thead-light'>{renderHead()}</thead>
+                <tbody>{typeof renderRow == 'function' ? data.map(renderRow) : renderRow}</tbody>
+            </table>
+        );
+        const properties = {};
+        if (stickyHead) {
+            properties.className = 'tile-table-fix-head';
+        } else {
+            properties.style = { marginBottom: 8 };
+        }
+        return <div {...properties}>{table}</div>;
+    } else {
+        return <b>{emptyTable}</b>;
+    }
+}
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
     renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {}, multipleTbody = false
