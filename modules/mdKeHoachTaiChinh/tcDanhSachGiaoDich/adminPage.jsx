@@ -187,7 +187,7 @@ class AdminEditModal extends AdminModal {
                 <FormSelect required data={yearDatas().reverse()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
                 <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
                 <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
-                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())}/>
+                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())} />
                 <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
                 <FormTextBox label='Ghi chú' className='col-md-12' ref={e => this.ghiChu = e} />
             </div>
@@ -209,7 +209,7 @@ class AdminCancelModal extends AdminModal {
         this.soTien?.value(data.khoanDong);
         this.setAmountText(data.khoanDong);
         this.ghiChu?.value('');
-        this.setState({transID: data.transactionId});
+        this.setState({ transID: data.transactionId });
     }
 
     onSubmit = () => {
@@ -217,9 +217,9 @@ class AdminCancelModal extends AdminModal {
         const ghiChu = this.ghiChu.value();
         if (!ghiChu) {
             T.notify('Thiếu ghi chú', 'danger');
-            this.namHoc.focus();
+            this.ghiChu.focus();
         } else {
-            this.props.cancel({transId, ghiChu}, () => this.hide());
+            this.props.cancel({ transId, ghiChu }, () => this.hide());
         }
     }
 
@@ -228,10 +228,10 @@ class AdminCancelModal extends AdminModal {
             title: 'Hủy giao dịch',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox readOnly label='Năm học' className='col-md-4' ref={e => this.namHoc = e}/>
-                <FormTextBox readOnly label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e}/>
-                <FormTextBox readOnly label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e}/>
-                <FormTextBox readOnly label='Số tiền' className='col-md-12' ref={e => this.soTien = e} type='number'/>
+                <FormTextBox readOnly label='Năm học' className='col-md-4' ref={e => this.namHoc = e} />
+                <FormTextBox readOnly label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} />
+                <FormTextBox readOnly label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} />
+                <FormTextBox readOnly label='Số tiền' className='col-md-12' ref={e => this.soTien = e} type='number' />
                 <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
                 <FormTextBox required label='Ghi chú' className='col-md-12' ref={e => this.ghiChu = e} />
             </div>
@@ -361,11 +361,11 @@ class DanhSachGiaoDich extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={
                     item.trangThai ? <div style={{ color: 'green' }}><i className='fa fa-lg fa-check-circle-o' /> Thành công</div> : <div style={{ color: 'red' }}><i className='fa fa-lg fa-times-circle-o' /> Thất bại</div>
                 } />
-                <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission = {permission}>
+                <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}>
                     <Tooltip title='Hủy' arrow>
-                    <button className='btn btn-danger' onClick={e => e.preventDefault() || this.adminCancelModal.show(item)}>
-                        <i className='fa fa-lg fa-times' />
-                    </button>
+                        <button className='btn btn-danger' onClick={e => e.preventDefault() || this.adminCancelModal.show(item)}>
+                            <i className='fa fa-lg fa-times' />
+                        </button>
                     </Tooltip>
                 </TableCell>
             </tr>),
@@ -401,7 +401,7 @@ class DanhSachGiaoDich extends AdminPage {
                     </div>
                 </div>
                 <AdminCancelModal ref={e => this.adminCancelModal = e} cancel={this.props.cancelGiaoDich} />
-                <AdminEditModal ref={e => this.adminModal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi}/>
+                <AdminEditModal ref={e => this.adminModal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <StatisticModal ref={e => this.statisModal = e} />
             </div>),
@@ -413,5 +413,5 @@ class DanhSachGiaoDich extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi, cancelGiaoDich};
+const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi, cancelGiaoDich };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);

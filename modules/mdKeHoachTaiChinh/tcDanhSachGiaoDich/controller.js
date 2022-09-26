@@ -8,17 +8,19 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesTcGiaoDich', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:read', 'tcGiaoDich:export', 'tcGiaoDich:write');
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:manage', 'tcGiaoDich:export', 'tcGiaoDich:write');
             resolve();
         } else resolve();
     }));
 
-    app.permission.add({ name: 'tcGiaoDich:read', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write', 'tcGiaoDich:check');
+    app.permission.add(
+        { name: 'tcGiaoDich:manage', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write', 'tcGiaoDich:check'
+    );
 
-    app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:read'), app.templates.admin);
+    app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:manage'), app.templates.admin);
 
 
-    app.get('/api/finance/danh-sach-giao-dich/page/:pageNumber/:pageSize', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/page/:pageNumber/:pageSize', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
         try {
             let filter = req.query.filter || {};
             const settings = await getSettings();
@@ -38,7 +40,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:read'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
         try {
             const searchTerm = req.query.condition;
             const list = await app.model.tcHocPhiTransaction.listBank(searchTerm || '');
@@ -135,9 +137,9 @@ module.exports = app => {
             //: (namhoc, hocky, ebank, transid, transdate, customerid, billid, serviceid, eamount, echecksum, done)
             if (!result?.outBinds?.ret)
                 throw {};
-            
-            await app.model.tcHocPhiTransaction.update({transId: manualTransid}, {ghiChu});
-                
+
+            await app.model.tcHocPhiTransaction.update({ transId: manualTransid }, { ghiChu });
+
             await app.model.tcHocPhiLog.create({
                 namHoc, hocKy,
                 mssv: sinhVien,
@@ -148,36 +150,50 @@ module.exports = app => {
                 duLieuMoi: app.utils.stringify({ hocPhi: `${soTien}`, transId: manualTransid })
             });
 
-            res.send();
+            res.end();
         } catch (error) {
             res.send({ error });
         }
 
     });
-//app.permission.check('tcGiaoDich:cancel'),
-    app.post('/api/finance/danh-sach-giao-dich/huy',  async (req, res) => {
+    //app.permission.check('tcGiaoDich:cancel'),
+    app.post('/api/finance/danh-sach-giao-dich/huy', app.permission.orCheck('tcGiaoDich:check', 'tcGiaoDich:cancel'), async (req, res) => {
         try {
-            let {ghiChu, transId } = req.body;
-            const giaoDich = await app.model.tcHocPhiTransaction.get({transId});
-            if (!giaoDich) throw 'Dữ liệu không hợp lệ.';
-            if (giaoDich.status == 0) throw 'Giao dịch đã được hủy.';
+            let { ghiChu, transId } = req.body;
+            let email = req.session.user.email;
+            if (!email) {
+                return res.send({ error: 'Không thể thực hiện hủy giao dịch.' });
+            }
+
+            const giaoDich = await app.model.tcHocPhiTransaction.get({ transId });
+            if (!giaoDich) {
+                return res.send({ error: 'Dữ liệu không hợp lệ.' });
+            }
+            if (giaoDich.status == 0) {
+                return res.send({ error: 'Giao dịch đã được hủy trước đó.' });
+            }
+
             const hocPhi = await app.model.tcHocPhi.get({ mssv: giaoDich.customerId, namHoc: giaoDich.namHoc, hocKy: giaoDich.hocKy });
-            if (!hocPhi) throw 'Dữ liệu không hợp lệ.';
-            await app.model.tcHocPhiTransaction.update({transId}, {ghiChu, status: 0});
-            let soTien = hocPhi.congNo + giaoDich.amount;
-            await app.model.tcHocPhi.update({mssv: hocPhi.mssv, namHoc: hocPhi.namHoc, hocKy: hocPhi.hocKy}, {congNo: soTien});
-            const timeStamp = new Date().getTime();
+            if (!hocPhi) {
+                return res.send({ error: 'Dữ liệu không hợp lệ.' });
+            }
+
+            await app.model.tcHocPhiTransaction.update({ transId }, { ghiChu, status: 0 });
+
+            const soTien = parseInt(hocPhi.congNo) + parseInt(giaoDich.amount);
+            await app.model.tcHocPhi.update({ mssv: hocPhi.mssv, namHoc: hocPhi.namHoc, hocKy: hocPhi.hocKy }, { congNo: soTien });
+
             await app.model.tcHocPhiLog.create({
                 namhoc: hocPhi.namHoc, hocKy: hocPhi.hocKy,
                 mssv: hocPhi.mssv,
-                email: req.session.user.email,
+                email: email,
                 thaoTac: 'd',
-                ngay: timeStamp,
+                ngay: new Date().getTime(),
                 duLieuCu: app.utils.stringify({ congNo: `${hocPhi.congNo}`, transId: transId }),
-                duLieuMoi: app.utils.stringify({ congNo: `${soTien}`})
+                duLieuMoi: app.utils.stringify({ congNo: `${soTien}` })
             });
 
-            res.send();
+            res.end();
         } catch (error) {
             res.send({ error });
         }
