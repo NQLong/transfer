@@ -9,7 +9,9 @@ module.exports = app => {
     app.permission.add(
         { name: 'svSdh:manage', menu },
         { name: 'svSdh:write' },
-        { name: 'svSdh:delete' }
+        { name: 'svSdh:delete' },
+        'svSdh:export',
+        'svSdh:import'
     );
 
     app.get('/user/sau-dai-hoc/sinh-vien', app.permission.check('svSdh:manage'), app.templates.admin);
@@ -18,7 +20,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRoleStudentSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && ['37'].includes(staff.maDonVi)) {
-            app.permissionHooks.pushUserPermission(user, 'svSdh:manage', 'svSdh:write', 'svSdh:delete');
+            app.permissionHooks.pushUserPermission(user, 'svSdh:manage', 'svSdh:write', 'svSdh:delete', 'svSdh:export', 'svSdh:import');
             resolve();
         } else resolve();
     }));
@@ -41,7 +43,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/sv-sdh/:mssv', app.permission.check('svSdh:manage'), (req, res) => {
+    app.get('/api/sv-sdh/item/:mssv', app.permission.check('svSdh:manage'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwSinhVienSdh.get({ ma: mssv }, (error, item) => {
             res.send({ error, item });
@@ -314,4 +316,103 @@ module.exports = app => {
 
         }
     };
+
+    app.get('/api/sv-sdh/download-excel', app.permission.check('svSdh:export'), async (req, res) => {
+        try {
+            let filter = app.utils.parse(req.query.filter || {});
+            const {listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender}= filter;
+            let listNganhSdh;
+            await app.model.dmNganhSauDaiHoc.getAll({},'maNganh,ten',null,(err,result)=>{
+                if(err)
+                {
+                    console.log(err);
+                }else{
+                    listNganhSdh=result;
+                }
+            });
+            filter = app.utils.stringify(filter, '');
+            let data = await app.model.fwSinhVienSdh.searchPage(1, 1000000, listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender, '');
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet('Thoi khoa bieu');
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 5 },
+                { header: 'MSSV', key: 'mssv', width: 5 },
+                { header: 'HỌ', key: 'ho', width: 5 },
+                { header: 'TÊN', key: 'ten', width: 5 },
+                { header: 'GIỚI TÍNH', key: 'gioiTinh', width: 7 },
+                { header: 'NGÀY SINH', key: 'ngaySinh', width: 7 },
+                { header: 'DÂN TỘC', key: 'danToc', width: 10 },
+                // { header: 'TÔN GIÁO', key: 'tonGiao', width: 5 },
+                { header: 'QUỐC TỊCH', key: 'quocTich', width: 10 },
+                // { header: 'HIỆN TẠI SỐ NHÀ', key: 'hienTaiSoNha', width: 10 },
+                // { header: 'THƯỜNG TRÚ SỐ NHÀ', key: 'thuongTruSoNha', width: 10 },
+                { header: 'KHOA', key: 'khoa', width: 10 },
+                { header: 'NGÀNH', key: 'nganh', width: 10 },
+                { header: 'NĂM TUYỂN SINH', key: 'namTuyenSinh', width: 10 },
+                // { header: 'NIÊN KHOÁ', key: 'nienKhoa', width: 20 },
+                // { header: 'BẬC ĐÀO TẠO', key: 'bacDaoTao', width: 20 },
+                // { header: 'CHƯƠNG TRÌNH ĐÀO TẠO', key: 'chuongTrinhDaoTao', width: 30 },
+                // { header: 'SỐ ĐIỆN THOẠI CÁ NHÂN', key: 'sdtCaNhan', width: 50 },
+                // { header: 'SỐ ĐIỆN THOẠI LIÊN HỆ', key: 'sdtLienHe', width: 30 },
+                { header: 'EMAIL', key: 'email', width: 30 },
+                // { header: 'CƠ QUAN', key: 'coQuan', width: 5 },
+                // { header: 'GIÁO VIÊN HƯỚNG DẪN', key: 'gvhd', width: 5 },
+                // { header: 'TÊN ĐỀ TÀI', key: 'tenDeTai', width: 5 },
+                // { header: 'TÌNH TRẠNG', key: 'tinhTrang', width: 5 },
+                // { header: 'HỆ ĐÀO TẠO', key: 'heDaoTao', width: 5 },
+                // { header: 'HỌ TÊN CHA', key: 'hoTenCha', width: 5 },
+                // { header: 'NĂM SINH CHA', key: 'namSinhCha', width: 5 },
+                // { header: 'NGHỀ NGHIỆP CHA', key: 'ngheNghiepCha', width: 5 },
+                // { header: 'SỐ ĐIỆN THOẠI CHA', key: 'sdtCha', width: 5 },
+                // { header: 'HỌ TÊN MẸ', key: 'hoTenMe', width: 5 },
+                // { header: 'NĂM SINH MẸ', key: 'namSinhMe', width: 5 },
+                // { header: 'NGHỀ NGHIỆP MẸ', key: 'ngheNghiepMe', width: 5 },
+                // { header: 'SỐ ĐIỆN THOẠI MẸ', key: 'sdtMe', width: 5 },
+                // { header: 'SỐ ĐIỆN THOẠI NGƯỜI THÂN', key: 'sdtNguoiThan', width: 5 },
+
+            ];
+
+            const list = data.rows;
+            list.forEach((item, index) => {
+                ws.addRow({
+                    ...item,
+                    stt: index + 1,
+                    ma: item.mssv,
+                    ho: item.ho,
+                    ten: item.ten,
+                    email: item.emailCaNhan||'',
+                    khoa: item.tenKhoa||'',
+                    nganh: listNganhSdh.find(e=>e.maNganh==item.maNganh).ten,
+                    namTuyenSinh: item.namTuyenSinh||'',
+                    danToc: item.danToc||'',
+                    quocTich: item.quocTich||'',
+                    ngaySinh: item.ngaySinh?new Date(item.ngaySinh):'',
+                    gioiTinh: item.gioiTinh==1?'Nam':'Nữ'
+                    // monHoc: `${app.utils.parse(item.tenMonHoc).vi}`,
+                    // tuChon: item.loaiMonHoc ? 'x' : '',
+                    // lop: item.nhom,
+                    // tongTiet: item.tongTiet,
+                    // phong: item.phong,
+                    // thu: item.thu,
+                    // tietBatDau: item.tietBatDau,
+                    // soTiet: item.soTiet,
+                    // sldk: item.soLuongDuKien,
+                    // ngayBatDau: item.ngayBatDau ? app.date.dateTimeFormat(new Date(Number(item.ngayBatDau)), 'dd/mm/yyyy') : '',
+                    // ngayKetThuc: item.ngayKetThuc ? app.date.dateTimeFormat(new Date(Number(item.ngayKetThuc)), 'dd/mm/yyyy') : '',
+                    // khoa: item.tenKhoaDangKy,
+                    // giangVien: item.listGiangVien?.split(',').map(gvItem => gvItem.split('_')[1]).join('\n'),
+                    // troGiang: item.listTroGiang?.split(',').map(tgItem => tgItem.split('_')[1]).join('\n'),
+                    // tenNganh: item.tenNganh.replaceAll('&&', '\n').replaceAll('%', ': '),
+                }, index === 0 ? 'n' : 'i');
+            });
+
+            let fileName = 'HOC_VIEN_SDH.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
+
 };

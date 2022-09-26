@@ -72,7 +72,7 @@ export function getSvSdhPage(pageNumber, pageSize, pageCondition, filter, done) 
 
 export function getSvSdhAdmin(mssv, done) {
     return dispatch => {
-        const url = `/api/sv-sdh/${mssv}`;
+        const url = `/api/sv-sdh/item/${mssv}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin sinh viên sau đại học không thành công!', 'danger');
