@@ -68,9 +68,9 @@ module.exports = app => {
         try {
             const _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
-                { condition, filter } = req.query;
+                { condition, filter, sortTerm } = req.query;
             const searchTerm = typeof condition === 'string' ? condition : '';
-            let page = await app.model.fwStudents.searchPage(_pageNumber, _pageSize, searchTerm, app.utils.stringify(filter));
+            let page = await app.model.fwStudents.searchPage(_pageNumber, _pageSize, searchTerm, app.utils.stringify(filter), sortTerm.split('_')[0], sortTerm.split('_')[1]);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
             const pageCondition = searchTerm;
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
