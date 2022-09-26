@@ -13452,17 +13452,17 @@
                 },
                 "HOC_KY": {
                     "value": "hocKy",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 11
-                },
-                "NAM": {
-                    "value": "nam",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 11
                 },
                 "DON_VI": {
                     "value": "donVi",
@@ -18381,13 +18381,6 @@
             "moduleName": "hcthUserOtp",
             "modelName": "hcthUserOtp",
             "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
                 "OTP": {
                     "value": "otp",
                     "dataType": "NVARCHAR2",
@@ -18415,6 +18408,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 10
+                },
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_175249\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [

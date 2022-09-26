@@ -146,6 +146,7 @@ module.exports = (app, appConfig) => {
     };
 
     // Load services --------------------------------------------------------------------------------------------------
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
     const axios = require('axios'),
         axiosRequest = async (type, url, data, requestConfig) => {
             try {
@@ -166,6 +167,7 @@ module.exports = (app, appConfig) => {
 
                 return response ? response.data : null;
             } catch (error) {
+                console.error('axiosRequest:', error);
                 return { error };
             }
         };

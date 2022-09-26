@@ -149,7 +149,6 @@ module.exports = (app, appConfig) => {
         }
     });
 
-
     // Hook uploadHooks -----------------------------------------------------------------------------------------------------------------------------
     const clusterImageUpload = (fields, files, params, done) => {
         if (fields && fields.userData && fields.userData == 'ClusterImageUpload' && fields.service && fields.token && files && files.clusterImageFile) {
@@ -202,7 +201,7 @@ module.exports = (app, appConfig) => {
             }
         }
     };
-    app.uploadHooks.add('ClusterImageUpload', (req, fields, files, params, done) => clusterImageUpload(fields, files, params, done));
+    app.uploadHooks.add('ClusterImageUpload', (req, fields, files, params, done) => clusterImageUpload(fields, files, params, done), false);
 
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
