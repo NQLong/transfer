@@ -39,7 +39,8 @@ export class LoginToTestModal extends AdminModal {
     }
 }
 class AdminStudentsPage extends AdminPage {
-    state = { filter: {}, sortTerm: [] };
+    defaultSortTerm = 'ten_ASC'
+    state = { filter: {}, sortTerm: 'ten_ASC' };
     componentDidMount() {
         T.ready('/user/students', () => {
             T.clearSearchBox();
@@ -67,7 +68,7 @@ class AdminStudentsPage extends AdminPage {
         }
     }
 
-    getStudentsPage = (pageNumber, pageSize, pageCondition, done) => this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, this.state.sortTerm.join(','), done);
+    getStudentsPage = (pageNumber, pageSize, pageCondition, done) => this.props.getStudentsPage(pageNumber, pageSize, pageCondition, this.state.filter, this.state?.sortTerm || this.defaultSortTerm, done);
 
     delete = (item) => {
         T.confirm('Xóa sinh viên', 'Xóa sinh viên này?', 'warning', true, isConfirm => {
@@ -82,7 +83,7 @@ class AdminStudentsPage extends AdminPage {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete', 'export']);
         let developer = this.getUserPermission('developer', ['login']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
-            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
 
         let table = renderDataTable({
             emptyTable: 'Không có dữ liệu sinh viên',
@@ -93,17 +94,17 @@ class AdminStudentsPage extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <TableHead content='MSSV' keyCol='mssv' onClick={this} />
-                    {/* <TableHead content='MSSV' sortable /> */}
-                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên lót</th>
-                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên</th>
+                    <TableHead style={{ width: 'auto' }} content='MSSV' keyCol='mssv' onClick={sortTerm => this.setState({ sortTerm }, () => this.getStudentsPage(pageNumber, pageSize, pageCondition))} />
+                    <TableHead content='Họ và tên lót' keyCol='ho' onClick={sortTerm => this.setState({ sortTerm }, () => this.getStudentsPage(pageNumber, pageSize, pageCondition))} />
+                    {/* <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên lót</th> */}
+                    <TableHead content='Tên' keyCol='ten' onClick={sortTerm => this.setState({ sortTerm }, () => this.getStudentsPage(pageNumber, pageSize, pageCondition))} />
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Giới tính</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
+                    <TableHead content='Ngày sinh' keyCol='ngaySinh' onClick={sortTerm => this.setState({ sortTerm }, () => this.getStudentsPage(pageNumber, pageSize, pageCondition))} />
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi sinh</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoa</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã ngành</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên ngành</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Khoá</th>
+                    <TableHead content='Khoá sinh viên' keyCol='namTuyenSinh' onClick={sortTerm => this.setState({ sortTerm }, () => this.getStudentsPage(pageNumber, pageSize, pageCondition))} />
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email cá nhân</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email sinh viên</th>
@@ -112,16 +113,10 @@ class AdminStudentsPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tôn giáo</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quốc tịch</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thường trú</th>
-                    {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ tên cha</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Địa chỉ cha</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT cha</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ tên mẹ</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Địa chỉ mẹ</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT mẹ</th> */}
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ tên liên lạc</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Địa chỉ liên lạc</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>SĐT liên lạc</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày nhập học</th>
+                    <TableHead content='Ngày nhập học' keyCol='ngayNhapHoc' onClick={sortTerm => this.setState({ sortTerm }, () => this.getStudentsPage(pageNumber, pageSize, pageCondition))} />
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Tình trạng</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
@@ -318,7 +313,6 @@ class AdminStudentsPage extends AdminPage {
                 <div className='tile'>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginBottom: '10px' }}>
                         <FormCheckbox label='Thao tác nhanh' onChange={value => this.setState({ quickAction: value })} style={{ marginBottom: '0' }} />
-                        {/* <div>{list && list.length ? <i>{T.numberDisplay(totalItem)} sinh viên</i> : ''}</div> */}
                         <Pagination style={{ position: '', bottom: '', width: '' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                             getPage={this.getStudentsPage} pageRange={3} />
                     </div>
@@ -330,8 +324,8 @@ class AdminStudentsPage extends AdminPage {
             ,
             backRoute: '/user/students',
             collapse: [
-                { icon: <i className='fa fa-lg fa-print' />, name: 'Export', permission: permission.export, onClick: () => T.download(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx'), type: 'info' },
-                { icon: <i className='fa fa-lg fa-upload' />, name: 'Import', permission: developer.login, onClick: () => this.props.history.push('/user/students/import'), type: 'danger' }
+                { icon: 'fa-print', name: 'Export', permission: permission.export, onClick: () => T.download(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx'), type: 'success' },
+                { icon: 'fa-upload', name: 'Import', permission: developer.login, onClick: () => this.props.history.push('/user/students/import'), type: 'danger' }
             ]
         });
     }
