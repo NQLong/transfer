@@ -28,7 +28,7 @@ class TccbCaNhanDangKyDetailsPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} >#</th>
                         <th style={{ width: '30%', textAlign: 'center' }}>Cán bộ</th>
                         <th style={{ width: '70%', textAlign: 'center' }}>Nhóm đăng ký</th>
                     </tr>

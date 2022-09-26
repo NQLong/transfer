@@ -48,7 +48,7 @@ class TccbDanhGiaPheDuyetDonViDetails extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
                         <th style={{ width: '20%', textAlign: 'center' }}>Cán bộ</th>
                         <th style={{ width: '40%', textAlign: 'center' }}>Cá nhân đăng ký</th>
                         <th style={{ width: '40%', textAlign: 'center' }}>Đơn vị phê duyệt</th>

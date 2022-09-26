@@ -18769,8 +18769,8 @@
                     "nullable": false,
                     "size": 128
                 },
-                "PARENT": {
-                    "value": "parent",
+                "NHOM_CHA": {
+                    "value": "nhomCha",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -18785,7 +18785,7 @@
                 }
             },
             "primaryKeys": [
-                "NAM_HOC"
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"
@@ -18804,10 +18804,10 @@
                 },
                 "NGANH": {
                     "value": "nganh",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": "22,0"
+                    "size": 20
                 },
                 "NHOM": {
                     "value": "nhom",
