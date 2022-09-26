@@ -7,7 +7,6 @@ module.exports = (app, serviceConfig) => { // Run on service project
     app.messageQueue.consume(`${serviceConfig.name}:send`, async (message) => {
         try {
             const { phoneNumber, content } = JSON.parse(message);
-            console.log('Send SMS:', phoneNumber, content);
             let { usernameViettel: user, passViettel: pass, brandName, } = await app.model.setting.getValue(['usernameViettel', 'passViettel', 'brandName', 'totalSMSViettel']);
             let dataEncode = parseInt(checkNonLatinChar(content));
 
@@ -20,34 +19,26 @@ module.exports = (app, serviceConfig) => { // Run on service project
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json; charset=utf-8' }
             };
-            return new Promise(resolve => {
-                const request = http.request(option, (_res) => {
-                    _res.on('data', async (chunk) => {
-                        let resData = {};
-                        try {
-                            resData = JSON.parse(chunk.toString());
-                        } catch (e) {
-                            console.error(e);
-                            resolve({ error: e });
-                        }
-                        if (resData.code == 1) {
-                            try {
-                                resolve({ success: true });
-                            } catch (error) {
-                                resolve({ error });
-                            }
-                        } else resolve({ error: 'Unsuccessful request' });
-                    });
+
+            const request = http.request(option, (_res) => {
+                _res.on('data', (chunk) => {
+                    try {
+                        const dataResponse = JSON.parse(chunk.toString());
+                        dataResponse.code == 1 ?
+                            console.log(`${serviceConfig.name}:send: ${phoneNumber}: ${content}`) :
+                            console.error(`${serviceConfig.name}:send: Unsuccessful request`);
+                    } catch (error) {
+                        console.error(`${serviceConfig.name}:send:`, error);
+                    }
                 });
-                request.on('error', (e) => {
-                    resolve({ error: `Problem with request to viettel: ${e.message}` });
-                });
-                request.write(dataRequest);
-                request.end();
             });
+            request.on('error', error => {
+                console.error(`${serviceConfig.name}:send: Problem with request to Viettel`, error);
+            });
+            request.write(dataRequest);
+            request.end();
         } catch (error) {
-            console.error(`Error: ${serviceConfig.name}:importDbCore:`, error);
-            app.messageQueue.send(`${serviceConfig.name}:importDbCoreResult`, { error });
+            console.error(`${serviceConfig.name}:send:`, error);
         }
     });
 };
