@@ -187,6 +187,22 @@ export function updateSdhChuongTrinhDaoTao(id, changes, done) {
         }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
     };
 }
+export function updateSdhChuongTrinhDaoTaoMulti(id, changes, done) {
+    return () => {
+        const url = '/api/sau-dai-hoc/chuong-trinh-dao-tao/multiple';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify(`Lưu lỗi: ${data.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${data.error.message}`);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật thành công!', 'success');
+                // dispatch(getSdhChuongTrinhDaoTaoPage());
+                done && done();
+            }
+        }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
+    };
+}
 
 
 export const SelectAdapter_ChuongTrinhDaoTaoFilter = (maNganh = null) => {
@@ -244,5 +260,20 @@ export function downloadWord(id, done) {
                 done(data.data);
             }
         }, () => T.notify('Tải file word bị lỗi', 'danger'));
+    };
+}
+
+export function updateKhungDaoTao(id, changes, done) {
+    return () => {
+        const url = '/api/sau-dai-hoc/khung-dao-tao';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify(`Lưu lỗi: ${data.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${data.error.message}`);
+                done && done(data.error);
+            } else {
+                done && done();
+            }
+        }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
     };
 }

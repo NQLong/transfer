@@ -4,7 +4,7 @@ module.exports = app => {
         menus: {
             7003: {
                 title: 'Chương trình đào tạo',
-                link: '/user/sau-dai-hoc/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#384C46', groupIndex:1
+                link: '/user/sau-dai-hoc/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#384C46', groupIndex: 1
             },
         },
     };
@@ -59,15 +59,15 @@ module.exports = app => {
 
     app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
         const maKhungDaoTao = req.query.maKhungDaoTao,
-            condition = req.query.searchText ? { 
+            condition = req.query.searchText ? {
                 statement: 'lower(maMonHoc) LIKE :searchText OR lower(tenMonHoc) LIKE :searchText AND maKhungDaoTao =:maKhungDaoTao',
                 parameter: {
-                    searchText : `%${req.query.searchText.toLowerCase()}%`,
+                    searchText: `%${req.query.searchText.toLowerCase()}%`,
                     maKhungDaoTao: maKhungDaoTao
-                } 
+                }
             } : { maKhungDaoTao };
 
-        app.model.sdhChuongTrinhDaoTao.getAll(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
+        app.model.sdhChuongTrinhDaoTao.getAll(condition, '*', 'maMonHoc ASC', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-nam-dao-tao/', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
@@ -338,4 +338,35 @@ module.exports = app => {
             res.send({ error: 'No permission' });
         }
     });
+
+    app.put('/api/sau-dai-hoc/khung-dao-tao', app.permission.orCheck('sdhChuongTrinhDaoTao:write', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
+        try {
+            app.model.sdhKhungDaoTao.update({ id: req.body.id }, req.body.changes, errors => res.send({ errors }));
+        } catch (error) {
+            console.error(error);
+            res.send(error);
+        }
+    });
+
+    app.put('/api/sau-dai-hoc/chuong-trinh-dao-tao/multiple', app.permission.orCheck('sdhChuongTrinhDaoTao:write', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
+        try {
+            const listID = req.body.id,
+                changes = req.body.changes,
+                errorList = [];
+            for (let i = 0; i < listID.length; i++) {
+                try {
+                    await app.model.sdhChuongTrinhDaoTao.update({ id: parseInt(listID[i]) }, changes);
+                } catch (error) {
+                    errorList.push(error);
+                }
+            }
+            res.send({ error: errorList.length ? errorList : null });
+
+        } catch (error) {
+            console.error(error);
+            res.send(error);
+        }
+    });
+
+
 };
