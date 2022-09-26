@@ -10,7 +10,7 @@ import ComponentTLD from '../tccbDanhGiaTyLeDiem/componentTLD';
 import ComponentDMCV from '../tccbDanhGiaDinhMucCongViecGvVaNcv/componentDMCV';
 import ComponentHDDonVi from '../tccbDanhGiaHoiDongCapDonVi/componentHDDonVi';
 import ComponentHDTruong from '../tccbDanhGiaHoiDongCapTruong/componentHDTruong';
-import ComponentFormChuyenVien from 'modules/_default/tccbDanhGiaFormChuyenVienParent/componentFormChuyenVien';
+import ComponentFormChuyenVien from 'modules/mdTccb/tccbDanhGiaFormChuyenVienParent/componentFormChuyenVien';
 import { getTccbDanhGiaNamAll } from './redux';
 import T from 'view/js/common';
 
