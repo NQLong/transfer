@@ -1,15 +1,3 @@
-CREATE OR REPLACE FUNCTION COMPARE_STRING_FILTER(INPUT IN STRING) RETURN VARCHAR2
-    IS OUTPUT VARCHAR2(500);
-BEGIN
-        SELECT regexp_substr(INPUT, '[^,]+', 1, level) INTO OUTPUT
-                                      from dual
-                                      connect by regexp_substr(INPUT, '[^,]+', 1, level) is not null;
-    RETURN OUTPUT;
-end;
-
-/
---EndMethod--
-
 CREATE OR REPLACE FUNCTION "COMPONENT_CREATE_NEW" (
     class_name   IN   NVARCHAR2,
     style        IN   NVARCHAR2,
@@ -2133,7 +2121,7 @@ end;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION FW_STUDENT_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                       searchTerm IN STRING, filter IN STRING,
+                                       searchTerm IN STRING, filter IN STRING, sortKey IN STRING, sortMode IN STRING,
                                        totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     STUDENT_INFO          SYS_REFCURSOR;
@@ -2168,7 +2156,6 @@ BEGIN
 
     SELECT COUNT(*)
     INTO totalItem
-
     FROM FW_STUDENT STU
              LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
              LEFT JOIN DM_LOAI_SINH_VIEN LSV on LSV.MA = STU.LOAI_SINH_VIEN
@@ -2199,39 +2186,28 @@ BEGIN
 
              LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.KHOA
              LEFT JOIN DM_TINH_TRANG_SINH_VIEN TTSV ON TTSV.MA = STU.TINH_TRANG
-    WHERE (
-            (listFaculty IS NOT NULL AND STU.KHOA IN (SELECT regexp_substr(listFaculty, '[^,]+', 1, level)
-                                                      from dual
-                                                      connect by regexp_substr(listFaculty, '[^,]+', 1, level) is not null) OR
-             listFaculty IS NULL)
-            AND (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0 OR
-                 listFromCity IS NULL)
-            AND (listKhoaSinhVien IS NOT NULL AND INSTR(listKhoaSinhVien, STU.NAM_TUYEN_SINH) != 0 OR
-                 listKhoaSinhVien IS NULL)
-            AND (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0 OR listEthnic IS NULL)
-            AND (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_GIA) != 0 OR
-                 listNationality IS NULL)
-            AND
-            (listReligion IS NOT NULL AND INSTR(listReligion, STU.DAN_TOC) != 0 OR listReligion IS NULL)
-            AND
-            (listLoaiHinhDaoTao IS NOT NULL AND INSTR(listLoaiHinhDaoTao, STU.LOAI_HINH_DAO_TAO) != 0 OR
-             listLoaiHinhDaoTao IS NULL)
-            AND (listLoaiSinhVien IS NOT NULL AND INSTR(listLoaiSinhVien, STU.LOAI_SINH_VIEN) != 0 OR
-                 listLoaiSinhVien IS NULL)
-            AND (listTinhTrangSinhVien IS NOT NULL AND INSTR(listTinhTrangSinhVien, STU.TINH_TRANG) != 0 OR
-                 listTinhTrangSinhVien IS NULL)
-            AND (gender IS NOT NULL AND ('0' + STU.GIOI_TINH) = gender OR gender IS NULL)
-            AND ((fromNhapHoc IS NOT NULL AND toNhapHoc IS NOT NULL AND fromNhapHoc < STU.NGAY_NHAP_HOC AND
-                  STU.NGAY_NHAP_HOC < toNhapHoc) OR toNhapHoc IS NULL OR fromNhapHoc IS NULL)
+    WHERE ((listFaculty IS NULL OR STU.KHOA IN UTILS_SPLIT_FILTER(listFaculty))
+        AND (listFromCity IS NULL OR STU.THUONG_TRU_MA_TINH IN UTILS_SPLIT_FILTER(listFromCity))
+        AND (listKhoaSinhVien IS NULL OR STU.NAM_TUYEN_SINH IN UTILS_SPLIT_FILTER(listKhoaSinhVien))
+        AND (listEthnic IS NULL OR STU.DAN_TOC IN UTILS_SPLIT_FILTER(listEthnic))
+        AND (listNationality IS NULL OR STU.QUOC_GIA IN UTILS_SPLIT_FILTER(listNationality))
+        AND (listReligion IS NULL OR STU.DAN_TOC IN UTILS_SPLIT_FILTER(listReligion))
+        AND
+           (listLoaiHinhDaoTao IS NULL OR STU.LOAI_HINH_DAO_TAO IN UTILS_SPLIT_FILTER(listLoaiHinhDaoTao))
+        AND (listLoaiSinhVien IS NULL OR STU.LOAI_SINH_VIEN IN UTILS_SPLIT_FILTER(listLoaiSinhVien))
+        AND (listTinhTrangSinhVien IS NULL OR STU.TINH_TRANG IN UTILS_SPLIT_FILTER(listTinhTrangSinhVien))
+        AND (gender IS NOT NULL AND (0 || STU.GIOI_TINH) = gender OR gender IS NULL)
+        AND ((fromNhapHoc IS NOT NULL AND toNhapHoc IS NOT NULL AND fromNhapHoc < STU.NGAY_NHAP_HOC AND
+              STU.NGAY_NHAP_HOC < toNhapHoc) OR toNhapHoc IS NULL OR fromNhapHoc IS NULL)
         )
       AND (searchTerm = ''
-        OR LOWER(STU.MSSV) LIKE sT
-        OR LOWER(TRIM(STU.HO || ' ' || STU.TEN)) LIKE sT
-        OR LOWER(STU.MA_NGANH) LIKE sT
-        OR LOWER(STU.LOP) LIKE sT
-        OR LOWER(STU.DIEN_THOAI_CA_NHAN) LIKE sT
-        OR LOWER(STU.DIEN_THOAI_LIEN_LAC) LIKE sT
-        OR LOWER(STU.EMAIL_CA_NHAN) LIKE sT);
+        OR LOWER(STU.MSSV) = LOWER(searchTerm)
+        OR LOWER(TRIM(STU.HO || ' ' || STU.TEN)) LIKE ST
+        OR LOWER(STU.MA_NGANH) LIKE ST
+        OR LOWER(STU.LOP) LIKE ST
+        OR LOWER(STU.DIEN_THOAI_CA_NHAN) LIKE ST
+        OR LOWER(STU.DIEN_THOAI_LIEN_LAC) LIKE ST
+        OR LOWER(STU.EMAIL_CA_NHAN) LIKE ST);
 
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
@@ -2241,42 +2217,42 @@ BEGIN
 
     OPEN STUDENT_INFO FOR
         SELECT *
-        FROM (SELECT STU.MSSV                      AS                                          "mssv",
-                     STU.HO                        AS                                          "ho",
-                     STU.TEN                       AS                                          "ten",
-                     STU.EMAIL_CA_NHAN             AS                                          "emailCaNhan",
-                     STU.EMAIL_TRUONG              AS                                          "emailTruong",
-                     STU.NGAY_SINH                 AS                                          "ngaySinh",
-                     STU.GIOI_TINH                 AS                                          "gioiTinh",
-                     STU.DAN_TOC                   AS                                          "maDanToc",
-                     STU.QUOC_GIA                  AS                                          "maQuocGia",
-                     LSV.TEN                       AS                                          "loaiSinhVien",
-                     LHDT.TEN                      AS                                          "loaiHinhDaoTao",
-                     TTSV.TEN                      AS                                          "tinhTrangSinhVien",
-                     STU.KHOA                      AS                                          "khoa",
-                     TTSV.TEN                      AS                                          "noiSinh",
-                     NDT.TEN_NGANH                 AS                                          "tenNganh",
-                     xaThuongTru.TEN_PHUONG_XA     as                                          "xaThuongTru",
-                     huyenThuongTru.TEN_QUAN_HUYEN as                                          "huyenThuongTru",
-                     tinhThuongTru.ten             as                                          "tinhThuongTru",
-                     STU.THUONG_TRU_SO_NHA         AS                                          "soNhaThuongTru",
+        FROM (SELECT STU.MSSV                      AS  "mssv",
+                     STU.HO                        AS  "ho",
+                     STU.TEN                       AS  "ten",
+                     STU.EMAIL_CA_NHAN             AS  "emailCaNhan",
+                     STU.EMAIL_TRUONG              AS  "emailTruong",
+                     STU.NGAY_SINH                 AS  "ngaySinh",
+                     STU.GIOI_TINH                 AS  "gioiTinh",
+                     STU.DAN_TOC                   AS  "maDanToc",
+                     STU.QUOC_GIA                  AS  "maQuocGia",
+                     LSV.TEN                       AS  "loaiSinhVien",
+                     LHDT.TEN                      AS  "loaiHinhDaoTao",
+                     TTSV.TEN                      AS  "tinhTrangSinhVien",
+                     STU.KHOA                      AS  "khoa",
+                     NS.TEN                        AS  "noiSinh",
+                     NDT.TEN_NGANH                 AS  "tenNganh",
+                     xaThuongTru.TEN_PHUONG_XA     as  "xaThuongTru",
+                     huyenThuongTru.TEN_QUAN_HUYEN as  "huyenThuongTru",
+                     tinhThuongTru.ten             as  "tinhThuongTru",
+                     STU.THUONG_TRU_SO_NHA         AS  "soNhaThuongTru",
 
-                     tinhLienLac.TEN               AS                                          "tinhLienLac",
-                     huyenLienLac.TEN_QUAN_HUYEN   AS                                          "huyenLienLac",
-                     xaLienLac.TEN_PHUONG_XA       AS                                          "xaLienLac",
-                     STU.LIEN_LAC_SO_NHA           AS                                          "soNhaLienLac",
-                     STU.DIEN_THOAI_CA_NHAN        AS                                          "dienThoaiCaNhan",
-                     STU.HO_TEN_NGUOI_LIEN_LAC     AS                                          "hoTenNguoiLienLac",
-                     STU.SDT_NGUOI_LIEN_LAC        AS                                          "sdtNguoiLienLac",
-                     KHOA.TEN                      AS                                          "tenKhoa",
-                     STU.MA_NGANH                  AS                                          "maNganh",
-                     STU.LOP                       AS                                          "lop",
-                     TONGIAO.TEN                   AS                                          "tonGiao",
-                     QG.TEN_QUOC_GIA               AS                                          "quocTich",
-                     DANTOC.TEN                    AS                                          "danToc",
-                     STU.NAM_TUYEN_SINH            AS                                          "namTuyenSinh",
-                     STU.NGAY_NHAP_HOC             AS                                          "ngayNhapHoc",
-                     STU.CAN_EDIT                  AS                                          "canEdit",
+                     tinhLienLac.TEN               AS  "tinhLienLac",
+                     huyenLienLac.TEN_QUAN_HUYEN   AS  "huyenLienLac",
+                     xaLienLac.TEN_PHUONG_XA       AS  "xaLienLac",
+                     STU.LIEN_LAC_SO_NHA           AS  "soNhaLienLac",
+                     STU.DIEN_THOAI_CA_NHAN        AS  "dienThoaiCaNhan",
+                     STU.HO_TEN_NGUOI_LIEN_LAC     AS  "hoTenNguoiLienLac",
+                     STU.SDT_NGUOI_LIEN_LAC        AS  "sdtNguoiLienLac",
+                     KHOA.TEN                      AS  "tenKhoa",
+                     STU.MA_NGANH                  AS  "maNganh",
+                     STU.LOP                       AS  "lop",
+                     TONGIAO.TEN                   AS  "tonGiao",
+                     QG.TEN_QUOC_GIA               AS  "quocTich",
+                     DANTOC.TEN                    AS  "danToc",
+                     STU.NAM_TUYEN_SINH            AS  "namTuyenSinh",
+                     STU.NGAY_NHAP_HOC             AS  "ngayNhapHoc",
+                     STU.CAN_EDIT                  AS  "canEdit",
                      ROW_NUMBER() OVER (ORDER BY NULL) R
               FROM FW_STUDENT STU
                        LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
@@ -2285,7 +2261,7 @@ BEGIN
                        LEFT JOIN DM_QUOC_GIA QG ON QG.MA_CODE = STU.QUOC_GIA
                        LEFT JOIN DM_DAN_TOC DANTOC ON DANTOC.MA = STU.DAN_TOC
                        LEFT JOIN DM_TON_GIAO TONGIAO ON TONGIAO.MA = STU.TON_GIAO
-                       LEFT JOIN DM_TINH_THANH_PHO TTSV ON TTSV.MA = STU.NOI_SINH_MA_TINH
+                       LEFT JOIN DM_TINH_THANH_PHO NS ON NS.MA = STU.NOI_SINH_MA_TINH
 
                        LEFT JOIN DM_PHUONG_XA xaThuongTru ON STU.THUONG_TRU_MA_XA = xaThuongTru.MA_PHUONG_XA
                        LEFT JOIN DM_QUAN_HUYEN huyenThuongTru ON STU.THUONG_TRU_MA_HUYEN = huyenThuongTru.MA_QUAN_HUYEN
@@ -2308,66 +2284,52 @@ BEGIN
 
                        LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.KHOA
                        LEFT JOIN DM_TINH_TRANG_SINH_VIEN TTSV ON TTSV.MA = STU.TINH_TRANG
-              WHERE (
-                      (listFaculty IS NOT NULL AND STU.KHOA IN (SELECT regexp_substr(listFaculty, '[^,]+', 1, level)
-                                                                from dual
-                                                                connect by regexp_substr(listFaculty, '[^,]+', 1, level) is not null) OR
-                       listFaculty IS NULL)
-                      AND (listFromCity IS NOT NULL AND
-                           STU.THUONG_TRU_MA_TINH IN (SELECT regexp_substr(listFromCity, '[^,]+', 1, level)
-                                                      from dual
-                                                      connect by regexp_substr(listFromCity, '[^,]+', 1, level) is not null) OR
-                           listFromCity IS NULL)
-                      AND (listKhoaSinhVien IS NOT NULL AND
-                           STU.NAM_TUYEN_SINH IN (SELECT regexp_substr(listKhoaSinhVien, '[^,]+', 1, level)
-                                                  from dual
-                                                  connect by regexp_substr(listKhoaSinhVien, '[^,]+', 1, level) is not null) OR
-                           listKhoaSinhVien IS NULL)
-                      AND
-                      (listEthnic IS NOT NULL AND STU.DAN_TOC IN (SELECT regexp_substr(listEthnic, '[^,]+', 1, level)
-                                                                  from dual
-                                                                  connect by regexp_substr(listEthnic, '[^,]+', 1, level) is not null) OR
-                       listEthnic IS NULL)
-                      AND (listNationality IS NOT NULL AND
-                           STU.QUOC_GIA IN (SELECT regexp_substr(listNationality, '[^,]+', 1, level)
-                                            from dual
-                                            connect by regexp_substr(listNationality, '[^,]+', 1, level) is not null) OR
-                           listNationality IS NULL)
-                      AND (listReligion IS NOT NULL AND
-                           STU.DAN_TOC IN (SELECT regexp_substr(listReligion, '[^,]+', 1, level)
-                                           from dual
-                                           connect by regexp_substr(listReligion, '[^,]+', 1, level) is not null)
-                      OR listReligion IS NULL)
-                      AND (listLoaiHinhDaoTao IS NOT NULL AND
-                           STU.LOAI_HINH_DAO_TAO IN (SELECT regexp_substr(listLoaiHinhDaoTao, '[^,]+', 1, level)
-                                                     from dual
-                                                     connect by regexp_substr(listLoaiHinhDaoTao, '[^,]+', 1, level) is not null)
-                      OR listLoaiHinhDaoTao IS NULL)
-                      AND (listLoaiSinhVien IS NOT NULL AND
-                           STU.LOAI_SINH_VIEN IN (SELECT regexp_substr(listLoaiSinhVien, '[^,]+', 1, level)
-                                                  from dual
-                                                  connect by regexp_substr(listLoaiSinhVien, '[^,]+', 1, level) is not null)
-                      OR listLoaiSinhVien IS NULL)
-                      AND (listTinhTrangSinhVien IS NOT NULL AND
-                           STU.TINH_TRANG IN (SELECT regexp_substr(listTinhTrangSinhVien, '[^,]+', 1, level)
-                                              from dual
-                                              connect by regexp_substr(listTinhTrangSinhVien, '[^,]+', 1, level) is not null) OR
-                           listTinhTrangSinhVien IS NULL)
-                      AND (gender IS NOT NULL AND ('0' || STU.GIOI_TINH) = gender OR gender IS NULL)
-                      AND ((fromNhapHoc IS NOT NULL AND toNhapHoc IS NOT NULL AND fromNhapHoc < STU.NGAY_NHAP_HOC AND
-                            STU.NGAY_NHAP_HOC < toNhapHoc) OR toNhapHoc IS NULL OR fromNhapHoc IS NULL)
+              WHERE ((listFaculty IS NULL OR STU.KHOA IN UTILS_SPLIT_FILTER(listFaculty))
+                  AND (listFromCity IS NULL OR STU.THUONG_TRU_MA_TINH IN UTILS_SPLIT_FILTER(listFromCity))
+                  AND (listKhoaSinhVien IS NULL OR STU.NAM_TUYEN_SINH IN UTILS_SPLIT_FILTER(listKhoaSinhVien))
+                  AND (listEthnic IS NULL OR STU.DAN_TOC IN UTILS_SPLIT_FILTER(listEthnic))
+                  AND (listNationality IS NULL OR STU.QUOC_GIA IN UTILS_SPLIT_FILTER(listNationality))
+                  AND (listReligion IS NULL OR STU.DAN_TOC IN UTILS_SPLIT_FILTER(listReligion))
+                  AND
+                     (listLoaiHinhDaoTao IS NULL OR STU.LOAI_HINH_DAO_TAO IN UTILS_SPLIT_FILTER(listLoaiHinhDaoTao))
+                  AND (listLoaiSinhVien IS NULL OR STU.LOAI_SINH_VIEN IN UTILS_SPLIT_FILTER(listLoaiSinhVien))
+                  AND (listTinhTrangSinhVien IS NULL OR STU.TINH_TRANG IN UTILS_SPLIT_FILTER(listTinhTrangSinhVien))
+                  AND (gender IS NOT NULL AND (0 || STU.GIOI_TINH) = gender OR gender IS NULL)
+                  AND ((fromNhapHoc IS NOT NULL AND toNhapHoc IS NOT NULL AND fromNhapHoc < STU.NGAY_NHAP_HOC AND
+                        STU.NGAY_NHAP_HOC < toNhapHoc) OR toNhapHoc IS NULL OR fromNhapHoc IS NULL)
                   )
                 AND (searchTerm = ''
                   OR LOWER(STU.MSSV) = LOWER(searchTerm)
-                  OR LOWER(TRIM(STU.HO || ' ' || STU.TEN)) LIKE sT
-                  OR LOWER(STU.MA_NGANH) LIKE sT
-                  OR LOWER(STU.LOP) LIKE sT
-                  OR LOWER(STU.DIEN_THOAI_CA_NHAN) LIKE sT
-                  OR LOWER(STU.DIEN_THOAI_LIEN_LAC) LIKE sT
-                  OR LOWER(STU.EMAIL_CA_NHAN) LIKE sT)
-                ) dataTable
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
-        ORDER BY dataTable."ten";
+                  OR LOWER(TRIM(STU.HO || ' ' || STU.TEN)) LIKE ST
+                  OR LOWER(STU.MA_NGANH) LIKE ST
+                  OR LOWER(STU.LOP) LIKE ST
+                  OR LOWER(STU.DIEN_THOAI_CA_NHAN) LIKE ST
+                  OR LOWER(STU.DIEN_THOAI_LIEN_LAC) LIKE ST
+                  OR LOWER(STU.EMAIL_CA_NHAN) LIKE ST)
+
+              ORDER BY CASE
+                           WHEN sortMode = 'ASC' THEN
+                               DECODE(sortKey, 'mssv', NLSSORT(STU.MSSV, 'NLS_SORT = BINARY_AI'), 'ho',
+                                      NLSSORT(STU.HO, 'NLS_SORT = VIETNAMESE'), 'ten',
+                                      NLSSORT(STU.TEN, 'NLS_SORT = VIETNAMESE'), 'ngaySinh',
+                                      NLSSORT(STU.NGAY_SINH, 'NLS_SORT = BINARY_AI'), 'ngayNhapHoc',
+                                      NLSSORT(STU.NGAY_NHAP_HOC, 'NLS_SORT = BINARY_AI'), 'namTuyenSinh',
+                                      NLSSORT(STU.NAM_TUYEN_SINH, 'NLS_SORT = BINARY_AI'),
+                                      NLSSORT(STU.TEN, 'NLS_SORT = VIETNAMESE'))
+                           END ASC NULLS LAST,
+
+                       CASE
+                           WHEN sortMode = 'DESC' THEN
+                               DECODE(sortKey, 'mssv', NLSSORT(STU.MSSV, 'NLS_SORT = BINARY_AI'), 'ho',
+                                      NLSSORT(STU.HO, 'NLS_SORT = VIETNAMESE'), 'ten',
+                                      NLSSORT(STU.TEN, 'NLS_SORT = VIETNAMESE'), 'ngaySinh',
+                                      NLSSORT(STU.NGAY_SINH, 'NLS_SORT = BINARY_AI'), 'ngayNhapHoc',
+                                      NLSSORT(STU.NGAY_NHAP_HOC, 'NLS_SORT = BINARY_AI'), 'namTuyenSinh',
+                                      NLSSORT(STU.NAM_TUYEN_SINH, 'NLS_SORT = BINARY_AI'),
+                                      NLSSORT(STU.TEN, 'NLS_SORT = VIETNAMESE'))
+                           END DESC NULLS LAST)
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+
     RETURN STUDENT_INFO;
 end;
 
@@ -19633,7 +19595,7 @@ END ;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION TC_LOAI_PHI_GET_STATISTIC(filter IN STRING) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION TC_LOAI_PHI_GET_STATISTIC(filter IN STRING, daDong out SYS_REFCURSOR) RETURN SYS_REFCURSOR
 AS
     my_cursor    SYS_REFCURSOR;
     namHoc       NUMBER(10);
@@ -19656,98 +19618,133 @@ BEGIN
     SELECT JSON_VALUE(filter, '$.batDau') INTO batDau FROM DUAL;
     SELECT JSON_VALUE(filter, '$.ketThuc') INTO ketThuc FROM DUAL;
 
+    OPEN daDong for
+        select TD."loaiPhi", TD."soTien", TD."soLuong", LP.TEN as "ten"
+        from (SELECT sum(DT.SO_TIEN) as "soTien", count(DT.LOAI_PHI) as "soLuong", DT.LOAI_PHI as "loaiPhi"
+              from TC_HOC_PHI_DETAIL DT
+                       LEFT JOIN TC_HOC_PHI HP
+                                 on HP.MSSV = DT.MSSV and HP.NAM_HOC = DT.NAM_HOC and HP.HOC_KY = DT.HOC_KY
+                       LEFT JOIN FW_STUDENT FS on DT.MSSV = FS.MSSV
+              where DT.NAM_HOC = namHoc
+                and DT.HOC_KY = hocKy
+                and FS.NAM_TUYEN_SINH = namTuyenSinh
+                and HP.CONG_NO <= 0
+                AND FS.BAC_DAO_TAO = bac
+                AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
+                                             from dual
+                                             connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
+                AND (nganh is null or FS.MA_NGANH = nganh)
+              GROUP BY DT.LOAI_PHI) TD
+                 LEFT JOIN TC_LOAI_PHI LP on LP.ID = TD."loaiPhi";
 
     OPEN my_cursor for
-        SELECT LP.ID                                          as "id",
-               LP.TEN                                         AS "ten",
-               (SELECT sum(TD.SO_TIEN)
-                from TC_HOC_PHI_DETAIL TD
-                         LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
-                WHERE TD.LOAI_PHI = LP.ID
-                  and TD.NAM_HOC = namHoc
-                  and TD.HOC_KY = hocKy
-                  and FS.NAM_TUYEN_SINH = namTuyenSinh
-                  AND FS.BAC_DAO_TAO = bac
-                  AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
-                                               from dual
-                                               connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
-                  AND (nganh is null or FS.MA_NGANH = nganh)) as "soTienDuKien",
-
-               (SELECT count(*)
-                from TC_HOC_PHI_DETAIL TD
-                         LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
-                WHERE TD.LOAI_PHI = LP.ID
-                  and TD.NAM_HOC = namHoc
-                  and TD.HOC_KY = hocKy
-                  and FS.NAM_TUYEN_SINH = namTuyenSinh
-                  AND FS.BAC_DAO_TAO = bac
-                  AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
-                                               from dual
-                                               connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
-                  AND (nganh is null or FS.MA_NGANH = nganh)) as "soLuongDuKien",
-
-               (SELECT sum(TD.SO_TIEN)
-                from TC_HOC_PHI_DETAIL TD
-                         LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
-                         LEFT JOIN (select HP.MSSV,
-                                           HP.NAM_HOC,
-                                           HP.HOC_KY,
-                                           HP.CONG_NO,
-                                           TT.TRANS_DATE,
-                                           row_number() over (partition by HP.MSSV order by TT.TRANS_DATE DESC) as ROW_ID
-                                    from TC_HOC_PHI HP
-                                             LEFT JOIN TC_HOC_PHI_TRANSACTION TT
-                                                       on HP.MSSV = TT.CUSTOMER_ID and HP.NAM_HOC = TT.NAM_HOC and
-                                                          HP.HOC_KY = TT.HOC_KY
-                ) THP
-                                   on FS.MSSV = THP.MSSV AND TD.HOC_KY = THP.HOC_KY and THP.NAM_HOC = TD.NAM_HOC and
-                                      ROW_ID = 1
-                WHERE TD.LOAI_PHI = LP.ID
-                  and TD.NAM_HOC = namHoc
-                  and TD.HOC_KY = hocKy
-                  and FS.NAM_TUYEN_SINH = namTuyenSinh
-                  AND FS.BAC_DAO_TAO = bac
-                  AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
-                                               from dual
-                                               connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
-                  and THP.CONG_NO <= 0
-                  and (batDau is null or THP.TRANS_DATE >= batDau)
-                  and (ketThuc is null or THP.TRANS_DATE < ketThuc)
-                  AND (nganh is null or FS.MA_NGANH = nganh)) as "soTienDaDong",
-
-               (SELECT count(*)
-                from TC_HOC_PHI_DETAIL TD
-                         LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
-                         LEFT JOIN (select HP.MSSV,
-                                           HP.NAM_HOC,
-                                           HP.HOC_KY,
-                                           HP.CONG_NO,
-                                           TT.TRANS_DATE,
-                                           row_number() over (partition by HP.MSSV order by TT.TRANS_DATE DESC) as ROW_ID
-                                    from TC_HOC_PHI HP
-                                             LEFT JOIN TC_HOC_PHI_TRANSACTION TT
-                                                       on HP.MSSV = TT.CUSTOMER_ID and HP.NAM_HOC = TT.NAM_HOC and
-                                                          HP.HOC_KY = TT.HOC_KY
-                ) THP
-                                   on FS.MSSV = THP.MSSV AND TD.HOC_KY = THP.HOC_KY and THP.NAM_HOC = TD.NAM_HOC and
-                                      ROW_ID = 1
-                WHERE TD.LOAI_PHI = LP.ID
-                  and TD.NAM_HOC = namHoc
-                  and TD.HOC_KY = hocKy
-                  and FS.NAM_TUYEN_SINH = namTuyenSinh
-                  AND FS.BAC_DAO_TAO = bac
-                  AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
-                                               from dual
-                                               connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
-                  and THP.CONG_NO <= 0
-                  and (batDau is null or THP.TRANS_DATE >= batDau)
-                  and (ketThuc is null or THP.TRANS_DATE < ketThuc)
-                  AND (nganh is null or FS.MA_NGANH = nganh)) as "soLuongDaDong"
-        FROM TC_LOAI_PHI LP
-        WHERE LP.ID in (SELECT regexp_substr(loaiPhi, '[^,]+', 1, level)
-                        from dual
-                        connect by regexp_substr(loaiPhi, '[^,]+', 1, level) is NOT NULL)
-        ORDER BY LP.ID;
+        select TD."loaiPhi", TD."soTien", TD."soLuong", LP.TEN as "ten"
+        from (SELECT sum(DT.SO_TIEN) as "soTien", count(DT.LOAI_PHI) as "soLuong", DT.LOAI_PHI as "loaiPhi"
+              from TC_HOC_PHI_DETAIL DT
+                       LEFT JOIN TC_HOC_PHI HP
+                                 on HP.MSSV = DT.MSSV and HP.NAM_HOC = DT.NAM_HOC and HP.HOC_KY = DT.HOC_KY
+                       LEFT JOIN FW_STUDENT FS on DT.MSSV = FS.MSSV
+              where DT.NAM_HOC = namHoc
+                and DT.HOC_KY = hocKy
+                and FS.NAM_TUYEN_SINH = namTuyenSinh
+                AND FS.BAC_DAO_TAO = bac
+                AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
+                                             from dual
+                                             connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
+                AND (nganh is null or FS.MA_NGANH = nganh)
+              GROUP BY DT.LOAI_PHI) TD
+                 LEFT JOIN TC_LOAI_PHI LP on LP.ID = TD."loaiPhi";
+    --         LEFT JOIN FW_STUDENT FS on DT.MSSV = FS.MSSV
+    --         SELECT LP.ID                                          as "id",
+--                LP.TEN                                         AS "ten",
+--                (SELECT sum(TD.SO_TIEN)
+--                 from TC_HOC_PHI_DETAIL TD
+--                          LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
+--                 WHERE TD.LOAI_PHI = LP.ID
+--                   and TD.NAM_HOC = namHoc
+--                   and TD.HOC_KY = hocKy
+--                   and FS.NAM_TUYEN_SINH = namTuyenSinh
+--                   AND FS.BAC_DAO_TAO = bac
+--                   AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
+--                                                from dual
+--                                                connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
+--                   AND (nganh is null or FS.MA_NGANH = nganh)) as "soTienDuKien",
+--
+--                (SELECT count(*)
+--                 from TC_HOC_PHI_DETAIL TD
+--                          LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
+--                 WHERE TD.LOAI_PHI = LP.ID
+--                   and TD.NAM_HOC = namHoc
+--                   and TD.HOC_KY = hocKy
+--                   and FS.NAM_TUYEN_SINH = namTuyenSinh
+--                   AND FS.BAC_DAO_TAO = bac
+--                   AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
+--                                                from dual
+--                                                connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
+--                   AND (nganh is null or FS.MA_NGANH = nganh)) as "soLuongDuKien",
+--
+--                (SELECT sum(TD.SO_TIEN)
+--                 from TC_HOC_PHI_DETAIL TD
+--                          LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
+--                          LEFT JOIN (select HP.MSSV,
+--                                            HP.NAM_HOC,
+--                                            HP.HOC_KY,
+--                                            HP.CONG_NO,
+--                                            TT.TRANS_DATE,
+--                                            row_number() over (partition by HP.MSSV order by TT.TRANS_DATE DESC) as ROW_ID
+--                                     from TC_HOC_PHI HP
+--                                              LEFT JOIN TC_HOC_PHI_TRANSACTION TT
+--                                                        on HP.MSSV = TT.CUSTOMER_ID and HP.NAM_HOC = TT.NAM_HOC and
+--                                                           HP.HOC_KY = TT.HOC_KY
+--                 ) THP
+--                                    on FS.MSSV = THP.MSSV AND TD.HOC_KY = THP.HOC_KY and THP.NAM_HOC = TD.NAM_HOC and
+--                                       ROW_ID = 1
+--                 WHERE TD.LOAI_PHI = LP.ID
+--                   and TD.NAM_HOC = namHoc
+--                   and TD.HOC_KY = hocKy
+--                   and FS.NAM_TUYEN_SINH = namTuyenSinh
+--                   AND FS.BAC_DAO_TAO = bac
+--                   AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
+--                                                from dual
+--                                                connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
+--                   and THP.CONG_NO <= 0
+--                   and (batDau is null or THP.TRANS_DATE >= batDau)
+--                   and (ketThuc is null or THP.TRANS_DATE < ketThuc)
+--                   AND (nganh is null or FS.MA_NGANH = nganh)) as "soTienDaDong",
+--
+--                (SELECT count(*)
+--                 from TC_HOC_PHI_DETAIL TD
+--                          LEFT JOIN FW_STUDENT FS on TD.MSSV = FS.MSSV
+--                          LEFT JOIN (select HP.MSSV,
+--                                            HP.NAM_HOC,
+--                                            HP.HOC_KY,
+--                                            HP.CONG_NO,
+--                                            TT.TRANS_DATE,
+--                                            row_number() over (partition by HP.MSSV order by TT.TRANS_DATE DESC) as ROW_ID
+--                                     from TC_HOC_PHI HP
+--                                              LEFT JOIN TC_HOC_PHI_TRANSACTION TT
+--                                                        on HP.MSSV = TT.CUSTOMER_ID and HP.NAM_HOC = TT.NAM_HOC and
+--                                                           HP.HOC_KY = TT.HOC_KY
+--                 ) THP
+--                                    on FS.MSSV = THP.MSSV AND TD.HOC_KY = THP.HOC_KY and THP.NAM_HOC = TD.NAM_HOC and
+--                                       ROW_ID = 1
+--                 WHERE TD.LOAI_PHI = LP.ID
+--                   and TD.NAM_HOC = namHoc
+--                   and TD.HOC_KY = hocKy
+--                   and FS.NAM_TUYEN_SINH = namTuyenSinh
+--                   AND FS.BAC_DAO_TAO = bac
+--                   AND FS.LOAI_HINH_DAO_TAO in (SELECT regexp_substr(loaiHinh, '[^,]+', 1, level)
+--                                                from dual
+--                                                connect by regexp_substr(loaiHinh, '[^,]+', 1, level) is NOT NULL)
+--                   and THP.CONG_NO <= 0
+--                   and (batDau is null or THP.TRANS_DATE >= batDau)
+--                   and (ketThuc is null or THP.TRANS_DATE < ketThuc)
+--                   AND (nganh is null or FS.MA_NGANH = nganh)) as "soLuongDaDong"
+--         FROM TC_LOAI_PHI LP
+--         WHERE LP.ID in (SELECT regexp_substr(loaiPhi, '[^,]+', 1, level)
+--                         from dual
+--                         connect by regexp_substr(loaiPhi, '[^,]+', 1, level) is NOT NULL)
+--         ORDER BY LP.ID;
     return my_cursor;
 END;
 
@@ -19774,19 +19771,14 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION UTILS_CHECK_SPLIT(colValue IN VARCHAR2, fullString IN STRING) RETURN NUMBER IS
-    RESULT NUMBER;
+CREATE OR REPLACE FUNCTION UTILS_SPLIT_FILTER(INPUT IN STRING) RETURN VARCHAR2
+    IS OUTPUT VARCHAR2(500);
 BEGIN
-    CASE
-        WHEN (fullString IS NULL OR colValue IN (SELECT regexp_substr(fullString, '[^,]+', 1, level)
-                                                 from dual
-                                                 connect by regexp_substr(fullString, '[^,]+', 1, level) is not null))
-            THEN RESULT := 1;
-        ELSE RESULT := 0;
-        END CASE;
-    RETURN RESULT;
-
-end UTILS_CHECK_SPLIT;
+        SELECT regexp_substr(INPUT, '[^,]+', 1, level) INTO OUTPUT
+                                      from dual
+                                      connect by regexp_substr(INPUT, '[^,]+', 1, level) is not null;
+    RETURN OUTPUT;
+end;
 
 /
 --EndMethod--
