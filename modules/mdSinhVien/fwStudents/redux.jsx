@@ -6,9 +6,11 @@ const sinhVienGetPage = 'sinhVien:GetPage';
 const sinhVienUpdate = 'sinhVien:Update';
 const sinhVienUserGet = 'sinhVien:UserGet';
 const sinhVienGetEditPage = 'sinhVien:GetEditPage';
-
+const sinhVienSetNull = 'sinhVien:SetNull';
 export default function sinhVienReducer(state = null, data) {
     switch (data.type) {
+        case sinhVienSetNull:
+            return Object.assign({}, state, { page: { ...data.page, list: null } });
         case sinhVienGetAll:
             return Object.assign({}, state, { items: data.items });
         case sinhVienGetPage:
@@ -51,11 +53,12 @@ export default function sinhVienReducer(state = null, data) {
 
 //Admin -----------------------------------------------------------------------------------------------------
 T.initPage('pageStudentsAdmin');
-export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, done) {
+export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, sortTerm, done) {
     const page = T.updatePage('pageStudentsAdmin', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
+        dispatch({ type: sinhVienSetNull });
         const url = `/api/students/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, result => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter, sortTerm }, result => {
             if (result.error) {
                 T.notify('Lấy danh sách sinh viên, học sinh bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, result.error);

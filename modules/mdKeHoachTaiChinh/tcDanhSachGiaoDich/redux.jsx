@@ -82,3 +82,20 @@ export function createGiaoDich(data, done) {
         }, () => T.notify('Tạo giao dịch lỗi', 'danger'));
     };
 }
+
+export function cancelGiaoDich(data, done) {
+    return dispatch => {
+        const url = '/api/finance/danh-sach-giao-dich/huy';
+        T.post(url, data, res => {
+            if (res.error) {
+                T.notify('Hủy giao dịch lỗi. ' + (res.error.message && typeof res.error.message === 'string' ? res.error.message : ''), 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            }
+            else {
+                T.notify('Hủy giao dịch thành công', 'success');
+                dispatch(getTongGiaoDichPage());
+                done && done(res.items);
+            }
+        }, () => T.notify('Hủy giao dịch lỗi', 'danger'));
+    };
+}
