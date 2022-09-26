@@ -8,6 +8,7 @@ import InputMask from 'react-input-mask';
 import NumberFormat from 'react-number-format';
 import 'react-datetime/css/react-datetime.css';
 import Tooltip from '@mui/material/Tooltip';
+import { SpeedDial, SpeedDialAction } from '@mui/material';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
@@ -120,6 +121,88 @@ export class TableHeader extends React.Component {
     }
 }
 
+export class TableHead extends React.Component {
+    changeSort = (key) => {
+        let cur = $(`#${key}`).attr('aria-sort'), sortTerm = '';
+        $(`.table-head:not(#${key})`).attr('aria-sort', 'none');
+        switch (cur) {
+            case null || 'none':
+                $(`#${key}`).attr('aria-sort', 'descending');
+                sortTerm = key + '_DESC';
+                break;
+            case 'descending':
+                $(`#${key}`).attr('aria-sort', 'ascending');
+                sortTerm = key + '_ASC';
+                break;
+            case 'ascending':
+                $(`#${key}`).attr('aria-sort', 'none');
+                sortTerm = null;
+                break;
+        }
+        this.props.onClick && this.props.onClick(sortTerm);
+    }
+    render() {
+        const { content = '', keyCol = '', style = {} } = this.props;
+        return <th className='table-head' id={keyCol} aria-sort='none' onClick={e => e.preventDefault() || this.changeSort(keyCol)} style={{ minWidth: '200px', maxWidth: '200px', ...style }}>
+            <div>{content}</div>
+            <span />
+        </th>;
+    }
+}
+
+export function renderDataTable({
+    data = [], style = {}, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = true, loadingOverlay = true, loadingClassName = '', loadingStyle = {}, className = '', renderHead = () => null, renderRow = () => null,
+}) {
+    const loadSpinner = <div className={(loadingOverlay ? 'overlay' : '') + loadingClassName} style={{ minHeight: '120px', ...loadingStyle }}>
+        <div className='m-loader mr-4'>
+            <svg className='m-circular' viewBox='25 25 50 50'>
+                <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+            </svg>
+        </div>
+        <h3 className='l-text'>{loadingText}</h3>
+    </div>;
+    const table = (
+        <table className={'table table-hover table-bordered table-responsive ' + className} style={{ margin: 0, ...style }}>
+            <thead className='thead-light'>{renderHead()}</thead>
+            <tbody>{!data ? loadSpinner : data.length ? (typeof renderRow == 'function' ? data.map(renderRow) : renderRow) : emptyTable}</tbody>
+        </table>
+    );
+    const properties = {};
+    if (stickyHead) {
+        properties.className = 'tile-table-fix-head';
+    } else {
+        properties.style = { marginBottom: 8 };
+    }
+    return <div {...properties}>{table}</div>;
+
+    // if (data == null) {
+    //     return (
+    //         <div className={(loadingOverlay ? 'overlay' : '') + loadingClassName} style={{ minHeight: '120px', ...loadingStyle }}>
+    //             <div className='m-loader mr-4'>
+    //                 <svg className='m-circular' viewBox='25 25 50 50'>
+    //                     <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+    //                 </svg>
+    //             </div>
+    //             <h3 className='l-text'>{loadingText}</h3>
+    //         </div>);
+    // } else if (data.length) {
+    //     const table = (
+    //         <table className={'table table-hover table-bordered table-responsive ' + className} style={{ margin: 0, ...style }}>
+    //             <thead className='thead-light'>{renderHead()}</thead>
+    //             <tbody>{data.length && (typeof renderRow == 'function' ? data.map(renderRow) : renderRow)}</tbody>
+    //         </table>
+    //     );
+    //     const properties = {};
+    //     if (stickyHead) {
+    //         properties.className = 'tile-table-fix-head';
+    //     } else {
+    //         properties.style = { marginBottom: 8 };
+    //     }
+    //     return <div {...properties}>{table}</div>;
+    // } else {
+    //     return <b>{emptyTable}</b>;
+    // }
+}
 export function renderTable({
     style = {}, className = '', getDataSource = () => null, loadingText = 'Đang tải...', emptyTable = 'Chưa có dữ liệu!', stickyHead = false,
     renderHead = () => null, renderRow = () => null, header = 'thead-dark', loadingOverlay = true, loadingClassName = '', loadingStyle = {}, multipleTbody = false
@@ -1011,10 +1094,43 @@ export class AdminPage extends React.Component {
         $(this.advanceSearchBox).addClass('hide');
     }
 
-
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, advanceSearchTitle = 'Tìm kiếm nâng cao', content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, advanceSearchTitle = 'Tìm kiếm nâng cao', content, backRoute, onCreate, onSave, onExport, onImport, buttons = null, collapse = null }) => {
         T.title(title);
-        let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
+
+        const typeMapper = {
+            'info': {
+                color: 'white', backgroundColor: 'info.main', '&:hover': {
+                    color: 'info.main',
+                    backgroundColor: 'white',
+                },
+            },
+            'primary': {
+                color: 'white', backgroundColor: 'primary.main', '&:hover': {
+                    color: 'primary.main',
+                    backgroundColor: 'white',
+                },
+            },
+            'success': {
+                color: 'white', backgroundColor: 'success.main', '&:hover': {
+                    color: 'success.main',
+                    backgroundColor: 'white',
+                },
+            },
+            'warning': {
+                color: 'black', backgroundColor: 'warning.main', '&:hover': {
+                    color: 'warning.main',
+                    backgroundColor: 'black',
+                },
+            },
+            'danger': {
+                color: 'white', backgroundColor: 'error.main', '&:hover': {
+                    color: 'error.main',
+                    backgroundColor: 'white',
+                },
+            },
+        };
+
+        let right = 10, createButton, saveButton, exportButton, importButton, customButtons, collapseButtons;
         if (onCreate) {
             createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới' />;
             right += 60;
@@ -1047,6 +1163,24 @@ export class AdminPage extends React.Component {
             }
         }
 
+        if (!onCreate && !onSave && !onExport && !onImport && !buttons && collapse && collapse.length && collapse.some(action => action.permission)) {
+            collapseButtons = <SpeedDial
+                className='collapsant'
+                ariaLabel='Công cụ'
+                icon={<i className='fa fa-2x fa-wrench' />}
+            >
+                {collapse.map(action => (
+                    action.permission && <SpeedDialAction
+                        sx={Object.assign({}, typeMapper[action.type], action.style || {})}
+                        key={action.name}
+                        icon={<i className={'fa fa-lg ' + action.icon} />}
+                        tooltipTitle={action.name}
+                        onClick={action.onClick}
+                    />
+                ))}
+            </SpeedDial>;
+        }
+
         return (
             <main className='app-content'>
                 <div className='app-title'>
@@ -1066,7 +1200,7 @@ export class AdminPage extends React.Component {
                 </div>
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
-                {importButton} {exportButton} {saveButton} {createButton} {customButtons}
+                {importButton} {exportButton} {saveButton} {createButton} {customButtons} {collapseButtons}
             </main>);
     }
 

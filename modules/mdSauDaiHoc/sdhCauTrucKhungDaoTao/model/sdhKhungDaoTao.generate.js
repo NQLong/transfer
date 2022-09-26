@@ -1,6 +1,6 @@
-// Table name: SDH_KHUNG_DAO_TAO { namDaoTao, maKhoa, maNganh, tenNganh, trinhDoDaoTao, bacDaoTao, thoiGianDaoTao, tenVanBang, userModified, lastModified, mucTieu, id }
+// Table name: SDH_KHUNG_DAO_TAO { namDaoTao, maKhoa, maNganh, tenNganh, trinhDoDaoTao, bacDaoTao, thoiGianDaoTao, tenVanBang, userModified, lastModified, mucTieu, id, soHocKy }
 const keys = ['ID'];
-const obj2Db = { 'namDaoTao': 'NAM_DAO_TAO', 'maKhoa': 'MA_KHOA', 'maNganh': 'MA_NGANH', 'tenNganh': 'TEN_NGANH', 'trinhDoDaoTao': 'TRINH_DO_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO', 'thoiGianDaoTao': 'THOI_GIAN_DAO_TAO', 'tenVanBang': 'TEN_VAN_BANG', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'mucTieu': 'MUC_TIEU', 'id': 'ID' };
+const obj2Db = { 'namDaoTao': 'NAM_DAO_TAO', 'maKhoa': 'MA_KHOA', 'maNganh': 'MA_NGANH', 'tenNganh': 'TEN_NGANH', 'trinhDoDaoTao': 'TRINH_DO_DAO_TAO', 'bacDaoTao': 'BAC_DAO_TAO', 'thoiGianDaoTao': 'THOI_GIAN_DAO_TAO', 'tenVanBang': 'TEN_VAN_BANG', 'userModified': 'USER_MODIFIED', 'lastModified': 'LAST_MODIFIED', 'mucTieu': 'MUC_TIEU', 'id': 'ID', 'soHocKy': 'SO_HOC_KY' };
 
 module.exports = app => {
     app.model.sdhKhungDaoTao = {

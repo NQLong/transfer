@@ -25,24 +25,23 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
     listMonHocChosen = []
 
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/chuong-trinh-dao-tao', () => {
-            const route = T.routeMatcher('/user/sau-dai-hoc/chuong-trinh-dao-tao/:ma');
-            this.ma = route.parse(window.location.pathname)?.ma;
-            this.setState({ isLoading: false });
-            const query = new URLSearchParams(this.props.location.search);
-            const id = query.get('id');
-            const khoaSdh = query.get('khoaSdh');
-            if (this.ma !== 'new') {
-                this.getData(this.ma);
-            } else {
-                if (id >= 0 && khoaSdh >= 0) {
-                    this.getData(id, true, khoaSdh);
-                    return;
-                }
-                this.maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
-                this.khoa.value(this.maKhoa == 37 ? '' : this.maKhoa);
+        T.ready('/user/sau-dai-hoc');
+        const route = T.routeMatcher('/user/sau-dai-hoc/chuong-trinh-dao-tao/:ma');
+        this.ma = route.parse(window.location.pathname)?.ma;
+        this.setState({ isLoading: false });
+        const query = new URLSearchParams(this.props.location.search);
+        const id = query.get('id');
+        const khoaSdh = query.get('khoaSdh');
+        if (this.ma !== 'new') {
+            this.getData(this.ma);
+        } else {
+            if (id >= 0 && khoaSdh >= 0) {
+                this.getData(id, true, khoaSdh);
+                return;
             }
-        });
+            this.maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
+            this.khoa.value(this.maKhoa == 37 ? '' : this.maKhoa);
+        }
     }
 
     pushMonHocChosen = (maMonHoc) => {
@@ -267,7 +266,7 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
                     })
                 }
                 {this.ma && <CirclePageButton type='custom' tooltip='Tải về chương trình đào tạo' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '60px' }} onClick={(e) => this.downloadWord(e)} />}
-                {this.ma && 
+                {this.ma &&
                     <Tooltip title={'Kế hoạch đào tạo'} arrow placement='top'>
                         <Link type='button' to={`/user/sau-dai-hoc/ke-hoach-dao-tao/${this.ma}`} className='btn btn-info btn-circle' style={{ zIndex: 100, position: 'fixed', right: '130px', bottom: '10px', color: 'white' }}>
                             <i className='fa fa-lg fa-list' />

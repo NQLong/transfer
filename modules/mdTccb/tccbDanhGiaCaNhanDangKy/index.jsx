@@ -11,11 +11,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/ca-nhan-dang-ky',
+            path: '/user/danh-gia/ca-nhan-dang-ky',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/tccb/ca-nhan-dang-ky/:nam',
+            path: '/user/danh-gia/ca-nhan-dang-ky/:nam',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
         }
     ],

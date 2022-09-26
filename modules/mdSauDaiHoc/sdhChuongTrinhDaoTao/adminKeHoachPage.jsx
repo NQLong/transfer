@@ -1,245 +1,316 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getSdhChuongTrinhDaoTao, SelectAdapter_CtDtFilterByKhungDt, updateSdhChuongTrinhDaoTao } from './redux';
-import { AdminPage, renderTable, TableCell, FormSelect, AdminModal } from 'view/component/AdminPage';
+import { getSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, getSdhKhungDaoTao, updateSdhChuongTrinhDaoTaoMulti, updateKhungDaoTao } from './redux';
+import { AdminPage, renderTable, TableCell, FormSelect, AdminModal, FormTextBox } from 'view/component/AdminPage';
+import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const data = [
-    { id: 1, text: 'Học kì 1' },
-    { id: 2, text: 'Học kì 2' },
-    { id: 3, text: 'Học kì 3' },
-    { id: 4, text: 'Học kì 4' }
-];
+const dataThu = [2, 3, 4, 5, 6, 7];
 
-class HocKyModal extends AdminModal {
+class EditMonModal extends AdminModal {
+    onShow = (item) => {
+        this.id = item.id;
+        this.hocKy = item.hocKy;
+        this.thu.value(item.thu);
+        this.tietBatDau.value(item.tietBatDau);
+    }
     onSubmit = (e) => {
         e.preventDefault();
-        if (!this.hocKy.value()) {
-            T.notify('Chưa chọn học kì', 'danger');
-            this.hocKy.focus();
-        } else {
-            this.props.addNewHocKy(this.hocKy.value());
-            this.hide();
-        }
+        const id = this.id,
+            hocKy = this.hocKy;
+        const thu = this.thu.value(),
+            tietBatDau = this.tietBatDau.value();
+        const changes = { hocKy: hocKy, thu: thu, tietBatDau: tietBatDau };
+        this.props.updateMonHoc(id, changes);
+        this.hide();
     };
 
     render = () => {
         return this.renderModal({
-            title: 'Tạo mới học kì',
-            submitText: 'Tạo mới',
+            title: 'Chỉnh sửa thông tin môn học',
+            submitText: 'Xác nhận',
             body: <div>
-                <FormSelect ref={e => this.hocKy = e} label='Khóa đào tạo' data={data} required />
+                <FormSelect ref={e => this.thu = e} label='Thứ' data={dataThu} allowClear />
+                <FormTextBox type='number' ref={e => this.tietBatDau = e} label='Tiết bắt đầu' allowClear />
+            </div>
+        });
+    }
+}
+class HocKyModal extends AdminModal {
+    onShow = (item) => {
+        $(`#mon${item.id}`).prop('checked', true);
+        this.props.handleSelected(item, true);
+        this.setState({ data: item });
+        this.hocKy.value('');
+    }
+    onSubmit = (e) => {
+        e.preventDefault();
+        let idlist = this.props.id;
+        this.props.updateMonHocMulti(idlist, { hocKy: this.hocKy.value() });
+        this.hide();
+    };
+
+    render = () => {
+        return this.renderModal({
+            title: 'Chọn học kỳ',
+            submitText: 'Xác nhận',
+            body: <div>
+                <FormSelect ref={e => this.hocKy = e} label='Học kỳ' data={this.props.dataHocKy} allowClear />
             </div>
         });
     }
 }
 
+class CreateModal extends AdminModal {
+    onShow = (soHocKy) => {
+        const route = T.routeMatcher('/user/sau-dai-hoc/ke-hoach-dao-tao/:ma'),
+            ma = route.parse(window.location.pathname)?.ma;
+        this.oldTerm = soHocKy;
+        this.ma = ma;
+        this.soHocKy.value('');
+    }
+    onSubmit = (e) => {
+        e.preventDefault();
+        const newTerm = this.soHocKy.value() + this.oldTerm;
+        const maKhung = parseInt(this.ma);
+        this.props.updateKhungDaoTao(maKhung, { soHocKy: newTerm }, () => this.props.getData(maKhung));
+        this.hide();
+    };
+
+    render = () => {
+        return this.renderModal({
+            title: 'Thêm mới học kì',
+            submitText: 'Xác nhận',
+            body: <div>
+                <FormTextBox type='number' ref={e => this.soHocKy = e} label='Số học kỳ' />
+            </div>
+        });
+    }
+}
 class SdhKeHoachDaoTaoDetails extends AdminPage {
     state = {
         chuongTrinhDaoTao: {},
-        ctsdh: []
+        ctsdh: [],
+        freeList: [],
+        dataHocKy: [],
+        selected: []
     };
     rows = {};
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/chuong-trinh-dao-tao', () => {
-            const route = T.routeMatcher('/user/sau-dai-hoc/ke-hoach-dao-tao/:ma'),
-                ma = route.parse(window.location.pathname)?.ma;
-            this.getData(ma);
+        T.ready('/user/sau-dai-hoc');
+        const route = T.routeMatcher('/user/sau-dai-hoc/ke-hoach-dao-tao/:ma'),
+            ma = route.parse(window.location.pathname)?.ma;
+        this.setState({ ma: parseInt(ma) });
+        this.getData(parseInt(ma));
+    }
+
+    componentDidUpdate() {
+        $('.draggable tbody, .droppable tbody').draggable({
+            helper: 'clone',
+            containment: 'body',
+            cursor: 'grabbing',
+            scroll: false,
+            backgroundColor: null,
+            zIndex: 99999,
+        });
+
+        $('.droppable').droppable({
+            accept: 'tbody',
+            drop: (event, ui) => {
+                try {
+                    const id = parseInt(ui.draggable.attr('idmon'));
+                    const currHocKy = ui.draggable.attr('hocky');
+                    const targetHocKy = parseInt(event.target.getAttribute('hocky'));
+                    if (currHocKy && parseInt(currHocKy) != targetHocKy) {
+                        this.updateMonHoc(id, { hocKy: targetHocKy });
+                    }
+                    else if (!currHocKy) {
+                        let currSelected = this.state.selected;
+                        const index = currSelected.indexOf(id);
+                        index == -1 ? currSelected.push(id) : null;
+                        this.setState({ selected: currSelected });
+                        const idlist = [...this.state.selected];
+                        this.updateMonHocMulti(idlist, { hocKy: targetHocKy });
+                    }
+                    else null;
+                } catch (error) {
+                    console.error(error);
+                }
+
+            }
         });
     }
 
     getData = (ma) => {
+        this.setState({ selected: [] });
+        $(':checkbox').prop('checked', false);
         this.props.getSdhChuongTrinhDaoTao(ma, (ctsdh) => {
             let chuongTrinhDaoTao = {};
+            let freeList = [];
             ctsdh.forEach((item, index) => {
                 if (item.hocKy) {
                     if (!chuongTrinhDaoTao[item.hocKy]) {
                         chuongTrinhDaoTao[item.hocKy] = [];
                     }
-                    item.isEdit = false;
-                    item.isDelete = false;
-                    item.idx = index;
                     chuongTrinhDaoTao[item.hocKy].push(item);
                 }
+                else {
+                    item.idx = index;
+                    freeList.push(item);
+                }
             });
-            this.setState({ ma, ctsdh, chuongTrinhDaoTao });
+            this.setState({ ma, ctsdh, chuongTrinhDaoTao, freeList });
+        });
+        this.props.getSdhKhungDaoTao(ma, result => {
+            const soHocKy = result.soHocKy;
+            let data = [];
+            for (let i = 1; i <= soHocKy; i++)
+                data.push({ id: i, text: `Học kỳ ${i}` });
+            this.setState({ dataHocKy: data });
         });
     }
 
     createHocKy = (e) => {
         e.preventDefault();
-        this.modal.show();
+        this.createModal.show(this.state.dataHocKy.length);
     }
 
-    addHocKy = (hocKy) => {
-        let chuongTrinhDaoTao = this.state.chuongTrinhDaoTao;
-        if (chuongTrinhDaoTao[hocKy]) {
-            T.notify('Đã có học kì ' + hocKy, 'danger');
-        } else {
-            chuongTrinhDaoTao[hocKy] = [];
-            this.setState({ chuongTrinhDaoTao });
-        }
+    updateMonHoc = (id, changes) => {
+        this.props.updateSdhChuongTrinhDaoTao(id, { hocKy: changes.hocKy, thu: changes.thu, tietBatDau: changes.tietBatDau }, () => this.getData(this.state.ma));
+    }
+    updateMonHocMulti = (id, changes) => {
+        this.props.updateSdhChuongTrinhDaoTaoMulti(id, changes, () => this.getData(this.state.ma));
     }
 
-    findCtdtById = (id) => {
-        let ctsdh = this.state.ctsdh,
-            result = ctsdh.findIndex(v => v.id == id);
-        return result;
-    }
-
-    addRow = (e, hocKy) => {
-        e.preventDefault();
-        let id = this.rows[`selectMh_${hocKy}`].value(),
-            chuongTrinhDaoTao = this.state.chuongTrinhDaoTao,
-            ctsdh = this.state.ctsdh;
-        if (!id) {
-            T.notify('Chưa chọn môn học!', 'danger');
-            this.rows[`selectMh_${hocKy}`].focus();
-        } else {
-            let index = this.findCtdtById(id);
-            if (ctsdh[index].hocKy) {
-                T.notify(`Trùng môn học ${ctsdh[index].maMonHoc}:${ctsdh[index].tenMonHoc}!`, 'danger');
-            } else this.props.updateSdhChuongTrinhDaoTao(id, { hocKy }, (item) => {
-                item.isEdit = false;
-                item.isDelete = false;
-                chuongTrinhDaoTao[hocKy].push(item);
-                if (index != -1) ctsdh[index].hocKy = Number(hocKy);
-                this.setState({ chuongTrinhDaoTao, ctsdh });
-            });
-        }
-
-    }
-
-    editRow = (e, hocKy, index) => {
-        e.preventDefault();
-        let chuongTrinhDaoTao = this.state.chuongTrinhDaoTao;
-        chuongTrinhDaoTao[hocKy][index].isEdit = true;
-        this.setState({ chuongTrinhDaoTao }, () => {
-            let item = chuongTrinhDaoTao[hocKy][index];
-            this.rows[`selectMh_${hocKy}_${index}`].value({ id: item.id, text: item.maMonHoc + ':' + item.tenMonHoc });
-        });
-    }
-
-    updateRow = (e, hocKy, index) => {
-        e.preventDefault();
-        let chuongTrinhDaoTao = this.state.chuongTrinhDaoTao,
-            ctsdh = this.state.ctsdh,
-            oldItem = chuongTrinhDaoTao[hocKy][index],
-            newId = this.rows[`selectMh_${hocKy}_${index}`].value();
-        if (!newId) {
-            T.notify('Chưa chọn môn học!', 'danger');
-            this.this.rows[`selectMh_${hocKy}_${index}`].focus();
-        } else {
-            let ctIndex = this.findCtdtById(newId);
-            if (ctsdh[ctIndex].hocKy) {
-                let hkIndex = chuongTrinhDaoTao[hocKy].findIndex(v => v.id == ctsdh[ctIndex].id);
-                if (hkIndex != -1 && hkIndex == index) {
-                    chuongTrinhDaoTao[hocKy][index].isEdit = false;
-                    this.setState({ chuongTrinhDaoTao });
-                } else T.notify(`Trùng môn học ${ctsdh[ctIndex].maMonHoc}:${ctsdh[ctIndex].tenMonHoc}!`, 'danger');
-            } else {
-                this.props.updateSdhChuongTrinhDaoTao(oldItem.id, { hocKy: null }, () => {
-                    this.props.updateSdhChuongTrinhDaoTao(newId, { hocKy }, (item) => {
-                        item.isEdit = false;
-                        item.isDelete = false;
-                        chuongTrinhDaoTao[hocKy][index] = item;
-                        if (ctIndex != -1) ctsdh[ctIndex].hocKy = Number(hocKy);
-                        this.setState({ chuongTrinhDaoTao, ctsdh });
-                    });
+    handleSelected = (item, flag) => {
+        let currSelected = this.state.selected;
+        if (!item) {
+            if (!flag) {
+                $(':checkbox').prop('checked', false);
+                currSelected = [];
+                this.setState({ selected: currSelected });
+            }
+            else {
+                $('.monselected').prop('checked', true);
+                this.state.freeList.forEach(item => {
+                    const index = currSelected.indexOf(item.id);
+                    index == -1 && currSelected.push(item.id);
                 });
+                this.setState({ selected: currSelected });
             }
         }
+        else {
+            const id = item.id;
+            const index = currSelected.indexOf(id);
+            flag ? (index == -1 && currSelected.push(id)) : (index != -1 && currSelected.splice(index, 1));
+            this.setState({ selected: currSelected });
+            if (currSelected.length == this.state.freeList.length)
+                $('#checkall').prop('checked', true);
+            else
+                $('#checkall').prop('checked', false);
+        }
+
     }
 
-    removeRow = (e, id, hocKy, index) => {
-        e.preventDefault();
-        let chuongTrinhDaoTao = this.state.chuongTrinhDaoTao,
-            ctsdh = this.state.ctsdh;
-        this.props.updateSdhChuongTrinhDaoTao(id, { hocKy: null }, () => {
-            chuongTrinhDaoTao[hocKy].splice(index, 1);
-            let ctIndex = this.findCtdtById(id);
-            if (ctIndex != -1) ctsdh[ctIndex].hocKy = null;
-            this.setState({ chuongTrinhDaoTao, ctsdh });
-        });
-    }
-
-    selectMh = (item, hocKy, index) => {
-        return (item && item.isEdit) || !item ? (
-            <>
-                <FormSelect ref={e => this.rows[`selectMh_${hocKy}${index != null ? '_' + index : ''}`] = e} data={SelectAdapter_CtDtFilterByKhungDt(this.state.ma)} style={{ marginBottom: 0 }} placeholder='Chọn môn học' readOnly={item ? !item.isEdit : false} />
-            </>
-        ) : <>{item.maMonHoc + ':' + item.tenMonHoc}</>;
-    }
-
-    renderTable = (list, hocKy, isAddMonHoc) => {
-        const permission = this.getUserPermission('sdhChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']),
-            readOnly = !(permission.write || permission.manage);
-        if (isAddMonHoc && list.length == 0) list.push('new');
+    renderTable2 = (list) => {
+        const permission = this.getUserPermission('sdhChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         return renderTable({
-            getDataSource: () => list.sort((a, b) => a.id - b.id),
+            getDataSource: () => list ? list : [],
             stickyHead: false,
+            className: 'hocKy',
             header: 'thead-light',
-            emptyTable: 'Không có dữ liệu',
+            emptyTable: 'Chưa có môn học được xếp',
             renderHead: () => (
                 <>
                     <tr>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>STT</th>
-                        <th rowSpan='2' style={{ width: '100%', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Môn học</th>
-                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Tự chọn</th>
-                        <th rowSpan='1' colSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Tín chỉ</th>
-                        {isAddMonHoc && !readOnly && <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>}
-                    </tr>
-                    <tr>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
+                        <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>#</th>
+                        <th style={{ width: '100%', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Môn học</th>
+                        <th style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Thứ</th>
+                        <th style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Tiết bắt đầu</th>
+                        <th style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center', }}>Thao tác</th>
                     </tr>
                 </>),
+            multipleTbody: true,
             renderRow: (item, index) => {
                 return (
-                    <React.Fragment key={index}>
-                        {item != 'new' && <tr>
+                    <tbody idmon={item.id} hocky={item.hocKy}>
+                        <tr>
+                            <TableCell style={{ textAlign: 'center' }} content={index + 1} />
+                            <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }} content={
+                                <Tooltip title={item.tenMonHoc} arrow placeholder='bottom'>
+                                    <div>{item.maMonHoc}</div>
+                                </Tooltip>} />
+                            <TableCell style={{ textAlign: 'center', }} content={item.thu ? item.thu : ''} />
+                            <TableCell style={{ textAlign: 'center', }} content={item.tietBatDau ? item.tietBatDau : ''} />
+                            <TableCell style={{ textAlign: 'center', }} type='buttons' content={item} permission={permission}>
+                                <Tooltip title='Chỉnh sửa' arrow placeholder='bottom' >
+                                    <a className='btn btn-info' href='#' onClick={() => {
+                                        this.monModal.show(item);
+                                    }}><i className='fa fa-lg fa-pencil' /></a>
+                                </Tooltip>
+                                <Tooltip title='Xóa khỏi học kỳ' arrow placeholder='bottom' >
+                                    <a className='btn btn-secondary' href='#' onClick={e => e.preventDefault() || this.updateMonHoc(item.id, { hocKy: '', thu: '', tietBatDau: '' })}><i className='fa fa-lg  fa-minus-circle' /></a>
+                                </Tooltip >
+                            </TableCell>
+
+                        </tr>
+                    </tbody>
+
+                );
+            },
+        });
+    }
+
+    renderTable = (list) => {
+        return renderTable({
+            getDataSource: () => list ? list : [],
+            stickyHead: true,
+            className: 'listMon',
+            header: 'thead-light',
+            emptyTable: 'Tất cả các môn học đã được xếp',
+            renderHead: () => (
+                <>
+                    <tr>
+                        <th style={{ width: 'auto', verticalAlign: 'middle', alignItems: 'center', whiteSpace: 'nowrap' }}><input className='selectall' id='checkall' type="checkbox" onChange={e => this.handleSelected(null, e.target.checked)} /> </th>
+                        <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>#</th>
+                        <th style={{ width: '40%', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Môn học</th>
+                        <th style={{ width: '20%', verticalAlign: 'middle', textAlign: 'center', whiteSpace: 'nowrap' }}>Tự chọn</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
+                        <th style={{ width: 'auto', verticalAlign: 'middle', alignItems: 'center', whiteSpace: 'nowrap' }}>Gán </th>
+                    </tr>
+                </>),
+            multipleTbody: true,
+            renderRow: (item, index) => {
+
+                return (
+                    <tbody idmon={item.id}>
+                        <tr>
+                            <TableCell type='buttons' style={{ justifyContent: 'space-between', alignItems: 'center' }} content=''>
+                                <input className='monselected' id={`mon${item.id}`} type="checkbox" onChange={e => this.handleSelected(item, e.target.checked)} />
+                            </TableCell>
                             <TableCell type='text' style={{ textAlign: 'center' }} content={index + 1} />
-                            <TableCell type='text' style={{ fontWeight: 'bold' }} content={isAddMonHoc ? this.selectMh(item, hocKy, index) : item.maMonHoc + ':' + item.tenMonHoc} />
+                            <TableCell type='text' style={{ fontWeight: 'bold', textAlign: 'center' }} content={
+                                <Tooltip title={item.tenMonHoc} arrow placeholder='bottom'>
+                                    <div>{item.maMonHoc}</div>
+                                </Tooltip>} />
                             <TableCell content={item.loaiMonHoc ? <i className='fa fa-check' aria-hidden='true'></i> : ''} style={{ textAlign: 'center' }} />
                             <TableCell type='number' style={{ textAlign: 'center', }} content={item.tinChiLyThuyet} />
                             <TableCell type='number' style={{ textAlign: 'center', }} content={item.tinChiThucHanh} />
-                            {isAddMonHoc && <td style={{ textAlign: 'center' }}>
-                                <div className='btn-group'>
-                                    {
-                                        (!readOnly) ?
-                                            <>
-                                                <a className='btn btn-primary' href='#' title={!item.isEdit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => !item.isEdit ? this.editRow(e, hocKy, index) : this.updateRow(e, hocKy, index)}><i className={'fa fa-lg ' + (!item.isEdit ? 'fa-edit' : 'fa-check')} /></a>
-                                                {!item.isEdit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, item.id, hocKy, index)}><i className='fa fa-lg fa-trash' /></a>}
-                                            </> : ''
-                                    }
-                                </div>
-                            </td>}
-                        </tr>}
-                        {isAddMonHoc && index == list.length - 1 &&
-                            <tr>
-                                <TableCell type='text' style={{ textAlign: 'center' }} content={''} />
-                                <TableCell type='text' style={{ fontWeight: 'bold' }} content={this.selectMh(null, hocKy)} />
-                                <TableCell content={''} style={{ textAlign: 'center' }} />
-                                <TableCell type='number' style={{ textAlign: 'center', }} content={0} />
-                                <TableCell type='number' style={{ textAlign: 'center', }} content={0} />
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        {
-                                            (!readOnly) ?
-                                                <>
-                                                    <a className='btn btn-primary' href='#' title='Xong' onClick={(e) => this.addRow(e, hocKy)}><i className='fa fa-lg fa-check' /></a>
-                                                </> : ''
-                                        }
-                                    </div>
-                                </td>
-                            </tr>}
-                    </React.Fragment>
+                            <TableCell type='buttons' style={{ justifyContent: 'space-between', alignItems: 'center' }} content=''>
+                                <a href='#' onClick={() => this.hocKyModal.show(item)}> <i className='fa fa-arrow-right' style={{ marginLeft: '50%' }} /></a>
+                            </TableCell>
+
+                        </tr>
+                    </tbody>
+
                 );
             },
         });
 
 
     }
+
 
     render() {
         const permission = this.getUserPermission('sdhChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']),
@@ -254,21 +325,41 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                 'Chỉnh sửa kế hoạch đào tạo',
             ],
             content: <>
-                <div className='tile'>
-                    <h3 className='tile-title'>Tất cả môn học</h3>
-                    <div className='tile-body'>
-                        {this.renderTable(this.state.ctsdh)}
-                    </div>
-                </div>
-                {this.state.chuongTrinhDaoTao && Object.keys(this.state.chuongTrinhDaoTao).map((item, index) => (
-                    <div key={index} className='tile'>
-                        <h3 className='tile-title'>Học kỳ {item}</h3>
-                        <div className='tile-body'>
-                            {this.renderTable(this.state.chuongTrinhDaoTao[item], item, true)}
+                <div className='row'>
+                    <div className={this.state.freeList.length ? 'tile col-md-6' : 'tile col-md-2'}  >
+                        <h3 className='tile-title'>{this.state.freeList.length ? 'Tất cả môn học' : 'Môn học'}</h3>
+                        <div className='tile-body draggable' style={{ overflowY: 'hidden', maxHeight: '95%', cursor: 'pointer' }} >
+                            {this.renderTable(this.state.freeList)}
                         </div>
                     </div>
-                ))}
-                <HocKyModal ref={e => this.modal = e} addNewHocKy={this.addHocKy} />
+                    <div className={this.state.freeList.length ? 'col-md-6' : 'col-md-10'} >
+                        {this.state.dataHocKy && this.state.dataHocKy.map((item, index) => (<>
+                            <div id={`accordion-${index}`} className='mt-1 droppable' hocky={item.id} style={{ cursor: 'pointer' }} >
+                                <div className='card' >
+                                    <button className='btn btn-link collapsed' data-toggle='collapse' data-target={`#collapseOne-${index}`} aria-expanded="true" aria-controls={`collapseOne-${index}`}>
+                                        <div className='card-header row' id={`heading-${index}`} style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                            <h6 className='mb-0'>
+                                                {item.text}
+                                            </h6>
+                                        </div>
+                                    </button>
+                                    <div id={`collapseOne-${index}`} className='collapse' aria-labelledby={`heading-${index}`} data-parent={`#accordion-${index}`} >
+                                        <div className='card-body' >
+                                            <div className='tile-body'>
+                                                {this.renderTable2(this.state.chuongTrinhDaoTao[item.id], item.id)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </>))}
+
+                    </div>
+                </div>
+                <EditMonModal ref={e => this.monModal = e} updateMonHoc={this.updateMonHoc} permission={permission} />
+                <HocKyModal ref={e => this.hocKyModal = e} permission={permission} dataHocKy={this.state.dataHocKy} updateMonHocMulti={this.updateMonHocMulti} id={this.state.selected} handleSelected={this.handleSelected} />
+                <CreateModal ref={e => this.createModal = e} permission={permission} updateKhungDaoTao={this.props.updateKhungDaoTao} getData={this.getData} />
             </>,
             backRoute: `/user/sau-dai-hoc/chuong-trinh-dao-tao/${this.state.ma}`,
             onCreate: !readOnly ? this.createHocKy : null
@@ -277,6 +368,6 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, sdhChuongTrinhDaoTao: state.daoTao.sdhChuongTrinhDaoTao });
-const mapActionsToProps = { getSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao };
+const mapActionsToProps = { getSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, getSdhKhungDaoTao, updateSdhChuongTrinhDaoTaoMulti, updateKhungDaoTao };
 export default connect(mapStateToProps, mapActionsToProps)(SdhKeHoachDaoTaoDetails);
 

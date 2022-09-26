@@ -1,6 +1,6 @@
-// Table name: TCCB_DANH_GIA_CA_NHAN_DANG_KY { id, shcc, idNhomDangKy, dangKy }
+// Table name: TCCB_DANH_GIA_CA_NHAN_DANG_KY { id, shcc, idNhomDangKy, nam }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'idNhomDangKy': 'ID_NHOM_DANG_KY', 'dangKy': 'DANG_KY' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'idNhomDangKy': 'ID_NHOM_DANG_KY', 'nam': 'NAM' };
 
 module.exports = app => {
     app.model.tccbDanhGiaCaNhanDangKy = {
@@ -214,6 +214,19 @@ module.exports = app => {
                     resolve(result);
                 }
             });
+        }),
+
+        searchPageDangKy: (pagenumber, pagesize, searchterm, searchnam, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tccb_danh_gia_ca_nhan_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal, :searchnam); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, searchnam }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                }));
         }),
     };
 };
