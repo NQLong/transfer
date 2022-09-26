@@ -270,7 +270,7 @@ export default class SectionAdminModal extends React.Component {
                     <thead>
                     <tr>
                         <th>Tham số</th>
-                        <th nowrap='true'>Mặc định</th>
+                        <th style={{whiteSpace: 'nowrap'}}>Mặc định</th>
                         <th>Mô tả</th>
                     </tr>
                     </thead>

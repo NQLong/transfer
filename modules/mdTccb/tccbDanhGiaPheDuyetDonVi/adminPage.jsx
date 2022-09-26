@@ -23,7 +23,7 @@ class TccbDanhGiaPheDuyetDonViPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                     <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm</th>
                     <th style={{ width: '50%', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời hạn phê duyệt của đơn vị</th>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (

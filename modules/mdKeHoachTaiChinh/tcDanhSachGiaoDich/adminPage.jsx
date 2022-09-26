@@ -1,8 +1,9 @@
 import React from 'react';
+import { Tooltip } from '@mui/material';
 import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox, renderTable, TableCell, AdminModal } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { getTongGiaoDichPage, getListNganHang, createGiaoDich } from './redux';
+import { getTongGiaoDichPage, getListNganHang, createGiaoDich, cancelGiaoDich } from './redux';
 import { getStudentHocPhi } from '../tcHocPhi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
@@ -154,7 +155,8 @@ class AdminEditModal extends AdminModal {
             soTien: this.soTien.value(),
             hocKy: this.hocKy.value(),
             namHoc: this.namHoc.value(),
-            sinhVien: this.sinhVien.value()
+            sinhVien: this.sinhVien.value(),
+            ghiChu: this.ghiChu.value()
         };
         if (!data.namHoc) {
             T.notify('Năm học trống ', 'danger');
@@ -182,11 +184,56 @@ class AdminEditModal extends AdminModal {
             title: 'Thêm giao dịch',
             size: 'large',
             body: <div className='row'>
-                <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
+                <FormSelect required data={yearDatas().reverse()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
                 <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
                 <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
-                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())}/>
+                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())} />
                 <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
+                <FormTextBox label='Ghi chú' className='col-md-12' ref={e => this.ghiChu = e} />
+            </div>
+        });
+    }
+}
+
+class AdminCancelModal extends AdminModal {
+
+    setAmountText = (value) => {
+        if (Number.isInteger(value))
+            this.thanhChu?.value(T.numberToVnText(value.toString()) + ' đồng');
+    }
+
+    onShow = (data) => {
+        this.namHoc?.value(data.namHoc);
+        this.hocKy?.value(data.hocKy);
+        this.sinhVien?.value(`${data.mssv}: ${data.ho || ''} ${data.ten || ''}`);
+        this.soTien?.value(data.khoanDong);
+        this.setAmountText(data.khoanDong);
+        this.ghiChu?.value('');
+        this.setState({ transID: data.transactionId });
+    }
+
+    onSubmit = () => {
+        const transId = this.state.transID;
+        const ghiChu = this.ghiChu.value();
+        if (!ghiChu) {
+            T.notify('Thiếu ghi chú', 'danger');
+            this.ghiChu.focus();
+        } else {
+            this.props.cancel({ transId, ghiChu }, () => this.hide());
+        }
+    }
+
+    render = () => {
+        return this.renderModal({
+            title: 'Hủy giao dịch',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox readOnly label='Năm học' className='col-md-4' ref={e => this.namHoc = e} />
+                <FormTextBox readOnly label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} />
+                <FormTextBox readOnly label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} />
+                <FormTextBox readOnly label='Số tiền' className='col-md-12' ref={e => this.soTien = e} type='number' />
+                <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
+                <FormTextBox required label='Ghi chú' className='col-md-12' ref={e => this.ghiChu = e} />
             </div>
         });
     }
@@ -294,7 +341,9 @@ class DanhSachGiaoDich extends AdminPage {
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngành</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ghi chú</th>
                 <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trạng thái</th>
+                <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>),
             renderRow: (item, index) => (<tr key={index}>
                 <TableCell style={{ textAlign: 'right' }} content={item.R} />
@@ -308,9 +357,17 @@ class DanhSachGiaoDich extends AdminPage {
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.maNganh}: ${item.tenNganh}`} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenBacDaoTao} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiHinhDaoTao} />
+                <TableCell style={{ whiteSpace: 'nowrap' }} content={item.ghiChu} />
                 <TableCell style={{ whiteSpace: 'nowrap' }} content={
-                    item.trangThai ? <div style={{ color: 'green' }}><i className='fa fa-lg fa-check-square-o' /> Thành công</div> : <div style={{ color: 'red' }}><i className='fa fa-lg fa-times' /> Thất bại</div>
+                    item.trangThai ? <div style={{ color: 'green' }}><i className='fa fa-lg fa-check-circle-o' /> Thành công</div> : <div style={{ color: 'red' }}><i className='fa fa-lg fa-times-circle-o' /> Thất bại</div>
                 } />
+                <TableCell type='buttons' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item} permission={permission}>
+                    <Tooltip title='Hủy' arrow>
+                        <button className='btn btn-danger' onClick={e => e.preventDefault() || this.adminCancelModal.show(item)}>
+                            <i className='fa fa-lg fa-times' />
+                        </button>
+                    </Tooltip>
+                </TableCell>
             </tr>),
 
         });
@@ -343,6 +400,7 @@ class DanhSachGiaoDich extends AdminPage {
                             getPage={this.getPage} />
                     </div>
                 </div>
+                <AdminCancelModal ref={e => this.adminCancelModal = e} cancel={this.props.cancelGiaoDich} />
                 <AdminEditModal ref={e => this.adminModal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <EditModal ref={e => this.modal = e} create={this.props.createGiaoDich} get={this.props.getStudentHocPhi} />
                 <StatisticModal ref={e => this.statisModal = e} />
@@ -355,5 +413,5 @@ class DanhSachGiaoDich extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, tcGiaoDich: state.finance.tcGiaoDich });
-const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi };
+const mapActionsToProps = { getTongGiaoDichPage, getListNganHang, createGiaoDich, getStudentHocPhi, cancelGiaoDich };
 export default connect(mapStateToProps, mapActionsToProps)(DanhSachGiaoDich);

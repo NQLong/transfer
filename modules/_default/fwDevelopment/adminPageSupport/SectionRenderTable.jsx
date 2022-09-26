@@ -175,7 +175,7 @@ export default class SectionRenderTable extends React.Component {
                     <thead>
                     <tr>
                         <th>Props</th>
-                        <th style={{ textAlign: 'center' }} nowrap='true'>Mặc định</th>
+                        <th style={{ textAlign: 'center' , whiteSpace: 'nowrap'}}>Mặc định</th>
                         <th>Mô tả</th>
                     </tr>
                     </thead>
