@@ -113,7 +113,7 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
                 getDataSource: () => newList, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} nowrap='true'>#</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
                         <th style={{ width: '10%', textAlign: 'center', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: '15%', textAlign: 'center', whiteSpace: 'nowrap' }}>Đơn vị</th>
                         <th style={{ width: '15%', textAlign: 'center', whiteSpace: 'nowrap' }}>Cá nhân đăng ký</th>
