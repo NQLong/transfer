@@ -14,7 +14,7 @@ module.exports = app => {
         { name: 'dmHocSdh:write' },
         { name: 'dmHocSdh:delete' },
     );
-    app.get('/user/danh-muc/bac-sdh', app.permission.check('dmHocSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/phan-he-dao-tao', app.permission.check('dmHocSdh:read'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRoleHocSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {

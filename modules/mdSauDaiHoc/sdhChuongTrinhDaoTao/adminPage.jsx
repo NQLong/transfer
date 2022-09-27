@@ -243,10 +243,7 @@ class TreeModal extends AdminModal {
         );
     }
 
-
     render = () => {
-        // const readOnly = this.props.readOnly;
-        // const isDaoTao = this.props.permission.write;
         return this.renderModal({
             title: `Chương trình năm học - ${this.namDaoTao}`,
             size: 'elarge',
@@ -299,38 +296,31 @@ class CloneModal extends AdminModal {
 }
 class HocKyModal extends AdminModal {
 
-    onShow = (item) => {
-        this.id = item.id;
-        this.setState({ soHocKy: item.soHocKy });
+    onShow = (id) => {
+        this.id = id;
     };
 
     onSubmit = (e) => {
         e.preventDefault();
         const id = this.id;
-        if (!this.state.soHocKy) {
-            const soHocKy = this.soHocKy.value();
-            if (!soHocKy) {
-                T.notify('Hãy chọn số học kì', 'danger');
-            }
-            else {
-                let changes = { soHocKy: parseInt(soHocKy) };
-                this.props.updateKhungDaoTao(id, changes, () => this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${id}`));
-            }
+        const soHocKy = this.soHocKy.value();
+        if (!soHocKy) {
+            T.notify('Hãy chọn số học kì', 'danger');
         }
-        else
-            this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${id}`);
-
+        else {
+            let changes = { soHocKy: parseInt(soHocKy) };
+            this.props.updateKhungDaoTao(id, changes, () => this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${id}`));
+        }
     };
 
     render = () => {
         return this.renderModal({
-            title: this.state.soHocKy ? 'Chỉnh sửa số học kì đào tạo' : 'Chọn số học kì đào tạo',
+            title: 'Chọn số học kì đào tạo',
             submitText: 'Xác nhận',
             body: <>
-                {!this.state.soHocKy ?
-                    (<div>
-                        <FormSelect ref={e => this.soHocKy = e} label='Số học kỳ' data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} required allowClear />
-                    </div>) : (<p style={{ fontWeight: 'bold' }}>Chương trình đạo tạo đã được thêm học kì. Bạn có muốn thay đổi không ?</p>)}
+                <div>
+                    <FormSelect ref={e => this.soHocKy = e} label='Số học kỳ' data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} required allowClear />
+                </div>
             </>
         });
     }
@@ -400,15 +390,12 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={item.thoiGianDaoTao + ' năm'} />
                     <TableCell content={item.tenKhoaBoMon} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/chuong-trinh-dao-tao/${item.id}`) : null}
-                    // onEdit={() => this.modal.show(item)}
-                    // onClone={(e) => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/chuong-trinh-dao-tao/new?id=${item.id}`)}
-                    >
+                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/chuong-trinh-dao-tao/${item.id}`) : null}>
                         <Tooltip title='Xem cây chương trình' arrow placeholder='bottom' >
-                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
+                            <a className='btn btn-secondary' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
                         </Tooltip>
                         <Tooltip title='Chỉnh sửa kế hoạch' arrow placeholder='bottom' >
-                            <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || this.props.getSdhKhungDaoTao(item.id, result => this.hockyModal.show(result))}><i className='fa fa-lg fa-list' /></a>
+                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.props.getSdhKhungDaoTao(item.id, result => !result.item.soHocKy ? this.hockyModal.show(result.item) : this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${item.id}`))}><i className='fa fa-lg fa-list' /></a>
                         </Tooltip >
                         {
                             permission.write && <Tooltip title='Sao chép' arrow>
@@ -466,7 +453,7 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     getPage={this.props.getSdhChuongTrinhDaoTaoPage} />
                 <TreeModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write} getSdhChuongTrinhDaoTao={this.props.getSdhChuongTrinhDaoTao} />
                 <CloneModal ref={e => this.cloneModal = e} permission={permissionDaoTao} readOnly={!permission.write} history={this.props.history} />
-                <HocKyModal ref={e => this.hockyModal = e} permission={permissionDaoTao} history={this.props.history} getSdhKhungDaoTao={this.props.getSdhKhungDaoTao} updateKhungDaoTao={this.props.updateKhungDaoTao} />
+                <HocKyModal ref={e => this.hockyModal = e} permission={permissionDaoTao} history={this.props.history} updateKhungDaoTao={this.props.updateKhungDaoTao} />
             </>,
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sau-dai-hoc/chuong-trinh-dao-tao/new') : null
         });
