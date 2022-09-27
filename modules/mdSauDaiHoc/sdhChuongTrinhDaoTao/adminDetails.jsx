@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createMultiSdhChuongTrinhDaoTao, createSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, getSdhChuongTrinhDaoTao, getSdhKhungDaoTao, deleteMultiSdhChuongTrinhDaoTao, downloadWord } from './redux';
+import { createMultiSdhChuongTrinhDaoTao, createSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, getSdhChuongTrinhDaoTao, getSdhKhungDaoTao, deleteMultiSdhChuongTrinhDaoTao, downloadWord, updateKhungDaoTao } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, CirclePageButton, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, CirclePageButton, FormSelect, FormTabs, FormTextBox, AdminModal } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
 import { SelectAdapter_DmNganhSdh } from '../dmNganhSauDaiHoc/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
@@ -14,11 +14,43 @@ import { SelectAdapter_DmKhoaSdh } from 'modules/mdDanhMuc/dmKhoaSauDaiHoc/redux
 // import ComponentKT from './ComponentKT';
 import { Tooltip } from '@mui/material';
 
+class HocKyModal extends AdminModal {
+
+    onShow = (id) => {
+        this.id = id;
+    };
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const id = this.id;
+        const soHocKy = this.soHocKy.value();
+        if (!soHocKy) {
+            T.notify('Hãy chọn số học kì', 'danger');
+        }
+        else {
+            let changes = { soHocKy: parseInt(soHocKy) };
+            this.props.updateKhungDaoTao(id, changes, () => this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${id}`));
+        }
+    };
+
+    render = () => {
+        return this.renderModal({
+            title: 'Chọn số học kì đào tạo',
+            submitText: 'Xác nhận',
+            body: <>
+                <div>
+                    <FormSelect ref={e => this.soHocKy = e} label='Số học kỳ' data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} required allowClear />
+                </div>
+            </>
+        });
+    }
+}
 class SdhChuongTrinhDaoTaoDetails extends AdminPage {
     state = {
         isLoading: true,
         // mucTieuDaoTao: {},
-        chuongTrinhDaoTao: {}
+        chuongTrinhDaoTao: {},
+        khungDaoTao: {}
     };
     mucTieu = {};
     chuongTrinh = {};
@@ -42,6 +74,7 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
             this.maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
             this.khoa.value(this.maKhoa == 37 ? '' : this.maKhoa);
         }
+        this.props.getSdhKhungDaoTao(this.ma, item => this.setState({ khungDaoTao: item }));
     }
 
     pushMonHocChosen = (maMonHoc) => {
@@ -78,7 +111,6 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
             const mucTieu = T.parse(data.mucTieu || '{}');
             this.khoaSdh = !isClone ? data.namDaoTao : khoaSdh;
             this.props.getSdhChuongTrinhDaoTao(id, (ctsdh) => {
-                console.log(ctsdh);
                 SelectAdapter_SdhCauTrucKhungDaoTao.fetchOne(this.khoaSdh, (rs) => {
                     this.setNamDaoTao(rs, mucTieu, ctsdh);
                     this.namDaoTao.value(rs.id);
@@ -268,11 +300,13 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
                 {this.ma && <CirclePageButton type='custom' tooltip='Tải về chương trình đào tạo' customIcon='fa-file-word-o' customClassName='btn-warning' style={{ marginRight: '60px' }} onClick={(e) => this.downloadWord(e)} />}
                 {this.ma &&
                     <Tooltip title={'Kế hoạch đào tạo'} arrow placement='top'>
-                        <Link type='button' to={`/user/sau-dai-hoc/ke-hoach-dao-tao/${this.ma}`} className='btn btn-info btn-circle' style={{ zIndex: 100, position: 'fixed', right: '130px', bottom: '10px', color: 'white' }}>
+                        <Link type='button' to={'#'} className='btn btn-info btn-circle' style={{ zIndex: 100, position: 'fixed', right: '130px', bottom: '10px', color: 'white' }} onClick={() => this.state.khungDaoTao.soHocKy ? this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${this.ma}`) : this.modal.show(this.ma)} >
                             <i className='fa fa-lg fa-list' />
                         </Link>
+
                     </Tooltip>
                 }
+                < HocKyModal permission={permission} ref={e => this.modal = e} updateKhungDaoTao={this.props.updateKhungDaoTao} history={this.props.history} />
             </>,
             backRoute: '/user/sau-dai-hoc/chuong-trinh-dao-tao',
             onSave: permission.write || permission.manage ? this.save : null,
@@ -281,5 +315,5 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, sdhChuongTrinhDaoTao: state.daoTao.sdhChuongTrinhDaoTao });
-const mapActionsToProps = { createMultiSdhChuongTrinhDaoTao, getSdhChuongTrinhDaoTao, getSdhKhungDaoTao, createSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, deleteMultiSdhChuongTrinhDaoTao, downloadWord };
+const mapActionsToProps = { createMultiSdhChuongTrinhDaoTao, getSdhChuongTrinhDaoTao, getSdhKhungDaoTao, createSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, deleteMultiSdhChuongTrinhDaoTao, downloadWord, updateKhungDaoTao };
 export default connect(mapStateToProps, mapActionsToProps)(SdhChuongTrinhDaoTaoDetails);

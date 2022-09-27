@@ -4,6 +4,7 @@ import { getSdhChuongTrinhDaoTao, updateSdhChuongTrinhDaoTao, getSdhKhungDaoTao,
 import { AdminPage, renderTable, TableCell, FormSelect, AdminModal, FormTextBox } from 'view/component/AdminPage';
 import { Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
+import T from 'view/js/common';
 
 const dataThu = [2, 3, 4, 5, 6, 7];
 
@@ -45,16 +46,26 @@ class HocKyModal extends AdminModal {
     }
     onSubmit = (e) => {
         e.preventDefault();
-        let idlist = this.props.id;
-        this.props.updateMonHocMulti(idlist, { hocKy: this.hocKy.value() });
-        this.hide();
+        if (!this.hocKy.value())
+            T.notify('Chưa chọn học kỳ', 'danger');
+        else {
+            let idList = this.props.idList;
+            this.props.updateMonHocMulti(idList, { hocKy: this.hocKy.value() });
+            this.hide();
+        }
     };
 
     render = () => {
+        const idList = this.props.idList;
+        const freeList = this.props.freeList;
+        let listMaMon = freeList.map(item => {
+            return idList.includes(item.id) && ({ maMonHoc: item.maMonHoc });
+        });
         return this.renderModal({
             title: 'Chọn học kỳ',
             submitText: 'Xác nhận',
             body: <div>
+                <p style={{ fontWeight: '400' }}> Thêm {idList.length > 8 ? 'tất cả các môn học đã chọn' : listMaMon.map((item, index) => { return <> <span key={index} style={{ fontWeight: 'bold' }}> {item.maMonHoc}</span></>; })} vào:</p>
                 <FormSelect ref={e => this.hocKy = e} label='Học kỳ' data={this.props.dataHocKy} allowClear />
             </div>
         });
@@ -65,24 +76,23 @@ class CreateModal extends AdminModal {
     onShow = (soHocKy) => {
         const route = T.routeMatcher('/user/sau-dai-hoc/ke-hoach-dao-tao/:ma'),
             ma = route.parse(window.location.pathname)?.ma;
-        this.oldTerm = soHocKy;
-        this.ma = ma;
-        this.soHocKy.value('');
+        this.setState({ oldTerm: soHocKy, ma: ma });
     }
     onSubmit = (e) => {
         e.preventDefault();
-        const newTerm = this.soHocKy.value() + this.oldTerm;
-        const maKhung = parseInt(this.ma);
+        const newTerm = 1 + this.state.oldTerm;
+        const maKhung = parseInt(this.state.ma);
         this.props.updateKhungDaoTao(maKhung, { soHocKy: newTerm }, () => this.props.getData(maKhung));
         this.hide();
     };
 
     render = () => {
+        const newTerm = 1 + this.state.oldTerm;
         return this.renderModal({
             title: 'Thêm mới học kì',
             submitText: 'Xác nhận',
             body: <div>
-                <FormTextBox type='number' ref={e => this.soHocKy = e} label='Số học kỳ' />
+                <h5>Bạn có chắc muốn thêm học kì {newTerm} không ?</h5>
             </div>
         });
     }
@@ -93,7 +103,8 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
         ctsdh: [],
         freeList: [],
         dataHocKy: [],
-        selected: []
+        selected: [],
+        tenNganh: ''
     };
     rows = {};
     componentDidMount() {
@@ -105,13 +116,29 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
     }
 
     componentDidUpdate() {
-        $('.draggable tbody, .droppable tbody').draggable({
+        $('.draggable tbody').draggable({
+            helper: 'clone',
+            containment: 'body',
+            scroll: true,
+            backgroundColor: 'red',
+            zIndex: 99999,
+            start: (event, ui) => {
+                ui.helper.css('background-color', 'paleturquoise');
+                ui.helper.css('cursor', 'grabbing');
+            }
+
+        });
+        $('.droppable tbody').draggable({
             helper: 'clone',
             containment: 'body',
             cursor: 'grabbing',
-            scroll: false,
+            scroll: true,
             backgroundColor: null,
             zIndex: 99999,
+            drag: (event, ui) => {
+                ui.helper.css('background-color', 'paleturquoise');
+                ui.helper.css('cursor', 'grabbing');
+            }
         });
 
         $('.droppable').droppable({
@@ -121,16 +148,9 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                     const id = parseInt(ui.draggable.attr('idmon'));
                     const currHocKy = ui.draggable.attr('hocky');
                     const targetHocKy = parseInt(event.target.getAttribute('hocky'));
-                    if (currHocKy && parseInt(currHocKy) != targetHocKy) {
+                    if ((currHocKy && parseInt(currHocKy) != targetHocKy) || !currHocKy) {
                         this.updateMonHoc(id, { hocKy: targetHocKy });
-                    }
-                    else if (!currHocKy) {
-                        let currSelected = this.state.selected;
-                        const index = currSelected.indexOf(id);
-                        index == -1 ? currSelected.push(id) : null;
-                        this.setState({ selected: currSelected });
-                        const idlist = [...this.state.selected];
-                        this.updateMonHocMulti(idlist, { hocKy: targetHocKy });
+                        !$(`#collapseOne-${targetHocKy - 1}`).hasClass('show') && $(`#collapseOne-${targetHocKy - 1}`).collapse('show');
                     }
                     else null;
                 } catch (error) {
@@ -162,12 +182,16 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
             this.setState({ ma, ctsdh, chuongTrinhDaoTao, freeList });
         });
         this.props.getSdhKhungDaoTao(ma, result => {
-            const soHocKy = result.soHocKy;
+            const soHocKy = result.item.soHocKy;
+            const res = JSON.parse(result.item.tenNganh);
+            const nganhDaoTao = res['vi'] + ' ' + result.cauTrucKhung.namDaoTao;
             let data = [];
             for (let i = 1; i <= soHocKy; i++)
                 data.push({ id: i, text: `Học kỳ ${i}` });
-            this.setState({ dataHocKy: data });
+            this.setState({ dataHocKy: data, tenNganh: nganhDaoTao });
+
         });
+
     }
 
     createHocKy = (e) => {
@@ -233,7 +257,7 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
             multipleTbody: true,
             renderRow: (item, index) => {
                 return (
-                    <tbody idmon={item.id} hocky={item.hocKy}>
+                    <tbody key={index} idmon={item.id} hocky={item.hocKy} style={{ backgroundColor: 'white' }}>
                         <tr>
                             <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                             <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }} content={
@@ -249,13 +273,13 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                                     }}><i className='fa fa-lg fa-pencil' /></a>
                                 </Tooltip>
                                 <Tooltip title='Xóa khỏi học kỳ' arrow placeholder='bottom' >
-                                    <a className='btn btn-secondary' href='#' onClick={e => e.preventDefault() || this.updateMonHoc(item.id, { hocKy: '', thu: '', tietBatDau: '' })}><i className='fa fa-lg  fa-minus-circle' /></a>
+                                    <a className='btn btn-danger' href='#' onClick={() => {
+                                        T.confirm('', `Xóa môn học ${item.maMonHoc} khỏi học kì ${item.hocKy}`, true, isConfirm => isConfirm && this.updateMonHoc(item.id, { hocKy: '', thu: '', tietBatDau: '' }));
+                                    }}><i className='fa fa-lg  fa-times' /></a>
                                 </Tooltip >
                             </TableCell>
 
-                        </tr>
-                    </tbody>
-
+                        </tr></tbody>
                 );
             },
         });
@@ -282,9 +306,8 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                 </>),
             multipleTbody: true,
             renderRow: (item, index) => {
-
                 return (
-                    <tbody idmon={item.id}>
+                    <tbody key={index} idmon={item.id} style={{ backgroundColor: 'white' }}>
                         <tr>
                             <TableCell type='buttons' style={{ justifyContent: 'space-between', alignItems: 'center' }} content=''>
                                 <input className='monselected' id={`mon${item.id}`} type="checkbox" onChange={e => this.handleSelected(item, e.target.checked)} />
@@ -297,13 +320,11 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                             <TableCell content={item.loaiMonHoc ? <i className='fa fa-check' aria-hidden='true'></i> : ''} style={{ textAlign: 'center' }} />
                             <TableCell type='number' style={{ textAlign: 'center', }} content={item.tinChiLyThuyet} />
                             <TableCell type='number' style={{ textAlign: 'center', }} content={item.tinChiThucHanh} />
+
                             <TableCell type='buttons' style={{ justifyContent: 'space-between', alignItems: 'center' }} content=''>
                                 <a href='#' onClick={() => this.hocKyModal.show(item)}> <i className='fa fa-arrow-right' style={{ marginLeft: '50%' }} /></a>
                             </TableCell>
-
-                        </tr>
-                    </tbody>
-
+                        </tr></tbody>
                 );
             },
         });
@@ -318,17 +339,18 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-university',
-            title: 'Chỉnh sửa kế hoạch đào tạo',
+            title: 'Kế hoạch đào tạo',
+            subTitle: this.state.tenNganh,
             breadcrumb: [
                 <Link key={1} to='/user/sau-dai-hoc/chuong-trinh-dao-tao'>Chương trình đào tạo</Link>,
                 <Link key={2} to={`/user/sau-dai-hoc/chuong-trinh-dao-tao/${this.state.ma}`}>Chỉnh sửa chương trình đào tạo</Link>,
-                'Chỉnh sửa kế hoạch đào tạo',
+                'Kế hoạch đào tạo',
             ],
             content: <>
                 <div className='row'>
-                    <div className={this.state.freeList.length ? 'tile col-md-6' : 'tile col-md-2'}  >
-                        <h3 className='tile-title'>{this.state.freeList.length ? 'Tất cả môn học' : 'Môn học'}</h3>
-                        <div className='tile-body draggable' style={{ overflowY: 'hidden', maxHeight: '95%', cursor: 'pointer' }} >
+                    <div className={this.state.freeList.length ? 'tile col-md-6  draggable' : 'tile col-md-2 draggable'} >
+                        <h3 className='tile-title'>Danh sách môn học</h3>
+                        <div className='tile-body' style={{ overflowY: 'hidden', maxHeight: '95%', cursor: 'pointer' }} >
                             {this.renderTable(this.state.freeList)}
                         </div>
                     </div>
@@ -336,7 +358,7 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                         {this.state.dataHocKy && this.state.dataHocKy.map((item, index) => (<>
                             <div id={`accordion-${index}`} className='mt-1 droppable' hocky={item.id} style={{ cursor: 'pointer' }} >
                                 <div className='card' >
-                                    <button className='btn btn-link collapsed' data-toggle='collapse' data-target={`#collapseOne-${index}`} aria-expanded="true" aria-controls={`collapseOne-${index}`}>
+                                    <button id={`btn-collapsed${index}`} className='btn btn-link collapsed' data-toggle='collapse' data-target={`#collapseOne-${index}`} aria-expanded="true" aria-controls={`collapseOne-${index}`}>
                                         <div className='card-header row' id={`heading-${index}`} style={{ justifyContent: 'center', alignItems: 'center' }}>
                                             <h6 className='mb-0'>
                                                 {item.text}
@@ -358,7 +380,7 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                     </div>
                 </div>
                 <EditMonModal ref={e => this.monModal = e} updateMonHoc={this.updateMonHoc} permission={permission} />
-                <HocKyModal ref={e => this.hocKyModal = e} permission={permission} dataHocKy={this.state.dataHocKy} updateMonHocMulti={this.updateMonHocMulti} id={this.state.selected} handleSelected={this.handleSelected} />
+                <HocKyModal ref={e => this.hocKyModal = e} permission={permission} dataHocKy={this.state.dataHocKy} updateMonHocMulti={this.updateMonHocMulti} idList={this.state.selected} handleSelected={this.handleSelected} freeList={this.state.freeList} />
                 <CreateModal ref={e => this.createModal = e} permission={permission} updateKhungDaoTao={this.props.updateKhungDaoTao} getData={this.getData} />
             </>,
             backRoute: `/user/sau-dai-hoc/chuong-trinh-dao-tao/${this.state.ma}`,

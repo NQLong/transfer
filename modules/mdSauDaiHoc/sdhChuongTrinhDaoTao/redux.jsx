@@ -97,13 +97,13 @@ export function getSdhChuongTrinhDaoTao(maKhungDaoTao, done) {
 
 export function getSdhKhungDaoTao(id, done) {
     return () => {
-        const url = `/api/sau-dai-hoc/khung-dao-tao/${id}`;
+        const url = `/api/sau-dai-hoc/khung-dao-tao/item/${id}`;
         T.get(url, { condition: { id } }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khung đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.items);
+                if (done) done(data);
             }
         });
     };
@@ -197,7 +197,6 @@ export function updateSdhChuongTrinhDaoTaoMulti(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thành công!', 'success');
-                // dispatch(getSdhChuongTrinhDaoTaoPage());
                 done && done();
             }
         }, () => T.notify('Cập nhật bị lỗi!', 'danger'));

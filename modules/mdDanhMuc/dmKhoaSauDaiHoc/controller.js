@@ -13,13 +13,15 @@ module.exports = app => {
         { name: 'dmKhoaSdh:read', menu },
         { name: 'dmKhoaSdh:delete' },
     );
-    app.get('/user/danh-muc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:read'), app.templates.admin);
     app.permissionHooks.add('staff', 'addRoleKhoaSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
             app.permissionHooks.pushUserPermission(user, 'dmKhoaSdh:read', 'dmKhoaSdh:write', 'dmKhoaSdh:delete');
             resolve();
         } else resolve();
     }));
+
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khoa-sau-dai-hoc/page/:pageNumber/:pageSize', app.permission.check('dmKhoaSdh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
