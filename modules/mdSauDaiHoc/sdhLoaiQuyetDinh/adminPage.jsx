@@ -63,10 +63,10 @@ class sdhLoaiQuyetDinhPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa Loại quyết định sau đại học', `Bạn có chắc bạn muốn xóa Loại quyết định sau đại học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+        T.confirm('Xóa loại quyết định', `Bạn có chắc muốn xóa loại quyết định ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
             isConfirm && this.props.deleteSdhLoaiQd(item.ma, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá Bậc sau đại học ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá Loại quyết định sau đại học ${item.ten} thành công!`, 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : `Xoá loại quyết định ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá loại quyết định ${item.ten} thành công!`, 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -80,7 +80,7 @@ class sdhLoaiQuyetDinhPage extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('sdhLoaiQuyetDinh', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhLoaiQuyetDinh ? this.props.sdhLoaiQuyetDinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] };
-        let table = 'Chua co du lieu';
+        let table = 'Chưa có dữ liệu';
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list,

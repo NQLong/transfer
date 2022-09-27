@@ -7,6 +7,7 @@ module.exports = app => {
     };
 
     app.permission.add(
+        { name: 'svSdh:read', menu },
         { name: 'svSdh:manage', menu },
         { name: 'svSdh:write' },
         { name: 'svSdh:delete' },
@@ -14,8 +15,8 @@ module.exports = app => {
         'svSdh:import'
     );
 
-    app.get('/user/sau-dai-hoc/sinh-vien', app.permission.check('svSdh:manage'), app.templates.admin);
-    app.get('/user/sv-sdh/upload', app.permission.check('svSdh:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/sinh-vien', app.permission.orCheck('svSdh:read', 'svSdh:manage'), app.templates.admin);
+    app.get('/user/sv-sdh/upload', app.permission.orCheck('svSdh:manage', 'svSdh:import'), app.templates.admin);
     app.get('/user/sv-sdh/item/:mssv', app.permission.check('svSdh:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRoleStudentSdh', (user, staff) => new Promise(resolve => {
@@ -291,7 +292,7 @@ module.exports = app => {
     app.get('/api/sv-sdh/download-excel', app.permission.check('svSdh:export'), async (req, res) => {
         try {
             let filter = app.utils.parse(req.query.filter || {});
-            const { listFaculty, listNganh, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = filter?filter:{listFaculty:'', listNganh:'', listFromCity:'', listEthnic:'', listNationality:'', listReligion:'', listTinhTrangSinhVien:'', gender:''};
+            const { listFaculty, listNganh, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = filter ? filter : { listFaculty: '', listNganh: '', listFromCity: '', listEthnic: '', listNationality: '', listReligion: '', listTinhTrangSinhVien: '', gender: '' };
             let listNganhSdh;
             await app.model.dmNganhSauDaiHoc.getAll({}, 'maNganh,ten', null, (err, result) => {
                 if (err) {

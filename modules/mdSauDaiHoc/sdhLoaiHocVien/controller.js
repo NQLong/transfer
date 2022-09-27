@@ -12,10 +12,11 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'sdhLoaiHocVien:read', menu },
+        { name: 'sdhLoaiHocVien:manage', menu },
         { name: 'sdhLoaiHocVien:write' },
         { name: 'sdhLoaiHocVien:delete' },
     );
-    app.get('/user/sau-dai-hoc/loai-hoc-vien', app.permission.check('sdhLoaiHocVien:write'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/loai-hoc-vien', app.permission.orCheck('sdhLoaiHocVien:write', 'sdhLoaiHocVien:manage'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesLoaiHocVien', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {

@@ -12,6 +12,7 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'sdhCauTrucKhungDaoTao:read', menu },
+        { name: 'sdhCauTrucKhungDaoTao:manage', menu },
         { name: 'sdhCauTrucKhungDaoTao:write' },
         { name: 'sdhCauTrucKhungDaoTao:delete' },
     );
@@ -22,8 +23,8 @@ module.exports = app => {
         } else resolve();
     }));
 
-    app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.check('sdhCauTrucKhungDaoTao:read'), app.templates.admin);
-    app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao/:ma', app.permission.check('sdhCauTrucKhungDaoTao:write'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.orCheck('sdhCauTrucKhungDaoTao:read', 'sdhCauTrucKhungDaoTao:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao/:ma', app.permission.orCheck('sdhCauTrucKhungDaoTao:write', 'sdhCauTrucKhungDaoTao:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.check('sdhCauTrucKhungDaoTao:read'), async (req, res) => {

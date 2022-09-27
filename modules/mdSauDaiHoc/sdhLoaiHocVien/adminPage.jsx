@@ -63,9 +63,9 @@ class sdhLoaiHocVienPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa loại hoc viên', `Bạn có chắc bạn muốn xóa loại hoc viên ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+        T.confirm('Xóa loại học viên', `Bạn có chắc muốn xóa loại học viên ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
             isConfirm && this.props.deleteSdhLoaiHv(item.ma, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá Loại hoc viên ${item.ten} bị lỗi!`, 'danger');
+                if (error) T.notify(error.message ? error.message : `Xoá loại học viên ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá loại học viên ${item.ten} thành công!`, 'success', false, 800);
             });
         });
@@ -80,7 +80,7 @@ class sdhLoaiHocVienPage extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('sdhLoaiHocVien', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhLoaiHocVien ? this.props.sdhLoaiHocVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] };
-        let table = 'Chua co du lieu';
+        let table = 'Chưa có dữ liệu';
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list,
@@ -112,10 +112,10 @@ class sdhLoaiHocVienPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Loại hoc viên',
+            title: 'Loại học viên',
             breadcrumb: [
                 <Link key={0} to={'/user/sau-dai-hoc'}>{'Sau đại học'}</Link>,
-                'Loại hoc viên'
+                'Loại học viên'
             ],
             content: <>
                 <div className='tile'>{table}</div>

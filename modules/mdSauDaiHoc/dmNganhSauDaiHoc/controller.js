@@ -10,10 +10,11 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'dmNganhSdh:read', menu },
+        { name: 'dmNganhSdh:manage', menu },
         { name: 'dmNganhSdh:write' },
         { name: 'dmNganhSdh:delete' },
     );
-    app.get('/user/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/danh-sach-nganh', app.permission.orCheck('dmNganhSdh:read', 'dmNganhSdh:manage'), app.templates.admin);
     app.get('/user/sau-dai-hoc/danh-sach-nganh/upload', app.permission.check('dmNganhSdh:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesNganhSdh', (user, staff) => new Promise(resolve => {
