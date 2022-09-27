@@ -47,6 +47,11 @@ export class AdminChart extends React.Component {
                 intersect: false
             },
             scales: type === 'bar' || type === 'line' ? {
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }],
                 yAxes: [{
                     ticks: {
                         display: false,
@@ -54,7 +59,7 @@ export class AdminChart extends React.Component {
                     }
                 }],
             } : null,
-            animation: {
+            animation: this.props.stack ? {} : {
                 duration: 1000,
                 easing: 'easeOutQuart',
                 onComplete: function () {
@@ -102,11 +107,36 @@ export class AdminChart extends React.Component {
                                 ctx.fillText(data, bar._model.x, bar._model.y - 6);
                             });
                         });
+                    } else {
+                        this.data.datasets.forEach(function (dataset, i) {
+                            let meta = chartInstance.controller.getDatasetMeta(i);
+                            meta.data.forEach(function (bar, index) {
+                                let data = dataset.data[index];
+                                ctx.fillText(data, bar._model.x - 20, bar._model.y + 5);
+                            });
+                        });
                     }
                 }
             }
         };
     }
+
+    stackOption = {
+        plugins: {
+            title: {
+                display: true,
+            },
+        },
+        responsive: true,
+        scales: {
+            xAxes: [{
+                stacked: true
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        }
+    };
 
     componentDidMount() {
         let { type = '', data = {}, percent = null } = this.props;
@@ -130,10 +160,10 @@ export class AdminChart extends React.Component {
                 Object.keys(datas).forEach((label, index, array) => {
                     datasets.push({
                         label: label,
-                        data: Object.values(datas)[index],
+                        data: this.props.stack ? datas[label] : Object.values(datas)[index],
                         fill: false,
-                        backgroundColor: type !== 'line' ? (colors ? (typeof colors === 'object' &&
-                            !Array.isArray(colors) ? colors[label] : colors) : Object.values(DefaultColors)) : DefaultColors.darkGrey,
+                        backgroundColor: this.props.stack ? Object.values(DefaultColors)[index] : (type !== 'line' ? (colors ? (typeof colors === 'object' &&
+                            !Array.isArray(colors) ? colors[label] : colors) : Object.values(DefaultColors)) : DefaultColors.darkGrey),
                         borderColor: type === 'line' ? colors : undefined
                     });
                     if (index === array.length - 1) {
@@ -143,7 +173,7 @@ export class AdminChart extends React.Component {
                                 datasets: datasets,
                                 labels: labels
                             },
-                            options: this.optionChart(type, percent)
+                            options: this.props.stack ? this.stackOption : this.optionChart(type, percent)
                         });
                     }
                 });

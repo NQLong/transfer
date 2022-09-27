@@ -1,6 +1,6 @@
-// Table name: TC_HOC_PHI_TRANSACTION { transId, transDate, customerId, billId, serviceId, amount, checksum, namHoc, hocKy, status, bank }
+// Table name: TC_HOC_PHI_TRANSACTION { transId, transDate, customerId, billId, serviceId, amount, checksum, namHoc, hocKy, status, bank, ghiChu }
 const keys = ['TRANS_ID'];
-const obj2Db = { 'transId': 'TRANS_ID', 'transDate': 'TRANS_DATE', 'customerId': 'CUSTOMER_ID', 'billId': 'BILL_ID', 'serviceId': 'SERVICE_ID', 'amount': 'AMOUNT', 'checksum': 'CHECKSUM', 'namHoc': 'NAM_HOC', 'hocKy': 'HOC_KY', 'status': 'STATUS', 'bank': 'BANK' };
+const obj2Db = { 'transId': 'TRANS_ID', 'transDate': 'TRANS_DATE', 'customerId': 'CUSTOMER_ID', 'billId': 'BILL_ID', 'serviceId': 'SERVICE_ID', 'amount': 'AMOUNT', 'checksum': 'CHECKSUM', 'namHoc': 'NAM_HOC', 'hocKy': 'HOC_KY', 'status': 'STATUS', 'bank': 'BANK', 'ghiChu': 'GHI_CHU' };
 
 module.exports = app => {
     app.model.tcHocPhiTransaction = {
@@ -266,6 +266,19 @@ module.exports = app => {
                         resolve(result);
                     }
                 }));
+        }),
+
+        getStatistic: (filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_hoc_phi_transaction_get_statistic(:filter, :tongsogiaodich); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, filter, tongsogiaodich: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => {
+                    if (error) {
+                        done && done(error);
+                        reject(error);
+                    } else {
+                        done && done(null, result);
+                        resolve(result);
+                    }
+                });
         }),
     };
 };

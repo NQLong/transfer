@@ -9,9 +9,7 @@ import { Tooltip } from '@mui/material';
 
 class EditModal extends AdminModal {
     componentDidMount() {
-        $(document).ready(() => this.onShown(() =>
-            this.dangKyKpi.focus()
-        ));
+        $(document).ready(() => this.onShown());
     }
 
     onShow = (item) => {
@@ -55,8 +53,8 @@ class EditModal extends AdminModal {
 class TccbDonViDangKyNhiemVuDetails extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/don-vi-dang-ky-nhiem-vu/:nam');
+        T.ready('/user', () => {
+            const route = T.routeMatcher('/user/danh-gia/don-vi-dang-ky-nhiem-vu/:nam');
             this.nam = Number(route.parse(window.location.pathname)?.nam);
             this.maDonVi = this.props.system.user.maDonVi;
             this.props.getDmDonVi(this.maDonVi, item => {
@@ -141,8 +139,8 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
             icon: 'fa fa-pencil',
             title: `Thông tin đăng ký năm: ${this.nam}, Đơn vị: ${this.donVi || ''}`,
             breadcrumb: [
-                <Link key={0} to='/user/tccb/'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/don-vi-dang-ky-nhiem-vu'>Đăng ký nhiệm vụ cho đơn vị</Link>,
+                <Link key={0} to='/user'>Thông tin cá nhân</Link>,
+                <Link key={1} to='/user/danh-gia/don-vi-dang-ky-nhiem-vu'>Đăng ký nhiệm vụ cho đơn vị</Link>,
                 'Thông tin đăng ký'
             ],
             content: <>
@@ -152,7 +150,7 @@ class TccbDonViDangKyNhiemVuDetails extends AdminPage {
                     update={this.update}
                     readOnly={!permission.write} />
             </>,
-            backRoute: '/user/tccb/don-vi-dang-ky-nhiem-vu',
+            backRoute: '/user/danh-gia/don-vi-dang-ky-nhiem-vu',
         });
     }
 }

@@ -18,7 +18,7 @@ module.exports = app => {
             const nam = Number(req.query.nam), maDonVi = req.query.ma;
             const donVi = await app.model.dmDonVi.get({ ma: maDonVi });
             let danhGiaDonVis = await app.model.tccbKhungDanhGiaDonVi.getAll({ nam, isDelete: 0 }, '*', 'THU_TU ASC');
-            let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi });
+            let dangKys = await app.model.tccbDonViDangKyNhiemVu.getAll({ nam, maDonVi }, 'id,dangKyKpi,dienGiai,maKhungDanhGiaDonVi,maDonVi,nam');
             let items = danhGiaDonVis.filter(item => !item.parentId);
             danhGiaDonVis = danhGiaDonVis.filter(item => item.parentId).map(item => {
                 const index = dangKys.findIndex(dangKy => dangKy.maKhungDanhGiaDonVi == item.id);

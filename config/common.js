@@ -58,7 +58,7 @@ module.exports = (app, appConfig) => {
         },
         user: {
             index: 1000, title: 'Trang cá nhân', link: '/user', icon: 'fa-user',
-            subMenusRender: false, groups: ['Thông tin cá nhân', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn', 'Văn phòng điện tử']
+            subMenusRender: false, groups: ['Thông tin cá nhân', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn', 'Văn bản', 'Đánh giá', 'Văn phòng điện tử']
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-pie-chart',
@@ -146,6 +146,7 @@ module.exports = (app, appConfig) => {
     };
 
     // Load services --------------------------------------------------------------------------------------------------
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
     const axios = require('axios'),
         axiosRequest = async (type, url, data, requestConfig) => {
             try {
@@ -166,6 +167,7 @@ module.exports = (app, appConfig) => {
 
                 return response ? response.data : null;
             } catch (error) {
+                console.error('axiosRequest:', error);
                 return { error };
             }
         };

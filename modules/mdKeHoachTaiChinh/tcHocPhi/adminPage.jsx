@@ -7,7 +7,7 @@ import { SelectAdapter_FwNamTuyenSinh } from 'modules/mdSinhVien/fwStudents/redu
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell, AdminModal, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, FormSelect, renderTable, TableCell, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import T from 'view/js/common';
 import CountUp from 'view/js/countUp';
@@ -152,11 +152,8 @@ const yearDatas = () => {
 
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 class TcHocPhiAdminPage extends AdminPage {
-    state = {
-        filter: {},
-        totalCurrent: 0,
-        totalPaid: 0
-    }
+    state = { filter: {}, totalCurrent: 0, totalPaid: 0, isButtonsExpanded: false }
+
     componentDidMount() {
         T.ready('/user/finance/hoc-phi', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
@@ -171,6 +168,9 @@ class TcHocPhiAdminPage extends AdminPage {
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
+            this.setState({ thaoTacNhanh: true }, () => {
+                this.thaoTacNhanh?.value(true);
+            });
         });
     }
 
@@ -248,41 +248,44 @@ class TcHocPhiAdminPage extends AdminPage {
     render() {
         let invoicePermission = this.getUserPermission('tcInvoice');
         let permission = this.getUserPermission('tcHocPhi', ['read', 'write', 'delete', 'manage', 'export']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list, settings } = this.props.tcHocPhi && this.props.tcHocPhi.page ? this.props.tcHocPhi.page : {
             pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null
         };
         const buttons = [];
 
-        invoicePermission.write && buttons.push({
-            className: 'btn-info', icon: 'fa-print', tooltip: 'Xuất hóa đơn', onClick: (e) => {
-                e.preventDefault();
-                this.invoiceModal.show({
-                    tuNgay: this.tuNgay?.value(),
-                    denNgay: this.denNgay?.value(),
-                    hocKy: this.term.value(),
-                    namHoc: this.year.value(),
-                });
-            }
-        }, {
-            className: 'btn-primary', icon: 'fa-scissors', tooltip: 'Tách MSSV', onClick: (e) => {
-                e.preventDefault();
-                this.tachMssvModal.show();
-            }
-        }, {
-            className: 'btn-secondary', icon: 'fa-cog', tooltip: 'Chọn BHYT', onClick: (e) => {
-                e.preventDefault();
-                this.props.history.push('/user/finance/bhyt');
-            }
-        });
+        if (this.state.isButtonsExpanded) {
+            buttons.push({ className: 'btn-secondary', icon: 'fa-caret-right', tooltip: 'Thu gọn', onClick: e => e.preventDefault() || this.setState({ isButtonsExpanded: false }) });
+            invoicePermission.write && buttons.push({
+                className: 'btn-info', icon: 'fa-print', tooltip: 'Xuất hóa đơn', onClick: (e) => {
+                    e.preventDefault();
+                    this.invoiceModal.show({
+                        tuNgay: this.tuNgay?.value(),
+                        denNgay: this.denNgay?.value(),
+                        hocKy: this.term.value(),
+                        namHoc: this.year.value(),
+                    });
+                }
+            }, {
+                className: 'btn-primary', icon: 'fa-scissors', tooltip: 'Tách MSSV', onClick: (e) => {
+                    e.preventDefault();
+                    this.tachMssvModal.show();
+                }
+            });
+            permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
+            permission.write && buttons.push({ type: 'primary', icon: 'fa-cloud-upload', className: 'btn-success', tooltip: 'Import', onClick: e => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') });
+            permission.export && buttons.push({ type: 'primary', icon: 'fa-file-excel-o', className: 'btn-success', tooltip: 'export', onClick: e => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') });
+        } else {
+            buttons.push({ className: 'btn-info', icon: 'fa-caret-left', tooltip: 'Mở rộng', onClick: e => e.preventDefault() || this.setState({ isButtonsExpanded: true }) });
+        }
 
-        permission.manage && buttons.push({ type: 'primary', icon: 'fa-table', tooltip: 'Thống kê', onClick: e => e.preventDefault() || (permission.manage && this.props.history.push('/user/finance/statistic')) });
+
 
 
         let table = renderTable({
             getDataSource: () => list,
             stickyHead: true,
             header: 'thead-light',
-            className: 'table-fix-col',
+            className: this.state.thaoTacNhanh ? 'table-fix-col' : '',
             emptyTable: 'Chưa có dữ liệu học phí học kỳ hiện tại',
             renderHead: () => (<tr>
                 <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -385,12 +388,13 @@ class TcHocPhiAdminPage extends AdminPage {
                         <NumberIcon type='primary' icon='fa-users' title='Tổng số sinh viên đóng học phí' value={totalItem || 0} />
                     </div>
                     <div className='col-md-6'>
-                        <NumberIcon type='info' icon='fa-users' title='Số sinh viên đã đóng đủ' value={this.state.totalPaid || 0} />
+                        <NumberIcon type='info' icon='fa-users' title='Số sinh viên đã đóng đủ' value={settings?.totalPaid || 0} />
                     </div>
                     <div className='col-md-12'>
                         <div className='tile'>
+                            <div><FormCheckbox isSwitch label={'Thao tác nhanh'} ref={e => this.thaoTacNhanh = e} onChange={value => this.setState({ thaoTacNhanh: value })} /></div>
                             {table}
-                            <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                            <Pagination {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} pageRange={3}
                                 getPage={this.getPage} />
                             <EditModal ref={e => this.modal = e} permission={permission} update={this.props.updateHocPhi} readOnly={!permission.readOnly} />
                             <Detail ref={e => this.detailModal = e} getHocPhi={this.props.getHocPhi} create={this.props.createMultipleHocPhi} readOnly={!permission.write} />
@@ -403,8 +407,8 @@ class TcHocPhiAdminPage extends AdminPage {
 
                     <TachMssvModal ref={e => this.tachMssvModal = e} />
                 </div>,
-            onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
-            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
+            // onImport: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/finance/import-hoc-phi') : null,
+            // onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/finance/hoc-phi/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_PHI.xlsx') : null,
             buttons: buttons,
         });
     }

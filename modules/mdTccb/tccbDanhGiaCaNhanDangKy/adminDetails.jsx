@@ -1,25 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy, updateTccbCaNhanDangKy } from './redux';
+import { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 
 class TccbCaNhanDangKyDetails extends AdminPage {
-
     componentDidMount() {
-        T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/ca-nhan-dang-ky/:nam');
+        T.ready('/user', () => {
+            const route = T.routeMatcher('/user/danh-gia/ca-nhan-dang-ky/:nam');
             this.nam = parseInt(route.parse(window.location.pathname)?.nam);
             this.props.getTccbCaNhanDangKyByYear(this.nam);
         });
     }
 
     dangKy = (item, value) => {
-        if (item.id) {
-            this.props.updateTccbCaNhanDangKy(item.id, { dangKy: value }, item.idNhomDangKy);
-        } else {
-            this.props.createTccbCaNhanDangKy({ dangKy: value }, item.nhom.id);
-        }
+        this.props.createTccbCaNhanDangKy({ dangKy: value }, item.nhom.id);
     }
 
     render() {
@@ -27,6 +22,8 @@ class TccbCaNhanDangKyDetails extends AdminPage {
             write: true,
         };
         const list = this.props.tccbCaNhanDangKy?.items || [];
+        const daDangKy = list.some(item => item.dangKy == 1);
+        const approvedDonVi = this.props.tccbCaNhanDangKy?.approvedDonVi;
         let table = renderTable({
             className: 'dmcv',
             emptyTable: 'Không có dữ liệu đăng ký',
@@ -48,7 +45,7 @@ class TccbCaNhanDangKyDetails extends AdminPage {
                     <tr>
                         <TableCell style={{ textAlign: 'center' }} className='text-primary' content={<b>{(index + 1).intToRoman()}</b>} />
                         <TableCell style={{ textAlign: 'left' }} className='text-primary' colSpan={5} content={<b>{item.nhom.ten}</b>} />
-                        <TableCell type='checkbox' rowSpan={1 + item.submenus.length * 2} content={item.dangKy || 0} permission={permission} onChanged={value => this.dangKy(item, value)} />
+                        <TableCell type='checkbox' rowSpan={1 + item.submenus.length * 2} content={item.dangKy} permission={permission} onChanged={value => this.dangKy(item, value)} />
                     </tr>
                     {
                         item.submenus.length > 0 &&
@@ -75,18 +72,19 @@ class TccbCaNhanDangKyDetails extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-pencil',
+            header: `${daDangKy ? (`Đơn vị phê duyệt: ${approvedDonVi || 'Chưa phê duyệt'}`) : 'Cá nhân chưa đăng ký'}`,
             title: 'Thông tin đăng ký',
             breadcrumb: [
-                <Link key={0} to='/user/tccb/'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/ca-nhan-dang-ky/'>Cá nhân đăng ký</Link>,
+                <Link key={0} to='/user'>Thông tin cá nhân</Link>,
+                <Link key={1} to='/user/danh-gia/ca-nhan-dang-ky'>Cá nhân đăng ký</Link>,
                 'Thông tin đăng ký'
             ],
             content: <div className='tile'>{table}</div>,
-            backRoute: '/user/tccb/ca-nhan-dang-ky',
+            backRoute: '/user/danh-gia/ca-nhan-dang-ky',
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, tccbCaNhanDangKy: state.tccb.tccbCaNhanDangKy });
-const mapActionsToProps = { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy, updateTccbCaNhanDangKy };
+const mapActionsToProps = { getTccbCaNhanDangKyByYear, createTccbCaNhanDangKy };
 export default connect(mapStateToProps, mapActionsToProps)(TccbCaNhanDangKyDetails);
