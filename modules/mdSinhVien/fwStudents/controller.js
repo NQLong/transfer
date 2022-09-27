@@ -231,7 +231,7 @@ module.exports = app => {
             const outDir = app.path.join(app.assetPath, 'image-card', `${new Date().getFullYear()}.zip`),
                 srcDir = app.path.join(app.assetPath, 'image-card', (new Date().getFullYear()).toString());
             await app.fs.zipDirectory(srcDir, outDir);
-            res.sendFile(outDir);
+            res.download(outDir, `ANH_THE_SV_${new Date().getFullYear()}.zip`);
         } catch (error) {
             res.send({ error });
         }
@@ -490,8 +490,8 @@ module.exports = app => {
             });
             let fileName = 'ALL_STUDENT_DATA.xlsx';
             app.excel.attachment(workBook, res, fileName);
-
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
