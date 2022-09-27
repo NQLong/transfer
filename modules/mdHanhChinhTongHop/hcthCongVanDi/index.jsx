@@ -24,10 +24,6 @@ export default {
         {
             path: '/user/van-ban-di/:id',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
-        },
-        // {
-        //     path: '/user/v2/van-ban-di/:id',
-        //     component: Loadable({ loading: Loading, loader: () => import('../hcthVanBanDi/userEditPage') })
-        // }
+        }
     ]
 };

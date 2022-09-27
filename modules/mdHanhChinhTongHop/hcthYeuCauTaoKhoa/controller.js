@@ -372,7 +372,6 @@ module.exports = app => {
                 image = image.resize(parseInt(width), parseInt(height));
                 buffer = image.getBuffer(jimp.MIME_PNG, (error, buffer) => { 
                     if (error) throw error;
-                    console.log(buffer);
                     sendResponse(buffer.toString('base64'));
                 });
             }
