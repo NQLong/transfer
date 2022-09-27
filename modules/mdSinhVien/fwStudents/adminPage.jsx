@@ -79,6 +79,14 @@ class AdminStudentsPage extends AdminPage {
         });
     }
 
+    downloadExcel = () => {
+        T.handleDownload(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx');
+    }
+
+    downloadImage = () => {
+        T.handleDownload('/api/students/download-image-card', 'ANH_THE.zip');
+    }
+
     render() {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete', 'export']);
         let developer = this.getUserPermission('developer', ['login']);
@@ -324,8 +332,9 @@ class AdminStudentsPage extends AdminPage {
             ,
             backRoute: '/user/students',
             collapse: [
-                { icon: 'fa-print', name: 'Export', permission: permission.export, onClick: () => T.download(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx'), type: 'success' },
-                { icon: 'fa-upload', name: 'Import', permission: developer.login, onClick: () => this.props.history.push('/user/students/import'), type: 'danger' }
+                { icon: 'fa-print', name: 'Export', permission: permission.export, onClick: this.downloadExcel, type: 'success' },
+                { icon: 'fa-upload', name: 'Import', permission: developer.login, onClick: () => this.props.history.push('/user/students/import'), type: 'danger' },
+                { icon: 'fa-picture-o', name: 'Tải ảnh thẻ', permission: permission.export, onClick: this.downloadImage, type: 'info' }
             ]
         });
     }

@@ -68,7 +68,7 @@ module.exports = app => {
         try {
             const _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
-                { condition, filter, sortTerm } = req.query;
+                { condition, filter, sortTerm = 'ten_ASC' } = req.query;
             const searchTerm = typeof condition === 'string' ? condition : '';
             let page = await app.model.fwStudents.searchPage(_pageNumber, _pageSize, searchTerm, app.utils.stringify(filter), sortTerm.split('_')[0], sortTerm.split('_')[1]);
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
@@ -226,6 +226,16 @@ module.exports = app => {
     app.uploadHooks.add('uploadSinhVienImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSinhVienImage(req, fields, files, params, done), done, 'student:login'));
 
+    app.get('/api/students/download-image-card', app.permission.check('student:manage'), async (req, res) => {
+        try {
+            const outDir = app.path.join(app.assetPath, 'image-card', `${new Date().getFullYear()}.zip`),
+                srcDir = app.path.join(app.assetPath, 'image-card', (new Date().getFullYear()).toString());
+            await app.fs.zipDirectory(srcDir, outDir);
+            res.download(outDir, `ANH_THE_SV_${new Date().getFullYear()}.zip`);
+        } catch (error) {
+            res.send({ error });
+        }
+    });
     const qrCode = require('qrcode');
     const toPdf = require('office-to-pdf');
     const initSyll = async (req, res, next) => {
@@ -480,8 +490,8 @@ module.exports = app => {
             });
             let fileName = 'ALL_STUDENT_DATA.xlsx';
             app.excel.attachment(workBook, res, fileName);
-
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });

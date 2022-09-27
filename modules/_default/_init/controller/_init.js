@@ -81,7 +81,7 @@ module.exports = app => {
     });
 
     // Upload ---------------------------------------------------------------------------------------------------------------------------------------
-    app.post('/user/upload', app.permission.check(), (req, res) => {
+    app.post('/user/upload', (req, res) => {
         app.getUploadForm().parse(req, (error, fields, files) => {
             console.log('User Upload:', fields, files, req.query);
             if (error) {
@@ -95,6 +95,7 @@ module.exports = app => {
             }
         });
     });
+
     app.put('/api/profile', app.permission.check(), (req, res) => {
         if (req.session.user.ma && req.body.changes) {
             const changes = {
