@@ -15,11 +15,11 @@ module.exports = app => {
         { name: 'sdhLoaiQuyetDinh:write' },
         { name: 'sdhLoaiQuyetDinh:delete' },
     );
-    app.get('/user/sau-dai-hoc/loai-quyet-dinh', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/loai-quyet-dinh', app.permission.check('sdhLoaiQuyetDinh:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesLoaiQuyetDinh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhLoaiQuyetDinh:read', 'sdhLoaiQuyetDinh:write', 'sdhLoaiQuyetDinh:delete', 'staff:login');
+            app.permissionHooks.pushUserPermission(user, 'sdhLoaiQuyetDinh:read', 'sdhLoaiQuyetDinh:write', 'sdhLoaiQuyetDinh:delete');
             resolve();
         } else resolve();
     }));

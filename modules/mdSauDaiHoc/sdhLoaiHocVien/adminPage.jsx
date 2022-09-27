@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
 
     render = () => {
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật học viên sau đại học' : 'Tạo mới học viên sau đại học',
+            title: this.state.ma ? 'Cập nhật học viên' : 'Tạo mới học viên',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-sm-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : false} placeholder='Mã' required />
                 <FormTextBox type='text' className='col-sm-12' ref={e => this.ten = e} label='Tên' placeholder='Tên' required />
@@ -59,15 +59,14 @@ class sdhLoaiHocVienPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/sau-dai-hoc', () => {
             this.props.getSdhLoaiHvPage();
-            console.log(this.props);
         });
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa Loại hoc viên sau đại học', `Bạn có chắc bạn muốn xóa Loại hoc viên sau đại học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+        T.confirm('Xóa loại hoc viên', `Bạn có chắc bạn muốn xóa loại hoc viên ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
             isConfirm && this.props.deleteSdhLoaiHv(item.ma, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá Loại hoc viên sau đại học ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá Loại hoc viên sau đại học ${item.ten} thành công!`, 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : `Xoá Loại hoc viên ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá loại học viên ${item.ten} thành công!`, 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -113,10 +112,10 @@ class sdhLoaiHocVienPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Loại hoc viên sau đại học',
+            title: 'Loại hoc viên',
             breadcrumb: [
                 <Link key={0} to={'/user/sau-dai-hoc'}>{'Sau đại học'}</Link>,
-                'Loại hoc viên sau đại học'
+                'Loại hoc viên'
             ],
             content: <>
                 <div className='tile'>{table}</div>

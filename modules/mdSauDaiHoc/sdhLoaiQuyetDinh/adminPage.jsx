@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
 
     render = () => {
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật học viên sau đại học' : 'Tạo mới học viên sau đại học',
+            title: this.state.ma ? 'Cập nhật loại quyết định' : 'Tạo mới loại quyết định',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-sm-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : false} placeholder='Mã' required />
                 <FormTextBox type='text' className='col-sm-12' ref={e => this.ten = e} label='Tên' placeholder='Tên' required />
@@ -112,10 +112,10 @@ class sdhLoaiQuyetDinhPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Loại quyết định sau đại học',
+            title: 'Loại quyết định',
             breadcrumb: [
                 <Link key={0} to={'/user/sau-dai-hoc'}>{'Sau đại học'}</Link>,
-                'Loại quyết định sau đại học'
+                'Loại quyết định'
             ],
             content: <>
                 <div className='tile'>{table}</div>
