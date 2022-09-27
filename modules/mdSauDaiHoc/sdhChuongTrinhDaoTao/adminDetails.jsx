@@ -74,7 +74,7 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
             this.maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
             this.khoa.value(this.maKhoa == 37 ? '' : this.maKhoa);
         }
-        this.props.getSdhKhungDaoTao(this.ma, item => this.setState({ khungDaoTao: item }));
+        this.props.getSdhKhungDaoTao(this.ma, result => this.setState({ khungDaoTao: result.item }));
     }
 
     pushMonHocChosen = (maMonHoc) => {
@@ -97,19 +97,19 @@ class SdhChuongTrinhDaoTaoDetails extends AdminPage {
     getData = (id, isClone = false, khoaSdh) => {
         this.trinhDoDaoTao.value('SDH');
         id && this.props.getSdhKhungDaoTao(id, (data) => {
-            this.khoa.value(data.maKhoa);
-            this.maNganh.value(data.maNganh);
+            this.khoa.value(data.item.maKhoa);
+            this.maNganh.value(data.item.maNganh);
             // this.setState({ chuyenNganh: data?.chuyenNganh || '' });
             // this.chuyenNganh.value(data.chuyenNganh);
-            this.setState({ maNganh: data.maNganh });
-            this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
-            this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
-            this.bacDaoTao.value(data.bacDaoTao);
-            this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
-            this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
-            this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
-            const mucTieu = T.parse(data.mucTieu || '{}');
-            this.khoaSdh = !isClone ? data.namDaoTao : khoaSdh;
+            this.setState({ maNganh: data.item.maNganh });
+            this.tenNganhVi.value(T.parse(data.item.tenNganh).vi || '');
+            this.tenNganhEn.value(T.parse(data.item.tenNganh).en || '');
+            this.bacDaoTao.value(data.item.bacDaoTao);
+            this.thoiGianDaoTao.value(data.item.thoiGianDaoTao || '');
+            this.tenVanBangVi.value(T.parse(data.item.tenVanBang).vi || '');
+            this.tenVanBangEn.value(T.parse(data.item.tenVanBang).en || '');
+            const mucTieu = T.parse(data.item.mucTieu || '{}');
+            this.khoaSdh = !isClone ? data.item.namDaoTao : khoaSdh;
             this.props.getSdhChuongTrinhDaoTao(id, (ctsdh) => {
                 SelectAdapter_SdhCauTrucKhungDaoTao.fetchOne(this.khoaSdh, (rs) => {
                     this.setNamDaoTao(rs, mucTieu, ctsdh);

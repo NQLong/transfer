@@ -123,21 +123,39 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
             backgroundColor: 'red',
             zIndex: 99999,
             start: (event, ui) => {
-                ui.helper.css('background-color', 'paleturquoise');
                 ui.helper.css('cursor', 'grabbing');
+            },
+            drag: (event, ui) => {
+                if (ui.helper.offset().top < ($('.droppable').offset().top - 35)) {
+                    ui.helper.css('background-color', 'gray');
+                    ui.helper.css('opacity', '0.5');
+                }
+                else {
+                    ui.helper.css('background-color', 'paleturquoise');
+                    ui.helper.css('opacity', '1');
+                }
             }
-
         });
         $('.droppable tbody').draggable({
             helper: 'clone',
             containment: 'body',
-            cursor: 'grabbing',
             scroll: true,
             backgroundColor: null,
             zIndex: 99999,
-            drag: (event, ui) => {
-                ui.helper.css('background-color', 'paleturquoise');
+            start: (event, ui) => {
                 ui.helper.css('cursor', 'grabbing');
+            },
+            drag: (event, ui) => {
+                if ((ui.helper.offset().left < ($('.draggable').offset().left + $('.draggable').width() - 100))
+                    || (ui.helper.offset().top < ($('.droppable').offset().top - 35))
+                    || (ui.helper.offset().bottom < ($('.droppable').offset().bottom - 35))) {
+                    ui.helper.css('background-color', 'gray');
+                    ui.helper.css('opacity', '0.5');
+                }
+                else {
+                    ui.helper.css('background-color', 'paleturquoise');
+                    ui.helper.css('opacity', '1');
+                }
             }
         });
 
@@ -204,6 +222,7 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
     }
     updateMonHocMulti = (id, changes) => {
         this.props.updateSdhChuongTrinhDaoTaoMulti(id, changes, () => this.getData(this.state.ma));
+        !$(`#collapseOne-${changes.hocKy - 1}`).hasClass('show') && $(`#collapseOne-${changes.hocKy - 1}`).collapse('show');
     }
 
     handleSelected = (item, flag) => {
