@@ -1,26 +1,15 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.category,
-        menus: {
-            4105: {
-                title: 'Môn học (trước 2022)',
-                subTitle: 'Sau đại học',
-                link: '/user/danh-muc/mon-hoc'
-            },
-        },
-    };
-    const menuSDH = {
+    const menuSdh = {
         parentMenu: app.parentMenu.sdh,
         menus: {
             7510: {
                 title: 'Môn học (trước 2022)',
-                link: '/user/sau-dai-hoc/mon-hoc', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex:1
+                link: '/user/sau-dai-hoc/mon-hoc', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex: 1
             },
         },
     };
     app.permission.add(
-        { name: 'dmMonHocSdh:manage', menu },
-        { name: 'dmMonHocSdh:manage', menu: menuSDH },
+        { name: 'dmMonHocSdh:manage', menu: menuSdh },
         { name: 'dmMonHocSdh:write' },
         { name: 'dmMonHocSdh:delete' },
     );

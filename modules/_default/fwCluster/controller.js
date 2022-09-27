@@ -64,6 +64,7 @@ module.exports = (app, appConfig) => {
         socketIoEmit();
     });
 
+
     // System Image APIs ----------------------------------------------------------------------------------------------------------------------------
     app.put('/api/cluster/image', app.permission.check('cluster:write'), async (req, res) => {
         const { serviceName, filename } = req.body;
@@ -200,7 +201,7 @@ module.exports = (app, appConfig) => {
             }
         }
     };
-    app.uploadHooks.add('ClusterImageUpload', (req, fields, files, params, done) => clusterImageUpload(fields, files, params, done));
+    app.uploadHooks.add('ClusterImageUpload', (req, fields, files, params, done) => clusterImageUpload(fields, files, params, done), false);
 
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
@@ -208,13 +209,12 @@ module.exports = (app, appConfig) => {
         ready: () => app.io && app.io.addSocketListener,
         run: () => app.io.addSocketListener('cluster', socket => {
             const user = app.io.getSessionUser(socket);
-            if (user && user.permissions.includes('cluster:manage')) {
-                socket.join('cluster');
-            }
-        })
+            user && user.permissions.includes('cluster:manage') && socket.join('cluster');
+        }),
     });
 
-    //pm2 logs API -------------------------------------------------------------------------------------------------------------------------------
+
+    // Pm2 logs API ---------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/cluster/logs', app.permission.check('cluster:manage'), (req, res) => {
         try {
             const { path, from } = req.query;
