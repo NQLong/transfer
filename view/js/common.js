@@ -90,6 +90,41 @@ const T = {
         link.click();
     },
 
+    handleDownload: (url, name, maxTimeout = 10000) => {
+        T.alert('Vui lòng chờ trong giây lát!', 'info', false, null, true);
+        $.ajax({
+            type: 'GET',
+            url: T.url(url),
+            xhr: () => {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState == 2) {
+                        if (xhr.status == 200) {
+                            xhr.responseType = 'blob';
+                        } else {
+                            xhr.responseType = 'text';
+                        }
+                    }
+                };
+                return xhr;
+            },
+            timeout: maxTimeout,
+            success: response => {
+                T.alert('Tải về thành công!', 'success', false, 2000);
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', name);
+                document.body.appendChild(link);
+                link.click();
+            },
+            error: (xmlhttprequest, textstatus, message) => {
+                T.alert('Tải về thất bại!', 'error', false, 2000);
+                console.error(xmlhttprequest, textstatus, message);
+            }
+        })
+    },
+
     getCookiePage: (cookieName, key) => {
         const pageData = T.storage(cookieName);
         return (pageData && pageData[key]) ? pageData[key] : '';
@@ -188,7 +223,7 @@ const T = {
 
     notify: (message, type) => $.notify({ message }, { type, placement: { from: 'bottom' }, z_index: 2000 }),
 
-    alert: (text, icon, button, timer) => {
+    alert: (text, icon, button, timer, disabledClick) => {
         let options = {}, done = null;
         if (icon) {
             if (typeof icon == 'boolean') {
@@ -217,6 +252,12 @@ const T = {
         } else {
             options.icon = 'success';
             options.button = true;
+        }
+        if (typeof disabledClick == 'boolean') {
+            if (disabledClick == true) {
+                options.closeOnClickOutside = false;
+                options.closeOnEsc = false;
+            }
         }
         options.text = text;
         done ? swal(options).then(done) : swal(options);

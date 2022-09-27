@@ -1,13 +1,18 @@
 module.exports = app => {
 
     // Upload Hook ----------------------------------------------------------------------------------------------------------------------------------
-    const uploadHooksList = {};
+    const uploadHooksList = {}, uploadHooksNoUserList = {};
     app.uploadHooks = {
-        add: (name, hook) => uploadHooksList[name] = hook,
+        add: (name, hook, isUser = true) => isUser ? (uploadHooksList[name] = hook) : (uploadHooksNoUserList[name] = hook),
         remove: name => uploadHooksList[name] = null,
 
-        run: (req, fields, files, params, sendResponse) =>
-            Object.keys(uploadHooksList).forEach(name => uploadHooksList[name] && uploadHooksList[name](req, fields, files, params, data => data && sendResponse(data))),
+        run: (req, fields, files, params, sendResponse) => {
+            const list = req.session.user ? uploadHooksList : uploadHooksNoUserList,
+                hookNames = Object.keys(list);
+            hookNames.forEach(hookName => list[hookName] && list[hookName](req, fields, files, params, data => {
+                data && sendResponse(data);
+            }));
+        },
     };
 
     // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------
