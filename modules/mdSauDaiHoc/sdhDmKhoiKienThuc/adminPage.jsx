@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { getSdhDmKhoiKienThucPage, deleteSdhDmKhoiKienThuc, createSdhDmKhoiKienThuc, updateSdhDmKhoiKienThuc, SelectAdapter_SdhDmKhoiKienThucAll } from './redux';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
@@ -57,9 +58,7 @@ class EditModal extends AdminModal {
 
 class SdhDmKhoiKienThucPage extends AdminPage {
     componentDidMount() {
-        let route = T.routeMatcher('/user/:menu/khoi-kien-thuc').parse(window.location.pathname);
-        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
-        T.ready(`/user/${this.menu}`);
+        T.ready('/user/sau-dai-hoc');
         T.onSearch = (searchText) => this.props.getSdhDmKhoiKienThucPage(undefined, undefined, searchText || '');
         T.showSearchBox();
         this.props.getSdhDmKhoiKienThucPage();
@@ -112,6 +111,7 @@ class SdhDmKhoiKienThucPage extends AdminPage {
             icon: 'fa fa-crosshairs',
             title: 'Khối kiến thức',
             breadcrumb: [
+                <Link key={0} to='/user/sau-dai-hoc'>Sau đại học</Link>,
                 'Khối kiến thức'
             ],
             content: <>
@@ -119,7 +119,7 @@ class SdhDmKhoiKienThucPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getSdhDmKhoiKienThucPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createSdhDmKhoiKienThuc} update={this.props.updateSdhDmKhoiKienThuc} />
             </>,
-            backRoute: `/user/${this.menu}`,
+            backRoute: '/user/sau-dai-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

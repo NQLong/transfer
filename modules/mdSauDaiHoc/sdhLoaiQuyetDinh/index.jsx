@@ -1,16 +1,16 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import sdhDmKhoiKienThuc from './redux';
+import sdhLoaiQuyetDinh from './redux';
 
 export default {
     redux: {
         parent: 'sdh',
-        reducers: { sdhDmKhoiKienThuc }
+        reducers: { sdhLoaiQuyetDinh, }
     },
     routes: [
         {
-            path: '/user/sau-dai-hoc/khoi-kien-thuc',
+            path: '/user/sau-dai-hoc/loai-quyet-dinh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

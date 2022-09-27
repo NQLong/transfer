@@ -97,13 +97,13 @@ export function getSdhChuongTrinhDaoTao(maKhungDaoTao, done) {
 
 export function getSdhKhungDaoTao(id, done) {
     return () => {
-        const url = `/api/sau-dai-hoc/khung-dao-tao/${id}`;
+        const url = `/api/sau-dai-hoc/khung-dao-tao/item/${id}`;
         T.get(url, { condition: { id } }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khung đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.items);
+                if (done) done(data);
             }
         });
     };
@@ -187,6 +187,21 @@ export function updateSdhChuongTrinhDaoTao(id, changes, done) {
         }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
     };
 }
+export function updateSdhChuongTrinhDaoTaoMulti(id, changes, done) {
+    return () => {
+        const url = '/api/sau-dai-hoc/chuong-trinh-dao-tao/multiple';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify(`Lưu lỗi: ${data.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${data.error.message}`);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật thành công!', 'success');
+                done && done();
+            }
+        }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
+    };
+}
 
 
 export const SelectAdapter_ChuongTrinhDaoTaoFilter = (maNganh = null) => {
@@ -244,5 +259,20 @@ export function downloadWord(id, done) {
                 done(data.data);
             }
         }, () => T.notify('Tải file word bị lỗi', 'danger'));
+    };
+}
+
+export function updateKhungDaoTao(id, changes, done) {
+    return () => {
+        const url = '/api/sau-dai-hoc/khung-dao-tao';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify(`Lưu lỗi: ${data.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${data.error.message}`);
+                done && done(data.error);
+            } else {
+                done && done();
+            }
+        }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
     };
 }

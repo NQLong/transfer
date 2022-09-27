@@ -13,9 +13,10 @@ import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTra
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 
 class AdminSvSdhPage extends AdminPage {
+
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/sinh-vien', () => {
+        T.ready('/user/sau-dai-hoc', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.props.getSvSdhPage(undefined, undefined, searchText || '', this.state.filter);
             T.showSearchBox(() => {
@@ -47,6 +48,7 @@ class AdminSvSdhPage extends AdminPage {
         this.setState({ filter: pageFilter }, () => {
             this.props.getSvSdhPage(pageNumber, pageSize, '', this.state.filter, (page) => {
                 if (isInitial) {
+                    this.showAdvanceSearch();
                     const filter = page.filter || {};
                     let { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -74,7 +76,7 @@ class AdminSvSdhPage extends AdminPage {
     }
 
     render() {
-        let permission = this.getUserPermission('svSdh', ['read', 'write', 'delete']);
+        let permission = this.getUserPermission('svSdh', ['read', 'write', 'delete', 'export']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.svSdh && this.props.svSdh.page ?
             this.props.svSdh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
@@ -152,7 +154,7 @@ class AdminSvSdhPage extends AdminPage {
                     getPage={this.props.getSvSdhPage} />
             </>
             ,
-            backRoute: '/user/students',
+            backRoute: '/user/sau-dai-hoc',
             onCreate: (e) => {
                 if (permission.write) {
                     e.preventDefault();
@@ -161,7 +163,10 @@ class AdminSvSdhPage extends AdminPage {
                     T.confirm('Cảnh báo', 'Bạn không có quyền thêm mới sinh viên. Liên hệ người có quyền để thao tác', 'warning', true);
                 }
             },
-            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sv-sdh/upload') : null
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sv-sdh/upload') : null,
+            onExport: permission.export ? (e) => e.preventDefault() || T.download(`/api/sv-sdh/download-excel?filter=${T.stringify(this.state.filter)}`, 'HOC_VIEN_SDH.xlsx') : null,
+
+            
         });
     }
 }

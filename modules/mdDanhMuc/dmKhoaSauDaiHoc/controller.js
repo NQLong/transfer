@@ -1,38 +1,27 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
-        menus: {
-            4103: {
-                title: 'Khoa đào tạo, giảng dạy',
-                subTitle: 'Sau đại học',
-                link: '/user/danh-muc/khoa-sau-dai-hoc'
-            },
-        },
-    };
-
-    const menuSdh = {
         parentMenu: app.parentMenu.sdh,
         menus: {
             7503: {
                 title: 'Khoa đào tạo, giảng dạy',
                 link: '/user/sau-dai-hoc/khoa-sau-dai-hoc',
-                backgroundColor: '#1ca474',
                 groupIndex: 2
             },
         },
     };
     app.permission.add(
         { name: 'dmKhoaSdh:read', menu },
-        { name: 'dmKhoaSdh:write', menu: menuSdh },
         { name: 'dmKhoaSdh:delete' },
     );
-    app.get('/user/danh-muc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/khoa-sau-dai-hoc', app.permission.check('dmKhoaSdh:read'), app.templates.admin);
     app.permissionHooks.add('staff', 'addRoleKhoaSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
             app.permissionHooks.pushUserPermission(user, 'dmKhoaSdh:read', 'dmKhoaSdh:write', 'dmKhoaSdh:delete');
             resolve();
         } else resolve();
     }));
+
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khoa-sau-dai-hoc/page/:pageNumber/:pageSize', app.permission.check('dmKhoaSdh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),

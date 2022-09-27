@@ -1,9 +1,9 @@
-// Table name: SDH_CHUONG_TRINH_DAO_TAO { maMonHoc, loaiMonHoc, tinChiLyThuyet, tinChiThucHanh, ghiChu, kichHoat, maKhoiKienThuc, maKhungDaoTao, tenMonHoc, maKhoiKienThucCon, id, hocKy, thu, tietBatDau }
-const keys = ['ID'];
-const obj2Db = { 'maMonHoc': 'MA_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'tinChiLyThuyet': 'TIN_CHI_LY_THUYET', 'tinChiThucHanh': 'TIN_CHI_THUC_HANH', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT', 'maKhoiKienThuc': 'MA_KHOI_KIEN_THUC', 'maKhungDaoTao': 'MA_KHUNG_DAO_TAO', 'tenMonHoc': 'TEN_MON_HOC', 'maKhoiKienThucCon': 'MA_KHOI_KIEN_THUC_CON', 'id': 'ID', 'hocKy': 'HOC_KY', 'thu': 'THU', 'tietBatDau': 'TIET_BAT_DAU' };
+// Table name: SDH_LOAI_QUYET_DINH { ma, ten, kichHoat }
+const keys = ['MA'];
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
-    app.model.sdhChuongTrinhDaoTao = {
+    app.model.sdhLoaiQuyetDinh = {
         create: (data, done) => new Promise((resolve, reject) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -18,10 +18,10 @@ module.exports = app => {
                 done && done('Data is empty!');
                 reject('Data is empty!');
             } else {
-                const sql = 'INSERT INTO SDH_CHUONG_TRINH_DAO_TAO (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                const sql = 'INSERT INTO SDH_LOAI_QUYET_DINH (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.sdhChuongTrinhDaoTao.get({ rowId: resultSet.lastRowid }).then(item => {
+                        app.model.sdhLoaiQuyetDinh.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
                             resolve(item);
                         }).catch(error => {
@@ -55,7 +55,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM SDH_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM SDH_LOAI_QUYET_DINH' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
@@ -87,7 +87,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM SDH_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM SDH_LOAI_QUYET_DINH' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                 if (error) {
                     done && done(error);
@@ -120,7 +120,7 @@ module.exports = app => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sqlCount = 'SELECT COUNT(*) FROM SDH_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sqlCount = 'SELECT COUNT(*) FROM SDH_LOAI_QUYET_DINH' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.executeExtra(sqlCount, parameter, (error, res) => {
                 if (error) {
                     done && done(error);
@@ -131,7 +131,7 @@ module.exports = app => {
                     result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
                     result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                     leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT SDH_CHUONG_TRINH_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM SDH_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                    const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT SDH_LOAI_QUYET_DINH.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM SDH_LOAI_QUYET_DINH' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                     app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                         if (error) {
                             done && done(error);
@@ -151,10 +151,10 @@ module.exports = app => {
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
-                const sql = 'UPDATE SDH_CHUONG_TRINH_DAO_TAO SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                const sql = 'UPDATE SDH_LOAI_QUYET_DINH SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.database.oracle.connection.main.executeExtra(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.sdhChuongTrinhDaoTao.get({ rowId: resultSet.lastRowid }).then(item => {
+                        app.model.sdhLoaiQuyetDinh.get({ rowId: resultSet.lastRowid }).then(item => {
                             done && done(null, item);
                             resolve(item);
                         }).catch(error => {
@@ -182,7 +182,7 @@ module.exports = app => {
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'DELETE FROM SDH_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'DELETE FROM SDH_LOAI_QUYET_DINH' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.executeExtra(sql, parameter, error => {
                 if (error) {
                     done && done(error);
@@ -204,7 +204,7 @@ module.exports = app => {
             }
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT COUNT(*) FROM SDH_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'SELECT COUNT(*) FROM SDH_LOAI_QUYET_DINH' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.executeExtra(sql, parameter, (error, result) => {
                 if (error) {
                     done && done(error);
