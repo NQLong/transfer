@@ -137,7 +137,7 @@ export function changeDmCoSoKcb(item) {
 
 export const SelectAdapter_DmCoSoKcbBhyt = {
     ajax: true,
-    url: '/api/danh-muc/co-so-kham-chua-benh/all',
+    url: '/api/danh-muc/co-so-kcb-bhyt/get-all-for-adapter',
     data: (params) => ({ searchTerm: params.term }),
     processResults: (response) => ({ results: response && response.items ? response.items.map((item) => ({ id: item.ma, text: `[${item.ma}] ${item.ten}: ${item.diaChi}`, ten: item.ten, loaiDangKy: item.loaiDangKy })) : [] }),
     fetchOne: (ma, done) => getDmCoSoKcb(ma, (item) => item && done && done({ id: item.ma, text: `[${item.ma}] ${item.ten}: ${item.diaChi}` }))(),
