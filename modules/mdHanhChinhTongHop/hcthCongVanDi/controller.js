@@ -1157,6 +1157,6 @@ module.exports = app => {
             }
             await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextState });
         }
-    }
+    };
 
 };

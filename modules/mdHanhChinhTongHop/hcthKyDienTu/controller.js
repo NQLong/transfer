@@ -9,10 +9,9 @@ module.exports = app => {
     app.get('/api/hcth/ky-dien-tu/van-ban-di', app.permission.orCheck('manager:write', 'rectors:login', 'developer:login'), async (req, res) => {
         try {
             //TODO: check quyền user đối với văn bản
-            // eslint-disable-next-line no-unused-vars            
-            const { id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType } = req.query;
+            // eslint-disable-next-line no-unused-vars
+            const { id, name, location, reason, page, x, y, signatureLevel, signType, format } = req.query;
             //get file imformation
-            console.log({ id, name, location, reason, page, x, y, signatureLevel, scale, preferSize, signType, format })
             const vanBanDiFile = await app.model.hcthVanBanDiFile.get({ id });
             const file = await app.model.hcthFile.get({ id: vanBanDiFile.fileId });
             if (!file) throw 'Không tìm được file';
@@ -36,7 +35,8 @@ module.exports = app => {
             image.resize(signTypeItem.width, signTypeItem.height).write(app.path.join(sessionFolder, req.session.user.shcc + '.png'));
 
             const { status } = await app.pdf.signVisualPlaceholder({
-                input, scale: '0', output, name, location, reason, scale: '-50', x, y, page,
+                input, output, name, location, reason, scale: '-50', x, y, page,
+                signatureLevel,
                 keystorePath: app.path.join(app.assetPath, '/pdf/p12placeholder/certificate.p12'),
                 imgPath: app.path.join(sessionFolder, `${req.session.user.shcc}.png`),
             });
@@ -48,9 +48,10 @@ module.exports = app => {
             //TODO: replace placeholder content with array of 0 (optional) -> make placeholder signature become invalid
             if (format) {
                 return res.send({ data: outputBuffer });
+            } else {
+                res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
+                res.end(Buffer.from(outputBuffer, 'base64'));
             }
-            res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
-            res.end(Buffer.from(outputBuffer, 'base64'));
         } catch (error) {
             console.error(error);
             res.status(400).send({ error });

@@ -83,7 +83,7 @@ export function getSo(id, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export const SelectAdapter_SoDangKy = {
