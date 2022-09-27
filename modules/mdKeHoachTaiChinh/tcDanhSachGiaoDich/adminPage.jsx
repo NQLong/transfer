@@ -18,21 +18,32 @@ const yearDatas = () => {
 const termDatas = [{ id: 1, text: 'HK1' }, { id: 2, text: 'HK2' }, { id: 3, text: 'HK3' }];
 
 class StatisticModal extends AdminModal {
+
+    onShow = () => {
+        this.setState({ isLoading: false });
+    }
+
     onSubmit = () => {
         const data = { loaiPhi: this.state.loaiPhi };
         try {
-            ['namHoc', 'hocKy', 'namTuyenSinh', 'bacDaoTao', 'loaiDaoTao', 'batDau', 'ketThuc', 'loaiPhi'].forEach(key => {
+            const checkField = ['namHoc', 'hocKy', 'namTuyenSinh', 'bacDaoTao', 'loaiDaoTao', 'loaiPhi', 'batDau', 'ketThuc'];
+            checkField.forEach(key => {
                 data[key] = this[key].value();
-                if (data[key] == null || (Array.isArray(data[key]) && !data[key].length)) {
+                if ((data[key] == null || (Array.isArray(data[key]) && !data[key].length)) && this[key].props.required) {
                     T.notify(`${this[key].props.label} trống`, 'danger');
                     throw new Error();
                 }
             });
             data.loaiDaoTao = data.loaiDaoTao.toString();
-            data.loaiPhi = data.loaiPhi.toString();
-            data.batDau = data.batDau.getTime();
-            data.ketThuc = data.ketThuc.getTime();
-            T.download(`/api/finance/danh-sach-giao-dich/stat?data=${JSON.stringify(data)}`, 'Thống kê.xlsx');
+            data.loaiPhi = data.loaiPhi?.toString() || '';
+            data.batDau = data.batDau && data.batDau.getTime();
+            data.ketThuc = data.ketThuc && data.ketThuc.getTime();
+            // const url = `/api/finance/danh-sach-giao-dich/stat?data=${JSON.stringify(data)}`;
+            this.setState({ isLoading: true });
+            T.download(`/api/finance/danh-sach-giao-dich/stat?data=${JSON.stringify(data)}`);
+
+            // this.setState({ isLoading: false });
+
         } catch (error) { console.error(error); return; }
     }
 
@@ -42,14 +53,14 @@ class StatisticModal extends AdminModal {
             size: 'elarge',
             isLoading: this.state.isLoading,
             body: <div className='row'>
-                <FormSelect ref={e => this.loaiPhi = e} label='Loại phí' className='col-md-12' data={SelectAdapter_TcLoaiPhi} multiple required />
+                <FormSelect ref={e => this.loaiPhi = e} label='Loại phí chính' className='col-md-12' data={SelectAdapter_TcLoaiPhi} multiple />
                 <FormSelect ref={e => this.namHoc = e} data={yearDatas().reverse()} label='Năm học' className='col-md-6' required />
                 <FormSelect ref={e => this.hocKy = e} data={termDatas} label='Học kỳ' className='col-md-6' required />
                 <FormSelect ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' data={SelectAdapter_FwNamTuyenSinh} className='col-md-4' required />
                 <FormSelect ref={e => this.bacDaoTao = e} data={SelectAdapter_DmSvBacDaoTao} label='Bậc đào tạo' className='col-md-4' required />
                 <FormSelect ref={e => this.loaiDaoTao = e} data={SelectAdapter_DmSvLoaiHinhDaoTao} label='Hệ đào tạo' className='col-md-4' required multiple />
-                <FormDatePicker ref={e => this.batDau = e} type='time' className='col-md-6' label='Từ thời điểm' required allowClear />
-                <FormDatePicker ref={e => this.ketThuc = e} type='time' className='col-md-6' label='Đến thời điểm' required allowClear />
+                <FormDatePicker ref={e => this.batDau = e} type='time' className='col-md-6' label='Từ thời điểm' allowClear />
+                <FormDatePicker ref={e => this.ketThuc = e} type='time' className='col-md-6' label='Đến thời điểm' allowClear />
             </div>
         });
     }
@@ -185,7 +196,7 @@ class AdminEditModal extends AdminModal {
                 <FormSelect required data={yearDatas()} label='Năm học' className='col-md-4' ref={e => this.namHoc = e} onChange={this.onChangeQuery} />
                 <FormSelect required data={termDatas} label='Học kỳ' className='col-md-4' ref={e => this.hocKy = e} onChange={this.onChangeQuery} />
                 <FormSelect required data={SelectAdapter_FwStudent} label='Sinh viên' className='col-md-4' ref={e => this.sinhVien = e} onChange={this.onChangeQuery} />
-                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())}/>
+                <FormTextBox label='Số tiền' readOnlyEmptyText='Chưa có dữ liệu học phí' className='col-md-12' ref={e => this.soTien = e} type='number' onChange={() => this.setAmountText(this.soTien.value())} />
                 <FormTextBox disabled label='Thành chữ' className='col-md-12' ref={e => this.thanhChu = e} readOnlyEmptyText='Chưa có dữ liệu học phí' />
             </div>
         });
