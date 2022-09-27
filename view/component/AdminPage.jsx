@@ -9,7 +9,6 @@ import NumberFormat from 'react-number-format';
 import 'react-datetime/css/react-datetime.css';
 import Tooltip from '@mui/material/Tooltip';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
-import T from 'view/js/common';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {

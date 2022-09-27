@@ -334,7 +334,7 @@ class AdminStudentsPage extends AdminPage {
             collapse: [
                 { icon: 'fa-print', name: 'Export', permission: permission.export, onClick: this.downloadExcel, type: 'success' },
                 { icon: 'fa-upload', name: 'Import', permission: developer.login, onClick: () => this.props.history.push('/user/students/import'), type: 'danger' },
-                { icon: 'fa-picture-o', name: 'Tải ảnh thẻ', permission: permission.export, onClick: this.downloadImage, type: 'info', wait: this.state.waitForDownload }
+                { icon: 'fa-picture-o', name: 'Tải ảnh thẻ', permission: permission.export, onClick: this.downloadImage, type: 'info' }
             ]
         });
     }

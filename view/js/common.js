@@ -3,7 +3,6 @@ import dateformat from 'dateformat';
 import routeMatcherLib from './routematcher.js';
 import './sweetalert.min.js';
 import FileSaver from 'file-saver';
-import { doUuTienMapper } from 'modules/mdHanhChinhTongHop/constant.js';
 
 const T = {
     title: title => {
