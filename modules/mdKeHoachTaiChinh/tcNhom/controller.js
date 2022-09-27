@@ -11,7 +11,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesNhomNganh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcNhom:read', 'dmCaHoc:write', 'dmCaHoc:delete');
+            app.permissionHooks.pushUserPermission(user, 'tcNhom:read', 'tcNhom:write', 'tcNhom:delete');
             resolve();
         } else resolve();
     }));
@@ -31,7 +31,6 @@ module.exports = app => {
             },);
             res.send({ page });
         } catch (error) {
-            console.error(error);
             res.send({ error });
         }
     });
@@ -48,14 +47,11 @@ module.exports = app => {
     });
 
 
-    app.post('/api/finance/nhom', app.permission.check('dmCaHoc:write'), async (req, res) => {
+    app.post('/api/finance/nhom', app.permission.check('tcNhom:write'), async (req, res) => {
         try {
             const { nganh, ...data } = req.body;
             data.heSo = 0;
-            const latest = await app.model.tcNhom.get({
-                statement: data.nhomCha ? `nhomCha = ${data.nhomCha}` : 'nhomCha is null',
-            }, 'id,heSo', 'id DESC');
-            console.log(data, latest);
+            const latest = await app.model.tcNhom.get({ nhomCha: data.nhomCha || null }, 'id,heSo', 'id DESC');
             if (latest) data.heSo = latest.heSo + 1;
             data.namHoc = 2022;
             data.hocKy = 1;
@@ -67,12 +63,12 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/finance/nhom', app.permission.check('dmCaHoc:write'), (req, res) => {
+    app.put('/api/finance/nhom', app.permission.check('tcNhom:write'), (req, res) => {
         let changes = app.clone(req.body.changes);
         app.model.tcNhom.update({ ma: req.body._id }, changes, (error, items) => res.send({ error, items }));
     });
 
-    app.delete('/api/finance/nhom', app.permission.check('dmCaHoc:delete'), (req, res) => {
+    app.delete('/api/finance/nhom', app.permission.check('tcNhom:delete'), (req, res) => {
         app.model.tcNhom.delete({ ma: req.body._id }, error => res.send({ error }));
     });
 };
