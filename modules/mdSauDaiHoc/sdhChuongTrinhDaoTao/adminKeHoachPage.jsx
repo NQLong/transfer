@@ -273,9 +273,9 @@ class SdhKeHoachDaoTaoDetails extends AdminPage {
                                     }}><i className='fa fa-lg fa-pencil' /></a>
                                 </Tooltip>
                                 <Tooltip title='Xóa khỏi học kỳ' arrow placeholder='bottom' >
-                                    <a className='btn btn-secondary' href='#' onClick={() => {
+                                    <a className='btn btn-danger' href='#' onClick={() => {
                                         T.confirm('', `Xóa môn học ${item.maMonHoc} khỏi học kì ${item.hocKy}`, true, isConfirm => isConfirm && this.updateMonHoc(item.id, { hocKy: '', thu: '', tietBatDau: '' }));
-                                    }}><i className='fa fa-lg  fa-minus-circle' /></a>
+                                    }}><i className='fa fa-lg  fa-times' /></a>
                                 </Tooltip >
                             </TableCell>
 
