@@ -54,8 +54,6 @@ class AdminSvSdhUploadPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Dân tộc</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Tôn giáo</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Nơi sinh</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Nguyên quán</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Thường trú</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Địa chỉ hiện tại</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Khoa</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Ngành</th>
@@ -67,15 +65,6 @@ class AdminSvSdhUploadPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Tình trạng</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Số điện thoại cá nhân</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Số điện thoại liên hệ</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Họ tên cha</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Năm sinh cha</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Nghề nghiệp cha</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Số điện thoại cha</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Họ tên mẹ</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Năm sinh mẹ</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Nghề nghiệp mẹ</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Số điện thoại mẹ</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Số điện thoại người thân (khẩn)</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Email cá nhân</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Tên cơ quan</th>
                     <th style={{ width: '100%', textAlign: 'center', whiteSpace: 'nowrap', backgroundColor: 'white', color: 'black', border: '1px solid #dee2e6' }}>Tên đề tài</th>
@@ -93,9 +82,9 @@ class AdminSvSdhUploadPage extends AdminPage {
                     <TableCell type='text' content={item.danToc} />
                     <TableCell type='text' content={item.tonGiao} />
                     <TableCell type='text' content={item.noiSinh} />
-                    <TableCell type='text' content={item.nguyenQuan} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.thuongTruSoNha ? (item.thuongTruSoNha + ', ') : '') + (item.thuongTruXa ? (item.thuongTruXa + ', ') : '') + (item.thuongTruHuyen ? item.thuongTruHuyen + ', ' : '') + (item.thuongTruTinh ? item.thuongTruTinh : '')} />
-                    <TableCell type='text' content={item.hienTai} />
+                    {/* <TableCell type='text' content={item.nguyenQuan} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.thuongTruSoNha ? (item.thuongTruSoNha + ', ') : '') + (item.thuongTruXa ? (item.thuongTruXa + ', ') : '') + (item.thuongTruHuyen ? item.thuongTruHuyen + ', ' : '') + (item.thuongTruTinh ? item.thuongTruTinh : '')} /> */}
+                    <TableCell type='text' content={item.hienTaiSoNha} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.khoa} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.nganh} />
                     <TableCell type='text' style={{ textAlign: 'center' }} content={item.namTuyenSinh} />
@@ -106,15 +95,6 @@ class AdminSvSdhUploadPage extends AdminPage {
                     <TableCell type='text' content={item.tinhTrang} />
                     <TableCell type='text' content={item.sdtCaNhan} />
                     <TableCell type='text' content={item.sdtLienHe} />
-                    <TableCell type='text' content={item.hoTenCha} />
-                    <TableCell type='text' content={item.namSinhCha} />
-                    <TableCell type='text' content={item.ngheNghiepCha} />
-                    <TableCell type='text' content={item.sdtCha} />
-                    <TableCell type='text' content={item.hoTenMe} />
-                    <TableCell type='text' content={item.namSinhMe} />
-                    <TableCell type='text' content={item.ngheNghiepMe} />
-                    <TableCell type='text' content={item.sdtMe} />
-                    <TableCell type='text' content={item.sdtNguoiThan} />
                     <TableCell type='text' content={item.email} />
                     <TableCell type='text' content={item.tenCoQuan} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenDeTai} />
@@ -141,13 +121,14 @@ class AdminSvSdhUploadPage extends AdminPage {
                             <FormFileBox ref={e => this.fileBox = e} className='col-md-6' postUrl='/user/upload' uploadType='fwSinhVienSdhFile' userData='fwSinhVienSdhImportData' onSuccess={this.onSuccess} />
                         </div>
                     </div>,
-                    <div key={1} className='tile'>{table}</div>]
+                    list.length!=0?
+                    <div key={1} className='tile'>{table}</div>:'']
                 }
                 {/* <a type='button' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} href={'/api/oisp-tuyen-sinh/import/get-sample-file'} >
                     <i className='fa fa-download' />
                 </a> */}
 
-                {readOnly ? '' :
+                {(readOnly || list.length==0) ? '' :
                     <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                         <i className='fa fa-lg fa-save' />
                     </button>}
