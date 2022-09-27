@@ -14,12 +14,12 @@ class BaoHiemInfoModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { dienDong, id } = item;
+        let { dienDong, id, maBhxhHienTai } = item || {};
         this.setState({ dienDong, id }, () => {
             switch (dienDong) {
                 case '0':
                     this.matTruocThe.setData(`BHYTSV_FRONT:${new Date().getFullYear()}_${id}`);
-                    // this.matSauThe.setData(`BHYTSV_BACK:${new Date().getFullYear()}_${id}`);
+                    this.maBhxhHienTai.value(maBhxhHienTai || '');
                     break;
                 default:
                     break;
@@ -27,9 +27,10 @@ class BaoHiemInfoModal extends AdminModal {
         });
     }
 
-    handleSize = (value) => {
-        if (value && value.toString().length > 10) {
-            this.maBhxhHienTai.value(value.toString().substring(0, 10));
+    handleSize = (e) => {
+        let currentValue = e.target.value;
+        if (currentValue && currentValue.length > 10) {
+            this.maBhxhHienTai.value(currentValue.substring(0, 10));
         }
     }
 
@@ -161,10 +162,9 @@ class BaoHiemInfoModal extends AdminModal {
     elementMienDong = () => {
         return (
             <div className='row'>
-                <FormTextBox label='Nhập số BHXH hiện tại' className='col-md-6' smallText='10 chữ số cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
+                <FormTextBox label='Nhập số BHXH hiện tại' className='col-md-6' smallText='10 ký tự cuối cùng trên thẻ BHYT' onChange={this.handleSize} ref={e => this.maBhxhHienTai = e} required />
 
-                <FormImageBox className='col-md-6' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' description={<div>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer'>đây</a></div>} />
-                {/* <FormImageBox className='col-md-6' ref={e => this.matSauThe = e} label={<>Ảnh <b>MẶT SAU</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_BACK' /> */}
+                <FormImageBox className='col-md-6' ref={e => this.matTruocThe = e} label={<>Ảnh <b>MẶT TRƯỚC</b> thẻ BHYT hiện tại</>} uploadType='BHYTSV_FRONT' description={<div>Độ lớn của file ảnh <b className='text-danger'>không quá 1MB</b>. Giảm kích thước file ảnh tại <a href='https://www.iloveimg.com/compress-image' target='_blank' rel='noreferrer' style={{ textDecoration: 'underline' }}>đây</a></div>} />
             </div>
         );
     }
