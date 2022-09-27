@@ -48,7 +48,7 @@ export default function svSdhReducer(state = null, data) {
 
 //Admin -----------------------------------------------------------------------------------------------------
 T.initPage('pageSvSdhAdmin');
-export function getSvSdhPage(pageNumber, pageSize, pageCondition, filter, done) {
+export function getSvSdhPage(pageNumber, pageSize, pageCondition, filter, sortTerm, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
@@ -56,7 +56,7 @@ export function getSvSdhPage(pageNumber, pageSize, pageCondition, filter, done) 
     const page = T.updatePage('pageSvSdhAdmin', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/sv-sdh/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter, sortTerm }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách sinh viên sau đại học bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);

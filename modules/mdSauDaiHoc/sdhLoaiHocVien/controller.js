@@ -15,11 +15,11 @@ module.exports = app => {
         { name: 'sdhLoaiHocVien:write' },
         { name: 'sdhLoaiHocVien:delete' },
     );
-    app.get('/user/sau-dai-hoc/loai-hoc-vien', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/loai-hoc-vien', app.permission.check('sdhLoaiHocVien:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesLoaiHocVien', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhLoaiHocVien:read', 'sdhLoaiHocVien:write', 'sdhLoaiHocVien:delete', 'staff:login');
+            app.permissionHooks.pushUserPermission(user, 'sdhLoaiHocVien:read', 'sdhLoaiHocVien:write', 'sdhLoaiHocVien:delete');
             resolve();
         } else resolve();
     }));
@@ -41,7 +41,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/sau-dai-hoc/loai-hoc-vien/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/all', app.permission.check('sdhLoaiHocVien:write'), (req, res) => {
         app.model.sdhLoaiHocVien.getAll((error, items) => res.send({ error, items }));
     });
 
