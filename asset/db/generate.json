@@ -6859,7 +6859,6 @@
                 "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
                 "HCTH_CONG_VAN_DI_GET_ALL_PHAN_HOI": "getAllPhanHoi",
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
-                "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
                 "HCTH_CONG_VAN_DI_SEARCH_SELECTOR": "searchSelector",
                 "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel",
                 "HCTH_CONG_VAN_DI_GET_SIGN_STAFF": "getSignStaff",
@@ -18421,26 +18420,12 @@
                     "nullable": true,
                     "size": 255
                 },
-                "APPROVED_TRUONG": {
-                    "value": "approvedTruong",
-                    "dataType": "CLOB",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": 4000
-                },
                 "ID_PHE_DUYET_CAP_DON_VI": {
                     "value": "idPheDuyetCapDonVi",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
-                },
-                "Y_KIEN_TRUONG_TCCB": {
-                    "value": "yKienTruongTccb",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
                 },
                 "TRUONG_TCCB": {
                     "value": "truongTccb",
@@ -18455,6 +18440,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "APPROVED_TRUONG": {
+                    "value": "approvedTruong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "Y_KIEN_TRUONG_TCCB": {
+                    "value": "yKienTruongTccb",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
                 }
             },
             "primaryKeys": [

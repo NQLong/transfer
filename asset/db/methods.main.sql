@@ -1912,9 +1912,13 @@ BEGIN
                STU.TEN                       AS "ten",
                STU.EMAIL_CA_NHAN             AS "emailCaNhan",
                STU.EMAIL_TRUONG              AS "emailTruong",
-               (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
-                               (STU.NGAY_SINH + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24, 'DD/MM/YYYY') datestr
-                from dual)
+               CASE
+                   WHEN STU.NGAY_SINH IS NULL OR STU.NGAY_SINH <= 0 THEN ''
+                   ELSE
+                       (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
+                                       (STU.NGAY_SINH + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24,
+                                       'DD/MM/YYYY') datestr
+                        from dual) END
                                              AS "ngaySinh",
                CASE
                    WHEN
@@ -1930,9 +1934,13 @@ BEGIN
                STU.MA_NGANH                  AS "maNganh",
                NDT.TEN_NGANH                 AS "tenNganh",
                STU.CMND                      AS "cccd",
-               (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
-                               (STU.CMND_NGAY_CAP + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24, 'DD/MM/YYYY') datestr
-                from dual)                   AS "ngayCapCccd",
+               CASE
+                   WHEN STU.CMND_NGAY_CAP IS NULL OR STU.CMND_NGAY_CAP <= 0 THEN ''
+                   ELSE
+                       (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
+                                       (STU.CMND_NGAY_CAP + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24,
+                                       'DD/MM/YYYY') datestr
+                        from dual) END       AS "ngayCapCccd",
                STU.CMND_NOI_CAP              AS "noiCapCccd",
                xaThuongTru.TEN_PHUONG_XA     as "xaThuongTru",
                huyenThuongTru.TEN_QUAN_HUYEN as "huyenThuongTru",
@@ -1951,9 +1959,13 @@ BEGIN
                QG.TEN_QUOC_GIA               AS "quocTich",
                DANTOC.TEN                    AS "danToc",
                STU.NAM_TUYEN_SINH            AS "namTuyenSinh",
-               (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
-                               (STU.NGAY_NHAP_HOC + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24, 'DD/MM/YYYY') datestr
-                from dual)
+               CASE
+                   WHEN STU.NGAY_NHAP_HOC IS NULL OR STU.NGAY_NHAP_HOC <= 0 THEN ''
+                   ELSE
+                       (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
+                                       (STU.NGAY_NHAP_HOC + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24,
+                                       'DD/MM/YYYY') datestr
+                        from dual) END
                                              AS "ngayNhapHoc",
                STU.KHU_VUC_TUYEN_SINH        AS "khuVucTuyenSinh",
                STU.DOI_TUONG_CHINH_SACH      AS "doiTuongChinhSach",
@@ -19838,18 +19850,6 @@ BEGIN
         WHERE isSHCC = tdnn.SHCC;
     return cur;
 END;
-
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION UTILS_SPLIT_FILTER(INPUT IN STRING) RETURN VARCHAR2
-    IS OUTPUT VARCHAR2(500);
-BEGIN
-        SELECT regexp_substr(INPUT, '[^,]+', 1, level) INTO OUTPUT
-                                      from dual
-                                      connect by regexp_substr(INPUT, '[^,]+', 1, level) is not null;
-    RETURN OUTPUT;
-end;
 
 /
 --EndMethod--
