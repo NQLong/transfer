@@ -79,6 +79,16 @@ export function getTccbNhomDanhGiaNhiemVuPage(pageNumber, pageSize, pageConditio
 }
 
 export function getTccbNhomDanhGiaNhiemVu(id, done) {
+    const listSelect = [
+        { id: -1, ten: 'Tất cả' },
+        { id: -2, ten: 'Chưa đăng ký' }
+    ];
+    const listFilter = listSelect.filter(item => item.id == id);
+    if (listFilter.length > 0) {
+        return () => {
+            done && done(listFilter[0]);
+        };
+    }
     return () => {
         const url = `/api/tccb/danh-gia/nhom-danh-gia-nhiem-vu/item/${id}`;
         T.get(url, data => {
