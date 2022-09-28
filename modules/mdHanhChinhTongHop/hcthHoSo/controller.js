@@ -1,12 +1,12 @@
 module.exports = app => {
-    const staffMenu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1058: { title: 'Hồ sơ', link: '/user/ho-so', icon: 'fa-file-text', backgroundColor: '#0B86AA', groupIndex: 5 },
-        },
-    };
+    // const staffMenu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1058: { title: 'Hồ sơ', link: '/user/ho-so', icon: 'fa-file-text', backgroundColor: '#0B86AA', groupIndex: 5 },
+    //     },
+    // };
 
-    app.permission.add({ name: 'staff:login', menu: staffMenu });
+    // app.permission.add({ name: 'staff:login', menu: staffMenu });
 
     app.get('/user/ho-so', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/ho-so/:id', app.permission.check('staff:login'), app.templates.admin);

@@ -1837,6 +1837,44 @@ END;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION FW_SINHVIENBHYT_DOWNLOAD_EXCEL(filter IN STRING) RETURN SYS_REFCURSOR
+AS
+    REF_SYS               SYS_REFCURSOR;
+    dienDongBhyt      STRING(5);
+    loaiBhyt          string(5);
+
+BEGIN
+
+    OPEN REF_SYS FOR
+        SELECT STU.MSSV                      AS "mssv",
+               STU.HO                        AS "ho",
+               STU.TEN                       AS "ten",
+               STU.DIEN_THOAI_CA_NHAN        AS "soDienThoaiCaNhan",
+               xaThuongTru.TEN_PHUONG_XA     as "xaThuongTru",
+               huyenThuongTru.TEN_QUAN_HUYEN as "huyenThuongTru",
+               tinhThuongTru.ten             as "tinhThuongTru",
+               STU.THUONG_TRU_SO_NHA         AS "soNhaThuongTru",
+               SBHYT.DIEN_DONG               AS "dienDongBhxh",
+               SBHYT.MA_BHXH_HIEN_TAI        AS "maBhxhHienTai",
+               DCSKB.TEN                     AS "coSoDangKyKcb",
+               SBPLCH.HO_TEN_CHU_HO          AS "hoTenChuHo",
+               SBPLCH.DIEN_THOAI_CHU_HO      AS "sdtChuHo"
+
+--                ,CB.HO || ' ' || CB.TEN        AS "canBoXuLy"
+        FROM SV_BAO_HIEM_Y_TE SBHYT
+                 LEFT JOIN  FW_STUDENT STU ON SBHYT.MSSV = STU.MSSV
+                 LEFT JOIN SV_BHYT_PHU_LUC_CHU_HO SBPLCH on SBHYT.MSSV = SBPLCH.MSSV
+                 LEFT JOIN DM_PHUONG_XA xaThuongTru ON STU.THUONG_TRU_MA_XA = xaThuongTru.MA_PHUONG_XA
+                 LEFT JOIN DM_QUAN_HUYEN huyenThuongTru ON STU.THUONG_TRU_MA_HUYEN = huyenThuongTru.MA_QUAN_HUYEN
+                 LEFT JOIN DM_TINH_THANH_PHO tinhThuongTru ON STU.THUONG_TRU_MA_TINH = tinhThuongTru.MA
+                 LEFT JOIN DM_CO_SO_KCB_BHYT DCSKB ON SBHYT.BENH_VIEN_DANG_KY = DCSKB.MA
+        ORDER BY STU.NAM_TUYEN_SINH DESC NULLS LAST, STU.TEN, STU.HO;
+    RETURN REF_SYS;
+end;
+
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION FW_STUDENT_DOWNLOAD_EXCEL(searchTerm IN STRING, filter IN STRING) RETURN SYS_REFCURSOR
 AS
     REF_SYS               SYS_REFCURSOR;
@@ -1874,15 +1912,20 @@ BEGIN
                STU.TEN                       AS "ten",
                STU.EMAIL_CA_NHAN             AS "emailCaNhan",
                STU.EMAIL_TRUONG              AS "emailTruong",
-               (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
-                               (STU.NGAY_SINH) / 1000 / 60 / 60 / 24, 'DD/MM/YYYY') datestr
-                from dual)
+               CASE
+                   WHEN STU.NGAY_SINH IS NULL OR STU.NGAY_SINH <= 0 THEN ''
+                   ELSE
+                       (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
+                                       (STU.NGAY_SINH + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24,
+                                       'DD/MM/YYYY') datestr
+                        from dual) END
                                              AS "ngaySinh",
                CASE
                    WHEN
                        STU.GIOI_TINH = 1 THEN 'Nam'
                    ELSE 'Nữ'
                    END                       AS "gioiTinh",
+               STU.DIEN_THOAI_CA_NHAN        AS "soDienThoai",
                LSV.TEN                       AS "loaiSinhVien",
                LHDT.TEN                      AS "loaiHinhDaoTao",
                TTSV.TEN                      AS "tinhTrangSinhVien",
@@ -1891,9 +1934,13 @@ BEGIN
                STU.MA_NGANH                  AS "maNganh",
                NDT.TEN_NGANH                 AS "tenNganh",
                STU.CMND                      AS "cccd",
-               (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
-                               (STU.CMND_NGAY_CAP) / 1000 / 60 / 60 / 24, 'DD/MM/YYYY') datestr
-                from dual)                   AS "ngayCapCccd",
+               CASE
+                   WHEN STU.CMND_NGAY_CAP IS NULL OR STU.CMND_NGAY_CAP <= 0 THEN ''
+                   ELSE
+                       (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
+                                       (STU.CMND_NGAY_CAP + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24,
+                                       'DD/MM/YYYY') datestr
+                        from dual) END       AS "ngayCapCccd",
                STU.CMND_NOI_CAP              AS "noiCapCccd",
                xaThuongTru.TEN_PHUONG_XA     as "xaThuongTru",
                huyenThuongTru.TEN_QUAN_HUYEN as "huyenThuongTru",
@@ -1912,9 +1959,13 @@ BEGIN
                QG.TEN_QUOC_GIA               AS "quocTich",
                DANTOC.TEN                    AS "danToc",
                STU.NAM_TUYEN_SINH            AS "namTuyenSinh",
-               (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
-                               (STU.NGAY_NHAP_HOC) / 1000 / 60 / 60 / 24, 'DD/MM/YYYY') datestr
-                from dual)
+               CASE
+                   WHEN STU.NGAY_NHAP_HOC IS NULL OR STU.NGAY_NHAP_HOC <= 0 THEN ''
+                   ELSE
+                       (select to_char(to_date('01/01/1970', 'dd/mm/yyyy') +
+                                       (STU.NGAY_NHAP_HOC + 14 * 60 * 60 * 1000) / 1000 / 60 / 60 / 24,
+                                       'DD/MM/YYYY') datestr
+                        from dual) END
                                              AS "ngayNhapHoc",
                STU.KHU_VUC_TUYEN_SINH        AS "khuVucTuyenSinh",
                STU.DOI_TUONG_CHINH_SACH      AS "doiTuongChinhSach",
@@ -19799,18 +19850,6 @@ BEGIN
         WHERE isSHCC = tdnn.SHCC;
     return cur;
 END;
-
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION UTILS_SPLIT_FILTER(INPUT IN STRING) RETURN VARCHAR2
-    IS OUTPUT VARCHAR2(500);
-BEGIN
-        SELECT regexp_substr(INPUT, '[^,]+', 1, level) INTO OUTPUT
-                                      from dual
-                                      connect by regexp_substr(INPUT, '[^,]+', 1, level) is not null;
-    RETURN OUTPUT;
-end;
 
 /
 --EndMethod--

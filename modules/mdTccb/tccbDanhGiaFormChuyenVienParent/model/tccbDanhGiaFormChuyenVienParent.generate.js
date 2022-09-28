@@ -1,6 +1,6 @@
-// Table name: TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT { id, nam, tieuDe, loaiCongViec, diemLonNhat, thuTu }
+// Table name: TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT { id, nam, tieuDe, diemLonNhat, loaiCongViec, thuTu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'tieuDe': 'TIEU_DE', 'loaiCongViec': 'LOAI_CONG_VIEC', 'diemLonNhat': 'DIEM_LON_NHAT', 'thuTu': 'THU_TU' };
+const obj2Db = { 'id': 'ID', 'nam': 'NAM', 'tieuDe': 'TIEU_DE', 'diemLonNhat': 'DIEM_LON_NHAT', 'loaiCongViec': 'LOAI_CONG_VIEC', 'thuTu': 'THU_TU' };
 
 module.exports = app => {
     app.model.tccbDanhGiaFormChuyenVienParent = {
@@ -214,19 +214,6 @@ module.exports = app => {
                     resolve(result);
                 }
             });
-        }),
-
-        ganThuTu: (pId, pThuTu, pIsUp, pNam, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.executeExtra('BEGIN tccb_danh_gia_form_chuyen_vien_parent_gan_thu_tu(:pId, :pThuTu, :pIsUp, :pNam); END;',
-                { pId, pThuTu, pIsUp, pNam }, (error, result) => {
-                    if (error) {
-                        done && done(error);
-                        reject(error);
-                    } else {
-                        done && done(null, result);
-                        resolve(result);
-                    }
-                });
         }),
     };
 };

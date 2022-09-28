@@ -49,10 +49,4 @@ module.exports = app => {
         }
     };
 
-    app.model.dmDonVi.getDonVi = (condition, selectedColumns, orderBy) => new Promise((resolve, reject) => {
-        app.model.dmDonVi.get(condition, selectedColumns, orderBy, (error, item) => {
-            const { handleResult } = require('../../../mdHanhChinhTongHop/constant');
-            handleResult(resolve, reject, item, error);
-        });
-    });
 };

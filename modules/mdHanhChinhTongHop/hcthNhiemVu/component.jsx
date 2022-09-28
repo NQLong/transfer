@@ -478,7 +478,7 @@ class CongVanDiSelector extends React.Component {
                 return (<tr key={item.id}>
                     <TableCell style={{}} content={<FormCheckbox ref={e => this.itemRef[item.id] = e} onChange={(value) => this.handleToggleItem(item, value)} />} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<Link to={`/user/van-ban-di/${item.id}`} target='_blank' rel='noopener noreferrer' >{item.soDi || 'Chưa có số'}</Link>} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={<Link to={`/user/van-ban-di/${item.id}`} target='_blank' rel='noopener noreferrer' >{item.soCongVan || 'Chưa có số'}</Link>} />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
 
                     <TableCell contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.tenDonViGui} />

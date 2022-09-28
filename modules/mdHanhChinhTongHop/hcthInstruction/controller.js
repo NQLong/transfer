@@ -1,12 +1,12 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1060: { title: 'Hướng dẫn sử dụng', link: '/user/instruction', icon: 'fa-list', backgroundColor: '#7FB77E', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1060: { title: 'Hướng dẫn sử dụng', link: '/user/instruction', icon: 'fa-list', backgroundColor: '#7FB77E', groupIndex: 5 },
+    //     },
+    // };
 
-    app.permission.add({ name: 'staff:login', menu: menu });
+    // app.permission.add({ name: 'staff:login', menu: menu });
 
     app.get('/user/instruction', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/instruction/:id', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);

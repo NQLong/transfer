@@ -6857,14 +6857,15 @@
             "methods": {
                 "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
                 "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
-                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi",
+                "HCTH_CONG_VAN_DI_GET_ALL_PHAN_HOI": "getAllPhanHoi",
                 "HCTH_CONG_VAN_DI_GET_HCTH_STAFF": "getHcthStaff",
-                "HCTH_CONG_VAN_DI_GET_ALL_STAFF": "getAllStaff",
-                "hcth_cong_van_di_search_selector": "searchSelector",
+                "HCTH_CONG_VAN_DI_SEARCH_SELECTOR": "searchSelector",
                 "HCTH_CONG_VAN_DI_DOWNLOAD_EXCEL": "downloadExcel",
                 "HCTH_CONG_VAN_DI_GET_SIGN_STAFF": "getSignStaff",
                 "HCTH_CONG_VAN_DI_VALIDATE_SO_CONG_VAN": "validateSoCongVan",
-                "HCTH_DASHBOARD_GET_DATA": "dashboardGetData"
+                "HCTH_DASHBOARD_GET_DATA": "dashboardGetData",
+                "HCTH_CONG_VAN_DI_SEARCH_PAGE_ALTERNATE": "searchPageAlternate",
+                "hcth_cong_van_di_get_manage_staff": "getManageStaff"
             },
             "columns": {
                 "ID": {
@@ -18151,6 +18152,9 @@
             "active": true,
             "moduleName": "hcthSigningConfig",
             "modelName": "hcthSigningConfig",
+            "methods": {
+                "hcth_signing_config_get_list": "getList"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -18416,26 +18420,12 @@
                     "nullable": true,
                     "size": 255
                 },
-                "APPROVED_TRUONG": {
-                    "value": "approvedTruong",
-                    "dataType": "CLOB",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": 4000
-                },
                 "ID_PHE_DUYET_CAP_DON_VI": {
                     "value": "idPheDuyetCapDonVi",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
-                },
-                "Y_KIEN_TRUONG_TCCB": {
-                    "value": "yKienTruongTccb",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
                 },
                 "TRUONG_TCCB": {
                     "value": "truongTccb",
@@ -18450,6 +18440,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "APPROVED_TRUONG": {
+                    "value": "approvedTruong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "Y_KIEN_TRUONG_TCCB": {
+                    "value": "yKienTruongTccb",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
                 }
             },
             "primaryKeys": [
@@ -18694,8 +18698,15 @@
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176768\".nextval",
                     "nullable": false,
+                    "size": "22,0"
+                },
+                "PARENT_ID": {
+                    "value": "parentId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
                     "size": "22,0"
                 },
                 "TIEU_DE": {
@@ -18707,13 +18718,6 @@
                 },
                 "DIEM_LON_NHAT": {
                     "value": "diemLonNhat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "4,0"
-                },
-                "PARENT_ID": {
-                    "value": "parentId",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -18733,18 +18737,15 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "TCCB_DANH_GiA_FORM_CHUYEN_VIEN_PARENT": {
+        "TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT": {
             "active": true,
             "moduleName": "tccbDanhGiaFormChuyenVienParent",
             "modelName": "tccbDanhGiaFormChuyenVienParent",
-            "methods": {
-                "TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT_GAN_THU_TU": "ganThuTu"
-            },
             "columns": {
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176765\".nextval",
                     "nullable": false,
                     "size": "22,0"
                 },
@@ -18762,19 +18763,19 @@
                     "nullable": true,
                     "size": 1000
                 },
-                "LOAI_CONG_VIEC": {
-                    "value": "loaiCongViec",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "DIEM_LON_NHAT": {
                     "value": "diemLonNhat",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
+                    "size": "22,0"
+                },
+                "LOAI_CONG_VIEC": {
+                    "value": "loaiCongViec",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
                 },
                 "THU_TU": {
                     "value": "thuTu",
