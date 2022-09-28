@@ -108,7 +108,6 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
             if (yKienTruongTccb == 'Có ý kiến') return item.yKienTruongTccb;
             if (yKienTruongTccb == 'Chưa có ý kiến') return !item.yKienTruongTccb;
         });
-        console.log(newList);
         if (newList && newList.length > 0) {
             table = renderTable({
                 getDataSource: () => newList, stickyHead: false,
