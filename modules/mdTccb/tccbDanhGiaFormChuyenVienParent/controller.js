@@ -23,8 +23,7 @@ module.exports = app => {
             if (listChild.length > 0 && changes.loaiCongViec == 1) {
                 throw 'Đã có thông tin, không thể đổi loại công việc';
             }
-            let sum = listChild.length > 0 ? listChild.reduce((prev, cur) => Number(prev.diemLonNhat) + Number(cur.diemLonNhat)) : 0;
-            sum = sum.diemLonNhat ? sum.diemLonNhat : sum;
+            let sum = listChild.reduce((prev, cur) => Number(prev) + Number(cur.diemLonNhat), 0);
             if (sum > changes.diemLonNhat) {
                 throw 'Điểm tiêu chí đánh giá phải lớn hơn tổng điểm các nội dung';
             }
@@ -76,8 +75,7 @@ module.exports = app => {
                 //Tránh không có parent mà đã tạo child
                 throw 'Lỗi không xác định';
             }
-            let sum = listChild.length > 0 ? listChild.reduce((prev, cur) => Number(prev.diemLonNhat) + Number(cur.diemLonNhat)) : 0;
-            sum = sum.diemLonNhat ? sum.diemLonNhat : sum;
+            let sum = listChild.reduce((prev, cur) => Number(prev) + Number(cur.diemLonNhat), 0);
             if (parentItem.loaiCongViec == 0 && parentItem.diemLonNhat < sum + Number(newItem.diemLonNhat)) {
                 throw 'Tổng điểm các nội dung không được lớn hơn tiêu chí đánh giá';
             }
@@ -98,12 +96,11 @@ module.exports = app => {
                 app.model.tccbDanhGiaFormChuyenVienChild.getAll({ parentId: item.parentId })
             ]);
             if (!parentItem) {
-                //Tránh không có parent mà đã tạo child
+                //Tránh không có parent mà đã sửa child
                 throw 'Lỗi không xác định';
             }
             listChild = listChild.filter(item => item.id != id);
-            let sum = listChild.length > 0 ? listChild.reduce((prev, cur) => Number(prev.diemLonNhat) + Number(cur.diemLonNhat)) : 0;
-            sum = sum.diemLonNhat ? sum.diemLonNhat : sum;
+            let sum = listChild.reduce((prev, cur) => Number(prev) + Number(cur.diemLonNhat), 0);
             if (parentItem.loaiCongViec == 0 && parentItem.diemLonNhat < sum + Number(changes.diemLonNhat)) {
                 throw 'Tổng điểm các nội dung không được lớn hơn tiêu chí đánh giá';
             }

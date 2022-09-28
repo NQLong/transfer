@@ -10,13 +10,7 @@ class EditModalNhom extends AdminModal {
         $(document).ready(() => this.onShown(() => this.tieuDe.focus()));
     }
 
-    onHide = () => {
-        this.tieuDe.value('');
-        this.diemLonNhat.value('');
-    }
-
     onShow = (item) => {
-        this.onHide();
         let { tieuDe, diemLonNhat, loaiCongViec } = item ? item : { tieuDe: '', diemLonNhat: 0, loaiCongViec: 1 };
         this.tieuDe.value(tieuDe || '');
         this.diemLonNhat.value(Number(diemLonNhat).toFixed(2));
@@ -25,18 +19,24 @@ class EditModalNhom extends AdminModal {
     };
 
     onSubmit = (e) => {
-        e.preventDefault();
-        const changes = {
-            tieuDe: getValue(this.tieuDe),
-            diemLonNhat: Number(getValue(this.diemLonNhat)).toFixed(2),
-            nam: Number(this.props.nam),
-            loaiCongViec: getValue(this.loaiCongViec),
-        };
-        if (!this.state.item) {
-            this.props.create({ ...changes, thuTu: this.props.thuTu }, this.hide);
-        } else {
-            this.props.update(this.state.item.id, changes, this.hide);
+        try {
+            e.preventDefault();
+            const changes = {
+                tieuDe: getValue(this.tieuDe),
+                diemLonNhat: Number(getValue(this.diemLonNhat)).toFixed(2),
+                nam: Number(this.props.nam),
+                loaiCongViec: getValue(this.loaiCongViec),
+            };
+            if (!this.state.item) {
+                this.props.create({ ...changes, thuTu: this.props.thuTu }, this.hide);
+            } else {
+                this.props.update(this.state.item.id, changes, this.hide);
+            }
+        } catch (error) {
+            T.notify('Có lỗi xảy ra!', 'danger');
+            console.error(error);
         }
+
     };
 
     changeKichHoat = value => {
@@ -67,13 +67,7 @@ class EditModal extends AdminModal {
         $(document).ready(() => this.onShown(() => this.tieuDe.focus()));
     }
 
-    onHide = () => {
-        this.tieuDe.value('');
-        this.diemLonNhat.value('');
-    }
-
     onShow = (item) => {
-        this.onHide();
         let editItem = item.item;
         let { tieuDe, diemLonNhat, parentName } = editItem ? editItem : { tieuDe: '', diemLonNhat: 0, parentName };
         this.parentName.value(parentName);
@@ -83,15 +77,20 @@ class EditModal extends AdminModal {
     };
 
     onSubmit = (e) => {
-        e.preventDefault();
-        const changes = {
-            tieuDe: getValue(this.tieuDe),
-            diemLonNhat: Number(getValue(this.diemLonNhat)).toFixed(2),
-        };
-        if (this.state.item.add) {
-            this.props.create({ ...changes, parentId: this.state.item.parentId }, this.hide);
-        } else {
-            this.props.update(this.state.item.item.id, changes, this.hide);
+        try {
+            e.preventDefault();
+            const changes = {
+                tieuDe: getValue(this.tieuDe),
+                diemLonNhat: Number(getValue(this.diemLonNhat)).toFixed(2),
+            };
+            if (this.state.item.add) {
+                this.props.create({ ...changes, parentId: this.state.item.parentId }, this.hide);
+            } else {
+                this.props.update(this.state.item.item.id, changes, this.hide);
+            }
+        } catch (error) {
+            T.notify('Có lỗi xảy ra!', 'danger');
+            console.error(error);
         }
     };
 
