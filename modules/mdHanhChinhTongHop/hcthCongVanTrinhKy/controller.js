@@ -1,12 +1,12 @@
 module.exports = app => {
     const { action } = require('../constant');
-    const userMenu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1056: { title: 'Văn bản trình ký', link: '/user/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00', groupIndex: 5 },
-        },
-    };
-    app.permission.add({ name: 'staff:login', menu: userMenu });
+    // const userMenu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1056: { title: 'Văn bản trình ký', link: '/user/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#00aa00', groupIndex: 5 },
+    //     },
+    // };
+    // app.permission.add({ name: 'staff:login', menu: userMenu });
 
     app.get('/user/cong-van-trinh-ky', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/cong-van-trinh-ky/:id', app.permission.check('staff:login'), app.templates.admin);

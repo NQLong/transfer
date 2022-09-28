@@ -174,7 +174,8 @@ class AdminEditPage extends AdminPage {
                 routeMatcherUrl: '/user/nhiem-vu/:id',
                 readyUrl: '/user',
                 breadcrumb: [
-                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    // <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    <Link key={0} to='/user/van-phong-dien-tu'>...</Link>,
                     <Link key={1} to='/user/nhiem-vu'>Danh sách nhiệm vụ</Link>,
                     this.state.id ? 'Cập nhật' : 'Tạo mới'
                 ],

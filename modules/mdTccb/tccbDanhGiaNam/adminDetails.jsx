@@ -8,6 +8,9 @@ import ComponentDGCB from './componentDGCB';
 import ComponentDGDV from './componentDGDV';
 import ComponentTLD from '../tccbDanhGiaTyLeDiem/componentTLD';
 import ComponentDMCV from '../tccbDanhGiaDinhMucCongViecGvVaNcv/componentDMCV';
+import ComponentHDDonVi from '../tccbDanhGiaHoiDongCapDonVi/componentHDDonVi';
+import ComponentHDTruong from '../tccbDanhGiaHoiDongCapTruong/componentHDTruong';
+import ComponentFormChuyenVien from 'modules/mdTccb/tccbDanhGiaFormChuyenVienParent/componentFormChuyenVien';
 import { getTccbDanhGiaNamAll } from './redux';
 import T from 'view/js/common';
 
@@ -52,6 +55,18 @@ class TccbKhungDanhGiaCanBoDetails extends AdminPage {
             {
                 title: 'Khung đánh giá đơn vị',
                 component: <ComponentDGDV nam={nam} />,
+            },
+            {
+                title: 'Hội đồng đánh giá cấp đơn vị',
+                component: <ComponentHDDonVi nam={nam} />,
+            },
+            {
+                title: 'Hội đồng đánh giá cấp trường',
+                component: <ComponentHDTruong nam={nam} />,
+            },
+            {
+                title: 'Form chuyên viên',
+                component: <ComponentFormChuyenVien nam={nam} />,
             },
         ] : [];
         return this.renderPage({
