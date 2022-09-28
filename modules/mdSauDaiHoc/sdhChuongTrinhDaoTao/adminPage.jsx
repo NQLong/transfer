@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getSdhChuongTrinhDaoTaoPage, getSdhChuongTrinhDaoTao, SelectAdapter_NamDaoTaoFilter } from './redux';
+import { getSdhChuongTrinhDaoTaoPage, getSdhChuongTrinhDaoTao, SelectAdapter_NamDaoTaoFilter, getSdhKhungDaoTao, updateKhungDaoTao } from './redux';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { AdminModal, AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
@@ -243,10 +243,7 @@ class TreeModal extends AdminModal {
         );
     }
 
-
     render = () => {
-        // const readOnly = this.props.readOnly;
-        // const isDaoTao = this.props.permission.write;
         return this.renderModal({
             title: `Chương trình năm học - ${this.namDaoTao}`,
             size: 'elarge',
@@ -297,23 +294,52 @@ class CloneModal extends AdminModal {
         });
     }
 }
+class HocKyModal extends AdminModal {
+
+    onShow = (id) => {
+        this.id = id;
+    };
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const id = this.id;
+        const soHocKy = this.soHocKy.value();
+        if (!soHocKy) {
+            T.notify('Hãy chọn số học kì', 'danger');
+        }
+        else {
+            let changes = { soHocKy: parseInt(soHocKy) };
+            this.props.updateKhungDaoTao(id, changes, () => this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${id}`));
+        }
+    };
+
+    render = () => {
+        return this.renderModal({
+            title: 'Chọn số học kì đào tạo',
+            submitText: 'Xác nhận',
+            body: <>
+                <div>
+                    <FormSelect ref={e => this.soHocKy = e} label='Số học kỳ' data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} required allowClear />
+                </div>
+            </>
+        });
+    }
+}
 class SdhChuongTrinhDaoTaoPage extends AdminPage {
     state = { donViFilter: '', idNamDaoTao: '', heDaoTaoFilter: '' }
     componentDidMount() {
-        T.ready('/user/sau-dai-hoc/chuong-trinh-dao-tao', () => {
-            T.clearSearchBox();
-            let permission = this.getUserPermission('sdhChuongTrinhDaoTao'),
-                user = this.props.system.user,
-                donViFilter = user.staff?.maDonVi;
-            if (permission.read) donViFilter = '';
-            this.setState({ donViFilter, idNamDaoTao: '', heDaoTaoFilter: '' });
-            T.onSearch = (searchText) => this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, {
-                searchTerm: searchText || '',
-            });
-            T.showSearchBox(() => { });
-            this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
-
+        T.ready('/user/sau-dai-hoc');
+        T.clearSearchBox();
+        let permission = this.getUserPermission('sdhChuongTrinhDaoTao'),
+            user = this.props.system.user,
+            donViFilter = user.staff?.maDonVi;
+        if (permission.read) donViFilter = '';
+        this.setState({ donViFilter, idNamDaoTao: '', heDaoTaoFilter: '' });
+        T.onSearch = (searchText) => this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, {
+            searchTerm: searchText || '',
         });
+        T.showSearchBox(() => { });
+        this.props.getSdhChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
     }
 
     delete = (e, item) => {
@@ -364,23 +390,22 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={item.thoiGianDaoTao + ' năm'} />
                     <TableCell content={item.tenKhoaBoMon} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
-                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/chuong-trinh-dao-tao/${item.id}`) : null}
-                    // onEdit={() => this.modal.show(item)}
-                    // onClone={(e) => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/chuong-trinh-dao-tao/new?id=${item.id}`)}
-                    >
+                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/chuong-trinh-dao-tao/${item.id}`) : null}>
                         <Tooltip title='Xem cây chương trình' arrow placeholder='bottom' >
-                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
+                            <a className='btn btn-secondary' href='#' onClick={e => e.preventDefault() || this.modal.show(item)}><i className='fa fa-lg fa-eye' /></a>
                         </Tooltip>
                         <Tooltip title='Chỉnh sửa kế hoạch' arrow placeholder='bottom' >
-                            <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${item.id}`)}><i className='fa fa-lg fa-list' /></a>
-                        </Tooltip>
-                        {permission.write && <Tooltip title='Sao chép' arrow>
-                            <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || this.cloneModal.show(item)}>
-                                <i className='fa fa-lg fa-clone ' />
-                            </a>
-                        </Tooltip>}
-                    </TableCell>
-                </tr>
+                            <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || this.props.getSdhKhungDaoTao(item.id, result => !result.item.soHocKy ? this.hockyModal.show(result.item) : this.props.history.push(`/user/sau-dai-hoc/ke-hoach-dao-tao/${item.id}`))}><i className='fa fa-lg fa-list' /></a>
+                        </Tooltip >
+                        {
+                            permission.write && <Tooltip title='Sao chép' arrow>
+                                <a className='btn btn-success' href='#' onClick={e => e.preventDefault() || this.cloneModal.show(item)}>
+                                    <i className='fa fa-lg fa-clone ' />
+                                </a>
+                            </Tooltip>
+                        }
+                    </TableCell >
+                </tr >
             )
         });
 
@@ -428,6 +453,7 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
                     getPage={this.props.getSdhChuongTrinhDaoTaoPage} />
                 <TreeModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write} getSdhChuongTrinhDaoTao={this.props.getSdhChuongTrinhDaoTao} />
                 <CloneModal ref={e => this.cloneModal = e} permission={permissionDaoTao} readOnly={!permission.write} history={this.props.history} />
+                <HocKyModal ref={e => this.hockyModal = e} permission={permissionDaoTao} history={this.props.history} updateKhungDaoTao={this.props.updateKhungDaoTao} />
             </>,
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sau-dai-hoc/chuong-trinh-dao-tao/new') : null
         });
@@ -435,5 +461,5 @@ class SdhChuongTrinhDaoTaoPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, sdhChuongTrinhDaoTao: state.sdh.sdhChuongTrinhDaoTao });
-const mapActionsToProps = { getSdhChuongTrinhDaoTaoPage, getSdhChuongTrinhDaoTao, getDmDonViAll };
-export default connect(mapStateToProps, mapActionsToProps)(SdhChuongTrinhDaoTaoPage);
+const mapActionsToProps = { getSdhChuongTrinhDaoTaoPage, getSdhChuongTrinhDaoTao, getDmDonViAll, getSdhKhungDaoTao, updateKhungDaoTao };
+export default connect(mapStateToProps, mapActionsToProps)(SdhChuongTrinhDaoTaoPage);   

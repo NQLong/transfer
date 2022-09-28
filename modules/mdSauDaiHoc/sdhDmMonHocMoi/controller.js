@@ -1,21 +1,22 @@
 module.exports = app => {
-    const menuSdh = {
-        parentMenu: app.parentMenu.sdh,
-        menus: {
-            7511: {
-                title: 'Môn học mới (sau 2022)',
-                link: '/user/sau-dai-hoc/mon-hoc-moi', icon: 'fa-list', backgroundColor: '#1ca474', groupIndex: 1
-            },
-        },
-    };
+    // const menuSdh = {
+    //     parentMenu: app.parentMenu.sdh,
+    //     menus: {
+    //         7511: {
+    //             title: 'Môn học mới (sau 2022)',
+    //             link: '/user/sau-dai-hoc/mon-hoc-moi', icon: 'fa-list', groupIndex: 1
+    //         },
+    //     },
+    // };
     app.permission.add(
-        { name: 'dmMonHocSdhMoi:manage', menu: menuSdh },
+        //{ name: 'dmMonHocSdhMoi:manage', menu: menuSdh },
         { name: 'dmMonHocSdhMoi:write' },
         { name: 'dmMonHocSdhMoi:delete' },
     );
-    app.get('/user/sau-dai-hoc/mon-hoc-moi', app.permission.check('dmMonHocSdhMoi:manage'), app.templates.admin);
-    app.get('/user/sau-dai-hoc/mon-hoc-moi/upload', app.permission.check('dmMonHocSdhMoi:write'), app.templates.admin);
+    // app.get('/user/sau-dai-hoc/mon-hoc-moi', app.permission.check('dmMonHocSdhMoi:manage'), app.templates.admin);
+    //app.get('/user/sau-dai-hoc/mon-hoc-moi/upload', app.permission.check('dmMonHocSdhMoi:write'), app.templates.admin);
 
+    /** temporarily hidden from menu */
     app.permissionHooks.add('staff', 'addRolesMonHocSdhMoi', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
             app.permissionHooks.pushUserPermission(user, 'dmMonHocSdhMoi:manage', 'dmMonHocSdhMoi:write', 'dmMonHocSdhMoi:delete');

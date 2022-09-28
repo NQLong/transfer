@@ -11,5 +11,5 @@ module.exports = app => {
     app.get('/user/hcth', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/students', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
     app.get('/user/dao-tao', app.permission.orCheck('staff:login', 'developer:login'), app.templates.admin);
-    app.get('/user/sau-dai-hoc', app.permission.orCheck('sdh:manage', 'developer:login', 'staff:login'), app.templates.admin);
+    app.get('/user/sau-dai-hoc', app.permission.orCheck('sdh:manage', 'developer:login'), app.templates.admin);
 };

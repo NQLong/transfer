@@ -59,7 +59,6 @@ module.exports = app => {
         try {
             const item = await app.model.tccbDanhGiaNam.get({ id: req.body.id });
             const nam = parseInt(item.nam);
-            await app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear(nam);
             await Promise.all([
                 app.model.tccbKhungDanhGiaCanBo.delete({ nam }),
                 app.model.tccbKhungDanhGiaDonVi.update({ nam }, { isDelete: 1 }),
@@ -67,6 +66,8 @@ module.exports = app => {
                 app.model.tccbDiemTru.delete({ nam }),
                 app.model.tccbTyLeDiem.delete({ nam }),
                 app.model.tccbDanhGiaNam.delete({ id: req.body.id }),
+                app.model.tccbDinhMucCongViecGvVaNcv.deleteByYear(nam),
+                app.model.tccbDanhGiaFormChuyenVienParent.deleteByYear(nam),
             ]);
             res.end();
         } catch (error) {
@@ -139,7 +140,10 @@ module.exports = app => {
                 listNewChild.map(item => app.model.tccbKhungDanhGiaDonVi.create(item)),
             ];
             await Promise.all(listPromise.reduce((prev, cur) => prev.concat(cur)));
-            await app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear(nam, newItem.nam);
+            await Promise.all([
+                app.model.tccbDinhMucCongViecGvVaNcv.cloneByYear(nam, newItem.nam),
+                app.model.tccbDanhGiaFormChuyenVienParent.cloneByYear(nam, newItem.nam),
+            ]);
             item = await app.model.tccbDanhGiaNam.create(newItem);
             res.send({ item });
         } catch (error) {

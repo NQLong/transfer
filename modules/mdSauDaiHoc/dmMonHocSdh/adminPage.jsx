@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { createDmMonHocSdh, getDmMonHocSdhPage, updateDmMonHocSdh, deleteDmMonHocSdh } from './redux';
 import { SelectAdapter_DmDonViFaculty_V2, getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
@@ -74,9 +75,7 @@ class EditModal extends AdminModal {
 class DmMonHocSdhPage extends AdminPage {
     state = { dmKhoaSdh: {} };
     componentDidMount() {
-        let route = T.routeMatcher('/user/:menu/mon-hoc').parse(window.location.pathname);
-        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
-        T.ready(`/user/${this.menu}`);
+        T.ready('/user/sau-dai-hoc');
         T.onSearch = (searchText) => this.props.getDmMonHocSdhPage(undefined, undefined, searchText || '');
         T.showSearchBox();
         this.props.getDmMonHocSdhPage();
@@ -144,6 +143,7 @@ class DmMonHocSdhPage extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Danh mục môn học sau đại học',
             breadcrumb: [
+                <Link key={0} to='/user/sau-dai-hoc'>Sau đại học</Link>,
                 'Danh mục môn học sau đại học'
             ],
             content: <>
@@ -154,7 +154,7 @@ class DmMonHocSdhPage extends AdminPage {
                     create={this.props.createDmMonHocSdh} update={this.props.updateDmMonHocSdh}
                     readOnly={!permission.write} />
             </>,
-            backRoute: `/user/${this.menu}`,
+            backRoute: '/user/sau-dai-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/sau-dai-hoc/mon-hoc/upload') : null
         });

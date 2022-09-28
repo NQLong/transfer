@@ -1,15 +1,17 @@
 module.exports = app => {
-    const menuSvSdh = {
+    const menu = {
         parentMenu: app.parentMenu.sdh,
         menus: {
-            7501: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien', groupIndex: 2 }
+            7501: { title: 'Sinh viên', link: '/user/sau-dai-hoc/sinh-vien', groupIndex: 3 }
         }
     };
 
     app.permission.add(
-        { name: 'svSdh:manage', menu: menuSvSdh },
+        { name: 'svSdh:manage', menu },
         { name: 'svSdh:write' },
-        { name: 'svSdh:delete' }
+        { name: 'svSdh:delete' },
+        'svSdh:export',
+        'svSdh:import'
     );
 
     app.get('/user/sau-dai-hoc/sinh-vien', app.permission.check('svSdh:manage'), app.templates.admin);
@@ -18,7 +20,7 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRoleStudentSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && ['37'].includes(staff.maDonVi)) {
-            app.permissionHooks.pushUserPermission(user, 'svSdh:manage', 'svSdh:write', 'svSdh:delete');
+            app.permissionHooks.pushUserPermission(user, 'svSdh:manage', 'svSdh:write', 'svSdh:delete', 'svSdh:export', 'svSdh:import');
             resolve();
         } else resolve();
     }));
@@ -28,9 +30,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = (req.query.filter && req.query.filter != '%%%%%%%%%%%%%%%%%%') ? req.query.filter : { listFaculty: null, listFromCity: null, listEthnic: null, listNationality: null, listReligion: null, listTinhTrangSinhVien: null, gender: null };
-
-        app.model.fwSinhVienSdh.searchPage(pageNumber, pageSize, listFaculty, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender, searchTerm, (error, page) => {
+        const { listFaculty, listNganh, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = (req.query.filter && req.query.filter != '%%%%%%%%%%%%%%%%%%') ? req.query.filter : { listFaculty: null, listNganh: null, listFromCity: null, listEthnic: null, listNationality: null, listReligion: null, listTinhTrangSinhVien: null, gender: null };
+        app.model.fwSinhVienSdh.searchPage(pageNumber, pageSize, listFaculty, listNganh, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -41,7 +42,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/sv-sdh/:mssv', app.permission.check('svSdh:manage'), (req, res) => {
+    app.get('/api/sv-sdh/item/:mssv', app.permission.check('svSdh:manage'), (req, res) => {
         const mssv = req.params.mssv;
         app.model.fwSinhVienSdh.get({ ma: mssv }, (error, item) => {
             res.send({ error, item });
@@ -69,7 +70,7 @@ module.exports = app => {
 
     app.post('/api/sv-sdh/multiple', app.permission.check('svSdh:write'), (req, res) => {
         const data = req.body.data;
-        let gioiTinhMapping = {}, quocGiaMapping = {}, danTocMapping = {}, tonGiaoMapping = {}, tinhTpMapping = {}, huyenMapping = {}, xaMapping = {}, donViMapping = {}, nganhSdhMapping = {},
+        let gioiTinhMapping = {}, quocGiaMapping = {}, danTocMapping = {}, tonGiaoMapping = {}, tinhTpMapping = {}, donViMapping = {}, nganhSdhMapping = {},
             bacDaoTaoMapping = {}, heDaoTaoMapping = {}, tinhTrangMapping = {}, canBoMapping = {};
 
         new Promise(resolve => {
@@ -97,16 +98,16 @@ module.exports = app => {
                 (items || []).forEach(item => tinhTpMapping[item.ten.toLowerCase().replace('tỉnh', '').replace('thành phố', '').trim()] = item.ma);
                 resolve();
             });
-        })).then(() => new Promise(resolve => {
-            app.model.dmQuanHuyen.getAll({ kichHoat: 1 }, (error, items) => {
-                (items || []).forEach(item => huyenMapping[item.tenQuanHuyen.toLowerCase()] = item.maQuanHuyen);
-                resolve();
-            });
-        })).then(() => new Promise(resolve => {
-            app.model.dmPhuongXa.getAll({ kichHoat: 1 }, (error, items) => {
-                (items || []).forEach(item => xaMapping[item.tenPhuongXa.toLowerCase()] = item.maPhuongXa);
-                resolve();
-            });
+            // })).then(() => new Promise(resolve => {
+            //     app.model.dmQuanHuyen.getAll({ kichHoat: 1 }, (error, items) => {
+            //         (items || []).forEach(item => huyenMapping[item.tenQuanHuyen.toLowerCase()] = item.maQuanHuyen);
+            //         resolve();
+            //     });
+            // })).then(() => new Promise(resolve => {
+            //     app.model.dmPhuongXa.getAll({ kichHoat: 1 }, (error, items) => {
+            //         (items || []).forEach(item => xaMapping[item.tenPhuongXa.toLowerCase()] = item.maPhuongXa);
+            //         resolve();
+            //     });
         })).then(() => new Promise(resolve => {
             app.model.dmDonVi.getAll((error, items) => {
                 (items || []).forEach(item => donViMapping[item.ten.toLowerCase()] = item.ma);
@@ -183,14 +184,9 @@ module.exports = app => {
                                 danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : '',
                                 tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : '',
                                 quocTich: item.quocTich && quocGiaMapping[item.quocTich.toLowerCase()] ? quocGiaMapping[item.quocTich.toLowerCase()] : '',
-                                nguyenQuanMaTinh: item.nguyenQuan ? tinhTpMapping[item.nguyenQuan.toLowerCase().trim()] : '',
                                 noiSinhMaTinh: item.noiSinh ? item.noiSinh.toLowerCase().includes('hcm') || item.noiSinh.toLowerCase().includes('hồ chí minh') ? tinhTpMapping['hồ chí minh'] : tinhTpMapping[item.noiSinh.toLowerCase().trim()] ? tinhTpMapping[item.noiSinh.toLowerCase().trim()] : '' : '',
                                 maKhoa: item.khoa && donViMapping[item.khoa.toLowerCase()] ? donViMapping[item.khoa.toLowerCase()] : '',
                                 maNganh: item.maNganh,
-                                thuongTruSoNha: item.thuongTruSoNha ? item.thuongTruSoNha : '',
-                                thuongTruMaXa: item.thuongTruXa && xaMapping[item.thuongTruXa.toLowerCase()] ? xaMapping[item.thuongTruXa.toLowerCase()] : '',
-                                thuongTruMaHuyen: item.thuongTruHuyen && huyenMapping[item.thuongTruHuyen.toLowerCase()] ? huyenMapping[item.thuongTruHuyen.toLowerCase()] : '',
-                                thuongTruMaTinh: item.thuongTruTinh && tinhTpMapping[item.thuongTruTinh.toLowerCase()] ? tinhTpMapping[item.thuongTruTinh.toLowerCase()] : '',
                                 namTuyenSinh: item.namTuyenSinh,
                                 nienKhoa: item.nienKhoa,
                                 bacDaoTao: item.bacDaoTao && bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] ? bacDaoTaoMapping[item.bacDaoTao.toLowerCase()] : '',
@@ -201,17 +197,9 @@ module.exports = app => {
                                 coQuan: item.tenCoQuan,
                                 gvhd: item.gvhd ? getGvhd(item.gvhd) : '',
                                 tenDeTai: item.tenDeTai,
-                                tinhTrang: item.maTinhTrang,
+                                tinhTrang: item.tinhTrang,
                                 heDaoTao: item.heDaoTao && heDaoTaoMapping[item.heDaoTao.toLowerCase()] ? heDaoTaoMapping[item.heDaoTao.toLowerCase()] : '',
-                                hoTenCha: item.hoTenCha ? item.hoTenCha : '',
-                                namSinhCha: item.namSinhCha ? item.namSinhCha : '',
-                                ngheNghiepCha: item.ngheNghiepCha ? item.ngheNghiepCha : '',
-                                sdtCha: item.sdtCha ? item.sdtCha : '',
-                                hoTenMe: item.hoTenMe ? item.hoTenMe : '',
-                                namSinhMe: item.namSinhMe ? item.namSinhMe : '',
-                                ngheNghiepMe: item.ngheNghiepMe ? item.ngheNghiepMe : '',
-                                sdtMe: item.sdtMe ? item.sdtMe : '',
-                                sdtNguoiThan: item.sdtNguoiThan ? item.sdtNguoiThan : '',
+                                hienTaiSoNha: item.hienTaiSoNha || ''
                             };
                             if (svSdh) {
                                 app.model.fwSinhVienSdh.update({ ma: item.ma }, newData, () => {
@@ -266,38 +254,23 @@ module.exports = app => {
                                     danToc: value[7],
                                     tonGiao: value[8],
                                     noiSinh: value[9],
-                                    nguyenQuan: value[10],
-                                    thuongTruTinh: value[11],
-                                    thuongTruHuyen: value[12],
-                                    thuongTruXa: value[13],
-                                    thuongTruSoNha: value[14],
-                                    hienTai: value[15],
-                                    maKhoa: value[19] ? value[19].result : '',
-                                    khoa: value[20],
-                                    maNganh: value[21],
-                                    nganh: value[22],
-                                    namTuyenSinh: value[23],
-                                    nienKhoa: value[24],
-                                    bacDaoTao: value[25],
-                                    heDaoTao: value[26],
-                                    chuongTrinhDaoTao: value[27],
-                                    maTinhTrang: value[28],
-                                    tinhTrang: value[28] ? tinhTrangMapping[value[28]] : '',
-                                    sdtCaNhan: value[29],
-                                    sdtLienHe: value[30],
-                                    hoTenCha: value[31],
-                                    namSinhCha: value[32],
-                                    ngheNghiepCha: value[33],
-                                    sdtCha: value[34],
-                                    hoTenMe: value[35],
-                                    namSinhMe: value[36],
-                                    ngheNghiepMe: value[37],
-                                    sdtMe: value[38],
-                                    sdtNguoiThan: value[39],
-                                    email: value[40],
-                                    tenCoQuan: value[42],
-                                    tenDeTai: value[43],
-                                    gvhd: value[44]
+                                    hienTaiSoNha: value[10],
+                                    maKhoa: value[11] ? value[11].result : '',
+                                    khoa: value[12],
+                                    maNganh: value[13],
+                                    nganh: value[14],
+                                    namTuyenSinh: value[15],
+                                    nienKhoa: value[16],
+                                    bacDaoTao: value[17],
+                                    heDaoTao: value[18],
+                                    chuongTrinhDaoTao: value[19],
+                                    tinhTrang: value[20],
+                                    sdtCaNhan: value[21],
+                                    sdtLienHe: value[22],
+                                    email: value[23],
+                                    tenCoQuan: value[24],
+                                    tenDeTai: value[25],
+                                    gvhd: value[26]
                                 };
 
                                 element.push(data);
@@ -314,4 +287,72 @@ module.exports = app => {
 
         }
     };
+
+    app.get('/api/sv-sdh/download-excel', app.permission.check('svSdh:export'), async (req, res) => {
+        try {
+            let filter = app.utils.parse(req.query.filter || {});
+            const { listFaculty, listNganh, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender } = filter?filter:{listFaculty:'', listNganh:'', listFromCity:'', listEthnic:'', listNationality:'', listReligion:'', listTinhTrangSinhVien:'', gender:''};
+            let listNganhSdh;
+            await app.model.dmNganhSauDaiHoc.getAll({}, 'maNganh,ten', null, (err, result) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    listNganhSdh = result;
+                }
+            });
+            let data = await app.model.fwSinhVienSdh.searchPage(1, 1000000, listFaculty, listNganh, listFromCity, listEthnic, listNationality, listReligion, listTinhTrangSinhVien, gender, '');
+            const workBook = app.excel.create();
+            const ws = workBook.addWorksheet('Thoi khoa bieu');
+            ws.columns = [
+                { header: 'STT', key: 'stt', width: 5 },
+                { header: 'MSSV', key: 'mssv', width: 5 },
+                { header: 'HỌ', key: 'ho', width: 5 },
+                { header: 'TÊN', key: 'ten', width: 5 },
+                { header: 'GIỚI TÍNH', key: 'gioiTinh', width: 7 },
+                { header: 'NGÀY SINH', key: 'ngaySinh', width: 7 },
+                { header: 'DÂN TỘC', key: 'danToc', width: 10 },
+                { header: 'TÌNH TRẠNG SINH VIÊN', key: 'tinhTrangSinhVien', width: 5 },
+                { header: 'QUỐC TỊCH', key: 'quocTich', width: 10 },
+                { header: 'CHƯƠNG TRÌNH ĐÀO TẠO', key: 'chuongTrinhDaoTao', width: 10 },
+                { header: 'HIỆN TẠI SỐ NHÀ', key: 'hienTaiSoNha', width: 10 },
+                { header: 'TÊN ĐỀ TÀI', key: 'tenDeTai', width: 10 },
+                { header: 'KHOA', key: 'khoa', width: 10 },
+                { header: 'NGÀNH', key: 'nganh', width: 10 },
+                { header: 'NĂM TUYỂN SINH', key: 'namTuyenSinh', width: 10 },
+                { header: 'EMAIL', key: 'email', width: 30 },
+                { header: 'SĐT CÁ NHÂN', key: 'sdtCaNhan', width: 30 },
+            ];
+
+            const list = data.rows;
+            list.forEach((item, index) => {
+                ws.addRow({
+                    ...item,
+                    stt: index + 1,
+                    ma: item.mssv,
+                    ho: item.ho,
+                    ten: item.ten,
+                    email: item.emailCaNhan || '',
+                    khoa: item.tenKhoa || '',
+                    nganh: listNganhSdh.find(e => e.maNganh == item.maNganh).ten,
+                    namTuyenSinh: item.namTuyenSinh || '',
+                    danToc: item.danToc || '',
+                    quocTich: item.quocTich || '',
+                    ngaySinh: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '',
+                    gioiTinh: item.gioiTinh == 1 ? 'Nam' : 'Nữ',
+                    tenDeTai: item.tenDeTai || '',
+                    sdtCaNhan: item.sdtCaNhan || '',
+                    chuongTrinhDaoTao: item.chuongTrinhDaoTao || '',
+                    hienTaiSoNha: item.hienTaiSoNha || '',
+                }, index === 0 ? 'n' : 'i');
+            });
+
+            let fileName = 'HOC_VIEN_SDH.xlsx';
+            app.excel.attachment(workBook, res, fileName);
+        } catch (error) {
+            console.error(error);
+            res.send({ error });
+        }
+    });
+
+
 };

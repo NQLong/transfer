@@ -58,12 +58,8 @@ class dmHocSdhPage extends AdminPage {
     state = { searching: false };
 
     componentDidMount() {
-        let route = T.routeMatcher('/user/:menu/:he').parse(window.location.pathname);
-        this.menu = route.menu == 'sau-dai-hoc' ? 'sau-dai-hoc' : 'category';
-        this.he = route.menu == 'bac-sdh' ? 'bac-sdh' : 'phan-he-dao-tao';
-
-        console.log(this.menu);
-        T.ready(`/user/${this.menu}`, () => {
+  
+        T.ready('/user/sau-dai-hoc', () => {
             T.onSearch = (searchText) => this.props.getDmHocSdhPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmHocSdhPage();
@@ -117,10 +113,10 @@ class dmHocSdhPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: this.menu == 'category' ?'Bậc sau đại học':'Phân hệ đào tạo',
+            title: 'Phân hệ đào tạo',
             breadcrumb: [
-                <Link key={0} to={this.menu == 'category' ? '/user/category' : '/user/sau-dai-hoc'}>{this.menu == 'category' ? 'Danh mục' : 'Sau đại học'}</Link>,
-                this.menu == 'category' ?'Bậc sau đại học':'Phân hệ đào tạo'
+                <Link key={0} to={'/user/sau-dai-hoc'}>{'Sau đại học'}</Link>,
+                'Phân hệ đào tạo'
             ],
             content: <>
                 <div className='tile'>{table}</div>
@@ -128,7 +124,7 @@ class dmHocSdhPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmHocSdh} update={this.props.updateDmHocSdh} permissions={currentPermissions} />
             </>,
-            backRoute: `/user/${this.menu}`,
+            backRoute: '/user/sau-dai-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }

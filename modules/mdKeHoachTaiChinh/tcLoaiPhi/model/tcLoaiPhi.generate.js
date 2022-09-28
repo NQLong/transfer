@@ -217,8 +217,8 @@ module.exports = app => {
         }),
 
         getStatistic: (filter, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_loai_phi_get_statistic(:filter); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tc_loai_phi_get_statistic(:filter, :dadong, :tongsinhvien, :tongsinhviendadong); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, dadong: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, tongsinhvien: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, tongsinhviendadong: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);
