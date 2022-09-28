@@ -8,19 +8,19 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesTcGiaoDich', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '34') {
-            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:manage', 'tcGiaoDich:export', 'tcGiaoDich:write');
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:export', 'tcGiaoDich:write');
             resolve();
         } else resolve();
     }));
 
     app.permission.add(
-        { name: 'tcGiaoDich:manage', menu }, 'tcGiaoDich:export', 'tcGiaoDich:write', 'tcGiaoDich:check'
+        { name: 'tcGiaoDich:write', menu }, 'tcGiaoDich:export', 'tcGiaoDich:manage', 'tcGiaoDich:check'
     );
 
-    app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:manage'), app.templates.admin);
+    app.get('/user/finance/danh-sach-giao-dich', app.permission.check('tcGiaoDich:write'), app.templates.admin);
 
 
-    app.get('/api/finance/danh-sach-giao-dich/page/:pageNumber/:pageSize', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/page/:pageNumber/:pageSize', app.permission.check('tcGiaoDich:write'), async (req, res) => {
         try {
             let filter = req.query.filter || {};
             const settings = await getSettings();
@@ -40,7 +40,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:manage'), async (req, res) => {
+    app.get('/api/finance/danh-sach-giao-dich/list-ngan-hang', app.permission.check('tcGiaoDich:write'), async (req, res) => {
         try {
             const searchTerm = req.query.condition;
             const list = await app.model.tcHocPhiTransaction.listBank(searchTerm || '');
@@ -157,7 +157,7 @@ module.exports = app => {
 
     });
     //app.permission.check('tcGiaoDich:cancel'),
-    app.post('/api/finance/danh-sach-giao-dich/huy', app.permission.orCheck('tcGiaoDich:check', 'tcGiaoDich:cancel'), async (req, res) => {
+    app.post('/api/finance/danh-sach-giao-dich/huy', app.permission.orCheck('tcGiaoDich:cancel'), async (req, res) => {
         try {
             let { ghiChu, transId } = req.body;
             let email = req.session.user.email;
@@ -303,4 +303,52 @@ module.exports = app => {
             res.send({ error });
         }
     });
+
+
+    app.assignRoleHooks.addRoles('tcThemGiaoDich', { id: 'tcGiaoDich:check', text: 'Quản lý giao dịch: Thêm giao dịch' });
+
+    app.assignRoleHooks.addHook('tcThemGiaoDich', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'tcThemGiaoDich' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('tcThemGiaoDich').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyThemGiaoDich', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi && staff.maDonVi == '34') {
+            app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:manage', 'tcGiaoDich:check', 'tcGiaoDich:cancel');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyThemGiaoDich', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'tcThemGiaoDich');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'tcGiaoDich:check') {
+                app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:check');
+            }
+        });
+        resolve();
+    }));
+
+    app.assignRoleHooks.addRoles('tcHuyGiaoDich', { id: 'tcGiaoDich:cancel', text: 'Quản lý giao dịch: Hủy giao dịch' });
+
+    app.assignRoleHooks.addHook('tcHuyGiaoDich', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'tcHuyGiaoDich' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('tcHuyGiaoDich').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyHuyGiaoDich', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'tcHuyGiaoDich');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'tcGiaoDich:cancel') {
+                app.permissionHooks.pushUserPermission(user, 'tcGiaoDich:cancel');
+            }
+        });
+        resolve();
+    }));
 };

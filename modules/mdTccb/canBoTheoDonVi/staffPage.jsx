@@ -114,14 +114,18 @@ class CanBoTheoDonVi extends AdminPage {
             daoTaoPermission = this.getCurrentPermissions().includes('faculty:login'),
             quanLyDaoTaoPermission = this.getCurrentPermissions().includes('quanLyDaoTao:manager'),
             managerPermission = this.getUserPermission('manager', ['write', 'login']),
-            congVanPermission = this.getUserPermission('hcth', ['manage']);
+            congVanPermission = this.getUserPermission('hcth', ['manage']),
+            giaoDichPermission = this.getUserPermission('tcGiaoDich', ['manage']);
+
         let nhomRoles = ['ttDoanhNghiep'];
         ctsvNhapHocPermissions.write && nhomRoles.push('ctsvNhapHoc');
+        giaoDichPermission.manage && nhomRoles.push('tcThemGiaoDich', 'tcHuyGiaoDich');
         congVanPermission.manage && nhomRoles.push('quanLyCongVanDen', 'hcthQuanLyCongVanDi');
         managerPermission.write && nhomRoles.push('quanLyCongVanPhong', 'quanLyCongVanDiPhong', 'soanThaoCongVanDi');
         managerPermission.login && nhomRoles.push('quanLyDonVi', 'tccbDonViDangKyNhiemVu');
         quanLyDaoTaoPermission && nhomRoles.push('quanLyDaoTao');
         daoTaoPermission && nhomRoles.push('daoTao');
+
 
         const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};
         let table = renderTable({
