@@ -36,7 +36,7 @@ export default StyleSheet.create({
         position: 'absolute',
         // bottom: 100,
         right: 10, 
-        bottom: 70
+        bottom: 30
     },
     buttonSign: {
         justifyContent: 'center',
@@ -64,9 +64,30 @@ export default StyleSheet.create({
         margin: 10,
     },
 
-    pdf: {
-        flex:1,
-        width:Dimensions.get('window').width,
-        height:Dimensions.get('window').height,
+    pdfBar: {
+        display: 'flex', 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+
+    prevTouch: {
+        padding: 10,
+        flex: 0.33,
+        alignItems: 'flex-start'
+    },
+
+    nextTouch: {
+        flex: 0.33,
+        padding: 10,
+        alignItems: 'flex-end'
+    },
+
+    paging: {
+        flex: 0.33,
+        padding: 10,
+        fontWeight: '500'
     }
+
+
 })

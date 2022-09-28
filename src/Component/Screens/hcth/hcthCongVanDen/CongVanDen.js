@@ -320,7 +320,7 @@ const actionToText = (value) => {
 
 
 const FileList = ({ navigation }) => {
-    const listFile = useSelector(state => state.hcthCongVanDen?.item?.listFile);
+    const listFile = useSelector(state => state.hcthCongVanDen?.item?.files);
     const id = useSelector(state => state.hcthCongVanDen?.item?.id);
     const { colors } = useTheme();
     const [isExpand, setIsExpand] = useState(true);
@@ -332,13 +332,12 @@ const FileList = ({ navigation }) => {
             return <List.Item title={'Chưa có tập tin công văn'} />
         else {
             const items = listFile.map((item, key) => {
-                const
-                    originalName = item.ten,
+                const originalName = item.file.ten,
                     linkFile = `${T.config.API_URL}api/hcth/cong-van-den/download/${id || 'new'}/${originalName}`,
                     style = {};
                 if (key == 0)
                     style.borderTopWidth = 0;
-                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.ten}</Text></TouchableOpacity>} />
+                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.file.ten}</Text></TouchableOpacity>} />
             });
             return items;
         };
@@ -457,7 +456,6 @@ const CongVanDen = (props) => {
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthCongVanDen?.item);
     const user = useSelector(state => state?.settings);
-    console.log(user.user.permissions);
     const userPermissions = useSelector(state => state?.settings?.user?.permissions);
     const isPresident = userPermissions.includes('rectors:login');
     const [context, setContext] = useState({});

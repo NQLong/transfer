@@ -145,7 +145,6 @@ export function readNotification(id, action, done) {
                 done && done(data.item);
             }
         }).catch( error => {
-            console.log(error);
             T.alert('Lỗi', 'Lấy thông tin thông báo bị lỗi!');
         });
     };

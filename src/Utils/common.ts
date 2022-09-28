@@ -239,7 +239,6 @@ T.storage = {
 T.setCookie = async () => {
     const data = await T.storage.get('siginInCookie');
     if (data && data.siginInCookie) {
-        console.log({ data })
         await CookieManager.setFromResponse(Config.API_URL, data.siginInCookie);
     }
 }
@@ -256,8 +255,8 @@ T.hasCookie = async (key = Config.COOKIE_NAME) => {
     return cookie[key];
 }
 T.config = Config;
-T.isDebug = Config.API_URL != 'https://hcmussh.edu.vn/';
-// T.isDebug = false;
+// T.isDebug = Config.API_URL != 'https://hcmussh.edu.vn/';
+T.isDebug = false;
 
 // @ts-ignore
 String.prototype.viText = function () {
