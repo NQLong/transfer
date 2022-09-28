@@ -22,7 +22,7 @@ module.exports = app => {
     // app.permission.add({ name: 'manager:write', menu: menu });
     // app.permission.add({ name: 'rectors:login', menu: menu });
     app.get('/user/hcth/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
-    app.get('/user/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
+    app.get('/user/yeu-cau-tao-khoa', app.permission.orCheck('rectors:login', 'manager:login'), app.templates.admin);
 
     app.get('/api/hcth/yeu-cau-tao-khoa/user/page/:pageNumber/:pageSize', app.permission.check('staff:login'), async (req, res) => {
         try {
@@ -131,10 +131,10 @@ module.exports = app => {
             value: `${donVi?.ten || ''}`.trim()
         }, {
             shortName: 'OU',
-            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `.${shcc}`
-        }
-        ];
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `-${shcc}`
+        }];
 
+        attributes.forEach(attribute => attribute.value = app.toEngWord(attribute.value));
         const extensions = [{
             name: 'basicConstraints',
             cA: false
@@ -156,10 +156,6 @@ module.exports = app => {
             name: 'extKeyUsage',
             serverAuth: true
         },
-            // {
-            //     name: 'subjectAltName',
-            //     altNames: validDomains.map(domain => { return { type: 2, value: domain } })
-            // }
         ];
 
         // Create an empty Certificate
@@ -198,10 +194,11 @@ module.exports = app => {
             if (khoa.publicKey) throw 'Khóa đã được gửi đến người dùng';
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
+            console.log({ p12b64 });
+            app.fs.writeFileSync('def.p12', p12b64, 'base64');
+            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, Math.floor(p12b64.length / 2)), { version: 33, errorCorrectionLevel: 'L', });
 
-            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, 2000), { version: 33, errorCorrectionLevel: 'L', });
-
-            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L' });
+            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(Math.floor(p12b64.length / 2), p12b64.length), { version: 33, errorCorrectionLevel: 'L' });
 
             await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới',
                 [{
@@ -370,7 +367,7 @@ module.exports = app => {
                 if (background)
                     image = image.background(background);
                 image = image.resize(parseInt(width), parseInt(height));
-                buffer = image.getBuffer(jimp.MIME_PNG, (error, buffer) => { 
+                buffer = image.getBuffer(jimp.MIME_PNG, (error, buffer) => {
                     if (error) throw error;
                     sendResponse(buffer.toString('base64'));
                 });
