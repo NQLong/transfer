@@ -18694,8 +18694,15 @@
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176768\".nextval",
                     "nullable": false,
+                    "size": "22,0"
+                },
+                "PARENT_ID": {
+                    "value": "parentId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
                     "size": "22,0"
                 },
                 "TIEU_DE": {
@@ -18707,13 +18714,6 @@
                 },
                 "DIEM_LON_NHAT": {
                     "value": "diemLonNhat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "4,0"
-                },
-                "PARENT_ID": {
-                    "value": "parentId",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -18733,18 +18733,15 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "TCCB_DANH_GiA_FORM_CHUYEN_VIEN_PARENT": {
+        "TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT": {
             "active": true,
             "moduleName": "tccbDanhGiaFormChuyenVienParent",
             "modelName": "tccbDanhGiaFormChuyenVienParent",
-            "methods": {
-                "TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT_GAN_THU_TU": "ganThuTu"
-            },
             "columns": {
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176765\".nextval",
                     "nullable": false,
                     "size": "22,0"
                 },
@@ -18762,19 +18759,19 @@
                     "nullable": true,
                     "size": 1000
                 },
-                "LOAI_CONG_VIEC": {
-                    "value": "loaiCongViec",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "DIEM_LON_NHAT": {
                     "value": "diemLonNhat",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
+                    "size": "22,0"
+                },
+                "LOAI_CONG_VIEC": {
+                    "value": "loaiCongViec",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
                 },
                 "THU_TU": {
                     "value": "thuTu",
