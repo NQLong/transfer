@@ -1,6 +1,6 @@
-// Table name: TCCB_DANH_GIA_PHE_DUYET_TRUONG { id, userDuyetCapTruong, approvedTruong, idPheDuyetCapDonVi, yKienTruongTccb, truongTccb, nam }
+// Table name: TCCB_DANH_GIA_PHE_DUYET_TRUONG { id, userDuyetCapTruong, idPheDuyetCapDonVi, truongTccb, nam, approvedTruong, yKienTruongTccb }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'userDuyetCapTruong': 'USER_DUYET_CAP_TRUONG', 'approvedTruong': 'APPROVED_TRUONG', 'idPheDuyetCapDonVi': 'ID_PHE_DUYET_CAP_DON_VI', 'yKienTruongTccb': 'Y_KIEN_TRUONG_TCCB', 'truongTccb': 'TRUONG_TCCB', 'nam': 'NAM' };
+const obj2Db = { 'id': 'ID', 'userDuyetCapTruong': 'USER_DUYET_CAP_TRUONG', 'idPheDuyetCapDonVi': 'ID_PHE_DUYET_CAP_DON_VI', 'truongTccb': 'TRUONG_TCCB', 'nam': 'NAM', 'approvedTruong': 'APPROVED_TRUONG', 'yKienTruongTccb': 'Y_KIEN_TRUONG_TCCB' };
 
 module.exports = app => {
     app.model.tccbDanhGiaPheDuyetTruong = {
@@ -216,9 +216,9 @@ module.exports = app => {
             });
         }),
 
-        searchPage: (pagenumber, pagesize, searchterm, searchnam, done) => new Promise((resolve, reject) => {
-            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tccb_danh_gia_phe_duyet_truong_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal, :searchnam); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, searchnam }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
+        searchPage: (pagenumber, pagesize, searchterm, searchnam, filter, done) => new Promise((resolve, reject) => {
+            app.database.oracle.connection.main.executeExtra('BEGIN :ret:=tccb_danh_gia_phe_duyet_truong_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal, :searchnam, :filter); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, searchnam, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, (error, result) => {
                     if (error) {
                         done && done(error);
                         reject(error);

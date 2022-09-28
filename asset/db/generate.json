@@ -10636,7 +10636,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 10
+                    "size": 20
                 },
                 "NGHE_NGHIEP_CU": {
                     "value": "ngheNghiepCu",
@@ -18416,26 +18416,12 @@
                     "nullable": true,
                     "size": 255
                 },
-                "APPROVED_TRUONG": {
-                    "value": "approvedTruong",
-                    "dataType": "CLOB",
-                    "dataDefault": "null",
-                    "nullable": true,
-                    "size": 4000
-                },
                 "ID_PHE_DUYET_CAP_DON_VI": {
                     "value": "idPheDuyetCapDonVi",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
-                },
-                "Y_KIEN_TRUONG_TCCB": {
-                    "value": "yKienTruongTccb",
-                    "dataType": "CLOB",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 4000
                 },
                 "TRUONG_TCCB": {
                     "value": "truongTccb",
@@ -18450,6 +18436,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "APPROVED_TRUONG": {
+                    "value": "approvedTruong",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "Y_KIEN_TRUONG_TCCB": {
+                    "value": "yKienTruongTccb",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
                 }
             },
             "primaryKeys": [
@@ -18694,8 +18694,15 @@
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
-                    "dataDefault": "",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176768\".nextval",
                     "nullable": false,
+                    "size": "22,0"
+                },
+                "PARENT_ID": {
+                    "value": "parentId",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
                     "size": "22,0"
                 },
                 "TIEU_DE": {
@@ -18707,13 +18714,6 @@
                 },
                 "DIEM_LON_NHAT": {
                     "value": "diemLonNhat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "4,0"
-                },
-                "PARENT_ID": {
-                    "value": "parentId",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -18733,18 +18733,146 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "TCCB_DANH_GiA_FORM_CHUYEN_VIEN_PARENT": {
+        "FW_DM_FORM_TYPE": {
             "active": true,
-            "moduleName": "tccbDanhGiaFormChuyenVienParent",
-            "modelName": "tccbDanhGiaFormChuyenVienParent",
-            "methods": {
-                "TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT_GAN_THU_TU": "ganThuTu"
+            "moduleName": "fwDmFormType",
+            "modelName": "fwDmFormType",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "CHU_THICH": {
+                    "value": "chuThich",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "SRC_PATH": {
+                    "value": "srcPath",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 11
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "HE_DAO_TAO": {
+                    "value": "heDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
             },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [
+                "HE_DAO_TAO"
+            ],
+            "type": "table"
+        },
+        "FW_MANAGE_FORM": {
+            "active": true,
+            "moduleName": "fwManageForm",
+            "modelName": "fwManageForm",
             "columns": {
                 "ID": {
                     "value": "id",
                     "dataType": "NUMBER",
                     "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "REGISTER": {
+                    "value": "register",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "REGISTION_TIME": {
+                    "value": "registionTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "MODEL": {
+                    "value": "model",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "FORM_TYPE": {
+                    "value": "formType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "STAFF_HANDLE": {
+                    "value": "staffHandle",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "HANDLE_TIME": {
+                    "value": "handleTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "ACTION": {
+                    "value": "action",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_DANH_GIA_FORM_CHUYEN_VIEN_PARENT": {
+            "active": true,
+            "moduleName": "tccbDanhGiaFormChuyenVienParent",
+            "modelName": "tccbDanhGiaFormChuyenVienParent",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176765\".nextval",
                     "nullable": false,
                     "size": "22,0"
                 },
@@ -18762,19 +18890,19 @@
                     "nullable": true,
                     "size": 1000
                 },
-                "LOAI_CONG_VIEC": {
-                    "value": "loaiCongViec",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
-                    "nullable": true,
-                    "size": "1,0"
-                },
                 "DIEM_LON_NHAT": {
                     "value": "diemLonNhat",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "4,0"
+                    "size": "22,0"
+                },
+                "LOAI_CONG_VIEC": {
+                    "value": "loaiCongViec",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
                 },
                 "THU_TU": {
                     "value": "thuTu",
