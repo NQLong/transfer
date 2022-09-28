@@ -44,7 +44,7 @@ module.exports = app => {
         app.model.sdhCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/:id', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
+    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/:id', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhCauTrucKhungDaoTao:manage'), (req, res) => {
         app.model.sdhCauTrucKhungDaoTao.get({ id: req.params.id }, '*', 'id ASC', (error, item) => res.send({ error, item }));
     });
 

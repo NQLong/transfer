@@ -12,6 +12,7 @@ module.exports = app => {
         // { name: 'dmMonHocSdh:manage', menu },
         { name: 'dmMonHocSdh:write' },
         { name: 'dmMonHocSdh:delete' },
+        'dmMonHocSdh:manage',
     );
     // app.get('/user/sau-dai-hoc/mon-hoc', app.permission.check('dmMonHocSdh:manage'), app.templates.admin);
     // app.get('/user/sau-dai-hoc/mon-hoc/upload', app.permission.check('dmMonHocSdh:write'), app.templates.admin);
