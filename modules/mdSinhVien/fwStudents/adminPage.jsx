@@ -80,7 +80,7 @@ class AdminStudentsPage extends AdminPage {
     }
 
     downloadExcel = () => {
-        T.handleDownload(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx');
+        T.handleDownload(`/api/students/download-excel?filter=${T.stringify(this.state.filter)}`, 'STUDENTS_DATA.xlsx', 20 * 1000);
     }
 
     downloadImage = () => {

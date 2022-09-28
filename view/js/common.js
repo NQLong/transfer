@@ -90,7 +90,7 @@ const T = {
         link.click();
     },
 
-    handleDownload: (url, name, maxTimeout = 10000) => {
+    handleDownload: (url, name, maxTimeout) => {
         T.alert('Vui lòng chờ trong giây lát!', 'info', false, null, true);
         $.ajax({
             type: 'GET',
@@ -100,9 +100,7 @@ const T = {
                 xhr.onreadystatechange = () => {
                     if (xhr.readyState == 2) {
                         if (xhr.status == 200) {
-                            xhr.responseType = 'blob';
-                        } else {
-                            xhr.responseType = 'text';
+                            if (name.endsWith('.zip')) xhr.responseType = 'blob';
                         }
                     }
                 };
@@ -111,9 +109,8 @@ const T = {
             timeout: maxTimeout,
             success: response => {
                 T.alert('Tải về thành công!', 'success', false, 2000);
-                const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
-                link.href = url;
+                link.href = T.url(url);
                 link.setAttribute('download', name);
                 document.body.appendChild(link);
                 link.click();
