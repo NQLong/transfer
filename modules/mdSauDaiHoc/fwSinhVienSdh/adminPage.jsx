@@ -97,7 +97,7 @@ class AdminSvSdhPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'center', minWidth: '100px' }}>Tôn giáo</th>
 
                     <th style={{ width: 'auto', whiteSpace: 'center' }}>Nơi sinh</th>
-                    <th style={{ width: 'auto', whiteSpace: 'center' }}>Hiện tại số nhà</th>
+                    {/* <th style={{ width: 'auto', whiteSpace: 'center' }}>Hiện tại số nhà</th> */}
 
                     <th style={{ width: '50%', whiteSpace: 'center' }}>Email</th>
                     <th style={{ width: '50%', whiteSpace: 'center' }}>Sđt cá nhân</th>
@@ -136,7 +136,7 @@ class AdminSvSdhPage extends AdminPage {
                     <TableCell type='date' dateFormat='dd/mm/yyyy' style={{ whiteSpace: 'nowrap' }} content={item.ngaySinh} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tonGiao ? item.tonGiao : 'Không'} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.noiSinh} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hienTaiSoNha} />
+                    {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hienTaiSoNha} /> */}
 
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.emailCaNhan} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.sdtCaNhan} />

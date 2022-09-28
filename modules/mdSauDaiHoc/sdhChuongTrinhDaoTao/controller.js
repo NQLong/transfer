@@ -4,12 +4,11 @@ module.exports = app => {
         menus: {
             7003: {
                 title: 'Chương trình đào tạo',
-                link: '/user/sau-dai-hoc/chuong-trinh-dao-tao', icon: 'fa-university', groupIndex:1
+                link: '/user/sau-dai-hoc/chuong-trinh-dao-tao', icon: 'fa-university', groupIndex: 1
             },
         },
     };
     app.permission.add(
-        { name: 'sdhChuongTrinhDaoTao:read', menu },
         { name: 'sdhChuongTrinhDaoTao:manage', menu },
         { name: 'sdhChuongTrinhDaoTao:write' },
         { name: 'sdhChuongTrinhDaoTao:delete' },
@@ -17,23 +16,23 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRoleSdhChuongTrinhDaoTao', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:write', 'sdhChuongTrinhDaoTao:delete');
+            app.permissionHooks.pushUserPermission(user, 'sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:write', 'sdhChuongTrinhDaoTao:delete');
             resolve();
         } else resolve();
     }));
 
-    app.get('/user/sau-dai-hoc/chuong-trinh-dao-tao', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/chuong-trinh-dao-tao', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), app.templates.admin);
     app.get('/user/sau-dai-hoc/chuong-trinh-dao-tao/:ma', app.permission.orCheck('sdhChuongTrinhDaoTao:write', 'sdhChuongTrinhDaoTao:manage'), app.templates.admin);
     app.get('/user/sau-dai-hoc/ke-hoach-dao-tao/:ma', app.permission.orCheck('sdhChuongTrinhDaoTao:write', 'sdhChuongTrinhDaoTao:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.searchTerm == 'string' ? req.query.searchTerm : '';
         const user = req.session.user, permissions = user.permissions;
         let donVi = req.query.donViFilter;
-        if (!permissions.includes('sdhChuongTrinhDaoTao:read')) {
+        if (!permissions.includes('sdhChuongTrinhDaoTao:manage')) {
             if (user.staff.maDonVi) donVi = user.staff.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
@@ -57,7 +56,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
         const maKhungDaoTao = req.query.maKhungDaoTao,
             condition = req.query.searchText ? {
                 statement: 'lower(maMonHoc) LIKE :searchText OR lower(tenMonHoc) LIKE :searchText AND maKhungDaoTao =:maKhungDaoTao',
@@ -70,13 +69,13 @@ module.exports = app => {
         app.model.sdhChuongTrinhDaoTao.getAll(condition, '*', 'maMonHoc ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-nam-dao-tao/', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-nam-dao-tao/', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
         const { maKhoa } = req.query;
         const condition = maKhoa ? { maKhoa } : {};
         app.model.sdhCauTrucKhungDaoTao.getAllNamDaoTao(condition, 'id, namDaoTao', 'namDaoTao ASC', (error, items) => res.send({ error, items }));
     });
 
-    // app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-mon-hoc', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
+    // app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/all-mon-hoc', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
     //     try {
     //         let { khoaSv, maNganh, loaiHinhDaoTao, bacDaoTao } = req.query.condition;
     //         let thoiGianMoMon = await app.model.sdhThoiGianMoMon.getActive();
@@ -151,13 +150,13 @@ module.exports = app => {
     // });
 
 
-    app.get('/api/sau-dai-hoc/khung-dao-tao/:ma', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
+    app.get('/api/sau-dai-hoc/khung-dao-tao/:ma', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.sdhKhungDaoTao.get(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/khung-dao-tao/item/:id', app.permission.orCheck('sdhChuongTrinhDaoTao:read', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
+    app.get('/api/sau-dai-hoc/khung-dao-tao/item/:id', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'sdhChuongTrinhDaoTao:manage'), async (req, res) => {
         try {
             let item = await app.model.sdhKhungDaoTao.get({ id: req.params.id }, '*', 'id ASC');
             let cauTrucKhung = await app.model.sdhCauTrucKhungDaoTao.get({ id: item.namDaoTao });
@@ -262,7 +261,7 @@ module.exports = app => {
     //     resolve();
     // }));
 
-    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/download-word/:id', app.permission.check('sdhChuongTrinhDaoTao:read'), async (req, res) => {
+    app.get('/api/sau-dai-hoc/chuong-trinh-dao-tao/download-word/:id', app.permission.check('sdhChuongTrinhDaoTao:manage'), async (req, res) => {
         if (req.params && req.params.id) {
             const id = req.params.id;
             let kdt = await app.model.sdhKhungDaoTao.get({ id }, '*', 'id ASC');
