@@ -94,7 +94,7 @@ class DmNganhSdhPage extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dmNganhSdh', ['read', 'write', 'delete']);
+            permission = this.getUserPermission('dmNganhSdh', ['write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmNganhSdh && this.props.dmNganhSdh.page ?
             this.props.dmNganhSdh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         let table = 'Không có danh sách ngành sau đại học!';

@@ -75,7 +75,7 @@ class AdminSvSdhPage extends AdminPage {
 
 
     render() {
-        let permission = this.getUserPermission('svSdh', ['read', 'write', 'delete', 'export', 'import']);
+        let permission = this.getUserPermission('svSdh', ['write', 'delete', 'export', 'import']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.svSdh && this.props.svSdh.page ?
             this.props.svSdh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };

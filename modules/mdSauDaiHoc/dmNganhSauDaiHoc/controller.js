@@ -9,22 +9,22 @@ module.exports = app => {
         },
     };
     app.permission.add(
-        { name: 'dmNganhSdh:read', menu },
+        { name: 'dmNganhSdh:manage', menu },
         { name: 'dmNganhSdh:write' },
         { name: 'dmNganhSdh:delete' },
     );
-    app.get('/user/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:read'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/danh-sach-nganh', app.permission.check('dmNganhSdh:manage'), app.templates.admin);
     app.get('/user/sau-dai-hoc/danh-sach-nganh/upload', app.permission.check('dmNganhSdh:write'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesNganhSdh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:read', 'dmNganhSdh:write', 'dmNganhSdh:delete');
+            app.permissionHooks.pushUserPermission(user, 'dmNganhSdh:write', 'dmNganhSdh:delete', 'dmNganhSdh:manage');
             resolve();
         } else resolve();
     }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/danh-sach-nganh/page/:pageNumber/:pageSize', app.permission.check('dmNganhSdh:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/danh-sach-nganh/page/:pageNumber/:pageSize', app.permission.check('dmNganhSdh:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -58,11 +58,11 @@ module.exports = app => {
         app.model.dmNganhSauDaiHoc.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/sau-dai-hoc/danh-sach-nganh/all', app.permission.check('dmNganhSdh:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/danh-sach-nganh/all', app.permission.check('dmNganhSdh:manage'), (req, res) => {
         app.model.dmNganhSauDaiHoc.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/danh-sach-nganh/item/:ma', app.permission.check('dmNganhSdh:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/danh-sach-nganh/item/:ma', app.permission.orCheck('dmNganhSdh:manage', 'dmNganhSdh:write'), (req, res) => {
         app.model.dmNganhSauDaiHoc.get({ maNganh: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
