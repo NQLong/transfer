@@ -51,7 +51,7 @@ class EditModalNhom extends AdminModal {
         const readOnly = this.props.readOnly;
         const isReadOnlyLoaiCongViec = this.state?.item?.submenus.length > 0;
         return this.renderModal({
-            title: !this.state.item ? 'Tạo mới nội dung' : 'Cập nhật nội dung',
+            title: !this.state.item ? 'Tạo mới tiêu chí' : 'Cập nhật tiêu chí',
             body: <div className='row'>
                 <FormTextBox className='col-12' ref={e => this.tieuDe = e} label='Tiêu đề' readOnly={readOnly} placeholder='Tiêu đề' required />
                 <FormTextBox type='number' min={0} step={true} className='col-12' ref={e => this.diemLonNhat = e} label='Điểm tối đa' readOnly={readOnly} placeholder='Điểm tối đa' required />
@@ -69,8 +69,8 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let editItem = item.item;
-        let { tieuDe, diemLonNhat, parentName } = editItem ? editItem : { tieuDe: '', diemLonNhat: 0, parentName };
-        this.parentName.value(parentName);
+        let { tieuDe, diemLonNhat } = editItem ? editItem : { tieuDe: '', diemLonNhat: 0 };
+        this.parentName.value(item.parentName || 'Chưa có nội dung');
         this.tieuDe.value(tieuDe || '');
         this.diemLonNhat.value(Number(diemLonNhat).toFixed(2));
         this.setState({ item });

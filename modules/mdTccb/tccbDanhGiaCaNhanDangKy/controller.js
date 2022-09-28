@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1002: { title: 'Cá nhân đăng ký', link: '/user/danh-gia/ca-nhan-dang-ky', icon: 'fa-pencil', backgroundColor: '#fecc2c', groupIndex: 6 }
+            1002: { title: 'Cá nhân đăng ký', link: '/user/danh-gia/ca-nhan-dang-ky', icon: 'fa-user', backgroundColor: '#fecc2c', groupIndex: 6 }
         }
     };
     app.permission.add(

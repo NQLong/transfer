@@ -31,7 +31,7 @@ class TccbDonViDangKyNhiemVuPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/danh-gia/don-vi-dang-ky-nhiem-vu/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
-                    <TableCell style={{ textAlign: 'center', color: `${new Date().getTime() >= item.donViBatDauDangKy && new Date().getTime() <= item.donViKetThucDangKy && 'green'}` }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell style={{ textAlign: 'center', color: `${new Date().getTime() >= item.donViBatDauDangKy && new Date().getTime() <= item.donViKetThucDangKy && 'green'}` }} content={item.donViBatDauDangKy ? `${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn đăng ký'} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}>
                         {
                             (Date.now() >= item.donViBatDauDangKy && Date.now() <= item.donViKetThucDangKy) ?

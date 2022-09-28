@@ -30,7 +30,7 @@ class TccbDanhGiaPheDuyetTruongPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/tccb/danh-gia-phe-duyet-truong/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
-                    <TableCell style={{ textAlign: 'center', color: `${Date.now() >= item.truongBatDauPheDuyet && Date.now() <= item.truongKetThucPheDuyet && 'green'}` }} content={`${T.dateToText(item.truongBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.truongKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell style={{ textAlign: 'center', color: `${Date.now() >= item.truongBatDauPheDuyet && Date.now() <= item.truongKetThucPheDuyet && 'green'}` }} content={item.truongBatDauPheDuyet ? `${T.dateToText(item.truongBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.truongKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn phê duyệt'} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons'>
                         {
                             (Date.now() >= item.truongBatDauPheDuyet && Date.now() <= item.truongKetThucPheDuyet) ?
