@@ -7,7 +7,6 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'svSdh:read', menu },
         { name: 'svSdh:manage', menu },
         { name: 'svSdh:write' },
         { name: 'svSdh:delete' },
@@ -15,7 +14,7 @@ module.exports = app => {
         'svSdh:import'
     );
 
-    app.get('/user/sau-dai-hoc/sinh-vien', app.permission.orCheck('svSdh:read', 'svSdh:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/sinh-vien', app.permission.check('svSdh:manage'), app.templates.admin);
     app.get('/user/sv-sdh/upload', app.permission.orCheck('svSdh:manage', 'svSdh:import'), app.templates.admin);
     app.get('/user/sv-sdh/item/:mssv', app.permission.check('svSdh:write'), app.templates.admin);
 

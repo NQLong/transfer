@@ -11,7 +11,6 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'sdhLoaiQuyetDinh:read', menu },
         { name: 'sdhLoaiQuyetDinh:manage', menu },
         { name: 'sdhLoaiQuyetDinh:write' },
         { name: 'sdhLoaiQuyetDinh:delete' },
@@ -20,14 +19,14 @@ module.exports = app => {
 
     app.permissionHooks.add('staff', 'addRolesLoaiQuyetDinh', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhLoaiQuyetDinh:read', 'sdhLoaiQuyetDinh:write', 'sdhLoaiQuyetDinh:delete');
+            app.permissionHooks.pushUserPermission(user, 'sdhLoaiQuyetDinh:write', 'sdhLoaiQuyetDinh:delete', 'sdhLoaiQuyetDinh:manage');
             resolve();
         } else resolve();
     }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/sau-dai-hoc/loai-quyet-dinh/page/:pageNumber/:pageSize', app.permission.check('sdhLoaiQuyetDinh:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/loai-quyet-dinh/page/:pageNumber/:pageSize', app.permission.check('sdhLoaiQuyetDinh:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let searchTerm = { statement: null };

@@ -80,7 +80,7 @@ class SdhDmKhoiKienThucPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('sdhDmKhoiKienThuc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('sdhDmKhoiKienThuc', ['write', 'delete']);
 
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhDmKhoiKienThuc && this.props.sdhDmKhoiKienThuc.page ?
             this.props.sdhDmKhoiKienThuc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };

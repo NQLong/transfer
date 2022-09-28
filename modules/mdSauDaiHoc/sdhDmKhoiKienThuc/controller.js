@@ -9,23 +9,22 @@ module.exports = app => {
         }
     };
     app.permission.add(
-        { name: 'sdhDmKhoiKienThuc:read', menu },
         { name: 'sdhDmKhoiKienThuc:manage', menu },
         { name: 'sdhDmKhoiKienThuc:write' },
         { name: 'sdhDmKhoiKienThuc:delete' }
     );
 
-    app.get('/user/sau-dai-hoc/khoi-kien-thuc', app.permission.orCheck('sdhDmKhoiKienThuc:read', 'sdhDmKhoiKienThuc:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/khoi-kien-thuc', app.permission.check('sdhDmKhoiKienThuc:manage'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesSdhKhoiKienThuc', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhDmKhoiKienThuc:read', 'sdhDmKhoiKienThuc:write', 'sdhDmKhoiKienThuc:delete');
+            app.permissionHooks.pushUserPermission(user, 'sdhDmKhoiKienThuc:write', 'sdhDmKhoiKienThuc:delete', 'sdhDmKhoiKienThuc:manage');
             resolve();
         } else resolve();
     }));
 
     //APIs----------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/khoi-kien-thuc/page/:pageNumber/:pageSize', app.permission.check('sdhDmKhoiKienThuc:read'), async (req, res) => {
+    app.get('/api/sau-dai-hoc/khoi-kien-thuc/page/:pageNumber/:pageSize', app.permission.check('sdhDmKhoiKienThuc:manage'), async (req, res) => {
         try {
             let _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
@@ -38,7 +37,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/sau-dai-hoc/khoi-kien-thuc/all', app.permission.check('sdhDmKhoiKienThuc:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/khoi-kien-thuc/all', app.permission.check('sdhDmKhoiKienThuc:manage'), (req, res) => {
         let searchTerm = `%${req.query.condition || ''}%`,
             khoiCha = req.query.khoiCha;
         app.model.sdhDmKhoiKienThuc.getAll({
@@ -49,7 +48,7 @@ module.exports = app => {
         }, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/khoi-kien-thuc/item/:ma', app.permission.check('sdhDmKhoiKienThuc:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/khoi-kien-thuc/item/:ma', app.permission.orCheck('sdhDmKhoiKienThuc:manage', 'sdhDmKhoiKienThuc:write'), (req, res) => {
         app.model.sdhDmKhoiKienThuc.get({ ma: req.params.ma }, (error, item) => {
             res.send({ error, item });
         });

@@ -11,23 +11,22 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'sdhCauTrucKhungDaoTao:read', menu },
         { name: 'sdhCauTrucKhungDaoTao:manage', menu },
         { name: 'sdhCauTrucKhungDaoTao:write' },
         { name: 'sdhCauTrucKhungDaoTao:delete' },
     );
     app.permissionHooks.add('staff', 'addRolesSdhCauTrucKhungDaoTao', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhCauTrucKhungDaoTao:read', 'sdhCauTrucKhungDaoTao:write', 'sdhCauTrucKhungDaoTao:delete');
+            app.permissionHooks.pushUserPermission(user, 'sdhCauTrucKhungDaoTao:write', 'sdhCauTrucKhungDaoTao:delete', 'sdhCauTrucKhungDaoTao:manage');
             resolve();
         } else resolve();
     }));
 
-    app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.orCheck('sdhCauTrucKhungDaoTao:read', 'sdhCauTrucKhungDaoTao:manage'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao', app.permission.check('sdhCauTrucKhungDaoTao:manage'), app.templates.admin);
     app.get('/user/sau-dai-hoc/cau-truc-khung-dao-tao/:ma', app.permission.orCheck('sdhCauTrucKhungDaoTao:write', 'sdhCauTrucKhungDaoTao:manage'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.check('sdhCauTrucKhungDaoTao:read'), async (req, res) => {
+    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/page/:pageNumber/:pageSize', app.permission.check('sdhCauTrucKhungDaoTao:manage'), async (req, res) => {
         try {
             let _pageNumber = parseInt(req.params.pageNumber),
                 _pageSize = parseInt(req.params.pageSize),
@@ -41,11 +40,11 @@ module.exports = app => {
 
     });
 
-    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/all', app.permission.check('sdhCauTrucKhungDaoTao:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/all', app.permission.check('sdhCauTrucKhungDaoTao:manage'), (req, res) => {
         app.model.sdhCauTrucKhungDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/:id', app.permission.orCheck('sdhCauTrucKhungDaoTao:read', 'sdhChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
+    app.get('/api/sau-dai-hoc/cau-truc-khung-dao-tao/:id', app.permission.orCheck('sdhChuongTrinhDaoTao:manage', 'dtThoiGianMoMon:write'), (req, res) => {
         app.model.sdhCauTrucKhungDaoTao.get({ id: req.params.id }, '*', 'id ASC', (error, item) => res.send({ error, item }));
     });
 

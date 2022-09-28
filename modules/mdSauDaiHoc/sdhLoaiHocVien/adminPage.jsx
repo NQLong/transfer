@@ -78,7 +78,7 @@ class sdhLoaiHocVienPage extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('sdhLoaiHocVien', ['read', 'write', 'delete']);
+            permission = this.getUserPermission('sdhLoaiHocVien', ['write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sdhLoaiHocVien ? this.props.sdhLoaiHocVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] };
         let table = 'Chưa có dữ liệu';
         if (list && list.length > 0) {
@@ -123,7 +123,7 @@ class sdhLoaiHocVienPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} update={this.props.updateSdhLoaiHv} create={this.props.createSdhLoaiHv} permission={currentPermissions} />
             </>,
             backRoute: '/user/sau-dai-hoc',
-            onCreate: (e) => this.showModal(e)
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 
