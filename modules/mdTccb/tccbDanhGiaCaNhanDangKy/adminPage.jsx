@@ -30,7 +30,7 @@ class TccbCaNhanDangKyPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/danh-gia/ca-nhan-dang-ky/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
-                    <TableCell style={{ textAlign: 'center', color: `${Date.now() >= item.nldBatDauDangKy && Date.now() <= item.nldKetThucDangKy && 'green'}` }} content={`${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell style={{ textAlign: 'center', color: `${Date.now() >= item.nldBatDauDangKy && Date.now() <= item.nldKetThucDangKy && 'green'}` }} content={item.nldBatDauDangKy ? `${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn đăng ký'} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons' content={item}>
                         <Tooltip title='Xem thông tin đăng ký' arrow>
                             <button className='btn btn-info' onClick={() => this.props.history.push(`/user/danh-gia/ca-nhan-dang-ky/${item.nam}`)}>

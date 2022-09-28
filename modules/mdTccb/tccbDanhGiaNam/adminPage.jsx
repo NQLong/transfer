@@ -192,7 +192,7 @@ class TccbDanhGiaNamPage extends AdminPage {
                         <TableCell style={{ textAlign: 'center' }} rowSpan={6} content={index + 1} />
                         <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}`} rowSpan={6} style={{ textAlign: 'center' }} content={item.nam} />
                         <TableCell style={{ textAlign: 'left' }} content={'Thời hạn đăng kí của đơn vị'} />
-                        <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}/don-vi`} style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={`${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                        <TableCell type='link' url={`/user/tccb/danh-gia/${item.nam}/don-vi`} style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={item.donViBatDauDangKy ? `${T.dateToText(item.donViBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucDangKy, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn đánh giá'} />
                         <TableCell style={{ textAlign: 'center' }} rowSpan={6} type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete}
                         >
@@ -220,23 +220,23 @@ class TccbDanhGiaNamPage extends AdminPage {
                     </tr>
                     <tr>
                         <TableCell style={{ textAlign: 'left' }} content={'Thời hạn đăng kí của người lao động'} />
-                        <TableCell type='link' url={`/user/tccb/danh-gia-ca-nhan/${item.nam}`} style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={`${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}`} />
+                        <TableCell type='link' url={`/user/tccb/danh-gia-ca-nhan/${item.nam}`} style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={item.nldBatDauDangKy ? `${T.dateToText(item.nldBatDauDangKy, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.nldKetThucDangKy, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn'} />
                     </tr>
                     <tr>
                         <TableCell style={{ textAlign: 'left' }} content={'Thời hạn đơn vị phê duyệt'} />
-                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={`${T.dateToText(item.donViBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}`} />
+                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={item.donViBatDauPheDuyet ? `${T.dateToText(item.donViBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn'} />
                     </tr>
                     <tr>
                         <TableCell style={{ textAlign: 'left' }} content={'Thời hạn trường phê duyệt'} />
-                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={`${T.dateToText(item.truongBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.truongKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}`} />
+                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={item.truongBatDauPheDuyet ? `${T.dateToText(item.truongBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.truongKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn'} />
                     </tr>
                     <tr>
                         <TableCell style={{ textAlign: 'left' }} content={'Thời hạn cá nhân tự đánh giá'} />
-                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={`${T.dateToText(item.caNhanBatDauTuDanhGia, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.caNhanKetThucTuDanhGia, 'dd/mm/yyyy HH:MM')}`} />
+                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={item.caNhanBatDauTuDanhGia ? `${T.dateToText(item.caNhanBatDauTuDanhGia, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.caNhanKetThucTuDanhGia, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn'} />
                     </tr>
                     <tr>
                         <TableCell style={{ textAlign: 'left' }} content={'Thời hạn đơn vị tự đánh giá'} />
-                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={`${T.dateToText(item.donViBatDauTuDanhGia, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucTuDanhGia, 'dd/mm/yyyy HH:MM')}`} />
+                        <TableCell style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }} content={item.donViBatDauTuDanhGia ? `${T.dateToText(item.donViBatDauTuDanhGia, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucTuDanhGia, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn'} />
                     </tr>
                 </>
             )

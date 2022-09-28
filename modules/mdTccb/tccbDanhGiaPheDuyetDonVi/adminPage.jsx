@@ -30,7 +30,7 @@ class TccbDanhGiaPheDuyetDonViPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'center' }} content={index + 1} />
                     <TableCell type='link' url={`/user/tccb/danh-gia-phe-duyet-don-vi/${item.nam}`} style={{ textAlign: 'center' }} content={item.nam} />
-                    <TableCell style={{ textAlign: 'center', color: `${Date.now() >= item.donViBatDauPheDuyet && Date.now() <= item.donViKetThucPheDuyet && 'green'}` }} content={`${T.dateToText(item.donViBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}`} />
+                    <TableCell style={{ textAlign: 'center', color: `${Date.now() >= item.donViBatDauPheDuyet && Date.now() <= item.donViKetThucPheDuyet && 'green'}` }} content={item.donViBatDauPheDuyet ? `${T.dateToText(item.donViBatDauPheDuyet, 'dd/mm/yyyy HH:MM')} - ${T.dateToText(item.donViKetThucPheDuyet, 'dd/mm/yyyy HH:MM')}` : 'Chưa có thời hạn phê duyệt'} />
                     <TableCell style={{ textAlign: 'center' }} type='buttons'>
                         {
                             (Date.now() >= item.donViBatDauPheDuyet && Date.now() <= item.donViKetThucPheDuyet) ?
