@@ -46,7 +46,8 @@ class hcthNhiemVuPage extends AdminPage {
             return {
                 readyUrl: '/user',
                 breadcrumb: [
-                    <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                    <Link key={0} to='/user/'>..</Link>,
+                    <Link key={1} to='/user/van-phong-dien-tu'>Văn phòng điện tử</Link>,
                     'Danh sách nhiệm vụ',
                 ],
                 backRoute: '/user',

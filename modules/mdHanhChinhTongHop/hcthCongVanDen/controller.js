@@ -7,14 +7,14 @@ module.exports = (app) => {
             501: { title: 'Văn bản đến', link: '/user/hcth/van-ban-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
         },
     };
-    const menu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1051: { title: 'Văn bản đến', link: '/user/van-ban-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1051: { title: 'Văn bản đến', link: '/user/van-ban-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00', groupIndex: 5 },
+    //     },
+    // };
     app.permission.add({ name: 'hcthCongVanDen:read', menu: staffMenu });
-    app.permission.add({ name: 'staff:login', menu });
+    // app.permission.add({ name: 'staff:login', menu });
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
     app.permission.add({ name: 'hcthCongVanDen:manage' });

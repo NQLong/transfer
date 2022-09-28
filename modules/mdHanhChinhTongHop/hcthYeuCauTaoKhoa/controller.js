@@ -2,6 +2,7 @@ module.exports = app => {
     const forge = require('node-forge');
     const qrCode = require('qrcode');
     const { trangThaiRequest } = require('../constant');
+    const jimp = require('jimp');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -10,16 +11,16 @@ module.exports = app => {
         },
     };
 
-    const menu = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1057: { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1057: { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#db2c2c', groupIndex: 5 },
+    //     },
+    // };
 
     app.permission.add({ name: 'hcthYeuCauTaoKhoa:read', menu: staffMenu }, 'hcthYeuCauTaoKhoa:write', 'hcthYeuCauTaoKhoa:delete');
-    app.permission.add({ name: 'manager:write', menu: menu });
-    app.permission.add({ name: 'rectors:login', menu: menu });
+    // app.permission.add({ name: 'manager:write', menu: menu });
+    // app.permission.add({ name: 'rectors:login', menu: menu });
     app.get('/user/hcth/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
     app.get('/user/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
 
@@ -104,20 +105,35 @@ module.exports = app => {
         const randomSerialNumber = () => {
             return makeNumberPositive(forge.util.bytesToHex(forge.random.getBytesSync(20)));
         };
+        const qtChucVu = await app.model.qtChucVu.get({ shcc, chucVuChinh: 1, thoiChucVu: 0 }, 'maChucVu');
+
+        const chucVu = await app.model.dmChucVu.get({ ma: qtChucVu?.maChucVu }, 'ten');
+
+        const canBo = await app.model.canBo.get({ shcc }, 'ho, ten, maDonVi');
+
+        const donVi = await app.model.dmDonVi.get({ ma: canBo?.maDonVi }, 'ten');
+
         // Define the attributes/properties for the Host Certificate
         const attributes = [{
             shortName: 'C',
             value: 'VN'
         }, {
             shortName: 'ST',
-            value: 'Ho Chi Minh'
+            value: 'Hồ Chí Minh'
         }, {
             shortName: 'L',
-            value: 'DAI HOC KHOA HOC VA XA HOI NHAN VAN'
+            value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
         }, {
             shortName: 'CN',
-            value: `${shcc}-${id}`
-        }];
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName()
+        }, {
+            shortName: 'O',
+            value: `${donVi?.ten || ''}`.trim()
+        }, {
+            shortName: 'OU',
+            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `.${shcc}`
+        }
+        ];
 
         const extensions = [{
             name: 'basicConstraints',
@@ -183,24 +199,25 @@ module.exports = app => {
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
 
-            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, 2000), { version: 33, errorCorrectionLevel: 'L',  });
+            const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, 2000), { version: 33, errorCorrectionLevel: 'L', });
 
-            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L'});
+            const qrCode_2 = await qrCode.toDataURL(p12b64.substring(2000, p12b64.length), { version: 30, errorCorrectionLevel: 'L' });
 
-            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới', 
-            [{
-                filename: `${shcc}-${khoa.id}-1.png`,
-                content:  qrCode_1.replace('data:image/png;base64,', ''),
-                encoding: 'base64'
-            }, {
-                filename: `${shcc}-${khoa.id}-2.png`,
-                content: qrCode_2.replace('data:image/png;base64,', ''),
-                encoding: 'base64'
-            }]);
+            await app.email.normalSendEmail(setting.email, setting.emailPassword, app.isDebug ? setting.debugEmail : email, [], 'Khóa người dùng mới', 'Tệp tin khóa người dùng mới', 'Tệp tin khóa người dùng mới',
+                [{
+                    filename: `${shcc}-${khoa.id}-1.png`,
+                    content: qrCode_1.replace('data:image/png;base64,', ''),
+                    encoding: 'base64'
+                }, {
+                    filename: `${shcc}-${khoa.id}-2.png`,
+                    content: qrCode_2.replace('data:image/png;base64,', ''),
+                    encoding: 'base64'
+                }]);
             await app.model.hcthUserPublicKey.update({ id: khoa.id }, { publicKey });
             res.send({});
 
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
@@ -331,8 +348,36 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), (req, res) => {
-        const shcc = req.session.user.shcc;
-        return res.sendFile(app.path.join(app.assetPath, `/key/${shcc}.png`));
+    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+        try {
+            const shcc = req.session.user.shcc;
+            const path = app.path.join(app.assetPath, `/key/${shcc}.png`);
+            const { format, height, width, background } = req.query;
+            let buffer = app.fs.readFileSync(path, 'base64');
+            const sendResponse = (buffer) => {
+                if (!format) {
+                    res.writeHead(200, [['Content-Type', 'image/png'], ['Content-Disposition', 'attachment;filename=' + `${shcc}.png`]]);
+                    return res.end(Buffer.from(buffer, 'base64'));
+                }
+                else if (format == 'base64') {
+                    return res.send({ data: buffer });
+                }
+                else
+                    return res.status(400).send({ error: 'format không được hỗ trợ' });
+            };
+            if (height != null && width != null) {
+                let image = await jimp.read(Buffer.from(buffer, 'base64'));
+                if (background)
+                    image = image.background(background);
+                image = image.resize(parseInt(width), parseInt(height));
+                buffer = image.getBuffer(jimp.MIME_PNG, (error, buffer) => { 
+                    if (error) throw error;
+                    sendResponse(buffer.toString('base64'));
+                });
+            }
+            else sendResponse(buffer);
+        } catch (error) {
+            res.status(400).send({ error });
+        }
     });
 };

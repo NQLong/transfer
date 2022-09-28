@@ -12,6 +12,7 @@ module.exports = (app, http, config) => {
     require('./lib/docx')(app);
     require('./lib/sms')(app);
     require('./lib/hooks')(app);
+    require('./lib/pdf')(app);
 
     app.url = require('url');
 
