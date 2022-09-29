@@ -11,22 +11,22 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'sdhLoaiHocVien:read', menu },
+        { name: 'sdhLoaiHocVien:manage', menu },
         { name: 'sdhLoaiHocVien:write' },
         { name: 'sdhLoaiHocVien:delete' },
     );
-    app.get('/user/sau-dai-hoc/loai-hoc-vien', app.permission.check('sdhLoaiHocVien:write'), app.templates.admin);
+    app.get('/user/sau-dai-hoc/loai-hoc-vien', app.permission.orCheck('sdhLoaiHocVien:write', 'sdhLoaiHocVien:manage'), app.templates.admin);
 
     app.permissionHooks.add('staff', 'addRolesLoaiHocVien', (user, staff) => new Promise(resolve => {
         if (staff.maDonVi && staff.maDonVi == '37') {
-            app.permissionHooks.pushUserPermission(user, 'sdhLoaiHocVien:read', 'sdhLoaiHocVien:write', 'sdhLoaiHocVien:delete');
+            app.permissionHooks.pushUserPermission(user, 'sdhLoaiHocVien:write', 'sdhLoaiHocVien:delete', 'sdhLoaiHocVien:manage');
             resolve();
         } else resolve();
     }));
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/sau-dai-hoc/loai-hoc-vien/page/:pageNumber/:pageSize', app.permission.check('sdhLoaiHocVien:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/page/:pageNumber/:pageSize', app.permission.check('sdhLoaiHocVien:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let searchTerm = { statement: null };
@@ -41,11 +41,11 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/sau-dai-hoc/loai-hoc-vien/all', app.permission.check('sdhLoaiHocVien:write'), (req, res) => {
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/all', app.permission.check('sdhLoaiHocVien:manage'), (req, res) => {
         app.model.sdhLoaiHocVien.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/sau-dai-hoc/loai-hoc-vien/item/:ma', app.permission.check('sdhLoaiHocVien:read'), (req, res) => {
+    app.get('/api/sau-dai-hoc/loai-hoc-vien/item/:ma', app.permission.orCheck('sdhLoaiHocVien:manage', 'sdhLoaiHocVien:write'), (req, res) => {
         app.model.sdhLoaiHocVien.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 

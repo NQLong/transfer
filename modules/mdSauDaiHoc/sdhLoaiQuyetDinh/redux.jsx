@@ -51,14 +51,14 @@ export function getSdhLoaiQdPage(pageNumber, pageSize, pageCondition, done) {
         const url = `/api/sau-dai-hoc/loai-quyet-dinh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, (data) => {
             if (data.error) {
-                T.notify('Lấy danh sách học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Lấy danh sách loại quyết định bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: SdhLoaiQuyetDinhGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại quyết định bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -67,15 +67,15 @@ export function updateSdhLoaiQd(ma, changes, done) {
         const url = '/api/sau-dai-hoc/loai-quyet-dinh';
         T.put(url, { ma, changes }, (data) => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Cập nhật thông tin loại quyết định bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin học Sau đại học thành công!', 'success');
+                T.notify('Cập nhật thông tin loại quyết định thành công!', 'success');
                 done && done(data.page);
                 dispatch(getSdhLoaiQdPage());
             }
-        }, (error) => T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin loại quyết định bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -84,14 +84,14 @@ export function createSdhLoaiQd(changes, done) {
         const url = '/api/sau-dai-hoc/loai-quyet-dinh';
         T.post(url, { changes }, (data) => {
             if (data.error) {
-                T.notify('Tạo học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Tạo loại quyết định bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                T.notify('Tạo mới thông tin học Sau đại học thành công!', 'success');
+                T.notify('Tạo mới thông tin loại quyết định thành công!', 'success');
                 dispatch(getSdhLoaiQdPage());
                 if (done) done(data);
             }
-        }, (error) => T.notify('Tạo học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Tạo loại quyết định bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -100,13 +100,13 @@ export function deleteSdhLoaiQd(ma) {
         const url = '/api/sau-dai-hoc/loai-quyet-dinh';
         T.delete(url, { ma }, (data) => {
             if (data.error) {
-                T.notify('Xóa danh mục học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Xóa danh mục loại quyết định bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
+                T.alert('Loại quyết định đã xóa thành công!', 'success', false, 800);
                 dispatch(getSdhLoaiQdPage());
             }
-        }, (error) => T.notify('Xóa học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Xóa loại quyết định bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { AdminModal, renderTimeline } from 'view/component/AdminPage';
-
 export class FileHistoryModal extends AdminModal {
 
     state = {

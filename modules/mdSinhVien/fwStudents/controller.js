@@ -230,6 +230,7 @@ module.exports = app => {
         try {
             const outDir = app.path.join(app.assetPath, 'image-card', `${new Date().getFullYear()}.zip`),
                 srcDir = app.path.join(app.assetPath, 'image-card', (new Date().getFullYear()).toString());
+            app.fs.deleteFile(outDir);
             await app.fs.zipDirectory(srcDir, outDir);
             res.download(outDir, `ANH_THE_SV_${new Date().getFullYear()}.zip`);
         } catch (error) {

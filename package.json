@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.305",
+    "version": "1.0.308",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -145,6 +145,7 @@
         "basic-auth": "^2.0.1",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
+        "buffer": "^6.0.3",
         "compression": "^1.7.4",
         "connect-redis": "^5.0.0",
         "cookie-parser": "^1.4.5",
@@ -162,6 +163,7 @@
         "google-auth-library": "^8.0.3",
         "helmet": "^3.22.0",
         "husky": "^6.0.0",
+        "java-caller": "^2.5.0",
         "jimp": "^0.10.3",
         "jquery": "^3.5.0",
         "json-beautify": "^1.1.1",
@@ -176,8 +178,10 @@
         "oracledb": "^5.0.0",
         "passport": "^0.5.2",
         "passport-google-oauth": "^2.0.0",
+        "pdf-lib": "^1.17.1",
         "pizzip": "^3.0.6",
         "qrcode": "^1.5.1",
+        "react-pdf": "^5.7.2",
         "html-react-parser": "^1.3.0",
         "prism-react-renderer": "^1.2.1",
         "react-simple-code-editor": "^0.11.0",
@@ -208,6 +212,7 @@
         "tien.trantan@hcmut.edu.vn",
         "huy.nguyenviethuy30@hcmut.edu.vn",
         "hieu.ngo2212@hcmut.edu.vn",
-        "nphien212@gmail.com"
+        "nphien212@gmail.com",
+        "hienvv17@gmail.com"
     ]
 }

@@ -51,7 +51,7 @@ export function getSdhLoaiHvPage(pageNumber, pageSize, pageCondition, done) {
         const url = `/api/sau-dai-hoc/loai-hoc-vien/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, (data) => {
             if (data.error) {
-                T.notify('Lấy danh sách học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Lấy danh sách loại học viên bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -59,7 +59,7 @@ export function getSdhLoaiHvPage(pageNumber, pageSize, pageCondition, done) {
                 console.log(data.page);
                 dispatch({ type: SdhLoaiHocVienGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại học viên bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -68,16 +68,16 @@ export function updateSdhLoaiHv(ma, changes, done) {
         const url = '/api/sau-dai-hoc/loai-hoc-vien';
         T.put(url, { ma, changes }, (data) => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Cập nhật thông tin loại học viên bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin học Sau đại học thành công!', 'success');
+                T.notify('Cập nhật thông tin loại học viên thành công!', 'success');
                 console.log(data);
                 done && done(data.page);
                 dispatch(getSdhLoaiHvPage());
             }
-        }, (error) => T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin loại học viên bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -89,11 +89,11 @@ export function createSdhLoaiHv(changes, done) {
                 T.notify('Tạo học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                T.notify('Tạo mới thông tin học Sau đại học thành công!', 'success');
+                T.notify('Tạo mới thông tin loại học viên thành công!', 'success');
                 dispatch(getSdhLoaiHvPage());
                 if (done) done(data);
             }
-        }, (error) => T.notify('Tạo học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Tạo mới loại học viên bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -102,13 +102,13 @@ export function deleteSdhLoaiHv(ma) {
         const url = '/api/sau-dai-hoc/loai-hoc-vien';
         T.delete(url, { ma }, (data) => {
             if (data.error) {
-                T.notify('Xóa danh mục học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
+                T.notify('Xóa loại học viên bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
+                T.alert('Loại học viên đã xóa thành công!', 'success', false, 800);
                 dispatch(getSdhLoaiHvPage());
             }
-        }, (error) => T.notify('Xóa học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
+        }, (error) => T.notify('Xóa loại học viên bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 

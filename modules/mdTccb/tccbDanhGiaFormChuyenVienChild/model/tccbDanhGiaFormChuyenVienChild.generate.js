@@ -1,6 +1,6 @@
-// Table name: TCCB_DANH_GIA_FORM_CHUYEN_VIEN_CHILD { id, tieuDe, diemLonNhat, parentId, thuTu }
+// Table name: TCCB_DANH_GIA_FORM_CHUYEN_VIEN_CHILD { id, parentId, tieuDe, diemLonNhat, thuTu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'tieuDe': 'TIEU_DE', 'diemLonNhat': 'DIEM_LON_NHAT', 'parentId': 'PARENT_ID', 'thuTu': 'THU_TU' };
+const obj2Db = { 'id': 'ID', 'parentId': 'PARENT_ID', 'tieuDe': 'TIEU_DE', 'diemLonNhat': 'DIEM_LON_NHAT', 'thuTu': 'THU_TU' };
 
 module.exports = app => {
     app.model.tccbDanhGiaFormChuyenVienChild = {
