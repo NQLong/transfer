@@ -193,7 +193,7 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
                     isPresident={isPresident}
                 />
             </>,
-            backRoute: '/user/tccb/danh-gia-phe-duyet-don-vi',
+            backRoute: '/user/tccb/danh-gia-phe-duyet-truong',
             buttons: [
                 isPresident ? { className: 'btn btn-danger', icon: 'fa-times', tooltip: 'Không đồng ý toàn bộ', onClick: e => this.approvedTruongAllAction(e, 'Không đồng ý') } : null,
                 isPresident ? { className: 'btn btn-success', icon: 'fa-check', tooltip: 'Đồng ý toàn bộ', onClick: e => this.approvedTruongAllAction(e, 'Đồng ý') } : null
