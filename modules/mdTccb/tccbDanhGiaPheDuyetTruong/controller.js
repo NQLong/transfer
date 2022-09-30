@@ -20,8 +20,9 @@ module.exports = app => {
         try {
             const nam = parseInt(req.query.nam),
                 _pageNumber = parseInt(req.params.pageNumber), _pageSize = parseInt(req.params.pageSize),
-                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = await app.model.tccbDanhGiaPheDuyetTruong.searchPage(_pageNumber, _pageSize, searchTerm, nam);
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+                filter = req.query.filter ? req.query.filter : { filterNhom: 'Tất cả', filterYKien: 'Tất cả' };
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = await app.model.tccbDanhGiaPheDuyetTruong.searchPage(_pageNumber, _pageSize, searchTerm, nam, JSON.stringify(filter));
             res.send({ page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition: searchTerm, list } });
         } catch (error) {
             res.send({ error });

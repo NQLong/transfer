@@ -13,6 +13,19 @@ class TccbCaNhanDangKyDetails extends AdminPage {
         });
     }
 
+    showStatus = (daDangKy, status) => {
+        if (!daDangKy) {
+            return <span>Chưa đăng ký</span>;
+        }
+        if (status == 'Đồng ý') {
+            return <>Đơn vị phê duyệt: <span style={{ color: 'green' }}>{status}</span></>;
+        }
+        if (status == 'Không đồng ý') {
+            return <>Đơn vị phê duyệt: <span style={{ color: 'red' }}>{status}</span></>;
+        }
+        return <>Đơn vị phê duyệt: Chưa phê duyệt</>;
+    }
+
     dangKy = (item, value) => {
         this.props.createTccbCaNhanDangKy({ dangKy: value }, item.nhom.id);
     }
@@ -72,7 +85,7 @@ class TccbCaNhanDangKyDetails extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-pencil',
-            header: `${daDangKy ? (`Đơn vị phê duyệt: ${approvedDonVi || 'Chưa phê duyệt'}`) : 'Cá nhân chưa đăng ký'}`,
+            header: this.showStatus(daDangKy, approvedDonVi),
             title: 'Thông tin đăng ký',
             breadcrumb: [
                 <Link key={0} to='/user'>Thông tin cá nhân</Link>,

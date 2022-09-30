@@ -54,13 +54,13 @@ export function getTccbDanhGiaPheDuyetTruongAllNam(done) {
 }
 
 T.initPage('pageTccbDanhGiaPDT');
-export function getTccbDanhGiaPDTPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTccbDanhGiaPDT', pageNumber, pageSize, pageCondition);
+export function getTccbDanhGiaPDTPage(pageNumber, pageSize, pageCondition, filter, done) {
+    const page = T.updatePage('pageTccbDanhGiaPDT', pageNumber, pageSize, pageCondition, filter);
     const route = T.routeMatcher('/user/tccb/danh-gia-phe-duyet-truong/:nam');
     const nam = parseInt(route.parse(window.location.pathname)?.nam);
     return dispatch => {
         const url = `/api/tccb/danh-gia-phe-duyet-truong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { nam, condition: page.pageCondition }, data => {
+        T.get(url, { nam, condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách phê duyệt bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);

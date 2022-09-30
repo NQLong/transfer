@@ -343,7 +343,10 @@ module.exports = (app, appConfig) => {
                         });
                     } else resolve();
                 })).then(() => new Promise(resolve => {
-                    app.model.fwStudents.get({ emailTruong: user.email }, (error, student) => {
+                    app.model.fwStudents.get({
+                        statement: 'LOWER(emailTruong) = :email',
+                        parameter: { email: user.email.toLowerCase() }
+                    }, (error, student) => {
                         if (student) {
                             app.permissionHooks.pushUserPermission(user, 'student:login');
                             let { khoa, namTuyenSinh, mssv, emailTruong } = student;

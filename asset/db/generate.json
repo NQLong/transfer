@@ -10637,7 +10637,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 10
+                    "size": 20
                 },
                 "NGHE_NGHIEP_CU": {
                     "value": "ngheNghiepCu",
@@ -18729,6 +18729,137 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "3,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_DM_FORM_TYPE": {
+            "active": true,
+            "moduleName": "fwDmFormType",
+            "modelName": "fwDmFormType",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "CHU_THICH": {
+                    "value": "chuThich",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "SRC_PATH": {
+                    "value": "srcPath",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 11
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "HE_DAO_TAO": {
+                    "value": "heDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [
+                "HE_DAO_TAO"
+            ],
+            "type": "table"
+        },
+        "FW_MANAGE_FORM": {
+            "active": true,
+            "moduleName": "fwManageForm",
+            "modelName": "fwManageForm",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_176765\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "REGISTER": {
+                    "value": "register",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "REGISTION_TIME": {
+                    "value": "registionTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "MODEL": {
+                    "value": "model",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "FORM_TYPE": {
+                    "value": "formType",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "STAFF_HANDLE": {
+                    "value": "staffHandle",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "HANDLE_TIME": {
+                    "value": "handleTime",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "ACTION": {
+                    "value": "action",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2
                 }
             },
             "primaryKeys": [

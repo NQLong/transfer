@@ -65,10 +65,20 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
             const route = T.routeMatcher('/user/tccb/danh-gia-phe-duyet-truong/:nam');
             const nam = parseInt(route.parse(window.location.pathname)?.nam);
             this.setState({ nam });
-            T.onSearch = (searchText) => this.props.getTccbDanhGiaPDTPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getTccbDanhGiaPDTPage();
+            this.getPage();
+            this.nhomDanhGiaNhiemVu.value(-1);
+            this.yKienTruongTccb.value('Tất cả');
         });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        const filter = {
+            filterNhom: this.state.nhomDanhGiaNhiemVu,
+            filterYKien: this.state.yKienTruongTccb,
+        };
+        this.props.getTccbDanhGiaPDTPage(pageN, pageS, pageC, filter, done);
     }
 
     showStatus = (status, alternativeText) => {
@@ -95,22 +105,13 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
 
     render() {
         const isPresident = this.getCurrentPermissions().includes('president:login');
-        const { nam, nhomDanhGiaNhiemVu, yKienTruongTccb } = this.state;
+        const { nam } = this.state;
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tccbDanhGiaPheDuyetTruong && this.props.tccbDanhGiaPheDuyetTruong.page ?
             this.props.tccbDanhGiaPheDuyetTruong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
         let table = 'Không có dữ liệu phê duyệt!';
-        const newList = list.filter(item => {
-            if (nhomDanhGiaNhiemVu == 'Tất cả') return true;
-            if (nhomDanhGiaNhiemVu == 'Chưa đăng ký') return !item.tenNhom;
-            return item.tenNhom == nhomDanhGiaNhiemVu;
-        }).filter(item => {
-            if (yKienTruongTccb == 'Tất cả') return true;
-            if (yKienTruongTccb == 'Có ý kiến') return item.yKienTruongTccb;
-            if (yKienTruongTccb == 'Chưa có ý kiến') return !item.yKienTruongTccb;
-        });
-        if (newList && newList.length > 0) {
+        if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => newList, stickyHead: false,
+                getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
@@ -179,20 +180,20 @@ class TccbDanhGiaPheDuyetTruongDetails extends AdminPage {
             content: <>
                 <div className='tile'>
                     <div className='d-flex flex-row'>
-                        <FormSelect style={{ width: '300px' }} className='p-2' placeholder='Cá nhân đăng ký' ref={e => this.nhomDanhGiaNhiemVu = e} data={SelectAdapter_NhomDanhGiaNhiemVu(nam)} onChange={value => this.setState({ nhomDanhGiaNhiemVu: value.text })} />
-                        <FormSelect style={{ width: '300px' }} className='p-2' placeholder='Ý kiến trưởng TCCB' ref={e => this.yKienTruongTccb = e} data={['Tất cả', 'Có ý kiến', 'Chưa có ý kiến']} onChange={value => this.setState({ yKienTruongTccb: value.text })} />
+                        <FormSelect style={{ width: '300px' }} className='p-2' placeholder='Cá nhân đăng ký' ref={e => this.nhomDanhGiaNhiemVu = e} data={SelectAdapter_NhomDanhGiaNhiemVu(nam)} onChange={value => this.setState({ nhomDanhGiaNhiemVu: value.text }, this.getPage)} />
+                        <FormSelect style={{ width: '300px' }} className='p-2' placeholder='Ý kiến trưởng TCCB' ref={e => this.yKienTruongTccb = e} data={['Tất cả', 'Có ý kiến', 'Chưa có ý kiến']} onChange={value => this.setState({ yKienTruongTccb: value.text }, this.getPage)} />
                     </div>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getTccbDanhGiaPDTPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e}
                     updatePresident={this.props.updateTccbDanhGiaPDT}
                     updateTruongTccb={this.props.updateTccbDanhGiaPDTTruongTccb}
                     isPresident={isPresident}
                 />
             </>,
-            backRoute: '/user/tccb/danh-gia-phe-duyet-don-vi',
+            backRoute: '/user/tccb/danh-gia-phe-duyet-truong',
             buttons: [
                 isPresident ? { className: 'btn btn-danger', icon: 'fa-times', tooltip: 'Không đồng ý toàn bộ', onClick: e => this.approvedTruongAllAction(e, 'Không đồng ý') } : null,
                 isPresident ? { className: 'btn btn-success', icon: 'fa-check', tooltip: 'Đồng ý toàn bộ', onClick: e => this.approvedTruongAllAction(e, 'Đồng ý') } : null
