@@ -5,7 +5,7 @@ node_modules/
 package-lock.json
 yarn.lock
 
-asset/host.json
+asset/host1.json
 asset/config.json
 asset/migration.json
 asset/menu.txt
