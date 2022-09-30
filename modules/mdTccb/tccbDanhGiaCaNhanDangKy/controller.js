@@ -84,7 +84,6 @@ module.exports = app => {
                 const index = items.findIndex(item => item.idNhom == nhom.id);
                 return !(index == -1);
             });
-            items = await app.model.tccbDinhMucCongViecGvVaNcv.getAll({ statement: 'idNhom IN (:listIdNhom)', parameter: { listIdNhom: listNhom.map(item => item.id) } }, '*', 'id');
             let [listCaNhanDangKy, listNgach, listChucDanhKhoaHoc] = await Promise.all([
                 app.model.tccbDanhGiaCaNhanDangKy.getAll({ shcc, nam }, 'id,idNhomDangKy'),
                 app.model.dmNgachCdnn.getAll(),
