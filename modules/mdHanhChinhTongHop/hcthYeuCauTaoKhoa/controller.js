@@ -194,8 +194,6 @@ module.exports = app => {
             if (khoa.publicKey) throw 'Khóa đã được gửi đến người dùng';
             const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
-            console.log({ p12b64 });
-            app.fs.writeFileSync('def.p12', p12b64, 'base64');
             const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, Math.floor(p12b64.length / 2)), { version: 33, errorCorrectionLevel: 'L', });
 
             const qrCode_2 = await qrCode.toDataURL(p12b64.substring(Math.floor(p12b64.length / 2), p12b64.length), { version: 33, errorCorrectionLevel: 'L' });
