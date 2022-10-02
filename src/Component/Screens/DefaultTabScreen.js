@@ -70,8 +70,7 @@ export default DefaultScreenTabs = ({ navigation }) => {
                     ),
                 }}
             />
-            <Tab.Screen name="notification" component={Key} options={{ headerTitle: 'Tạo khoá', tabBarLabel: 'Tạo khoá', tabBarIcon: ({ color, size }) => (<Ionicons name="key-outline" color={color} size={size} />), }} />
-            <Tab.Screen name="key"
+            <Tab.Screen name="noti"
                 component={Notification}
                 options={{
                     headerTitle: 'Thông báo', tabBarLabel: 'Thông báo',

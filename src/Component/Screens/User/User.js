@@ -1,13 +1,12 @@
-import { signOut, switchUser, SelectAdapter_FwCanBo} from '@/Store/settings';
-import { MenuItem, Tile, FormSelect } from '@/Utils/component';
+import { signOut, switchUser, SelectAdapter_FwCanBo } from '@/Store/settings';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View, FlatList } from 'react-native';
+import { ScrollView, TouchableOpacity, View, FlatList } from 'react-native';
 import { useTheme, Card, List, Text, Dialog, TextInput } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
-import commonStyles from '../../../Asset/Styles/styles'; 
+import commonStyles from '../../../Asset/Styles/styles';
 
 import styles from './styles';
 import T from '@/Utils/common';
@@ -30,7 +29,7 @@ const User = () => {
     const [userData, setUserData] = useState([]);
     const [isExistKey, setIsExisKey] = useState(false);
     const onSignOut = async () => {
-        await setDisableLogout(true);
+        setDisableLogout(true);
         dispatch(signOut(() => setDisableLogout(false)));
     };
 
@@ -49,19 +48,17 @@ const User = () => {
     useEffect(() => {
         const dataSource = SelectAdapter_FwCanBo;
         T.get(dataSource.url, { params: dataSource.data({ term: inputSearch }) })
-        .then(response => dataSource.processResults(response))
-        .then(({ results }) => setUserData(results)).catch(error => { T.alert('Lỗi', 'Không lấy được danh sách người dùng'); console.error(error) });
+            .then(response => dataSource.processResults(response))
+            .then(({ results }) => setUserData(results)).catch(error => { T.alert('Lỗi', 'Không lấy được danh sách người dùng'); console.error(error) });
     }, [inputSearch])
 
+    const checkExistKey = async () => {
+        const result = await RNFS.exists(RNFS.DocumentDirectoryPath + `/keystore.p12`);
+        return result;
+    }
+
     useEffect(() => {
-        const checkExistKey = async () => {
-            const result = await RNFS.exists(RNFS.DocumentDirectoryPath + `/${user.shcc}.p12`);
-            return result;
-        }
-        checkExistKey()
-        .then(res => {
-            setIsExisKey(res)
-        });
+        checkExistKey().then(res => setIsExisKey(res));
     }, [isFocused])
 
     useEffect(() => {
@@ -69,7 +66,7 @@ const User = () => {
     }, [])
 
     const renderItem = ({ item }) => {
-        return <TouchableOpacity onPress={() => onSwitchUser(item)}><List.Item title={item.text}/></TouchableOpacity>
+        return <TouchableOpacity onPress={() => onSwitchUser(item)}><List.Item title={item.text} /></TouchableOpacity>
     }
 
     return (
@@ -78,17 +75,17 @@ const User = () => {
                 <Card style={commonStyles.m5} elevation={4}>
                     <List.Item title={'Họ và tên'} right={() => <Text style={commonStyles.alignSelfCenter} variant='bodyMedium'>{`${user?.lastName || ''} ${user?.firstName || ''}`.trim().normalizedName()}</Text>} />
                     <List.Item title={'Email'} right={() => <Text style={commonStyles.alignSelfCenter} variant='bodyMedium'>{user?.email}</Text>} />
-                    <List.Item title={'Chữ ký'} right={() => 
+                    <List.Item title={'Chữ ký'} right={() =>
                         <>
-                        <Text style={{...commonStyles.alignSelfCenter, color: chuKy ? 'green' : 'red', fontWeight: 'bold'}} variant='bodyMedium'>
-                            {chuKy ? 'Đã tạo' :  'Chưa tạo'}
-                        </Text>
-                        { chuKy ? <Ionicons name="checkmark-circle-outline" color={'green'} size={25} style={{ marginTop: 5, marginLeft: 10}}/> : <Ionicons name="close-circle-outline" color={'red'} size={25} />}
+                            <Text style={{ ...commonStyles.alignSelfCenter, color: isExistKey ? 'green' : 'red', fontWeight: 'bold' }} variant='bodyMedium'>
+                                {isExistKey ? 'Đã cài đặt' : 'Chưa cài đặt'}
+                            </Text>
+                            {isExistKey ? <Ionicons name="checkmark-circle-outline" color={'green'} size={25} style={{ marginTop: 5, marginLeft: 10 }} /> : <Ionicons name="close-circle-outline" color={'red'} size={25} />}
                         </>
                     } />
                     <View style={styles.buttonView}>
                         <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={() => navigation.push('ScanQRCode', { navigation })}>
-                            <Text style={{ ...styles.buttonText, color: colors.background}} >
+                            <Text style={{ ...styles.buttonText, color: colors.background }} >
                                 {
                                     isExistKey ? 'Cập nhật khoá' : 'Tạo khoá'
                                 }
@@ -96,39 +93,39 @@ const User = () => {
                         </TouchableOpacity>
                     </View>
 
-                    { T.debug && 
+                    {T.isDebug &&
                         <View style={styles.buttonView}>
                             <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={() => setShowUserModal(true)} disabled={disableLogout}>
-                                <Text style={{ ...styles.buttonText, color: colors.background}} >Switch user</Text>
+                                <Text style={{ ...styles.buttonText, color: colors.background }} >Switch user</Text>
                             </TouchableOpacity>
                         </View>
                     }
-                    
+
                     <View style={styles.buttonView}>
                         <TouchableOpacity style={{ ...styles.signIn, backgroundColor: colors.primary }} onPress={onSignOut} disabled={disableLogout}>
-                            <Text style={{ ...styles.buttonText, color: colors.background}} >Đăng xuất</Text>
+                            <Text style={{ ...styles.buttonText, color: colors.background }} >Đăng xuất</Text>
                         </TouchableOpacity>
                     </View>
 
-                    
+
                 </Card>
             </ScrollView>
             <Dialog visible={isShowUserModal} onDismiss={onHideModal}>
-                        <Dialog.Title>Chọn user</Dialog.Title>
-                        <Dialog.Content>
-                            <TextInput theme={{ roundness: 20 }} mode='outlined' placeholder='Tìm kiếm' value={inputSearch} onChangeText={value => setInputSearch(value)} />
-                        </Dialog.Content>
-                        <Dialog.ScrollArea style={{ maxHeight: '70%' }}>
-                            <FlatList
-                                data={userData}
-                                renderItem={renderItem}
-                                keyExtractor={item => item.id}
-                            />
-                        </Dialog.ScrollArea>
-                        <Dialog.Actions>
-                            {null}
-                        </Dialog.Actions>
-                </Dialog>
+                <Dialog.Title>Chọn user</Dialog.Title>
+                <Dialog.Content>
+                    <TextInput theme={{ roundness: 20 }} mode='outlined' placeholder='Tìm kiếm' value={inputSearch} onChangeText={value => setInputSearch(value)} />
+                </Dialog.Content>
+                <Dialog.ScrollArea style={{ maxHeight: '70%' }}>
+                    <FlatList
+                        data={userData}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.id}
+                    />
+                </Dialog.ScrollArea>
+                <Dialog.Actions>
+                    {null}
+                </Dialog.Actions>
+            </Dialog>
         </>
     );
 }

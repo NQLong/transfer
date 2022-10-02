@@ -56,10 +56,10 @@ export const Comment = ({ image, name, timestamp, content, style = {} }) => {
     </View>
 }
 
-export const FormTextBox = ({ placeholder, onChangeText, value, icon, style }) => {
+export const FormTextBox = ({ placeholder, onChangeText, value, icon, style, type, autoCapitalize = 'none' }) => {
     return (<View style={{ ...styles.formInput, ...style }}>
         {icon ? icon : null}
-        <TextInput placeholder={placeholder} placeholderTextColor='#999999' style={styles.textInput} autoCapitalize='none' value={value} onChangeText={onChangeText} />
+        <TextInput secureTextEntry={type === 'password' ? true : false} placeholder={placeholder} placeholderTextColor='#999999' style={styles.textInput} autoCapitalize={autoCapitalize} value={value} onChangeText={onChangeText} />
     </View>);
 };
 export const FormPasswordTextBox = ({ placeholder, onChangeText, value, icon, style }) => {
@@ -117,6 +117,7 @@ export class AdminModal extends React.Component {
 
     hide = () => {
         this.setState({ visible: false });
+        this.onHide && this.onHide();
     }
 
     show = (item = null) => {

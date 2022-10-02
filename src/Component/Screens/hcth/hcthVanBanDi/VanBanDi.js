@@ -378,7 +378,6 @@ const VanBanDi = (props) => {
     const dispatch = useDispatch();
     const item = useSelector(state => state?.hcthVanBanDi?.item);
 
-    console.log('item :', item?.trangThai);
 
     const files = item?.files || [];
 
@@ -446,7 +445,6 @@ const VanBanDi = (props) => {
     const menuItems = [];
 
     // enabledSignBtn && menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
-    console.log(item?.files?.find(file => file.config.map(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
     if (item?.files?.some(file => file.config.some(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
         menuItems.push(<Menu.Item key={item.trangThai} onPress={onSignVanBanDi} title={vanBanDi.trangThai[item.trangThai].text} />);
 

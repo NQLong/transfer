@@ -35,53 +35,62 @@ const CongVanTrinhKySign = ({ navigation, route }) => {
                 name = cert.cert.subject.getField({ shortName: 'CN' })?.value || '';
                 location = cert.cert.subject.getField({ shortName: 'L' })?.value || '';
             } catch (error) {
+                console.error(error);
+                setSubmitting(false);
                 return T.alert('Lỗi xác thực', 'Mật khẩu chữ ký không chính xác');
             }
             const signTypeItem = vanBanDi.signType[config.signType];
             const data = { x: config.xCoordinate, y: config.yCoordinate, id: file.id, name, location, reason: signTypeItem.text, page: config.pageNumber, signatureLevel: signTypeItem.level, signType: signTypeItem.id, format: 'base64' };
 
             dispatch(getChuKyDienTuVanBanDi(data, async (res) => {
-                const signPdf = new SignPDF(Buffer.from(res.data, 'base64'), Buffer.from(key, 'base64'));
-                const { pdf: pdfBuffer } = await signPdf.signPDF(passphrase);
+                try {
+                    const signPdf = new SignPDF(Buffer.from(res.data, 'base64'), Buffer.from(key, 'base64'));
+                    const { pdf: pdfBuffer } = await signPdf.signPDF(passphrase);
 
-                var path = fs.DocumentDirectoryPath + '/res.pdf';
-                const uploadUrl = T.config.API_URL + 'user/upload';
+                    var path = fs.DocumentDirectoryPath + '/res.pdf';
+                    const uploadUrl = T.config.API_URL + 'user/upload';
 
-                fs.writeFile(path, pdfBuffer.toString('base64'), 'base64').then(() => {
+                    await fs.writeFile(path, pdfBuffer.toString('base64'), 'base64');
                     const originFileName = file.file.ten;
-                    let files = [{ name: 'file', filename: originFileName, filepath: path, filetype: 'application/pdf' },];
-                    let upload = (response) => { };
-                    let uploadProgress = (response) => { console.log(response); };
-                    fs.uploadFiles({
-                        toUrl: uploadUrl, files: files, method: 'POST',
-                        headers: { Accept: 'application/pdf', },
-                        fields: { userData: `hcthKyDienTu`, data: JSON.stringify({ id: file.id, configId: config.id, signType: config.signType }), },
-                        begin: upload,
-                        progress: uploadProgress,
-                    }).promise.then((response) => {
-                        if (response.statusCode == 200) {
-                            const body = response.body && JSON.parse(response.body);
-                            if (body.error)
-                                T.alert('Lỗi');
-                            T.alert('Thông báo', 'Chữ kí hợp lệ. Tải lên thành công !!');
-                            const remain = files.slice(1);
-                            if (remain.length)
-                                navigation.navigate('PositionPicker', { files: remain, item });
-                            else
-                                navigation.navigate('vanBanDiPage', {});
-                        } else {
-                            T.alert('Lỗi');
-                        }
-                    }).catch((err) => {
-                        T.alert('Lỗi', 'Kí văn bản lỗi!');
-                        setSubmitting(false);
-                    });
-                });
+                    const fileConfig = {
+                        uri: `file://${path}`,
+                        name: originFileName,
+                        type: 'application/pdf',
+                    };
+                    const formData = new FormData();
+                    formData.append('file', fileConfig);
+                    formData.append('userData', 'hcthKyDienTu');
+                    formData.append('data', JSON.stringify({ id: file.id, configId: config.id, signType: config.signType }));
 
+                    const response = await T.post('/user/upload', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+                    if (response.error) {
+                        throw response.error;
+                    } else {
+                        T.alert('Thông báo', 'Chữ kí hợp lệ. Tải lên thành công !!');
+                        const remain = files.slice(1);
+                        if (remain.length) {
+                            navigation.navigate('PositionPicker', { files: remain, item });
+                        }
+                        else {
+                            navigation.navigate('vanBanDiPage', {});
+                        }
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    T.alert('Lỗi', 'Kí văn bản lỗi!');
+                    setSubmitting(false);
+                };
             }));
-        }
-        catch (error) {
+
+        } catch (error) {
+            setSubmitting(false);
             console.error(error);
+            T.alert('Lỗi', 'Kí văn bản lỗi!');
         }
     }
 

@@ -32,7 +32,6 @@ const PositionPick = ({ navigation, route }) => {
         const file = files[0];
         const url = `/api/hcth/van-ban-di/file/${file.id}?format=base64`;
         const config = file.config.find(configItem => configItem.signType == item.trangThai);
-        console.log(config);
         const signTypeItem = vanBanDi.signType[config.signType]
         setSignTypeItem(signTypeItem);
         let pdfData;
@@ -74,7 +73,6 @@ const PositionPick = ({ navigation, route }) => {
             borderColor: rgb(1, 0, 0)
         })
         setSourcePdf(Buffer.from(await pdfDoc.save()).toString('base64'));
-        console.log({config})
         setConfig({ ...config, xCoordinate: x, yCoordinate: y, pageNumber })
     }
 
