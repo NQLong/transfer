@@ -74,6 +74,7 @@ const ScanScreen = ({ navigation }) => {
 			const p12Der = forge.util.decode64(key), p12Asn1 = forge.asn1.fromDer(p12Der), p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, passphrase), bags = p12.getBags({ bagType: forge.pki.oids.certBag }), cert = bags[forge.pki.oids.certBag][0];
 			name = cert.cert.subject.getField({ shortName: 'CN' })?.value || '';
 			location = cert.cert.subject.getField({ shortName: 'L' })?.value || '';
+			console.info({ name, location });
 			modal.current.hide();
 			const path = RNFS.DocumentDirectoryPath + '/keystore.p12';
 			await RNFS.writeFile(path, key, 'base64');
