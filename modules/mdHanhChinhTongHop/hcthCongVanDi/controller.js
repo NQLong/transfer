@@ -1080,7 +1080,9 @@ module.exports = app => {
         app.permission.has(req, () => hcthKyDienTu(req, fields, files, params, done), done, 'staff:login'));
 
     const hcthKyDienTu = async (req, fields, files, params, done) => {
+
         try {
+            console.log({ field: fields.userData });
             if (fields.userData && fields.userData[0] && fields.userData[0] == 'hcthKyDienTu' && files.file && files.file.length > 0) {
                 const
                     file = files.file[0],
@@ -1129,6 +1131,7 @@ module.exports = app => {
 
                 //     done && done({ error: null, item });
                 // }
+                console.log('hello')
                 done({});
             }
         } catch (error) {
