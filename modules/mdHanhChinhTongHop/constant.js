@@ -156,7 +156,7 @@ module.exports = {
             KY_THE_THUC: { id: 'KY_THE_THUC', text: 'Ký nháy thể thức', level: 3, color: 'blue', height: 50, width: 50 },
             /**NOTE: for van ban noi bo, ky phat hanh has level 1 but if its require red stamp then level would still be 2 */
             KY_PHAT_HANH: { id: 'KY_PHAT_HANH', text: 'Ký phát hành', level: 2, color: 'green', height: 75, width: 75 },
-            SO_VAN_BAN: { id: 'SO_VAN_BAN', text: 'Số văn bản', color: 'blue' },
+            SO_VAN_BAN: { id: 'SO_VAN_BAN', text: 'Số văn bản', color: 'blue', width: 200 },
             DONG_DAU: { id: 'DONG_DAU', text: 'Đóng dấu mộc đỏ', level: 1, color: 'red', height: 100, width: 100 },
             KY_PHU_LUC: { id: 'KY_PHU_LUC', text: 'Ký phụ lục', level: 1, color: 'blue', phuLuc: 1 },
         }

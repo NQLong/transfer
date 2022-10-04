@@ -35,7 +35,7 @@ export default class VanBanDiFileV2 extends React.Component {
                                 <button className='btn btn-outline-info' onClick={(e) => e.preventDefault() || e.stopPropagation() || this.configModal.show(item)}><i className='fa fa-lg fa-sliders' /></button>
                             </Tooltip>
                             <Tooltip title='Tải xuống' arrow>
-                                <a className='btn btn-info' href={`/api/hcth/van-ban-di/file/${item.id}`} download title='Tải về'>
+                                <a className='btn btn-info' href={`/api/hcth/van-ban-di/file/${item.id}`} download>
                                     <i className='fa fa-lg fa-download' />
                                 </a>
                             </Tooltip>

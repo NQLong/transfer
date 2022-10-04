@@ -165,6 +165,11 @@ module.exports = (env, argv) => ({
                     options: { limit: 10000 },
                 },
             },
+            {
+                test: /\.js$/,
+                enforce: 'pre',
+                use: ['source-map-loader'],
+            },
         ]
     },
     devServer: {

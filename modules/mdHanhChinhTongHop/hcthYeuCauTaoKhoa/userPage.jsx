@@ -37,7 +37,9 @@ class CreateModal extends AdminModal {
 class DownloadModal extends AdminModal {
 
     onShow = () => {
+        this.setState({ isLoading: false });
         this.passphrase.value('');
+        this.confirmPassphrase.value('');
     }
 
     onSubmit = () => {
@@ -50,8 +52,13 @@ class DownloadModal extends AdminModal {
         } else if (data.passphrase.length < 8) {
             T.notify('Mật khẩu phải có ít nhất 8 ký tự', 'danger');
             this.passphrase.focus();
+        } else if (this.confirmPassphrase.value() != data.passphrase) {
+            T.notify('Mật khẩu xác thực không khớp', 'danger');
+            this.confirmPassphrase.focus();
         } else {
-            this.props.download(data, () => this.hide());
+            this.setState({ isLoading: true }, () => {
+                this.props.download(data, () => this.hide());
+            });
         }
     }
 
@@ -59,11 +66,13 @@ class DownloadModal extends AdminModal {
         return this.renderModal({
             title: 'Tạo yêu cầu mới',
             size: 'large',
+            isLoading: this.state.isLoading,
             body: <div className='row'>
                 <div className='col-md-12 form-group' style={{ color: 'red', padding: 20 }}>
                     *Lưu ý: Mật khẩu này không thể thay đổi đối với mỗi chữ ký và sẽ được yêu cầu mỗi khi cài đặt chữ ký trên thiết bị
                 </div>
                 <FormTextBox className='col-md-12' ref={e => this.passphrase = e} label='Mật khẩu' type='password' />
+                <FormTextBox className='col-md-12' ref={e => this.confirmPassphrase = e} label='Xác thực mật khẩu' type='password' />
             </div>
         });
     }
@@ -206,7 +215,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
                     <div className='tile-body col-md-12'>
                         {this.renderSignatureTable({})}
                     </div>
-                </div> 
+                </div>
                 <div className='tile row'>
                     <h3 className='tile-header'>Lịch sử yêu cầu tạo chữ ký</h3>
                     <div className='tile-body col-md-12'>
@@ -217,7 +226,7 @@ export class UserYeuCauTaoKhoa extends AdminPage {
                 <DownloadModal ref={e => this.downloadModal = e} download={(data, done) => this.onDownloadKey(data, done)} />
                 <DrawSignatureModal ref={e => this.drawSignatureModal = e} {...this.props} shcc={this.props?.system?.user?.shcc} />
             </>,
-            onCreate: permissions.some(item => ['rectors:login', 'persident:login', 'manager:write'].includes(item)) ? () => this.modal.show() : null,
+            onCreate: permissions.some(item => ['rectors:login', 'persident:login', 'manager:write', 'hcthMocDo:write'].includes(item)) ? () => this.modal.show() : null,
             buttons
         });
     }

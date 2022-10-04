@@ -18,7 +18,7 @@ class MainPage extends AdminPage {
             { title: 'Văn bản đến', backgroundColor: '#00aa00', link: '/user/van-ban-den', icon: 'fa-caret-square-o-left' },
             { title: 'Văn bản đi', backgroundColor: '#0B86AA', link: '/user/van-ban-di', icon: 'fa-caret-square-o-right' },
             { title: 'Văn bản trình ký', link: '/user/cong-van-trinh-ky', icon: 'fa-pencil-square-o', backgroundColor: '#832391' },
-            permissions.some(item => ['manager:write', 'rectors:login'].includes(item)) && { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#DB2C2C' },
+            permissions.some(item => ['manager:write', 'rectors:login', 'hcthMocDo:write'].includes(item)) && { title: 'Chữ ký', link: '/user/yeu-cau-tao-khoa', icon: 'fa-key', backgroundColor: '#DB2C2C' },
             { title: 'Nhiệm vụ', link: '/user/nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#DE602F' },
             // { title: 'Quản lý số văn bản', link: '/user/dang-ky-so', icon: 'fa-sign-in', backgroundColor: '#b52b79' },
             { title: 'Hồ sơ', link: '/user/ho-so', icon: 'fa-file-text', backgroundColor: '#0B86AA' },

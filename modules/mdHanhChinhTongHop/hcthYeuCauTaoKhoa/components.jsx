@@ -19,6 +19,7 @@ export class DrawSignatureModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const { shcc } = this.props.system.user;
+        console.log(this.state);
         this.props.createSignatureImg(shcc, this.state.sigUrl, () => this.hide());
     }
 

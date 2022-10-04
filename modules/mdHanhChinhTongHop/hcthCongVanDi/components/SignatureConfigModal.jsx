@@ -81,6 +81,8 @@ export default class SignatureConfigModal extends AdminModal {
                 }
                 else if (item.id == vanBanDi.signType.SO_VAN_BAN.id) {
                     const current = this.state.config.find(config => config.signType == item.id);
+                    console.log({ current });
+                    console.log(this.state.config);
                     const newObject = {
                         ...current,
                         fontName: this.allRef.fontName.value(),
@@ -103,6 +105,7 @@ export default class SignatureConfigModal extends AdminModal {
     onChangePosition = (data, signType) => {
         const config = [...this.state.config];
         let current = config.find(item => item.signType == signType);
+        console.log({ current });
         const index = config.indexOf(current);
         current = { ...current, ...data };
         config.splice(index, 1, current);
@@ -132,16 +135,19 @@ export default class SignatureConfigModal extends AdminModal {
                     </React.Fragment>;
                 }
                 else if (item.id == signType.SO_VAN_BAN.id) {
-                    const { height = 50, width = 50, text } = item;
+                    let { height = 50, width = 50, text } = item;
                     const { xCoordinate, yCoordinate, pageNumber } = this.state.config?.find(config => config.signType == item.id) || {};
-
                     return <React.Fragment key={index}>
                         <li className='col-md-12 font-weight-bold'>{text}</li>
                         <div className='col-md-12 d-flex align-items-center justify-content-center' style={{ gap: 10, marginBottom: 15 }}>
                             <FormSelect ref={e => this.allRef.fontName = e} placeholder='Kiểu font' data={Object.values(font).reverse()} style={{ flex: 1, margin: 'auto' }} />
-                            <FormSelect ref={e => this.allRef.fontSize = e} placeholder='Kích thuớc font' data={fontSizeArray()} style={{ flex: 1, margin: 'auto' }} />
+                            <FormSelect ref={e => this.allRef.fontSize = e} placeholder='Kích thuớc font' data={fontSizeArray()} type='number' style={{ flex: 1, margin: 'auto' }} />
                             <Tooltip title='Vị trí chữ ký' arrow>
-                                <button className='btn btn-secondary' onClick={(e) => e.preventDefault() || this.props.pdfModal.show({ id: this.state.id, xCoordinate, yCoordinate, height, width, pageNumber, submit: (data) => this.onChangePosition(data, index) })}>
+                                <button className='btn btn-secondary' onClick={(e) => {
+                                    e.preventDefault();
+                                    const fontSize = parseInt(this.allRef.fontSize?.value());
+                                    this.props.pdfModal.show({ id: this.state.id, xCoordinate, yCoordinate, height: fontSize ? fontSize + 10 : height, width, pageNumber, submit: (data) => this.onChangePosition(data, item.id) })
+                                }}>
                                     <i className='fa fa-lg fa-crosshairs' />
                                 </button>
                             </Tooltip>

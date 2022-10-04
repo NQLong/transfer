@@ -252,7 +252,7 @@ module.exports = app => {
     app.get('/api/hcth/van-ban-di/file/:id', app.permission.orCheck('staff:login', 'developer:login'), async (req, res) => {
         try {
             const { id } = req.params;
-            const { format, version } = req.query;
+            const { format, version, mode } = req.query;
             const instance = await app.model.hcthVanBanDiFile.get({ id });
             let condition = {
                 id: instance.fileId,
@@ -263,8 +263,34 @@ module.exports = app => {
                 condition.id = version;
             const file = await app.model.hcthFile.get({ id: instance.fileId });
             if (!instance || !file) return res.status(404).send({ error: 'Tệp tin không tồn tại' });
+            let path = app.path.join(app.assetPath, `congVanDi/${instance.vanBanDi}`, file.tenFile);
 
-            const buffer = app.fs.readFileSync(app.path.join(app.assetPath, `congVanDi/${instance.vanBanDi}`, file.tenFile), 'base64');
+            if (mode == 'sign') {
+                const config = await app.model.hcthSigningConfig.getList(instance.id);
+                console.log({ config });
+                const soVanBan = config.rows.find(item => item.signType == vanBanDi.signType.SO_VAN_BAN.id);
+                console.log(soVanBan);
+                if (soVanBan && soVanBan.fontName && soVanBan.fontSize && soVanBan.status != 'added') {
+                    // prepare session folder for signing -> this would be deleted -> TODO: schedule delete these folder
+                    const sessionFolder = app.path.join(app.assetPath, 'pdf', 'cache', new Date().getTime().toString());
+                    app.fs.createFolder(sessionFolder);
+                    const output = app.path.join(sessionFolder, file.tenFile);
+                    const result = await app.pdf.addSoVanBanForm({
+                        input: path, output, ttfPath: app.path.join(app.assetPath, 'pdf', 'fonts', 'times.ttf'),
+                        // x: soVanBan.xCoordinate, y: soVanBan.yCoordinate, 
+                        x:0, y:0,
+                        width: vanBanDi.signType.SO_VAN_BAN.width,
+                        fontSize: soVanBan.fontSize,
+                    });
+                    console.log(result);
+                    if (result.status != 0) {
+                        console.error(result.stderr);
+                        throw 'Lỗi hệ thống';
+                    }
+                    path = output;
+                }
+            }
+            const buffer = app.fs.readFileSync(path, 'base64');
             if (!format) {
                 res.writeHead(200, [['Content-Type', 'application/pdf'], ['Content-Disposition', 'attachment;filename=' + `${file.ten}`]]);
                 return res.end(Buffer.from(buffer, 'base64'));
@@ -1161,5 +1187,29 @@ module.exports = app => {
             await app.model.hcthCongVanDi.update({ id: instance.id }, { trangThai: nextState });
         }
     };
+
+
+    // Phân quyền soạn thảo văn bản đi trong đơn vị
+    const dongDau = 'hcthMocDo', dongDauPermission = 'hcthMocDo:write';
+
+    app.assignRoleHooks.addRoles(dongDau, { id: dongDauPermission, text: 'Hành chính tổng hợp: Quản lý mộc đỏ' });
+
+    app.assignRoleHooks.addHook(dongDau, async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole === dongDau && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get(dongDau).map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('assignRole', 'checkRoleMocDo', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == dongDau);
+        inScopeRoles.forEach(role => {
+            if (role.tenRole === dongDauPermission) {
+                app.permissionHooks.pushUserPermission(user, dongDauPermission);
+            }
+        });
+        resolve();
+    }));
 
 };

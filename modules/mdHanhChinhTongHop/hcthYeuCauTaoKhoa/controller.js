@@ -22,7 +22,7 @@ module.exports = app => {
     // app.permission.add({ name: 'manager:write', menu: menu });
     // app.permission.add({ name: 'rectors:login', menu: menu });
     app.get('/user/hcth/yeu-cau-tao-khoa', app.permission.check('hcthYeuCauTaoKhoa:read'), app.templates.admin);
-    app.get('/user/yeu-cau-tao-khoa', app.permission.orCheck('rectors:login', 'manager:login'), app.templates.admin);
+    app.get('/user/yeu-cau-tao-khoa', app.permission.orCheck('rectors:login', 'manager:login', 'hcthMocDo:write'), app.templates.admin);
 
     app.get('/api/hcth/yeu-cau-tao-khoa/user/page/:pageNumber/:pageSize', app.permission.check('staff:login'), async (req, res) => {
         try {
@@ -42,7 +42,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/khoa/user', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+    app.get('/api/hcth/khoa/user', app.permission.orCheck('rectors:login', 'manager:write', 'hcthMocDo:write'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc;
             const khoa = await app.model.hcthUserPublicKey.get({ shcc, kichHoat: 1 });
@@ -58,7 +58,7 @@ module.exports = app => {
     });
 
 
-    const genKey = async (id, shcc, passphrase) => {
+    const genKey = async (id, shcc, passphrase, req) => {
         // const fs = require('fs');
         const setting = await app.model.hcthSetting.getValue('rootPassphrase');
         const privateKey = app.fs.readFileSync(app.path.join(app.assetPath, 'ca/hcmussh.key'), 'utf-8');
@@ -114,25 +114,48 @@ module.exports = app => {
         const donVi = await app.model.dmDonVi.get({ ma: canBo?.maDonVi }, 'ten');
 
         // Define the attributes/properties for the Host Certificate
-        const attributes = [{
-            shortName: 'C',
-            value: 'VN'
-        }, {
-            shortName: 'ST',
-            value: 'Hồ Chí Minh'
-        }, {
-            shortName: 'L',
-            value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
-        }, {
-            shortName: 'CN',
-            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName()
-        }, {
-            shortName: 'O',
-            value: `${donVi?.ten || ''}`.trim()
-        }, {
-            shortName: 'OU',
-            value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `-${shcc}`
-        }];
+        let attributes;
+        if (!req.session.user.permissions.includes('hcthMocDo:write')) {
+            attributes = [{
+                shortName: 'C',
+                value: 'VN'
+            }, {
+                shortName: 'ST',
+                value: 'Hồ Chí Minh'
+            }, {
+                shortName: 'L',
+                value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
+            }, {
+                shortName: 'CN',
+                value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName()
+            }, {
+                shortName: 'O',
+                value: `${donVi?.ten || ''}`.trim()
+            }, {
+                shortName: 'OU',
+                value: `${chucVu?.ten || ''}`.trim() + ' ' + `${canBo?.ho || ''} ${canBo?.ten || ''}`.trim().normalizedName() + `-${shcc}-${id}`
+            }];
+        } else {
+            attributes = [{
+                shortName: 'C',
+                value: 'VN'
+            }, {
+                shortName: 'ST',
+                value: 'Hồ Chí Minh'
+            }, {
+                shortName: 'L',
+                value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
+            }, {
+                shortName: 'CN',
+                value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
+            }, {
+                shortName: 'O',
+                value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH'
+            }, {
+                shortName: 'OU',
+                value: 'ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH-' + id
+            }];
+        }
 
         attributes.forEach(attribute => attribute.value = app.toEngWord(attribute.value));
         const extensions = [{
@@ -184,7 +207,7 @@ module.exports = app => {
         return { p12b64, publicKey: forge.pki.publicKeyToPem(hostKeys.publicKey) };
     };
 
-    app.post('/api/hcth/khoa/user/download', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+    app.post('/api/hcth/khoa/user/download', app.permission.orCheck('rectors:login', 'manager:write', 'hcthMocDo:write'), async (req, res) => {
         try {
             const { passphrase } = req.body;
             const shcc = req.session.user.shcc,
@@ -192,7 +215,7 @@ module.exports = app => {
             const khoa = await app.model.hcthUserPublicKey.get({ shcc, kichHoat: 1 });
             if (!khoa) throw 'Không tìm thấy khóa người dùng';
             if (khoa.publicKey) throw 'Khóa đã được gửi đến người dùng';
-            const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase);
+            const { p12b64, publicKey } = await genKey(khoa.id, shcc, passphrase, req);
             const setting = await app.model.hcthSetting.getValue('email', 'emailPassword', 'debugEmail');
             const qrCode_1 = await qrCode.toDataURL(p12b64.substring(0, Math.floor(p12b64.length / 2)), { version: 33, errorCorrectionLevel: 'L', });
 
@@ -234,7 +257,7 @@ module.exports = app => {
     });
 
 
-    app.post('/api/hcth/yeu-cau-tao-khoa', app.permission.orCheck('manager:write', 'rectors:login'), async (req, res) => {
+    app.post('/api/hcth/yeu-cau-tao-khoa', app.permission.orCheck('manager:write', 'rectors:login', 'hcthMocDo:write'), async (req, res) => {
         try {
             const data = req.body;
             const shcc = req.session.user.shcc;
@@ -302,6 +325,7 @@ module.exports = app => {
             res.send({ item, error: null });
 
         } catch (error) {
+            console.error(error);
             res.send({ error });
         }
     });
@@ -323,13 +347,14 @@ module.exports = app => {
                 done && done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.fs.deleteFile(srcPath);
             } else {
-                const content = app.fs.readFileSync(files.hcthSignatureFile[0].path);
-                done && done({ item: { ...files.hcthSignatureFile[0], content: content.toString('base64') } });
+                const content = app.fs.readFileSync(files.hcthSignatureFile[0].path, 'base64');
+                console.log({ content });
+                done && done({ item: { ...files.hcthSignatureFile[0], content } });
             }
         }
     };
 
-    app.get('/api/hcth/chu-ky', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+    app.get('/api/hcth/chu-ky', app.permission.orCheck('rectors:login', 'manager:write', 'hcthMocDo:write'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc;
             const signature = await app.model.hcthChuKy.get({ shcc });
@@ -343,7 +368,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write'), async (req, res) => {
+    app.get('/api/hcth/chu-ky/download', app.permission.orCheck('rectors:login', 'manager:write', 'hcthMocDo:write'), async (req, res) => {
         try {
             const shcc = req.session.user.shcc;
             const path = app.path.join(app.assetPath, `/key/${shcc}.png`);
