@@ -9,6 +9,7 @@ module.exports = app => {
         run: (req, fields, files, params, sendResponse) => {
             const list = req.session.user ? uploadHooksList : uploadHooksNoUserList,
                 hookNames = Object.keys(list);
+            console.log({ user: req.session });
             hookNames.forEach(hookName => list[hookName] && list[hookName](req, fields, files, params, data => {
                 data && sendResponse(data);
             }));
