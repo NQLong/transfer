@@ -308,7 +308,7 @@ const FileList = ({ navigation }) => {
             const items = listFile.map((item, key) => {
                 const linkFile = `${T.config.API_URL}api/hcth/van-ban-di/file/${item.id}`, style = {};
                 if (key == 0) style.borderTopWidth = 0;
-                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile, cache: true } })}><Text variant="bodyMedium">{item.file.ten}</Text></TouchableOpacity>} />
+                return <List.Item key={key} left={() => null} title={() => <TouchableOpacity onPress={() => navigation.push('ReadFile', { item, source: { uri: linkFile } })}><Text variant="bodyMedium">{item.file.ten}</Text></TouchableOpacity>} />
             });
             return items;
         };
@@ -406,8 +406,7 @@ const VanBanDi = (props) => {
         try {
 
             //prepare file list
-            const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => cfg.shcc === userInfo.shcc && !cfg.signAt && cfg.signType == item.trangThai));
-            const congVanId = item.id;
+            const listSignFile = files.filter(file => file.config.length > 0 && file.config.some(cfg => ((item.trangThai == vanBanDi.signType.DONG_DAU.id && userInfo.permissions.includes('hcthMocDo:write')) || cfg.shcc === userInfo.shcc) && !cfg.signAt && cfg.signType == item.trangThai));
             const keyDir = RNFS.DocumentDirectoryPath + `/keystore.p12`;
             let key;
             try {
@@ -443,9 +442,15 @@ const VanBanDi = (props) => {
     const openMenu = () => setIsMenuVisible(true);
     const closeMenu = () => setIsMenuVisible(false);
     const menuItems = [];
-
+    console.log(item?.files?.some(file => file.config.some(config => !config.signAt && (item.trangThai == vanBanDi.trangThai.DONG_DAU.id || config.shcc == userInfo.shcc) &&
+        (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')) &&
+        (item.trangThai != vanBanDi.trangThai.DONG_DAU.id || userInfo.permissions.includes('hcthMocDo:write')))));
     // enabledSignBtn && menuItems.push(<Menu.Item key='ky' onPress={onSignVanVanDi} title="Ký văn bản" />);
-    if (item?.files?.some(file => file.config.some(config => config.signType == item.trangThai && !config.signAt && config.shcc == userInfo.shcc && (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')))))
+    if (item?.files?.some(file => file.config.some(config => config.signType == item.trangThai &&
+        !config.signAt && (item.trangThai == vanBanDi.trangThai.DONG_DAU.id || config.shcc == userInfo.shcc) &&
+        (item.trangThai != vanBanDi.trangThai.KY_PHAT_HANH.id || userInfo.permissions.includes('rectors:login')) &&
+        (item.trangThai != vanBanDi.trangThai.DONG_DAU.id || userInfo.permissions.includes('hcthMocDo:write'))))
+    )
         menuItems.push(<Menu.Item key={item.trangThai} onPress={onSignVanBanDi} title={vanBanDi.trangThai[item.trangThai].text} />);
 
 

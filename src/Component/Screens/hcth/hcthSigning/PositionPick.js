@@ -30,7 +30,7 @@ const PositionPick = ({ navigation, route }) => {
 
     const init = async () => {
         const file = files[0];
-        const url = `/api/hcth/van-ban-di/file/${file.id}?format=base64`;
+        const url = `/api/hcth/van-ban-di/file/${file.id}?format=base64&mode=sign`;
         const config = file.config.find(configItem => configItem.signType == item.trangThai);
         const signTypeItem = vanBanDi.signType[config.signType]
         setSignTypeItem(signTypeItem);
@@ -69,7 +69,7 @@ const PositionPick = ({ navigation, route }) => {
         page.drawImage(pngImage, {
             x: Math.round(x - 25 / 2),
             y: Math.round(pageHeight - 25 / 2 - y),
-            height: 25, width: 25,
+            height: signTypeItem.height, width: signTypeItem.width,
             borderColor: rgb(1, 0, 0)
         })
         setSourcePdf(Buffer.from(await pdfDoc.save()).toString('base64'));
